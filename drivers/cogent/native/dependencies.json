@@ -826,6 +826,17 @@
               "sha256": "1c4f627d7136a7ce5e9575ec10da7b5314756a77a52ebd3d0ade3cf569786e44"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/popupinspection",
+          "inputs": "native/patches/popupinspection/original-hashes.json",
+          "outputs": "native/patches/popupinspection/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/popupinspection/0083-bounded-popup-inspection.patch",
+              "sha256": "b14c4999d2c59cd4e512bea9f2c0e121fb874f99053e864fb9a9b6676449bcec"
+            }
+          ]
         }
       ]
     },

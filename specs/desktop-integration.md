@@ -53,3 +53,28 @@ endurance. Tracked cleanup and process exit do not establish Cocoa deallocation.
 
 See [usage](../docs/desktop-integration.md) and the
 [Mac delivery plan](macos-delivery.md) for actual qualification status.
+
+## Actual popup inspection
+
+`DesktopSnapshot.Popups` describes actual completed current popup scenes in the
+active main stage, separately from persistent semantic option nodes. Only the
+top event-accepting popup's visible enabled direct standard buttons are targeted.
+Bounds are scene-pixel rectangles clipped to the popup/window; the popup origin
+is applied exactly once. Returned labels own their admitted bytes.
+
+Popup/item IDs include the completed frame and actual scene/button incarnation.
+A closed/reopened or replaced popup cannot reuse authority even if the frame
+number is unchanged. Targeted keys still require current actual focus. Popup
+inspection shares the 8192 semantic-record/8MiB output budget with generated
+identifiers and fixed records charged; at most 64 popup stages are visited.
+Pending/unshown/dirty geometry and exhausted budgets refuse without partial data.
+No historical widget registry is retained. Custom/nested menus retain existing
+inspectors. Ordinary apps do not run this inspector; unrelated Custom events
+retain normal modal routing.
+
+## Owner wakes under popup modality
+
+Exact originating owner wakes bypass popup modality even without DesktopSession,
+so posted application work continues while a menu is open. Only the exact driver
+wake and this window's session requests are intercepted; unrelated Custom events
+retain ordinary popup routing. Launched/unlaunched teardown clears the hook.

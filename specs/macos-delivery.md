@@ -31,7 +31,20 @@ share the render owner, stale callbacks lose authority and successful expiry
 requests a repaint. Owned software race checks and reproducible preparation are
 separate from native/physical acceptance. The broad upstream diagnostic failure
 and restored SDK test-image side effect remain explicit. No new catalogue or
-full Mac gate is closed; ordinary Selector/NumberField native checks are next.
+full Mac gate is closed; ordinary Selector/NumberField checks follow in the checkpoint below.
+
+The [popup and Selector integration checkpoint](../docs/reports/macos-native-controls/README.md)
+adds stage83 bounded actual-menu inspection, repairs owner wakes starved by modal
+menus, and restores actual Selector click focus before its menu opens. Final
+Core/driver/gallery race, vet, build and preparation checks pass. Four native
+attempts remain failed and sealed: the final source-asserted prefix reaches ten
+Selector observations plus one accepted numeric edit (24 inputs/11 observations),
+then refuses the next key because Enter cleared numeric focus. No complete native
+catalogue, M2/M5 or other Mac gate closes. The corrected checker authors four routed refocus clicks after numeric Enter
+(57 inputs/21 unchanged observations); its revised native qualification remains
+pending. Complete that record before the remaining catalogue checks;
+physical/OS input, human accessibility and M3–M7 remain open. No SDK refresh or
+OS settings change occurs.
 
 ## Finish line
 

@@ -490,3 +490,19 @@ The owner-held `ui.Breadcrumb` component adds bounded controlled hierarchy/locat
 navigation over ordinary managed nodes. Ancestors are quiet buttons and the current
 location is a passive label. Item/root identity, queued request guards, read-only
 behavior and overflow/focus/accessibility follow [the breadcrumb contract](breadcrumb.md).
+
+## Selector click focus
+
+A pointer click on an enabled focusable Selector takes actual quiet keyboard
+focus before opening its menu. The menu owns its own item focus; selection or
+cancellation leaves keyboard navigation with the originating Selector. Disabled,
+read-only or nonfocusable native controls do not acquire focus through this hook.
+Taking focus does not itself propose a value or consume the click. Model rejection
+continues to restore the controlled selection, including the next real menu.
+The native gallery check and actual software FIFO regression separately verify
+pointer selection, actual ContainsFocus/public focus, Return reopen and Escape.
+
+An accepted NumberField Enter completes editing and follows normal focus
+traversal. A later numeric key step requires actual focus to be routed back to
+the field. The native check's remaining focus guard reflects that consumer
+sequence requirement, not a request to keep the Spinner focused artificially.

@@ -1,0 +1,326 @@
+--- /dev/null
++++ b/core/popup_inspection.go
+@@ -0,0 +1,150 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++
++package core
++
++import (
++	"errors"
++	"image"
++	"math"
++	"strings"
++	"sync/atomic"
++
++	"cogentcore.org/core/styles/states"
++)
++
++var (
++	ErrPopupInspectionPending = errors.New("core: popup layout not completed")
++	ErrPopupInspectionBudget  = errors.New("core: popup inspection budget exceeded")
++)
++
++// PopupInspection is detached diagnostic data from a real current popup Scene.
++// Only the top event-accepting popup is Interactive. Items cover direct standard
++// Buttons (including Chooser menus); custom/nested menu implementations retain
++// their existing inspectors. Bounds are clipped raw window pixels, not DP.
++type PopupInspection struct {
++	ID          uint64
++	Type        StageTypes
++	Bounds      image.Rectangle
++	Interactive bool
++	Items       []PopupItemInspection
++}
++
++type PopupItemInspection struct {
++	ID                         uint64
++	Name                       string
++	Bounds                     image.Rectangle
++	Enabled, Focused, Selected bool
++}
++
++const popupInspectionKey = "core.vellum-popup-inspection"
++
++type popupInspectionIdentity struct {
++	owner *WidgetBase
++	id    uint64
++}
++
++// Only the monotonic counter is global; there is no historical widget registry.
++var popupInspectionNext atomic.Uint64
++
++func nextPopupInspectionID(next *atomic.Uint64) uint64 {
++	for {
++		old := next.Load()
++		if old == math.MaxUint64 {
++			return 0 // never wrap and revive a stale identity
++		}
++		if next.CompareAndSwap(old, old+1) {
++			return old + 1
++		}
++	}
++}
++
++func popupInspectionID(w *WidgetBase) uint64 {
++	if old, ok := w.Properties[popupInspectionKey].(*popupInspectionIdentity); ok && old.owner == w {
++		return old.id
++	}
++	id := nextPopupInspectionID(&popupInspectionNext)
++	if id != 0 {
++		// Properties are excluded from ordinary cloning; the owner check also
++		// fails closed for a manually copied property map or WidgetBase.
++		w.SetProperty(popupInspectionKey, &popupInspectionIdentity{owner: w, id: id})
++	}
++	return id
++}
++
++// InspectPopups must run with this Scene's render context already held. It does
++// not lock that context recursively or invoke widget/update/style callbacks.
++// Stack locks protect only bounded pointer snapshots; no pointers escape here.
++// maxRecords (<=8192) charges every popup and visited direct child, even skipped
++// non-Buttons. maxBytes (<=8MiB) charges fixed records and copied labels. Callers
++// pass the remaining shared budget. Refusal returns no partial snapshot.
++func (sc *Scene) InspectPopups(maxRecords, maxBytes int) ([]PopupInspection, error) {
++	if maxRecords < 0 || maxRecords > 8192 || maxBytes < 0 || maxBytes > 8<<20 {
++		return nil, ErrPopupInspectionBudget
++	}
++	if sc == nil || sc.Stage == nil || sc.Stage.Mains == nil || sc.renderContext() == nil {
++		return nil, ErrPopupInspectionPending
++	}
++	main := sc.Stage.Mains.top()
++	if main == nil || main.Scene == nil || main.renderContext != sc.renderContext() || main.popups == nil {
++		return nil, ErrPopupInspectionPending
++	}
++	stack := main.popups
++	stack.Lock()
++	if len(stack.stack.Order) > 64 || len(stack.stack.Order) > maxRecords {
++		stack.Unlock()
++		return nil, ErrPopupInspectionBudget
++	}
++	stages := make([]*Stage, 0, len(stack.stack.Order))
++	for _, kv := range stack.stack.Order {
++		stages = append(stages, kv.Value)
++	}
++	stack.Unlock()
++	var active *Stage
++	for i := len(stages) - 1; i >= 0; i-- {
++		if !stages[i].ignoreEvents {
++			active = stages[i]
++			break
++		}
++	}
++	window := sc.renderContext().geom.Bounds()
++	var out []PopupInspection
++	charge := func(bytes int) bool {
++		maxRecords--
++		maxBytes -= bytes
++		return maxRecords >= 0 && maxBytes >= 0
++	}
++	for _, st := range stages {
++		p := st.Scene
++		if p == nil || p.This == nil || st.Main != main || p.showIter <= sceneShowIters || !p.hasFlag(sceneHasShown) || p.GlobalLayoutPending() || p.hasFlag(sceneNeedsLayout) || p.hasFlag(sceneNeedsRender) {
++			return nil, ErrPopupInspectionPending
++		}
++		if !charge(128) {
++			return nil, ErrPopupInspectionBudget
++		}
++		v := PopupInspection{ID: popupInspectionID(p.AsWidget()), Type: st.Type, Bounds: p.SceneGeom.Bounds().Intersect(window), Interactive: st == active}
++		if v.ID == 0 {
++			return nil, ErrPopupInspectionBudget
++		}
++		for _, child := range p.Children {
++			if !charge(128) {
++				return nil, ErrPopupInspectionBudget
++			}
++			button, ok := child.(*Button)
++			if !ok || button.This == nil {
++				continue
++			}
++			if len(button.Text) > 1<<20 || len(button.Text) > maxBytes {
++				return nil, ErrPopupInspectionBudget
++			}
++			maxBytes -= len(button.Text)
++			id := popupInspectionID(button.AsWidget())
++			if id == 0 {
++				return nil, ErrPopupInspectionBudget
++			}
++			bounds := button.Geom.TotalBBox.Add(p.SceneGeom.Pos).Intersect(v.Bounds)
++			v.Items = append(v.Items, PopupItemInspection{ID: id, Name: strings.Clone(button.Text), Bounds: bounds, Enabled: v.Interactive && button.IsVisible() && !button.IsReadOnly() && !bounds.Empty(), Focused: button.ContainsFocus(), Selected: button.StateIs(states.Selected)})
++		}
++		out = append(out, v)
++	}
++	return out, nil
++}
+--- /dev/null
++++ b/core/popup_inspection_offscreen_test.go
+@@ -0,0 +1,170 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++//go:build offscreen
++
++package core
++
++import (
++	"errors"
++	"image"
++	"math"
++	"strings"
++	"sync/atomic"
++	"testing"
++	"unsafe"
++
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/events/key"
++	"cogentcore.org/core/styles/states"
++)
++
++func inspectPopupFixture(t *testing.T) (*ManualWindow, *Body, *Chooser, *int) {
++	t.Helper()
++	var chooser *Chooser
++	calls := new(int)
++	m, body, _ := manualFixture(t, func(b *Body) {
++		chooser = NewChooser(b).SetStrings("Basic", "Advanced")
++		chooser.OnChange(func(events.Event) { *calls++ })
++	})
++	drainManual(t, m)
++	clickManual(t, m, center(chooser))
++	return m, body, chooser, calls
++}
++
++func TestPopupInspectionInvisibleItemNotTargetable(t *testing.T) {
++	m, body, _, _ := inspectPopupFixture(t)
++	rc := m.window.renderContext()
++	rc.Lock()
++	button := body.Scene.Stage.popups.top().Scene.Children[1].(*Button)
++	stored := button.Geom.TotalBBox
++	button.SetState(true, states.Invisible)
++	button.NeedsRender()
++	rc.Unlock()
++	drainManual(t, m)
++	p := inspectPopupOwned(t, m, body.Scene)
++	if stored.Empty() || len(p) != 1 || len(p[0].Items) != 2 || p[0].Items[1].Bounds.Empty() || p[0].Items[1].Enabled {
++		t.Fatal("invisible item with retained geometry offered as target", p)
++	}
++}
++
++func inspectPopupOwned(t *testing.T, m *ManualWindow, sc *Scene) []PopupInspection {
++	t.Helper()
++	rc := m.window.renderContext()
++	rc.Lock()
++	defer rc.Unlock()
++	p, err := sc.InspectPopups(8192, 8<<20)
++	if err != nil {
++		t.Fatal(err)
++	}
++	return p
++}
++
++func TestPopupInspectionActualChooserGeometryIdentityAndDetachment(t *testing.T) {
++	m, body, chooser, calls := inspectPopupFixture(t)
++	p := inspectPopupOwned(t, m, body.Scene)
++	if len(p) != 1 || len(p[0].Items) != 2 || !p[0].Interactive || p[0].ID == 0 {
++		t.Fatalf("actual chooser popup missing: %+v", p)
++	}
++	first, second := p[0].Items[0], p[0].Items[1]
++	if first.Name != "Basic" || second.Name != "Advanced" || first.ID == second.ID || first.ID == 0 || !first.Selected || !first.Enabled || !second.Enabled {
++		t.Fatalf("actual menu state %+v", p)
++	}
++	stage := body.Scene.Stage.popups.top()
++	button := stage.Scene.Children[1].(*Button)
++	want := button.Geom.TotalBBox.Add(stage.Scene.SceneGeom.Pos).Intersect(p[0].Bounds)
++	if second.Bounds != want || second.Bounds.Empty() || !second.Bounds.In(p[0].Bounds) {
++		t.Fatalf("window-coordinate bounds %v want %v", second.Bounds, want)
++	}
++	p[0].Items[1].Name = "mutated"
++	p[0].Items[1].Bounds = image.Rectangle{}
++	before := inspectPopupOwned(t, m, body.Scene)
++	if before[0].Items[1].Name != "Advanced" || before[0].Items[1].Bounds != want || before[0].ID != p[0].ID || before[0].Items[1].ID != second.ID || *calls != 0 {
++		t.Fatal("inspection mutated widgets, identities, or invoked a model callback")
++	}
++	// Route the actual menu item pointer, not the chooser's persistent AX option.
++	clickManual(t, m, second.Bounds.Min.Add(second.Bounds.Size().Div(2)))
++	if *calls != 1 || chooser.CurrentIndex != 1 || len(inspectPopupOwned(t, m, body.Scene)) != 0 {
++		t.Fatal("actual menu pointer did not commit exactly once and retire popup")
++	}
++	clickManual(t, m, center(chooser))
++	after := inspectPopupOwned(t, m, body.Scene)
++	if len(after) != 1 || after[0].ID == before[0].ID || after[0].Items[1].ID == second.ID || !after[0].Items[1].Selected {
++		t.Fatal("reopening revived an old popup/button identity")
++	}
++}
++
++func TestPopupInspectionBudgetPendingAndCoveredLayers(t *testing.T) {
++	m, body, _, _ := inspectPopupFixture(t)
++	rc := m.window.renderContext()
++	rc.Lock()
++	for _, budget := range [][2]int{{0, 8 << 20}, {1, 8 << 20}, {8192, 0}, {8193, 8 << 20}} {
++		p, err := body.Scene.InspectPopups(budget[0], budget[1])
++		if !errors.Is(err, ErrPopupInspectionBudget) || p != nil {
++			rc.Unlock()
++			t.Fatalf("partial or unbounded snapshot %v %v", p, err)
++		}
++	}
++	active := body.Scene.Stage.popups.top()
++	active.Scene.NeedsLayout()
++	if p, err := body.Scene.InspectPopups(8192, 8<<20); !errors.Is(err, ErrPopupInspectionPending) || p != nil {
++		rc.Unlock()
++		t.Fatal("pending popup geometry admitted")
++	}
++	rc.Unlock()
++	drainManual(t, m)
++	upper := NewScene("upper-menu")
++	NewButton(upper).SetText("Top")
++	NewPopupStage(MenuStage, upper, body).Run()
++	tip := NewScene("tip")
++	NewButton(tip).SetText("Tip")
++	NewPopupStage(TooltipStage, tip, body).SetTimeout(0).Run()
++	drainManual(t, m)
++	p := inspectPopupOwned(t, m, body.Scene)
++	if len(p) != 3 || p[0].Interactive || !p[1].Interactive || p[2].Interactive || p[0].Items[0].Enabled || p[2].Items[0].Enabled {
++		t.Fatalf("covered or ignored popup offered as target: %+v", p)
++	}
++	// A same-window modal main stage covers every popup owned by the prior main.
++	dialog := NewBody("inspection-dialog").NewDialog(body).SetNewWindow(false).Run()
++	drainManual(t, m)
++	if p := inspectPopupOwned(t, m, body.Scene); len(p) != 0 {
++		t.Fatal("background-main popup leaked through modal scope", p)
++	}
++	rc.Lock()
++	dialog.Scene.Close()
++	rc.Unlock()
++	drainManual(t, m)
++	m.window.SystemWindow.Events().Key(events.KeyChord, 0, key.CodeEscape, 0)
++	drainManual(t, m)
++}
++
++func TestPopupInspectionIdentityCopyAndSaturation(t *testing.T) {
++	a, b := &WidgetBase{}, &WidgetBase{}
++	first := popupInspectionID(a)
++	b.Properties = a.Properties // even an explicit shared-map copy must fail closed
++	second := popupInspectionID(b)
++	if first == 0 || second == first || popupInspectionID(b) != second || popupInspectionID(a) == second {
++		t.Fatal("copied metadata revived another widget identity")
++	}
++	var counter atomic.Uint64
++	counter.Store(math.MaxUint64 - 1)
++	if nextPopupInspectionID(&counter) != math.MaxUint64 || nextPopupInspectionID(&counter) != 0 || counter.Load() != math.MaxUint64 {
++		t.Fatal("saturated identity allocator wrapped")
++	}
++}
++
++// A bounded detached label must own its bytes: an immutable short substring can
++// otherwise retain an arbitrarily larger source allocation after popup removal.
++func TestPopupInspectionLabelOwnsBoundedBacking(t *testing.T) {
++	m, body, _, _ := inspectPopupFixture(t)
++	backing := strings.Repeat("x", 4<<20) + "Tiny"
++	label := backing[len(backing)-4:]
++	rc := m.window.renderContext()
++	rc.Lock()
++	button := body.Scene.Stage.popups.top().Scene.Children[1].(*Button)
++	button.Text = label // test fixture only; preserve the already completed layout
++	rc.Unlock()
++	p := inspectPopupOwned(t, m, body.Scene)
++	got := p[0].Items[1].Name
++	if got != label || unsafe.StringData(got) == unsafe.StringData(label) {
++		t.Fatal("detached bounded label retains the original backing allocation")
++	}
++}

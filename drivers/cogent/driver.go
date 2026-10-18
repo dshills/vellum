@@ -234,6 +234,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					closeTextWindow(w)
 					closeAccessibility(w, "driver-unlaunched-cleanup")
 					w.metrics.retire()
+					w.body.Scene.SetOriginCustomHandler(nil)
 					d.DesktopSession.retire(w)
 					nativeUnmountServices(w.body)
 					disposeControlTree(w.root)
@@ -290,15 +291,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					failWindow(w, err)
 					return
 				}
-				if d.DesktopSession != nil {
-					w.body.Scene.SetOriginCustomHandler(func(e events.Event) bool {
-						if !d.DesktopSession.owns(w, e) {
-							return false
-						}
-						custom(w, e)
-						return true
-					})
-				}
+				bindWindowOriginCustom(w, d.DesktopSession, custom)
 				nativeMountServices(w.body, services)
 				configureInitialWindow(w.body)
 				w.host = newAccessibilityHost(w)
@@ -404,6 +397,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					closeTextWindow(w)
 					closeAccessibility(w, "driver-window-cleanup")
 					w.metrics.retire()
+					w.body.Scene.SetOriginCustomHandler(nil)
 					d.DesktopSession.retire(w)
 					nativeUnmountServices(w.body)
 					disposeControlTree(w.root)
@@ -450,7 +444,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 		if d.DesktopSession != nil && d.DesktopSession.handle(w, e) {
 			return
 		}
-		if ce, ok := e.(*events.CustomEvent); ok && ce.Data == "vellum.wake" {
+		if isWindowWake(e) {
 			e.SetHandled()
 		}
 	}
@@ -646,7 +640,7 @@ func drainCustom(a *app.Application, pending *atomic.Bool, refresh func(), e eve
 	pending.Store(false)
 	a.Drain()
 	refresh()
-	if ce, ok := e.(*events.CustomEvent); ok && ce.Data == "vellum.wake" {
+	if isWindowWake(e) {
 		e.SetHandled()
 	}
 }

@@ -22,9 +22,14 @@ import (
 func desktopFixture(t *testing.T) (*DesktopSession, *Manual, *app.Application, *nativeWindow, *int) {
 	t.Helper()
 	clicks := new(int)
-	m, a := simpleManual(t, manualConfig(t, 7), func() ui.Node {
+	s, m, a, w := desktopViewFixture(t, func() ui.Node {
 		return ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{{ID: "button", Kind: ui.Button, Text: "Place", Activate: func() { *clicks++ }}}}
 	})
+	return s, m, a, w, clicks
+}
+func desktopViewFixture(t *testing.T, view func() ui.Node) (*DesktopSession, *Manual, *app.Application, *nativeWindow) {
+	t.Helper()
+	m, a := simpleManual(t, manualConfig(t, 7), view)
 	unitSettle(t, m)
 	w := m.implementation.find("one").state
 	s := NewDesktopSession()
@@ -34,20 +39,16 @@ func desktopFixture(t *testing.T) (*DesktopSession, *Manual, *app.Application, *
 	if err := s.bind(w); err != nil {
 		t.Fatal(err)
 	}
-	w.body.Scene.SetOriginCustomHandler(func(e events.Event) bool {
-		if !s.owns(w, e) {
-			return false
-		}
+	bindWindowOriginCustom(w, s, func(_ *nativeWindow, e events.Event) {
 		// The production driver drains/refreshed owner work before session handling.
 		m.implementation.custom(w, e)
 		if err := m.implementation.refresh(m.implementation.find("one")); err != nil {
 			t.Fatal(err)
 		}
 		s.handle(w, e)
-		return true
 	})
 	t.Cleanup(func() { s.retire(w); s.close() })
-	return s, m, a, w, clicks
+	return s, m, a, w
 }
 func desktopPump(t *testing.T, s *DesktopSession, m *Manual, r *desktopRequest) desktopReply {
 	t.Helper()

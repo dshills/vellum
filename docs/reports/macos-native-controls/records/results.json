@@ -1,0 +1,593 @@
+{
+  "base": "a1f92bb13bdd2e7896aa02b12982fa4a984a8465",
+  "native_result": "FAILED",
+  "native_failures": {
+    "native-v1": {
+      "result": "FAILED_OR_CANCELED",
+      "native_executed": true,
+      "error": {
+        "type": "ValueError",
+        "message": "native process/result/cleanup failed"
+      },
+      "closed_mac_gates": [],
+      "run": {
+        "argv": [
+          "/usr/bin/sandbox-exec",
+          "-p",
+          "(version 1)(allow default)(deny network* (remote ip) (local ip))(deny file-write* (subpath \"/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2\"))",
+          "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-control-popup-a1f92bb/gallery-native-v3",
+          "-control-native-check"
+        ],
+        "cwd": "/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent",
+        "started_utc": "2026-10-18T08:29:36.165153+00:00",
+        "watchdog_seconds": 120,
+        "error": null,
+        "exit_code": 1,
+        "created": true,
+        "observation_errors": [],
+        "logs_complete": true,
+        "pins_stable": true,
+        "stop_at_exit": false,
+        "pid": 18274,
+        "group": 18274,
+        "owned": {
+          "created": true,
+          "pid": 18274,
+          "group": 18274,
+          "terminal": true,
+          "group_absent": true,
+          "exit_code": 1,
+          "errors": [],
+          "observation": {
+            "group": 18274,
+            "members": [],
+            "observation_sha256": "78bad12d94339301fc0b9c290f2bb2bb656d5bdac2e9eb4d171d55305ac756b6"
+          }
+        },
+        "seconds": 90.76151362492237,
+        "logs": {
+          "stdout": {
+            "bytes": 7872,
+            "sha256": "60e55c67af7bda1576a332a6aa6104bdf007902218596889fa5e95e4230b5e7e"
+          },
+          "stderr": {
+            "bytes": 26,
+            "sha256": "ff0b142000f16b0b98c9ff243db59a282e37ede46cdc5cae77d4b896a7e10116"
+          }
+        }
+      },
+      "completed_utc": "2026-10-18T08:31:06.962281+00:00"
+    },
+    "native-v2": {
+      "result": "FAILED_OR_CANCELED",
+      "native_executed": true,
+      "error": {
+        "type": "ValueError",
+        "message": "native process/result/cleanup failed"
+      },
+      "closed_mac_gates": [],
+      "run": {
+        "argv": [
+          "/usr/bin/sandbox-exec",
+          "-p",
+          "(version 1)(allow default)(deny network* (remote ip) (local ip))(deny file-write* (subpath \"/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2\"))",
+          "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-control-popup-a1f92bb/gallery-native-v4",
+          "-control-native-check"
+        ],
+        "cwd": "/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent",
+        "started_utc": "2026-10-18T08:43:06.995144+00:00",
+        "watchdog_seconds": 120,
+        "error": null,
+        "exit_code": 1,
+        "created": true,
+        "observation_errors": [],
+        "logs_complete": true,
+        "pins_stable": true,
+        "stop_at_exit": false,
+        "pid": 22471,
+        "group": 22471,
+        "owned": {
+          "created": true,
+          "pid": 22471,
+          "group": 22471,
+          "terminal": true,
+          "group_absent": true,
+          "exit_code": 1,
+          "errors": [],
+          "observation": {
+            "group": 22471,
+            "members": [],
+            "observation_sha256": "6c5593d65641781134a247acc1896f0a13782be5008ce3a554dc13db37169f5c"
+          }
+        },
+        "seconds": 1.2721566670807078,
+        "logs": {
+          "stdout": {
+            "bytes": 19637,
+            "sha256": "3052b68169096776e2459d48b445d3fbd747dfbb90ea8a1b0d479f95d9fca6b8"
+          },
+          "stderr": {
+            "bytes": 42,
+            "sha256": "b6ee99e04a1a70c75607348f0381b11d9996345327fb2a5bcac2a3321e296ee6"
+          }
+        }
+      },
+      "completed_utc": "2026-10-18T08:43:08.295937+00:00"
+    },
+    "native-v3": {
+      "result": "FAILED_OR_CANCELED",
+      "native_executed": true,
+      "error": {
+        "type": "ValueError",
+        "message": "native process/result/cleanup failed"
+      },
+      "closed_mac_gates": [],
+      "run": {
+        "argv": [
+          "/usr/bin/sandbox-exec",
+          "-p",
+          "(version 1)(allow default)(deny network* (remote ip) (local ip))(deny file-write* (subpath \"/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2\"))",
+          "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-control-popup-a1f92bb/gallery-native-v5",
+          "-control-native-check"
+        ],
+        "cwd": "/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent",
+        "started_utc": "2026-10-18T08:53:18.952822+00:00",
+        "watchdog_seconds": 120,
+        "error": null,
+        "exit_code": 1,
+        "created": true,
+        "observation_errors": [],
+        "logs_complete": true,
+        "pins_stable": true,
+        "stop_at_exit": false,
+        "pid": 25682,
+        "group": 25682,
+        "owned": {
+          "created": true,
+          "pid": 25682,
+          "group": 25682,
+          "terminal": true,
+          "group_absent": true,
+          "exit_code": 1,
+          "errors": [],
+          "observation": {
+            "group": 25682,
+            "members": [],
+            "observation_sha256": "e03d11bcb5d5c1dbd7d6d7007a223a13afa88cd4badbbf0daeef6d8d3aed5b36"
+          }
+        },
+        "seconds": 2.3801258750027046,
+        "logs": {
+          "stdout": {
+            "bytes": 83025,
+            "sha256": "d8fdf9b0be770655b7166c79d881b15af43cf2ad4e0b32ec3c4f45b87d8a4c6b"
+          },
+          "stderr": {
+            "bytes": 32,
+            "sha256": "0ea9449d3e838586bbf96c55917c6925f7a178f547e7b0a610976c38188bf9c9"
+          }
+        }
+      },
+      "completed_utc": "2026-10-18T08:53:21.367335+00:00"
+    },
+    "native-v4": {
+      "result": "FAILED_OR_CANCELED",
+      "native_executed": true,
+      "error": {
+        "type": "ValueError",
+        "message": "native process/result/cleanup failed"
+      },
+      "closed_mac_gates": [],
+      "run": {
+        "argv": [
+          "/usr/bin/sandbox-exec",
+          "-p",
+          "(version 1)(allow default)(deny network* (remote ip) (local ip))(deny file-write* (subpath \"/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2\"))",
+          "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-control-popup-a1f92bb/gallery-native-v6",
+          "-control-native-check"
+        ],
+        "cwd": "/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent",
+        "started_utc": "2026-10-18T08:59:39.912462+00:00",
+        "watchdog_seconds": 120,
+        "error": null,
+        "exit_code": 1,
+        "created": true,
+        "observation_errors": [],
+        "logs_complete": true,
+        "pins_stable": true,
+        "stop_at_exit": false,
+        "pid": 27658,
+        "group": 27658,
+        "owned": {
+          "created": true,
+          "pid": 27658,
+          "group": 27658,
+          "terminal": true,
+          "group_absent": true,
+          "exit_code": 1,
+          "errors": [],
+          "observation": {
+            "group": 27658,
+            "members": [],
+            "observation_sha256": "713f1341b8906686b9d8a6d2ed484997d46b7bec9529dbe46fe89529b2af5111"
+          }
+        },
+        "seconds": 2.574704125057906,
+        "logs": {
+          "stdout": {
+            "bytes": 95752,
+            "sha256": "7cfb7cd5928686d1e8d40da86f4d431946160d5641bea7119521a39424da4003"
+          },
+          "stderr": {
+            "bytes": 42,
+            "sha256": "bf0ffd1f80c39bcd987ddd9fbf15758ba0cd172c9b8843cf06d7bae66a4e137d"
+          }
+        }
+      },
+      "completed_utc": "2026-10-18T08:59:42.522313+00:00"
+    }
+  },
+  "final_source_asserted_prefix": {
+    "observations": 11,
+    "inputs": 24,
+    "numeric_value": 42,
+    "numeric_proposals": 1
+  },
+  "checks": {
+    "driver-all-v5": {
+      "exit_code": 0,
+      "error": null,
+      "seconds": 269.6742271659896,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 23869,
+        "group": 23869,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 23869,
+          "members": [],
+          "observation_sha256": "cb4a982076d7af4af030a721b6dde908934acf964981379b08e197e42b52941e"
+        }
+      },
+      "prepared_exact": null,
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "owned-core-v2": {
+      "exit_code": 0,
+      "error": null,
+      "seconds": 11.426605291897431,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 15263,
+        "group": 15263,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 15263,
+          "members": [],
+          "observation_sha256": "70401ae2a0b7f0d086a08b4bee58a4b47b7fad5ae76d01d531786b58dd63bcc8"
+        }
+      },
+      "prepared_exact": null,
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "core-vet-v2": {
+      "exit_code": 0,
+      "error": null,
+      "seconds": 0.6927434579702094,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 15463,
+        "group": 15463,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 15463,
+          "members": [],
+          "observation_sha256": "165798839d51a338ce40838a84caf2462ab99cb29f6ff053b82628c3eb01dd18"
+        }
+      },
+      "prepared_exact": null,
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "consumer-vet-v5": {
+      "exit_code": 0,
+      "error": null,
+      "seconds": 0.45102258399128914,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 26617,
+        "group": 26617,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 26617,
+          "members": [],
+          "observation_sha256": "bbf4cec13c1a896d5f2b58f7ea7346bb61181d906932c4096ad333e0e756c983"
+        }
+      },
+      "prepared_exact": null,
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "catalogue-build-v6": {
+      "exit_code": 0,
+      "error": null,
+      "seconds": 3.4258616250008345,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 26570,
+        "group": 26570,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 26570,
+          "members": [],
+          "observation_sha256": "72f9740fb22598183d901aa4aa9858cfac7dbe69705a844ac19e311b885f1a69"
+        }
+      },
+      "prepared_exact": null,
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "gallery-tests-final": {
+      "exit_code": 0,
+      "error": null,
+      "seconds": 3.8614018749212846,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 26520,
+        "group": 26520,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 26520,
+          "members": [],
+          "observation_sha256": "443af0c6ed62e051b6c4cdb4a691c90359609f8ff95899a5ee01d0e3d062198f"
+        }
+      },
+      "prepared_exact": null,
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "prepare-v3": {
+      "exit_code": 0,
+      "error": null,
+      "seconds": 1.949307833914645,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 16158,
+        "group": 16158,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 16158,
+          "members": [],
+          "observation_sha256": "8ba2c275adc8dca850232a0088b403034f5b24d51010a7c1b7e02fd522d6e0a1"
+        }
+      },
+      "prepared_exact": true,
+      "prepared_files": 6267,
+      "prepared_sha256": "8d22e7df7e7ed1ecf296bf55c7d9295b8884c12d8e62385cd47673a28d6374e8"
+    },
+    "prepare-tests-v3": {
+      "exit_code": 0,
+      "error": null,
+      "seconds": 0.11787295795511454,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 16423,
+        "group": 16423,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 16423,
+          "members": [],
+          "observation_sha256": "8f9566885929366875f1c1b6679283a95ab0f510528de42e8b667e969cb42a6f"
+        }
+      },
+      "prepared_exact": null,
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "validation-controls-v1": {
+      "exit_code": 0,
+      "error": null,
+      "seconds": 0.0721991250757128,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 13235,
+        "group": 13235,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 13235,
+          "members": [],
+          "observation_sha256": "4b4ddaf2660d105892afc4785fa4d02b3a36465250cf4a7115becffed4362b2f"
+        }
+      },
+      "prepared_exact": null,
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "wake-negative-v1": {
+      "exit_code": 1,
+      "error": null,
+      "seconds": 10.495427791960537,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 19980,
+        "group": 19980,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 1,
+        "errors": [],
+        "observation": {
+          "group": 19980,
+          "members": [],
+          "observation_sha256": "87049331b67360c216c334bacb17beefdd420e7bfe8a5bb2feba1a06b5ab89b5"
+        }
+      },
+      "prepared_exact": null,
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "wake-positive-v1": {
+      "exit_code": 0,
+      "error": null,
+      "seconds": 11.458307583001442,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 20279,
+        "group": 20279,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 20279,
+          "members": [],
+          "observation_sha256": "84386e4c9b4c9c8a69499a40dcd1aab110605910817d31c25f464f9f83b0bb04"
+        }
+      },
+      "prepared_exact": null,
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "selector-focus-negative-v1": {
+      "exit_code": 1,
+      "error": null,
+      "seconds": 10.403861625003628,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 23333,
+        "group": 23333,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 1,
+        "errors": [],
+        "observation": {
+          "group": 23333,
+          "members": [],
+          "observation_sha256": "7972b92f21e35cc06cd073c2af368c2ca682d1385f1063d5a98ae6a363f011a9"
+        }
+      },
+      "prepared_exact": null,
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "selector-focus-positive-v1": {
+      "exit_code": 0,
+      "error": null,
+      "seconds": 11.526677458081394,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 23611,
+        "group": 23611,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 23611,
+          "members": [],
+          "observation_sha256": "45f964068e7ac8509d67a0065c2169a6eadeb1a0fae60e85b3d31c12ff5e20ed"
+        }
+      },
+      "prepared_exact": null,
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "select-all-negative-v1": {
+      "exit_code": 1,
+      "error": null,
+      "seconds": 8.733960375073366,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 26232,
+        "group": 26232,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 1,
+        "errors": [],
+        "observation": {
+          "group": 26232,
+          "members": [],
+          "observation_sha256": "f44fbcdb5880bfae845c52f97bcc4d670a2e57f63fa23d8aa2840b3e6ab6b40b"
+        }
+      },
+      "prepared_exact": null,
+      "prepared_files": null,
+      "prepared_sha256": null
+    }
+  },
+  "full_native_validation_passed": false,
+  "physical_input_verified": false,
+  "sdk_refreshed": false,
+  "full_mac_complete": false,
+  "closed_mac_gates": [],
+  "corrected_consumer": {
+    "planned_inputs": 57,
+    "observations": 21,
+    "native_executed": false,
+    "provider_retained_finding": "f632a5ec86a60767",
+    "source_refocus_implemented": true,
+    "verification": [
+      "number-refocus-v1",
+      "gallery-tests-refocus",
+      "consumer-vet-v6",
+      "catalogue-build-v7",
+      "validation-refocus-controls-v2"
+    ]
+  }
+}

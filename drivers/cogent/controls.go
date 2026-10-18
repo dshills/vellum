@@ -12,6 +12,7 @@ import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/styles/abilities"
 	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/text/textcore"
@@ -201,7 +202,16 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	case ui.Separator:
 		widget = core.NewSeparator(parent)
 	case ui.Selector:
-		widget = core.NewChooser(parent)
+		chooser := core.NewChooser(parent)
+		// Chooser consumes Click while opening its menu, before the base widget
+		// can take quiet focus. Preserve that ordinary click behavior first so
+		// closing the menu returns keyboard input to the actual selector.
+		chooser.OnFirst(events.Click, func(events.Event) {
+			if !chooser.IsReadOnly() && chooser.AbilityIs(abilities.Focusable) {
+				chooser.SetFocusQuiet()
+			}
+		})
+		widget = chooser
 	case ui.Slider:
 		widget = core.NewSlider(parent)
 	case ui.NumberField:

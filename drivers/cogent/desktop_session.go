@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"image"
 	"math"
 	"slices"
@@ -106,6 +107,34 @@ type DesktopSnapshot struct {
 	Grids      []GridInspection
 	Trees      []TreeInspection
 	Canvases   []DesktopCanvasInspection
+	Popups     []DesktopPopup
+}
+
+// DesktopPopup contains actual current popup geometry, separate from persistent
+// semantic option nodes. IDs include frame, Scene and Button incarnations; they
+// are not application domain IDs. Only top eligible direct standard Buttons are
+// enabled targets. Custom/nested menus keep their existing semantic inspectors.
+type DesktopPopup struct {
+	ID, Kind    string
+	Bounds      image.Rectangle
+	Interactive bool
+	Items       []DesktopElement
+}
+
+func desktopTargetElement(out DesktopSnapshot, id string) (DesktopElement, bool) {
+	for _, el := range out.Elements {
+		if el.ID == id {
+			return el, true
+		}
+	}
+	for _, p := range out.Popups {
+		for _, el := range p.Items {
+			if el.ID == id {
+				return el, true
+			}
+		}
+	}
+	return DesktopElement{}, false
 }
 
 // DesktopCanvasInspection keeps the existing annotation count separate from
@@ -454,23 +483,14 @@ func (s *DesktopSession) handle(w *nativeWindow, e events.Event) bool {
 				return
 			}
 			if r.input.Target != "" {
-				found := false
-				for _, el := range out.Elements {
-					if el.ID == r.input.Target {
-						found = true
-						if !el.Enabled || el.Bounds.Empty() {
-							failure = ErrDesktopPending
-						} else if r.input.Type.IsKey() {
-							if !el.Focused {
-								failure = ErrDesktopPending
-							}
-						} else if !r.input.Position.In(el.Bounds) {
-							failure = ErrDesktopPending
-						}
-						break
+				el, found := desktopTargetElement(out, r.input.Target)
+				if !found || !el.Enabled || el.Bounds.Empty() {
+					failure = ErrDesktopPending
+				} else if r.input.Type.IsKey() {
+					if !el.Focused {
+						failure = ErrDesktopPending
 					}
-				}
-				if !found {
+				} else if !r.input.Position.In(el.Bounds) {
 					failure = ErrDesktopPending
 				}
 			}
@@ -641,7 +661,46 @@ func desktopSnapshot(w *nativeWindow, frame uint64) (DesktopSnapshot, error) {
 	if e := collect(w.root, ""); e != nil {
 		return out, e
 	}
+	popups, err := w.body.Scene.InspectPopups(8192-len(out.Elements), (8<<20)-bytes)
+	if err != nil {
+		if errors.Is(err, core.ErrPopupInspectionBudget) {
+			return out, ErrDesktopBudget
+		}
+		return out, errors.Join(ErrDesktopPending, err)
+	}
+	remaining := (8 << 20) - bytes
+	for _, p := range popups {
+		v, err := desktopPopupInspection(p, frame, &remaining)
+		if err != nil {
+			return out, err
+		}
+		out.Popups = append(out.Popups, v)
+	}
+
 	return out, nil
+}
+
+// Charge the generated public representation too: Core's own bounded metadata
+// budget does not account for these frame/parent IDs and DesktopElement fields.
+// 512 per record conservatively reserves fixed records/slice overhead; strings
+// are charged separately. This shares the existing 8MiB semantic output budget.
+func desktopPopupInspection(p core.PopupInspection, frame uint64, remaining *int) (DesktopPopup, error) {
+	id := fmt.Sprintf("popup:%d:%d", frame, p.ID)
+	kind := p.Type.String()
+	*remaining -= 512 + len(id) + len(kind)
+	if *remaining < 0 {
+		return DesktopPopup{}, ErrDesktopBudget
+	}
+	v := DesktopPopup{ID: id, Kind: kind, Bounds: p.Bounds, Interactive: p.Interactive}
+	for _, item := range p.Items {
+		itemID := fmt.Sprintf("%s:%d", id, item.ID)
+		*remaining -= 512 + len(itemID) + len(id) + len("popup-item") + len(item.Name)
+		if *remaining < 0 {
+			return DesktopPopup{}, ErrDesktopBudget
+		}
+		v.Items = append(v.Items, DesktopElement{ID: itemID, Parent: id, Role: "popup-item", Name: item.Name, Bounds: item.Bounds, Enabled: item.Enabled, Focused: item.Focused, Selected: item.Selected})
+	}
+	return v, nil
 }
 
 // DesktopState is bounded terminal accounting, without retained window roots.

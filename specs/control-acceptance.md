@@ -67,9 +67,18 @@ record's command/history, workers, edits, tab reorder, placement, modal preceden
 and two-window survival through native Go event routing. It does not establish
 native catalogue completeness, physical input or human assistive-technology use.
 
+The [popup/Selector integration checkpoint](../docs/reports/macos-native-controls/README.md)
+repairs owner wake starvation and actual Selector click focus. Its final native
+attempt reaches the source-asserted Selector states and one accepted typed
+number, then fails the next focused-key guard after numeric Enter. All four
+native attempts remain failed/sealed; no full native subcase closes. The original check reached 24/11 of its 49/21 record. The corrected checker now
+authors four routed numeric refocus clicks: 57 inputs/21 unchanged observations;
+its native acceptance is pending.
+
 The remaining native catalogue work is:
 
-1. In the gallery, exercise ordinary Selector popup and NumberField typed,
+1. Run the corrected 57-input native gallery record and complete
+   ordinary Selector popup and NumberField typed,
    pointer and keyboard edits, including rejection/disabled behavior. The
    deterministic keyboard regression does not qualify an actual desktop popup.
 2. Exercise the rest of the supported catalogue's focus, input, state publication

@@ -53,3 +53,31 @@ The [workspace-native checker](../examples/replay/cmd/workspace-native/README.md
 consumes the fixed professional workspace record with native geometry anchors
 and a narrow Mac Select All intent translation. It retains source-specific
 receipts; consult its report for the current outcome and remaining gates.
+
+For actual menus, inspect `snapshot.Popups`, then use the current item's exact
+`ID` and center of its clipped `Bounds`. Persistent option semantics in
+`Elements` describe model choices and are separate from the open popup's actual
+item geometry. Only enabled items of the top interactive popup are targets.
+Reacquire a frame/snapshot after each input, including menu navigation. Closed or
+replaced popup/button identities cannot be reused, including in the same frame.
+Custom/nested menus retain their existing inspectors.
+
+The standard gallery has a runnable bounded integration mode:
+
+```sh
+cd drivers/cogent
+go run ./cmd/gallery -control-native-check
+```
+
+It uses the ordinary public Selector/NumberField constructors and emits one JSON
+result after its 57-input/21-observation scenario and tracked shutdown. See the
+[gallery instructions](../drivers/cogent/cmd/gallery/README.md) and
+[current result](reports/macos-native-controls/README.md). This command routes
+Go events through the native FIFO; physical/OS input remains separate evidence.
+
+Current status: all four original native attempts remain failed. The last reached
+24 routed inputs/11 observations before a missing-refocus guard. The corrected
+scenario now adds four explicit routed refocus clicks after numeric Enter:
+57 inputs/21 unchanged model observations. Its software focus/refocus regression,
+gallery race checks and build pass; the revised native record has not run. Full
+numeric/disabled continuation and final original-reference closure remain pending.

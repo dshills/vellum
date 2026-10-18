@@ -239,3 +239,10 @@ owned without recursive locking. Successful expiry requests one on-demand paint.
 The event-loop wait is released after cleanup (also on panic). See
 [checkpoint](../../../docs/reports/macos-popup-lifecycle/README.md) for scoped race,
 preparation, build and review evidence and the retained failed diagnostic.
+
+Stage83 (`patches/popupinspection`) exposes owner-held bounded detached current
+popup geometry and fresh scene/button incarnation IDs. Public DesktopSession
+keeps these separate from persistent option semantics, refuses stale/hidden/
+disabled targets and charges generated labels/IDs against its shared budget.
+See [contract](patches/popupinspection/README.md) and the
+[native controls report](../../../docs/reports/macos-native-controls/README.md).

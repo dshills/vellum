@@ -21,6 +21,8 @@ import (
 )
 
 type gallery struct {
+	selectionRequests, numberRequests, outsideClicks     int
+	selectionReject, numberReject                        bool
 	documents                                            []string
 	documentSelected                                     string
 	documentText                                         map[string]string
@@ -111,18 +113,18 @@ func (g *gallery) view() ui.Node {
 	}
 
 	numeric := ui.Numeric{Min: 0, Max: 100, Step: 1}
-	changeNumber := func(e ui.ChangeEvent) { g.number = e.Number }
+	changeNumber := g.acceptNumber
 	controls := ui.Node{ID: "controls", Kind: ui.Scroll, Grow: true, Children: []ui.Node{
 		{ID: "enable", Kind: ui.Checkbox, Text: "Enable editing controls", Checked: g.enabled, Change: func(e ui.ChangeEvent) { g.enabled = e.Checked }, Accessibility: ui.Accessibility{Help: "Toggle the disabled state of the controls below"}},
 		{ID: "details", Kind: ui.Disclosure, Text: "Editing controls", Checked: g.details, Change: func(e ui.ChangeEvent) { g.details = e.Checked }, Children: []ui.Node{
 			{ID: "fields", Kind: ui.FormGroup, Text: "Editing", Disabled: !g.enabled, Style: ui.Style{Gap: ui.Some(float32(10))}, Children: []ui.Node{
 				{ID: "selection-label", Kind: ui.Label, Text: "Preset"},
-				{ID: "selection", Kind: ui.Selector, SelectedID: g.selection, Options: []ui.Option{{ID: "basic", Label: "Basic"}, {ID: "advanced", Label: "Advanced"}, {ID: "unavailable", Label: "Unavailable", Disabled: true}}, Change: func(e ui.ChangeEvent) { g.selection = e.SelectedID }, Accessibility: ui.Accessibility{Name: "Preset"}},
+				g.selectionControl(),
 				{ID: "radio-preset", Kind: ui.RadioGroup, SelectedID: g.selection, Options: []ui.Option{{ID: "basic", Label: "Basic"}, {ID: "advanced", Label: "Advanced"}, {ID: "unavailable", Label: "Unavailable", Disabled: true}}, Change: func(e ui.ChangeEvent) { g.selection = e.SelectedID }, Accessibility: ui.Accessibility{Name: "Preset radio choices"}},
 				{ID: "segmented-preset", Kind: ui.SegmentedControl, SelectedID: g.selection, Options: []ui.Option{{ID: "basic", Label: "Basic"}, {ID: "advanced", Label: "Advanced"}, {ID: "unavailable", Label: "Unavailable", Disabled: true}}, Change: func(e ui.ChangeEvent) { g.selection = e.SelectedID }, Accessibility: ui.Accessibility{Name: "Preset segments"}},
 				{ID: "value-label", Kind: ui.Label, Text: fmt.Sprintf("Shared slider / numeric value: %.0f", g.number)},
 				{ID: "slider", Kind: ui.Slider, Number: g.number, Numeric: numeric, Change: changeNumber, MinWidth: 300, Accessibility: ui.Accessibility{Name: "Level", Help: "Drag or use arrow keys"}},
-				{ID: "number", Kind: ui.NumberField, Number: g.number, Numeric: numeric, Change: changeNumber, Accessibility: ui.Accessibility{Name: "Numeric level"}},
+				g.numberControl(),
 				{ID: "text-label", Kind: ui.Label, Text: "Project name"},
 				{ID: "project-name", Kind: ui.TextField, Text: g.text, Change: func(e ui.ChangeEvent) { g.text = e.Text }, Accessibility: ui.Accessibility{Name: "Project name", Help: "Single-line native text field"}},
 				{ID: "focus-name", Kind: ui.Button, Text: "Focus project name", Activate: func() { g.focus.ID = "project-name"; g.focus.Sequence++ }},
@@ -233,7 +235,11 @@ func main() {
 	menuSmoke := flag.Bool("menu-smoke", false, "check actual Cocoa menu routing and lifetime in a bounded fixture")
 	colorSmoke := flag.Bool("color-smoke", false, "verify bounded native color field acceptance and lifetime")
 	progressSmoke := flag.Bool("progress-smoke", false, "verify native progress shape values, geometry and lifetime")
+	catalogue := flag.Bool("control-native-check", false, "run bounded ordinary selector/number-field native FIFO acceptance")
 	flag.Parse()
+	if *catalogue && (*smoke || *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *exit > 0) {
+		must(errors.New("control-native-check requires its own bounded process"))
+	}
 	if *progressSmoke && (*colorSmoke || *menuSmoke || *disclosureSmoke || *smoke || *exit > 0) {
 		must(errors.New("progress-smoke requires its own bounded process"))
 	}
@@ -246,7 +252,7 @@ func main() {
 	if *disclosureSmoke && (*smoke || *exit > 0) {
 		must(errors.New("disclosure-smoke requires its own bounded process"))
 	}
-	if *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke {
+	if *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *catalogue {
 		core.DebugSettings.DisableWindowGeometrySaver = true
 	}
 	a, err := app.New(app.Config{})
@@ -260,6 +266,9 @@ func main() {
 		g.tab = "colors"
 	}
 	view := g.view
+	if *catalogue {
+		view = g.controlCatalogueView
+	}
 	if *progressSmoke {
 		view = g.progressView
 	}
@@ -315,6 +324,10 @@ func main() {
 		time.AfterFunc(2200*time.Millisecond, func() { _ = a.Post(func() { g.dialog = false; a.Invalidate("gallery") }) })
 	}
 	theme := ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Size: 16}), Foreground: ui.Some(color.NRGBA{R: 32, G: 36, B: 42, A: 255})}, Kinds: map[ui.Kind]ui.Style{ui.Column: {Gap: ui.Some(float32(8))}}}
+	if *catalogue {
+		must(runControlCatalogue(ctx, a, g, theme))
+		return
+	}
 	err = a.Run(ctx, cogent.Driver{Theme: theme})
 	if progressDone != nil {
 		cancel()
