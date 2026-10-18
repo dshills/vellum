@@ -21,43 +21,47 @@ import (
 )
 
 type gallery struct {
-	selectionRequests, numberRequests, outsideClicks     int
-	enabledRequests, snappingRequests, pinnedRequests    int
-	selectionReject, numberReject                        bool
-	documents                                            []string
-	documentSelected                                     string
-	documentText                                         map[string]string
-	documentReject                                       bool
-	documentCloseRequests                                int
-	enabled                                              bool
-	details                                              bool
-	snapping, pinned                                     bool
-	selection, tab, text                                 string
-	number                                               float32
-	split                                                float32
-	dialog                                               bool
-	focus                                                ui.FocusRequest
-	picture                                              *canvas.TiledImage
-	imageFit                                             ui.ImageFit
-	menuCount                                            int
-	viewMenuRequests                                     int
-	viewMenuReject                                       bool
-	menuLast                                             string
-	menuDisabled                                         bool
-	menuChecked                                          bool
-	colorPicker                                          *ui.ColorPicker
-	breadcrumb                                           *ui.Breadcrumb
-	breadcrumbRequests                                   int
-	breadcrumbReject                                     bool
-	colorEdits, colorInvalid                             int
-	colorReject, colorNormalize                          bool
-	listSelection                                        string
-	listReject, listReadOnly, listDisabled, listReversed bool
-	listRequests                                         int
+	detailsRequests, splitRequests, structurePageRequests, documentSelectRequests              int
+	detailsReject, detailsReadOnly, detailsDisabled, splitReject, splitReadOnly, splitDisabled bool
+	structurePage                                                                              string
+	selectionRequests, numberRequests, outsideClicks                                           int
+	enabledRequests, snappingRequests, pinnedRequests                                          int
+	selectionReject, numberReject                                                              bool
+	documents                                                                                  []string
+	documentSelected                                                                           string
+	documentText                                                                               map[string]string
+	documentReject                                                                             bool
+	documentCloseRequests                                                                      int
+	enabled                                                                                    bool
+	details                                                                                    bool
+	snapping, pinned                                                                           bool
+	selection, tab, text                                                                       string
+	number                                                                                     float32
+	split                                                                                      float32
+	dialog                                                                                     bool
+	focus                                                                                      ui.FocusRequest
+	picture                                                                                    *canvas.TiledImage
+	imageFit                                                                                   ui.ImageFit
+	menuCount                                                                                  int
+	viewMenuRequests                                                                           int
+	viewMenuReject                                                                             bool
+	menuLast                                                                                   string
+	menuDisabled                                                                               bool
+	menuChecked                                                                                bool
+	colorPicker                                                                                *ui.ColorPicker
+	breadcrumb                                                                                 *ui.Breadcrumb
+	breadcrumbRequests                                                                         int
+	breadcrumbReject                                                                           bool
+	colorEdits, colorInvalid                                                                   int
+	colorReject, colorNormalize                                                                bool
+	listSelection                                                                              string
+	listReject, listReadOnly, listDisabled, listReversed                                       bool
+	listRequests                                                                               int
 }
 
 func newGallery() *gallery {
 	g := &gallery{enabled: true, details: true, selection: "basic", tab: "controls", text: "Vellum", number: 25, split: 0.35, picture: galleryImage(), imageFit: ui.ImageContain}
+	g.structurePage = "sections"
 	g.documents = []string{"sketch", "notes"}
 	g.documentSelected = "sketch"
 	g.documentText = map[string]string{"sketch": "Untitled sketch", "notes": "Working notes"}
@@ -117,8 +121,8 @@ func (g *gallery) view() ui.Node {
 
 	controls := ui.Node{ID: "controls", Kind: ui.Scroll, Grow: true, Children: []ui.Node{
 		g.enableControl(),
-		{ID: "details", Kind: ui.Disclosure, Text: "Editing controls", Checked: g.details, Change: func(e ui.ChangeEvent) { g.details = e.Checked }, Children: []ui.Node{
-			{ID: "fields", Kind: ui.FormGroup, Text: "Editing", Disabled: !g.enabled, Style: ui.Style{Gap: ui.Some(float32(10))}, Children: []ui.Node{
+		g.detailsControl(
+			ui.Node{ID: "fields", Kind: ui.FormGroup, Text: "Editing", Disabled: !g.enabled, Style: ui.Style{Gap: ui.Some(float32(10))}, Children: []ui.Node{
 				{ID: "selection-label", Kind: ui.Label, Text: "Preset"},
 				g.selectionControl(),
 				g.radioControl(),
@@ -130,7 +134,7 @@ func (g *gallery) view() ui.Node {
 				{ID: "project-name", Kind: ui.TextField, Text: g.text, Change: func(e ui.ChangeEvent) { g.text = e.Text }, Accessibility: ui.Accessibility{Name: "Project name", Help: "Single-line native text field"}},
 				{ID: "focus-name", Kind: ui.Button, Text: "Focus project name", Activate: func() { g.focus.ID = "project-name"; g.focus.Sequence++ }},
 			}},
-		}},
+		),
 		{ID: "more-controls", Kind: ui.Toolbar, Accessibility: ui.Accessibility{Name: "Control tools"}, Children: []ui.Node{
 			g.snappingControl(),
 			g.pinnedControl(),
@@ -151,10 +155,7 @@ func (g *gallery) view() ui.Node {
 	}}
 	splitDemo := ui.Node{ID: "split-demo", Kind: ui.Column, Grow: true, Children: []ui.Node{
 		{ID: "split-instructions", Kind: ui.Label, Text: "Drag the divider, or focus it and use Left/Right, Home and End."},
-		{ID: "panes", Kind: ui.SplitPane, Number: g.split, Grow: true, Change: func(e ui.ChangeEvent) { g.split = e.Number }, Accessibility: ui.Accessibility{Name: "Inspector width", Help: "Resize the inspector and workspace"}, Children: []ui.Node{
-			{ID: "split-inspector", Kind: ui.FormGroup, Text: "Inspector", Children: []ui.Node{{ID: "split-name", Kind: ui.TextField, Text: g.text, Change: func(e ui.ChangeEvent) { g.text = e.Text }, Accessibility: ui.Accessibility{Name: "Project name"}}}},
-			{ID: "split-workspace", Kind: ui.Scroll, Children: []ui.Node{{ID: "split-content", Kind: ui.Label, Text: "Workspace content retains its native controls as the panes resize."}, {ID: "split-reset", Kind: ui.Button, Text: "Reset divider", Activate: func() { g.split = 0.35 }}}},
-		}},
+		g.splitControl(),
 	}}
 	symbols := ui.Node{ID: "symbols", Kind: ui.Scroll, Grow: true, Children: []ui.Node{
 		g.actionMenuControl(),
@@ -224,7 +225,11 @@ func main() {
 	catalogue := flag.Bool("control-native-check", false, "run bounded ordinary selector/number-field native FIFO acceptance")
 	choices := flag.Bool("choice-native-check", false, "run bounded ordinary choices/toggles/slider native FIFO acceptance")
 	navigation := flag.Bool("navigation-native-check", false, "run bounded list and action-menu native FIFO acceptance")
+	structure := flag.Bool("structure-native-check", false, "run bounded tabs/disclosure/split/scroll native FIFO acceptance")
 	flag.Parse()
+	if *structure && (*navigation || *choices || *catalogue || *smoke || *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *exit > 0) {
+		must(errors.New("structure-native-check requires its own bounded process"))
+	}
 	if *navigation && (*choices || *catalogue || *smoke || *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *exit > 0) {
 		must(errors.New("navigation-native-check requires its own bounded process"))
 	}
@@ -246,7 +251,7 @@ func main() {
 	if *disclosureSmoke && (*smoke || *exit > 0) {
 		must(errors.New("disclosure-smoke requires its own bounded process"))
 	}
-	if *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *catalogue || *choices || *navigation {
+	if *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *catalogue || *choices || *navigation || *structure {
 		core.DebugSettings.DisableWindowGeometrySaver = true
 	}
 	a, err := app.New(app.Config{})
@@ -269,11 +274,14 @@ func main() {
 	if *navigation {
 		view = g.navigationCatalogueView
 	}
+	if *structure {
+		view = g.structureCatalogueView
+	}
 	if *progressSmoke {
 		view = g.progressView
 	}
 	width, height := float32(720), float32(650)
-	if *choices || *navigation {
+	if *choices || *navigation || *structure {
 		width, height = 900, 700
 	}
 	must(a.Open(app.Window{ID: "gallery", Title: "Vellum Controls", Width: width, Height: height, View: view}))
@@ -328,6 +336,10 @@ func main() {
 		time.AfterFunc(2200*time.Millisecond, func() { _ = a.Post(func() { g.dialog = false; a.Invalidate("gallery") }) })
 	}
 	theme := ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Size: 16}), Foreground: ui.Some(color.NRGBA{R: 32, G: 36, B: 42, A: 255})}, Kinds: map[ui.Kind]ui.Style{ui.Column: {Gap: ui.Some(float32(8))}}}
+	if *structure {
+		must(runStructureCatalogue(ctx, a, g, theme))
+		return
+	}
 	if *navigation {
 		must(runNavigationCatalogue(ctx, a, g, theme))
 		return

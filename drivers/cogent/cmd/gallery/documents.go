@@ -14,7 +14,7 @@ func (g *gallery) documentsView() ui.Node {
 	if len(g.documents) == 0 {
 		content.Children = append(content.Children, ui.Node{ID: "documents-empty", Kind: ui.Label, Text: "All documents are closed."})
 	} else {
-		tabs := ui.Node{ID: "document-tabs", Kind: ui.Tabs, SelectedID: g.documentSelected, Grow: true, Change: func(e ui.ChangeEvent) { g.documentSelected = e.SelectedID }, TabClose: func(e ui.TabCloseEvent) {
+		tabs := ui.Node{ID: "document-tabs", Kind: ui.Tabs, SelectedID: g.documentSelected, Grow: true, Change: func(e ui.ChangeEvent) { g.documentSelectRequests++; g.documentSelected = e.SelectedID }, TabClose: func(e ui.TabCloseEvent) {
 			g.documentCloseRequests++
 			if g.documentReject {
 				return

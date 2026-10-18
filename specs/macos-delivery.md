@@ -508,3 +508,20 @@ frame thresholds and the complete table/tree/application matrix still apply.
 The next bottleneck investigation must use full refresh/scene capture and native
 publication costs, rather than extrapolating another small isolated allocation
 win into framework completion. M4–M7 and native M2/M5 remain open.
+
+### Structural controls checkpoint
+
+The [native structural result](../docs/reports/macos-structure-catalogue/README.md)
+adds controlled tab keyboard navigation with burst/read-only lifetime fixes.
+The new 50-input/42-state native scenario fails after41 inputs/35 source-asserted
+observations, before document selection/close results. Preserve the sealed failure;
+next record measured acquisition status/attempts without relaxing Frame success
+or ordinary retries, and resolve the original disabled-layout equality oracle
+using same-style restoration or independently checked state-specific metrics
+before a new scope. Full structural catalogue,
+physical/pixels/M2/M5/M3–M7 remain open with unchanged thresholds.
+
+The structural native prefix above predates the subsequent Prism tab activation
+and disabled-focus fixes. Those fixes pass actual Core queue/manager routing and
+complete driver/gallery race suites, but have not received a new native run.
+They retain the failed scope and do not close the full structural/native gate.

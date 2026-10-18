@@ -147,6 +147,30 @@ nodes cannot carry independent focus requests. A Tabs request targets its select
 enabled native tab button, or the first enabled option when the selected option
 is disabled. A Tabs control with no enabled options cannot receive focus.
 
+Focused tab headers handle unmodified Left/Right with enabled-option wrap and
+Home/End with enabled endpoints; Space/Enter proposes the focused option.
+Keyboard movement changes native header focus and queues one stable-ID proposal
+through the latest owner callback. Rejected selection stays accepted as before.
+Read-only headers can move focus without proposing selection. Activating an
+already accepted focused option is a no-op; existing explicit pointer repeats
+remain proposals. Modified/previously handled chords keep command priority.
+Queued movement retains absolute input-time intent even before a redraw.
+Activation compares with the latest live pending intent, so focus-only traversal
+back to a still-rendered selected header cannot lose an explicit activation.
+One immutable intent per strip survives owner delivery until authoritative
+originating reconciliation. Admission refusal restores only the exact previous
+intent; rejection, lifecycle changes and reconciliation retire it. Input-time
+read-only authority cannot revive when a callback is later enabled.
+If the actually focused header becomes ineligible, originating reconciliation
+moves focus to the selected/first enabled header without proposing selection.
+If no header is eligible, traversal skips the complete strip subtree (including
+Parts and child descriptors awaiting sync), focusing the next enabled control or
+clearing focus when there is none. Existing valid focus is preserved.
+Hiding/disabling/removing a strip, dialog scope closure and nil/non-nil Change
+transitions revoke old selection capabilities. Owner callbacks never traverse
+originating native widget trees or change their focus from another window.
+
+
 `Accessibility{Name, Help}` carries a semantic label independently of visible
 text. The native adapter stores typed `cogent.Semantics` under
 `cogent.SemanticsProperty`, including stable ID, kind/role, name, help, disabled

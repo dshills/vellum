@@ -1431,3 +1431,20 @@ still fails 4 ms. Corrected-source native CPU/GPU functional checks remain separ
 from that measured overlay. No full table/tree/UI/resource/physical-input or Mac
 completion gate closes. Full current-source matrix and allocation attribution
 remain required before M3/M4 acceptance.
+
+### Structural controls checkpoint
+
+The [native structural result](../docs/reports/macos-structure-catalogue/README.md)
+adds controlled tab keyboard navigation with burst/read-only lifetime fixes.
+The new 50-input/42-state native scenario fails after41 inputs/35 source-asserted
+observations, before document selection/close results. Preserve the sealed failure;
+next record measured acquisition status/attempts without relaxing Frame success
+or ordinary retries, and resolve the original disabled-layout equality oracle
+using same-style restoration or independently checked state-specific metrics
+before a new scope. Full structural catalogue,
+physical/pixels/M2/M5/M3–M7 remain open with unchanged thresholds.
+
+The structural native prefix above predates the subsequent Prism tab activation
+and disabled-focus fixes. Those fixes pass actual Core queue/manager routing and
+complete driver/gallery race suites, but have not received a new native run.
+They retain the failed scope and do not close the full structural/native gate.

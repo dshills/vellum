@@ -9,7 +9,9 @@ composites. Composite controls use the same public node APIs.
 widgets with measured geometry/completed software frames. **A** means native
 adapter/object or owner/model checks; direct setters and semantic handlers are
 not physical input. **W** is the full public workspace replay. **N** is a named native Go FIFO
-record; OS/physical input and native pixels are separate evidence. Test names below
+record. **N-partial** means source-asserted observations from a failed native
+record with independent validation incomplete; it does not qualify a native pass.
+OS/physical input and native pixels are separate evidence. Test names below
 identify their containing source files. The [M2 result](../docs/reports/macos-workspace-acceptance/README.md)
 records actual execution and qualified reuse. This is a coverage map, not a
 claim that all Mac acceptance gates have passed.
@@ -23,11 +25,11 @@ claim that all Mac acceptance gates have passed.
 | `Icon` | `TestIconsManualArtworkInputAndReplacement`: bundled symbol replacement, geometry and nonempty artwork | R |
 | `Image` | `TestManagedImageManualCenteredFitAndCompletedPixels`, `TestManagedImageManualScrollClipPreservesSourceMapping`: fit, source mapping and clipped pixels | R |
 | `Extension` | `TestPublicWorkbenchManualConsumer`: independently consumed public dock, repeated panel-local IDs and routed activation; `TestExtensionReplacementDestroysOnlyReplacedInstance`: replacement ownership | R/A |
-| `SplitPane` | `TestSplitManualKeyboardPointerGeometryAndRetainedDraft`: divider keys/drag, measured ratio and retained child editing | R |
+| `SplitPane` | `TestSplitManualKeyboardPointerGeometryAndRetainedDraft`: divider keys/drag, measured ratio and retained child editing; `gallery -structure-native-check`: native prefix through controlled keys/geometry/state; complete50/42 pending | R/N-partial |
 | `Toolbar` | `TestChromeManualToolbarOverflowAndStatusUpdates`: overflowing tool reveal, Home/End/arrows and disabled skipping | R |
 | `StatusBar` | `TestChromeManualToolbarOverflowAndStatusUpdates`: owner change reaches caption, semantics and completed pixels | R |
 | `FormGroup` | `TestChromeManualToolbarOverflowAndStatusUpdates`: literal caption and child focus traversal | R |
-| `Disclosure` | `TestDisclosureManualPointerKeyboardGeometryAndFocus`: collapse/reopen, layout release, focus and retained children | R |
+| `Disclosure` | `TestDisclosureManualPointerKeyboardGeometryAndFocus`: collapse/reopen, layout release, focus and retained children; `gallery -structure-native-check`: source-asserted native prefix through focus/state; disabled style metrics differ; independent oracle incomplete | R/N-partial |
 | `Checkbox` | `TestChoiceManualQuietPointerFocusAdvancesOrdinaryControl`: measured pointer focus and Tab; `TestNativeControlsChangeRetainedCallbacksAndDisabled`: typed change and controlled state | R/A |
 | `Switch` | `TestExpandedControlsManualFrameAndInput`: focused key changes accepted boolean and completed frame | R |
 | `ToggleButton` | `TestExpandedControlsManualFrameAndInput`, `TestExpandedRejectedToggleRestoresVisibleStyle`: pointer activation and rejected-value styling | R |
@@ -44,8 +46,8 @@ claim that all Mac acceptance gates have passed.
 | `NumberField` | `TestOrdinarySelectorAndNumberKeyboardControlledRoundTrip`: focused numeric step, exactly one proposal, rejected-value restoration and disabled refusal | R |
 | `TextField` | `TestManualRealManagedProjectInput`: routed text edit and Undo; `TestManagedTextFieldFocusLossWaitsForAdmittedNativeFIFO`: native input handoff | R/A |
 | `MultilineText` | `TestFrozenWorkspaceRecordsAcrossBatches`: notes edits/history and UTF-16 selection; `TestManagedEditorCompositionHistoryExactBytes`: composition/committed-byte boundary | W/A |
-| `Tabs` | `TestTabCloseActualPointerKeyboardAndGeometry`: controlled pointer/key close and stale target refusal; `TestNativeTabsReorderReparentAndDisabledOption`: page identity | R/A |
-| `Scroll` | `TestManagedImageManualScrollClipPreservesSourceMapping`, `TestPlacementNativeScrolledContentAndPreviewPixels`: actual ancestor scroll clips and transformed content | R |
+| `Tabs` | `TestTabCloseActualPointerKeyboardAndGeometry`: controlled pointer/key close and stale target refusal; `TestNativeTabsReorderReparentAndDisabledOption`: page identity; `gallery -structure-native-check`: native prefix through root-page navigation; document-close native states pending | R/A/N-partial |
+| `Scroll` | `TestManagedImageManualScrollClipPreservesSourceMapping`, `TestPlacementNativeScrolledContentAndPreviewPixels`: actual ancestor scroll clips and transformed content; `gallery -structure-native-check`: source-asserted native prefix through scroll endpoints/boundary/restoration; complete record pending | R/N-partial |
 | `Dialog` | `TestManualModalDisabledAndStaleRealRouter`: modal refusal of background input; `TestDialogSceneLifecyclePreservesChildrenAndDismissesOnce`: preserved children and single dismissal | R/A |
 | `Canvas2D` | `TestPlacementActualRoutingScaledAcrossBatches`, `TestPlacementRoutedCancellationAndRetirement`: transformed placement/history, consumption and cancellation; `TestCanvasCompletedSemanticsAndSelection`: completed object geometry | R/A |
 | `DataGrid` | `TestStoredGridRoutedReplayAcrossBatches`, `TestManagedGridRowSelectionActualPointerKeysAllAndPaging`: routed stored data, selection, scrolling and completed frames | R |
@@ -107,6 +109,14 @@ and original-window closure pass. Callback totals are 8 list, 2 menu, 3 check/re
 and 1 outside action. This is controlled Go2/SDK786a CPU-scene routing. Remaining
 catalogue, full M2/M5, physical/human input and M3–M7 stay open; no SDK refresh.
 
+The [structural catalogue checkpoint](../docs/reports/macos-structure-catalogue/README.md)
+adds tested controlled Tabs keyboard navigation. The new 50-input/42-state
+native scenario fails after41 inputs/35 source-asserted observations, before
+document selection/close results. The measured-frame acquisition reason is
+unknown. Review establishes that disabled styling changes metrics, invalidating
+the original cross-style geometry equality guard. The failed scope remains sealed. Full structural qualification and
+physical/pixels/M2/M5/M3–M7 remain open; N-partial means a failed record prefix.
+
 The remaining native catalogue work is:
 
 1. Exercise the rest of the supported catalogue's focus, input, state publication
@@ -120,3 +130,8 @@ The remaining native catalogue work is:
 Full M2/M5 remain open. Live tests require current desktop authorization. No
 records or image goldens are regenerated to obtain a passing result. Performance,
 idle, memory and endurance belong to M3/M4 with their original thresholds.
+
+The structural native prefix above predates the subsequent Prism tab activation
+and disabled-focus fixes. Those fixes pass actual Core queue/manager routing and
+complete driver/gallery race suites, but have not received a new native run.
+They retain the failed scope and do not close the full structural/native gate.

@@ -56,3 +56,17 @@ bound and owner FIFO acknowledgement after admission; accepted proposals are not
 reissued while awaiting native publication. Terminal cleanup must report no
 windows, accessibility registrations, native operations or pending callbacks.
 It does not synthesize global keyboard/pointer input or certify human VoiceOver.
+
+The gallery's new `-structure-native-check` authors selected-document pointer/key
+rejection, accepted keyboard close, unchanged selection callback count and
+new-frame stale refusal within a 50-input/42-observation scenario, reusing the
+ordinary document view. Its first native run stops at a measured-frame failure
+before these close observations; they remain native-pending. Actual public
+Manual routing and focused regressions pass. See the
+[result](../docs/reports/macos-structure-catalogue/README.md). The separate Cocoa
+selector/physical/human acceptance requirements above remain unchanged.
+
+The structural native prefix above predates the subsequent Prism tab activation
+and disabled-focus fixes. Those fixes pass actual Core queue/manager routing and
+complete driver/gallery race suites, but have not received a new native run.
+They retain the failed scope and do not close the full structural/native gate.

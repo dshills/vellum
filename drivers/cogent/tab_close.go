@@ -44,6 +44,8 @@ func tabCloseSameScopes(a, b []*tabCloseScope) bool {
 type tabBinding struct {
 	button               *core.Tab
 	closeEpoch           atomic.Pointer[tabCloseEpoch]
+	selectEpoch          atomic.Pointer[tabCloseEpoch]
+	selectWritable       bool
 	closeWidget          atomic.Pointer[core.Button]
 	presented            bool
 	presentationType     core.TabTypes
@@ -157,6 +159,16 @@ func syncTabVisibility(r *record, visible bool, scopes []*tabCloseScope) {
 	}
 	r.control.tabs.visible = visible
 	for id, binding := range r.control.tabs.bindings {
+		writable := r.node.Change != nil
+		if binding.selectWritable != writable {
+			binding.selectEpoch.Store(nil)
+			binding.selectWritable = writable
+		}
+		if !tabSelectionEnabled(r, id, binding) {
+			binding.selectEpoch.Store(nil)
+		} else if previous := binding.selectEpoch.Load(); previous == nil || !tabCloseSameScopes(previous.scopes, scopes) {
+			binding.selectEpoch.Store(&tabCloseEpoch{scopes: append([]*tabCloseScope(nil), scopes...)})
+		}
 		enabled := tabCloseEnabled(r, id, binding) && binding.closeWidget.Load() != nil
 		if !enabled {
 			binding.closeEpoch.Store(nil)
@@ -164,6 +176,7 @@ func syncTabVisibility(r *record, visible bool, scopes []*tabCloseScope) {
 			binding.closeEpoch.Store(&tabCloseEpoch{scopes: append([]*tabCloseScope(nil), scopes...)})
 		}
 	}
+	reconcileTabSelection(r)
 }
 func tabCloseID(tabs, page string) string {
 	return "tab-close:" + accessibilityIDPart(tabs) + ":" + accessibilityIDPart(page)

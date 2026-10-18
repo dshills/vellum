@@ -73,3 +73,24 @@ The complete native routing record passes list scroll/focus/rejection/read-only/
 disabled behavior and menu duplicate-label/check/separator/dismissal/stale-target
 cases with exactly-once callbacks and terminal cleanup. Native pixels, physical/
 OS input and human accessibility remain separate. See the [result](../../../../docs/reports/macos-navigation-catalogue/README.md).
+
+## Native structural controls
+
+```sh
+go run ./cmd/gallery -structure-native-check
+```
+
+This separate bounded 900x700 requested view reuses ordinary Disclosure/SplitPane
+constructors and the document-tab view. It authors 50 Go FIFO inputs/42 observations, emits one result and joins its
+worker. The intended successful path closes the original window; failure cleanup
+retires the session. The first native run remains failed at41 inputs/35 states. It uses the other
+catalogue modes' 90-second deadline, 6-second join, exclusive flags and disabled
+process-local geometry persistence. Tested state uses ordinary public callbacks;
+owner-posted policies are setup only. The ordinary split page now includes enough
+workspace rows to exercise actual scrolling. See the
+[result and limitations](../../../../docs/reports/macos-structure-catalogue/README.md).
+
+The structural native prefix above predates the subsequent Prism tab activation
+and disabled-focus fixes. Those fixes pass actual Core queue/manager routing and
+complete driver/gallery race suites, but have not received a new native run.
+They retain the failed scope and do not close the full structural/native gate.

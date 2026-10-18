@@ -99,3 +99,18 @@ popup target, even with a new frame. Read-only list keys can change focus and
 scroll while accepted selection stays fixed. See the
 [native list/menu result](reports/macos-navigation-catalogue/README.md). It does
 not establish native pixels or physical/OS/assistive-technology input.
+
+
+`gallery -structure-native-check` exercises tabs/disclosure/split/scroll and
+controlled document closes through public DesktopSession Go FIFO, with an authored 50-input/42-state record. Its first native run fails at41/35
+before document selection/close observations; full native qualification is pending.
+The runnable consumer checks actual targets/focus, divider geometry, scrolling,
+callbacks, stale refusal and terminal cleanup without substituting semantic actions. The [result](reports/macos-structure-catalogue/README.md)
+keeps this evidence separate from physical input, native pixels and broader Mac
+qualification. Ordinary tab keyboard navigation is documented in the
+[controls contract](../specs/controls.md).
+
+The structural native prefix above predates the subsequent Prism tab activation
+and disabled-focus fixes. Those fixes pass actual Core queue/manager routing and
+complete driver/gallery race suites, but have not received a new native run.
+They retain the failed scope and do not close the full structural/native gate.

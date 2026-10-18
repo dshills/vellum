@@ -87,6 +87,7 @@ func cacheFieldEditingState(r *record, state core.TextFieldEditingState) bool {
 }
 
 type tabState struct {
+	pending  atomic.Pointer[tabSelectionIntent]
 	pages    map[string]*core.Frame
 	buttons  map[string]*core.Tab
 	order    []string
@@ -326,9 +327,9 @@ func controlDisabled(r *record) bool {
 	}
 	return false
 }
-func postControl(r *record, fn func()) {
+func postControl(r *record, fn func()) bool {
 	if tree.IsNil(r.widget) {
-		return
+		return false
 	}
 	if err := r.control.a.PostWindow(r.control.windowRef, func() {
 		if !r.control.retired {
@@ -336,13 +337,15 @@ func postControl(r *record, fn func()) {
 		}
 	}); err != nil {
 		if errors.Is(err, app.ErrClosed) || errors.Is(err, app.ErrWindowClosed) {
-			return
+			return false
 		}
 		// Refusal can occur outside the owner. Coalesce the error atomically;
 		// accepted values and user error callbacks are handled by native refresh.
 		r.control.refused.Store(&err)
 		r.control.a.Invalidate(r.control.window)
+		return false
 	}
+	return true
 }
 func dispatchControl(r *record, e events.Event) {
 	if r.control == nil || r.control.gridEdit != nil {
@@ -634,23 +637,8 @@ func prepareControl(r *record, n ui.Node) error {
 			c.order = append(c.order, o.ID)
 			id := o.ID
 			binding := bindTab(r, id, button)
-			button.OnClick(func(e events.Event) {
-				postControl(r, func() {
-					enabled := false
-					for _, current := range r.node.Options {
-						if current.ID == id {
-							enabled = !r.control.disabled && !current.Disabled
-							break
-						}
-					}
-					if !enabled || r.node.Change == nil || r.control.tabs.bindings[id] != binding || !r.control.tabs.visible {
-						requestControlRestore(r)
-						return
-					}
-					r.node.Change(ui.ChangeEvent{ID: r.node.ID, Kind: ui.Tabs, SelectedID: id})
-					r.control.a.Invalidate(r.control.window)
-				})
-			})
+			button.OnFirst(events.KeyChord, func(e events.Event) { tabNavigationKey(r, id, binding, e) })
+			button.OnClick(func(e events.Event) { queueTabSelection(r, id, binding, id, binding, true) })
 		}
 	}
 	return nil
@@ -715,6 +703,7 @@ func finishControl(r *record, n ui.Node) {
 			w.DeleteTabIndex(i)
 			delete(c.pages, id)
 			if binding := c.bindings[id]; binding != nil {
+				binding.selectEpoch.Store(nil)
 				binding.closeEpoch.Store(nil)
 				binding.closeWidget.Store(nil)
 			}
@@ -865,7 +854,9 @@ func disposeControl(r *record) {
 		disposePlacement(r)
 		r.control.retired = true
 		if r.control.tabs != nil {
+			r.control.tabs.pending.Store(nil)
 			for _, binding := range r.control.tabs.bindings {
+				binding.selectEpoch.Store(nil)
 				binding.closeEpoch.Store(nil)
 				binding.closeWidget.Store(nil)
 			}

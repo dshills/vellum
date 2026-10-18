@@ -1,0 +1,220 @@
+{
+  "base_commit": "e9896d6bd8a940590f27dd08d971f79a8049cf7c",
+  "native": {
+    "result": "FAILED_OR_CANCELED",
+    "native_executed": true,
+    "error": {
+      "type": "ValueError",
+      "message": "owned native result"
+    },
+    "closed_full_mac_gates": [],
+    "run": {
+      "argv": [
+        "/usr/bin/sandbox-exec",
+        "-p",
+        "(version 1)(allow default)(deny network* (remote ip) (local ip))(deny file-write* (subpath \"/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2\"))",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-structure-catalogue-e9896d6/native-gallery",
+        "-structure-native-check"
+      ],
+      "cwd": "/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent",
+      "started_utc": "2026-10-18T12:16:55.407321+00:00",
+      "watchdog_seconds": 120,
+      "error": null,
+      "exit_code": 1,
+      "created": true,
+      "observation_errors": [],
+      "logs_complete": true,
+      "pins_stable": true,
+      "stop_at_exit": false,
+      "pid": 32943,
+      "group": 32943,
+      "owned": {
+        "created": true,
+        "pid": 32943,
+        "group": 32943,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 1,
+        "errors": [],
+        "observation": {
+          "group": 32943,
+          "members": [],
+          "observation_sha256": "3c3fe8f98fc3f1fb4fa7521a5306ccb650a0ccb1d262e2d5e57d7a0789034765"
+        }
+      },
+      "seconds": 5.657392124994658,
+      "logs": {
+        "stdout": {
+          "bytes": 574033,
+          "sha256": "a77eb7e1f86e23c23fad6f28b6ce3a478e6a2f773d73ba7349eb6d2edb981bd4"
+        },
+        "stderr": {
+          "bytes": 73,
+          "sha256": "a96f366202de5cbf0ec75896492face63b34a48d054f1b266bd2c950e058d71e"
+        }
+      }
+    },
+    "completed_utc": "2026-10-18T12:17:01.096071+00:00"
+  },
+  "native_inputs": 41,
+  "source_asserted_observations": 35,
+  "complete_native_record": false,
+  "failed_post_boundary": {
+    "result": "UNCHANGED_AFTER_FAILED_NATIVE",
+    "canonical_head": "e9896d6bd8a940590f27dd08d971f79a8049cf7c",
+    "canonical_source_sha256": "db1a49460a5a062c2395f66e513fc211ecbe265bfc946ec3b532ad6dea8df206",
+    "candidate_source_sha256": "70b331d77baa2d9bb0eaaf264062b7d0bb8a6063ba91959ebfa33cf92a300c45",
+    "prepared_sha256": "914e42815dc2d77a8d3f99a7608f11e0ac829c46fb99f4c87e84d3c61c0ccb41",
+    "sdk_sha256": "4ce384e5873e00f148b72458ead131f42d4b3d7a464980423cb2f01881e94f26",
+    "native_result": "FAILED_OR_CANCELED",
+    "scope_sealed": true
+  },
+  "native_failure_review": {
+    "archive_member": "checkpoint/internal-native-failure-review.json",
+    "sha256": "9982ab90dd84bf020a285af59bfb36bf24971b22a3bda75ecfb92357b0a1f765",
+    "approved": true,
+    "native_record_qualified": false
+  },
+  "geometry_review": {
+    "archive_member": "checkpoint/internal-geometry-review.json",
+    "sha256": "1083fe67871160365c1956ba65c82c14a43a96e684f4529f4131242eadb840a2",
+    "approved": true,
+    "independent_35_observation_pass_claim_permitted": false
+  },
+  "prefix_attempt": {
+    "result": "FAILED_ORIGINAL_DISABLED_LAYOUT_EQUALITY_GUARD",
+    "complete_native_pass": false,
+    "independent_35_state_validation_complete": false,
+    "failed_guard": "prefix released/restored section layout",
+    "first_failed_label": "section-disabled",
+    "raw_stdout_sha256": "a77eb7e1f86e23c23fad6f28b6ce3a478e6a2f773d73ba7349eb6d2edb981bd4",
+    "oracle_sha256": "685ae6eb3a6879c4bddc195464d7b684cc97201494e007c7cd0351a05d5c3476",
+    "script_sha256": "de8fc9a014652d173130f1fb8ce7484141d3966a18cb31739db8cc6be86928e2",
+    "produced_prefix_result": false,
+    "limitation": "Expanded disabled controls legitimately have different shadow/border metrics; original oracle compares to initial enabled geometry. Original script/oracle/raw preserved, no rerun or missing snapshot inferred."
+  },
+  "oracle_prefix_result": "FAILED_ORIGINAL_DISABLED_LAYOUT_EQUALITY_GUARD; no independent35-state pass",
+  "synthetic_positive_controls": 1,
+  "synthetic_negative_controls": 34,
+  "prepared_files": 6268,
+  "sdk_files": 7880,
+  "sdk_unchanged": true,
+  "physical_input_verified": false,
+  "native_pixels_verified": false,
+  "closed_full_mac_gates": [],
+  "goal_complete": false,
+  "original_software_checks": {
+    "tabs-final": {
+      "receipt_sha256": "1e136ae0dc87c3833033917394e876470c0c058527781c729ed46e93c39a0651",
+      "exit_code": 0,
+      "seconds": 12.530601874925196,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned_group_absent": true
+    },
+    "driver-final": {
+      "receipt_sha256": "e5fd9922928d5680ddef71f5190b15ff785383c2cade734b12e26e6bfcfcddad",
+      "exit_code": 0,
+      "seconds": 280.3483145419741,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned_group_absent": true
+    },
+    "gallery-final": {
+      "receipt_sha256": "19b409a016857f9cd479f94875b0b48726d065209ed92a048d23774f47da38e3",
+      "exit_code": 0,
+      "seconds": 14.331194708007388,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned_group_absent": true
+    },
+    "vet-root-final": {
+      "receipt_sha256": "af368802b85cbc286d481c55ffcc3496f6f61b98d218e52f888901fdc1525ccc",
+      "exit_code": 0,
+      "seconds": 4.060421667061746,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned_group_absent": true
+    },
+    "build-final": {
+      "receipt_sha256": "3b599dbd1906870dc464772fbb47062313354519fb2ca17b451ae670a261279d",
+      "exit_code": 0,
+      "seconds": 10.425412415992469,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned_group_absent": true
+    },
+    "validation-final": {
+      "receipt_sha256": "05dc662de6adb47b534d0c56b61cd9f45aa6f7dec12faaa1e7e0f1ed86447deb",
+      "exit_code": 0,
+      "seconds": 0.41172037506476045,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned_group_absent": true
+    }
+  },
+  "checks": {
+    "tabs-final": {
+      "receipt_sha256": "dc01bc8c8fc9df4c3411a3e8e95629fa55890c971a7fe72f356c34a961096b99",
+      "exit_code": 0,
+      "seconds": 3.5459200829500332,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned_group_absent": true
+    },
+    "driver-final": {
+      "receipt_sha256": "6fe6f9304b36b2cec988a8587b88c785e4a509b0d041d57fb1e3dc14d3783217",
+      "exit_code": 0,
+      "seconds": 284.60104149999097,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned_group_absent": true
+    },
+    "gallery-final": {
+      "receipt_sha256": "e0f74037246502a3783d571e83d9211946274614292518b4e1232a79a6bc8c48",
+      "exit_code": 0,
+      "seconds": 13.592220667051151,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned_group_absent": true
+    },
+    "vet-final": {
+      "receipt_sha256": "e599de860cf89c17ccfda2e55ffd0900b62560dc1278d1e110e2c3513466f914",
+      "exit_code": 0,
+      "seconds": 10.331151540973224,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned_group_absent": true
+    },
+    "build-final": {
+      "receipt_sha256": "b94ebb457ee773a8235d71a84045ad9618e59e47841483ec681f3c645438c4a1",
+      "exit_code": 0,
+      "seconds": 10.271765707992017,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned_group_absent": true
+    }
+  },
+  "native_source_predates_review_fixes": true,
+  "review_fixes_native_verified": false,
+  "original_provider_review": {
+    "archive_prefix": "original/checkpoint/",
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "calls": 1,
+    "files": 20,
+    "bytes": 89210,
+    "cli_exit_code": 1,
+    "retained_findings": 2,
+    "disposition": "BOTH_REPRODUCED_AND_FIXED; original rejection preserved"
+  },
+  "review_regressions": [
+    "Core Right/ShiftTab/Space before owner delivery",
+    "Core Right/ShiftTab/Enter before owner delivery",
+    "Focused option becomes disabled with unchanged FocusRequest",
+    "Whole strip disabled with focusable page descendants",
+    "Pending delivery versus authoritative publication",
+    "Admission refusal preserves previous pending intent",
+    "Hidden/disposed pending capabilities retire"
+  ]
+}
