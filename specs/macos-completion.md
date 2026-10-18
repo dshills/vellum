@@ -48,18 +48,24 @@ under offscreen tags is retained separately from passing package outcomes.
 
 ## Latest unattended evidence
 
-The [current SDK tree boundary](../docs/reports/macos-tree-boundary/README.md)
-completes two ordinary runs of 240 measured events each and two separate
-diagnostics of 120 each, all after 128 warmups per run (480 ordinary / 240
-diagnostic samples). Both ordinary
-100k-wide runs miss the unchanged 4 ms p95 target: CPU 7.183709 ms and
-GPU-requested 7.217669 ms. All routes match 68–69 clipped-row geometry; the GPU
-diagnostic proves 120 fresh accepted draws without fallback/reuse. One run per
-mode is cost-boundary evidence, not the repeated full tree qualification matrix.
-The next bounded prototype is stable-key native row retention with the existing
-fixed-allocation local-layout boundary, initially for viewport-only changes with
-proved immutable index identity. Full fallback, semantics/lifecycle and both-mode
-material-gain checks remain mandatory. No implementation or adoption is claimed.
+The [retained tree/local-layout prototype](../docs/reports/macos-tree-local-layout/README.md)
+is implemented privately and rejected. Independent original-constructor pixels/
+geometry at five scales, stale/fresh AX/pointer routing, coalesced pending fences,
+race/vet/build checks and two positive native diagnostics pass. The diagnostics
+record 120 measured frames each after 128 warmups and observe 40 successful local
+passes by the warmup snapshot; GPU accepts 120 fresh draws without fallback.
+Five ordinary original/candidate pairs per CPU/GPU mode record 240 measured
+frames each after 128 warmups (4,800 ordinary samples). Median run-p95 worsens
+CPU 7.293207 → 7.848000 ms and GPU 7.071166 → 7.531169 ms; no pair improves and
+both median p99s regress. All twenty p95s fail 4 ms. Effective 68–69 clipped-row
+geometry matches. All native groups retire; failures and raw evidence remain.
+No runtime, identity API, prepared dependency or SDK change is adopted. Retire
+the entire experiment without guard relaxation or more local-row/cache tuning.
+M3 requires a different material scene-publication/rendering decision; independent
+M6 shipped-component/rights inventory is next. Full tree/P6/general UI and all
+other Mac completion gates remain open. The preceding
+[SDK cost boundary](../docs/reports/macos-tree-boundary/README.md) remains separate
+one-process-per-mode historical evidence, not part of these paired statistics.
 
 The [current SDK lifecycle/idle checkpoint](../docs/reports/macos-sdk-lifecycle-stage0079/README.md)
 passes two same-name composed lifetimes (66 native selector checks), a 40-second
