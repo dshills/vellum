@@ -594,3 +594,20 @@ full gallery offscreen race suite, vet and native executable build pass. This
 closes the known cross-catalogue consumer shutdown defect; no native application
 runs, sealed scopes remain sealed and no full M2/M5/M3–M7 gate closes. Remaining
 structural and text/modal native acceptance follows under a fresh reviewed scope.
+
+
+### Text/editor/modal catalogue and unavailable consumer checkpoint
+
+The [text/modal result](../docs/reports/macos-text-modal/README.md) adds an ordinary
+public editor page/shared project field and dialog, plus the intended68-input/
+33-state consumer. Full software160/162DPI, driver/gallery race, qualified
+unchanged-root reuse, affected vet and build pass. The adapter preserves the
+multiline renderer's existing required monospace family under UI typography.
+The fresh native case **fails** at35inputs/19validated observations through
+editor Tab on actual one-attempt occluded196609 acquisition. Typed unavailable
+propagation/no retry and tracked session/owned-process cleanup pass. Disabled-
+editor/modal/final-close native checks remain unqualified; the exact failed case
+is sealed. No full M2/M5/M3–M7 gate closes or SDK/prepared bytes change. Continue
+at the actual drawable availability/ownership boundary before another complete
+structural/text/modal admission; do not infer readiness from shown state or
+retry a sealed case. Earlier failed native cases retain their own unknown causes.

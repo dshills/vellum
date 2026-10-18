@@ -131,3 +131,27 @@ current headless checks are recorded in the
 [shutdown checkpoint](../../../../docs/reports/macos-catalogue-lifecycle/README.md).
 Previous native records remain scoped to their original source; the shared
 shutdown change alone supplies no new native catalogue or physical-input result.
+
+
+## Text, editor history and dialogs
+
+The ordinary Text and dialogs page uses public editor.Model with the shared
+project field/preferences dialog. Command+Z/Shift+Command+Z use one journal;
+Tab traverses focus. The backend requires its monospace family, so UI family
+themes do not override it; size, weight and slant still apply.
+
+```sh
+go run ./cmd/gallery -text-native-check
+```
+
+This exclusive900x700 requested mode authors68Go FIFO inputs/33observations for
+text acceptance/rejection/disabled state, exact Unicode/grapheme edits and
+Undo/Redo, modal focus/background refusal, retained reopen, Escape/Apply,
+hidden/stale refusal and closure with a modal. It shares the90-second scenario,
+6-second join and independent1-second final-close bounds and disables process-
+local geometry persistence. Typed drawable unavailability stops it without retry.
+The native case currently fails after35inputs/19observations on an actual
+occluded drawable; disabled-editor/modal/final-close native results remain open.
+The complete software record passes at160/162DPI. See the
+[text/modal result](../../../../docs/reports/macos-text-modal/README.md).
+Go routing is separate from physical input, live IME, VoiceOver and native pixels.

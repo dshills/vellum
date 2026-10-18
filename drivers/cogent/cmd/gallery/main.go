@@ -17,10 +17,14 @@ import (
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/editor"
 	"github.com/dshills/vellum/ui"
 )
 
 type gallery struct {
+	notes                                                                                      *editor.Model
+	textRequests, editRequests, dialogOpens, dialogDismisses, dialogApplies                    int
+	textReject, textDisabled, notesDisabled                                                    bool
 	mediaPage                                                                                  string
 	mediaTools, mediaLast, imageReplacements, imageFitRequests                                 int
 	detailsRequests, splitRequests, structurePageRequests, documentSelectRequests              int
@@ -63,6 +67,11 @@ type gallery struct {
 
 func newGallery() *gallery {
 	g := &gallery{enabled: true, details: true, selection: "basic", tab: "controls", text: "Vellum", number: 25, split: 0.35, picture: galleryImage(), imageFit: ui.ImageContain}
+	var err error
+	g.notes, err = editor.New("Draft\nsecond line\n", editor.Config{})
+	if err != nil {
+		panic(err)
+	}
 	g.structurePage = "sections"
 	g.mediaPage = "chrome"
 	g.documents = []string{"sketch", "notes"}
@@ -134,7 +143,7 @@ func (g *gallery) view() ui.Node {
 				g.sliderControl(),
 				g.numberControl(),
 				{ID: "text-label", Kind: ui.Label, Text: "Project name"},
-				{ID: "project-name", Kind: ui.TextField, Text: g.text, Change: func(e ui.ChangeEvent) { g.text = e.Text }, Accessibility: ui.Accessibility{Name: "Project name", Help: "Single-line native text field"}},
+				g.projectTextField("project-name", "Project name"),
 				{ID: "focus-name", Kind: ui.Button, Text: "Focus project name", Activate: func() { g.focus.ID = "project-name"; g.focus.Sequence++ }},
 			}},
 		),
@@ -153,7 +162,7 @@ func (g *gallery) view() ui.Node {
 		{ID: "controls-separator", Kind: ui.Separator},
 		g.progressBarControl(),
 		g.progressShapesControl(),
-		{ID: "show-dialog", Kind: ui.Button, Text: "Open preferences dialog", Activate: func() { g.dialog = true }},
+		{ID: "show-dialog", Kind: ui.Button, Text: "Open preferences dialog", Activate: g.openPreferences},
 		{ID: "state", Kind: ui.StatusBar, Accessibility: ui.Accessibility{Name: "Application status"}, Text: fmt.Sprintf("Preset %s · project %s", g.selection, g.text)},
 	}}
 	splitDemo := ui.Node{ID: "split-demo", Kind: ui.Column, Grow: true, Children: []ui.Node{
@@ -183,12 +192,8 @@ func (g *gallery) view() ui.Node {
 
 	return ui.Node{ID: "gallery", Kind: ui.Column, Grow: true, Focus: g.focus, Style: ui.Style{Padding: ui.Some(ui.UniformInsets(16)), Gap: ui.Some(float32(12))}, Children: []ui.Node{
 		{ID: "title", Kind: ui.Label, Text: "Vellum controls gallery", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 24, Weight: 600})}},
-		{ID: "pages", Kind: ui.Tabs, Grow: true, SelectedID: g.tab, Options: []ui.Option{{ID: "controls", Label: "Controls"}, {ID: "split-demo", Label: "Split panes"}, {ID: "symbols", Label: "Icons and actions"}, {ID: "images", Label: "Images"}, {ID: "colors", Label: "Colors"}, {ID: "documents", Label: "Document tabs"}, {ID: "lists", Label: "Lists"}, {ID: "chrome", Label: "Chrome"}, {ID: "about", Label: "About"}}, Change: func(e ui.ChangeEvent) { g.tab = e.SelectedID }, Children: []ui.Node{controls, splitDemo, symbols, images, colorsPage, g.documentsView(), g.listBoxView(), g.chromeView(), {ID: "about", Kind: ui.Column, Children: []ui.Node{{ID: "about-text", Kind: ui.Label, Text: "Ordinary Go nodes, retained native controls, local theme values."}}}}},
-		{ID: "preferences", Kind: ui.Dialog, Text: "Preferences", Open: g.dialog, Dismiss: func() { g.dialog = false }, Children: []ui.Node{
-			{ID: "dialog-description", Kind: ui.Label, Text: "Native modal dialog with retained content. Close with Escape or the Close button."},
-			{ID: "dialog-name", Kind: ui.TextField, Text: g.text, Change: func(e ui.ChangeEvent) { g.text = e.Text }, Accessibility: ui.Accessibility{Name: "Project name in preferences"}},
-			{ID: "apply", Kind: ui.Button, Text: "Apply and close", Activate: func() { g.dialog = false }},
-		}},
+		{ID: "pages", Kind: ui.Tabs, Grow: true, SelectedID: g.tab, Options: []ui.Option{{ID: "controls", Label: "Controls"}, {ID: "split-demo", Label: "Split panes"}, {ID: "symbols", Label: "Icons and actions"}, {ID: "images", Label: "Images"}, {ID: "colors", Label: "Colors"}, {ID: "documents", Label: "Document tabs"}, {ID: "lists", Label: "Lists"}, {ID: "chrome", Label: "Chrome"}, {ID: "text-page", Label: "Text and dialogs"}, {ID: "about", Label: "About"}}, Change: func(e ui.ChangeEvent) { g.tab = e.SelectedID }, Children: []ui.Node{controls, splitDemo, symbols, images, colorsPage, g.documentsView(), g.listBoxView(), g.chromeView(), g.textPage(), {ID: "about", Kind: ui.Column, Children: []ui.Node{{ID: "about-text", Kind: ui.Label, Text: "Ordinary Go nodes, retained native controls, local theme values."}}}}},
+		g.preferencesDialog(),
 	}}
 }
 func main() {
@@ -203,7 +208,11 @@ func main() {
 	navigation := flag.Bool("navigation-native-check", false, "run bounded list and action-menu native FIFO acceptance")
 	structure := flag.Bool("structure-native-check", false, "run bounded tabs/disclosure/split/scroll native FIFO acceptance")
 	media := flag.Bool("media-native-check", false, "run bounded image/chrome/composite native FIFO acceptance")
+	textModal := flag.Bool("text-native-check", false, "run bounded text/editor/dialog native FIFO acceptance")
 	flag.Parse()
+	if *textModal && (*media || *structure || *navigation || *choices || *catalogue || *smoke || *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *exit > 0) {
+		must(errors.New("text-native-check requires its own bounded process"))
+	}
 	if *media && (*structure || *navigation || *choices || *catalogue || *smoke || *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *exit > 0) {
 		must(errors.New("media-native-check requires its own bounded process"))
 	}
@@ -231,7 +240,7 @@ func main() {
 	if *disclosureSmoke && (*smoke || *exit > 0) {
 		must(errors.New("disclosure-smoke requires its own bounded process"))
 	}
-	if *media || *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *catalogue || *choices || *navigation || *structure {
+	if *textModal || *media || *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *catalogue || *choices || *navigation || *structure {
 		core.DebugSettings.DisableWindowGeometrySaver = true
 	}
 	a, err := app.New(app.Config{})
@@ -260,11 +269,14 @@ func main() {
 	if *media {
 		view = g.mediaCatalogueView
 	}
+	if *textModal {
+		view = g.textCatalogueView
+	}
 	if *progressSmoke {
 		view = g.progressView
 	}
 	width, height := float32(720), float32(650)
-	if *media || *choices || *navigation || *structure {
+	if *textModal || *media || *choices || *navigation || *structure {
 		width, height = 900, 700
 	}
 	must(a.Open(app.Window{ID: "gallery", Title: "Vellum Controls", Width: width, Height: height, View: view}))
@@ -319,6 +331,10 @@ func main() {
 		time.AfterFunc(2200*time.Millisecond, func() { _ = a.Post(func() { g.dialog = false; a.Invalidate("gallery") }) })
 	}
 	theme := ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Size: 16}), Foreground: ui.Some(color.NRGBA{R: 32, G: 36, B: 42, A: 255})}, Kinds: map[ui.Kind]ui.Style{ui.Column: {Gap: ui.Some(float32(8))}}}
+	if *textModal {
+		must(runTextCatalogue(ctx, a, g, theme))
+		return
+	}
 	if *media {
 		must(runMediaCatalogue(ctx, a, g, theme))
 		return

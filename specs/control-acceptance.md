@@ -44,11 +44,11 @@ claim that all Mac acceptance gates have passed.
 | `SegmentedControl` | `TestChoiceManualKeyboardPointerAndFocus`: same scenario over segmented presentation | R |
 | `Slider` | `TestColorPickerManagedKeyboardReconcileAndPixels`: actual focused key changes a managed byte slider; `TestNativeControlsChangeRetainedCallbacksAndDisabled`: typed payload and finite refusal | R/A |
 | `NumberField` | `TestOrdinarySelectorAndNumberKeyboardControlledRoundTrip`: focused numeric step, exactly one proposal, rejected-value restoration and disabled refusal | R |
-| `TextField` | `TestManualRealManagedProjectInput`: routed text edit and Undo; `TestManagedTextFieldFocusLossWaitsForAdmittedNativeFIFO`: native input handoff | R/A |
-| `MultilineText` | `TestFrozenWorkspaceRecordsAcrossBatches`: notes edits/history and UTF-16 selection; `TestManagedEditorCompositionHistoryExactBytes`: composition/committed-byte boundary | W/A |
+| `TextField` | `TestManualRealManagedProjectInput`: routed text edit and Undo; `TestManagedTextFieldFocusLossWaitsForAdmittedNativeFIFO`: native input handoff; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI; native `gallery -text-native-check`: independently validated failed19/35prefix, complete68/33pending | R/A/N-partial |
+| `MultilineText` | `TestFrozenWorkspaceRecordsAcrossBatches`: notes edits/history and UTF-16 selection; `TestManagedEditorCompositionHistoryExactBytes`: composition/committed-byte boundary; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI; native `gallery -text-native-check`: independently validated failed19/35prefix, complete68/33pending | W/A/N-partial |
 | `Tabs` | `TestTabCloseActualPointerKeyboardAndGeometry`: controlled pointer/key close and stale target refusal; `TestNativeTabsReorderReparentAndDisabledOption`: page identity; `gallery -structure-native-check`: native prefix through root-page navigation; document-close native states pending | R/A/N-partial |
 | `Scroll` | `TestManagedImageManualScrollClipPreservesSourceMapping`, `TestPlacementNativeScrolledContentAndPreviewPixels`: actual ancestor scroll clips and transformed content; `gallery -structure-native-check`: source-asserted native prefix through scroll endpoints/boundary/restoration; complete record pending | R/N-partial |
-| `Dialog` | `TestManualModalDisabledAndStaleRealRouter`: modal refusal of background input; `TestDialogSceneLifecyclePreservesChildrenAndDismissesOnce`: preserved children and single dismissal | R/A |
+| `Dialog` | `TestManualModalDisabledAndStaleRealRouter`: modal refusal of background input; `TestDialogSceneLifecyclePreservesChildrenAndDismissesOnce`: preserved children and single dismissal; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI | R/A |
 | `Canvas2D` | `TestPlacementActualRoutingScaledAcrossBatches`, `TestPlacementRoutedCancellationAndRetirement`: transformed placement/history, consumption and cancellation; `TestCanvasCompletedSemanticsAndSelection`: completed object geometry | R/A |
 | `DataGrid` | `TestStoredGridRoutedReplayAcrossBatches`, `TestManagedGridRowSelectionActualPointerKeysAllAndPaging`: routed stored data, selection, scrolling and completed frames | R |
 | `DataTree` | `TestManagedTreeActualGeometryAndKeyboard`, `TestManagedTreePointerDisclosureAndRetiredPress`: indexed geometry, keys/disclosure and retired presses | R |
@@ -193,3 +193,13 @@ Two actual Application regressions discriminate the missing-cancel and canceled-
 close counterfactuals. Final gallery race/vet/build and the distinct corrected
 71-input/42-observation native case pass; both native scopes remain sealed.
 One original Anthropic Sonnet 5.5 call and independent fix reviews are retained.
+
+The [text/editor/modal result](../docs/reports/macos-text-modal/README.md) supplies
+N-partial evidence for TextField/MultilineText through `gallery -text-native-check`:
+the intended68/33 record fails after35inputs/19independent observations on actual
+typed drawable unavailability. Accepted/rejected/disabled-field behavior,
+Unicode/grapheme edits, journal Undo/Redo and editor Tab are validated in this
+failed prefix. Disabled-editor/modal/final-close native results remain open;
+full software33states pass160/162DPI. The case is permanently sealed without
+retry. Physical/OS input, live IME, human accessibility and native pixels remain
+separate; full M2/M5/M3–M7 and remaining structural acceptance stay open.

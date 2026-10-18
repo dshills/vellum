@@ -199,3 +199,28 @@ func TestSliderManagedSizingOverridesFinalDefaultsAndRestores(t *testing.T) {
 		t.Fatal("sizing changes replaced retained slider")
 	}
 }
+
+func TestManagedEditorTypographyPreservesNativeFamily(t *testing.T) {
+	_, _, _, r, _ := editorFixture(t, "Draft\nnotes\n")
+	widget := r.widget
+	r.theme = ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 18, Weight: 600, Italic: true})}}
+	for _, nodeStyle := range []ui.Style{{}, {Typography: ui.Some(ui.Typography{Family: "Another UI Font", Size: 22, Weight: 700})}, {}} {
+		n := r.node
+		n.Style = nodeStyle
+		if err := syncRecord(r, n); err != nil {
+			t.Fatal(err)
+		}
+		widget.AsWidget().Style()
+		font := widget.AsWidget().Styles.Font
+		if r.widget != widget || font.Family != rich.Monospace || font.CustomFont != "" {
+			t.Fatal("UI font theme invalidated retained document renderer", font)
+		}
+		wantSize, wantWeight, wantSlant := float32(18), rich.Semibold, rich.Italic
+		if nodeStyle.Typography.Set {
+			wantSize, wantWeight, wantSlant = 22, rich.Bold, rich.SlantNormal
+		}
+		if font.Size.Value != wantSize || font.Weight != wantWeight || font.Slant != wantSlant {
+			t.Fatal("other typography lost", font)
+		}
+	}
+}

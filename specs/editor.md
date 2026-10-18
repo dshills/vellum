@@ -175,3 +175,18 @@ requests invoke it once on the owner while the application is open, including
 cancellation, window closure or client retirement errors. Whole-application
 closure cancels user dispatch. Settlement covers the named model's single live
 binding; it is not a global multiwindow flush.
+
+
+## Current renderer font family and gallery integration
+
+The managed multiline backend requires its monospace rich-font family. The
+adapter preserves this existing invariant after theme/node styles; general UI
+`Typography.Family` overrides do not select a proportional family for
+`MultilineText`. Size, weight and slant remain configurable. This avoids repeated
+downstream correction after style refresh. The ordinary
+[gallery](../drivers/cogent/cmd/gallery/README.md) consumes public editor.Model;
+full software routing and the independently validated failed native prefix in
+[the text/modal result](../docs/reports/macos-text-modal/README.md) cover exact
+Unicode edits, grapheme deletion and one Undo/Redo journal. The complete native
+text/modal record remains open after actual drawable unavailability. Go FIFO
+establishes no live IME, physical input or native pixels.

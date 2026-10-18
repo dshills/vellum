@@ -82,6 +82,14 @@ func applyStyle(s *styles.Style, n ui.Node, theme ui.Theme) {
 			s.Font.Slant = rich.Italic
 		}
 	}
+	// The current multiline backend requires a monospace rich family. Its own
+	// defaults establish that invariant before the application's final styler;
+	// keep ordinary UI family themes from undoing it on every refresh.
+	if n.Kind == ui.MultilineText {
+		s.Font.Family = rich.Monospace
+		s.Font.CustomFont = ""
+	}
+
 }
 func nativeAlignment(a ui.Alignment) styles.Aligns {
 	switch a {
