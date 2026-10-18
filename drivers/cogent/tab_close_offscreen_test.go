@@ -126,3 +126,43 @@ func TestTabCloseActualPointerKeyboardAndGeometry(t *testing.T) {
 		t.Fatal("retirement reenabled unmanaged deletion seam")
 	}
 }
+
+func TestTabCloseRejectedPointerRetainsHeaderFocus(t *testing.T) {
+	for _, closed := range []string{"a", "b"} {
+		t.Run(closed, func(t *testing.T) {
+			var proposals []string
+			selections := 0
+			view := func() ui.Node {
+				n := closeTabsFixture(func(e ui.TabCloseEvent) { proposals = append(proposals, e.PageID) })
+				n.Change = func(ui.ChangeEvent) { selections++ }
+				n.Focus = ui.FocusRequest{ID: "tabs", Sequence: 1}
+				return n
+			}
+			m, _ := simpleManual(t, manualConfig(t, 7), view)
+			unitSettle(t, m)
+			before, close := imageManualElement(t, m, tabCloseID("tabs", closed))
+			root := m.implementation.find("one").state.root
+			page := root.control.tabs.pages[closed]
+			for _, typ := range []events.Types{events.MouseDown, events.MouseUp} {
+				if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: before.Incarnation, Target: close.ID, TargetIncarnation: close.Incarnation, Type: typ, Button: events.Left}); err != nil {
+					t.Fatal(err)
+				}
+			}
+			unitSettle(t, m)
+			snap, _ := imageManualElement(t, m, tabCloseID("tabs", closed))
+			if len(proposals) != 1 || proposals[0] != closed || selections != 0 || root.node.SelectedID != "a" || root.control.tabs.pages[closed] != page {
+				t.Fatal("rejected pointer close changed accepted state", proposals, selections)
+			}
+			if snap.FocusedID != "tabs" || !root.control.tabs.buttons[closed].ContainsFocus() {
+				t.Fatal("rejected close lost actual header focus", closed, snap.FocusedID)
+			}
+			if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: before.Incarnation, Type: events.KeyChord, Code: key.CodeDelete}); err != nil {
+				t.Fatal(err)
+			}
+			unitSettle(t, m)
+			if len(proposals) != 2 || proposals[1] != closed || selections != 0 || root.node.SelectedID != "a" || root.control.tabs.pages[closed] != page {
+				t.Fatal("Delete did not use the retained header focus", proposals, selections)
+			}
+		})
+	}
+}

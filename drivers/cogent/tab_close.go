@@ -59,7 +59,15 @@ func bindTab(r *record, id string, button *core.Tab) *tabBinding {
 	r.control.tabs.bindings[id] = binding
 	// Never restore nil after retirement: a late private close gesture must not
 	// fall through to the backend's destructive unmanaged deletion path.
-	button.CloseRequest = func(origin *core.Button) { queueTabCloseFrom(r, id, binding, origin) }
+	button.CloseRequest = func(origin *core.Button) {
+		// The private close click clears focus in Core. Restore its live header
+		// here, on the originating native event, without selecting that page.
+		// Owner delivery (including a peer-window drain) must never touch focus.
+		if origin != nil && binding.closeWidget.Load() == origin && tabCloseEpochLive(binding.closeEpoch.Load()) && tabCloseEnabled(r, id, binding) {
+			button.SetFocusQuiet()
+		}
+		queueTabCloseFrom(r, id, binding, origin)
+	}
 	button.OnFirst(events.KeyChord, func(e events.Event) {
 		if e.IsHandled() || e.Modifiers() != 0 || !tabCloseEpochLive(binding.closeEpoch.Load()) {
 			return

@@ -17,7 +17,13 @@ be reparented before native page destruction, preserving uncommitted drafts.
 
 Pointer activation of the private close button and Delete/Backspace while a tab
 header is focused request closing that tab. Modified chords remain available to
-application commands/window handling. Close buttons add no managed Tab stop.
+application commands/window handling. A live private close click quietly focuses
+its originating header without selecting that page. If the application rejects
+the request, Delete/Backspace continues to address that same header, including an
+unselected document. This focus change runs during the originating native click,
+never from a queued owner callback or a semantic close action. Stale artwork,
+hidden/disabled controls and retired lifetimes cannot acquire focus this way.
+Close buttons add no managed Tab stop.
 Disabled ancestors/options, hidden containers, retired tabs/artwork and closed
 dialog lifetimes refuse requests. Native fallback deletion is intercepted before
 parent/index lookup, and the gesture is consumed even when owner admission fails.
