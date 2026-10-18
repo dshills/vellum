@@ -57,7 +57,7 @@ fixture failures. The later local-callback fix received fresh checks above.
 Checks use Go1.25.6/GOMAXPROCS2, actual candidate sources and an external dependency
 manifest pinning prepared Core/typesetting and the retained source-built786a
 native library/module. Checkout go.mod, prepared outputs and SDK bytes stay
-unchanged. No native application is launched. Historical raw receipts remain in
+unchanged. These software checks launch no native application. Historical raw receipts remain in
 the local checkpoint workspace; the bounded archive retains their logs/ownership
 records and condensed receipts with original receipt hashes, plus complete
 current final receipts and exact sources. This is not a refreshed SDK package.
@@ -68,16 +68,61 @@ independently checked disposition to be retained with the records. The final com
 
 ## Still open
 
-A fresh separately admitted native visibility lifecycle scenario must establish
-actual NSWindow notifications, ordinary redraw after native visibility changes,
-unchanged unavailable-frame behavior and owned closure. No old sealed catalogue
-case is replayed here. This checkpoint does not diagnose those failures or
-promise recovery when the backend yields without a Cocoa state change.
+The native lifecycle record below qualifies this one clean/popup hide/show
+scenario. No old sealed catalogue case is replayed. It does not diagnose earlier
+acquisition failures or promise recovery when a backend yields without a Cocoa
+state change. Complete structural and text/modal catalogue acceptance remains
+required under a fresh scope.
 
 The failed text/modal35-input19-state prefix and structural failures remain
 failed. Full native catalogue, physical/OS input, IME, human VoiceOver, native
 pixels/presentation, M2/M5, performance/resource/rights/distribution and full Mac
 completion remain open. No system settings or SDK refresh occurs.
+
+## Native visibility lifecycle evidence
+
+Clean runtime source `2aca9b6` passes a separately admitted one-window native
+consumer in 2.960 seconds. Four actual same-window Cocoa notifications and five
+copied visibility observations match two hide/show cycles, first with a clean
+scene and then with an actual Selector popup. Both hidden explicit Frame requests
+return typed terminal unavailable from one occluded acquisition attempt and grant
+no Snapshot capability. Ordinary composition calls begin after each observed
+visible notification and return before a new explicit measured request. The two
+new requests complete; the popup and its original item incarnation remain intact.
+
+There are seven explicit Frames, five successful snapshots, two Go FIFO pointer
+records and 21 total session requests. Ten ordinary End calls are observed in
+total: this is not one native frame per transition or proof of GPU/presentation
+success. The software counterfactual above separately identifies the observer's
+scene-dirt requirement; native expose handling may also cause redraw. The private
+entry-ordinal witness is deliberately conservative about notification ordering.
+
+Original reference refusal, private observer retirement and tracked session/AX/
+callback cleanup pass. Owned group1195 is absent with complete stable streams and
+whole clean source5498/prepared6276/SDK7880 post-boundaries intact. One inactive,
+untitled, hidden TUINS window remains sampled; native deallocation/zero-Cocoa-
+window, memory, physical/OS input, native pixels and presentation are unqualified.
+Controlled Go1.25.6/GOMAXPROCS2/SDK786a CPU-scene routing is the tested scope.
+
+The preceding private consumer fails before its first public session operation:
+Issued0/Measured0, CLI1 after37.789 seconds, owned group97947 absent. Its original
+case remains failed and sealed. The helper boxed the C logical expression as JSON
+integers0/1 while Go required a boolean, discarding replies and timing out. Actual
+original/fixed-helper Foundation fixtures with nil/fake objects prove numeric
+versus boolean wire types without constructing NSApplication or NSWindow. The
+original malformed native bytes were discarded, so their exact contents are not
+retrospectively observed. The separately corrected consumer uses explicit JSON
+booleans and bounded raw decode-fault evidence. No product defect or Cocoa queue
+delivery diagnosis is inferred from this private failure.
+
+Actual-source build/vet, 26 independent negative validator controls, source/plan
+admission and independent result reviews cover the corrected private consumer.
+No runtime source or SDK/prepared byte changes follow the existing Prism-reviewed
+implementation. Both native scopes, source/controllers, exact plans, receipts and
+raw streams are in [the bounded native archive](records/native-checkpoint.tar.gz)
+with [member hashes](records/native-manifest.json). Binaries/SDK and earlier unused
+preflight compile versions remain local; they are not copied recursively into
+this archive. No second implementation/provider review or full Mac gate closure.
 
 ## Provider disposition
 

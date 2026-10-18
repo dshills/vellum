@@ -1,0 +1,23 @@
+{
+  "archive": "native-checkpoint.tar.gz",
+  "sha256": "9a38f25fe4a907df17b8022f95cffa391ac77773846da48e6c48be9e40d3ab0d",
+  "manifest": "native-manifest.json",
+  "manifest_sha256": "8b51285f0d434234ab541fc8c1a53595763f980c6500d632b9141120eb64a0bf",
+  "members": 77,
+  "expanded_bytes": 25329214,
+  "compressed_bytes": 6840314,
+  "limits": {
+    "members": 128,
+    "expanded_bytes": 33554432,
+    "member_bytes": 8388608,
+    "compressed_bytes": 8388608
+  },
+  "original_case": "FAILED_SEALED_PRIVATE_WIRE",
+  "corrected_case": "PASS_SCOPED_NATIVE_VISIBILITY",
+  "binaries_and_SDK_excluded": true,
+  "earlier_preflight_compile_versions_local_only": true,
+  "physical_input_verified": false,
+  "native_pixels_verified": false,
+  "native_deallocation_verified": false,
+  "closed_full_mac_gates": []
+}

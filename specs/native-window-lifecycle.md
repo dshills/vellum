@@ -140,3 +140,12 @@ Foundation-only observer fixtures and Manual owner/composition regressions do no
 establish real NSWindow notification timing, Metal availability or presentation.
 The [checkpoint](../docs/reports/macos-window-visibility/README.md) records the
 current qualification and preserves earlier failed native scopes.
+
+The separately reviewed clean-source `2aca9b6` native record now passes two
+clean/popup hide/show cycles: four actual Cocoa notifications, ordinary redraw
+after visible delivery, unchanged typed terminal hidden Frame failures, fresh
+explicit frame success and tracked cleanup. The actual Selector popup survives.
+This scoped evidence remains separate from native deallocation, presentation,
+physical/human workflows and complete Mac qualification. The preceding private
+wire-format failure stays failed/sealed; deterministic original/fixed Foundation
+wire fixtures and a distinct corrected admission establish that test correction.
