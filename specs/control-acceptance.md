@@ -85,6 +85,16 @@ source-asserted observations; the styling-only case did not fix actual focus.
 Controlled Go2/SDK786a CPU-scene routing is qualified for this record only. Full
 catalogue/M2, physical/human M5 and M3–M7 remain open; no SDK refresh occurs.
 
+The [choice catalogue checkpoint](../docs/reports/macos-choice-catalogue/README.md)
+adds a complete 30-input/23-observation native record for Checkbox, Switch,
+ToggleButton, RadioGroup, SegmentedControl and Slider keyboard behavior. Shared
+state, rejected changes, disabled skipping/refusal, focus and exactly-once
+callbacks pass. ProgressBar/Ring/Gauge and status publish expected values and
+fully visible geometry; native progress pixels and Slider drag are not claimed.
+Original-reference/session/process retirement passes. This advances named
+catalogue coverage in controlled Go2/SDK786a CPU-scene routing; remaining catalogue,
+full M2/M5, physical/human input and M3–M7 remain open. No SDK refresh occurs.
+
 The remaining native catalogue work is:
 
 1. Exercise the rest of the supported catalogue's focus, input, state publication

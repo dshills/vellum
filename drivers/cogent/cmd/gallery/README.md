@@ -35,3 +35,23 @@ the inherited-state and actual multi-click focus fixes. Six preceding attempts
 remain failed/sealed. This is automated native Go routing in the controlled
 Go2/SDK786a CPU-scene configuration; physical/OS input and full Mac acceptance
 remain open. See the [result](../../../../docs/reports/macos-control-refocus/README.md).
+
+## Native choice catalogue
+
+```sh
+go run ./cmd/gallery -choice-native-check
+```
+
+This independent mode uses the same ordinary public constructors in a compact
+900x700 requested window. It routes 30 inputs and checks 23 observations, then
+closes its original window and emits one JSON result. The 90-second deadline,
+6-second worker join, nonzero failures and disabled geometry persistence match
+the other catalogue mode. These modes and `-exit-after` are mutually exclusive.
+
+Checkbox, Switch and ToggleButton receive pointer/Space input. RadioGroup and
+SegmentedControl share selection, skip disabled options and restore rejected
+requests. Slider keyboard changes drive progress/status values. Right at its
+maximum sends one clamped Change proposal; selected-choice Space sends none.
+Final native routing passes with exact callback counts and terminal cleanup.
+Progress checks cover semantics/layout, not native pixels; Slider drag and
+physical/OS input remain separate. See the [result](../../../../docs/reports/macos-choice-catalogue/README.md).

@@ -1,0 +1,122 @@
+{
+  "base_commit": "500cf8016e114b3ef3fba029c9cd086592bc3224",
+  "native": {
+    "result": "PASS_NATIVE_CHOICES",
+    "native_executed": true,
+    "error": null,
+    "closed_mac_gates": [],
+    "run": {
+      "argv": [
+        "/usr/bin/sandbox-exec",
+        "-p",
+        "(version 1)(allow default)(deny network* (remote ip) (local ip))(deny file-write* (subpath \"/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2\"))",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-choice-catalogue-500cf80/native-gallery",
+        "-choice-native-check"
+      ],
+      "cwd": "/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent",
+      "started_utc": "2026-10-18T10:35:02.675495+00:00",
+      "watchdog_seconds": 120,
+      "error": null,
+      "exit_code": 0,
+      "created": true,
+      "observation_errors": [],
+      "logs_complete": true,
+      "pins_stable": true,
+      "stop_at_exit": false,
+      "pid": 75077,
+      "group": 75077,
+      "owned": {
+        "created": true,
+        "pid": 75077,
+        "group": 75077,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 75077,
+          "members": [],
+          "observation_sha256": "b6a6852ce2f0a35ed339c0e78778128d1bca9f38dc384959f33c6ca5b66b7732"
+        }
+      },
+      "seconds": 3.6358562910000005,
+      "logs": {
+        "stdout": {
+          "bytes": 369021,
+          "sha256": "c4f271e64451ff2aa6dd2425c56a74a5384141417b09643a90c9dc7a13de7332"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    "summary": {
+      "result": "PASS_NATIVE_CHOICES",
+      "observations": 23,
+      "inputs": 30,
+      "callbacks": {
+        "enable": 2,
+        "switch": 2,
+        "pin": 2,
+        "selection": 6,
+        "number": 5,
+        "ordinary_action": 1
+      },
+      "known_font_diagnostics": 0,
+      "session": {
+        "Started": true,
+        "Closed": true,
+        "Pending": false,
+        "LiveWindows": 0,
+        "Issued": 136
+      },
+      "physical_input_verified": false,
+      "slider_drag_verified": false,
+      "progress_pixels_verified": false
+    },
+    "completed_utc": "2026-10-18T10:35:10.956210+00:00"
+  },
+  "checks": {
+    "gallery-final": {
+      "receipt_sha256": "256370d8af144e5c3af84657b113d7b3e4d0d77b8eb4176828ca0a64347ca6bf",
+      "exit_code": 0,
+      "seconds": 7.665530041999999,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned_group_absent": true
+    },
+    "vet-final": {
+      "receipt_sha256": "fe4e3ba66b3768dc169d0486b53ba9e31ba075937ebfc2c0f54a28163d33da42",
+      "exit_code": 0,
+      "seconds": 0.723576792,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned_group_absent": true
+    },
+    "build-final": {
+      "receipt_sha256": "51b84210f2555ddfc3a856fcc29211ad01270215acd32135776bd206e8257a4c",
+      "exit_code": 0,
+      "seconds": 6.5481891249999995,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned_group_absent": true
+    },
+    "validation-final-v2": {
+      "receipt_sha256": "cd4312073277536dd2ebc9928a81a6a7a5161281a4a76a875983f5c5ca80d003",
+      "exit_code": 0,
+      "seconds": 0.23893554199999997,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned_group_absent": true
+    }
+  },
+  "prepared_files": 6267,
+  "sdk_files": 7880,
+  "sdk_unchanged": true,
+  "physical_input_verified": false,
+  "slider_drag_verified": false,
+  "progress_pixels_verified": false,
+  "closed_full_mac_gates": [],
+  "goal_complete": false
+}

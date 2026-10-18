@@ -80,3 +80,12 @@ the inherited-state and actual multi-click focus fixes. Six preceding attempts
 remain failed/sealed. This is automated native Go routing in the controlled
 Go2/SDK786a CPU-scene configuration; physical/OS input and full Mac acceptance
 remain open. See the [result](reports/macos-control-refocus/README.md).
+
+The gallery's `-choice-native-check` is a separate bounded mode for shared
+choices, toggles and Slider keyboard input: 30 routed inputs/23 observations pass
+with callback/rejection/disabled/focus/closure checks. Progress/status publication
+uses numeric semantics and measured layout, not native pixel validation. It
+uses the same public API and current exact group-qualified option identities;
+repeated option DomainIDs across groups are not input capabilities. See the
+[native choice result](reports/macos-choice-catalogue/README.md). Physical/OS input,
+Slider drag, presentation and full Mac gates remain open.
