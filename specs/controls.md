@@ -43,7 +43,11 @@ observers must not reenter application ownership. Changes emitted synchronously
 by native focus transitions therefore cannot nest `Application.Do`.
 
 `Disabled` blocks model changes, including descendants of disabled managed
-containers. Native styles reflect that disabled state. Selector/tabs options use
+containers. Native styles reflect that disabled state. Reconciliation refreshes
+retained descendants when effective disabled state changes, even when their own
+descriptors are unchanged. Re-enabling an ancestor preserves a child's own
+Disabled state. Text/numeric multi-clicks restore actual focus when eligible
+before ordinary word/all selection; they do not propose a value just to focus. Selector/tabs options use
 stable IDs independent of displayed labels; duplicate/empty IDs and missing
 selected IDs are rejected. Native selector menus omit disabled choices; a
 model-selected disabled choice can still be displayed. Tabs display disabled

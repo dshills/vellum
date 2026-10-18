@@ -46,7 +46,7 @@ separate from native/physical acceptance. The broad upstream diagnostic failure
 and restored SDK test-image side effect remain explicit. No new catalogue or
 full Mac gate is closed; ordinary Selector/NumberField checks follow in the checkpoint below.
 
-The [popup and Selector integration checkpoint](../docs/reports/macos-native-controls/README.md)
+The historical [popup and Selector integration checkpoint](../docs/reports/macos-native-controls/README.md)
 adds stage83 bounded actual-menu inspection, repairs owner wakes starved by modal
 menus, and restores actual Selector click focus before its menu opens. Final
 Core/driver/gallery race, vet, build and preparation checks pass. Four native
@@ -54,10 +54,19 @@ attempts remain failed and sealed: the final source-asserted prefix reaches ten
 Selector observations plus one accepted numeric edit (24 inputs/11 observations),
 then refuses the next key because Enter cleared numeric focus. No complete native
 catalogue, M2/M5 or other Mac gate closes. The corrected checker authors four routed refocus clicks after numeric Enter
-(57 inputs/21 unchanged observations); its revised native qualification remains
-pending. Complete that record before the remaining catalogue checks;
+(57 inputs/21 unchanged observations); that checkpoint left revised native qualification pending. The subsequent
+result below completes this record; remaining catalogue checks continue;
 physical/OS input, human accessibility and M3–M7 remain open. No SDK refresh or
 OS settings change occurs.
+
+The subsequent [retained-state and multi-click checkpoint](../docs/reports/macos-control-refocus/README.md) completes the unchanged native
+Selector/NumberField record: 57 routed inputs and 21 independently expected
+observations. Go adapter fixes restore inherited disabled styling and actual
+focus before ordinary double/triple-click handling, preserving selection and
+exactly-once edits. Two preceding 57-input cases remain failed at 54 receipts/19
+source-asserted observations; the styling-only case did not fix actual focus.
+Controlled Go2/SDK786a CPU-scene routing is qualified for this record only. Full
+catalogue/M2, physical/human M5 and M3–M7 remain open; no SDK refresh occurs.
 
 ## M1 SDK command ownership
 

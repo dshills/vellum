@@ -215,12 +215,15 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	case ui.Slider:
 		widget = core.NewSlider(parent)
 	case ui.NumberField:
-		widget = core.NewSpinner(parent)
+		spinner := core.NewSpinner(parent)
+		bindFieldPointerFocus(&spinner.TextField)
+		widget = spinner
 	case ui.TextField:
 		c.fieldChanges.Store(&fieldChangeEpoch{})
 		c.client = textClientID.Add(1)
 		c.textEpoch = 1
 		field := core.NewTextField(parent)
+		bindFieldPointerFocus(field)
 		field.SetNativeEditingListener(func(core.TextFieldEditingState) { requestTextPublicationScoped(c.windowRef) })
 		field.SetNativeFocusLostHandler(func() bool {
 			// Focus can change from either the scene loop or an owner refresh.
@@ -297,6 +300,19 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	}
 	managedReturned = true
 	return widget, true, nil
+}
+
+// A disabled field can retain its visual Focused flag after actual focus moves.
+// Native multi-click handlers consult that flag; restore actual focus first,
+// leaving word/all selection and change delivery to their ordinary handlers.
+func bindFieldPointerFocus(field *core.TextField) {
+	for _, typ := range []events.Types{events.DoubleClick, events.TripleClick} {
+		field.OnFirst(typ, func(events.Event) {
+			if !field.IsReadOnly() && field.AbilityIs(abilities.Focusable) && !field.ContainsFocus() {
+				field.SetFocus()
+			}
+		})
+	}
 }
 
 func controlDisabled(r *record) bool {

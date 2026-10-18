@@ -75,9 +75,8 @@ result after its 57-input/21-observation scenario and tracked shutdown. See the
 [current result](reports/macos-native-controls/README.md). This command routes
 Go events through the native FIFO; physical/OS input remains separate evidence.
 
-Current status: all four original native attempts remain failed. The last reached
-24 routed inputs/11 observations before a missing-refocus guard. The corrected
-scenario now adds four explicit routed refocus clicks after numeric Enter:
-57 inputs/21 unchanged model observations. Its software focus/refocus regression,
-gallery race checks and build pass; the revised native record has not run. Full
-numeric/disabled continuation and final original-reference closure remain pending.
+Current status: the complete 57-input/21-observation native record passes with
+the inherited-state and actual multi-click focus fixes. Six preceding attempts
+remain failed/sealed. This is automated native Go routing in the controlled
+Go2/SDK786a CPU-scene configuration; physical/OS input and full Mac acceptance
+remain open. See the [result](reports/macos-control-refocus/README.md).

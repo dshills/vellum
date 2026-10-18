@@ -583,6 +583,7 @@ func syncRecordVisible(r *record, n ui.Node, visible bool, scopes []*tabCloseSco
 	}
 	previous := r.node
 	r.node = n
+	disabledChanged := r.widget.AsWidget().IsDisabled() != controlDisabled(r)
 	if previous.Style != n.Style || previous.Grow != n.Grow || previous.MinWidth != n.MinWidth || previous.MinHeight != n.MinHeight {
 		if r.control != nil && r.control.grid != nil {
 			r.control.grid.layoutPending.Store(true)
@@ -611,6 +612,12 @@ func syncRecordVisible(r *record, n ui.Node, visible bool, scopes []*tabCloseSco
 	syncSemantics(r)
 	if err := syncControl(r, previous); err != nil {
 		return err
+	}
+	// An ancestor update may already have styled this widget using its old
+	// inherited Disabled flag. Refresh after its own state and control sync,
+	// even when its descriptor is unchanged, before syncing descendants.
+	if disabledChanged {
+		r.widget.AsWidget().Update()
 	}
 	if n.Kind == ui.Dialog && r.control != nil && r.control.dialog != nil {
 		d := r.control.dialog

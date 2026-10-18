@@ -1,5 +1,10 @@
 # Popup routing, actual menu inspection and Selector focus
 
+Historical checkpoint: its four attempts remain failed. The subsequent
+[retained-state and multi-click checkpoint](../macos-control-refocus/README.md)
+passes the corrected 57-input/21-observation record after two further product
+fixes. The pending statements below describe this earlier checkpoint.
+
 This checkpoint fixes two demonstrated framework defects. An ordinary posted
 application wake was starved while a modal menu owned events; the driver now
 routes its exact wake and originating session packets before popup modality,

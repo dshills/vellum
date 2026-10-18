@@ -67,24 +67,30 @@ record's command/history, workers, edits, tab reorder, placement, modal preceden
 and two-window survival through native Go event routing. It does not establish
 native catalogue completeness, physical input or human assistive-technology use.
 
-The [popup/Selector integration checkpoint](../docs/reports/macos-native-controls/README.md)
+The historical [popup/Selector integration checkpoint](../docs/reports/macos-native-controls/README.md)
 repairs owner wake starvation and actual Selector click focus. Its final native
 attempt reaches the source-asserted Selector states and one accepted typed
 number, then fails the next focused-key guard after numeric Enter. All four
 native attempts remain failed/sealed; no full native subcase closes. The original check reached 24/11 of its 49/21 record. The corrected checker now
 authors four routed numeric refocus clicks: 57 inputs/21 unchanged observations;
-its native acceptance is pending.
+that checkpoint left native acceptance pending. The subsequent result below
+completes this record.
+
+The subsequent [retained-state and multi-click checkpoint](../docs/reports/macos-control-refocus/README.md) completes the unchanged native
+Selector/NumberField record: 57 routed inputs and 21 independently expected
+observations. Go adapter fixes restore inherited disabled styling and actual
+focus before ordinary double/triple-click handling, preserving selection and
+exactly-once edits. Two preceding 57-input cases remain failed at 54 receipts/19
+source-asserted observations; the styling-only case did not fix actual focus.
+Controlled Go2/SDK786a CPU-scene routing is qualified for this record only. Full
+catalogue/M2, physical/human M5 and M3–M7 remain open; no SDK refresh occurs.
 
 The remaining native catalogue work is:
 
-1. Run the corrected 57-input native gallery record and complete
-   ordinary Selector popup and NumberField typed,
-   pointer and keyboard edits, including rejection/disabled behavior. The
-   deterministic keyboard regression does not qualify an actual desktop popup.
-2. Exercise the rest of the supported catalogue's focus, input, state publication
+1. Exercise the rest of the supported catalogue's focus, input, state publication
    and lifetime through actual native routing, with named evidence for each
    entry. Keep automated Go routing separate from OS and physical input.
-3. Complete real keyboard/pointer and human assistive-technology workflows,
+2. Complete real keyboard/pointer and human assistive-technology workflows,
    including modal/focus boundaries, text/IME and virtual data. Follow the M5
    native matrix in `macos-delivery.md`; software DPI changes do not qualify
    physical display transitions.

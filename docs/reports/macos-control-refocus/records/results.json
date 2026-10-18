@@ -1,0 +1,282 @@
+{
+  "base_commit": "4d0b5f76319809300ce8a5057d2e8a1ab5e77884",
+  "final_native": {
+    "result": "PASS_NATIVE_CONTROLS",
+    "native_executed": true,
+    "error": null,
+    "closed_mac_gates": [],
+    "run": {
+      "argv": [
+        "/usr/bin/sandbox-exec",
+        "-p",
+        "(version 1)(allow default)(deny network* (remote ip) (local ip))(deny file-write* (subpath \"/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2\"))",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-control-refocus-4d0b5f7/gallery-multiclick",
+        "-control-native-check"
+      ],
+      "cwd": "/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent",
+      "started_utc": "2026-10-18T09:58:31.227452+00:00",
+      "watchdog_seconds": 120,
+      "error": null,
+      "exit_code": 0,
+      "created": true,
+      "observation_errors": [],
+      "logs_complete": true,
+      "pins_stable": true,
+      "stop_at_exit": false,
+      "pid": 49907,
+      "group": 49907,
+      "owned": {
+        "created": true,
+        "pid": 49907,
+        "group": 49907,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 49907,
+          "members": [],
+          "observation_sha256": "53737779ae8fca8ab765857b99274ddc110a4184f3d8885ec26e36955acc727b"
+        }
+      },
+      "seconds": 4.769712333101779,
+      "logs": {
+        "stdout": {
+          "bytes": 206760,
+          "sha256": "32548b8ccbaf6606579c63fc610e38017b8adaf37999943bd9285f338ca9b180"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    "summary": {
+      "result": "PASS_NATIVE_CONTROLS",
+      "observations": 21,
+      "inputs": 57,
+      "selection_proposals": 3,
+      "numeric_proposals": 7,
+      "outside_actions": 1,
+      "known_font_diagnostics": 0,
+      "session": {
+        "Started": true,
+        "Closed": true,
+        "Pending": false,
+        "LiveWindows": 0,
+        "Issued": 213
+      },
+      "physical_input_verified": false
+    },
+    "completed_utc": "2026-10-18T09:58:37.819305+00:00"
+  },
+  "earlier_native_attempts": [
+    {
+      "scope": "macos-control-refocus-4d0b5f7",
+      "result": {
+        "result": "FAILED_OR_CANCELED",
+        "native_executed": true,
+        "error": {
+          "type": "ValueError",
+          "message": "owned native result"
+        },
+        "closed_mac_gates": [],
+        "run": {
+          "argv": [
+            "/usr/bin/sandbox-exec",
+            "-p",
+            "(version 1)(allow default)(deny network* (remote ip) (local ip))(deny file-write* (subpath \"/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2\"))",
+            "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-control-refocus-4d0b5f7/gallery",
+            "-control-native-check"
+          ],
+          "cwd": "/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent",
+          "started_utc": "2026-10-18T09:31:39.330137+00:00",
+          "watchdog_seconds": 120,
+          "error": null,
+          "exit_code": 1,
+          "created": true,
+          "observation_errors": [],
+          "logs_complete": true,
+          "pins_stable": true,
+          "stop_at_exit": false,
+          "pid": 39441,
+          "group": 39441,
+          "owned": {
+            "created": true,
+            "pid": 39441,
+            "group": 39441,
+            "terminal": true,
+            "group_absent": true,
+            "exit_code": 1,
+            "errors": [],
+            "observation": {
+              "group": 39441,
+              "members": [],
+              "observation_sha256": "38476c250308c13dbf308558feb28020d39b2b4f35522e7e8e6425f4c5798d2a"
+            }
+          },
+          "seconds": 4.98921791696921,
+          "logs": {
+            "stdout": {
+              "bytes": 193579,
+              "sha256": "30ddc357c470a1672e2c41f0da2ac8b751f5387403d9f0854236a7707cd92087"
+            },
+            "stderr": {
+              "bytes": 43,
+              "sha256": "ef76594b9afc8a31d196ac32d0d80571a915520c9a574a7e247891bfe50be8cb"
+            }
+          }
+        },
+        "completed_utc": "2026-10-18T09:31:44.354521+00:00"
+      },
+      "inputs": 54,
+      "source_asserted_observations": 19
+    },
+    {
+      "scope": "macos-control-reenable-4d0b5f7",
+      "result": {
+        "result": "FAILED_OR_CANCELED",
+        "native_executed": true,
+        "error": {
+          "type": "ValueError",
+          "message": "owned native result"
+        },
+        "closed_mac_gates": [],
+        "run": {
+          "argv": [
+            "/usr/bin/sandbox-exec",
+            "-p",
+            "(version 1)(allow default)(deny network* (remote ip) (local ip))(deny file-write* (subpath \"/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2\"))",
+            "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-control-refocus-4d0b5f7/gallery-fix",
+            "-control-native-check"
+          ],
+          "cwd": "/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent",
+          "started_utc": "2026-10-18T09:42:43.643446+00:00",
+          "watchdog_seconds": 120,
+          "error": null,
+          "exit_code": 1,
+          "created": true,
+          "observation_errors": [],
+          "logs_complete": true,
+          "pins_stable": true,
+          "stop_at_exit": false,
+          "pid": 44471,
+          "group": 44471,
+          "owned": {
+            "created": true,
+            "pid": 44471,
+            "group": 44471,
+            "terminal": true,
+            "group_absent": true,
+            "exit_code": 1,
+            "errors": [],
+            "observation": {
+              "group": 44471,
+              "members": [],
+              "observation_sha256": "44ebc2d1636c0b0091589e3f98d2e35a5c2599ddce1249eac53c2c0ea0c60aff"
+            }
+          },
+          "seconds": 4.530195583007298,
+          "logs": {
+            "stdout": {
+              "bytes": 193570,
+              "sha256": "90ab537c9c884080e1c068b90e7ca3e9951830c494d7222035318447e6741789"
+            },
+            "stderr": {
+              "bytes": 43,
+              "sha256": "ef76594b9afc8a31d196ac32d0d80571a915520c9a574a7e247891bfe50be8cb"
+            }
+          }
+        },
+        "completed_utc": "2026-10-18T09:42:48.204142+00:00"
+      },
+      "inputs": 54,
+      "source_asserted_observations": 19
+    }
+  ],
+  "checks": {
+    "reenable-negative": {
+      "exit_code": 1,
+      "seconds": 12.832435291958973,
+      "receipt_sha256": "3b44c1ed16aacce2657214939226a1505e1a448b24f56545bfc27bb11ca4f7c0"
+    },
+    "reenable-positive": {
+      "exit_code": 0,
+      "seconds": 12.460106709040701,
+      "receipt_sha256": "cc609366a0110fb8c0c5ed80e30c7bc59bfb602fb819780f227c7268e880502a"
+    },
+    "focused-negative": {
+      "exit_code": 0,
+      "seconds": 13.540562250069343,
+      "receipt_sha256": "bd16067ac5562018951031917785861ae2c832fb9e9ad5c977d20170c81e6d38"
+    },
+    "prefix-diagnostic": {
+      "exit_code": 1,
+      "seconds": 10.493355832993984,
+      "receipt_sha256": "2039415f1f85bff43836d143e345331cd4d0bc0f5aa6fc75c8855dc804cb7c6e"
+    },
+    "prefix-diagnostic-v2": {
+      "exit_code": 1,
+      "seconds": 10.46297745895572,
+      "receipt_sha256": "498b0527e7ede0fa8eb0fc7e4ec14bab601ceaa454f5ad9d3c576dd56eb62fec"
+    },
+    "prefix-diagnostic-v3": {
+      "exit_code": 1,
+      "seconds": 11.13137600000482,
+      "receipt_sha256": "953132fc0088150ca08261b6a9d8335035e7b138dd79c996708581f8c0c8a750"
+    },
+    "multiclick-negative": {
+      "exit_code": 1,
+      "seconds": 14.162717457977124,
+      "receipt_sha256": "259f932473e545bf006de17b067e552c01b9d5094a6c2d29598bf7aeade7c8fd"
+    },
+    "multiclick-positive": {
+      "exit_code": 1,
+      "seconds": 14.315455415984616,
+      "receipt_sha256": "124e9dd343ed394bce0b21fc1207c70f626f8641edcf855f5637e842114f5e57"
+    },
+    "multiclick-positive-v2": {
+      "exit_code": 0,
+      "seconds": 15.323903083102778,
+      "receipt_sha256": "fb7ad662981299a492269f3d84d5d52e724715674064cade132b89536c178b39"
+    },
+    "driver-race": {
+      "exit_code": 0,
+      "seconds": 275.606250083074,
+      "receipt_sha256": "d7ad15db5b948142e93005b2c5fce8f72490139a472851ad6a3afac58739d2a0"
+    },
+    "driver-race-final": {
+      "exit_code": 0,
+      "seconds": 276.31417158292606,
+      "receipt_sha256": "8fd7159c0f8353733202f6a6c19aaa4d8a67b08d5513183e0770013e2758c3d1"
+    },
+    "final-vet": {
+      "exit_code": 0,
+      "seconds": 9.70234125002753,
+      "receipt_sha256": "1c5a2aaeffbba6bdb353ce9db454e49c47c0a4736129058b7f513d8ca634aec0"
+    },
+    "final-build": {
+      "exit_code": 0,
+      "seconds": 9.144983500009403,
+      "receipt_sha256": "6f6da4476a4cd81077cf037d8d856204c7f29d9e73ae534b124e933a8bec78ad"
+    }
+  },
+  "prepared_files": 6267,
+  "sdk_unchanged": true,
+  "sdk_files": 7880,
+  "sdk_vector_sha256": "4ce384e5873e00f148b72458ead131f42d4b3d7a464980423cb2f01881e94f26",
+  "physical_input_verified": false,
+  "closed_full_mac_gates": [],
+  "goal_complete": false,
+  "machine": {
+    "sw_vers": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83\n",
+    "machine": "arm64",
+    "native_inputs": "public DesktopSession Go FIFO; no OS input synthesis",
+    "physical_input_verified": false,
+    "window_size_scene_pixels": {
+      "X": 729,
+      "Y": 658
+    },
+    "logical_dpi": 162
+  }
+}
