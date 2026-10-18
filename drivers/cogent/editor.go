@@ -238,6 +238,7 @@ func syncEditor(r *record) {
 	b.syncing = true
 	defer func() { b.syncing = false }()
 	state := w.EditingState()
+	restoreSelection := r.control.disabled && (state.Anchor != s.Selection.Anchor || state.Focus != s.Selection.Focus)
 	if state.Text != s.VisibleText {
 		// A composition replacement must discard the previous private restoration
 		// baseline; Model is the only authority allowed to restore committed bytes.
@@ -246,20 +247,23 @@ func syncEditor(r *record) {
 	}
 	if s.Composing {
 		start, end, active := w.NativeCompositionRange()
-		if !active || start != s.Marked.Start || end != s.Marked.End || b.selectionEpoch != s.SelectionEpoch {
-			w.ApplyNativeEdit(s.VisibleText, s.Selection.Anchor, s.Selection.Focus, s.Marked.Start, s.Marked.End, "mark")
+		if !active || start != s.Marked.Start || end != s.Marked.End || b.selectionEpoch != s.SelectionEpoch || restoreSelection {
+			if !applyEditorModelState(w, s, s.Marked.Start, s.Marked.End, "mark") {
+				editorError(r, ErrTextInputStale)
+				return
+			}
 		}
 	} else {
 		// An owner Install/Replace can seal preedit without changing its visible
 		// bytes. Retire the private baseline too; otherwise later Escape could
 		// restore bytes from before the accepted owner transaction.
 		if _, _, active := w.NativeCompositionRange(); active {
-			if !w.ApplyNativeEdit(s.VisibleText, s.Selection.Anchor, s.Selection.Focus, -1, -1, "unmark") {
+			if !applyEditorModelState(w, s, -1, -1, "unmark") {
 				editorError(r, ErrTextInputStale)
 				return
 			}
 		}
-		if b.selectionEpoch != s.SelectionEpoch || state.Text != s.VisibleText {
+		if b.selectionEpoch != s.SelectionEpoch || state.Text != s.VisibleText || restoreSelection {
 			if !w.SetEditingSelection(s.Selection.Anchor, s.Selection.Focus) {
 				// Portable selections use scalar units. Ordinary native navigation
 				// operates on shaped graphemes, so normalize an external interior
@@ -280,10 +284,30 @@ func syncEditor(r *record) {
 	}
 	b.revision, b.epoch, b.selectionEpoch = s.Revision, s.VisibleEpoch, s.SelectionEpoch
 }
+
+// Only syncEditor calls this while syncing under originating widget ownership.
+// Restore authoritative model composition despite a disabled private widget;
+// the control/native-input admission remains disabled throughout this setter.
+func applyEditorModelState(w *textcore.Editor, s editor.Snapshot, start, end int, phase string) bool {
+	disabled := w.StateIs(states.Disabled)
+	if disabled {
+		w.SetState(false, states.Disabled)
+		defer w.SetState(true, states.Disabled)
+	}
+	return w.ApplyNativeEdit(s.VisibleText, s.Selection.Anchor, s.Selection.Focus, start, end, phase)
+}
+
 func syncEditorFromWidget(r *record, state core.TextFieldEditingState) {
 	b := r.control.editor
 	s := b.model.Snapshot()
-	if r.control.disabled || b.revision != s.Revision || b.epoch != s.VisibleEpoch || b.selectionEpoch != s.SelectionEpoch {
+	synchronized := b.revision == s.Revision && b.epoch == s.VisibleEpoch && b.selectionEpoch == s.SelectionEpoch
+	// The outgoing native client is still published after it becomes disabled.
+	// An already accepted state needs no restoration: invalidating here would
+	// make every refresh publish and dirty the owner again indefinitely.
+	if r.control.disabled && synchronized && state.Text == s.VisibleText && state.Anchor == s.Selection.Anchor && state.Focus == s.Selection.Focus {
+		return
+	}
+	if r.control.disabled || !synchronized {
 		requestControlRestore(r)
 		return
 	}

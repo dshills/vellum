@@ -156,6 +156,15 @@ Native clients carry a fresh mount identity and acknowledged shadow. Committed,
 visible and selection clocks reject stale shadow input, including undo/install
 ABA. Publication updates the shadow only after native acceptance. Disabled or
 retired controls refuse input; remounts cannot inherit old-client messages.
+An outgoing disabled editor can still publish inactive native state. An exact
+match of binding/content/selection epochs, visible bytes and directional selection
+must quiesce without dirtying the owner or changing model/history. Divergent
+private text/selection or stale epochs request restoration, then quiesce after
+originating reconciliation. Disabled-only selection restoration includes preedit
+scalar positions. Authoritative model mark/unmark may temporarily bypass the
+private widget's Disabled flag under originating ownership with syncing enabled;
+the control admission remains disabled and the flag is restored before return.
+This model restoration cannot admit user input or activate the native client.
 Native UTF-16 ranges convert to document scalar offsets. Committed external
 selection requests that fall inside a shaped grapheme normalize once to a
 forward caret or outward selection boundaries, retaining selection direction;

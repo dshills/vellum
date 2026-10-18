@@ -25,11 +25,11 @@ claim that all Mac acceptance gates have passed.
 | `Icon` | `TestIconsManualArtworkInputAndReplacement`: bundled symbol replacement, geometry and nonempty artwork | R |
 | `Image` | `TestManagedImageManualCenteredFitAndCompletedPixels`, `TestManagedImageManualScrollClipPreservesSourceMapping`: fit, source mapping and clipped pixels; native `gallery -media-native-check` checks accepted fit/replacement callbacks, role and visible geometry (native pixels separate) | R/N |
 | `Extension` | `TestPublicWorkbenchManualConsumer`: independently consumed public dock, repeated panel-local IDs and routed activation; `TestExtensionReplacementDestroysOnlyReplacedInstance`: replacement ownership | R/A |
-| `SplitPane` | `TestSplitManualKeyboardPointerGeometryAndRetainedDraft`: divider keys/drag, measured ratio and retained child editing; `gallery -structure-native-check`: native prefix through controlled keys/geometry/state; complete50/42 pending | R/N-partial |
+| `SplitPane` | `TestSplitManualKeyboardPointerGeometryAndRetainedDraft`: divider keys/drag, measured ratio and retained child editing; `gallery -structure-native-check`: full50-input42-state native Go FIFO record, measured focus/geometry/state, retained pages, rejected/accepted close and stale-target retirement | R/N |
 | `Toolbar` | `TestChromeManualToolbarOverflowAndStatusUpdates`: overflowing tool reveal, Home/End/arrows and disabled skipping; native `gallery -media-native-check` checks actual overflow reveal, End/Home, disabled skipping and one activation | R/N |
 | `StatusBar` | `TestChromeManualToolbarOverflowAndStatusUpdates`: owner change reaches caption, semantics and completed pixels; native `gallery -media-native-check` checks accepted caption after toolbar/path actions | R/N |
 | `FormGroup` | `TestChromeManualToolbarOverflowAndStatusUpdates`: literal caption and child focus traversal; native `gallery -media-native-check` checks literal caption and actual field traversal | R/N |
-| `Disclosure` | `TestDisclosureManualPointerKeyboardGeometryAndFocus`: collapse/reopen, layout release, focus and retained children; `gallery -structure-native-check`: source-asserted native prefix through focus/state; disabled style metrics differ; independent oracle incomplete | R/N-partial |
+| `Disclosure` | `TestDisclosureManualPointerKeyboardGeometryAndFocus`: collapse/reopen, layout release, focus and retained children; `gallery -structure-native-check`: full50-input42-state native Go FIFO record, measured focus/geometry/state, retained pages, rejected/accepted close and stale-target retirement | R/N |
 | `Checkbox` | `TestChoiceManualQuietPointerFocusAdvancesOrdinaryControl`: measured pointer focus and Tab; `TestNativeControlsChangeRetainedCallbacksAndDisabled`: typed change and controlled state | R/A |
 | `Switch` | `TestExpandedControlsManualFrameAndInput`: focused key changes accepted boolean and completed frame | R |
 | `ToggleButton` | `TestExpandedControlsManualFrameAndInput`, `TestExpandedRejectedToggleRestoresVisibleStyle`: pointer activation and rejected-value styling | R |
@@ -46,8 +46,8 @@ claim that all Mac acceptance gates have passed.
 | `NumberField` | `TestOrdinarySelectorAndNumberKeyboardControlledRoundTrip`: focused numeric step, exactly one proposal, rejected-value restoration and disabled refusal | R |
 | `TextField` | `TestManualRealManagedProjectInput`: routed text edit and Undo; `TestManagedTextFieldFocusLossWaitsForAdmittedNativeFIFO`: native input handoff; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI; native `gallery -text-native-check`: independently validated failed19/35prefix, complete68/33pending | R/A/N-partial |
 | `MultilineText` | `TestFrozenWorkspaceRecordsAcrossBatches`: notes edits/history and UTF-16 selection; `TestManagedEditorCompositionHistoryExactBytes`: composition/committed-byte boundary; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI; native `gallery -text-native-check`: independently validated failed19/35prefix, complete68/33pending | W/A/N-partial |
-| `Tabs` | `TestTabCloseActualPointerKeyboardAndGeometry`: controlled pointer/key close and stale target refusal; `TestNativeTabsReorderReparentAndDisabledOption`: page identity; `gallery -structure-native-check`: native prefix through root-page navigation; document-close native states pending | R/A/N-partial |
-| `Scroll` | `TestManagedImageManualScrollClipPreservesSourceMapping`, `TestPlacementNativeScrolledContentAndPreviewPixels`: actual ancestor scroll clips and transformed content; `gallery -structure-native-check`: source-asserted native prefix through scroll endpoints/boundary/restoration; complete record pending | R/N-partial |
+| `Tabs` | `TestTabCloseActualPointerKeyboardAndGeometry`: controlled pointer/key close and stale target refusal; `TestNativeTabsReorderReparentAndDisabledOption`: page identity; `gallery -structure-native-check`: full50-input42-state native Go FIFO record, measured focus/geometry/state, retained pages, rejected/accepted close and stale-target retirement | R/A/N |
+| `Scroll` | `TestManagedImageManualScrollClipPreservesSourceMapping`, `TestPlacementNativeScrolledContentAndPreviewPixels`: actual ancestor scroll clips and transformed content; `gallery -structure-native-check`: full50-input42-state native Go FIFO record, measured focus/geometry/state, retained pages, rejected/accepted close and stale-target retirement | R/N |
 | `Dialog` | `TestManualModalDisabledAndStaleRealRouter`: modal refusal of background input; `TestDialogSceneLifecyclePreservesChildrenAndDismissesOnce`: preserved children and single dismissal; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI | R/A |
 | `Canvas2D` | `TestPlacementActualRoutingScaledAcrossBatches`, `TestPlacementRoutedCancellationAndRetirement`: transformed placement/history, consumption and cancellation; `TestCanvasCompletedSemanticsAndSelection`: completed object geometry | R/A |
 | `DataGrid` | `TestStoredGridRoutedReplayAcrossBatches`, `TestManagedGridRowSelectionActualPointerKeysAllAndPaging`: routed stored data, selection, scrolling and completed frames | R |
@@ -203,3 +203,17 @@ failed prefix. Disabled-editor/modal/final-close native results remain open;
 full software33states pass160/162DPI. The case is permanently sealed without
 retry. Physical/OS input, live IME, human accessibility and native pixels remain
 separate; full M2/M5/M3–M7 and remaining structural acceptance stay open.
+
+### Complete structural record; text publication fix
+
+The [structural/publication checkpoint](../docs/reports/macos-editor-publication/README.md)
+independently validates all50 inputs/42 states for Disclosure, Tabs, SplitPane,
+Scroll and document closure at d1232b5. Rejected close retains header focus;
+the following Delete requests and accepted removal match the unchanged oracle.
+Earlier failed scopes remain failed/sealed. The separate text/modal case fails
+at editor-disabled after35 inputs/19 source-asserted states, with952 completed
+Frames and a final deadline failure; no disabled snapshot or modal acceptance
+is established. Its publication loop is repaired and covered by six actual
+publication-path counterfactuals. Fresh complete text/modal68/33 native acceptance
+is next, followed by the M2 requirement audit. Physical/human M5 and M3–M7 remain
+separate and open; no record/golden or Frame-unavailable policy changes.

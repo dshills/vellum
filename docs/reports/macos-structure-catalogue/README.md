@@ -107,3 +107,12 @@ dragging, arbitrary resize/display transitions, presentation, performance or
 native deallocation/endurance. Earlier full workspace records retain their pinned
 sources; this tab-selection delta does not requalify that full record. Follow the
 unchanged [Mac delivery plan](../../../specs/macos-delivery.md).
+
+
+## Subsequent complete native record
+
+The [d1232b5 structural/publication checkpoint](../macos-editor-publication/README.md)
+now independently passes the entire unchanged50-input42-state structural record,
+including rejected-close focus, following Delete and accepted removal. Original
+failures above stay failed/sealed and describe their historical source only.
+This is native Go FIFO routing; physical input and native pixels remain separate.
