@@ -32,6 +32,15 @@ native readback or a smaller successful fixture cannot replace an open gate.
 Public upload, tagging, signing/notarization with an owner's identity, and changes
 to system input/accessibility preferences are not implicitly authorized here.
 
+The [Go standard-library input checkpoint](../docs/reports/macos-stdlib-inputs/README.md)
+closes a specific M6 collector gap: selected runtime/standard-library source,
+embed/object inputs and named ancestor declarations now participate in sampled
+collection and the owned build's before/after checks. The corrected minimum-Go
+private build records 236 packages, 1,348 selected files and nine declaration
+candidates; 96 related test methods pass. No produced app is executed and no
+rights or complete Mac gate is approved. Final SDK refresh and actual notice
+applicability/native/font/asset closure remain open.
+
 ## Current position
 
 | Area | Implemented and demonstrated | Still prevents completion |
@@ -381,7 +390,7 @@ be budgeted in addition to implementation time.
 | M3 | Failing / incomplete | [Full current table matrix](../docs/reports/macos-grid-matrix/README.md): all 40 p95s fail 4 ms; GPU case medians 4.71–4.82 ms, CPU 5.61–5.77 ms. Matched 10k/1M visible work scales flat. Four separate GPU cases confirm actual acceptance, no fallback. [Composition and rejected culling](../docs/reports/macos-scene-composition/README.md) now rule out smaller references alone. [Row-fragment feasibility](../docs/reports/macos-row-fragments/README.md) also fails. [Resolved shaping](../docs/reports/macos-resolved-shapes/README.md) also fails its material-gain bar despite positive reuse. The [current tree boundary](../docs/reports/macos-tree-boundary/README.md) fails its two scoped ordinary observations. The subsequent [tree/local-layout prototype](../docs/reports/macos-tree-local-layout/README.md) also fails: CPU median run-p95 7.293207 → 7.848000 ms, GPU 7.071166 → 7.531169 ms, 0/5 improved pairs each. Whole overlay rejected; no runtime/API/SDK change. Next M3 needs a different material scene-publication/rendering decision; no further AX/upload/culling/row/shape-cache or local-tree tuning. Independent M6 component/rights work proceeds. |
 | M4 | Partial; current SDK preflight and sampled idle CPU pass | [Two composed cycles/66 native checks and four eligible 60-second CPU intervals](../docs/reports/macos-sdk-lifecycle-stage0079/README.md) pass with owned process-group absence and framework-tracked retirement. Extra admissions remain unattributed; one hidden Cocoa window remains unclassified, so native deallocation/leak closure stays open. Original sandbox harness failure is preserved. OS wakeups/presentation, full memory/resource accounting, ten-minute activity, 1,000-cycle and overnight gates remain open. |
 | M5 | Partial; live checks authorized while owner is away | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
-| M6 | Partial; current SDK incorporation and scoped consumption pass | The [7,879-file current SDK](../docs/reports/macos-sdk-stage0079/README.md) passes actual Go 1.25.6 relocated consumer/public-contract checks, 26 default main builds plus one tagged helper and 28-font metadata mapping. [Four native SDK cases](../docs/reports/macos-sdk-native-stage0079/README.md) pass source assertions/readbacks/owned closure. Final candidate/application-bundle acceptance, broader native/human workflows, exact runtime/font/non-font/generated-asset rights and owner distribution approval remain. |
+| M6 | Partial; current SDK incorporation and scoped consumption pass | The [7,879-file current SDK](../docs/reports/macos-sdk-stage0079/README.md) passes actual Go 1.25.6 relocated consumer/public-contract checks, 26 default main builds plus one tagged helper and 28-font metadata mapping. [Four native SDK cases](../docs/reports/macos-sdk-native-stage0079/README.md) pass source assertions/readbacks/owned closure. The [standard-library input checkpoint](../docs/reports/macos-stdlib-inputs/README.md) now binds selected Go package source/declaration bytes and refuses their drift in owned builds; it does not approve notice applicability. Final candidate/application-bundle acceptance, broader native/human workflows, exact runtime/font/non-font/generated-asset rights and owner distribution approval remain. |
 | M7 | Open | Requirement-by-requirement final audit after all preceding gates close. |
 
 The ledger changes only when the corresponding requirement is demonstrated.

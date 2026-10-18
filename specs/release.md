@@ -36,6 +36,25 @@ dependency closure or a prebuilt archive's embedded Rust/C component provenance.
 Installed Go declaration candidates are recorded from GOROOT and its parent;
 they do not establish a complete toolchain component audit.
 
+The `go_standard_library` section records the Go-selected standard-library
+package source, assembly, cgo, embedded and `.syso` object files from the installed
+GOROOT, with normalized relative paths, sizes and SHA256 identities. It records
+named ancestor LICENSE/COPYING/NOTICE/PATENTS candidates and package-to-file
+references. Standard package metadata now participates in the final Go-list
+resampling; file bytes and newly added/changed declarations are rechecked. The
+existing owned build producer compares this section before and after compilation,
+so standard-library source drift refuses a successful build receipt. External
+GOROOT aliases are supported; symlinks inside the selected installation, including
+links back to its root, are refused. Source/declaration and package lists are
+bounded before surplus hashing.
+
+These are the installed Go tool's selected inputs, not authenticated upstream
+source, compiler-generated data, transitive includes, external SDK headers,
+compiler/linker component closure or code surviving linking. Nearby declarations
+remain candidates; notice applicability and redistribution approval remain open.
+Older schema-1 inventories without this additive section do not establish this
+coverage. The inventory does not update distribution gates or execute the app.
+
 Nearby license/notice paths are declaration candidates, not evidence that their
 terms apply to an asset. All embedded asset/native rights remain review-required,
 and the distribution audit remains pending. The JSON neither approves rights nor

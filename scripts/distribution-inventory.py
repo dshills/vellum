@@ -69,16 +69,111 @@ def normalize_flag(flag, roots):
 
 def build_metadata(packages):
     """Compare build inputs, excluding Go's changing cache/staleness fields."""
-    fields = ("ImportPath", "Dir", "Imports", "GoFiles", "CgoFiles", "CFiles", "CXXFiles", "MFiles", "HFiles", "FFiles", "SFiles", "SwigFiles", "SwigCXXFiles", "EmbedPatterns", "EmbedFiles", "CgoCFLAGS", "CgoCPPFLAGS", "CgoCXXFLAGS", "CgoFFLAGS", "CgoLDFLAGS", "Error", "DepsErrors", "Incomplete")
+    fields = ("Standard", "ImportPath", "Dir", "Imports", "GoFiles", "CgoFiles", "CFiles", "CXXFiles", "MFiles", "HFiles", "FFiles", "SFiles", "SwigFiles", "SwigCXXFiles", "SysoFiles", "EmbedPatterns", "EmbedFiles", "CgoCFLAGS", "CgoCPPFLAGS", "CgoCXXFLAGS", "CgoFFLAGS", "CgoLDFLAGS", "Error", "DepsErrors", "Incomplete")
     out = []
     for package in sorted(packages, key=lambda value: value["ImportPath"]):
-        if package.get("Standard"):
-            continue
         record = {key: package[key] for key in fields if key in package}
         module = package.get("Module", {})
         record["Module"] = {key: module[key] for key in ("Path", "Version", "Sum", "Dir", "Replace") if key in module}
         out.append(record)
     return out
+
+
+STANDARD_SOURCE_FIELDS = ("GoFiles", "CgoFiles", "CFiles", "CXXFiles", "MFiles",
+                          "HFiles", "FFiles", "SFiles", "SwigFiles", "SwigCXXFiles",
+                          "SysoFiles", "EmbedFiles")
+TOOLCHAIN_DECLARATIONS = ("LICENSE", "COPYING", "NOTICE", "PATENTS")
+
+
+def standard_library_inventory(packages, toolchain_root):
+    """Hash Go-selected sources; nearby declarations do not establish rights.
+
+    This excludes compiler-generated inputs, transitive includes, external
+    headers, compiler/linker executables and proof of code surviving linking.
+    Paths are GOROOT-relative so equal installations compare after relocation.
+    """
+    toolchain_root = toolchain_root.resolve()
+    result, files, declarations, seen = [], {}, {}, set()
+    selected_count = 0
+
+    def admit(name, destination):
+        if name not in destination:
+            if len(files) + len(declarations) == MAX_FILES:
+                raise ValueError("standard-library inventory exceeds file-count bound")
+            destination[name] = file_identity(toolchain_root, name)
+
+    for package in sorted(packages, key=lambda value: value["ImportPath"]):
+        if "Standard" in package and type(package["Standard"]) is not bool:
+            raise ValueError("invalid standard-library package marker")
+        if not package.get("Standard"):
+            continue
+        name = package["ImportPath"]
+        if (not name or name in seen or len(seen) == MAX_FILES or package.get("Error")
+                or package.get("DepsErrors") or package.get("Incomplete")):
+            raise ValueError("duplicate, incomplete or over-budget standard-library package")
+        seen.add(name)
+        directory = Path(package["Dir"])
+        # macOS may spell the same installation through /var or /private/var,
+        # or a GOROOT alias. Resolve only the installation prefix; descendant
+        # components remain lexical so internal source symlinks are refused.
+        # The outermost match prevents an internal link back to GOROOT from
+        # masquerading as another installation prefix.
+        installation = next((parent for parent in reversed([directory, *directory.parents])
+                             if parent.resolve() == toolchain_root), None)
+        if installation is None:
+            raise ValueError("standard-library package outside selected GOROOT")
+        relative = directory.relative_to(installation)
+        if (not directory.is_absolute() or not relative.parts or relative.parts[0] != "src"
+                or ".." in relative.parts or "\\" in str(relative)):
+            raise ValueError("standard-library package outside GOROOT/src")
+        # Refuse a redirected package directory before enumerating any inputs.
+        current = toolchain_root
+        for part in relative.parts:
+            current /= part
+            if current.is_symlink():
+                raise ValueError("standard-library source cannot contain symlinks")
+        if not current.is_dir():
+            raise ValueError("standard-library package directory is missing")
+        for field in STANDARD_SOURCE_FIELDS:
+            values = package.get(field, [])
+            if type(values) is not list or any(type(value) is not str for value in values):
+                raise ValueError("invalid standard-library source list")
+        selected = sum(len(package.get(field, [])) for field in STANDARD_SOURCE_FIELDS)
+        if selected > MAX_FILES - selected_count:
+            raise ValueError("standard-library inventory exceeds file-count bound")
+        selected_count += selected
+        sources = {}
+        for field in STANDARD_SOURCE_FIELDS:
+            values = package.get(field, [])
+            if len(set(values)) != len(values):
+                raise ValueError("duplicate standard-library source")
+            sources[field] = []
+            for filename in sorted(values):
+                # Validate the unjoined spelling too: Path would normalize a//b.
+                path = PurePosixPath(filename)
+                if (not filename or path.is_absolute() or ".." in path.parts
+                        or str(path) != filename or "\\" in filename):
+                    raise ValueError("invalid standard-library source path")
+                source = (relative / filename).as_posix()
+                admit(source, files)
+                sources[field].append(source)
+            if not sources[field]:
+                del sources[field]
+        nearby = []
+        for parent in [relative, *relative.parents]:
+            for filename in TOOLCHAIN_DECLARATIONS:
+                candidate = parent / filename
+                path = toolchain_root / candidate
+                if path.exists() or path.is_symlink():
+                    notice = candidate.as_posix()
+                    admit(notice, declarations)
+                    nearby.append(notice)
+        result.append({"package": name, "directory": relative.as_posix(),
+                       "source_fields": sources, "nearby_declaration_candidates": sorted(nearby)})
+    return {"scope": "Selected standard-library package source/embedded/object files and named ancestor declarations from this installed GOROOT; not complete compiler/native inputs, linked-code membership or notice applicability",
+            "rights_status": "review-required", "packages": result,
+            "files": [files[name] for name in sorted(files)],
+            "declaration_candidates": [declarations[name] for name in sorted(declarations)]}
 
 
 def package_inventory(packages, roots, notices):
@@ -267,6 +362,8 @@ def collect(root, include_untracked=False, binary=None, link_map=None):
             notice_by_module[module["Path"]] = {"license_files": [record]}
     raw = check_child_output(["go", "list", "-deps", "-json", "./cmd/workbench"], cwd=root / "drivers/cogent", env=env, text=True, timeout=COMMAND_TIMEOUT_SECONDS)
     packages = release.decode_objects(raw)
+    toolchain_root = Path(configuration.pop("GOROOT")).resolve()
+    standard = standard_library_inventory(packages, toolchain_root)
     builds = package_inventory(packages, roots, notice_by_module)
     link_observation = native_link_observation(binary, link_map, roots, builds) if binary is not None else None
     if link_observation is not None and link_observation["architecture"] != {"arm64": "arm64", "amd64": "x86_64"}.get(configuration["GOARCH"]):
@@ -281,14 +378,14 @@ def collect(root, include_untracked=False, binary=None, link_map=None):
         sources.append(record)
     # Capture patch/pin identity in addition to hashes of the prepared files.
     pin_record = file_identity(root, "drivers/cogent/native/dependencies.json")
-    toolchain_root = Path(configuration.pop("GOROOT")).resolve()
     toolchain_roots = {"GOROOT": toolchain_root, "GOROOT-parent": toolchain_root.parent}
     toolchain_declarations = []
     for label, base in toolchain_roots.items():
-        for filename in ("LICENSE", "COPYING", "NOTICE"):
+        for filename in TOOLCHAIN_DECLARATIONS:
             if (base / filename).exists() or (base / filename).is_symlink():
                 toolchain_declarations.append({"source_root": label, **file_identity(base, filename)})
     inputs = [(root, record) for record in sources]
+    inputs += [(toolchain_root, record) for record in standard["files"] + standard["declaration_candidates"]]
     inputs += [(roots[record["module"]], record) for record in builds["embedded_assets"]]
     inputs += [(roots[package["module"]], record) for package in builds["packages"] for record in package["cgo_source_files"]]
     inputs += [(roots[record["module"]], record) for library in builds["native_link_candidates"] for record in library["file_candidates"]]
@@ -307,14 +404,17 @@ def collect(root, include_untracked=False, binary=None, link_map=None):
     if [name for name, _ in release.source_files(root, include_untracked=include_untracked)] != [record["file"] for record in sources]:
         raise ValueError("SDK source set changed during inventory collection")
     latest = check_child_output(["go", "list", "-deps", "-json", "./cmd/workbench"], cwd=root / "drivers/cogent", env=env, text=True, timeout=COMMAND_TIMEOUT_SECONDS)
-    if build_metadata(release.decode_objects(latest)) != build_metadata(packages):
+    latest_packages = release.decode_objects(latest)
+    if build_metadata(latest_packages) != build_metadata(packages):
         raise ValueError("Go build metadata changed during inventory collection")
+    if standard_library_inventory(latest_packages, toolchain_root) != standard:
+        raise ValueError("standard-library inputs or declarations changed during collection")
     if release.source_state(root) != source_state:
         raise ValueError("Git state changed during inventory collection")
     if link_observation is not None:
         if native_link_observation(binary, link_map, roots, builds) != link_observation:
             raise ValueError("native link observation changed during collection")
-    result = {"schema": 1, "scope": "SDK source payload and selected macOS workbench Go build inputs; native files are linker search candidates, not proof of final binary inclusion or a complete embedded Rust/C dependency closure", "distribution_audit": "pending", "runtime_executed": False, "source": source_state, "include_untracked": include_untracked, "build_configuration": configuration, "package_pattern": "./cmd/workbench", "pin_manifest": pin_record, "framework_declarations": declarations, "toolchain_declaration_candidates": toolchain_declarations, "go_notices": notices, "sdk_files": sources, **builds}
+    result = {"schema": 1, "scope": "SDK source payload and selected macOS workbench Go build inputs; native files are linker search candidates, not proof of final binary inclusion or a complete embedded Rust/C dependency closure", "distribution_audit": "pending", "runtime_executed": False, "source": source_state, "include_untracked": include_untracked, "build_configuration": configuration, "package_pattern": "./cmd/workbench", "pin_manifest": pin_record, "framework_declarations": declarations, "toolchain_declaration_candidates": toolchain_declarations, "go_standard_library": standard, "go_notices": notices, "sdk_files": sources, **builds}
     if link_observation is not None:
         result["native_link_observation"] = link_observation
     return result

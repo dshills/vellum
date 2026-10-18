@@ -27,8 +27,10 @@ class InventoryChecks(unittest.TestCase):
         (native / "arm64/libfake.a").write_bytes(b"!<arch>\nfixture\x00archive")
         (native / "LICENSE").write_bytes(b"native declaration candidate")
         (toolchain.parent / "LICENSE").write_bytes(b"installed Go declaration candidate")
+        (toolchain / "src/runtime").mkdir(parents=True)
+        (toolchain / "src/runtime/runtime.go").write_bytes(b"package runtime\n")
         graph = [{"Path": "example.com/framework", "Replace": {"Dir": str(root)}}, {"Path": "example.com/driver", "Main": True, "Dir": "/retired/temporary/graph"}, {"Path": "example.com/native", "Dir": str(native), "Version": "v1.0.0", "Sum": "h1:fixture"}]
-        packages = [{"ImportPath": "runtime", "Standard": True}, {"ImportPath": "example.com/driver", "Module": {"Path": "example.com/driver"}, "Dir": str(driver), "EmbedFiles": ["font.ttf"], "CgoFiles": ["bridge.go"], "CgoLDFLAGS": ["-L", str(native / "arm64"), "-lfake", "-framework", "Cocoa"]}]
+        packages = [{"ImportPath": "runtime", "Standard": True, "Dir": str(toolchain / "src/runtime"), "GoFiles": ["runtime.go"]}, {"ImportPath": "example.com/driver", "Module": {"Path": "example.com/driver"}, "Dir": str(driver), "EmbedFiles": ["font.ttf"], "CgoFiles": ["bridge.go"], "CgoLDFLAGS": ["-L", str(native / "arm64"), "-lfake", "-framework", "Cocoa"]}]
         notices = {"schema": 1, "modules": [{"module": "example.com/native", "license_files": [{"file": "LICENSE", "sha256": hashlib.sha256((native / "LICENSE").read_bytes()).hexdigest()}], "module_license_files": ["LICENSE"]}]}
         sources = [(name, root / name) for name in ["LICENSE", "drivers/cogent/LICENSE", "drivers/cogent/bridge.go", "drivers/cogent/font.ttf", "drivers/cogent/native/dependencies.json"]]
         configuration = {"GOOS": "darwin", "GOARCH": "arm64", "CGO_ENABLED": "1", "GOVERSION": "go-fixture", "GOROOT": str(toolchain)}
@@ -72,6 +74,103 @@ class InventoryChecks(unittest.TestCase):
                 self.assertNotIn(temporary, json.dumps(result))
                 results.append(result)
         self.assertEqual(results[0], results[1])
+
+    def test_standard_sources_declarations_and_relocation_are_bound(self):
+        reports = []
+        for _ in range(2):
+            with tempfile.TemporaryDirectory() as temporary:
+                fixture = self.fixture(Path(temporary)); toolchain = Path(fixture[7]["GOROOT"])
+                runtime = toolchain / "src/runtime"
+                (toolchain / "PATENTS").write_bytes(b"installed patent declaration")
+                (runtime / "NOTICE").write_bytes(b"local declaration candidate")
+                (runtime / "asm.s").write_bytes(b"assembly fixture")
+                (runtime / "object.syso").write_bytes(b"object fixture")
+                (runtime / "embedded.bin").write_bytes(b"embedded fixture")
+                package = fixture[4][0]
+                package.update(SFiles=["asm.s"], SysoFiles=["object.syso"], EmbedFiles=["embedded.bin"])
+                report = self.collect_fixture(fixture)
+                standard = report["go_standard_library"]
+                self.assertEqual(standard["rights_status"], "review-required")
+                self.assertEqual([r["file"] for r in standard["files"]], ["src/runtime/asm.s", "src/runtime/embedded.bin", "src/runtime/object.syso", "src/runtime/runtime.go"])
+                self.assertEqual([r["file"] for r in standard["declaration_candidates"]], ["PATENTS", "src/runtime/NOTICE"])
+                self.assertEqual(standard["packages"][0]["source_fields"]["SysoFiles"], ["src/runtime/object.syso"])
+                self.assertEqual(standard["packages"][0]["nearby_declaration_candidates"], ["PATENTS", "src/runtime/NOTICE"])
+                self.assertEqual(standard["files"][-1]["sha256"], hashlib.sha256(b"package runtime\n").hexdigest())
+                self.assertIn({"source_root": "GOROOT", "file": "PATENTS", "bytes": 28, "sha256": hashlib.sha256(b"installed patent declaration").hexdigest()}, report["toolchain_declaration_candidates"])
+                self.assertNotIn(temporary, json.dumps(report))
+                reports.append(report)
+        self.assertEqual(reports[0], reports[1])
+
+    def test_goroot_alias_resolves_without_accepting_internal_source_links(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = self.fixture(Path(temporary)); toolchain = Path(fixture[7]["GOROOT"])
+            alias = Path(temporary) / "Go alias"; alias.symlink_to(toolchain, target_is_directory=True)
+            original = inventory.standard_library_inventory([fixture[4][0]], toolchain)
+            package = {**fixture[4][0], "Dir": str(alias / "src/runtime")}
+            self.assertEqual(original, inventory.standard_library_inventory([package], toolchain.resolve()))
+
+    def test_standard_source_and_metadata_drift_refuse(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = self.fixture(Path(temporary)); original = inventory.file_identity
+            reads = 0
+            def changing(base, name):
+                nonlocal reads
+                result = original(base, name)
+                if name == "src/runtime/runtime.go":
+                    reads += 1
+                    if reads == 2: result["sha256"] = "changed"
+                return result
+            with mock.patch.object(inventory, "file_identity", side_effect=changing):
+                with self.assertRaisesRegex(ValueError, "input changed"):
+                    self.collect_fixture(fixture)
+            packages = [dict(p) for p in fixture[4]]
+            packages[0]["GoFiles"] = ["different.go"]
+            with self.assertRaisesRegex(ValueError, "build metadata changed"):
+                self.collect_fixture(fixture, package_change=packages)
+
+    def test_new_standard_declaration_and_changed_notice_refuse(self):
+        for create in [False, True]:
+            with self.subTest(create=create), tempfile.TemporaryDirectory() as temporary:
+                fixture = self.fixture(Path(temporary)); original = inventory.standard_library_inventory
+                toolchain = Path(fixture[7]["GOROOT"])
+                notice = toolchain / "src/runtime/NOTICE"
+                if not create: notice.write_bytes(b"first notice")
+                calls = 0
+                def change(packages, root):
+                    nonlocal calls
+                    calls += 1
+                    if calls == 2: notice.write_bytes(b"later notice")
+                    return original(packages, root)
+                with mock.patch.object(inventory, "standard_library_inventory", side_effect=change):
+                    with self.assertRaisesRegex(ValueError, "standard-library inputs or declarations changed"):
+                        self.collect_fixture(fixture)
+
+    def test_standard_paths_markers_duplicates_and_budgets_refuse(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = self.fixture(Path(temporary)); toolchain = Path(fixture[7]["GOROOT"])
+            package = fixture[4][0]; method = inventory.standard_library_inventory
+            cases = [{"Dir": str(toolchain / "src/../outside")}, {"Dir": str(toolchain.parent)}, {"GoFiles": ["../LICENSE"]}, {"GoFiles": ["a//b"]}, {"GoFiles": ["/LICENSE"]}, {"GoFiles": ["runtime.go", "runtime.go"]}, {"GoFiles": "runtime.go"}, {"Incomplete": True}, {"Standard": "true"}]
+            for mutation in cases:
+                with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                    method([{**package, **mutation}], toolchain)
+            with self.assertRaises(ValueError): method([package, package], toolchain)
+            (toolchain / "src/alias").symlink_to(toolchain / "src/runtime", target_is_directory=True)
+            with self.assertRaisesRegex(ValueError, "symlinks"):
+                method([{**package, "Dir": str(toolchain / "src/alias")}], toolchain)
+            (toolchain / "src/loop").symlink_to(toolchain, target_is_directory=True)
+            with self.assertRaisesRegex(ValueError, "symlinks"):
+                method([{**package, "Dir": str(toolchain / "src/loop/src/runtime")}], toolchain)
+            (toolchain / "src/runtime/alias.go").symlink_to(toolchain / "src/runtime/runtime.go")
+            with self.assertRaisesRegex(ValueError, "symlinks"):
+                method([{**package, "GoFiles": ["alias.go"]}], toolchain)
+            with mock.patch.object(inventory, "MAX_FILES", 1), mock.patch.object(inventory, "file_identity", wraps=inventory.file_identity) as identity:
+                with self.assertRaisesRegex(ValueError, "file-count bound"):
+                    method([{**package, "SFiles": ["unhashed.s"]}], toolchain)
+                identity.assert_not_called()
+            (toolchain / "PATENTS").write_bytes(b"oversize declaration")
+            with mock.patch.object(inventory, "MAX_FILE_BYTES", 4):
+                with self.assertRaisesRegex(ValueError, "file bound"):
+                    method([{**package, "GoFiles": []}], toolchain)
 
     def test_missing_native_declaration_or_file_is_an_unresolved_candidate(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -132,7 +231,7 @@ class InventoryChecks(unittest.TestCase):
     def test_sdk_count_refuses_before_hashing_surplus_file(self):
         with tempfile.TemporaryDirectory() as temporary:
             fixture = list(self.fixture(Path(temporary)))
-            fixture[4] = [{"ImportPath": "runtime", "Standard": True}]
+            fixture[4] = [fixture[4][0]]
             with mock.patch.object(inventory, "MAX_FILES", 1), mock.patch.object(inventory, "file_identity", wraps=inventory.file_identity) as identity:
                 with self.assertRaisesRegex(ValueError, "SDK inventory exceeds file-count bound"):
                     self.collect_fixture(tuple(fixture))

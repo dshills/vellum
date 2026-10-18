@@ -25,7 +25,7 @@ class BuildChecks(unittest.TestCase):
     def run_fixture(self, base, mode="ok", hook=None):
         root=base/"source";root.mkdir(exist_ok=True)
         output=base/"Output parent"/"Result with spaces, 'quotes'"
-        before={"schema":1,"runtime_executed":False,"distribution_audit":"pending","source":{"commit":"fixture","clean":True},"build_configuration":{"GOOS":"darwin","GOARCH":"arm64","CGO_ENABLED":"1"},"sdk_files":[{"file":"fixture.go","sha256":"original"}]}
+        before={"schema":1,"runtime_executed":False,"distribution_audit":"pending","source":{"commit":"fixture","clean":True},"build_configuration":{"GOOS":"darwin","GOARCH":"arm64","CGO_ENABLED":"1"},"sdk_files":[{"file":"fixture.go","sha256":"original"}],"go_standard_library":{"files":[{"file":"src/runtime/runtime.go","sha256":"original"}]}}
         calls=[]
         def collect(root, **options):
             value=copy.deepcopy(before)
@@ -35,8 +35,9 @@ class BuildChecks(unittest.TestCase):
                 observation=build.inventory.native_link_observation(binary,link_map,{}, {"native_link_candidates":[]})
                 value['native_link_observation']=observation
                 if mode=="late-output-drift":binary.write_bytes(binary.read_bytes()+b'changed')
-                if mode in {"source-drift","config-drift"}:
+                if mode in {"source-drift","config-drift","stdlib-drift"}:
                     if mode=="source-drift":value['sdk_files'][0]['sha256']='changed'
+                    elif mode=='stdlib-drift':value['go_standard_library']['files'][0]['sha256']='changed'
                     else:value['build_configuration']['GOARCH']='amd64'
                 if hook:hook(output)
             return value
@@ -82,7 +83,7 @@ class BuildChecks(unittest.TestCase):
             self.assertTrue(receipt['command']['outputs_initially_absent'])
 
     def test_failures_retain_diagnostics_without_success_receipt(self):
-        cases={'nonzero':subprocess.CalledProcessError,'timeout':subprocess.TimeoutExpired,'missing-map':ValueError,'source-drift':ValueError,'config-drift':ValueError,'output-drift':ValueError,'late-output-drift':ValueError,'tool-drift':ValueError,'env-drift':ValueError,'bad-arch':ValueError}
+        cases={'nonzero':subprocess.CalledProcessError,'timeout':subprocess.TimeoutExpired,'missing-map':ValueError,'source-drift':ValueError,'config-drift':ValueError,'stdlib-drift':ValueError,'output-drift':ValueError,'late-output-drift':ValueError,'tool-drift':ValueError,'env-drift':ValueError,'bad-arch':ValueError}
         for mode,error in cases.items():
             with self.subTest(mode=mode),tempfile.TemporaryDirectory()as temporary:
                 base=Path(temporary)

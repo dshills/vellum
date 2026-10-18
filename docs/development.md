@@ -238,7 +238,16 @@ python3 scripts/distribution-inventory.py --output /tmp/vellum-distribution.json
 
 Use a new output path outside the checkout. The report records SDK file hashes,
 resolved embedded assets, listed cgo sources and native linker-search candidates
-against the verified module notice graph. Review-required asset/native rights
+against the verified module notice graph. The additive `go_standard_library`
+section also hashes Go-selected runtime/standard-library source, assembly, cgo,
+embedded and object files from GOROOT, and named ancestor declarations including
+PATENTS. The stored selected-file, package/source-list and declaration records
+join the owned build's before/after comparison; full standard-package metadata is
+also resampled within each collection. Detected changes refuse a success receipt. Source
+paths remain relative after a GOROOT relocation, while internal source symlinks
+are refused. This is sampled input coverage, not an authenticated toolchain,
+complete compiler/transitive-header closure, linked-code inventory or notice
+applicability/rights approval. Review-required asset/native rights
 and prebuilt archive component provenance remain separate from this inventory.
 The collector does not approve or publish a distribution.
 
