@@ -2,8 +2,8 @@
 
 Updated 17 October 2026. The latest complete table matrix measures clean
 `bd672a6` with stage0079; the current headless-qualified private SDK uses clean `abe67c6`, Go 1.25.6 and
-stage0079. The last SDK native drawing/3D/imaging checks remain historical
-`5eef841` evidence.
+stage0079. Four serial starter/drawing/3D/imaging native source-assertion/readback
+cases now pass from that exact SDK on this Mac.
 Owner: the main Vellum development chat. This is the execution plan for the
 existing [Mac completion requirements](macos-completion.md), not a replacement
 for those requirements or a declaration that implemented APIs have qualified.
@@ -35,7 +35,7 @@ to system input/accessibility preferences are not implicitly authorized here.
 | Application/API | Public Go APIs, controls/themes, commands/tasks, documents/history, docking and independent windows | Complete composed workflow and lifecycle acceptance on a release candidate |
 | Data and canvas | Managed tables/trees, typed placement, retained drawing/images, compute/HDR and custom 3D | Frame targets, representative interaction, full resource accounting |
 | Mac integration | Cocoa input/accessibility, menus, clipboard, choosers, drops, tray and optional notifications | Human/native workflow coverage, scale/display changes, declared service support |
-| SDK | Current relocated minimum-Go SDK, all default main builds and font-byte mapping; earlier SDK native drawing/3D/imaging checks | Final clean candidate including the M1 cancellation fix, component/rights closure and distribution acceptance |
+| SDK | Current relocated minimum-Go SDK, all default main builds, font-byte mapping and four native source-assertion/readback cases | Final clean candidate including the M1 cancellation fix, component/rights closure and distribution acceptance |
 | Performance/endurance | Existing profilers, ordinary benchmarks, scoped idle samples and historical 1,000-cycle campaigns | Ordinary targets still fail; complete current-source memory/pacing/idle/overnight qualification |
 
 The first automated desktop placement attempt expired without input. The second
@@ -129,7 +129,9 @@ explicitly authorized tests and restore any authorized temporary state changes.
    A [fresh current private SDK](../docs/reports/macos-sdk-stage0079/README.md)
    now includes M1/stage0079 and passes actual Go 1.25.6 relocated consumption,
    all 26 default-main builds plus the tagged lifecycle helper and 28-font byte/
-   metadata mapping. Its native execution and rights/full acceptance remain open.
+   metadata mapping. [Four serial native cases](../docs/reports/macos-sdk-native-stage0079/README.md)
+   now pass with the same binaries/archive and confirmed owned shutdown. Broader
+   native/human workflows and rights/full acceptance remain open.
    The [resolved-shaping checkpoint](../docs/reports/macos-resolved-shapes/README.md)
    then proves real CPU/GPU reuse and passes correctness, but ordinary median
    run-p95 improves only 0.074/0.076 ms, below the 0.4 ms adoption bar. Its whole
@@ -291,21 +293,22 @@ The full matrix, rejected M3-A/tile-culling comparisons and rejected row-fragmen
 feasibility are recorded. M3 now needs a separate material architecture decision
 against the same targets. Do not continue tuning the rejected prototype.
 The independent [M6 minimum-Go source check](../docs/reports/macos-minimum-go/README.md)
-passes; final SDK and rights closure remain open. Return to the architecture
-decision; rerun the full matrix only after an adopted change. Update the remaining
-estimate from those results.
+passes. The current private SDK also passes minimum-Go relocated/all-default-main
+and four native source-assertion cases; final candidate acceptance and rights
+closure remain open. Return to the architecture decision; rerun the full matrix
+only after an adopted change. Update the remaining estimate from those results.
 An eight-hour final soak,
 human accessibility/input verification and required display availability must
 be budgeted in addition to implementation time.
 
 | Milestone | Current status | Next action / evidence needed |
 | --- | --- | --- |
-| M1 | Complete in source | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); final SDK incorporation remains in M6. |
+| M1 | Complete in source; incorporated in current private SDK | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); exact helper bytes are included in the [current SDK](../docs/reports/macos-sdk-stage0079/README.md). Full final artifact acceptance remains in M6. |
 | M2 | Headless record/map complete; native integration open | [Six frozen records and catalogue coverage](../docs/reports/macos-workspace-acceptance/README.md); native 10k/1M workflow and desktop catalogue checks remain. |
-| M3 | Failing / incomplete | [Full current table matrix](../docs/reports/macos-grid-matrix/README.md): all 40 p95s fail 4 ms; GPU case medians 4.71–4.82 ms, CPU 5.61–5.77 ms. Matched 10k/1M visible work scales flat. Four separate GPU cases confirm actual acceptance, no fallback. [Composition and rejected culling](../docs/reports/macos-scene-composition/README.md) now rule out smaller references alone. [Row-fragment feasibility](../docs/reports/macos-row-fragments/README.md) also fails. Next: separate material architecture decision; no further AX/upload/culling/row-cache tuning. |
+| M3 | Failing / incomplete | [Full current table matrix](../docs/reports/macos-grid-matrix/README.md): all 40 p95s fail 4 ms; GPU case medians 4.71–4.82 ms, CPU 5.61–5.77 ms. Matched 10k/1M visible work scales flat. Four separate GPU cases confirm actual acceptance, no fallback. [Composition and rejected culling](../docs/reports/macos-scene-composition/README.md) now rule out smaller references alone. [Row-fragment feasibility](../docs/reports/macos-row-fragments/README.md) also fails. [Resolved shaping](../docs/reports/macos-resolved-shapes/README.md) also fails its material-gain bar despite positive reuse. Next: separate material architecture decision; no further AX/upload/culling/row/shape-cache tuning. |
 | M4 | Partial | Historical lifecycle and scoped idle successes; full current candidate memory, integrated activity and overnight gates remain open. |
 | M5 | Partial; live checks authorized while owner is away | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
-| M6 | Partial | Private SDK native consumers pass; [native notice packaging](../docs/reports/macos-native-component-notices/README.md) now binds the source-built archive declarations. [Actual Go 1.25.6 source/driver/public-contract race, vet and native build](../docs/reports/macos-minimum-go/README.md) pass; no GUI launch or full SDK qualification. Final SDK refresh, relocated/all-demo/native checks, exact runtime/asset rights closure and owner approval remain. |
+| M6 | Partial; current SDK incorporation and scoped consumption pass | The [7,879-file current SDK](../docs/reports/macos-sdk-stage0079/README.md) passes actual Go 1.25.6 relocated consumer/public-contract checks, 26 default main builds plus one tagged helper and 28-font metadata mapping. [Four native SDK cases](../docs/reports/macos-sdk-native-stage0079/README.md) pass source assertions/readbacks/owned closure. Final candidate/application-bundle acceptance, broader native/human workflows, exact runtime/font/non-font/generated-asset rights and owner distribution approval remain. |
 | M7 | Open | Requirement-by-requirement final audit after all preceding gates close. |
 
 The ledger changes only when the corresponding requirement is demonstrated.

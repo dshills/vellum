@@ -91,6 +91,13 @@ launched; final runtime, complete component/font/non-font/generated asset rights
 owner distribution decision and other release gates remain open. This is a
 private consumption checkpoint, not final release qualification.
 
+The subsequent [current SDK native checks](../docs/reports/macos-sdk-native-stage0079/README.md)
+execute starter, drawing, 3D and imaging fixtures successfully using those same
+Go 1.25.6 non-race binaries, with GPU readback/source assertions, geometry isolation
+and owned closure. No rebuild or repeated Prism call is needed for unchanged
+implementation evidence. Full native/human, performance/memory/endurance, older-OS,
+rights and release gates remain open.
+
 ## Private source-built GPU consumer
 
 The [pinned-source GPU consumer checkpoint](../docs/reports/macos-source-built-gpu/README.md)
