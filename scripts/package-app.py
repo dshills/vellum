@@ -11,9 +11,14 @@ import plistlib
 import posixpath
 import re
 import shutil
+import stat
 import tarfile
 import tempfile
 import zipfile
+
+import app_notices
+
+from native_archive import regular_stream, unchanged
 
 from artifact_io import publish_exclusive
 from child_process import run_child, check_child_output
@@ -106,7 +111,35 @@ def application_archive(stage, output, name, target):
                     archive.add(stage, arcname=name, filter=lambda member: normalized_tar_member(member, name + "/" + name))
 
 
-def package(binary, output, name, identifier, version, target, identity=None, build_version="1"):
+def binary_digest(path):
+    # Stream the admitted regular file, refusing growth or observed mutation.
+    stream, before = regular_stream(path, (1 << 63) - 1)
+    digest, count = hashlib.sha256(), 0
+    with stream:
+        while chunk := stream.read(64 * 1024):
+            count += len(chunk)
+            if count > before.st_size:
+                raise ValueError("app executable changed while hashing")
+            digest.update(chunk)
+        unchanged(stream, before)
+    if count != before.st_size:
+        raise ValueError("app executable changed while hashing")
+    return digest.hexdigest()
+
+
+def verify_app(stage, name, binary_sha256, manifest_bytes, notice_record):
+    if binary_digest(stage/"Contents/MacOS"/name) != binary_sha256:
+        raise ValueError("packaged app executable changed")
+    resources = stage/"Contents/Resources"
+    if app_notices.read_regular(resources/"APP_MANIFEST.json", len(manifest_bytes)) != manifest_bytes:
+        raise ValueError("packaged app manifest changed")
+    if notice_record is not None:
+        app_notices.verify(resources/app_notices.DIRECTORY, notice_record["artifact_sha256"], notice_record)
+
+
+def package(binary, output, name, identifier, version, target, identity=None, build_version="1", notice_bundle=None):
+    if notice_bundle is not None and target != "darwin":
+        raise ValueError("app notice bundles are implemented only for macOS")
     validate(binary,name,identifier,version,target,identity,build_version)
     sdk_release = json.loads((Path(__file__).resolve().parents[1]/"release/version.json").read_text())["version"]
     if output.exists() or output.is_symlink():
@@ -125,26 +158,51 @@ def package(binary, output, name, identifier, version, target, identity=None, bu
         validate(executable,name,identifier,version,target,identity,build_version)
         if target == "darwin":
             darwin_dependencies(executable)
-        manifest = {"schema":1,"name":name,"identifier":identifier,"version":version,"build_version":build_version,"sdk_release":sdk_release,"target":target,"source_binary_sha256":hashlib.sha256(executable.read_bytes()).hexdigest(),"private_build":True,"signed_identity":identity,"notarized":False,"native_distribution_audit":"pending","target_runtime":"unverified"}
+        manifest = {"schema":1,"name":name,"identifier":identifier,"version":version,"build_version":build_version,"sdk_release":sdk_release,"target":target,"source_binary_sha256":binary_digest(executable),"private_build":True,"signed_identity":identity,"notarized":False,"native_distribution_audit":"pending","target_runtime":"unverified"}
         if target=="darwin":
-            (stage/"Contents/Resources").mkdir()
+            resources = stage/"Contents/Resources"
+            resources.mkdir()
+            if notice_bundle is not None:
+                manifest["component_notices"] = app_notices.copy(notice_bundle, resources/app_notices.DIRECTORY, manifest["source_binary_sha256"])
             info={"CFBundlePackageType":"APPL","CFBundleName":name,"CFBundleDisplayName":name,"CFBundleExecutable":name,"CFBundleIdentifier":identifier,"CFBundleVersion":build_version,"CFBundleShortVersionString":version,"NSHighResolutionCapable":True}
             (stage/"Contents/Info.plist").write_bytes(plistlib.dumps(info,sort_keys=True))
-            (stage/"Contents/Resources/APP_MANIFEST.json").write_text(json.dumps(manifest,indent=2)+"\n")
+            manifest_bytes = (json.dumps(manifest,indent=2)+"\n").encode()
+            (resources/"APP_MANIFEST.json").write_bytes(manifest_bytes)
             normalize_layout(stage)
+            notice_record = manifest.get("component_notices")
+            verify_app(stage, name, manifest["source_binary_sha256"], manifest_bytes, notice_record)
             if identity is not None:
                 run_child(["codesign","--force","--sign",identity,str(stage)],check=True, env=child_environment(), timeout=NATIVE_TOOL_TIMEOUT_SECONDS)
                 run_child(["codesign","--verify","--strict",str(stage)],check=True, env=child_environment(), timeout=NATIVE_TOOL_TIMEOUT_SECONDS)
-            # Exclusive reservation keeps preexisting directories/symlinks safe.
+            packaged_sha256 = binary_digest(executable) if identity is not None else manifest["source_binary_sha256"]
+            verify_app(stage, name, packaged_sha256, manifest_bytes, notice_record)
+            # Exclusive reservation; sampled identity guards preserve replacements.
             output.mkdir()
+            owned = output.lstat()
+            def still_owned():
+                try:
+                    current = output.lstat()
+                    return stat.S_ISDIR(current.st_mode) and (current.st_dev, current.st_ino) == (owned.st_dev, owned.st_ino)
+                except FileNotFoundError:
+                    return False
+            def require_owned():
+                if not still_owned():
+                    raise ValueError("app output directory was replaced")
             try:
+                require_owned()
                 output.chmod(0o755)
                 for child in stage.iterdir():
+                    require_owned()
                     shutil.move(str(child),output/child.name)
+                require_owned()
                 if identity is not None:
                     run_child(["codesign","--verify","--strict",str(output)],check=True, env=child_environment(), timeout=NATIVE_TOOL_TIMEOUT_SECONDS)
+                verify_app(output, name, packaged_sha256, manifest_bytes, notice_record)
+                require_owned()
             except BaseException:
-                shutil.rmtree(output);raise
+                if still_owned():
+                    shutil.rmtree(output)
+                raise
         else:
             (stage/"APP_MANIFEST.json").write_text(json.dumps(manifest,indent=2)+"\n")
             artifact = Path(directory)/"application.archive"
@@ -152,7 +210,10 @@ def package(binary, output, name, identifier, version, target, identity=None, bu
             application_archive(stage, artifact, name, target)
             artifact.chmod(0o644)
             publish_exclusive(artifact,output)
-    return {"output":str(output),"private_build":True,"target":target,"signed":identity is not None,"notarized":False,"native_distribution_audit":"pending"}
+    result = {"output":str(output),"private_build":True,"target":target,"signed":identity is not None,"notarized":False,"native_distribution_audit":"pending"}
+    if target == "darwin":
+        result["packaged_binary_sha256"] = packaged_sha256
+    return result
 
 
 def main():
@@ -164,9 +225,10 @@ def main():
     parser.add_argument("--version",required=True,help="numeric app release version: major.minor.patch")
     parser.add_argument("--build-version",default="1",help="numeric bundle build version (one to three components); increment for distribution")
     parser.add_argument("--platform",dest="target",choices=["darwin","windows","linux"],default=platform.system().lower())
+    parser.add_argument("--notice-bundle",type=Path,help="explicit binary-bound original notice bundle for a macOS app; rights review remains pending")
     parser.add_argument("--sign-identity",help="explicit macOS code-signing identity; '-' requests ad-hoc signing")
     args=parser.parse_args()
-    print(json.dumps(package(args.binary.absolute(),args.output.absolute(),args.name,args.identifier,args.version,args.target,args.sign_identity,args.build_version),indent=2))
+    print(json.dumps(package(args.binary.absolute(),args.output.absolute(),args.name,args.identifier,args.version,args.target,args.sign_identity,args.build_version,args.notice_bundle),indent=2))
 
 
 if __name__=="__main__":main()

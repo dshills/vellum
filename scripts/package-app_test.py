@@ -4,6 +4,7 @@ import errno
 import os
 import subprocess
 import json
+import hashlib
 import plistlib
 from pathlib import Path
 import tarfile
@@ -163,4 +164,91 @@ class AppChecks(unittest.TestCase):
    with mock.patch.object(app,"darwin_dependencies",side_effect=inspect),self.assertRaisesRegex(ValueError,"staged dependency rejection"):
     app.package(binary,output,"Audit","org.example.app","0.1.0","darwin")
    self.assertEqual(len(inspected),1);self.assertFalse(output.exists())
+ def notice_bundle(self,root,binary):
+  source=root/"notices";source.mkdir();(source/"NOTICES").mkdir();body=b"Original fixture declaration\n";(source/"NOTICES/LICENSE").write_bytes(body)
+  inventory={"schema":1,"target":"darwin","artifact_sha256":hashlib.sha256(binary.read_bytes()).hexdigest(),"distribution_audit":"pending","applicability":"review-required","scope":"Explicit fixture only; completeness unverified","files":{"NOTICES/LICENSE":{"bytes":len(body),"sha256":hashlib.sha256(body).hexdigest()}},"components":[{"id":"fixture@1","notice_files":["NOTICES/LICENSE"]}]}
+  (source/"INVENTORY.json").write_text(json.dumps(inventory,indent=2)+"\n");return source
+ def test_mac_notices_bind_staged_bytes_and_copy_original_payloads(self):
+  with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"),mock.patch.object(app,"run_child") as execute:
+   root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");source=self.notice_bundle(root,binary);out=root/"Test.app"
+   app.package(binary,out,"Test","org.example.test","0.1.0","darwin",notice_bundle=source)
+   manifest=json.loads((out/"Contents/Resources/APP_MANIFEST.json").read_text());record=manifest["component_notices"]
+   self.assertEqual(record["artifact_sha256"],manifest["source_binary_sha256"]);self.assertEqual(record["files"],1);self.assertEqual(record["distribution_audit"],"pending");self.assertEqual(manifest["native_distribution_audit"],"pending")
+   for name in ["INVENTORY.json","NOTICES/LICENSE"]:self.assertEqual((out/"Contents/Resources/THIRD_PARTY_NOTICES"/name).read_bytes(),(source/name).read_bytes())
+   self.assertEqual((out/"Contents/Resources/THIRD_PARTY_NOTICES/NOTICES/LICENSE").stat().st_mode&0o777,0o644);execute.assert_not_called()
+ def test_notice_binary_mismatch_and_payload_rejection_leave_no_output(self):
+  for kind in ["binary","payload"]:
+   with self.subTest(kind=kind),tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"),mock.patch.object(app,"run_child") as execute:
+    root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");source=self.notice_bundle(root,binary);out=root/"Test.app"
+    if kind=="binary":binary.write_bytes(b"\xcf\xfa\xed\xfechanged")
+    else:(source/"NOTICES/LICENSE").write_text("changed")
+    with self.assertRaises(ValueError):app.package(binary,out,"Test","org.example.test","0.1.0","darwin",notice_bundle=source)
+    self.assertFalse(out.exists());execute.assert_not_called();self.assertFalse(list(root.glob(".vellum-app-*")))
+ def test_notice_binding_checks_copied_executable_after_valid_source_replacement(self):
+  with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"):
+   root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");source=self.notice_bundle(root,binary);out=root/"Test.app";actual=app.shutil.copyfile
+   def replace_then_copy(src,dst):
+    src.write_bytes(b"\xcf\xfa\xed\xfereplaced-valid-format");return actual(src,dst)
+   with mock.patch.object(app.shutil,"copyfile",side_effect=replace_then_copy),self.assertRaisesRegex(ValueError,"executable binding"):app.package(binary,out,"Test","org.example.test","0.1.0","darwin",notice_bundle=source)
+   self.assertFalse(out.exists())
+ def test_notices_are_verified_before_publication_after_explicit_signing(self):
+  with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"):
+   root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");source=self.notice_bundle(root,binary);out=root/"Test.app"
+   def execute(args,**kwargs):
+    if "--sign" in args:(Path(args[-1])/"Contents/Resources/THIRD_PARTY_NOTICES/NOTICES/LICENSE").write_text("tampered")
+   with mock.patch.object(app,"run_child",side_effect=execute),self.assertRaises(ValueError):app.package(binary,out,"Test","org.example.test","0.1.0","darwin","-",notice_bundle=source)
+   self.assertFalse(out.exists())
+ def test_final_notice_tampering_removes_only_owned_output(self):
+  with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"):
+   root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");source=self.notice_bundle(root,binary);out=root/"Test.app";actual=app.shutil.move
+   def move_and_tamper(src,dst):
+    result=actual(src,dst);(out/"Contents/Resources/THIRD_PARTY_NOTICES/NOTICES/LICENSE").write_text("tampered");return result
+   with mock.patch.object(app.shutil,"move",side_effect=move_and_tamper),self.assertRaises(ValueError):app.package(binary,out,"Test","org.example.test","0.1.0","darwin",notice_bundle=source)
+   self.assertFalse(out.exists());self.assertTrue((source/"NOTICES/LICENSE").exists());self.assertTrue(binary.exists())
+ def test_notice_bundle_is_mac_only_and_never_implicitly_signed(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\x7fELFfixture")
+   with self.assertRaisesRegex(ValueError,"only for macOS"):app.package(binary,root/"out","Test","org.example.test","0.1.0","linux",notice_bundle=root/"missing")
+   self.assertFalse((root/"out").exists())
+ def test_executable_and_manifest_tampering_during_publication_refuse(self):
+  for kind in ["executable","manifest"]:
+   with self.subTest(kind=kind),tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"):
+    root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");source=self.notice_bundle(root,binary);out=root/"Test.app";actual=app.shutil.move
+    def move_and_tamper(src,dst):
+     result=actual(src,dst);path=out/("Contents/MacOS/Test" if kind=="executable" else "Contents/Resources/APP_MANIFEST.json");body=bytearray(path.read_bytes());body[-1]^=1;path.write_bytes(body);return result
+    with mock.patch.object(app.shutil,"move",side_effect=move_and_tamper),self.assertRaises(ValueError):app.package(binary,out,"Test","org.example.test","0.1.0","darwin",notice_bundle=source)
+    self.assertFalse(out.exists());self.assertTrue(binary.exists())
+ def test_pre_sign_executable_and_manifest_revalidation(self):
+  for kind in ["executable","manifest"]:
+   with self.subTest(kind=kind),tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"),mock.patch.object(app,"run_child") as execute:
+    root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");source=self.notice_bundle(root,binary);out=root/"Test.app";actual=app.normalize_layout
+    def tamper(stage):
+     actual(stage);path=stage/("Contents/MacOS/Test" if kind=="executable" else "Contents/Resources/APP_MANIFEST.json");body=bytearray(path.read_bytes());body[-1]^=1;path.write_bytes(body)
+    with mock.patch.object(app,"normalize_layout",side_effect=tamper),self.assertRaises(ValueError):app.package(binary,out,"Test","org.example.test","0.1.0","darwin","-",notice_bundle=source)
+    execute.assert_not_called();self.assertFalse(out.exists())
+ def test_explicit_signing_transformation_is_bound_through_publication(self):
+  with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"):
+   root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");source=self.notice_bundle(root,binary);out=root/"Test.app"
+   def execute(args,**kwargs):
+    if "--sign" in args:
+     path=Path(args[-1])/"Contents/MacOS/Test";path.write_bytes(path.read_bytes()+b"simulated signature transformation")
+   with mock.patch.object(app,"run_child",side_effect=execute):result=app.package(binary,out,"Test","org.example.test","0.1.0","darwin","-",notice_bundle=source)
+   manifest=json.loads((out/"Contents/Resources/APP_MANIFEST.json").read_text());final=hashlib.sha256((out/"Contents/MacOS/Test").read_bytes()).hexdigest()
+   self.assertEqual(manifest["source_binary_sha256"],hashlib.sha256(binary.read_bytes()).hexdigest());self.assertEqual(result["packaged_binary_sha256"],final);self.assertNotEqual(final,manifest["source_binary_sha256"])
+ def test_replacement_output_directory_is_preserved_on_failure(self):
+  with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"):
+   root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");source=self.notice_bundle(root,binary);out=root/"Test.app";moved=root/"original-renamed";actual=app.shutil.move
+   def replace_output(src,dst):
+    result=actual(src,dst);out.rename(moved);out.mkdir();(out/"unrelated").write_bytes(b"preserve me");return result
+   with mock.patch.object(app.shutil,"move",side_effect=replace_output),self.assertRaisesRegex(ValueError,"directory was replaced"):app.package(binary,out,"Test","org.example.test","0.1.0","darwin",notice_bundle=source)
+   self.assertEqual((out/"unrelated").read_bytes(),b"preserve me");self.assertTrue((moved/"Contents/MacOS/Test").exists());self.assertTrue(binary.exists())
+ def test_failure_before_output_identity_preserves_empty_unproven_path(self):
+  with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"):
+   root=Path(tmp);binary=root/"binary";body=b"\xcf\xfa\xed\xfefixture";binary.write_bytes(body);source=self.notice_bundle(root,binary);out=root/"Test.app";actual=Path.lstat
+   def fail_ownership_capture(path,*args,**kwargs):
+    if path==out and out.exists():raise PermissionError("fixture identity acquisition failed")
+    return actual(path,*args,**kwargs)
+   with mock.patch.object(Path,"lstat",new=fail_ownership_capture),self.assertRaisesRegex(PermissionError,"identity acquisition failed"):app.package(binary,out,"Test","org.example.test","0.1.0","darwin",notice_bundle=source)
+   self.assertTrue(out.is_dir());self.assertEqual(list(out.iterdir()),[]);self.assertEqual(binary.read_bytes(),body);self.assertFalse(list(root.glob(".vellum-app-*")))
+   with self.assertRaisesRegex(ValueError,"exists"):app.package(binary,out,"Test","org.example.test","0.1.0","darwin",notice_bundle=source)
 if __name__=="__main__":unittest.main()

@@ -41,6 +41,16 @@ candidates; 96 related test methods pass. No produced app is executed and no
 rights or complete Mac gate is approved. Final SDK refresh and actual notice
 applicability/native/font/asset closure remain open.
 
+
+The [Mac app notice payload checkpoint](../docs/reports/macos-app-notices/README.md)
+adds explicit binary-bound notice bundles to private `.app` packaging, including
+original-byte copying, staged/final executable and manifest validation, bounded
+member/reference checks and guarded cleanup. Thirty-six focused test methods
+and a headless real-binary package pass. Its selected 109 declarations remain
+partial; five native-library Go graph modules lack recorded declarations, and
+the mismatched source-built native notice bundle is excluded. No app is launched,
+no signing is requested and M6 rights/final runtime acceptance remains open.
+
 ## Current position
 
 | Area | Implemented and demonstrated | Still prevents completion |

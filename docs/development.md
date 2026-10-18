@@ -422,3 +422,23 @@ not qualify it. Follow the shared native-test scheduling/ownership process and
 keep live execution paused while the user is working. Offscreen checks and the
 exact evidence requirements are described in the
 [window lifetime contract](../specs/window-lifetimes.md#same-name-native-lifecycle-fixture).
+
+## Private Mac app notice payloads
+
+After building the app, prepare an explicit notice directory using the
+[binary-bound inventory schema](../specs/release.md#private-application-packaging).
+Keep the original declarations and record the SHA256 of the exact pre-sign
+executable. Then package without launching or signing it:
+
+```sh
+python3 scripts/package-app.py --binary /tmp/vellum-workbench \
+  --output /tmp/VellumWorkbench.app --name VellumWorkbench \
+  --identifier com.vellum.local.workbench --version 0.1.0 \
+  --platform darwin --notice-bundle /tmp/vellum-notices
+```
+
+The output must be new. Inspect `Contents/Resources/APP_MANIFEST.json` and
+`THIRD_PARTY_NOTICES/INVENTORY.json` for the bound executable/inventory identities
+and exact original payloads. Notice admission/copying is a headless packaging
+check; source selection, completeness and distribution approval remain pending.
+Opening the app is a separate native acceptance action.

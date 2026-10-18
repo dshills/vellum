@@ -1,0 +1,754 @@
+{
+  "archive": "records.tar.gz",
+  "archive_sha256": "8d6d53af93412c4f9a0eb82cfc7bbbfed593e3fbadfcd8b65e83de72b37362d0",
+  "files": {
+    "app_notices.py": {
+      "bytes": 7082,
+      "sha256": "d03c3a95f2c24f3105d3da9dba0097c100132e4781b951e2a94691c90c5cb45d"
+    },
+    "app_notices_test.py": {
+      "bytes": 8765,
+      "sha256": "4be8e3c69913dc84712c897720bcdfe2ac49080106d3a8516484018a50037373"
+    },
+    "bundle-origins.json": {
+      "bytes": 36500,
+      "sha256": "819e45bca596fae3c791bec2ae71dc984e5a54d714eb3821dbd6081bac67b310"
+    },
+    "final-checks.json": {
+      "bytes": 777,
+      "sha256": "fb9034baad3adf862a4416ac4abf953de98a421c0fd61f9a25afa29975613232"
+    },
+    "final-source-docs.diff": {
+      "bytes": 52433,
+      "sha256": "a8d2003c63b1bf7c4bb113f1bdbda2bcf390c51978f530a979003c88938388d5"
+    },
+    "input-build-inventory.json": {
+      "bytes": 4255658,
+      "sha256": "fc271616c3e758d62933f5b239e8a66430f02ce44d9381b9db9212fcff442120"
+    },
+    "input-build-receipt.json": {
+      "bytes": 3218,
+      "sha256": "01b59117c58805e94e88005fd6977bcf95f953504dc89781595734c189363cfa"
+    },
+    "input-sdk-go-inventory.json": {
+      "bytes": 112562,
+      "sha256": "0ef64501fbd9f154ca0e9f4624ad1c5dbf3608409ecc021aebbc2405eb72e758"
+    },
+    "internal-execution-review.json": {
+      "bytes": 55549,
+      "sha256": "285c0ca59df3c5140bddd7cc8f20634f9f84039baee2118f9dfc9bc0ad697da4"
+    },
+    "internal-prism-closure.json": {
+      "bytes": 10823,
+      "sha256": "38815b6156692060a5c8c977112c284b13d62f7b7739b20e09ba98dd6dc0f80f"
+    },
+    "internal-results-review.json": {
+      "bytes": 10226,
+      "sha256": "2589268b1470e424920bfad064c3b6a659daf6ef6c1bc1eb4737f755b8e60317"
+    },
+    "internal-source-review.json": {
+      "bytes": 10069,
+      "sha256": "96137174a893ee168b77692e828608d2ec7f8b9d9a007b4801313f2abeede185"
+    },
+    "module-notice-gaps.json": {
+      "bytes": 1411,
+      "sha256": "54ab35a9be3f7b91398fb93af9859bb36696e1426491b875382aec1acf4ac0fa"
+    },
+    "notice-bundle/INVENTORY.json": {
+      "bytes": 31874,
+      "sha256": "930a000a702e15218fae4e7f7487b2916ea8bad0c9f2d62fda498cf84164fc14"
+    },
+    "notice-bundle/NOTICES/go-module-000/000-LICENSE": {
+      "bytes": 1187,
+      "sha256": "886dff73f14c6beea6936796184c1517c3c4a6986b97d26904e5dac028c494dc"
+    },
+    "notice-bundle/NOTICES/go-module-001/000-LICENSE": {
+      "bytes": 1498,
+      "sha256": "c6297bf0da1f70caea4ef25247a6d11650cb1c87b0b0a28a53a6bc725fe451d1"
+    },
+    "notice-bundle/NOTICES/go-module-001/001-LICENSE_APACHE": {
+      "bytes": 11357,
+      "sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd"
+    },
+    "notice-bundle/NOTICES/go-module-001/002-OFL.txt": {
+      "bytes": 4396,
+      "sha256": "cee9892f9f0cc8fe882c9e9537ee6a89621d86ee7ceaf70b02e2b2b1c25c061a"
+    },
+    "notice-bundle/NOTICES/go-module-001/003-LICENSE.txt": {
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "notice-bundle/NOTICES/go-module-002/000-LICENSE": {
+      "bytes": 1539,
+      "sha256": "99afeab1cc45d2ea2912fee0ece1dcfd3f4869dc98b92242a6edeb84977eb8ae"
+    },
+    "notice-bundle/NOTICES/go-module-003/000-LICENSE": {
+      "bytes": 16725,
+      "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+    },
+    "notice-bundle/NOTICES/go-module-004/000-LICENSE.txt": {
+      "bytes": 1078,
+      "sha256": "2db9097f7b3750c1c9426996d21fe443d339131fb758c2167d2d5fabe8e6cbf9"
+    },
+    "notice-bundle/NOTICES/go-module-005/000-LICENSE.txt": {
+      "bytes": 1094,
+      "sha256": "779fa7aa8c1e18e7512b8c5c2b38599f84752c1046125548efb5cce2cc80d085"
+    },
+    "notice-bundle/NOTICES/go-module-006/000-LICENSE": {
+      "bytes": 1107,
+      "sha256": "b498052ec363d4e01abb1ea745843de470b7fb14a8d16ca82205dfb17beaccdb"
+    },
+    "notice-bundle/NOTICES/go-module-007/000-COPYING": {
+      "bytes": 1055,
+      "sha256": "ec31560a57df05e92e10a288879ac52ddebc21c1861dd79bd25b5c33aaa1252a"
+    },
+    "notice-bundle/NOTICES/go-module-008/000-COPYING": {
+      "bytes": 1055,
+      "sha256": "e7bf754e7153012a3a8ff697d21acd6c12e590d6a55f2aef8ee83616aa9a795f"
+    },
+    "notice-bundle/NOTICES/go-module-009/000-COPYING": {
+      "bytes": 1078,
+      "sha256": "094d3bf4f6aca4f593f642100c7fd3b64b45fa8757ecb28a1395143e04046391"
+    },
+    "notice-bundle/NOTICES/go-module-010/000-LICENSE": {
+      "bytes": 1077,
+      "sha256": "637516cf71f2b3eda480c6cb39ee62297d8748acc95d8b4c63200d04e18793ea"
+    },
+    "notice-bundle/NOTICES/go-module-011/000-LICENSE": {
+      "bytes": 1070,
+      "sha256": "11319e34d9dac2f45392f14f4f62e28b24173cfa13d39b32e7b7b66c2f3bdccd"
+    },
+    "notice-bundle/NOTICES/go-module-012/000-LICENSE": {
+      "bytes": 1084,
+      "sha256": "a91ec19456c4efb3d9fc22dc9c1ec60ec3701a9e8f4be511ebcf908c04288ffb"
+    },
+    "notice-bundle/NOTICES/go-module-013/000-LICENSE.txt": {
+      "bytes": 16726,
+      "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
+    },
+    "notice-bundle/NOTICES/go-module-014/000-LICENSE": {
+      "bytes": 1340,
+      "sha256": "eb26340b6d817419004f4479fdf6c4cc4fc2b129534916bfbfa0317ad1286a96"
+    },
+    "notice-bundle/NOTICES/go-module-015/000-LICENSE": {
+      "bytes": 1067,
+      "sha256": "6abee1efeac88cba6264a5778ef15caac65b8fd2a68ec1d34c80cb086afa24a2"
+    },
+    "notice-bundle/NOTICES/go-module-016/000-LICENSE": {
+      "bytes": 1537,
+      "sha256": "bd714c99f7f2ba7f3fedbcc124892261680f27ad44dbf8c3bb6cab082646bd1f"
+    },
+    "notice-bundle/NOTICES/go-module-017/000-LICENSE": {
+      "bytes": 11379,
+      "sha256": "9aaa5d967b90e8e460c31214618517a1fb49810fbc79ebc78df0c7c81259aff6"
+    },
+    "notice-bundle/NOTICES/go-module-018/000-LICENSE": {
+      "bytes": 11325,
+      "sha256": "cb5e8e7e5f4a3988e1063c142c60dc2df75605f4c46515e776e3aca6df976e14"
+    },
+    "notice-bundle/NOTICES/go-module-018/001-NOTICE": {
+      "bytes": 126,
+      "sha256": "dccd26c6fd9c296daf44d0bc56bb4efc566edd4880381b3331c9a63e6e471338"
+    },
+    "notice-bundle/NOTICES/go-module-019/000-LICENSE": {
+      "bytes": 766,
+      "sha256": "1b93a317849ee09d3d7e4f1d20c2b78ddb230b4becb12d7c224c927b9d470251"
+    },
+    "notice-bundle/NOTICES/go-module-020/000-LICENSE": {
+      "bytes": 1072,
+      "sha256": "9be5d04bb4d706914d5bf943710da4afeb42048f7c529902fb57c82762a991a9"
+    },
+    "notice-bundle/NOTICES/go-module-021/000-LICENSE": {
+      "bytes": 1078,
+      "sha256": "ce557dd36f129a17646345e971b4a889785bedef8b25c3e76916215c12c93b0a"
+    },
+    "notice-bundle/NOTICES/go-module-022/000-LICENSE": {
+      "bytes": 1070,
+      "sha256": "ae34cb138b18131bfab5b22e59758e4e6c4c5bfd1f19d6f28fd664678f7eed32"
+    },
+    "notice-bundle/NOTICES/go-module-023/000-LICENSE": {
+      "bytes": 1531,
+      "sha256": "2dfbe6d2b5eb18b55148f3805d88648a09e0d17e38428123259afb08c8996e37"
+    },
+    "notice-bundle/NOTICES/go-module-024/000-LICENSE": {
+      "bytes": 1537,
+      "sha256": "33443b584ce7956dbc4adc120502e4095b0caf24e8c8cd36935fb2e81ac00779"
+    },
+    "notice-bundle/NOTICES/go-module-024/001-LICENSE-GUST": {
+      "bytes": 1377,
+      "sha256": "49ea6cb9257bbee0a3979c48a774cd221550ac1c20c95549efe45fc99cc18050"
+    },
+    "notice-bundle/NOTICES/go-module-025/000-LICENSE": {
+      "bytes": 1485,
+      "sha256": "72f474049924563f43e5a5cc8e7e228a4fc8eb58e3dd7383bd3552c0725f566c"
+    },
+    "notice-bundle/NOTICES/go-module-025/001-LICENSE.md": {
+      "bytes": 904,
+      "sha256": "149704059b5d0bf551637e50042dd4de9c2cae921021f6636298911e3a5f9462"
+    },
+    "notice-bundle/NOTICES/go-module-026/000-LICENSE": {
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "notice-bundle/NOTICES/go-module-026/001-LICENSE": {
+      "bytes": 1479,
+      "sha256": "dd26a7abddd02e2d0aba97805b31f248ef7835d9e10da289b22e3b8ab78b324d"
+    },
+    "notice-bundle/NOTICES/go-module-027/000-LICENSE": {
+      "bytes": 3006,
+      "sha256": "6b1bf94c77d7faa0ce94f8745595bfaf4c404f8b3873f5c2ce55ca15f8e44eca"
+    },
+    "notice-bundle/NOTICES/go-module-027/001-LICENSE": {
+      "bytes": 1674,
+      "sha256": "e45d96558ba3d406f95dffed6f22c3be07093475ef617bcfddf88444d6b66788"
+    },
+    "notice-bundle/NOTICES/go-module-028/000-LICENSE": {
+      "bytes": 3005,
+      "sha256": "a1e5b69b12756927cfe3b3a373df05a55c1aaa69c6b259e06d8746257cb17d06"
+    },
+    "notice-bundle/NOTICES/go-module-028/001-COPYING": {
+      "bytes": 1141,
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+    },
+    "notice-bundle/NOTICES/go-module-028/002-COPYING": {
+      "bytes": 593,
+      "sha256": "f55f74bf740db07bb032a90aa74af4307adea3d489c1ccba12453cf0c0a764cb"
+    },
+    "notice-bundle/NOTICES/go-module-028/003-COPYING": {
+      "bytes": 4370,
+      "sha256": "9b35b8485f69cd298fccbb3c40a827dc06cf1185553bef827903497d2944a8d7"
+    },
+    "notice-bundle/NOTICES/go-module-028/004-COPYING": {
+      "bytes": 584,
+      "sha256": "d24039e4d22c9bc72096f6174374539d92a3d6e1163938546ec59179fe095e6f"
+    },
+    "notice-bundle/NOTICES/go-module-029/000-LICENSE": {
+      "bytes": 1081,
+      "sha256": "e4d63d6f9b65f053ce5beb8c5225a83c7be73010cef4fb849aca0c52d92b9236"
+    },
+    "notice-bundle/NOTICES/go-module-030/000-LICENSE.txt": {
+      "bytes": 1427,
+      "sha256": "f7b377536d149ca0818e1c341aeca76d63f55ca749cfd713484a1672f89714f7"
+    },
+    "notice-bundle/NOTICES/go-module-031/000-LICENSE": {
+      "bytes": 1479,
+      "sha256": "17b5d209ba8f9684257ecfcff87df6ceda6194143a8fbd074f29727cff6f0c40"
+    },
+    "notice-bundle/NOTICES/go-module-032/000-LICENSE": {
+      "bytes": 1482,
+      "sha256": "af11d643d903cb178a641d7512879285287844f7a6c0611e2d0c6b131e50188b"
+    },
+    "notice-bundle/NOTICES/go-module-033/000-LICENSE": {
+      "bytes": 1312,
+      "sha256": "2be1b548b0387ca8948e1bb9434e709126904d15f622cc2d0d8e7f186e4d122d"
+    },
+    "notice-bundle/NOTICES/go-module-034/000-LICENSE": {
+      "bytes": 1479,
+      "sha256": "2d36597f7117c38b006835ae7f537487207d8ec407aa9d9980794b2030cbc067"
+    },
+    "notice-bundle/NOTICES/go-module-035/000-LICENSE": {
+      "bytes": 1070,
+      "sha256": "85ffa04d14965497779ceb017229dae1448f470c62db422c97a14a4ce66c95b7"
+    },
+    "notice-bundle/NOTICES/go-module-036/000-LICENSE": {
+      "bytes": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    "notice-bundle/NOTICES/go-module-037/000-LICENSE": {
+      "bytes": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    "notice-bundle/NOTICES/go-module-038/000-LICENSE": {
+      "bytes": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    "notice-bundle/NOTICES/go-module-039/000-LICENSE": {
+      "bytes": 11357,
+      "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1"
+    },
+    "notice-bundle/NOTICES/go-module-040/000-LICENSE": {
+      "bytes": 1479,
+      "sha256": "2d36597f7117c38b006835ae7f537487207d8ec407aa9d9980794b2030cbc067"
+    },
+    "notice-bundle/NOTICES/go-module-041/000-LICENSE": {
+      "bytes": 11360,
+      "sha256": "4819582701f150b28a563a6cd8ed0bf5a754e3c67b90ad38d78ba4131bf77795"
+    },
+    "notice-bundle/NOTICES/go-module-042/000-LICENSE": {
+      "bytes": 1070,
+      "sha256": "7e47a9fd2664f0ebd611d867cb42950d37099a9e6eece83379e5eb34ac4ddfe2"
+    },
+    "notice-bundle/NOTICES/go-module-043/000-LICENSE": {
+      "bytes": 1072,
+      "sha256": "f5a169b17b7b5bc97a3909f190089256dc62adb86eefc65454b0fdca37861c20"
+    },
+    "notice-bundle/NOTICES/go-module-044/000-License": {
+      "bytes": 1073,
+      "sha256": "04a07632499685c7614e52e822b0ac0ec0767b4e9b2a3e8ae7cb52ed0d4df3c7"
+    },
+    "notice-bundle/NOTICES/go-module-045/000-License": {
+      "bytes": 1052,
+      "sha256": "283c28b781bc7487bd7bcaf453cbd811f5ee8d7ce625cfcf8dcacae6ba1f4bb5"
+    },
+    "notice-bundle/NOTICES/go-module-046/000-LICENSE": {
+      "bytes": 1055,
+      "sha256": "1e4cf2a117516ec1b54041d68ed4f5d331878b04de3386f4790e7b5b9c04e1ec"
+    },
+    "notice-bundle/NOTICES/go-module-047/000-LICENSE": {
+      "bytes": 1099,
+      "sha256": "08eab1118c80885fa1fa6a6dd7303f65a379fcb3733e063d20d1bbc2c76e6fa1"
+    },
+    "notice-bundle/NOTICES/go-module-048/000-LICENSE": {
+      "bytes": 1085,
+      "sha256": "dce57e2906b8ebfc7a0978105aac3082ddceb8a1f673bec71b9c8dc5df51c5d7"
+    },
+    "notice-bundle/NOTICES/go-module-049/000-LICENSE": {
+      "bytes": 1085,
+      "sha256": "22adc4abdece712a737573672f082fd61ac2b21df878efb87ffcff4354a07f26"
+    },
+    "notice-bundle/NOTICES/go-module-050/000-LICENSE": {
+      "bytes": 1079,
+      "sha256": "233e8cf9a812999ccee4d3edb270b0f11ab3539658e680bcb873604915ca5038"
+    },
+    "notice-bundle/NOTICES/go-module-051/000-LICENSE": {
+      "bytes": 756,
+      "sha256": "7b850692b15c71706bc6906b51d6375c1404c2d26233078335b6aaa7def8b3f4"
+    },
+    "notice-bundle/NOTICES/go-module-052/000-LICENSE": {
+      "bytes": 10173,
+      "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9"
+    },
+    "notice-bundle/NOTICES/go-module-058/000-LICENSE": {
+      "bytes": 1101,
+      "sha256": "26844e4b53c5adec04e557fd7dfef281cc0205a7d355626b1c68b778b99e9e7b"
+    },
+    "notice-bundle/NOTICES/go-module-059/000-LICENSE": {
+      "bytes": 1312,
+      "sha256": "8d427fd87bc9579ea368fde3d49f9ca22eac857f91a9dec7e3004bdfab7dee86"
+    },
+    "notice-bundle/NOTICES/go-module-060/000-LICENSE": {
+      "bytes": 1445,
+      "sha256": "2eb550be6801c1ea434feba53bf6d12e7c71c90253e0a9de4a4f46cf88b56477"
+    },
+    "notice-bundle/NOTICES/go-module-061/000-LICENSE.txt": {
+      "bytes": 1072,
+      "sha256": "a59885f5f0f3b3c07cf9444db5fe399b6f0791eac82055f7b85cc65500551039"
+    },
+    "notice-bundle/NOTICES/go-module-062/000-LICENSE": {
+      "bytes": 1479,
+      "sha256": "4835612df0098ca95f8e7d9e3bffcb02358d435dbb38057c844c99d7f725eb20"
+    },
+    "notice-bundle/NOTICES/go-module-063/000-LICENSE.txt": {
+      "bytes": 10140,
+      "sha256": "5e3400b93bbb099e83e52bab885e7441750673c21f97988ca3f1240639b63283"
+    },
+    "notice-bundle/NOTICES/go-module-064/000-LICENSE": {
+      "bytes": 1531,
+      "sha256": "b8514c577c1c4b46cee454d5a882b15fa411e72c5bd7f801f241591789fce61a"
+    },
+    "notice-bundle/NOTICES/go-module-065/000-LICENSE": {
+      "bytes": 1103,
+      "sha256": "f8e536c1c7b695810427095dc85f5f80d44ff7c10535e8a9486cf393e2599189"
+    },
+    "notice-bundle/NOTICES/go-module-066/000-LICENSE.md": {
+      "bytes": 1074,
+      "sha256": "0ebcdb0e336d600038ecdb7b8d339d937a66b62cb6d1128896fdc20cfe01c188"
+    },
+    "notice-bundle/NOTICES/go-module-067/000-LICENSE.md": {
+      "bytes": 1074,
+      "sha256": "0ebcdb0e336d600038ecdb7b8d339d937a66b62cb6d1128896fdc20cfe01c188"
+    },
+    "notice-bundle/NOTICES/go-module-068/000-LICENSE": {
+      "bytes": 1071,
+      "sha256": "c1d6f653c38c80294dc7994647ba0dcc508ce64a86996303c804efa2f7982bff"
+    },
+    "notice-bundle/NOTICES/go-module-069/000-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-module-070/000-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-module-071/000-LICENSE": {
+      "bytes": 1479,
+      "sha256": "2d36597f7117c38b006835ae7f537487207d8ec407aa9d9980794b2030cbc067"
+    },
+    "notice-bundle/NOTICES/go-module-071/001-LICENSE": {
+      "bytes": 11357,
+      "sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd"
+    },
+    "notice-bundle/NOTICES/go-module-072/000-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-module-073/000-LICENSE": {
+      "bytes": 1479,
+      "sha256": "2d36597f7117c38b006835ae7f537487207d8ec407aa9d9980794b2030cbc067"
+    },
+    "notice-bundle/NOTICES/go-module-074/000-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-module-075/000-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-module-076/000-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-module-077/000-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-module-078/000-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-module-079/000-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-module-080/000-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-module-081/000-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-module-082/000-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-module-083/000-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-module-084/000-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-module-085/000-LICENSE": {
+      "bytes": 1377,
+      "sha256": "69ce77f2b1c9c608d27f2d749b0e7d0c13960ed3b0dc07b973ac940e362e5d9c"
+    },
+    "notice-bundle/NOTICES/go-module-086/000-LICENSE": {
+      "bytes": 2151,
+      "sha256": "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+    },
+    "notice-bundle/NOTICES/go-module-086/001-NOTICE": {
+      "bytes": 560,
+      "sha256": "f6c2dd3a67b576eafb89b80200b8b1627230bf3821a0c14cb99a22ac19107d00"
+    },
+    "notice-bundle/NOTICES/go-module-087/000-LICENSE": {
+      "bytes": 1483,
+      "sha256": "fd9fd6038f0180c81c54e88bf5b692cdbed1086b95f843099aa306ddb7d5c850"
+    },
+    "notice-bundle/NOTICES/go-module-087/001-LICENSE-STAR-TEX": {
+      "bytes": 1537,
+      "sha256": "bd714c99f7f2ba7f3fedbcc124892261680f27ad44dbf8c3bb6cab082646bd1f"
+    },
+    "notice-bundle/NOTICES/go-module-088/000-LICENSE": {
+      "bytes": 1479,
+      "sha256": "2d36597f7117c38b006835ae7f537487207d8ec407aa9d9980794b2030cbc067"
+    },
+    "notice-bundle/NOTICES/go-standard/000-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-standard/001-PATENTS": {
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    "notice-bundle/NOTICES/go-standard/002-LICENSE": {
+      "bytes": 9714,
+      "sha256": "56210f826b8f0fbac3160dfe55c97f4019eb6cdda3963b5a0eab8a8bdb62360e"
+    },
+    "notice-bundle/NOTICES/go-standard/003-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-standard/004-PATENTS": {
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    "notice-bundle/NOTICES/go-standard/005-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-standard/006-PATENTS": {
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    "notice-bundle/NOTICES/go-standard/007-LICENSE": {
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "notice-bundle/NOTICES/go-standard/008-PATENTS": {
+      "bytes": 1303,
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+    },
+    "notice-bundle/NOTICES/vellum/LICENSE": {
+      "bytes": 1068,
+      "sha256": "07c4328563b9066be35c2ac90c6744e6ac904882fd2355ea82d7f0756c940b43"
+    },
+    "notices-v1/owned.json": {
+      "bytes": 241,
+      "sha256": "6de534fa395726d6569158b783b69665410f028a0e55935c45917f5da6f1d755"
+    },
+    "notices-v1/stderr": {
+      "bytes": 106,
+      "sha256": "2e7e95d82618f1ea08b0a24d61f374c3b161fb04ee47113d6baab1ebd15ac0a2"
+    },
+    "notices-v1/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "notices-v1.json": {
+      "bytes": 2638,
+      "sha256": "2b4bf82e95403e2d991db3a3731244ffe46e580a7380127e96f6ff914de4d299"
+    },
+    "notices-v2/owned.json": {
+      "bytes": 241,
+      "sha256": "f3fc65da7ec0a18165ba410b60675ffc136b1d7405f67bf7b32689316ff6c0a8"
+    },
+    "notices-v2/stderr": {
+      "bytes": 107,
+      "sha256": "cad4b5a6c7a3ead5c109e2d6fde865e8a8e6bb34d6d5fec7c4bd9f3be355982d"
+    },
+    "notices-v2/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "notices-v2.json": {
+      "bytes": 2638,
+      "sha256": "3c7d8ef83252a3d4643f05f70f726ffa189b1cf6b8338f0eb571703c0d8a7ead"
+    },
+    "original/package-app.py": {
+      "bytes": 9604,
+      "sha256": "c8fecd72484cec1be458c69cc09c74f190b6bd42193a0da68eee0464b096c920"
+    },
+    "original/package-app_test.py": {
+      "bytes": 12971,
+      "sha256": "b16671dab83fbd150aa1eb456ce492faea9f2b9a994166c9f6209b96e1bd1eda"
+    },
+    "package-app.py": {
+      "bytes": 12635,
+      "sha256": "f9906d790c6baef842bb188ff33e6dea459b410c4c504816b5128b13a8f70edb"
+    },
+    "package-app_test.py": {
+      "bytes": 23565,
+      "sha256": "9a3cab82f70d3ee282cf896ed22e3ef01cb4c53c7d2ffb9c937d2c085270c833"
+    },
+    "package-v1/owned.json": {
+      "bytes": 241,
+      "sha256": "86dd51b6153a26a99b49218fd6ad049751c3cdd1baf9a5a044b1e41d192aa0a1"
+    },
+    "package-v1/stderr": {
+      "bytes": 121,
+      "sha256": "ad7e11a94b55a920f691fe7a343f3ccb84536c31f397f8644e4bae432a7e7cbd"
+    },
+    "package-v1/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "package-v1.json": {
+      "bytes": 2637,
+      "sha256": "a8e6a09020aae54c600cc15ade4f81b7a3aad6440e7b1338c2fa5c6f78fabd61"
+    },
+    "package-v2/owned.json": {
+      "bytes": 241,
+      "sha256": "0dd98fbf70fff89d19aa020b843132f64c27645ad9bcf764f61523bf91a556ad"
+    },
+    "package-v2/stderr": {
+      "bytes": 125,
+      "sha256": "1b2b013632e27a101e430c8b945d9540a87c6b47f4b7ce7288023ffc540e7f1b"
+    },
+    "package-v2/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "package-v2.json": {
+      "bytes": 2638,
+      "sha256": "7c6396ea7d9ee8cafd37a634446c9e5b15a0d12d121536a9b663ab3337b87e32"
+    },
+    "package-v3/owned.json": {
+      "bytes": 241,
+      "sha256": "0b880abcb61ddf89abe4e35b64af2333294763d03ed7791f0aba88f378f041d7"
+    },
+    "package-v3/stderr": {
+      "bytes": 126,
+      "sha256": "d47fb3b169a6a43ac7466acaef97bc71bdc09cd54c41d405ad207c87528a4fec"
+    },
+    "package-v3/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "package-v3.json": {
+      "bytes": 2636,
+      "sha256": "7508a2b49897fa0846d26269ab1e45795b7e69c69fbd0e91c8f68696b709ad87"
+    },
+    "package_evidence.py": {
+      "bytes": 4363,
+      "sha256": "ab7a57f0555309f883c7b07b63e2846f3d70c8cbd71d1ae5479991f22c0bb082"
+    },
+    "packaged-Info.plist": {
+      "bytes": 657,
+      "sha256": "4a99feb6616d71a349f6667f6279e276d6d149b72c5e2b6fc66d96f51bc6e245"
+    },
+    "packaged-app-manifest.json": {
+      "bytes": 871,
+      "sha256": "ba600416bd634c2c8ad440335775678981169bf481c6efff57eec1f33ac61ebf"
+    },
+    "prepare_bundle.py": {
+      "bytes": 4661,
+      "sha256": "c79edbfa9cea8069192ba82f1fe4de8668ca91e25fb56de0203de2ced098b2d9"
+    },
+    "prism-command.json": {
+      "bytes": 893,
+      "sha256": "308edad115f08979c139500e27839471f346af1d872f45d2ed482b6764f4d5cc"
+    },
+    "prism-disposition.json": {
+      "bytes": 2006,
+      "sha256": "965480089757ecfad4e580f6e7a832694c0c6827e5d0b5d4077be8b2f12d7d4d"
+    },
+    "prism-rules.json": {
+      "bytes": 2612,
+      "sha256": "81217455331e67645aec9de9a2e97ce5cba4f1abd72899b23c8f0b95d1ee8d90"
+    },
+    "prism-staged.diff": {
+      "bytes": 49920,
+      "sha256": "9e3dd56cb83df0ad9f048049d6f976d47b27df1d408ac2de88d392451c7bbc71"
+    },
+    "prism.json": {
+      "bytes": 3501,
+      "sha256": "ef93c725950d00c20493e2c9e2779d85e49340f68ad1b8f3b98a4a38f417a97e"
+    },
+    "prism.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "prism.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "prism_review.py": {
+      "bytes": 1335,
+      "sha256": "cfaa4e402a206029de3a776ff556c7d56d725d78c3d54f18ff2f61fe6718570c"
+    },
+    "real-package-v1/owned.json": {
+      "bytes": 1139,
+      "sha256": "d37bfc61c038657479ff9e964a9ad1d910f2abaadd1190958bcfd8e844e249e1"
+    },
+    "real-package-v1/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "real-package-v1/stdout": {
+      "bytes": 344,
+      "sha256": "1a6f5d6a054278d1e6ccb49e12a24559cb636ca4e85c57df85b2653eba56ffe4"
+    },
+    "real-package-v1.json": {
+      "bytes": 27016,
+      "sha256": "8f5bae2173b605d5d8373cc88d45f9b0116f506e45c6fdf5506db38103169cc5"
+    },
+    "real-package-verification.json": {
+      "bytes": 24426,
+      "sha256": "d72de7994660ceefb697822aad62be3090a048de19e2425d35444a194eff5db5"
+    },
+    "real_package.py": {
+      "bytes": 2260,
+      "sha256": "b2bce6e009323122fa36a3a9b2d96376045a4200eee6cb6dcdac3a20ec99425a"
+    },
+    "run_tests.py": {
+      "bytes": 1342,
+      "sha256": "ce83442d531f31fb0fe9626b2ab4aa290ce39279aad660e25dc871fa7995cb77"
+    },
+    "scope.json": {
+      "bytes": 501,
+      "sha256": "8eb51fa8d09072f24c9f042a7607ab0208c1cf59d703e4054f482b60bb7faab6"
+    },
+    "shared/112-run.py": {
+      "bytes": 11845,
+      "sha256": "e76238012be63f58cbc5923e27f6fc227a3aca8443d85d64f466c0675382c7ac"
+    },
+    "shared/113-run.py": {
+      "bytes": 7439,
+      "sha256": "6e8c6c4a8c814cf0c0083348e06de982fbeb9024c5744cc215bb8af67bcb214b"
+    },
+    "shared/116-live_lease.py": {
+      "bytes": 910,
+      "sha256": "90137d3675603d3018c62b46b55dbc35242d0869127acc53fdae00d35bd0f1f4"
+    },
+    "shared/117-version.json": {
+      "bytes": 1001,
+      "sha256": "971c6abbff909b475df8078fff164c0c035674a3663d441b539028ae3dd4b01e"
+    },
+    "shared/118-app_notices.py": {
+      "bytes": 7082,
+      "sha256": "d03c3a95f2c24f3105d3da9dba0097c100132e4781b951e2a94691c90c5cb45d"
+    },
+    "shared/119-artifact_io.py": {
+      "bytes": 1746,
+      "sha256": "c2f4a6cc7d07e039350d31e23c3e5a574a79756444ab84e41ab09feff6d2a4e5"
+    },
+    "shared/120-child_process.py": {
+      "bytes": 10519,
+      "sha256": "f907c7c6ce54871c9693be9fd8a9088cf09bd22cabc4e48d3abc7191f75bc7e6"
+    },
+    "shared/121-native_archive.py": {
+      "bytes": 7086,
+      "sha256": "b186e30cf34577b0c1ccc4d25f5c090981afac25a0840942de0e83087ca4b541"
+    },
+    "shared/122-native_gpu.py": {
+      "bytes": 14990,
+      "sha256": "f6aa6f176bdab810d2f3f6d27dd079ee195928942ed761ac2081b2687369142d"
+    },
+    "shared/123-package-app.py": {
+      "bytes": 12635,
+      "sha256": "f9906d790c6baef842bb188ff33e6dea459b410c4c504816b5128b13a8f70edb"
+    },
+    "shared/124-sdk_environment.py": {
+      "bytes": 1356,
+      "sha256": "e100d93ed7ca190725c8e10d1b721cb56f2d86a5f12643b53b4ee198a79b4311"
+    },
+    "shared/sources.json": {
+      "bytes": 35278,
+      "sha256": "6df69ef58e348684e5dd16d81da50edf24a8086ff0631205f8fcb97f4a1c3ad1"
+    },
+    "versions/v1/app_notices.py": {
+      "bytes": 6843,
+      "sha256": "3ba4d1909cf20f3621f891cb595aacbb7e09be0f9778e320ecb60b8c3c12fd04"
+    },
+    "versions/v1/app_notices_test.py": {
+      "bytes": 8112,
+      "sha256": "ecf39243f9ef612c40e5d0f0cc5b6d88d4df020652bbcc63f13e50e2f84f0588"
+    },
+    "versions/v1/package-app.py": {
+      "bytes": 10547,
+      "sha256": "deeaf016f07b917dffab0e41d3f8594cb6723f268a3a42faee4ace66674dd78e"
+    },
+    "versions/v1/package-app_test.py": {
+      "bytes": 18468,
+      "sha256": "c4665e5a66a534959900f4fccbb854e3e40f392f29ddfe4c4bf861394f177159"
+    },
+    "versions/v2/app_notices.py": {
+      "bytes": 7082,
+      "sha256": "d03c3a95f2c24f3105d3da9dba0097c100132e4781b951e2a94691c90c5cb45d"
+    },
+    "versions/v2/app_notices_test.py": {
+      "bytes": 8765,
+      "sha256": "4be8e3c69913dc84712c897720bcdfe2ac49080106d3a8516484018a50037373"
+    },
+    "versions/v2/package-app.py": {
+      "bytes": 12635,
+      "sha256": "f9906d790c6baef842bb188ff33e6dea459b410c4c504816b5128b13a8f70edb"
+    },
+    "versions/v2/package-app_test.py": {
+      "bytes": 22442,
+      "sha256": "e9f4a83b07ba34c79d9e4bf350f6b985185788b3299f05c22f39196561c75a36"
+    }
+  }
+}

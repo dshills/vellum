@@ -379,10 +379,64 @@ closure exists; the current statically linked example can be packaged without
 prototype helpers. Windows/Linux layouts are not proof that dynamic native
 runtime dependencies are complete or that the app ran on those targets.
 
+Mac applications can optionally supply `--notice-bundle <directory>`. The
+packager admits the bundle against the **staged executable's pre-sign SHA256**,
+then copies its original inventory and declaration bytes into
+`Contents/Resources/THIRD_PARTY_NOTICES`. `APP_MANIFEST.component_notices` records
+the inventory hash, executable binding, file/component/byte counts and pending
+review status. Legacy packages without this option make no notice-coverage claim.
+The option is currently Mac-only; it neither discovers nor selects applicable
+licenses automatically.
+
+The input directory contains `INVENTORY.json` and exactly the files that inventory
+lists. Schema 1 requires these fields and no others:
+
+- `schema`: integer `1`; `target`: `darwin`.
+- `artifact_sha256`: lowercase SHA256 of the executable before signing.
+- `distribution_audit`: `pending`; `applicability`: `review-required`.
+- `scope`: a nonempty description of the caller-selected coverage, up to 4,096 characters.
+- `files`: a map of `NOTICES/...` paths to exact `{bytes, sha256}` records.
+- `components`: objects with unique nonempty `id` values (up to 512 characters)
+  and nonempty `notice_files` lists referring to those paths. Every file must be
+  referenced; several components may share one declaration.
+
+The validator refuses duplicate JSON keys, nonfinite values, unrecognized schema
+fields, invalid identities, duplicate component/references, case-colliding file
+or directory spellings, traversal, nonregular inputs and symlinks at the root or within it. Parent
+installation aliases are resolved before descendant checks. Notice paths use
+ASCII letter/digit-leading components followed by letters, digits, dots, dashes
+or underscores, with no trailing dots; each starts with `NOTICES/`, has at most
+16 components and at most 1,024 characters. Extra files/directories refuse.
+Limits are 1 MiB inventory, 1,024 declaration files, 512 components, 4 MiB per
+file and 16 MiB including inventory. Counts and declared byte totals are checked
+before declaration contents are read. These limits bound admitted memory and
+copy work; source paths/bytes are sampled rather than isolated against concurrent
+adversarial directory replacement.
+
+The copied bytes come from a validated bounded snapshot. The packager checks
+staged notice contents after copying. It checks executable bytes, exact app
+manifest bytes and optional notices before signing/publication and again at
+the final output. Explicit signing may transform the executable; the command's
+JSON result records `packaged_binary_sha256` after that transformation, and final
+copy verification uses that identity. The app manifest and notice inventory
+retain the pre-sign source identity. The unchanged expected app manifest is
+also checked after signing. These are sampled byte/identity checks, not filesystem
+isolation. This is caller-selected material,
+not attested component provenance, complete linked membership, applicable-license
+selection or rights approval. Both inventory and app manifest remain pending;
+source-built GPU notices must not be applied to a different native archive.
+
 macOS bundle publication reserves the output exclusively and fills that directory.
 It is non-atomic: successful command return and its JSON report mark completion.
-Normal exceptions remove the owned partial directory, while forced termination or
-power loss can leave partial output requiring inspection/removal before retry.
+Normal exceptions remove the partial directory only while its sampled device/
+inode identity still matches the directory this call created. A detected
+replacement is preserved and packaging fails. A failure immediately after output
+creation, before its identity can be captured, preserves that unproven empty
+path too: no payload is moved and no completion result is returned. Inspect and
+remove that empty partial output manually before retrying; the tool never guesses
+that an unproven path is safe to delete. This identity check is not isolation
+against adversarial concurrent path changes. Forced termination or power loss can
+leave partial output requiring inspection/removal before retry.
 The tool refuses existing output rather than overwriting that partial state.
 
 The app manifest marks the artifact private, target runtime unverified, native
