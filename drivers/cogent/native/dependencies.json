@@ -870,6 +870,17 @@
               "sha256": "e70614dcc4ec0db4edc36302c465ba018f90f6e7c338d7d5dfb3a37f82d9c394"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/editorbodyfont",
+          "inputs": "native/patches/editorbodyfont/original-hashes.json",
+          "outputs": "native/patches/editorbodyfont/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/editorbodyfont/0087-editor-body-and-gutter-fonts.patch",
+              "sha256": "f0e9cf2762ca6e4d98eb892b0f086149ddff4c611ac526548da08e00b933c711"
+            }
+          ]
         }
       ]
     },

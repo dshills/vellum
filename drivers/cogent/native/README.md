@@ -251,3 +251,11 @@ Stage84 (`patches/popupbuttonembedders`) includes direct Button embeddings such
 as MenuButton items in bounded actual-popup inspection. It verifies initialized
 base/direct-child ownership, retains budget/clipping/lifetime rules and excludes
 passive or foreign/nested wrappers. See the [contract](patches/popupbuttonembedders/README.md).
+
+
+Stage87 separates monospaced multiline document shaping from themed line-number
+chrome. Fresh body styles enter Lines and body/tab shaping; full layout retires
+the tab shape with other layout caches. Retained160/162DPI typography/selection/
+pixel restoration and direct-scene bundled-font fixture coverage accompany the
+[editor body/gutter patch](patches/editorbodyfont/README.md). No public API,
+native acquisition/lifecycle behavior or retained SDK bytes change.

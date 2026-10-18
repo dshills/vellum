@@ -44,8 +44,8 @@ claim that all Mac acceptance gates have passed.
 | `SegmentedControl` | `TestChoiceManualKeyboardPointerAndFocus`: same scenario over segmented presentation | R |
 | `Slider` | `TestColorPickerManagedKeyboardReconcileAndPixels`: actual focused key changes a managed byte slider; `TestNativeControlsChangeRetainedCallbacksAndDisabled`: typed payload and finite refusal | R/A |
 | `NumberField` | `TestOrdinarySelectorAndNumberKeyboardControlledRoundTrip`: focused numeric step, exactly one proposal, rejected-value restoration and disabled refusal | R |
-| `TextField` | `TestManualRealManagedProjectInput`: routed text edit and Undo; `TestManagedTextFieldFocusLossWaitsForAdmittedNativeFIFO`: native input handoff; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI; native `gallery -text-native-check`: independently validated failed19/35prefix, complete68/33pending | R/A/N-partial |
-| `MultilineText` | `TestFrozenWorkspaceRecordsAcrossBatches`: notes edits/history and UTF-16 selection; `TestManagedEditorCompositionHistoryExactBytes`: composition/committed-byte boundary; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI; native `gallery -text-native-check`: independently validated failed19/35prefix, complete68/33pending | W/A/N-partial |
+| `TextField` | `TestManualRealManagedProjectInput`: routed text edit and Undo; `TestManagedTextFieldFocusLossWaitsForAdmittedNativeFIFO`: native input handoff; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI; native `gallery -text-native-check`: complete68/33pending; sealed failed prefixes are source-asserted, not a complete native pass | R/A/N-partial |
+| `MultilineText` | `TestFrozenWorkspaceRecordsAcrossBatches`: notes edits/history and UTF-16 selection; `TestManagedEditorCompositionHistoryExactBytes`: composition/committed-byte boundary; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI; native `gallery -text-native-check`: complete68/33pending; sealed failed prefixes are source-asserted, not a complete native pass | W/A/N-partial |
 | `Tabs` | `TestTabCloseActualPointerKeyboardAndGeometry`: controlled pointer/key close and stale target refusal; `TestNativeTabsReorderReparentAndDisabledOption`: page identity; `gallery -structure-native-check`: full50-input42-state native Go FIFO record, measured focus/geometry/state, retained pages, rejected/accepted close and stale-target retirement | R/A/N |
 | `Scroll` | `TestManagedImageManualScrollClipPreservesSourceMapping`, `TestPlacementNativeScrolledContentAndPreviewPixels`: actual ancestor scroll clips and transformed content; `gallery -structure-native-check`: full50-input42-state native Go FIFO record, measured focus/geometry/state, retained pages, rejected/accepted close and stale-target retirement | R/N |
 | `Dialog` | `TestManualModalDisabledAndStaleRealRouter`: modal refusal of background input; `TestDialogSceneLifecyclePreservesChildrenAndDismissesOnce`: preserved children and single dismissal; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI | R/A |
@@ -217,3 +217,21 @@ is established. Its publication loop is repaired and covered by six actual
 publication-path counterfactuals. Fresh complete text/modal68/33 native acceptance
 is next, followed by the M2 requirement audit. Physical/human M5 and M3–M7 remain
 separate and open; no record/golden or Frame-unavailable policy changes.
+
+
+### Current body/gutter typography qualification
+
+The [editor typography checkpoint](../docs/reports/macos-editor-gutter-font/README.md)
+restores the original six216-operation27-capture software workspace records at
+10k/1M rows and owner batches1/7/64 under Go1.25.6. Document body styling remains
+monospaced; line-number chrome retains UI theme typography. Original records and
+image goldens are unchanged. Retained typography/DPI/tab-cache and selection tests
+pass. This is software evidence, separate from native catalogue completion.
+
+A fresh native text/modal attempt on5e30a6c remains failed/sealed at name-rejected
+(21 inputs/3 source-asserted states). Its final sampled visibility is known/false,
+sequence3, followed by one typed surfaceoccluded196609 acquisition. The disabled
+and modal phases are not reached; no native qualification of the prior disabled
+publication repair follows. Complete native text/modal68/33 acceptance and the
+current-candidate M2 requirement audit remain open. Physical/human M5 and M3–M7
+are separate; no acquisition retry or record/golden change is introduced.

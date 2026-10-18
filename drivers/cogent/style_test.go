@@ -9,6 +9,7 @@ import (
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/text/rich"
+	"cogentcore.org/core/text/textcore"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/workbench"
@@ -210,10 +211,17 @@ func TestManagedEditorTypographyPreservesNativeFamily(t *testing.T) {
 		if err := syncRecord(r, n); err != nil {
 			t.Fatal(err)
 		}
-		widget.AsWidget().Style()
+		widget.(*textcore.Editor).Style()
 		font := widget.AsWidget().Styles.Font
-		if r.widget != widget || font.Family != rich.Monospace || font.CustomFont != "" {
-			t.Fatal("UI font theme invalidated retained document renderer", font)
+		wantFamily := rich.FontName("Noto Sans")
+		if nodeStyle.Typography.Set {
+			wantFamily = "Another UI Font"
+		}
+		if r.widget != widget || font.Family != rich.Custom || font.CustomFont != wantFamily {
+			t.Fatal("retained editor lost themed gutter typography", font)
+		}
+		if widget.(*textcore.Editor).Lines.FontStyle().Family != rich.Monospace {
+			t.Fatal("UI font theme invalidated document body font")
 		}
 		wantSize, wantWeight, wantSlant := float32(18), rich.Semibold, rich.Italic
 		if nodeStyle.Typography.Set {

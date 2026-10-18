@@ -188,11 +188,15 @@ binding; it is not a global multiwindow flush.
 
 ## Current renderer font family and gallery integration
 
-The managed multiline backend requires its monospace rich-font family. The
-adapter preserves this existing invariant after theme/node styles; general UI
-`Typography.Family` overrides do not select a proportional family for
-`MultilineText`. Size, weight and slant remain configurable. This avoids repeated
-downstream correction after style refresh. The ordinary
+The managed multiline document body requires its monospace rich-font family.
+Fresh body rich/text styles normalize that family and clear the copied custom
+font before Lines admission, character sizing and body/tab shaping. General UI
+`Typography.Family` overrides style the editor's line-number gutter, while the
+document body remains monospaced. Size, weight and slant reach both. Normalizing
+the body must not mutate widget UI typography or earlier submitted text styles;
+no repeated downstream family correction is needed. Full layout invalidates the
+cached tab shape alongside line and gutter shapes, including after retained
+font, scale or wrap changes. The ordinary
 [gallery](../drivers/cogent/cmd/gallery/README.md) consumes public editor.Model;
 full software routing and the independently validated failed native prefix in
 [the text/modal result](../docs/reports/macos-text-modal/README.md) cover exact

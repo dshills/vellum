@@ -1,0 +1,224 @@
+--- /dev/null
++++ b/text/textcore/gutter_typography_vellum_test.go
+@@ -0,0 +1,114 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++//go:build offscreen
++
++package textcore
++
++import (
++	"context"
++	"crypto/sha256"
++	"errors"
++	"image"
++	"io/fs"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/core"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/text/fonts"
++	"cogentcore.org/core/text/lines"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/shaped"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++)
++
++// Exercise the actual Manual style/layout/body/tab/gutter render caches under
++// retained typography changes. Original frozen workspace images cover the
++// historical gutter pixels independently of these structural assertions.
++func TestVellumEditorBodyGutterTypography(t *testing.T) {
++	for _, dpi := range []float32{160, 162} {
++		t.Run(fmtDPI(dpi), func(t *testing.T) {
++			clock := &ownedFixtureClock{now: time.Unix(1730000000, 0).UTC()}
++			body := core.NewBody("editor body and gutter")
++			ed := NewEditor(body)
++			old := ed.Lines
++			ed.SetLines(lines.NewLinesExact().SetString("\tiWiW Ω\nnext\n"))
++			old.Close()
++			size := float32(18)
++			ed.Styler(func(s *styles.Style) {
++				s.Font.Family = rich.Custom
++				s.Font.CustomFont = "Noto Sans"
++				s.Font.Size = units.Dp(size)
++				s.Font.Weight = rich.Semibold
++				s.Font.Slant = rich.Italic
++			})
++			m, err := body.NewWindow().RunManual(context.Background(), core.ManualWindowConfig{Size: image.Pt(640, 320), LogicalDPI: dpi, EventCapacity: 64, Now: func() time.Time { return clock.now }, AfterFunc: clock.After, NewShaper: func() (shaped.Shaper, error) { return shapedgt.NewShaperWithFonts([]fs.FS{fonts.Default}), nil }})
++			if err != nil {
++				t.Fatal(err)
++			}
++			t.Cleanup(func() {
++				if err := m.Close(context.Background()); err != nil && !errors.Is(err, core.ErrManualCallback) && !errors.Is(err, lines.ErrManualViews) {
++					t.Error(err)
++				}
++			})
++			ownedDrain(t, m)
++			if !ed.SetEditingSelection(3, 7) {
++				t.Fatal("selection")
++			}
++			ed.NeedsRender()
++			ownedDrain(t, m)
++			accepted := ed.EditingState()
++			var initial [32]byte
++			var previousTab *shaped.Lines
++			for i, wantSize := range []float32{18, 22, 18} {
++				size = wantSize
++				ed.Update()
++				ownedDrain(t, m)
++				ui := ed.Styles.Font
++				document := ed.Lines.FontStyle()
++				if ui.Family != rich.Custom || ui.CustomFont != "Noto Sans" || ui.Size.Value != wantSize || ui.Weight != rich.Semibold || ui.Slant != rich.Italic {
++					t.Fatal("gutter lost UI typography", ui)
++				}
++				if document.Family != rich.Monospace || document.Weight != rich.Semibold || document.Slant != rich.Italic {
++					t.Fatal("body inherited proportional UI family", document)
++				}
++				if ed.tabRender == nil || len(ed.tabRender.Source) == 0 || len(ed.lineNoRenders) == 0 || ed.lineNoRenders[0].lns == nil {
++					t.Fatal("body tab or gutter was not actually rendered")
++				}
++				tab, _ := ed.tabRender.Source.Span(0)
++				gutter, _ := ed.lineNoRenders[0].lns.Source.Span(0)
++				if tab == nil || tab.Family != rich.Monospace || gutter == nil || gutter.Family != rich.Custom {
++					t.Fatal("body/gutter shaping families", tab, gutter)
++				}
++				if i > 0 && ed.tabRender == previousTab {
++					t.Fatal("font transition reused stale tab shape")
++				}
++				previousTab = ed.tabRender
++				state := ed.EditingState()
++				if state.Text != accepted.Text || state.Anchor != accepted.Anchor || state.Focus != accepted.Focus {
++					t.Fatal("style changed accepted edit/selection", state, accepted)
++				}
++				pixels, err := m.Image(context.Background())
++				if err != nil {
++					t.Fatal(err)
++				}
++				digest := sha256.Sum256(pixels.Pix)
++				if i == 0 {
++					initial = digest
++				}
++				if i == 1 && digest == initial {
++					t.Fatal("font size did not change completed pixels")
++				}
++				if i == 2 && digest != initial {
++					t.Fatal("restored typography did not restore completed pixels")
++				}
++			}
++		})
++	}
++}
++func fmtDPI(v float32) string {
++	if v == 160 {
++		return "160dpi"
++	}
++	return "162dpi"
++}
+--- a/text/textcore/layout.go
++++ b/text/textcore/layout.go
+@@ -11,18 +11,30 @@
+ 	"cogentcore.org/core/math32"
+ 	"cogentcore.org/core/styles"
+ 	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/text"
+ 	"cogentcore.org/core/text/textpos"
+ )
+ 
+ // maxGrowLines is the maximum number of lines to grow to
+ // (subject to other styling constraints).
+ const maxGrowLines = 25
++
++// bodyRichText keeps document shaping monospaced without changing the widget's
++// UI typography, which is also used by line-number chrome. NewRichText returns
++// fresh values; neither widget style nor previously submitted rich text aliases
++// these normalized body styles.
++func (ed *Base) bodyRichText() (*rich.Style, *text.Style) {
++	sty, tsty := ed.Styles.NewRichText()
++	sty.Family = rich.Monospace
++	tsty.CustomFont = ""
++	return sty, tsty
++}
+ 
+ // styleSizes gets the charSize based on Style settings,
+ // and updates lineNumberOffset.
+ func (ed *Base) styleSizes() {
+ 	ed.lineNumberDigits = max(1+int(math32.Log10(float32(ed.NumLines()))), 3)
+-	sty, tsty := ed.Styles.NewRichText()
++	sty, tsty := ed.bodyRichText()
+ 	lno := true
+ 	if ed.Lines != nil {
+ 		lno = ed.Lines.Settings.LineNumbers
+@@ -87,6 +99,7 @@
+ 	ed.totalSize.Y = ed.charSize.Y * float32(ed.linesSize.Y)
+ 	ed.lineRenders = make([]renderCache, ed.visSize.Y+1)
+ 	ed.lineNoRenders = make([]renderCache, ed.visSize.Y+1)
++	ed.tabRender = nil
+ 
+ 	// ed.hasLinks = false // todo: put on lines
+ 	ed.lastVisSizeAlloc = ed.visSizeAlloc
+--- a/text/textcore/native_vellum_test.go
++++ b/text/textcore/native_vellum_test.go
+@@ -7,10 +7,12 @@
+ 	"cogentcore.org/core/styles/units"
+ 	"cogentcore.org/core/text/fonts"
+ 	"cogentcore.org/core/text/lines"
++	"cogentcore.org/core/text/shaped"
+ 	"cogentcore.org/core/text/shaped/shapers/shapedgt"
+ 	"cogentcore.org/core/text/textpos"
+ 	"image"
+ 	"image/png"
++	"io/fs"
+ 	"os"
+ 	"strings"
+ 	"testing"
+@@ -118,6 +120,20 @@
+ 		t.Fatal("legacy newline policy silently changed")
+ 	}
+ }
++
++// Direct scene fixtures have no render context to create their text shaper.
++// Always initialize it with bundled fonts before styling/layout; the optional
++// system-font cache below remains an explicit extra, not required bootstrap.
++// These package tests are serial. Restore the factory before any fixture input.
++func configureEditorSceneShaper(b *core.Body) {
++	previous := shaped.NewShaper
++	defer func() { shaped.NewShaper = previous }()
++	shaped.NewShaper = func() shaped.Shaper {
++		return shapedgt.NewShaperWithFonts([]fs.FS{fonts.Default})
++	}
++	b.Scene.MakeTextShaper()
++}
++
+ func TestVellumEditorNativeRenderedGeometry(t *testing.T) {
+ 	b := core.NewBody()
+ 	b.Scene.AddChild(b)
+@@ -131,6 +147,7 @@
+ 	ed.Styler(func(s *styles.Style) { s.Min.X.Em(16); s.Max.X.Em(16); s.Min.Y = units.Em(4); s.Max.Y = units.Em(4) })
+ 	count := 0
+ 	ed.SetNativeEditingListener(func(EditorEditingState) { count++ })
++	configureEditorSceneShaper(b)
+ 	if cache := os.Getenv("VELLUM_FONT_CACHE"); cache != "" {
+ 		preload := shapedgt.NewShaperWithFonts(fonts.Embedded).(*shapedgt.Shaper)
+ 		if err := preload.FontMap().UseSystemFonts(cache); err != nil {
+--- a/text/textcore/render.go
++++ b/text/textcore/render.go
+@@ -177,7 +177,7 @@
+ 	tx := buf.ViewMarkupLine(ed.viewId, ln)
+ 	ts := ed.Lines.Settings.TabSize
+ 	indent := 0
+-	sty, tsty := ed.Styles.NewRichText()
++	sty, tsty := ed.bodyRichText()
+ 
+ 	shapeTab := func(stx rich.Text, ssz math32.Vector2) *shaped.Lines {
+ 		if ed.tabRender != nil {
+--- a/text/textcore/visual_vellum_test.go
++++ b/text/textcore/visual_vellum_test.go
+@@ -28,6 +28,7 @@
+ 	old.Close()
+ 	t.Cleanup(ls.Close)
+ 	ed.Styler(func(s *styles.Style) { s.Min.X.Em(width); s.Max.X.Em(width); s.Min.Y.Em(6); s.Max.Y.Em(6) })
++	configureEditorSceneShaper(b)
+ 	if cache := os.Getenv("VELLUM_FONT_CACHE"); cache != "" {
+ 		pre := shapedgt.NewShaperWithFonts(fonts.Embedded).(*shapedgt.Shaper)
+ 		if err := pre.FontMap().UseSystemFonts(cache); err != nil {
