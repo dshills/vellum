@@ -39,7 +39,7 @@ go test -race -timeout=120s github.com/go-text/typesetting/font -run "^TestVellu
 # Explicit routing uses the offscreen driver; these processes do not open GUI windows.
 (cd "$VELLUM_REPO_ROOT/drivers/cogent" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
 (cd "$VELLUM_REPO_ROOT/drivers/cogent/build/upstream" && go test -race -tags offscreen ./core ./events ./text/lines ./text/textcore ./system/driver/offscreen -run 'TestVellumSourceTiming|TestVellumSpriteSource|TestVellumReviewTextCursor|TestManual|TestVellumManual|TestVellumSourceClock|TestVellumDefaultRepeatClick|TestVellumOutputBuffer|TestVellumPointer')
-(cd "$VELLUM_REPO_ROOT/examples/replay" && go test -race ./... && go vet ./... && go test -race -tags offscreen ./... && go vet -tags offscreen ./... && mkdir -p build && go build -o build/vellum-workspace ./cmd/workspace)
+(cd "$VELLUM_REPO_ROOT/examples/replay" && go test -race ./... && go vet ./... && go test -race -tags offscreen ./... && go vet -tags offscreen ./... && mkdir -p build && go build -o build/vellum-workspace ./cmd/workspace && if [ "$(go env GOOS)" = darwin ]; then go build -tags vellum_native_checks -o build/vellum-workspace-native ./cmd/workspace-native; fi)
 (cd "$VELLUM_REPO_ROOT/examples/grid" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
 (cd "$VELLUM_REPO_ROOT/examples/loadedgrid" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
 (cd "$VELLUM_REPO_ROOT/examples/loadedtree" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)

@@ -60,21 +60,26 @@ The portable root package tests retain the detailed validation contracts in
 
 ## Remaining Mac acceptance
 
-The map supplies a named automated scenario for every catalogue entry. It does
-not close the native half of M2 or M5. The required next native scenarios are:
+The map supplies a named automated scenario for every catalogue entry. The
+[full native workspace checkpoint](../docs/reports/macos-native-workspace/README.md)
+now passes all 216 operations and 27 captures at both 10k/1M rows. It covers the
+record's command/history, workers, edits, tab reorder, placement, modal precedence
+and two-window survival through native Go event routing. It does not establish
+native catalogue completeness, physical input or human assistive-technology use.
 
-1. Run the professional workspace native integration variants at both 10k and
-   1M rows, checking command/history, cancellation, document persistence,
-   dock/float/redock, two-window survival and data edits. Its existing 18-action
-   smoke is a native supplement; the 216-operation record is qualified separately.
-2. In the gallery, exercise the ordinary Selector popup and NumberField typed,
-   pointer and keyboard edits, including rejection/disabled behavior. The new
+The remaining native catalogue work is:
+
+1. In the gallery, exercise ordinary Selector popup and NumberField typed,
+   pointer and keyboard edits, including rejection/disabled behavior. The
    deterministic keyboard regression does not qualify an actual desktop popup.
-3. Exercise the supported catalogue with real keyboard/pointer input and human
-   assistive technology, including modal/focus boundaries, text/IME and virtual
-   data. Follow the native workflow matrix in `macos-delivery.md`; software DPI
-   changes do not qualify physical display transitions.
+2. Exercise the rest of the supported catalogue's focus, input, state publication
+   and lifetime through actual native routing, with named evidence for each
+   entry. Keep automated Go routing separate from OS and physical input.
+3. Complete real keyboard/pointer and human assistive-technology workflows,
+   including modal/focus boundaries, text/IME and virtual data. Follow the M5
+   native matrix in `macos-delivery.md`; software DPI changes do not qualify
+   physical display transitions.
 
-These remain open while live testing is stopped. No records or image goldens
-are regenerated to obtain a passing result. Performance, idle, memory and
-endurance belong to M3/M4 and have their original thresholds.
+Full M2/M5 remain open. Live tests require current desktop authorization. No
+records or image goldens are regenerated to obtain a passing result. Performance,
+idle, memory and endurance belong to M3/M4 with their original thresholds.

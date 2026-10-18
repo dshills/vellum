@@ -3,32 +3,25 @@
 package workspace
 
 import (
-	"bytes"
 	"context"
 	"crypto/sha256"
-	"embed"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"image"
-	"image/color"
-	"io"
 	"io/fs"
 	"reflect"
 	"strings"
 	"time"
-	"unicode/utf8"
 
 	"cogentcore.org/core/events"
-	"cogentcore.org/core/events/key"
 	"cogentcore.org/core/math32"
 	"cogentcore.org/core/text/fonts"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/execution"
 	"github.com/dshills/vellum/replay"
-	"github.com/dshills/vellum/ui"
 )
 
 // Backend is an example adapter for this declared fixture. Its physical
@@ -85,7 +78,7 @@ func NewBackend(ctx context.Context, rows, ownerBatch int) (_ *Backend, err erro
 	if err != nil {
 		return nil, err
 	}
-	theme := ui.Theme{Default: ui.Style{Foreground: ui.Some(color.NRGBA{R: 24, G: 24, B: 24, A: 255}), Background: ui.Some(color.NRGBA{R: 248, G: 248, B: 248, A: 255}), Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 16})}}
+	theme := FixtureTheme()
 	config := cogent.ManualConfig{Clock: clock, Executor: ex, Commands: f.Commands, Theme: theme, OwnerBatch: ownerBatch, MaxWindows: 4, EventCapacity: 128, LogicalDPI: 160}
 	var identities []replay.Font
 	err = fs.WalkDir(fonts.Default, ".", func(path string, d fs.DirEntry, err error) error {
@@ -296,35 +289,6 @@ func (b *Backend) checkLive(ctx context.Context, o replay.Operation) (cogent.Man
 	return cogent.ManualWindowSnapshot{}, cogent.ErrManualClosed
 }
 
-// Key names are this fixture's declared transport: one Unicode scalar for text,
-// or one of the explicit special codes. Modifier bits are Shift/Control/Alt/Meta.
-func transportKey(value string) (rune, key.Codes, error) {
-	codes := map[string]key.Codes{"Enter": key.CodeReturnEnter, "Escape": key.CodeEscape, "Tab": key.CodeTab, "Backspace": key.CodeBackspace, "Delete": key.CodeDelete, "Left": key.CodeLeftArrow, "Right": key.CodeRightArrow, "Up": key.CodeUpArrow, "Down": key.CodeDownArrow, "Home": key.CodeHome, "End": key.CodeEnd, "F2": key.CodeF2}
-	if code, ok := codes[value]; ok {
-		return 0, code, nil
-	}
-	if utf8.RuneCountInString(value) != 1 {
-		return 0, 0, replay.ErrInvalid
-	}
-	r, _ := utf8.DecodeRuneInString(value)
-	code := key.CodeUnknown
-	if r == 'a' || r == 'A' {
-		code = key.CodeA
-	}
-	if r == 'z' || r == 'Z' {
-		code = key.CodeZ
-	}
-	return r, code, nil
-}
-func transportModifiers(bits uint32) key.Modifiers {
-	var m key.Modifiers
-	for i, flag := range []key.Modifiers{key.Shift, key.Control, key.Alt, key.Meta} {
-		if bits&(1<<i) != 0 {
-			m.SetFlag(true, flag)
-		}
-	}
-	return m
-}
 func (b *Backend) Apply(ctx context.Context, o replay.Operation) error {
 	if _, err := b.checkLive(ctx, o); err != nil {
 		return err
@@ -386,50 +350,6 @@ func (b *Backend) Apply(ctx context.Context, o replay.Operation) error {
 	}
 }
 
-//go:embed records/*.json
-var recordFiles embed.FS
-
-func FixtureBytes(rows int) []byte {
-	return []byte(fmt.Sprintf("{\"schema\":1,\"rows\":%d,\"columns\":20,\"tree_nodes\":100000,\"values\":\"(r*97+c*13+7)%%10007\",\"parent\":\"(node-1)/100\",\"seed\":1}", rows))
-}
-func FixtureSHA256(rows int) string {
-	h := sha256.Sum256(FixtureBytes(rows))
-	return hex.EncodeToString(h[:])
-}
-func windowWidth(id string) int {
-	if id == "inspector" {
-		return 500
-	}
-	return Width
-}
-func windowHeight(id string) int {
-	if id == "inspector" {
-		return 320
-	}
-	return Height
-}
-func Record(rows int) (replay.Record, error) {
-	var record replay.Record
-	if rows != 10000 && rows != MaxRows {
-		return record, replay.ErrInvalid
-	}
-	data, err := recordFiles.ReadFile(fmt.Sprintf("records/%d.json", rows))
-	if err != nil {
-		return record, err
-	}
-	if len(data) > 8<<20 {
-		return record, replay.ErrCapacity
-	}
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&record); err != nil {
-		return record, err
-	}
-	if err := decoder.Decode(new(any)); err != io.EOF {
-		return record, replay.ErrInvalid
-	}
-	return record, record.Validate(replay.Limits{})
-}
 func (b *Backend) Capture(ctx context.Context, o replay.Operation) (replay.Observation, error) {
 	if _, err := b.checkLive(ctx, o); err != nil {
 		return replay.Observation{}, err

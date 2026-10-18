@@ -1,5 +1,3 @@
-//go:build offscreen
-
 package workspace
 
 import (

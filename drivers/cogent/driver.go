@@ -31,9 +31,12 @@ type Extension interface {
 type ThemeExtension interface{ SetTheme(ui.Theme) }
 
 type Driver struct {
-	Commands *command.Registry
-	OnError  func(error)
-	Theme    ui.Theme
+	// DesktopSession opts into bounded native integration routing and frame barriers.
+	// It cannot be combined with FrameMetrics. Ordinary applications leave it nil.
+	DesktopSession *DesktopSession
+	Commands       *command.Registry
+	OnError        func(error)
+	Theme          ui.Theme
 	// ContinuousRendering opts into refresh-rate paint ticks; default uses invalidation.
 	ContinuousRendering bool
 	// ExperimentalGridScrollReuse enables checked CPU pixel reuse in main-window
@@ -71,11 +74,15 @@ type nativeWindow struct {
 	lossMu           sync.Mutex
 	input            atomic.Pointer[textWindow]
 	metrics          *frameWindowMetrics
+	desktop          *DesktopSession
 	source           atomic.Pointer[events.Source]
 	pending, closing atomic.Bool
 }
 
 func (d Driver) Run(ctx context.Context, a *app.Application) error {
+	if d.DesktopSession != nil && d.FrameMetrics != nil {
+		return ErrDesktopSession
+	}
 	if d.FrameMetrics != nil && !d.FrameMetrics.valid() {
 		return ErrFrameMetricsConfig
 	}
@@ -95,6 +102,12 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			processRun.Store(false)
 		}
 	}()
+	if d.DesktopSession != nil {
+		if err := d.DesktopSession.start(a); err != nil {
+			return err
+		}
+		defer d.DesktopSession.close()
+	}
 	if err := configureAccessibility(a); err != nil {
 		return err
 	}
@@ -164,6 +177,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			if !a.TakeDirty(w.window.Ref()) {
 				return
 			}
+			d.DesktopSession.invalidate(w)
 			metricTag, metricStart := w.metrics.reconcileStart()
 			defer w.metrics.reconcileEnd(metricTag, metricStart)
 			n := w.window.View()
@@ -220,6 +234,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					closeTextWindow(w)
 					closeAccessibility(w, "driver-unlaunched-cleanup")
 					w.metrics.retire()
+					d.DesktopSession.retire(w)
 					nativeUnmountServices(w.body)
 					disposeControlTree(w.root)
 					// NewBody assigns a Scene parent before adding the body to
@@ -270,6 +285,19 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 						failWindow(w, metricErr)
 						return
 					}
+				}
+				if err := d.DesktopSession.bind(w); err != nil {
+					failWindow(w, err)
+					return
+				}
+				if d.DesktopSession != nil {
+					w.body.Scene.SetOriginCustomHandler(func(e events.Event) bool {
+						if !d.DesktopSession.owns(w, e) {
+							return false
+						}
+						custom(w, e)
+						return true
+					})
 				}
 				nativeMountServices(w.body, services)
 				configureInitialWindow(w.body)
@@ -376,6 +404,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					closeTextWindow(w)
 					closeAccessibility(w, "driver-window-cleanup")
 					w.metrics.retire()
+					d.DesktopSession.retire(w)
 					nativeUnmountServices(w.body)
 					disposeControlTree(w.root)
 				}
@@ -418,6 +447,9 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			syncTopology()
 		}()
 		refresh(w)
+		if d.DesktopSession != nil && d.DesktopSession.handle(w, e) {
+			return
+		}
 		if ce, ok := e.(*events.CustomEvent); ok && ce.Data == "vellum.wake" {
 			e.SetHandled()
 		}

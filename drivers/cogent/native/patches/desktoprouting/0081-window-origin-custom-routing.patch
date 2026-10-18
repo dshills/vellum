@@ -1,0 +1,111 @@
+--- a/core/scene.go
++++ b/core/scene.go
+@@ -34,7 +34,8 @@
+ // within a given [Stage] and overall rendering context, representing the unit
+ // of rendering in the Cogent Core framework.
+ type Scene struct { //core:no-new
+-	frameTrace atomic.Pointer[FrameTrace]
++	frameTrace   atomic.Pointer[FrameTrace]
++	originCustom atomic.Pointer[originCustomHandler]
+ 	Frame
+ 
+ 	// Body provides the main contents of scenes that use control Bars
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -511,6 +511,13 @@
+ 	// debugging on Android. TODO: maybe figure out a more sustainable approach to this.
+ 
+ 	et := e.Type()
++	if et == events.Custom {
++		if stage := w.mains.windowStage(); stage != nil && stage.Scene != nil && stage.Scene.dispatchOriginCustom(e) {
++			e.SetHandled()
++			w.requestPaintAfter(0)
++			return
++		}
++	}
+ 	if DebugSettings.EventTrace && et != events.WindowPaint && et != events.MouseMove {
+ 		log.Println("Window got event", e)
+ 	}
+--- /dev/null
++++ b/core/origin_custom.go
+@@ -0,0 +1,27 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package core
++
++import "cogentcore.org/core/events"
++
++type originCustomHandler struct{ handle func(events.Event) bool }
++
++// SetOriginCustomHandler installs an optional window-origin Custom handler on
++// the main Scene. It runs with the native render context locked, before popup
++// modality chooses a target Scene. Returning true consumes this Custom event;
++// returning false preserves ordinary stage routing. Non-Custom input is never
++// intercepted. Install before starting the window or from its event loop.
++// Clear the hook during window teardown to release captured application state.
++func (sc *Scene) SetOriginCustomHandler(handler func(events.Event) bool) {
++	if handler == nil {
++		sc.originCustom.Store(nil)
++	} else {
++		sc.originCustom.Store(&originCustomHandler{handle: handler})
++	}
++}
++func (sc *Scene) dispatchOriginCustom(e events.Event) bool {
++	if e.Type() != events.Custom {
++		return false
++	}
++	h := sc.originCustom.Load()
++	return h != nil && h.handle(e)
++}
+--- /dev/null
++++ b/core/origin_custom_offscreen_test.go
+@@ -0,0 +1,50 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++//go:build offscreen
++
++package core
++
++import (
++	"cogentcore.org/core/events"
++	"context"
++	"testing"
++)
++
++func TestOriginCustomSurvivesModalPopupAndPreservesRouting(t *testing.T) {
++	m, b, _ := manualFixture(t, func(b *Body) { NewButton(b).SetText("main") })
++	drainManual(t, m)
++	popup := NewScene("origin-popup")
++	NewButton(popup).SetText("popup")
++	stage := NewPopupStage(MenuStage, popup, b).Run()
++	if !stage.Modal {
++		t.Fatal("fixture not modal")
++	}
++	drainManual(t, m)
++	origin, popupCount, mainCount := 0, 0, 0
++	b.Scene.OnFirst(events.Custom, func(events.Event) { mainCount++ })
++	popup.OnFirst(events.Custom, func(events.Event) { popupCount++ })
++	b.Scene.SetOriginCustomHandler(func(e events.Event) bool {
++		ce := e.(*events.CustomEvent)
++		if ce.Data != "owned" {
++			return false
++		}
++		origin++
++		return true
++	})
++	source := m.window.SystemWindow.Events()
++	source.Custom("owned")
++	drainManual(t, m)
++	source.Custom("ordinary")
++	drainManual(t, m)
++	if origin != 1 || popupCount != 1 || mainCount != 0 {
++		t.Fatalf("origin=%d popup=%d main=%d", origin, popupCount, mainCount)
++	}
++	b.Scene.SetOriginCustomHandler(nil)
++	source.Custom("owned")
++	drainManual(t, m)
++	if origin != 1 || popupCount != 2 {
++		t.Fatal("cleared origin hook retained authority")
++	}
++	if err := m.Close(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++}

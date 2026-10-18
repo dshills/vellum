@@ -804,6 +804,17 @@
               "sha256": "125b4774dfa44722b93d8f10784de99617182c85986d02ad86c9ac95894fd548"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/desktoprouting",
+          "inputs": "native/patches/desktoprouting/original-hashes.json",
+          "outputs": "native/patches/desktoprouting/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/desktoprouting/0081-window-origin-custom-routing.patch",
+              "sha256": "9f3ee50307aec48447c2016d662080030fcbfcb00471cd35a73bd463de004dc7"
+            }
+          ]
         }
       ]
     },

@@ -100,3 +100,11 @@ The instrumentation-only [native workspace smoke runner](cmd/workspace-smoke/REA
 provides an 18-action Cocoa/owner scenario for the same stored-data fixture.
 Its native execution and cleanup results are recorded separately from the
 software records and from physical input or performance acceptance.
+
+
+The [full native workspace checker](cmd/workspace-native/README.md) consumes the
+same 216-operation record and 27 domain checkpoints through the public optional
+`cogent.DesktopSession` API. It resolves authored interactions against completed
+native geometry, with autonomous native scheduling and explicit composition
+barriers. Automated Go routing, physical input, presentation and performance
+remain separate evidence. Consult the checkpoint report for actual results.

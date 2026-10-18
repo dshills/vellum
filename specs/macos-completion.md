@@ -25,6 +25,18 @@ identity. Replacement and real removal retire old objects. The separate stored
 400-cell Cocoa acceptance mode and scoped lifecycle/race fixtures qualify this
 behavior. Full-frame latency targets and human screen-reader checks remain open.
 
+
+The [native workspace checkpoint](../docs/reports/macos-native-workspace/README.md)
+now passes all 216 operations and 27 captures at both 10k/1M rows through the public
+optional DesktopSession and dedicated native consumer. Actual focus, independently
+predicted viewport scroll, semantics, painted placement/history and surviving-
+window state pass; both owned processes and tracked sessions/workers/services
+retire. Failed earlier cases remain failed. This closes the native full-record
+subgate, while catalogue coverage and full M2 remain open. Controlled GOMAXPROCS=2,
+the retained SDK's separately pinned native library, autonomous scheduling and
+one unclassified hidden TUINS Cocoa window remain explicit limits. Physical/
+human input, presentation/performance, M3–M7 and full Mac completion remain open.
+
 ## M1 SDK command ownership
 
 The [M1 cancellation checkpoint](../docs/reviews/macos-sdk-cancellation/README.md)
@@ -35,14 +47,14 @@ Prism review and internal reviews are retained. Existing private SDK archives
 remain unchanged; final candidate packaging, M2–M7 and full Mac acceptance remain
 open. This work uses no native windows or system preference changes.
 
-## M2 headless workspace and catalogue
+## M2 workspace and catalogue
 
 The [M2 headless checkpoint](../docs/reports/macos-workspace-acceptance/README.md)
 passes the full professional workspace record at both row counts and batches
 1/7/64: 1,296 operations and 162 frozen observations, with unchanged records and
 goldens. The [catalogue map](control-acceptance.md) covers 34 public kinds plus
 two composites. New actual focused-keyboard regressions close the Selector and
-NumberField coverage gaps. Native integration, physical/human workflows and
+NumberField coverage gaps. Native catalogue integration, physical/human workflows and
 ordinary performance remain open; the failed native-only package selection
 under offscreen tags is retained separately from passing package outcomes.
 
@@ -61,7 +73,7 @@ subsequently reduces allocation but fails its frozen latency bar: CPU/GPU
 median p95 gains are 0.058/0.150 ms, CPU improves only 3/5 pairs and its median
 p99 worsens. All twenty ordinary p95s exceed 4 ms. No runtime change is adopted;
 the 26-process scope seals with all 36 conditional extension cases unexecuted.
-Next close full native M2 workspace integration, then make a materially different
+Next close the remaining native M2 catalogue coverage, then make a materially different
 measured M3 implementation decision. The initial intermediate-composition validator
 failure and independently reviewed recovery remain explicit; no native case
 is repeated. No current SDK refresh or full Mac completion is claimed.

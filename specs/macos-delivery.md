@@ -12,6 +12,18 @@ Owner: the main Vellum development chat. This is the execution plan for the
 existing [Mac completion requirements](macos-completion.md), not a replacement
 for those requirements or a declaration that implemented APIs have qualified.
 
+
+The [native workspace checkpoint](../docs/reports/macos-native-workspace/README.md)
+now passes all 216 operations and 27 captures at both 10k/1M rows through the public
+optional DesktopSession and dedicated native consumer. Actual focus, independently
+predicted viewport scroll, semantics, painted placement/history and surviving-
+window state pass; both owned processes and tracked sessions/workers/services
+retire. Failed earlier cases remain failed. This closes the native full-record
+subgate, while catalogue coverage and full M2 remain open. Controlled GOMAXPROCS=2,
+the retained SDK's separately pinned native library, autonomous scheduling and
+one unclassified hidden TUINS Cocoa window remain explicit limits. Physical/
+human input, presentation/performance, M3–M7 and full Mac completion remain open.
+
 ## Finish line
 
 Finish the Go-native framework on the local Mac: an independently consumable SDK
@@ -71,8 +83,8 @@ correctness checks and reduces sampled allocation, but is rejected: CPU/GPU
 median run-p95 gains are only 0.057835/0.150298 ms, CPU improves 3/5 pairs and
 median p99 worsens. The fixed 0.4 ms/4-of-5 both-mode bar fails; no runtime is
 adopted and no conditional full candidate matrix runs. Retire this style
-experiment. Next complete M2's full native workspace integration at 10k/1M
-rows; the existing 18-action smoke is insufficient. A materially different
+experiment. The full native workspace record now passes at both row counts; next close
+M2's remaining native catalogue coverage. A materially different
 measured M3 decision and the remaining table/tree/general-UI matrix still precede
 full resource/endurance qualification and M7 closure.
 
@@ -421,8 +433,8 @@ be budgeted in addition to implementation time.
 | Milestone | Current status | Next action / evidence needed |
 | --- | --- | --- |
 | M1 | Complete in source; incorporated in current private SDK | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); exact helper bytes are included in the [current SDK](../docs/reports/macos-sdk-stage0079/README.md). Full final artifact acceptance remains in M6. |
-| M2 | Headless record/map complete; native integration open | [Six frozen records and catalogue coverage](../docs/reports/macos-workspace-acceptance/README.md); native 10k/1M workflow and desktop catalogue checks remain. |
-| M3 | Failing / incomplete; current table matrix measured | [Current Go table matrix](../docs/reports/macos-grid-current/README.md): 7/40 run-p95s meet 4 ms, 33 fail; all 40 p99s meet 6 ms. Only fixed-height million-row GPU meets both targets in all five runs (median run-p95 3.840415 ms). Eight separate final-scene diagnostics and exact 10k/1M geometry pass, with the original validator failure/recovery preserved. The [render-local style experiment](../docs/reports/macos-grid-paint/README.md) reduces allocation but fails the frozen latency bar (CPU/GPU median p95 gains 0.058/0.150 ms; CPU 3/5 improved pairs and worse median p99). It stays private and is rejected; no further style/cache tuning or conditional matrix is run. Next close full native M2 integration, then select a materially different measured M3 implementation. The [earlier table matrix](../docs/reports/macos-grid-matrix/README.md) and rejected culling/row-fragment/resolved-shape experiments remain historical. The [tree/local-layout prototype](../docs/reports/macos-tree-local-layout/README.md) remains rejected (0/5 improved pairs each CPU/GPU); no further local-tree/cache tuning is adopted. Full tree/general UI, remaining performance and M4–M7 gates stay open. |
+| M2 | Partial; headless and native workspace records pass, native catalogue open | [Six frozen software records and catalogue map](../docs/reports/macos-workspace-acceptance/README.md), plus [both full native 10k/1M records](../docs/reports/macos-native-workspace/README.md), pass. Close the remaining desktop catalogue checks. |
+| M3 | Failing / incomplete; current table matrix measured | [Current Go table matrix](../docs/reports/macos-grid-current/README.md): 7/40 run-p95s meet 4 ms, 33 fail; all 40 p99s meet 6 ms. Only fixed-height million-row GPU meets both targets in all five runs (median run-p95 3.840415 ms). Eight separate final-scene diagnostics and exact 10k/1M geometry pass, with the original validator failure/recovery preserved. The [render-local style experiment](../docs/reports/macos-grid-paint/README.md) reduces allocation but fails the frozen latency bar (CPU/GPU median p95 gains 0.058/0.150 ms; CPU 3/5 improved pairs and worse median p99). It stays private and is rejected; no further style/cache tuning or conditional matrix is run. Next close the remaining native M2 catalogue coverage, then select a materially different measured M3 implementation. The [earlier table matrix](../docs/reports/macos-grid-matrix/README.md) and rejected culling/row-fragment/resolved-shape experiments remain historical. The [tree/local-layout prototype](../docs/reports/macos-tree-local-layout/README.md) remains rejected (0/5 improved pairs each CPU/GPU); no further local-tree/cache tuning is adopted. Full tree/general UI, remaining performance and M4–M7 gates stay open. |
 | M4 | Partial; current SDK preflight and sampled idle CPU pass | [Two composed cycles/66 native checks and four eligible 60-second CPU intervals](../docs/reports/macos-sdk-lifecycle-stage0079/README.md) pass with owned process-group absence and framework-tracked retirement. Extra admissions remain unattributed; one hidden Cocoa window remains unclassified, so native deallocation/leak closure stays open. Original sandbox harness failure is preserved. OS wakeups/presentation, full memory/resource accounting, ten-minute activity, 1,000-cycle and overnight gates remain open. |
 | M5 | Partial; live checks authorized while owner is away | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
 | M6 | Partial; current SDK incorporation and scoped consumption pass | The [current SDK](../docs/reports/macos-sdk-stage0079/README.md) (7,879 payload files plus `SDK_MANIFEST.json`, 7,880 total) passes actual Go 1.25.6 relocated consumer/public-contract checks, 26 default main builds plus one tagged helper and 28-font metadata mapping. [Four native SDK cases](../docs/reports/macos-sdk-native-stage0079/README.md) pass source assertions/readbacks/owned closure. The [standard-library input checkpoint](../docs/reports/macos-stdlib-inputs/README.md) now binds selected Go package source/declaration bytes and refuses their drift in owned builds; it does not approve notice applicability. Final candidate/application-bundle acceptance, broader native/human workflows, exact runtime/font/non-font/generated-asset rights and owner distribution approval remain. |

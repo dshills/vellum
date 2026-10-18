@@ -22,3 +22,6 @@ are retained; current document links and tooling use the reorganized paths.
 
 - [Span header construction](reports/macos-span-headers/README.md): bounded scene-builder scratch and source-capture allocation evidence.
 - [Packed glyph coverage](reports/macos-packed-coverage/README.md): owned cached-span replay with original admission and exact output checks.
+
+- [Native integration session usage](desktop-integration.md).
+- [Full native workspace checkpoint](reports/macos-native-workspace/README.md).
