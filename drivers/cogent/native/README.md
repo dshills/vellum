@@ -246,3 +246,8 @@ keeps these separate from persistent option semantics, refuses stale/hidden/
 disabled targets and charges generated labels/IDs against its shared budget.
 See [contract](patches/popupinspection/README.md) and the
 [native controls report](../../../docs/reports/macos-native-controls/README.md).
+
+Stage84 (`patches/popupbuttonembedders`) includes direct Button embeddings such
+as MenuButton items in bounded actual-popup inspection. It verifies initialized
+base/direct-child ownership, retains budget/clipping/lifetime rules and excludes
+passive or foreign/nested wrappers. See the [contract](patches/popupbuttonembedders/README.md).

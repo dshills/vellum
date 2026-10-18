@@ -1,0 +1,103 @@
+--- a/core/popup_inspection.go
++++ b/core/popup_inspection.go
+@@ -18,8 +18,8 @@
+ )
+ 
+ // PopupInspection is detached diagnostic data from a real current popup Scene.
+-// Only the top event-accepting popup is Interactive. Items cover direct standard
+-// Buttons (including Chooser menus); custom/nested menu implementations retain
++// Only the top event-accepting popup is Interactive. Items cover direct Buttons and
++// Button embeddings (including managed action menus); nested menu implementations retain
+ // their existing inspectors. Bounds are clipped raw window pixels, not DP.
+ type PopupInspection struct {
+ 	ID          uint64
+@@ -129,8 +129,8 @@
+ 			if !charge(128) {
+ 				return nil, ErrPopupInspectionBudget
+ 			}
+-			button, ok := child.(*Button)
+-			if !ok || button.This == nil {
++			button := AsButton(child)
++			if button == nil || button.This == nil || button.AsTree() != child.AsTree() {
+ 				continue
+ 			}
+ 			if len(button.Text) > 1<<20 || len(button.Text) > maxBytes {
+--- /dev/null
++++ b/core/popup_button_embedder_offscreen_test.go
+@@ -0,0 +1,76 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++//go:build offscreen
++
++package core
++
++import (
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/styles/states"
++	"cogentcore.org/core/tree"
++	"testing"
++)
++
++type popupInspectionEmbeddedButton struct{ Button }
++
++// A wrapper forwarding some other button is not a direct embedded menu item.
++type popupInspectionForeignButton struct {
++	Frame
++	button *Button
++}
++
++func (w *popupInspectionForeignButton) AsButton() *Button { return w.button }
++
++// Managed MenuButton items embed Button to own their lifecycle. They must have
++// the same actual popup geometry/capabilities as direct standard Buttons.
++func TestPopupInspectionButtonEmbeddersAndPassiveSeparator(t *testing.T) {
++	var anchor *Button
++	m, body, _ := manualFixture(t, func(b *Body) { anchor = NewButton(b).SetText("Actions") })
++	scene := NewScene("embedded-actions")
++	calls := 0
++	var stage *Stage
++	first := tree.New[popupInspectionEmbeddedButton](scene)
++	first.SetText("Repeated label")
++	first.OnClick(func(events.Event) { calls++; stage.ClosePopup() })
++	blocked := tree.New[popupInspectionEmbeddedButton](scene)
++	blocked.SetText("Unavailable").SetState(true, states.Disabled)
++	NewSeparator(scene)
++	NewButton(scene).SetText("Repeated label")
++	foreign := tree.New[popupInspectionForeignButton](scene)
++	foreign.button = anchor
++	stage = NewMenuStage(scene, anchor, anchor.ContextMenuPos(nil))
++	stage.Run()
++	drainManual(t, m)
++	before := inspectPopupOwned(t, m, body.Scene)
++	if len(before) != 1 || len(before[0].Items) != 3 {
++		t.Fatal("derived buttons omitted or separator admitted", before)
++	}
++	a, b, c := before[0].Items[0], before[0].Items[1], before[0].Items[2]
++	if a.Name != "Repeated label" || b.Name != "Unavailable" || c.Name != "Repeated label" || !a.Enabled || b.Enabled || !c.Enabled || a.ID == b.ID || a.ID == c.ID || b.ID == c.ID {
++		t.Fatal("derived button state/order/identity", before)
++	}
++	for _, item := range before[0].Items {
++		if item.Bounds.Empty() || !item.Bounds.In(before[0].Bounds) {
++			t.Fatal("actual clipped item bounds", item)
++		}
++	}
++	want := first.Geom.TotalBBox.Add(scene.SceneGeom.Pos).Intersect(before[0].Bounds)
++	if a.Bounds != want {
++		t.Fatal("derived geometry does not belong to actual widget", a.Bounds, want)
++	}
++	second := inspectPopupOwned(t, m, body.Scene)
++	if second[0].Items[0].ID != a.ID || second[0].Items[2].ID != c.ID || calls != 0 {
++		t.Fatal("inspection changes identity or invokes callback")
++	}
++	clickManual(t, m, a.Bounds.Min.Add(a.Bounds.Size().Div(2)))
++	if calls != 1 || len(inspectPopupOwned(t, m, body.Scene)) != 0 {
++		t.Fatal("actual derived pointer lost or duplicated", calls)
++	}
++	again := NewScene("new-embedded-actions")
++	tree.New[popupInspectionEmbeddedButton](again).SetText("Repeated label")
++	NewMenuStage(again, anchor, anchor.ContextMenuPos(nil)).Run()
++	drainManual(t, m)
++	reopened := inspectPopupOwned(t, m, body.Scene)
++	if len(reopened) != 1 || len(reopened[0].Items) != 1 || reopened[0].ID == before[0].ID || reopened[0].Items[0].ID == a.ID {
++		t.Fatal("derived popup item lifetime revived", reopened)
++	}
++}

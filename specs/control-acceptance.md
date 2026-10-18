@@ -8,7 +8,8 @@ composites. Composite controls use the same public node APIs.
 **R** means primitive input routed through the manual driver's actual managed
 widgets with measured geometry/completed software frames. **A** means native
 adapter/object or owner/model checks; direct setters and semantic handlers are
-not physical input. **W** is the full public workspace replay. Test names below
+not physical input. **W** is the full public workspace replay. **N** is a named native Go FIFO
+record; OS/physical input and native pixels are separate evidence. Test names below
 identify their containing source files. The [M2 result](../docs/reports/macos-workspace-acceptance/README.md)
 records actual execution and qualified reuse. This is a coverage map, not a
 claim that all Mac acceptance gates have passed.
@@ -35,8 +36,8 @@ claim that all Mac acceptance gates have passed.
 | `ProgressGauge` | `TestProgressShapesCompletedFramesAcrossDPI`: semicircle fractions/DPI and passive lifetime | R |
 | `Separator` | `TestExpandedControlsManualFrameAndInput`: composed decoration; `TestExpandedControlsValidationAndFocus` in `ui/expanded_controls_test.go`: descriptor rules | R/A |
 | `Selector` | `TestOrdinarySelectorAndNumberKeyboardControlledRoundTrip`: focused arrows skip disabled options, wrap by stable ID and restore rejected values | R |
-| `ListBox` | `TestListBoxActualScrollingNavigationAndPixels`, `TestListBoxActualWorkbenchModalFocusAndClosure`: scrolling selection, focus scopes and retirement | R |
-| `MenuButton` | `TestMenuButtonRealPopupRoutingAndRetirement`: open, measured item click, duplicate labels, dismissal and stale popup refusal | R |
+| `ListBox` | `TestListBoxActualScrollingNavigationAndPixels`, `TestListBoxActualWorkbenchModalFocusAndClosure`: scrolling selection, focus scopes and retirement; `gallery -navigation-native-check`: native scroll/rejection/read-only/disabled/Tab and exactly-once proposals | R/N |
+| `MenuButton` | `TestMenuButtonRealPopupRoutingAndRetirement`: open, measured item click, duplicate labels, dismissal and stale popup refusal; `gallery -navigation-native-check`: native duplicate/check/separator actions, dismissal, modal disable and closure | R/N |
 | `RadioGroup` | `TestChoiceManualKeyboardPointerAndFocus`: arrow wrap/disabled skip, measured pointer, one Tab stop and exclusive state | R |
 | `SegmentedControl` | `TestChoiceManualKeyboardPointerAndFocus`: same scenario over segmented presentation | R |
 | `Slider` | `TestColorPickerManagedKeyboardReconcileAndPixels`: actual focused key changes a managed byte slider; `TestNativeControlsChangeRetainedCallbacksAndDisabled`: typed payload and finite refusal | R/A |
@@ -94,6 +95,17 @@ fully visible geometry; native progress pixels and Slider drag are not claimed.
 Original-reference/session/process retirement passes. This advances named
 catalogue coverage in controlled Go2/SDK786a CPU-scene routing; remaining catalogue,
 full M2/M5, physical/human input and M3–M7 remain open. No SDK refresh occurs.
+
+The [list/menu catalogue checkpoint](../docs/reports/macos-navigation-catalogue/README.md)
+adds stage84 support for direct Button embeddings in popup inspection and
+47 native Go FIFO inputs/41 independent observations. The original 17-input
+case remains failed/sealed; only the distinct corrected scope passes. ListBox scrolling,
+explicit repeat proposals, rejection/read-only/disabled behavior and Tab pass;
+MenuButton duplicate-label actions, actual popup pointer/keys, disabled/stale
+refusal, Escape/outside consumption, modal owner disable, check/separator/reset
+and original-window closure pass. Callback totals are 8 list, 2 menu, 3 check/reset
+and 1 outside action. This is controlled Go2/SDK786a CPU-scene routing. Remaining
+catalogue, full M2/M5, physical/human input and M3–M7 stay open; no SDK refresh.
 
 The remaining native catalogue work is:
 

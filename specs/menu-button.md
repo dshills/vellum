@@ -63,3 +63,12 @@ This control supplies a flat in-window action list. Nested menus,
 radio action groups and command shortcuts are future API work. Human
 VoiceOver, physical input, cross-display popup placement and broader Mac
 qualification remain separate from automated Cocoa selector checks.
+
+The gallery's `-navigation-native-check` shares both ordinary menu constructors.
+Its native Go FIFO record covers actual duplicate-label action selection by
+pointer and keys, disabled/stale target refusal, Escape/outside release handling,
+owner disable while modal, Tab traversal, controlled check rejection/reset,
+separators and closing with a current popup. The
+[result](../docs/reports/macos-navigation-catalogue/README.md) records 47 total
+inputs/41 observations across the list/menu scenario. Accepted check semantics
+do not verify native checkmark pixels, physical input or human VoiceOver.

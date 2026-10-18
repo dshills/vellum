@@ -78,6 +78,17 @@ Original-reference/session/process retirement passes. This advances named
 catalogue coverage in controlled Go2/SDK786a CPU-scene routing; remaining catalogue,
 full M2/M5, physical/human input and M3–M7 remain open. No SDK refresh occurs.
 
+The [list/menu catalogue checkpoint](../docs/reports/macos-navigation-catalogue/README.md)
+adds stage84 support for direct Button embeddings in popup inspection and
+47 native Go FIFO inputs/41 independent observations. The original 17-input
+case remains failed/sealed; only the distinct corrected scope passes. ListBox scrolling,
+explicit repeat proposals, rejection/read-only/disabled behavior and Tab pass;
+MenuButton duplicate-label actions, actual popup pointer/keys, disabled/stale
+refusal, Escape/outside consumption, modal owner disable, check/separator/reset
+and original-window closure pass. Callback totals are 8 list, 2 menu, 3 check/reset
+and 1 outside action. This is controlled Go2/SDK786a CPU-scene routing. Remaining
+catalogue, full M2/M5, physical/human input and M3–M7 stay open; no SDK refresh.
+
 ## M1 SDK command ownership
 
 The [M1 cancellation checkpoint](../docs/reviews/macos-sdk-cancellation/README.md)

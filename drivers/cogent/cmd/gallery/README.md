@@ -55,3 +55,21 @@ maximum sends one clamped Change proposal; selected-choice Space sends none.
 Final native routing passes with exact callback counts and terminal cleanup.
 Progress checks cover semantics/layout, not native pixels; Slider drag and
 physical/OS input remain separate. See the [result](../../../../docs/reports/macos-choice-catalogue/README.md).
+
+## Native lists and action menus
+
+```sh
+go run ./cmd/gallery -navigation-native-check
+```
+
+This separate 900x700 requested view reuses the ordinary public list and two
+menu constructors. It records 47 native Go FIFO packets and 41 observations,
+then closes the original window and emits one JSON result. Its 90-second
+deadline, 6-second join, nonzero failures, disabled geometry persistence and
+exclusive mode flags match the other catalogue modes. Policy changes are
+owner-posted setup; tested values flow through ordinary public callbacks.
+
+The complete native routing record passes list scroll/focus/rejection/read-only/
+disabled behavior and menu duplicate-label/check/separator/dismissal/stale-target
+cases with exactly-once callbacks and terminal cleanup. Native pixels, physical/
+OS input and human accessibility remain separate. See the [result](../../../../docs/reports/macos-navigation-catalogue/README.md).

@@ -837,6 +837,17 @@
               "sha256": "b14c4999d2c59cd4e512bea9f2c0e121fb874f99053e864fb9a9b6676449bcec"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/popupbuttonembedders",
+          "inputs": "native/patches/popupbuttonembedders/original-hashes.json",
+          "outputs": "native/patches/popupbuttonembedders/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/popupbuttonembedders/0084-inspect-button-embedders.patch",
+              "sha256": "d840e9fa4b3d41bf175d9071996c866bb2a17a52f5c258bb7e3fc98d39f1afd6"
+            }
+          ]
         }
       ]
     },

@@ -58,7 +58,9 @@ See [usage](../docs/desktop-integration.md) and the
 
 `DesktopSnapshot.Popups` describes actual completed current popup scenes in the
 active main stage, separately from persistent semantic option nodes. Only the
-top event-accepting popup's visible enabled direct standard buttons are targeted.
+top event-accepting popup's visible enabled direct Buttons and Button embeddings
+are targeted. An initialized base must share the direct child's tree identity;
+a wrapper forwarding another or nested button is excluded.
 Bounds are scene-pixel rectangles clipped to the popup/window; the popup origin
 is applied exactly once. Returned labels own their admitted bytes.
 
@@ -68,7 +70,7 @@ number is unchanged. Targeted keys still require current actual focus. Popup
 inspection shares the 8192 semantic-record/8MiB output budget with generated
 identifiers and fixed records charged; at most 64 popup stages are visited.
 Pending/unshown/dirty geometry and exhausted budgets refuse without partial data.
-No historical widget registry is retained. Custom/nested menus retain existing
+No historical widget registry is retained. Nested/non-Button menus retain existing
 inspectors. Ordinary apps do not run this inspector; unrelated Custom events
 retain normal modal routing.
 

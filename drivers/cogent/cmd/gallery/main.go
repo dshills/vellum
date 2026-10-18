@@ -40,6 +40,8 @@ type gallery struct {
 	picture                                              *canvas.TiledImage
 	imageFit                                             ui.ImageFit
 	menuCount                                            int
+	viewMenuRequests                                     int
+	viewMenuReject                                       bool
 	menuLast                                             string
 	menuDisabled                                         bool
 	menuChecked                                          bool
@@ -155,21 +157,9 @@ func (g *gallery) view() ui.Node {
 		}},
 	}}
 	symbols := ui.Node{ID: "symbols", Kind: ui.Scroll, Grow: true, Children: []ui.Node{
-		{ID: "menu-actions", Kind: ui.MenuButton, Text: "Document actions", Icon: ui.SymbolSettings, Disabled: g.menuDisabled,
-			Options: []ui.Option{{ID: "blocked", Label: "Unavailable", Disabled: true}, {ID: "first", Label: "Run action"}, {ID: "second", Label: "Run action"}},
-			Change:  func(e ui.ChangeEvent) { g.menuCount++; g.menuLast = e.SelectedID }},
+		g.actionMenuControl(),
 		{ID: "menu-status", Kind: ui.StatusBar, Text: fmt.Sprintf("Action %s · requests %d", g.menuLast, g.menuCount)},
-		{ID: "view-menu", Kind: ui.MenuButton, Text: "View options", Options: []ui.Option{
-			{ID: "grid", Label: "Show grid", Checkable: true, Checked: g.menuChecked},
-			{ID: "group-divider", Separator: true},
-			{ID: "reset", Label: "Reset view"},
-		}, Change: func(e ui.ChangeEvent) {
-			if e.SelectedID == "grid" {
-				g.menuChecked = e.Checked
-			} else if e.SelectedID == "reset" {
-				g.menuChecked = false
-			}
-		}},
+		g.viewMenuControl(),
 		{ID: "view-state", Kind: ui.Label, Text: fmt.Sprintf("Show grid: %t", g.menuChecked)},
 	}}
 	for _, symbol := range ui.Symbols() {
@@ -233,7 +223,11 @@ func main() {
 	progressSmoke := flag.Bool("progress-smoke", false, "verify native progress shape values, geometry and lifetime")
 	catalogue := flag.Bool("control-native-check", false, "run bounded ordinary selector/number-field native FIFO acceptance")
 	choices := flag.Bool("choice-native-check", false, "run bounded ordinary choices/toggles/slider native FIFO acceptance")
+	navigation := flag.Bool("navigation-native-check", false, "run bounded list and action-menu native FIFO acceptance")
 	flag.Parse()
+	if *navigation && (*choices || *catalogue || *smoke || *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *exit > 0) {
+		must(errors.New("navigation-native-check requires its own bounded process"))
+	}
 	if *choices && (*catalogue || *smoke || *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *exit > 0) {
 		must(errors.New("choice-native-check requires its own bounded process"))
 	}
@@ -252,7 +246,7 @@ func main() {
 	if *disclosureSmoke && (*smoke || *exit > 0) {
 		must(errors.New("disclosure-smoke requires its own bounded process"))
 	}
-	if *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *catalogue || *choices {
+	if *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *catalogue || *choices || *navigation {
 		core.DebugSettings.DisableWindowGeometrySaver = true
 	}
 	a, err := app.New(app.Config{})
@@ -272,11 +266,14 @@ func main() {
 	if *choices {
 		view = g.choiceCatalogueView
 	}
+	if *navigation {
+		view = g.navigationCatalogueView
+	}
 	if *progressSmoke {
 		view = g.progressView
 	}
 	width, height := float32(720), float32(650)
-	if *choices {
+	if *choices || *navigation {
 		width, height = 900, 700
 	}
 	must(a.Open(app.Window{ID: "gallery", Title: "Vellum Controls", Width: width, Height: height, View: view}))
@@ -331,6 +328,10 @@ func main() {
 		time.AfterFunc(2200*time.Millisecond, func() { _ = a.Post(func() { g.dialog = false; a.Invalidate("gallery") }) })
 	}
 	theme := ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Size: 16}), Foreground: ui.Some(color.NRGBA{R: 32, G: 36, B: 42, A: 255})}, Kinds: map[ui.Kind]ui.Style{ui.Column: {Gap: ui.Some(float32(8))}}}
+	if *navigation {
+		must(runNavigationCatalogue(ctx, a, g, theme))
+		return
+	}
 	if *choices {
 		must(runChoiceCatalogue(ctx, a, g, theme))
 		return

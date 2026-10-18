@@ -84,3 +84,10 @@ An independent SDK consumer exercises this public contract. Portable, actual
 offscreen input and inert Cocoa selector checks are separate from physical Mac
 pointer/key input and human VoiceOver verification. Those live gates and wider
 Mac performance/endurance/distribution acceptance remain open.
+
+The gallery also offers `-navigation-native-check`, a bounded native Go FIFO
+consumer sharing the ordinary list constructor. Its named 47-input/41-observation
+record includes actual list scrolling/pointer input, explicit accepted-row repeat,
+rejection/read-only/disabled behavior and Tab. See the
+[result](../docs/reports/macos-navigation-catalogue/README.md). Native routing is
+separate from physical input, native pixels and human accessibility acceptance.

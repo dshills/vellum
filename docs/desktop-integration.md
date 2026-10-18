@@ -89,3 +89,13 @@ uses the same public API and current exact group-qualified option identities;
 repeated option DomainIDs across groups are not input capabilities. See the
 [native choice result](reports/macos-choice-catalogue/README.md). Physical/OS input,
 Slider drag, presentation and full Mac gates remain open.
+
+
+Use `gallery -navigation-native-check` for the separate native ListBox/MenuButton
+record: 47 packets/41 observations. It uses actual group-qualified row bounds and
+actual current popup item IDs; repeated action labels are distinguished by item
+order/identity and verified callback IDs. Reopening never revives an earlier
+popup target, even with a new frame. Read-only list keys can change focus and
+scroll while accepted selection stays fixed. See the
+[native list/menu result](reports/macos-navigation-catalogue/README.md). It does
+not establish native pixels or physical/OS/assistive-technology input.

@@ -65,6 +65,17 @@ Original-reference/session/process retirement passes. This advances named
 catalogue coverage in controlled Go2/SDK786a CPU-scene routing; remaining catalogue,
 full M2/M5, physical/human input and M3–M7 remain open. No SDK refresh occurs.
 
+The [list/menu catalogue checkpoint](../docs/reports/macos-navigation-catalogue/README.md)
+adds stage84 support for direct Button embeddings in popup inspection and
+47 native Go FIFO inputs/41 independent observations. The original 17-input
+case remains failed/sealed; only the distinct corrected scope passes. ListBox scrolling,
+explicit repeat proposals, rejection/read-only/disabled behavior and Tab pass;
+MenuButton duplicate-label actions, actual popup pointer/keys, disabled/stale
+refusal, Escape/outside consumption, modal owner disable, check/separator/reset
+and original-window closure pass. Callback totals are 8 list, 2 menu, 3 check/reset
+and 1 outside action. This is controlled Go2/SDK786a CPU-scene routing. Remaining
+catalogue, full M2/M5, physical/human input and M3–M7 stay open; no SDK refresh.
+
 ## Finish line
 
 Finish the Go-native framework on the local Mac: an independently consumable SDK
@@ -214,9 +225,11 @@ explicitly authorized tests and restore any authorized temporary state changes.
    The existing private SDK archive remains historical; M6 includes the fix.
 2. **M2 headless checkpoint complete.** The full public professional replay
    passes all six frozen records. The [catalogue map](control-acceptance.md)
-   includes the new routed Selector/NumberField regressions. Native M2 integration
-   remains queued; [actual results](../docs/reports/macos-workspace-acceptance/README.md)
-   distinguish software routing from desktop acceptance.
+   includes routed control regressions and named native records. The complete
+   [native workspace record](../docs/reports/macos-native-workspace/README.md)
+   passes at both row counts; native catalogue coverage remains partial. Physical/
+   human workflows and full M2 acceptance remain open. Software and native
+   evidence retain their distinct scopes.
 3. **M3-A, tile culling, row fragments and resolved shaping are rejected.** The complete table
    matrix still fails. No follow-up AX, packed-upload or tile-culling microtuning
    is queued. The [composition checkpoint](../docs/reports/macos-scene-composition/README.md)
