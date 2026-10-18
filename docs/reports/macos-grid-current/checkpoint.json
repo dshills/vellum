@@ -1,0 +1,212 @@
+{
+  "schema": 1,
+  "source_base": "a2b4143578631cbc57f29fcc1ee18b513e4567a3",
+  "runtime_changed": false,
+  "files": {
+    "docs/reports/macos-grid-current/README.md": "60e352941a6193461164b1e8032652cab27880a24525b14c57e2cfcff59b3b05",
+    "specs/grid-performance.md": "100a2a109de3aeebb94520f15dc1c7f4ff36fb971efa8fb93627dfb408223959",
+    "specs/macos-delivery.md": "aa276641c37f20dc757ef21aa7b0d383b460f99168c0877aed6224e292a64061",
+    "specs/macos-completion.md": "e007dbafea519e4704854f6ebcc39ed9210dccfc3aadf94e60d4d92f8c1bece7"
+  },
+  "archive": {
+    "file": "records.tar.gz",
+    "sha256": "0a991612a427352bd5cfa9711afd7210a0fcb51c4f4f02415acd1f46122ef1a0",
+    "bytes": 4219041,
+    "members": 355,
+    "expanded_bytes": 23139759,
+    "manifest_sha256": "6935a982e7c7b6aa7bd229475408b66da39f4a4f7550775a27ec80a4186c769f",
+    "validated_every_member": true
+  },
+  "reviews": {
+    "initial_admission": {
+      "record": "initial/admission.json",
+      "sha256": "274476a8b54598dc269dd7811eda2202676fb3eb3cabbeeba924a676ef96fa47"
+    },
+    "recovery_admission": {
+      "record": "recovery/admission.json",
+      "sha256": "248dccb01ed4924a83d7f052da2d1d59d237291117d800dbb8e21c8f3634a52d"
+    },
+    "results": {
+      "record": "recovery/internal-results-review.json",
+      "sha256": "c3d947ca7be05f73e8109c5bccfc1a77255e323a2689deea1180aa4ec2a8c889"
+    },
+    "pre_prism": {
+      "record": "recovery/internal-pre-prism-review.json",
+      "sha256": "47bc9f463e4078f7075823a82a98c8a6060d60620a5f35e78561975e9239d152"
+    },
+    "final": {
+      "record": "recovery/internal-final-review.json",
+      "sha256": "0b84f791074c5763ab192868e71905f860314b79e956fab5d9fbe9ea024a9e50"
+    }
+  },
+  "identity": {
+    "tested_go_source": "a2b4143578631cbc57f29fcc1ee18b513e4567a3",
+    "minimum_go": "1.25.6",
+    "prepared_stage": 80,
+    "prepared_files": 6261,
+    "prepared_sha256": "0374c940c2f26205b961be34383f6a0fd882a2c73a6c6bcf4657da93dcab2496",
+    "sdk_source": "abe67c625a498d27b78f9719e6038cc1d6c23e88",
+    "sdk_leaves_including_manifest": 7880,
+    "sdk_refreshed": false,
+    "native_archive": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+    "default_checkout_native_archive_qualified": false,
+    "binaries": {
+      "original": {
+        "import": "github.com/dshills/vellum/examples/loadedgrid",
+        "path": "/private/tmp/vellum-sdk-stage0079-abe67c6-cache-v2/all-main-bin-v2/7/loadedgrid",
+        "bytes": 59836130,
+        "sha256": "4d00a180ff8a0140e3a2d86b46ea467c89186fac14c1d247c376ad964f3cd38a",
+        "go_version": "go1.25.6"
+      },
+      "current": {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-cell-surface-410a98c/grid-integrated",
+        "sha256": "81b85e39e2626d612ea61729a4085e289dd29b2332aa83d5ee85623db37f03db"
+      },
+      "diagnostic": {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-cell-surface-410a98c/grid-integrated-diagnostic",
+        "sha256": "34786e78b65da79fe805b0d8b76b63de9946860ef2ac327eab526b51ef7d7579"
+      }
+    },
+    "production_delta": [
+      "drivers/cogent/grid.go",
+      "drivers/cogent/grid_geometry.go",
+      "drivers/cogent/grid_scroll.go",
+      "drivers/cogent/grid_surface.go"
+    ]
+  },
+  "results": {
+    "ordinary_runs": 40,
+    "ordinary_samples": 4800,
+    "p95_4ms_pass_runs": 7,
+    "p95_4ms_fail_runs": 33,
+    "p99_6ms_pass_runs": 40,
+    "only_all_five_both_target_case": "gpu-fixed-1000000",
+    "full_matrix_target_pass": false,
+    "ordinary_geometry_pairs": 20,
+    "diagnostic_geometry_pairs": 4,
+    "functional_diagnostic_runs": 8,
+    "functional_diagnostic_samples": 960,
+    "allocation_runs": 4,
+    "allocation_samples": 480,
+    "total_unique_native_processes": 52,
+    "offline_profile_commands": 13,
+    "controls_positive": 3,
+    "controls_negative": 27,
+    "source_line_allocation_site": "grid_surface.go:376 per-cell paint-style copy; escape cause/fix/latency benefit not proved",
+    "cases": {
+      "cpu-fixed-10000": {
+        "median_run_p95_ns": 4997499,
+        "median_run_p99_ns": 5267750,
+        "p95_4ms_pass_runs": 0,
+        "p99_6ms_pass_runs": 5,
+        "median_run_allocation_p50_bytes": 4161104,
+        "median_terminal_process_go_heap_bytes": 26019992
+      },
+      "gpu-fixed-10000": {
+        "median_run_p95_ns": 4323542,
+        "median_run_p99_ns": 4564208,
+        "p95_4ms_pass_runs": 0,
+        "p99_6ms_pass_runs": 5,
+        "median_run_allocation_p50_bytes": 5749000,
+        "median_terminal_process_go_heap_bytes": 27350320
+      },
+      "cpu-fixed-1000000": {
+        "median_run_p95_ns": 4758751,
+        "median_run_p99_ns": 4970416,
+        "p95_4ms_pass_runs": 0,
+        "p99_6ms_pass_runs": 5,
+        "median_run_allocation_p50_bytes": 4160496,
+        "median_terminal_process_go_heap_bytes": 200340848
+      },
+      "gpu-fixed-1000000": {
+        "median_run_p95_ns": 3840415,
+        "median_run_p99_ns": 4073543,
+        "p95_4ms_pass_runs": 5,
+        "p99_6ms_pass_runs": 5,
+        "median_run_allocation_p50_bytes": 5741336,
+        "median_terminal_process_go_heap_bytes": 201656208
+      },
+      "cpu-variable-10000": {
+        "median_run_p95_ns": 4905001,
+        "median_run_p99_ns": 5437711,
+        "p95_4ms_pass_runs": 0,
+        "p99_6ms_pass_runs": 5,
+        "median_run_allocation_p50_bytes": 4225608,
+        "median_terminal_process_go_heap_bytes": 26152032
+      },
+      "gpu-variable-10000": {
+        "median_run_p95_ns": 4452875,
+        "median_run_p99_ns": 4774832,
+        "p95_4ms_pass_runs": 0,
+        "p99_6ms_pass_runs": 5,
+        "median_run_allocation_p50_bytes": 5823704,
+        "median_terminal_process_go_heap_bytes": 27641560
+      },
+      "cpu-variable-1000000": {
+        "median_run_p95_ns": 4846960,
+        "median_run_p99_ns": 5061792,
+        "p95_4ms_pass_runs": 0,
+        "p99_6ms_pass_runs": 5,
+        "median_run_allocation_p50_bytes": 4224744,
+        "median_terminal_process_go_heap_bytes": 208426288
+      },
+      "gpu-variable-1000000": {
+        "median_run_p95_ns": 4046042,
+        "median_run_p99_ns": 4296291,
+        "p95_4ms_pass_runs": 2,
+        "p99_6ms_pass_runs": 5,
+        "median_run_allocation_p50_bytes": 5814792,
+        "median_terminal_process_go_heap_bytes": 209897208
+      }
+    }
+  },
+  "recovery": {
+    "initial_scope_result": "FAILED_OR_CANCELED",
+    "original_successful_validations": 5,
+    "original_failed_validation": "diagnostic-gpu-variable-10000",
+    "original_failed_status_preserved": true,
+    "six_prior_raw_runs_revalidated": true,
+    "sixth_missing_postvalidation_vector_lease_flag_preserved": true,
+    "current_vectors_reconciled_before_revalidation": true,
+    "new_processes": 46,
+    "new_process_counts": {
+      "diagnostics": 2,
+      "ordinary": 40,
+      "allocation": 4
+    },
+    "new_scope_result": "MEASURED_FULL_CURRENT_TABLE_MATRIX_AND_SEPARATE_DIAGNOSTICS",
+    "no_native_case_restarted": true,
+    "final_scene_freshness_required": true,
+    "both_scopes_sealed": true
+  },
+  "prism": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "calls": 1,
+    "complete": true,
+    "files": 4,
+    "diff_bytes": 18083,
+    "raw_cli_exit_code": 0,
+    "retained": 0,
+    "discarded": 1,
+    "suppressed": 0,
+    "discarded_id": "d53c21382712ddae",
+    "disposition": "Accepted editorial count clarity, equations added after provider; no runtime or result change.",
+    "record": "recovery/prism.json",
+    "sha256": "69184ba474582c8d085ee58cf29f2e9ac7e1e8d143adda728dad577fbe6f9627",
+    "disposition_record": "recovery/prism-disposition.json",
+    "disposition_sha256": "5ccaf52138ff3f35ca5fc988b043c0632feb71b36d2f71e62d0b9a90d06c5497"
+  },
+  "qualification": {
+    "closed_mac_gates": [],
+    "table_measurement_complete": true,
+    "table_performance_gate_complete": false,
+    "physical_input_qualified": false,
+    "presentation_qualified": false,
+    "resource_endurance_qualified": false,
+    "rights_or_distribution_qualified": false,
+    "full_mac_complete": false,
+    "next": "Investigate per-render paint-style ownership with parity/lifetime/fallback tests and matched ordinary evidence; remaining table/tree/general-UI/resource/physical/SDK/final audit targets unchanged."
+  },
+  "scope": "Evidence/docs only. Ordinary timings exclude all diagnostic/profile runs. Profiles are sampled process Go allocation attribution, not framework-only/native/GPU/retained memory. No source/SDK/native archive change, public push/release/tag/sign/notarization. Archive snapshot precedes package/commit transaction receipts and final archive review."
+}

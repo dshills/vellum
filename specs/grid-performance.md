@@ -630,3 +630,23 @@ values are not painted as completed cells. A late refusal may omit body values
 for that invalidated paint before the ordinary frame is rebuilt. The original
 route remains the independent pixel/geometry/style oracle. Explicit legacy
 widget test helpers do not change normal NewManual routing.
+
+## Current stage0080 eight-case matrix
+
+The [current-grid matrix](../docs/reports/macos-grid-current/README.md) records
+all eight CPU/GPU fixed/variable 10k/1M cases on the exact current `a2b4143` Go
+implementation over the retained private SDK graphics library: five ordinary
+120-event processes per case, 128 warm events each and 4,800 raw samples. All
+twenty ordinary paired 10k/1M geometry arrays match. All forty p99s meet 6 ms;
+seven p95s meet 4 ms and thirty-three fail. Only fixed-height million-row GPU
+meets both targets in all five runs (median run-p95 3.840415 ms). This closes
+the missing current table measurement, not the full M3 performance gate.
+
+Separate eight-case final-composition diagnostics prove the actual value route.
+The initial intermediate-reuse validation failure remains FAILED/sealed, with
+six saved raw runs revalidated under a reviewed final-scene freshness rule;
+only the remaining 46 cases execute in a new scope. No diagnostic timing is
+pooled into ordinary results. Allocation captures identify the per-cell paint
+style copy as a substantial new allocation site. A per-render style ownership
+fix is proposed; no cache, runtime fix or new allocation/latency pass is adopted
+by this result checkpoint. Existing targets and broader Mac gates remain.

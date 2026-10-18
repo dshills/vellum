@@ -48,6 +48,18 @@ under offscreen tags is retained separately from passing package outcomes.
 
 ## Latest unattended evidence
 
+The [current managed-grid matrix](../docs/reports/macos-grid-current/README.md)
+completes the eight CPU/GPU fixed/variable 10k/1M stored-table measurements for
+`a2b4143` Go code over the retained SDK native library. Five ordinary runs per
+case retain 4,800 samples with exact paired visible geometry. All forty p99s
+meet 6 ms; seven p95s meet 4 ms, while thirty-three fail. Fixed-height
+million-row GPU is the only case meeting both targets in all five runs. The
+full M3 gate remains open. Separate actual route diagnostics and sampled
+allocation captures identify the per-cell render-style copy as the next concrete
+allocation site to address. The initial intermediate-composition validator
+failure and independently reviewed recovery remain explicit; no native case
+is repeated. No current SDK refresh or full Mac completion is claimed.
+
 The [retained tree/local-layout prototype](../docs/reports/macos-tree-local-layout/README.md)
 is implemented privately and rejected. Independent original-constructor pixels/
 geometry at five scales, stale/fresh AX/pointer routing, coalesced pending fences,
@@ -61,8 +73,8 @@ both median p99s regress. All twenty p95s fail 4 ms. Effective 68–69 clipped-r
 geometry matches. All native groups retire; failures and raw evidence remain.
 No runtime, identity API, prepared dependency or SDK change is adopted. Retire
 the entire experiment without guard relaxation or more local-row/cache tuning.
-M3 requires a different material scene-publication/rendering decision; independent
-M6 shipped-component/rights inventory is next. Full tree/P6/general UI and all
+The subsequent managed-grid body-layout change and current matrix are recorded
+above. Full tree/P6/general UI and all
 other Mac completion gates remain open. The preceding
 [SDK cost boundary](../docs/reports/macos-tree-boundary/README.md) remains separate
 one-process-per-mode historical evidence, not part of these paired statistics.
