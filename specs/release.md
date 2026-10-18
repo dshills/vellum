@@ -78,6 +78,19 @@ that same authenticated ZIP. This is not an executed-build/compiler/features
 attestation, a reproduced source build, complete component/rights approval or
 authentication of a Vellum SDK. Existing distribution gates remain unchanged.
 
+## Current private SDK minimum-Go consumption
+
+The [stage0079 private SDK checkpoint](../docs/reports/macos-sdk-stage0079/README.md)
+packages clean `abe67c6`, including M1 cancellation and the source-built GPU notice
+bundle. Its 7,879 payload files pass complete integrity, actual Go 1.25.6 relocated
+consumer/public-contract checks, all 26 default-main builds and the explicitly
+tagged window-cycle helper. Twenty-eight distinct shipped fonts are mapped to
+name-table metadata and declaration candidates, with twelve selected Darwin
+embeds. Initial cache/inventory failures are preserved. No native application is
+launched; final runtime, complete component/font/non-font/generated asset rights,
+owner distribution decision and other release gates remain open. This is a
+private consumption checkpoint, not final release qualification.
+
 ## Private source-built GPU consumer
 
 The [pinned-source GPU consumer checkpoint](../docs/reports/macos-source-built-gpu/README.md)

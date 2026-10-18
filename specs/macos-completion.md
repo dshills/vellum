@@ -48,6 +48,17 @@ under offscreen tags is retained separately from passing package outcomes.
 
 ## Latest unattended evidence
 
+The [current private SDK checkpoint](../docs/reports/macos-sdk-stage0079/README.md)
+packages clean `abe67c6` with M1 cancellation and stage0079: 7,879 payload files,
+89 Go notice modules and 82 native component entries. Actual Go 1.25.6 relocated
+consumer race/vet/build and public-contract race/vet pass, as do all 26 discovered
+default mains plus the explicitly tagged window-cycle helper. All 27 metadata
+records confirm that compiler and Darwin/ARM64. Seventy-one owned commands retire
+with group absence; initial cache/inventory failures remain preserved. The font
+mapping binds all 28 shipped fonts, twelve selected Darwin embeds and original
+name/declaration records without rights approval. No native application launches;
+new SDK native acceptance, full M6/rights and every other open Mac gate remain.
+
 The [resolved-shaping checkpoint](../docs/reports/macos-resolved-shapes/README.md)
 rejects a private cache despite positive actual dirty-sizing reuse in both CPU/GPU
 modes (2,636 horizontal hits and zero misses each). Correctness/race, native GPU

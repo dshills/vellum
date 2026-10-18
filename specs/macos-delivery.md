@@ -1,8 +1,9 @@
 # Mac framework delivery plan
 
 Updated 17 October 2026. The latest complete table matrix measures clean
-`bd672a6` with stage0079; the most recent private GPU
-SDK and its native drawing/3D/imaging checks use clean runtime source `5eef841`.
+`bd672a6` with stage0079; the current headless-qualified private SDK uses clean `abe67c6`, Go 1.25.6 and
+stage0079. The last SDK native drawing/3D/imaging checks remain historical
+`5eef841` evidence.
 Owner: the main Vellum development chat. This is the execution plan for the
 existing [Mac completion requirements](macos-completion.md), not a replacement
 for those requirements or a declaration that implemented APIs have qualified.
@@ -34,7 +35,7 @@ to system input/accessibility preferences are not implicitly authorized here.
 | Application/API | Public Go APIs, controls/themes, commands/tasks, documents/history, docking and independent windows | Complete composed workflow and lifecycle acceptance on a release candidate |
 | Data and canvas | Managed tables/trees, typed placement, retained drawing/images, compute/HDR and custom 3D | Frame targets, representative interaction, full resource accounting |
 | Mac integration | Cocoa input/accessibility, menus, clipboard, choosers, drops, tray and optional notifications | Human/native workflow coverage, scale/display changes, declared service support |
-| SDK | Relocated public consumers; current private SDK drawing/3D/imaging native checks | Final clean candidate including the M1 cancellation fix, component/rights closure and distribution acceptance |
+| SDK | Current relocated minimum-Go SDK, all default main builds and font-byte mapping; earlier SDK native drawing/3D/imaging checks | Final clean candidate including the M1 cancellation fix, component/rights closure and distribution acceptance |
 | Performance/endurance | Existing profilers, ordinary benchmarks, scoped idle samples and historical 1,000-cycle campaigns | Ordinary targets still fail; complete current-source memory/pacing/idle/overnight qualification |
 
 The first automated desktop placement attempt expired without input. The second
@@ -125,6 +126,10 @@ explicitly authorized tests and restore any authorized temporary state changes.
    architecture decision is required; no further row-cache tuning is queued.
    The independent [M6 minimum-toolchain source check](../docs/reports/macos-minimum-go/README.md)
    now passes; final SDK/rights closure remains open.
+   A [fresh current private SDK](../docs/reports/macos-sdk-stage0079/README.md)
+   now includes M1/stage0079 and passes actual Go 1.25.6 relocated consumption,
+   all 26 default-main builds plus the tagged lifecycle helper and 28-font byte/
+   metadata mapping. Its native execution and rights/full acceptance remain open.
    The [resolved-shaping checkpoint](../docs/reports/macos-resolved-shapes/README.md)
    then proves real CPU/GPU reuse and passes correctness, but ordinary median
    run-p95 improves only 0.074/0.076 ms, below the 0.4 ms adoption bar. Its whole
