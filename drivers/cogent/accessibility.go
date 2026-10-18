@@ -68,6 +68,7 @@ type accessibilityAction struct {
 type accessibilityHandler func(accessibilityAction) bool
 
 type accessibilityBridge struct {
+	visibility        *windowVisibility // immutable after native attachment construction
 	token             uint64
 	owner             *app.Application
 	mu                sync.Mutex
@@ -99,7 +100,12 @@ var accessibilityRegistry = struct {
 }{bridges: map[uint64]*accessibilityBridge{}, windows: map[string]*accessibilityBridge{}}
 
 func newAccessibilityBridge(owner *app.Application) *accessibilityBridge {
-	b := &accessibilityBridge{token: accessibilityToken.Add(1), owner: owner, handlers: map[string]accessibilityHandler{}, done: make(chan struct{})}
+	return newAccessibilityBridgeWithVisibility(owner, nil)
+}
+
+// All callback-readable fields are initialized before registry publication.
+func newAccessibilityBridgeWithVisibility(owner *app.Application, visibility *windowVisibility) *accessibilityBridge {
+	b := &accessibilityBridge{token: accessibilityToken.Add(1), owner: owner, visibility: visibility, handlers: map[string]accessibilityHandler{}, done: make(chan struct{})}
 	accessibilityRegistry.Lock()
 	accessibilityRegistry.bridges[b.token] = b
 	accessibilityRegistry.Unlock()
@@ -168,6 +174,7 @@ func (b *accessibilityBridge) closeFrom(source string) {
 	// Publish the record before signaling closure so every canceled request sees
 	// the same first-close provenance, even when a later cleanup path runs.
 	b.closed.Store(true)
+	b.visibility.close()
 	b.generation.Add(1)
 	b.handlers = nil
 	b.activationGuards = nil

@@ -65,8 +65,9 @@ type desktopRequest struct {
 	done    atomic.Bool
 }
 type desktopReply struct {
-	snapshot DesktopSnapshot
-	err      error
+	snapshot   DesktopSnapshot
+	visibility DesktopWindowVisibility
+	err        error
 }
 type desktopFIFO struct {
 	events.Event
@@ -334,17 +335,21 @@ func (s *DesktopSession) cancel(r *desktopRequest) {
 	s.finishLocked(r, desktopReply{err: r.ctx.Err()})
 }
 func (s *DesktopSession) wait(r *desktopRequest) (DesktopSnapshot, error) {
+	reply := s.waitReply(r)
+	return reply.snapshot, reply.err
+}
+func (s *DesktopSession) waitReply(r *desktopRequest) desktopReply {
 	tick := time.NewTicker(2 * time.Millisecond)
 	defer tick.Stop()
 	for {
 		select {
 		case out := <-r.reply:
-			return out.snapshot, out.err
+			return out
 		case <-r.ctx.Done():
 			s.cancel(r)
-			return DesktopSnapshot{}, r.ctx.Err()
+			return desktopReply{err: r.ctx.Err()}
 		case <-r.ref.Context().Done():
-			return DesktopSnapshot{}, ErrDesktopClosed
+			return desktopReply{err: ErrDesktopClosed}
 		case <-tick.C:
 			s.mu.Lock()
 			s.reapLocked()
@@ -366,6 +371,19 @@ func (s *DesktopSession) Frame(ctx context.Context, ref app.WindowRef) error {
 	}
 	_, e = s.wait(r)
 	return e
+}
+
+// Visibility observes the latest native Mac occlusion state after preceding FIFO
+// work. It does not require or publish a completed frame, acquire a drawable,
+// wait for visibility, or retry Frame. Known is false for an unsupported driver
+// (including Manual). A later Frame may still return ErrDesktopFrameUnavailable.
+func (s *DesktopSession) Visibility(ctx context.Context, ref app.WindowRef) (DesktopWindowVisibility, error) {
+	r, err := s.submit(ctx, ref, 4, DesktopInput{})
+	if err != nil {
+		return DesktopWindowVisibility{}, err
+	}
+	reply := s.waitReply(r)
+	return reply.visibility, reply.err
 }
 
 // Snapshot reads settled geometry/semantics without creating a frame. Call Frame
@@ -452,6 +470,16 @@ func (s *DesktopSession) handle(w *nativeWindow, e events.Event) bool {
 			b.trace.Reconciled(r.tag, 0)
 			w.body.Scene.NeedsRender()
 		}
+		return true
+	}
+	if r.kind == 4 {
+		value, err := w.visibility.Load().snapshot()
+		if canceled := r.ctx.Err(); canceled != nil {
+			err = canceled
+		}
+		s.mu.Lock()
+		s.finishLocked(r, desktopReply{visibility: value, err: err})
+		s.mu.Unlock()
 		return true
 	}
 	if r.kind == 3 {

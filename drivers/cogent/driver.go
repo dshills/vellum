@@ -73,6 +73,7 @@ type nativeWindow struct {
 	stopLoss         func()
 	lossMu           sync.Mutex
 	input            atomic.Pointer[textWindow]
+	visibility       atomic.Pointer[windowVisibility]
 	metrics          *frameWindowMetrics
 	desktop          *DesktopSession
 	source           atomic.Pointer[events.Source]
@@ -333,6 +334,10 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					return
 				}
 				w.source.Store(w.body.SystemEvents())
+				if err := bindWindowVisibility(w); err != nil {
+					failWindow(w, err)
+					return
+				}
 				if err := withWindowOwner(a, w.window.Ref(), func() {
 					w.rootMu.Lock()
 					defer w.rootMu.Unlock()

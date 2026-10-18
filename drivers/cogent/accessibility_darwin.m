@@ -7,6 +7,50 @@
 #include <string.h>
 #include <math.h>
 #include <stdatomic.h>
+
+// Object-scoped Foundation notification ownership, also exercised without an
+// NSWindow by deterministic fixtures. Handler runs synchronously on the poster.
+@interface VellumWindowVisibilityObserver : NSObject
+- (instancetype)initWithObject:(id)object handler:(void (^)(void))handler;
+- (void)sample;
+- (void)invalidate;
+@end
+
+@interface VellumWindowVisibilityObserver ()
+@property (weak) id object;
+@property (copy) void (^handler)(void);
+@property BOOL closed;
+@end
+@implementation VellumWindowVisibilityObserver
+- (instancetype)initWithObject:(id)object handler:(void (^)(void))handler {
+ if(!object || !handler)return nil;
+ self=[super init];
+ if(self){
+  _object=object; _handler=[handler copy];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changed:) name:NSWindowDidChangeOcclusionStateNotification object:object];
+  // Subscribe before the initial sample; no transition can fall between them.
+  [self sample];
+ }
+ return self;
+}
+- (void)sample {
+ // A foreign manual notification may race invalidation. Retain and call the
+ // same checked block; a second property read could instead return nil.
+ void (^handler)(void)=self.handler;
+ if(!self.closed && self.object && handler)handler();
+}
+- (void)changed:(NSNotification *)note { if(note.object==self.object)[self sample]; }
+- (void)invalidate {
+ if(self.closed)return;
+ self.closed=YES;
+ [[NSNotificationCenter defaultCenter] removeObserver:self];
+ self.handler=nil;
+ self.object=nil;
+}
+- (void)dealloc { [[NSNotificationCenter defaultCenter] removeObserver:self]; }
+@end
+
+extern void vellumWindowVisibility(uint64_t token,int visible);
 extern int vellumAXAction(uint64_t token,uint64_t generation,char *id,char *kind,char *value);
 extern void vellumAXResult(uint64_t request,char *json);
 @class VellumAXState;
@@ -33,6 +77,7 @@ static NSMutableDictionary<NSNumber *,VellumAXState *> *vellumAXStates;
 @property uint64_t token;
 @property uint64_t generation;
 @property BOOL closed;
+@property (strong) VellumWindowVisibilityObserver *visibility;
 @property (strong) NSMutableDictionary<NSString *,VellumAXElement *> *elements;
 @property (copy) NSArray *roots;
 @property (copy) NSArray *hierarchy;
@@ -301,7 +346,16 @@ int vellumAXAttach(uint64_t token,void *viewPtr,void *windowPtr){
  if(!viewClass)return 0;state.installedViewClass=viewClass;
  objc_setAssociatedObject(view,&vellumAXKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
  object_setClass(view,viewClass);
- if(!vellumAXStates)vellumAXStates=[NSMutableDictionary new];vellumAXStates[@(token)]=state;return 1;
+ if(!vellumAXStates)vellumAXStates=[NSMutableDictionary new];vellumAXStates[@(token)]=state;
+ __weak NSWindow *observedWindow=window;
+ state.visibility=[[VellumWindowVisibilityObserver alloc] initWithObject:window handler:^{
+  // NSWindow notifications are delivered on main. Refuse foreign manual posts;
+  // no AppKit access, UI work or blocking main dispatch occurs off its owner.
+  if(![NSThread isMainThread])return;
+  NSWindow *liveWindow=observedWindow;
+  if(liveWindow)vellumWindowVisibility(token,(liveWindow.occlusionState&NSWindowOcclusionStateVisible)!=0);
+ }];
+ return 1;
  }
 }
 void vellumAXDetach(uint64_t token){
@@ -312,6 +366,7 @@ void vellumAXDetach(uint64_t token){
  // allValues array here so it cannot retain every retired element and node.
  @autoreleasepool{
  VellumAXState *state=vellumAXStates[@(token)];if(!state||state.closed)return;state.closed=YES;
+ [state.visibility invalidate];state.visibility=nil;
  for(VellumAXElement *x in state.elements.allValues){x.live=NO;x.parentElement=nil;x.childElements=@[];}
  [state.geometry removeAllObjects];[state.textGeometry removeAllObjects];
  // A later observer/subclass owns its own isa change; do not overwrite it.
@@ -763,5 +818,66 @@ char *vellumAXPayloadFixture(const char *json,int consume){
   NSDictionary *result=@{@"alive_while_queued":@(alive),@"copied_bytes":@(copied),@"decoded":@(decoded),@"released_after_consumer":@(released)};
   NSData *data=[NSJSONSerialization dataWithJSONObject:result options:0 error:nil];
   return strdup([[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding].UTF8String?:"");
+ }
+}
+
+// Deterministically model handler invalidation immediately after its getter.
+// The actual production sample method must call its retained first result.
+@interface VellumVisibilityRetiringFixture : VellumWindowVisibilityObserver
+@property BOOL retireOnRead;
+@end
+@implementation VellumVisibilityRetiringFixture
+- (void (^)(void))handler {
+ void (^handler)(void)=[super handler];
+ if(self.retireOnRead){self.retireOnRead=NO;[super setHandler:nil];}
+ return handler;
+}
+@end
+
+// End the temporary stack-block capture's frame before testing handler release.
+__attribute__((noinline)) static VellumWindowVisibilityObserver *vellumVisibilityFixtureObserver(id target,NSObject * __weak *probe,int *calls) {
+ NSObject *sentinel=[NSObject new];
+ *probe=sentinel;
+ return [[VellumWindowVisibilityObserver alloc] initWithObject:target handler:^{(void)sentinel;(*calls)++;}];
+}
+char *vellumWindowVisibilityObserverFixture(void) {
+ @autoreleasepool {
+  NSObject * __weak weakTarget;
+  NSObject * __weak weakSentinel;
+  int calls=0;
+  int initial,unrelated,matching,sampled,closed;
+  BOOL refused,installed,handlerCleared;
+  VellumWindowVisibilityObserver *observer;
+  @autoreleasepool {
+   NSObject *target=[NSObject new],*other=[NSObject new];
+   weakTarget=target;
+   observer=vellumVisibilityFixtureObserver(target,&weakSentinel,&calls);
+   installed=weakSentinel!=nil;
+   initial=calls;
+   [[NSNotificationCenter defaultCenter] postNotificationName:NSWindowDidChangeOcclusionStateNotification object:other];
+   unrelated=calls;
+   [[NSNotificationCenter defaultCenter] postNotificationName:NSWindowDidChangeOcclusionStateNotification object:target];
+   matching=calls;
+   [observer sample];sampled=calls;
+   [observer invalidate];[observer invalidate];handlerCleared=observer.handler==nil;
+   [[NSNotificationCenter defaultCenter] postNotificationName:NSWindowDidChangeOcclusionStateNotification object:target];
+   [observer sample];closed=calls;
+   refused=[[VellumWindowVisibilityObserver alloc] initWithObject:nil handler:^{}]==nil&&[[VellumWindowVisibilityObserver alloc] initWithObject:other handler:nil]==nil;
+  }
+  // Posted NSNotifications temporarily retain their object until pool drain.
+  // The observer remains alive here, so leaked handler/object ownership fails.
+  BOOL targetReleased=weakTarget==nil,handlerReleased=weakSentinel==nil;
+  BOOL released=targetReleased&&handlerReleased;
+  __block int capturedCalls=0;
+  NSObject *capturedTarget=[NSObject new];
+  VellumVisibilityRetiringFixture *captured=[[VellumVisibilityRetiringFixture alloc] initWithObject:capturedTarget handler:^{capturedCalls++;}];
+  captured.retireOnRead=YES;
+  [captured sample];
+  BOOL capturedHandler=capturedCalls==2&&captured.handler==nil;
+  [captured invalidate];
+  [observer sample];closed=calls;
+  NSData *data=[NSJSONSerialization dataWithJSONObject:@{@"initial":@(initial),@"unrelated":@(unrelated),@"matching":@(matching),@"sampled":@(sampled),@"closed":@(closed),@"released":@(released),@"targetReleased":@(targetReleased),@"handlerReleased":@(handlerReleased),@"refused":@(refused),@"installed":@(installed),@"handlerCleared":@(handlerCleared),@"capturedHandler":@(capturedHandler)} options:0 error:nil];
+  NSString *json=[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+  return json.UTF8String?strdup(json.UTF8String):NULL;
  }
 }

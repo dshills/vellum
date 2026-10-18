@@ -118,3 +118,25 @@ reentrant Raise and concurrent focus/close regression coverage. Existing mixed
 live manual/ordinary mode refusals still apply. Offscreen routing evidence does
 not establish physical desktop focus, native object deallocation or full Mac
 acceptance.
+
+
+## Occlusion notification ownership
+
+The Mac accessibility/native attachment owns one object-specific Cocoa occlusion
+observer, installed before its initial main-thread sample. A weak window capture
+prevents extending native lifetime. Detach invalidates the observer and clears its
+handler before native window destruction. Go bridge retirement independently
+revokes the bounded owner FIFO state, including failure/partial-attach paths.
+
+The state retains only detached visibility/sequence and one exact pending redraw
+wake. Initial samples flush on OnShow binding; duplicate notifications coalesce.
+Retirement removes undelivered nodes and clears the source. Dequeued retired or
+foreign wakes cannot repaint or consume a later incarnation's pending request.
+The owner marks scene dirt before requesting rendering, so a clean scene can be
+recomposed after a visible transition. Existing Frame completion and unavailable
+semantics remain unchanged. See [integration contract](desktop-integration.md).
+
+Foundation-only observer fixtures and Manual owner/composition regressions do not
+establish real NSWindow notification timing, Metal availability or presentation.
+The [checkpoint](../docs/reports/macos-window-visibility/README.md) records the
+current qualification and preserves earlier failed native scopes.

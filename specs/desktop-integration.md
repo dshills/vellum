@@ -78,5 +78,47 @@ retain normal modal routing.
 
 Exact originating owner wakes bypass popup modality even without DesktopSession,
 so posted application work continues while a menu is open. Only the exact driver
-wake and this window's session requests are intercepted; unrelated Custom events
+wake, source-bound window visibility wake and this window's session requests are intercepted; unrelated Custom events
 retain ordinary popup routing. Launched/unlaunched teardown clears the hook.
+
+
+## Mac window visibility
+
+The Mac native attachment subscribes to its original NSWindow's occlusion-change
+notification before sampling the initial NSWindowOcclusionStateVisible bit. Only
+the native main thread reads AppKit. Initial observations are retained until
+OnShow binds the FIFO after rendering configuration. A visible state then queues
+one owner redraw, and subsequent hidden-to-visible transitions do the same.
+Duplicate notifications and bursts coalesce into one exact pending wake. The
+owner consumes its latest state, invalidates any settled session revision and
+marks Scene.NeedsRender, including through popup modality. A paint-loop wake
+alone is insufficient when a prior failed composition consumed scene dirt.
+
+An exact state/source/wake identity prevents stale or foreign delivery from
+consuming a newer request. Native teardown removes notification ownership before
+window destruction; every Go bridge retirement removes pending FIFO nodes and
+clears its source reference. Already dequeued events become inert. No widget,
+native pointer, polling timer or historical visibility list is retained.
+
+`DesktopSession.Visibility(ctx, originalRef)` is a separate single-consumer FIFO
+inspection. It requires a live native binding but no successful Frame, returns
+copied Known/Visible/Sequence fields, and does not acquire, publish, clear or retry
+a frame capability. Known=false describes unsupported/unobserved state, including
+Manual; sequence is attachment-local and refuses exhaustion. Original-window,
+cancellation and pending-request limits remain unchanged.
+
+Visible means only the sampled Cocoa occlusion-visible bit. It does not prove
+current drawable availability, GPU completion, displayed pixels or presentation.
+Frame keeps its existing first-composition terminal behavior, including typed
+unavailable failure and no automatic retries. A visibility event requests ordinary
+redraw; it does not promise recovery when a backend yields without a Cocoa state
+change or diagnose any earlier sealed failure. Native lifecycle qualification is
+separate from deterministic owner routing and Foundation notification fixtures.
+
+
+If the visibility sequence reaches its uint64 limit, the next change retires
+this attachment's automatic visibility redraw state and removes any queued wake.
+`Visibility` then returns `ErrDesktopBudget`; the counter never wraps or revives
+old authority. Ordinary application invalidation and painting remain available.
+A fresh window attachment has its own sequence. This failure mode is covered by
+a queued-wake retirement regression.

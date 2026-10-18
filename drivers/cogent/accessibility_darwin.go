@@ -59,7 +59,7 @@ func configureAccessibility(a *app.Application) error {
 		return fmt.Errorf("cogent: accessibility requires exclusive native attachment hook")
 	}
 	desktop.TheApp.NativeAttach = func(w *desktop.Window) (desktop.NativeAttachment, error) {
-		b := newAccessibilityBridge(a)
+		b := newAccessibilityBridgeWithVisibility(a, newWindowVisibility())
 		if C.vellumAXAttach(C.uint64_t(b.token), w.Glw.GetCocoaView(), w.Glw.GetCocoaWindow()) == 0 {
 			b.closeFrom("native-attach-failed")
 			return nil, fmt.Errorf("cogent: native accessibility attachment failed")

@@ -156,3 +156,27 @@ drawable readiness. The new scalar is also available on `FrameSample`, omitted
 from JSON whenfalse. Contradictory submission flags and source-diagnostic faults
 stay failed generic terminals. Timing/ownership/first-composition contracts remain
 unchanged. See the [checkpoint and verification limits](reports/macos-frame-unavailable/README.md).
+
+
+The Mac adapter now requests an owner redraw when its sampled native occlusion
+state changes from hidden to visible. Applications using on-demand rendering need
+no visibility polling. This redraw also works while a framework popup is open;
+it does not change application selection or dismiss the popup.
+
+A session consumer can inspect `session.Visibility(ctx, originalRef)` even after
+a failed Frame. The returned `DesktopWindowVisibility` copies `Known`, `Visible`
+and an attachment-local `Sequence`. Unsupported/unobserved backends return
+`Known=false`; no completed frame is required or granted. Use the same original
+WindowRef, deadline and one-consumer rule as other session operations. This is a
+Cocoa state observation, not a drawable-readiness fence. Frame may still yield
+`ErrDesktopFrameUnavailable`; the framework does not retry failed session frames.
+The [visibility checkpoint](reports/macos-window-visibility/README.md) separates
+software/notification ownership checks from actual native-window qualification.
+
+
+If the visibility sequence reaches its uint64 limit, the next change retires
+this attachment's automatic visibility redraw state and removes any queued wake.
+`Visibility` then returns `ErrDesktopBudget`; the counter never wraps or revives
+old authority. Ordinary application invalidation and painting remain available.
+A fresh window attachment has its own sequence. This failure mode is covered by
+a queued-wake retirement regression.
