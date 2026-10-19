@@ -104,3 +104,16 @@ first/reverse scrolls; an oversized workload is refused before data/UI creation.
 See the [route investigation](../../docs/reports/macos-tree-gpu/README.md) for
 separate diagnostics and a rejected scanline-allocation prototype. No renderer
 change was adopted by that investigation.
+
+## Native presentation preflight
+
+`-perf -nodes=100000 -perf-presentation=/private/tmp/new-loadedtree-presentation.json`
+records a separate bounded raw journal using the public native presentation API.
+It excludes other diagnostic modes and requires a new file. Every performance
+event is labeled as diagnostic. The strict validator joins receipt, completed CPU
+generation and actual native presentation, retaining losses and teardown state.
+These serial runs cannot qualify sustained 60 Hz cadence or physical input latency.
+See the [capture contract](../../specs/presentation-capture.md) and current
+[Mac release policy](../../specs/macos-responsiveness.md); the earlier 4 ms budgets
+remain optimization targets. No real presentation journal has been qualified by
+this checkpoint.

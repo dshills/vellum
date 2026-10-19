@@ -87,3 +87,13 @@ headless accounting, late callbacks, actual bridge compilation and controlled
 native drawable stand-ins. Those tests create no native window or real drawable.
 Live interception, actual Metal delivery/clock correlation, pacing, affected
 native lifecycle acceptance and the full Mac release gate remain open.
+
+## Consumer preflight
+
+The [serial capture checkpoint](../docs/reports/macos-presentation-capture/README.md)
+adds opt-in stored grid/tree journals and a strict offline validator. Race tests,
+vet, native builds and synthetic journal controls pass. No real native feedback
+was captured here; serial scroll intervals do not qualify sustained 60 Hz pacing.
+Callback/clock/lifecycle proof and a continuously changing campaign remain open.
+
+See the [capture contract](presentation-capture.md) for flags, bounds and provenance.

@@ -63,13 +63,14 @@ func main() {
 	deep := flag.Bool("perf-deep", false, "warm deep-chain viewport instead of wide branch")
 	gpuScene := flag.Bool("perf-gpu-scene", false, "opt into GPU scene rendering for this performance run")
 	sourceDetails := flag.Bool("perf-source-details", false, "additional diagnostic source clocks/counters; exclude from ordinary timing")
+	presentationDetails := flag.String("perf-presentation", "", "new raw native presentation journal; separate serial diagnostic, not60Hz cadence qualification")
 	flag.Parse()
-	if *perf && *smoke || !*perf && (*deep || *gpuScene || *sourceDetails || *samples != 240 || *warmup != 128) {
+	if *perf && *smoke || !*perf && (*deep || *gpuScene || *sourceDetails || *samples != 240 || *warmup != 128 || *presentationDetails != "") {
 		fmt.Fprintln(os.Stderr, "loadedtree: perf flags require -perf and exclude -smoke")
 		os.Exit(1)
 	}
 	if *perf {
-		if e := runTreePerf(treePerfConfig{Nodes: *nodes, Samples: *samples, Warmup: *warmup, Deep: *deep, GPUSceneRendering: *gpuScene, SourceDetails: *sourceDetails}); e != nil {
+		if e := runTreePerf(treePerfConfig{Nodes: *nodes, Samples: *samples, Warmup: *warmup, Deep: *deep, GPUSceneRendering: *gpuScene, SourceDetails: *sourceDetails, PresentationDetails: *presentationDetails}); e != nil {
 			fmt.Fprintln(os.Stderr, e)
 			os.Exit(1)
 		}

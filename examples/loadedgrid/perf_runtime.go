@@ -52,6 +52,9 @@ func perfEmit(event string, value map[string]any) error {
 	value["event"] = event
 	return json.NewEncoder(os.Stdout).Encode(value)
 }
+func (c perfConfig) emit(event string, value map[string]any) error {
+	return perfEmit(event, markPresentationRecord(value, c.PresentationDetails != ""))
+}
 func newPerfProgram(ctx context.Context, c perfConfig) (*perfProgram, map[string]any, error) {
 	if err := c.validate(); err != nil {
 		return nil, nil, err
@@ -182,7 +185,7 @@ func perfCountDelta(before, after countSnapshot) (countSnapshot, error) {
 	}
 	return countSnapshot{after.Keys - before.Keys, after.Inverse - before.Inverse, after.Cells - before.Cells}, nil
 }
-func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c perfConfig) (result error) {
+func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c perfConfig, capture *perfPresentationCapture) (result error) {
 	initial, err := p.inspect(ctx)
 	if err != nil {
 		return err
@@ -247,7 +250,7 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
 	if !initial.Bounds.In(image.Rectangle{Min: windowGeometry.Render.Pos, Max: windowGeometry.Render.Pos.Add(windowGeometry.Render.Size)}) {
 		return errors.New("loadedgrid perf: grid outside native render area")
 	}
-	if err = perfEmit("grid.perf.ready", map[string]any{"window_geometry_guard": 1, "native_window": windowGeometry, "rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "alloc_profile": c.AllocationProfile != "", "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "warmup": c.Warmup, "memory_after_warm_gc": warmMemory, "initial_geometry": initial.Bounds, "warm_start_viewport": initial.Viewport, "warm_end_viewport": warmFinal.Viewport, "warm_start_generation": initial.Generation, "warm_end_generation": warmFinal.Generation, "warm_callbacks": warmCallbacks}); err != nil {
+	if err = c.emit("grid.perf.ready", map[string]any{"window_geometry_guard": 1, "native_window": windowGeometry, "rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "alloc_profile": c.AllocationProfile != "", "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "warmup": c.Warmup, "memory_after_warm_gc": warmMemory, "initial_geometry": initial.Bounds, "warm_start_viewport": initial.Viewport, "warm_end_viewport": warmFinal.Viewport, "warm_start_generation": initial.Generation, "warm_end_generation": warmFinal.Generation, "warm_callbacks": warmCallbacks}); err != nil {
 		return err
 	}
 	stopAllocation, err := startPerfAllocationProfile(c.AllocationProfile)
@@ -297,7 +300,7 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
 		if afterMemory.TotalAlloc < beforeMemory.TotalAlloc || afterMemory.Mallocs < beforeMemory.Mallocs {
 			return errors.New("loadedgrid perf: allocation counter overflow")
 		}
-		if err = perfEmit("grid.perf.sample", map[string]any{"gpu_scene_rendering": c.GPUSceneRendering, "alloc_profile": c.AllocationProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "index": i, "tag": sample.Tag, "generation": sample.Generation, "frame": g.Frames, "callbacks": changed, "geometry": geometry, "metrics": perfMetrics(sample), "native_sample": sample, "source_callbacks": counts, "go_process_alloc_bytes": afterMemory.TotalAlloc - beforeMemory.TotalAlloc, "go_process_mallocs": afterMemory.Mallocs - beforeMemory.Mallocs, "go_gc_cycles": afterMemory.NumGC - beforeMemory.NumGC}); err != nil {
+		if err = c.emit("grid.perf.sample", map[string]any{"gpu_scene_rendering": c.GPUSceneRendering, "alloc_profile": c.AllocationProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "index": i, "tag": sample.Tag, "generation": sample.Generation, "frame": g.Frames, "callbacks": changed, "geometry": geometry, "metrics": perfMetrics(sample), "native_sample": sample, "source_callbacks": counts, "go_process_alloc_bytes": afterMemory.TotalAlloc - beforeMemory.TotalAlloc, "go_process_mallocs": afterMemory.Mallocs - beforeMemory.Mallocs, "go_gc_cycles": afterMemory.NumGC - beforeMemory.NumGC}); err != nil {
 			return err
 		}
 	}
@@ -322,8 +325,11 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
 	if finalWindowGeometry != windowGeometry {
 		return errors.New("loadedgrid perf: native window endpoints changed")
 	}
+	if err = capture.Seal(ctx); err != nil {
+		return err
+	}
 	runtime.GC()
-	return perfEmit("grid.perf.end", map[string]any{"window_geometry_guard": 1, "native_window": finalWindowGeometry, "rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "alloc_profile": c.AllocationProfile != "", "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "samples": c.Samples, "callbacks": callbacks, "dropped": final.Dropped, "pending": final.Pending, "memory_after_measured_gc": readPerfMemory(), "native_gpu_memory": "unavailable", "presentation_timestamps": "unavailable", "allocation_scope": "process-wide Go allocation between observations includes measurement helpers; not framework-only allocation attribution"})
+	return c.emit("grid.perf.end", map[string]any{"window_geometry_guard": 1, "native_window": finalWindowGeometry, "rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "alloc_profile": c.AllocationProfile != "", "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "samples": c.Samples, "callbacks": callbacks, "dropped": final.Dropped, "pending": final.Pending, "memory_after_measured_gc": readPerfMemory(), "native_gpu_memory": "unavailable", "presentation_timestamps": perfPresentationStatus(c.PresentationDetails), "allocation_scope": "process-wide Go allocation between observations includes measurement helpers; not framework-only allocation attribution"})
 }
 
 // Detailed records are diagnostic instrumentation. The ordinary constructor
@@ -355,16 +361,23 @@ func runPerf(c perfConfig) (terminal error) {
 	if err != nil {
 		return err
 	}
+	capture, err := startPerfPresentation(c.PresentationDetails, m, presentationCaptureConfig{Method: "routed-grid-scroll", Samples: c.Samples, Warmup: c.Warmup, DataSize: c.Rows, Variable: c.Variable, Novel: c.Novel, GPURequested: c.GPUSceneRendering})
+	if err != nil {
+		return err
+	}
+	workerRetired := true
+	runtimeReturned := false
+	defer func() { terminal = errors.Join(terminal, capture.Finish(terminal, workerRetired, runtimeReturned)) }()
 	finishInput, err := startPerfInputDetails(c.InputDetails, m)
 	if err != nil {
 		return err
 	}
 	defer func() { terminal = errors.Join(terminal, finishInput(terminal)) }()
-	if err = perfEmit("grid.perf.setup", metadata); err != nil {
+	if err = c.emit("grid.perf.setup", metadata); err != nil {
 		return err
 	}
 	failure := make(chan error, 1)
-	d := cogent.Driver{FrameMetrics: m, GPUSceneRendering: c.GPUSceneRendering, Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 15}), Foreground: ui.Some(color.NRGBA{R: 20, G: 20, B: 20, A: 255}), Background: ui.Some(color.NRGBA{R: 250, G: 250, B: 250, A: 255})}}, OnError: func(err error) {
+	d := cogent.Driver{FrameMetrics: m, PresentationMetrics: capture.Metrics(), GPUSceneRendering: c.GPUSceneRendering, Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 15}), Foreground: ui.Some(color.NRGBA{R: 20, G: 20, B: 20, A: 255}), Background: ui.Some(color.NRGBA{R: 250, G: 250, B: 250, A: 255})}}, OnError: func(err error) {
 		select {
 		case failure <- err:
 		default:
@@ -373,8 +386,10 @@ func runPerf(c perfConfig) (terminal error) {
 	}}
 	result := make(chan error, 1)
 	workerDone := make(chan struct{})
-	go func() { defer close(workerDone); result <- p.measure(ctx, m, c); p.owner.Close() }()
+	workerRetired = false
+	go func() { defer close(workerDone); result <- p.measure(ctx, m, c, capture); p.owner.Close() }()
 	native := p.owner.Run(ctx, d)
+	runtimeReturned = true
 	var measured error
 	select {
 	case measured = <-result:
@@ -384,10 +399,9 @@ func runPerf(c perfConfig) (terminal error) {
 		cancel()
 		measured = errors.New("loadedgrid perf: native runtime ended before measured completion")
 	}
-	select {
-	case <-workerDone:
-	case <-ctx.Done():
-		measured = errors.Join(measured, ctx.Err())
+	workerRetired = joinPerfPresentationWorker(workerDone, cancel)
+	if !workerRetired {
+		measured = errors.Join(measured, errors.New("loadedgrid perf: measurement worker did not retire"))
 	}
 	select {
 	case e := <-failure:

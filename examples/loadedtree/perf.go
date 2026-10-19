@@ -31,9 +31,13 @@ type treePerfConfig struct {
 	Nodes, Samples, Warmup           int
 	Deep                             bool
 	GPUSceneRendering, SourceDetails bool
+	PresentationDetails              string
 }
 
 func (c treePerfConfig) validate() error {
+	if !validPresentationPath(c.PresentationDetails) || c.PresentationDetails != "" && c.SourceDetails {
+		return errors.New("loadedtree perf: presentation capture requires a separate diagnostic path and mode")
+	}
 	if (c.Nodes != 10_000 && c.Nodes != 100_000) || c.Samples < 120 || c.Samples > 2048 || c.Warmup < treePerfPeriod || c.Warmup > 2048 || c.Warmup%treePerfPeriod != 0 {
 		return errors.New("loadedtree perf: nodes10000/100000, samples120..2048, warmup32..2048 in complete cycles required")
 	}
@@ -104,6 +108,7 @@ func (p *treePerfProgram) describe() ui.Node {
 }
 func treePerfMemory() runtime.MemStats { var s runtime.MemStats; runtime.ReadMemStats(&s); return s }
 func (c treePerfConfig) record(event string, value map[string]any) map[string]any {
+	value = markPresentationRecord(value, c.PresentationDetails != "")
 	value["event"] = event
 	value["gpu_scene_rendering"] = c.GPUSceneRendering
 	value["source_details"] = c.SourceDetails
@@ -228,7 +233,7 @@ func (p *treePerfProgram) callbackCount(ctx context.Context) (uint64, error) {
 	err := p.owned(ctx, func() error { count = p.callbacks; return nil })
 	return count, err
 }
-func (p *treePerfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c treePerfConfig) error {
+func (p *treePerfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c treePerfConfig, capture *perfPresentationCapture) error {
 	initial, err := p.inspect(ctx)
 	if err != nil {
 		return err
@@ -319,10 +324,13 @@ func (p *treePerfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c
 			return errors.New("loadedtree perf: terminal recorder contains refused frame")
 		}
 	}
+	if err = capture.Seal(ctx); err != nil {
+		return err
+	}
 	runtime.GC()
 	return c.emit("tree.perf.finished", map[string]any{"nodes": c.Nodes, "deep": c.Deep, "samples": c.Samples, "frame_tickets": len(snapshot.Samples), "memory": treePerfMemory(), "full_p6_qualified": false})
 }
-func runTreePerf(c treePerfConfig) error {
+func runTreePerf(c treePerfConfig) (terminal error) {
 	if err := c.validate(); err != nil {
 		return err
 	}
@@ -389,23 +397,42 @@ func runTreePerf(c treePerfConfig) error {
 	if err != nil {
 		return err
 	}
+	capture, err := startPerfPresentation(c.PresentationDetails, metrics, presentationCaptureConfig{Method: "routed-tree-scroll", Samples: c.Samples, Warmup: c.Warmup, DataSize: c.Nodes, Deep: c.Deep, GPURequested: c.GPUSceneRendering})
+	if err != nil {
+		return err
+	}
+	workerRetired := true
+	runtimeReturned := false
+	defer func() { terminal = errors.Join(terminal, capture.Finish(terminal, workerRetired, runtimeReturned)) }()
 	result := make(chan error, 1)
 	failures := make(chan error, 1)
-	driver := cogent.Driver{GPUSceneRendering: c.GPUSceneRendering, FrameMetrics: metrics, Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 12}), Foreground: ui.Some(color.NRGBA{R: 20, G: 20, B: 20, A: 255}), Background: ui.Some(color.NRGBA{R: 250, G: 250, B: 250, A: 255})}}, OnError: func(e error) {
+	driver := cogent.Driver{GPUSceneRendering: c.GPUSceneRendering, FrameMetrics: metrics, PresentationMetrics: capture.Metrics(), Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 12}), Foreground: ui.Some(color.NRGBA{R: 20, G: 20, B: 20, A: 255}), Background: ui.Some(color.NRGBA{R: 250, G: 250, B: 250, A: 255})}}, OnError: func(e error) {
 		select {
 		case failures <- e:
 		default:
 		}
 		cancel()
 	}}
-	go func() { err := p.measure(ctx, metrics, c); result <- err; owner.Close() }()
+	workerDone := make(chan struct{})
+	workerRetired = false
+	go func() {
+		defer close(workerDone)
+		err := p.measure(ctx, metrics, c, capture)
+		result <- err
+		owner.Close()
+	}()
 	native := owner.Run(ctx, driver)
+	runtimeReturned = true
 	var measured error
 	select {
 	case measured = <-result:
 	case <-time.After(2 * time.Second):
 		cancel()
 		measured = errors.New("loadedtree perf: runtime ended before worker completion")
+	}
+	workerRetired = joinPerfPresentationWorker(workerDone, cancel)
+	if !workerRetired {
+		measured = errors.Join(measured, errors.New("loadedtree perf: measurement worker did not retire"))
 	}
 	select {
 	case e := <-failures:

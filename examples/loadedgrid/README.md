@@ -76,3 +76,16 @@ selects a separate bounded scalar input ledger saved after native teardown,
 including failed warmups. It observes admissions, actual wheel remainder/scale
 and owner transitions; untraced means tag zero, not a desktop-origin assertion.
 The file must be new. These diagnostic samples cannot qualify warm latency.
+
+## Native presentation preflight
+
+`-perf -rows=10000 -perf-presentation=/private/tmp/new-loadedgrid-presentation.json`
+records a separate bounded raw journal using the public native presentation API.
+It excludes other diagnostic modes and requires a new file. Every performance
+event is labeled as diagnostic. The strict validator joins receipt, completed CPU
+generation and actual native presentation, retaining losses and teardown state.
+These serial runs cannot qualify sustained 60 Hz cadence or physical input latency.
+See the [capture contract](../../specs/presentation-capture.md) and current
+[Mac release policy](../../specs/macos-responsiveness.md); the earlier 4 ms budgets
+remain optimization targets. No real presentation journal has been qualified by
+this checkpoint.

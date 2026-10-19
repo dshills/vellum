@@ -1,0 +1,410 @@
+{
+  "scope": "macos-presentation-capture-7cbbb73",
+  "base_commit": "7cbbb73b393e8cf3164822958bcc41fcce59d2bc",
+  "checks": [
+    {
+      "check": "checks-v8-grid",
+      "receipt_sha256": "1cf2ee2b4dc37d54b0a74d965b032fc668a66832743946f373bf14f6e4c6523c",
+      "seconds": 25.565411082934588,
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "bytes": 10525,
+          "sha256": "bfff72824a33202494c41641e43b45b01c50f816538fb053795c9c41a5cc4938"
+        },
+        "stderr": {
+          "bytes": 1128,
+          "sha256": "e31a5cc4c4fb808bb15b8b98c0b6b3ae5bb832c6081af7d0e07446f405326546"
+        }
+      },
+      "owned": {
+        "created": true,
+        "pid": 77178,
+        "group": 77178,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 77178,
+          "members": [],
+          "observation_sha256": "a00dfa613aba5a391c6c5fa7ec8c3da0abaf99f13c62322e914479eee5bca653"
+        }
+      },
+      "top_level_test_methods": [
+        "TestActualLoadedGridWorkerRoutingAndFilterFIFO",
+        "TestActualLoadedGridAsyncEditingDraftAndConflict",
+        "TestActualLoadedGridAsyncEditRemovesFilteredRow",
+        "TestWorkerLatestQueryCancelCreditsAndRefusedSubmit",
+        "TestOwnerDomainCASStaleDraftAndFilteredEdit",
+        "TestWindowCloseRevokesResultButCanceledWorkerRetainsCredit",
+        "TestExternalRefusesPendingSettlementWithoutStrandingSave",
+        "TestFilterSettlementReadsAcknowledgedValueAndRefusesStaleWork",
+        "TestPerfWarmupRefusesOffsetsExtraCallbacksAndLayoutDrift",
+        "TestPerfInputLedgerExclusiveFailureEvidence",
+        "TestPerfActualViewportAndRoutedScroll",
+        "TestPerfPresentationSeparateMode",
+        "TestPresentationCaptureExclusiveFileAndFailurePreservation",
+        "TestPresentationCaptureNoAfterCloseClaimBeforeWorkerRetirement",
+        "TestPresentationCaptureAdmissionDisabledSymlinkAndCancellation",
+        "TestPresentationPrefixLossCannotBeFilteredByDraining",
+        "TestPresentationWorkerJoinRequiresTerminalAck",
+        "TestPresentationExecutableHashIsBoundedAndStable",
+        "TestPresentationRecordsCannotMasqueradeAsOrdinary",
+        "TestPresentationCaptureSetupFailureHasNoAfterCloseClaim",
+        "TestPresentationFrozenPrefixRequiresEntireCompletedCohort",
+        "TestPerfProfileWriterBudgetAndStickyFailure",
+        "TestPerfAllocationExclusivePairAndFailure",
+        "TestPerfAllocationSnapshotsBoundedAndFinishOnce",
+        "TestPerfAllocationDisabledInvalidAndRuntimeSnapshot",
+        "TestPerfProfileExclusiveAdmissionAndDisabled",
+        "TestPerfConfigAndClosedWarmTrajectory",
+        "TestPerfAllocationModeRequiresSeparateExplicitPerf",
+        "TestPerfSourceDetailsRequireExplicitPerfAndBoundedRecorder",
+        "TestPerfNestedSourceCostsDoNotBecomeAdditionalUIWork",
+        "TestPerfVariableRowsUseStoredSourceAndExactIndex",
+        "TestPerfGeometryCountsRenderedClipsAndIgnoresDomainOrdinal",
+        "TestPerfSourceCounterOverflowRefuses",
+        "TestPerfWindowObservationUsesQueuedMainAndDetachedValues",
+        "TestPerfWindowObservationRefusesStoppedWrongAndClosed",
+        "TestStoredRecordsImmutableDenseIndexAndCapabilities",
+        "TestStoredMillionRowsLogicalAndHeapMemory",
+        "TestGenerationAndCopyCancellationBounds"
+      ],
+      "binary": null
+    },
+    {
+      "check": "checks-v8-tree",
+      "receipt_sha256": "ba856fce7c1b3c155b0fe7222e8aebc0cb3fdad12aabee66ed8243078dbd22bf",
+      "seconds": 16.648862792062573,
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "bytes": 8276,
+          "sha256": "1a373970e25c180e17f89a2f0733efd03be874ecb00cd70edafcc81e64f3eee1"
+        },
+        "stderr": {
+          "bytes": 1128,
+          "sha256": "9c62edbd4d29b0a54d446b75b3a4ea926581051ddc11edaeecae18f98f594619"
+        }
+      },
+      "owned": {
+        "created": true,
+        "pid": 77165,
+        "group": 77165,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 77165,
+          "members": [],
+          "observation_sha256": "4c43cbc8c8958990e946d03f18d0067278d3ac9b05653b78d07e32e9cba393cd"
+        }
+      },
+      "top_level_test_methods": [
+        "TestActualStoredTreeRoutesAndWorkers",
+        "TestActualTreeDisclosureUsesWorker",
+        "TestActualCancelInitialLoaderBeforeWorker",
+        "TestStoredTreeDataHugeBranchDeepChain",
+        "TestWorkerLatestCancellationHiddenSelection",
+        "TestCanceledLoadAndWindowResultRefusal",
+        "TestIndexCommitRetainsCurrentCursorAndViewport",
+        "TestConsumerDomainCASAndHeldFilterCancellation",
+        "TestCompleteRefusalCancelAndRequestRetirement",
+        "TestCancelPublishedLoaderRejectsOlderToken",
+        "TestFailedPreparationCannotRetireNewerAdmission",
+        "TestTreePerfPresentationSeparateMode",
+        "TestPresentationCaptureExclusiveFileAndFailurePreservation",
+        "TestPresentationCaptureNoAfterCloseClaimBeforeWorkerRetirement",
+        "TestPresentationCaptureAdmissionDisabledSymlinkAndCancellation",
+        "TestPresentationPrefixLossCannotBeFilteredByDraining",
+        "TestPresentationWorkerJoinRequiresTerminalAck",
+        "TestPresentationExecutableHashIsBoundedAndStable",
+        "TestPresentationRecordsCannotMasqueradeAsOrdinary",
+        "TestPresentationCaptureSetupFailureHasNoAfterCloseClaim",
+        "TestPresentationFrozenPrefixRequiresEntireCompletedCohort",
+        "TestTreePerfConfigAndTrajectory",
+        "TestTreePerfGeometryRequiresActualClippedWorkload",
+        "TestTreePerfInspectionDistinguishesStartupAndRetirement",
+        "TestTreePerfModesAndSourceCapacity"
+      ],
+      "binary": null
+    },
+    {
+      "check": "checks-v8-vet-grid",
+      "receipt_sha256": "c7ad3d9a9802cbbe125fdd5084b2af294c61db284ecedb4b2227856e58e4618c",
+      "seconds": 1.8363654580898583,
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1023,
+          "sha256": "b586f077f5fc3f7a5c486b121b620d8cf2abca7c9f7da20c478a10b1de320614"
+        }
+      },
+      "owned": {
+        "created": true,
+        "pid": 77172,
+        "group": 77172,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 77172,
+          "members": [],
+          "observation_sha256": "9dd4acc96632185b913372169d9682ab0406bb482847c4946cb6d378da8f9868"
+        }
+      },
+      "top_level_test_methods": [],
+      "binary": null
+    },
+    {
+      "check": "checks-v8-vet-tree",
+      "receipt_sha256": "87076a65a5f9dd109f56ed0fff5d66503e37c396040d82f43bf0a7800c501d13",
+      "seconds": 1.8182667080545798,
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1023,
+          "sha256": "b586f077f5fc3f7a5c486b121b620d8cf2abca7c9f7da20c478a10b1de320614"
+        }
+      },
+      "owned": {
+        "created": true,
+        "pid": 77191,
+        "group": 77191,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 77191,
+          "members": [],
+          "observation_sha256": "9c0c8d26513769c4dc09e7e92073e44aef5d4210698ba8a1873c57767bc4534b"
+        }
+      },
+      "top_level_test_methods": [],
+      "binary": null
+    },
+    {
+      "check": "checks-v7-compile-grid",
+      "receipt_sha256": "99e69182ca84dbdc30abcdca44be5944bc438fe5a4183db58735e720cbad91c8",
+      "seconds": 7.013135082903318,
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1123,
+          "sha256": "272fa0309d1fa6bfd8ba4c904c5d350582215bce1379777072bf2ab9d18c2c75"
+        }
+      },
+      "owned": {
+        "created": true,
+        "pid": 76052,
+        "group": 76052,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 76052,
+          "members": [],
+          "observation_sha256": "b85465c5bc262b4d4ee6a52b1d90336ae9535266bcea7728ce58d8d00883794c"
+        }
+      },
+      "top_level_test_methods": [],
+      "binary": {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-capture-7cbbb73/checks-v7-compile-grid-unused",
+        "sha256": "935fba65f05a9fc206e5259d66a1a71074617e0f951936ff05f608aebdb40914",
+        "native_launch_admitted": false
+      }
+    },
+    {
+      "check": "checks-v7-compile-tree",
+      "receipt_sha256": "2654a7378e907d39d9611b7efb86aa7a17701ee5e08657f88990547474082fdc",
+      "seconds": 6.975212124991231,
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1123,
+          "sha256": "34c179c525b033efc13b1e35011b773b637fc649eb1df794d84986debc83431d"
+        }
+      },
+      "owned": {
+        "created": true,
+        "pid": 76054,
+        "group": 76054,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 76054,
+          "members": [],
+          "observation_sha256": "0fcda7258f9700c4aacd9af7a16379af176f4550306ff42927e2b76bccfb4ec6"
+        }
+      },
+      "top_level_test_methods": [],
+      "binary": {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-capture-7cbbb73/checks-v7-compile-tree-unused",
+        "sha256": "2d3a756ca4fc31ac3ec4f7382eb4aa3096f83705a29edcfb5ce47ec23404f4dc",
+        "native_launch_admitted": false
+      }
+    },
+    {
+      "check": "checks-v6-python",
+      "receipt_sha256": "77cd22664fa89a612ce153c6be8665c440d7bfbadb0b2349c2da13284df667d3",
+      "seconds": 2.4337282499764115,
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1048,
+          "sha256": "7e33be69bb411f58e0855496dc8c511801216f56ed3efb86515cae18bdea2050"
+        }
+      },
+      "owned": {
+        "created": true,
+        "pid": 71084,
+        "group": 71084,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 71084,
+          "members": [],
+          "observation_sha256": "08329ef0b4cf99b6f606772d371e2421037ef92fb0ef53d27b6fbf9e5e4b1797"
+        }
+      },
+      "top_level_test_methods": [
+        "test_both_methods_all_tags_and_zero_drawable_id",
+        "test_bounded_strict_file_loading",
+        "test_cli_validates_binary_hash_and_remains_nonqualifying",
+        "test_composition_identity_cannot_be_reused_or_changed",
+        "test_external_modfile_without_vcs_requires_binary_binding",
+        "test_generation_intermediate_and_presentation_order",
+        "test_missing_duplicate_unknown_and_capacity_controls",
+        "test_nonregular_and_symlink_input_refused_without_blocking",
+        "test_same_composition_may_repeat_with_identical_stamp",
+        "test_schema_clock_identity_loss_and_scope_controls"
+      ],
+      "binary": null
+    }
+  ],
+  "native_window_or_real_feedback_executed": false,
+  "continuous_pacing_qualified": false,
+  "physical_latency_qualified": false,
+  "sdk_changed": false,
+  "prepared_native_sources_changed": false,
+  "gates_closed": [],
+  "build_info": {
+    "grid": {
+      "binary_sha256": "935fba65f05a9fc206e5259d66a1a71074617e0f951936ff05f608aebdb40914",
+      "metadata_sha256": "dfc6b8d5b9c483e1e108a6f36583d78bcdba48c378df8feef2cc13f69562c36d",
+      "VCS_stamp_present": false,
+      "actual_application_executed": false
+    },
+    "tree": {
+      "binary_sha256": "2d3a756ca4fc31ac3ec4f7382eb4aa3096f83705a29edcfb5ce47ec23404f4dc",
+      "metadata_sha256": "5c5bfbfedf440952417198831ff360550068fd55f76aece37fb8241c67a7391c",
+      "VCS_stamp_present": false,
+      "actual_application_executed": false
+    }
+  },
+  "failed_intermediate_checks": [
+    {
+      "check": "checks-v7-grid",
+      "receipt_sha256": "77e5f3ee50d8963636924122d05957c65cbb6f42dfa7b8bd8ed7e4d3a5e0ed53",
+      "exit_code": 1,
+      "logs": {
+        "stdout": {
+          "bytes": 71,
+          "sha256": "24b0ab84cb9f46ca928ccbb46db16f20009fc0a09d370b9acf3a95a6117d5a9c"
+        },
+        "stderr": {
+          "bytes": 2105,
+          "sha256": "c8a4726c1132deed2be963fd2f6af3643ec140083cacaf191ab4585fcbc342d1"
+        }
+      },
+      "reason": "regression fixture initialized promoted Frame fields as top-level literal fields; corrected fixture only"
+    },
+    {
+      "check": "checks-v7-tree",
+      "receipt_sha256": "c5b00612d1ee9fc01ea40fc9da7e7e4eda21c4dd215bbeca645b0d9866c8edd9",
+      "exit_code": 1,
+      "logs": {
+        "stdout": {
+          "bytes": 71,
+          "sha256": "05f3d3f4a5b8ace48b035db3a0e78c5e1fc8d675bc846dde8aaa8d66aecdcf47"
+        },
+        "stderr": {
+          "bytes": 2105,
+          "sha256": "80c6ef64c9a9a5aeb0d9956553c90e98357b308caa01451d72584f5ad9e24ed8"
+        }
+      },
+      "reason": "regression fixture initialized promoted Frame fields as top-level literal fields; corrected fixture only"
+    },
+    {
+      "check": "checks-v7-vet-grid",
+      "receipt_sha256": "27d4b5f480404414728bedf4ffdbcdb8212a4fcdc62bb78b1a10fea8bef488b8",
+      "exit_code": 1,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1232,
+          "sha256": "2584dc4f4e513ee75196b43022e632fa284f7f1439d10de95a8ee82bf7c8eb23"
+        }
+      },
+      "reason": "regression fixture initialized promoted Frame fields as top-level literal fields; corrected fixture only"
+    },
+    {
+      "check": "checks-v7-vet-tree",
+      "receipt_sha256": "a8dea17975ebd653b371d9bbb1e460ff7966b821d242d25ea825dc7c646bf67e",
+      "exit_code": 1,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1232,
+          "sha256": "0b45b28f7465bb1f2350bec82eba536a719831e50b3952e0ba0221301d640c2b"
+        }
+      },
+      "reason": "regression fixture initialized promoted Frame fields as top-level literal fields; corrected fixture only"
+    }
+  ],
+  "prism": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "calls": 1,
+    "receipt_sha256": "41fe70c2976330ec8a3592db7b5852eb7d479535ec841d67c85da24854b46eee",
+    "command_sha256": "a6fb02815fc958b5414bf85f0039d5a0abc8fd2e5d0c740ce0d5cf5518788975",
+    "reviewed_files": 20,
+    "reviewed_bytes": 98385,
+    "finding": "accepted focused producer cohort hardening; final fix reviewed internally"
+  }
+}

@@ -18,15 +18,16 @@ const perfPeriod = 64
 const perfMinCells = 400
 
 type perfConfig struct {
-	Rows              int
-	Variable          bool
-	Samples, Warmup   int
-	Novel             bool
-	CPUProfile        string
-	AllocationProfile string
-	SourceDetails     bool
-	InputDetails      string
-	GPUSceneRendering bool
+	Rows                int
+	Variable            bool
+	Samples, Warmup     int
+	Novel               bool
+	CPUProfile          string
+	AllocationProfile   string
+	SourceDetails       bool
+	InputDetails        string
+	PresentationDetails string
+	GPUSceneRendering   bool
 }
 
 func validatePerfModes(perf, smoke, sourceDetails bool, profile, allocation string) error {
@@ -46,6 +47,9 @@ func validatePerfModes(perf, smoke, sourceDetails bool, profile, allocation stri
 }
 
 func (c perfConfig) validate() error {
+	if !validPresentationPath(c.PresentationDetails) || c.PresentationDetails != "" && (c.SourceDetails || c.CPUProfile != "" || c.AllocationProfile != "" || c.InputDetails != "") {
+		return errors.New("loadedgrid perf: presentation capture requires a new separate diagnostic path and mode")
+	}
 	if !validPerfAllocationPrefix(c.AllocationProfile) || c.AllocationProfile != "" && (c.CPUProfile != "" || c.SourceDetails || c.InputDetails != "") {
 		return errors.New("loadedgrid perf: allocation profiling requires a valid separate diagnostic prefix and mode")
 	}

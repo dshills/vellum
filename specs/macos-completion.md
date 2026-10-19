@@ -9,6 +9,13 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
+The [serial capture checkpoint](../docs/reports/macos-presentation-capture/README.md)
+adds opt-in stored grid/tree journals and a strict offline validator. Race tests,
+vet, native builds and synthetic journal controls pass. No real native feedback
+was captured here; serial scroll intervals do not qualify sustained 60 Hz pacing.
+Callback/clock/lifecycle proof and a continuously changing campaign remain open.
+
+
 Execution order, milestone exit criteria and limits on investigation/review are
 maintained in the [Mac delivery plan](macos-delivery.md). This file retains the
 full acceptance scope and historical evidence.
