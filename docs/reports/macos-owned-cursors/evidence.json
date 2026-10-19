@@ -1,0 +1,1702 @@
+{
+  "schema": 1,
+  "base": "e17d35947e37d56a861343a2d6c134f871c4e668",
+  "scope": "Original cursor artwork/preparation and headless SDK/build/app packaging; no Mac gate closure",
+  "units": {
+    "methods": 54,
+    "passed": true
+  },
+  "raster": {
+    "tests": 3,
+    "subcases": 390,
+    "passed": true,
+    "physical_pointer_verified": false
+  },
+  "sdk": {
+    "result": "PASS_SDK_OWNED_CURSOR_ARTWORK",
+    "sdk_files": 8119,
+    "archive": {
+      "archive": "/private/tmp/vellum-owned-cursors-e17d359-v3/sdk.tar.gz",
+      "sha256": "33504ff40f24605b71dede2d19ec91f2834895252efa33030ee976d2176cb7cd",
+      "version": "v0.1.0-alpha.2",
+      "modules": 89,
+      "private_build": true
+    },
+    "source": {
+      "clean": false,
+      "commit": "e17d35947e37d56a861343a2d6c134f871c4e668"
+    },
+    "added": [
+      "THIRD_PARTY_NOTICES/52587f40b684ebe8/cursors/LICENSE_VELLUM.txt",
+      "THIRD_PARTY_NOTICES/52587f40b684ebe8/cursors/NOTICE.md",
+      "drivers/cogent/build/upstream/cursors/LICENSE_VELLUM.txt",
+      "drivers/cogent/build/upstream/cursors/NOTICE.md",
+      "drivers/cogent/build/upstream/cursors/cursorimg/owned_art_test.go",
+      "drivers/cogent/build/upstream/cursors/owned-assets.json",
+      "drivers/cogent/build/upstream/cursors/owned_art_test.go",
+      "drivers/cogent/native/assets/cursors/LICENSE",
+      "drivers/cogent/native/assets/cursors/README.md",
+      "drivers/cogent/native/assets/cursors/alias.svg",
+      "drivers/cogent/native/assets/cursors/arrow.svg",
+      "drivers/cogent/native/assets/cursors/cell.svg",
+      "drivers/cogent/native/assets/cursors/context-menu.svg",
+      "drivers/cogent/native/assets/cursors/copy.svg",
+      "drivers/cogent/native/assets/cursors/crosshair.svg",
+      "drivers/cogent/native/assets/cursors/generate.py",
+      "drivers/cogent/native/assets/cursors/grab.svg",
+      "drivers/cogent/native/assets/cursors/grabbing.svg",
+      "drivers/cogent/native/assets/cursors/help.svg",
+      "drivers/cogent/native/assets/cursors/manifest.json",
+      "drivers/cogent/native/assets/cursors/move.svg",
+      "drivers/cogent/native/assets/cursors/not-allowed.svg",
+      "drivers/cogent/native/assets/cursors/pointer.svg",
+      "drivers/cogent/native/assets/cursors/poof.svg",
+      "drivers/cogent/native/assets/cursors/progress.svg",
+      "drivers/cogent/native/assets/cursors/resize-col.svg",
+      "drivers/cogent/native/assets/cursors/resize-down.svg",
+      "drivers/cogent/native/assets/cursors/resize-e.svg",
+      "drivers/cogent/native/assets/cursors/resize-ew.svg",
+      "drivers/cogent/native/assets/cursors/resize-left.svg",
+      "drivers/cogent/native/assets/cursors/resize-n.svg",
+      "drivers/cogent/native/assets/cursors/resize-ne.svg",
+      "drivers/cogent/native/assets/cursors/resize-nesw.svg",
+      "drivers/cogent/native/assets/cursors/resize-ns.svg",
+      "drivers/cogent/native/assets/cursors/resize-nw.svg",
+      "drivers/cogent/native/assets/cursors/resize-nwse.svg",
+      "drivers/cogent/native/assets/cursors/resize-right.svg",
+      "drivers/cogent/native/assets/cursors/resize-row.svg",
+      "drivers/cogent/native/assets/cursors/resize-s.svg",
+      "drivers/cogent/native/assets/cursors/resize-se.svg",
+      "drivers/cogent/native/assets/cursors/resize-sw.svg",
+      "drivers/cogent/native/assets/cursors/resize-up.svg",
+      "drivers/cogent/native/assets/cursors/resize-w.svg",
+      "drivers/cogent/native/assets/cursors/screenshot-selection.svg",
+      "drivers/cogent/native/assets/cursors/screenshot-window.svg",
+      "drivers/cogent/native/assets/cursors/text.svg",
+      "drivers/cogent/native/assets/cursors/vertical-text.svg",
+      "drivers/cogent/native/assets/cursors/wait.svg",
+      "drivers/cogent/native/assets/cursors/zoom-in.svg",
+      "drivers/cogent/native/assets/cursors/zoom-out.svg",
+      "drivers/cogent/native/patches/ownedcursors/0089-owned-cursor-artwork.patch",
+      "drivers/cogent/native/patches/ownedcursors/fixture-original-hashes.json",
+      "drivers/cogent/native/patches/ownedcursors/fixture-output-hashes.json",
+      "drivers/cogent/native/patches/ownedcursors/original-hashes.json",
+      "drivers/cogent/native/patches/ownedcursors/output-hashes.json",
+      "specs/cursor-artwork.md"
+    ],
+    "changed": [
+      "THIRD_PARTY_INVENTORY.json",
+      "drivers/cogent/build/upstream/cursors/README.md",
+      "drivers/cogent/build/upstream/cursors/cursors.go",
+      "drivers/cogent/build/upstream/cursors/svg/alias.svg",
+      "drivers/cogent/build/upstream/cursors/svg/arrow.svg",
+      "drivers/cogent/build/upstream/cursors/svg/cell.svg",
+      "drivers/cogent/build/upstream/cursors/svg/context-menu.svg",
+      "drivers/cogent/build/upstream/cursors/svg/copy.svg",
+      "drivers/cogent/build/upstream/cursors/svg/crosshair.svg",
+      "drivers/cogent/build/upstream/cursors/svg/grab.svg",
+      "drivers/cogent/build/upstream/cursors/svg/grabbing.svg",
+      "drivers/cogent/build/upstream/cursors/svg/help.svg",
+      "drivers/cogent/build/upstream/cursors/svg/move.svg",
+      "drivers/cogent/build/upstream/cursors/svg/not-allowed.svg",
+      "drivers/cogent/build/upstream/cursors/svg/pointer.svg",
+      "drivers/cogent/build/upstream/cursors/svg/poof.svg",
+      "drivers/cogent/build/upstream/cursors/svg/progress.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-col.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-down.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-e.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-ew.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-left.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-n.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-ne.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-nesw.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-ns.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-nw.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-nwse.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-right.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-row.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-s.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-se.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-sw.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-up.svg",
+      "drivers/cogent/build/upstream/cursors/svg/resize-w.svg",
+      "drivers/cogent/build/upstream/cursors/svg/screenshot-selection.svg",
+      "drivers/cogent/build/upstream/cursors/svg/screenshot-window.svg",
+      "drivers/cogent/build/upstream/cursors/svg/text.svg",
+      "drivers/cogent/build/upstream/cursors/svg/vertical-text.svg",
+      "drivers/cogent/build/upstream/cursors/svg/wait.svg",
+      "drivers/cogent/build/upstream/cursors/svg/zoom-in.svg",
+      "drivers/cogent/build/upstream/cursors/svg/zoom-out.svg",
+      "drivers/cogent/build/upstream/svg/testdata/svg/zoom-in.svg",
+      "drivers/cogent/native/dependencies.json",
+      "drivers/cogent/prepare.py",
+      "drivers/cogent/prepare_test.py",
+      "specs/macos-delivery.md"
+    ],
+    "notice_deltas": {
+      "cogentcore.org/core": {
+        "cursors/LICENSE_VELLUM.txt": {
+          "file": "cursors/LICENSE_VELLUM.txt",
+          "notice": "52587f40b684ebe8/cursors/LICENSE_VELLUM.txt",
+          "sha256": "07c4328563b9066be35c2ac90c6744e6ac904882fd2355ea82d7f0756c940b43"
+        },
+        "cursors/NOTICE.md": {
+          "file": "cursors/NOTICE.md",
+          "notice": "52587f40b684ebe8/cursors/NOTICE.md",
+          "sha256": "b33482464d92f006606e9e28a21ace824f9a55aac2be36f0d0891e86d6ceef0d"
+        }
+      }
+    }
+  },
+  "native_build": {
+    "result": "PASS_FRESH_NATIVE_BUILD_AND_UNSIGNED_APP",
+    "binary_sha256": "3d788e548cc35d433dafd6e30287608ca6f0b08ea9ffdc74463282aeea8f02b8",
+    "selected_native_members": 141,
+    "notice_components": 176,
+    "notice_files": 398,
+    "SDK_unchanged": true,
+    "native_app_launched": false
+  },
+  "artifacts": {
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/owned_art_test.go.txt": {
+      "bytes": 2319,
+      "sha256": "125c35b3cbfa1a908526505cf022ac0c2459309195a10538ec6f970b49801f4f"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prepare-v4-plan.json": {
+      "bytes": 1060,
+      "sha256": "dbad1b916a30a4e7a93715fd5f935da33d53a71281d7a235668dfadfb17514e1"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/implementation-v1.json": {
+      "bytes": 15836,
+      "sha256": "921d0ffd2f15773451aab41ef9677dc967d096e6880d6248ac0c290de9be4a57"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/author-assets.py": {
+      "bytes": 5730,
+      "sha256": "df1133a0061b1e8790240fd5f95025f8a70a6e72c5794f6329010d3e9b2caada"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prepare-v2-result.json": {
+      "bytes": 3537,
+      "sha256": "84664e3b1f0884030b2ce7e262aadc6f69db4a7b47033b2e6332d3dfdff0f316"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/overlay-unit-v2.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/generation.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prepare-v3-inputs.json": {
+      "bytes": 1047965,
+      "sha256": "a8f7b4cfe26d665d77d7010f2d5d3ebd7065c4d1b4d0cf4e0e35fd66e1a9cdcc"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/clean-plan.json": {
+      "bytes": 1328,
+      "sha256": "398f5b2666c2dcef6f90fad34b97d9d71eb49fd49c43a52f2e4e5fd67a9615f9"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/generation-renewal-plan.json": {
+      "bytes": 488,
+      "sha256": "e208e4615ac27a5178311cfcd4c827c50e6b35495f8d6428d602104b55366659"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/build-all.py": {
+      "bytes": 4059,
+      "sha256": "031166ae8715613ced6826d722924e99e05cefd391b06bd4858540adce8f0c6a"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prepare-inputs.json": {
+      "bytes": 1047415,
+      "sha256": "05c6e80d603c13abdca5952b45bbaf8d49b2f2feb1a3844d8f87ea39b57a5c94"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/verify-app-v2-source.py": {
+      "bytes": 2713,
+      "sha256": "414342f6f72a0ef495c7e7975ed2bcf3071583519bf947fb4d17f2d5e3d694be"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/fresh-preparation.json": {
+      "bytes": 679742,
+      "sha256": "c89a27eed69cd27689b15d215ecd0a0c7e92fca27d1d510feb052c8107975fab"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/inspection-v2-plan.json": {
+      "bytes": 492,
+      "sha256": "0b817d0ddd77b51a4220120fc2b2ef74762609e173d26ded97c22ab9ffa3b652"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/inspect-sdk-v2-source.py": {
+      "bytes": 3987,
+      "sha256": "556c6898c1bb8f33a3e39ef29747e535e0afb02d60146f1cff2601df29fb9c5d"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/app-notice-validation.json": {
+      "bytes": 604,
+      "sha256": "e7af0f1bbb44dace2f42165d14d1723d2698b265391fd4612c51af64397c8b1f"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/generation-refusal-v2.stderr": {
+      "bytes": 576,
+      "sha256": "a40901fcecab8bb75dcee1a79e484175e3f9f13604400592717e195b68de5855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/inspection-v2-result.json": {
+      "bytes": 3713,
+      "sha256": "64513be4553fbb6e2fc8b916ce6d730c6496d9ab969091b4b76734bd37fbfa22"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/units.py": {
+      "bytes": 597,
+      "sha256": "12aef42cd886dde49a28f1e83db53a952a172a82ed59c3d4e5c22d897a5e4170"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prepare-v2-plan.json": {
+      "bytes": 1060,
+      "sha256": "ecd0b574ee0a0e82e3d95066e37bf042115c04522cbb9eebca7c0571d8d49be4"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/inspect-sdk.py": {
+      "bytes": 4162,
+      "sha256": "abbe9ed347551018456220c706e78a280fb5c2aa0a606c9aafe3f0ba748d512c"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/checkpoint.py": {
+      "bytes": 10722,
+      "sha256": "07119332935315bb20c4b67cf02b6ffaca3172265ad9cf9e1dd47dea17b7b4ac"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/app-artifact-result.json": {
+      "bytes": 94631,
+      "sha256": "301cbde820bb953867447df2d511e560ec5c0b0ad866118dee3611cb35655083"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/inspection-v3-inputs.json": {
+      "bytes": 1046905,
+      "sha256": "8c1b73382850dae1da8458b2bbd3e3873da596dd3ff65996d488aa8d25ff944a"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/builds-plan.json": {
+      "bytes": 1627,
+      "sha256": "45eee54afd70efdef559e9cf703b044ff5c00e21b9fbd02df980e6f782014217"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/report-v1-evidence.json": {
+      "bytes": 89075,
+      "sha256": "ad1a2561479416c397b4467cb9beca92772d70b012e7a7eec651b048e4a509a9"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/fresh-preparation-v3.json": {
+      "bytes": 679782,
+      "sha256": "669f43341094448b33482051c617b1301fddd32723986d49c9df4e13969d6cb4"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/sdk-inputs.json": {
+      "bytes": 1048634,
+      "sha256": "474d9d10c4a4629b2d9150ecfe0b920301e9c03ac260a97f92466559084e1969"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/overlay-code.py.txt": {
+      "bytes": 8436,
+      "sha256": "90c0564739683f2c76395c56e2dbdf0c60e0fa815923c7ab7524d2f3e2504f9d"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/generation-renewal-inputs.json": {
+      "bytes": 1047693,
+      "sha256": "5857cecc2ded0642b389d8e6c42b17fe970506fba30433b01d46fdc4bff9e7a4"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/baseline-cursors.json": {
+      "bytes": 5016,
+      "sha256": "38025eb1b8e572ab192d4b7ee758a9386fecdf724443f5deb96b5505adfd1a81"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/generation-v2-result.json": {
+      "bytes": 3686,
+      "sha256": "f625cb46ef7688b19b54e3ccf06ae7e4fc549f9a92b878ec527997bcaf81ab14"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/notice-origins.json": {
+      "bytes": 230435,
+      "sha256": "7012a4335c4209886c4b413397ed4c3b86df005e784d1a1b6998f4bff00478a9"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/implementation.json": {
+      "bytes": 16400,
+      "sha256": "d3a5e2686567964beb7913b89d12ab784f5a7db293b7d880c782bfccf353d457"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prepare-check-attempt-v3-source.py": {
+      "bytes": 1485,
+      "sha256": "bce17649dc34b30b1e16e7557487965a647807e66e68c7565997000637731e86"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/builds-v2-result.json": {
+      "bytes": 10750,
+      "sha256": "05f4b8ebd273ec1b521746b374bbc5fdbacf5a8cda882daabc98c4a3dff9a7d6"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/execute-attempt-v3-source.py": {
+      "bytes": 3210,
+      "sha256": "2489e2057c1cdc535cd87321c302eb4d32fca4f0aabd46e2b7f612406ce0be74"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/grouped-attempt-v3-source.py": {
+      "bytes": 1614,
+      "sha256": "4f34757fd122f0880328a2a1fdc2324d1da810e356e822b641a092e137efcbf1"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/internal-integration-source-review.json": {
+      "bytes": 23873,
+      "sha256": "4624673b95f9a0e307d8a563f77de33835a7d01e56f2f0c3796b8cd5a88224fb"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/checkpoint-checkpoint-v1.py": {
+      "bytes": 10235,
+      "sha256": "54eeb2bdd827da2a16fa0404024a5c331299018ce3bc63a2d62df8ac6e0d8cb2"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prepare-v4-result.json": {
+      "bytes": 10260,
+      "sha256": "30b3d33ebfcd2f979fb6ac4d9cb4809eb5fc521bd9ca2cac5efc19b18295fc31"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/package-notices.py": {
+      "bytes": 1066,
+      "sha256": "1dca409d74a92c99b87c50fd25e77cf5ab93bb7bd6372c3385719447319bfd22"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/inspection-v3-plan.json": {
+      "bytes": 436,
+      "sha256": "c35ba00e08898a12086e50e2e5a28f9ce4ba032646b73d3e0958b7ec8ac34824"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/sdk-v2-plan.json": {
+      "bytes": 1382,
+      "sha256": "e9b01936fa1f3dd4432da511f58b51218f6798a9c0bb7f58beb9efa2f9e348ee"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/cursorimg_test.go.txt": {
+      "bytes": 3286,
+      "sha256": "e74ee96d2ab85115dcec16e761aa5605db564f9020b883dbe2333b242ec08cb3"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/generation-refusal-v2.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/app-v2-result.json": {
+      "bytes": 11458,
+      "sha256": "b3e6c9d9fed921234469060d002fbe960286006e61ab6a4f66a897adfb67d829"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/authorship.json": {
+      "bytes": 6197,
+      "sha256": "39ae9024de1c83e9fa4b804ada291a86428e6ca0fb0d6a3a3ea8413f57e88dab"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/execute.py": {
+      "bytes": 3210,
+      "sha256": "b846ef6c3d0e077b563a185bf9f0e9bd616fffe41688270e86678fbfaf166c89"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/existing-notices-check.py": {
+      "bytes": 1200,
+      "sha256": "a6d206935236525bfc4eff244a9fa0226e997d640e44188cd1e5db875ab415cd"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/inspection-final-result.json": {
+      "bytes": 3659,
+      "sha256": "32adaccd84b201642b9a0bbb851ea4481418817a955a09cff5dbcb166c9e972b"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/builds-result.json": {
+      "bytes": 7384,
+      "sha256": "4ae66cfb72898e7759abdc8f18e3b027cdb4975d284a69e5c5ef077c83d6f320"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/build-all-v1-source.py": {
+      "bytes": 3661,
+      "sha256": "272bac53807b6d9b2c9b62255575dc69ac07ce018bddf5440b8c05dc8af37f7e"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/inspect-sdk-attempt-v3-source.py": {
+      "bytes": 4162,
+      "sha256": "acdfe5cdc216de6ba57eb7ca2d6ac95b0a5e433e5e168abdfd9c1b3f1e03bead"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commit.py": {
+      "bytes": 3991,
+      "sha256": "6e4314fee4c6c30134c9758a1046351809f35742b4225ab313d3f9b148f109cd"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/app-result.json": {
+      "bytes": 94631,
+      "sha256": "301cbde820bb953867447df2d511e560ec5c0b0ad866118dee3611cb35655083"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prepare-v3-plan.json": {
+      "bytes": 1060,
+      "sha256": "c0db2c1c66695ed327f5774bdad257d9b7fa20c87d2c8fe5a0c6ce6891bd02bf"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/sdk-v2-result.json": {
+      "bytes": 4384,
+      "sha256": "cb6836cd208eb392c21fb43838e4a02ffb64d661b4308173bd184685c90f5d9b"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/fix-duplicate.py": {
+      "bytes": 3786,
+      "sha256": "9c1bc3150d4476337c5ce2b37aff97d1eccd487bc5ad1f78f7141e55adcb683a"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/overlay-unit-v2.stderr": {
+      "bytes": 3637,
+      "sha256": "a13b965dc340c218b3a2e6523cf48bfcb55ab3ad845c8169a3c9c2d69b4830e0"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/grouped-sdk-package-source.py": {
+      "bytes": 1614,
+      "sha256": "d4c34f8c05f103e14d862b7df31aaba29df10472068fedad5db42ece4f266cde"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/review.py": {
+      "bytes": 2111,
+      "sha256": "e2fe4983688a6fa8da676d926960f590291b5b01639e46c544731ffd3035fc85"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/generation.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prism-rules.json": {
+      "bytes": 993,
+      "sha256": "bb35376fabc093c47a3aa41d1867aa70e61967ed52a3d41dd68ca5a6eb7a8eff"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/candidate-install-result.json": {
+      "bytes": 109,
+      "sha256": "3cbd0356dd966087592576d50605edeecbbad554fe988f19a869d4d27af0a92c"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/wire.py": {
+      "bytes": 7378,
+      "sha256": "81e7f0e7d7c9d890b0986f52c19bef058ac0d86030c932e5ce6f2bc8e329012e"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/generation-refusal.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/overlay-unit-v1-source.py": {
+      "bytes": 30393,
+      "sha256": "3dc33a0c686ff421791ffb3e90d01249e75d128078ac8ae4e281cd574ebd0297"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/sdk-result.json": {
+      "bytes": 11549,
+      "sha256": "eceee15c5bd1c94dc01cc411592e43acf38a1e906ce86472300448c6969dc528"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/old-artwork-discovery.json": {
+      "bytes": 223,
+      "sha256": "7b833ee341e0d4393e63afe898ae652f615a2a8755ad9c7ab7d0a71915e7e9b1"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/generation-renewal-result.json": {
+      "bytes": 3612,
+      "sha256": "ca90289af9e9f1295b73da173ab96228bee9b29806e5bd320a62ba0a02711a12"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/internal-fixture-source-review.json": {
+      "bytes": 12569,
+      "sha256": "a5b3381f79c251596ef137b35574d9fa8e6ed2c1aaf044389afcc8ea719ab3af"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/candidate-install.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/inspection-v2-inputs.json": {
+      "bytes": 1046963,
+      "sha256": "76339adc8090154e466aa6ff8022f19540a1967928827d9e4e24eecf8af6989b"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/internal-overlay-review.json": {
+      "bytes": 4997,
+      "sha256": "0ca0834c50d2544e2f93baa4624fe3db8c3f9928a0cc3265bb21ebb2699dac29"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/verify-app.py": {
+      "bytes": 2722,
+      "sha256": "b9e759c393e6cfefb668275c1bb155ea610f216f6db829475da54a4f8e1e43c7"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/all-mains.json": {
+      "bytes": 285772,
+      "sha256": "5064009c50622c57d0b69222e00ff4c864f0da9afec66f30c526427baf9cb9ce"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/overlay-unit-v3.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/candidate-install-v2-result.json": {
+      "bytes": 79,
+      "sha256": "71e53aada5867187efd58dabc38cc42b72c9d2cfabebb9ba22082da1d04019d1"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/inspection-v3-result.json": {
+      "bytes": 3632,
+      "sha256": "77a4c60971c980b7100a7ee1566fb2f9440b73fbb8b69e3e61e6266692c78ef4"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/generation-check.py": {
+      "bytes": 1345,
+      "sha256": "340b20156f31a5697ef6528b7d03a82f10ed86b333d539e8ed9d777b4c078e61"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/app-notice-inputs.json": {
+      "bytes": 751,
+      "sha256": "5f6e2d6a32b4dbb1ee6e2f738e23d51b7e96b3473f6aee152d7f18b979908b8c"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prepare-result.json": {
+      "bytes": 10232,
+      "sha256": "af1ede746c53a64df49f373eee844c897b607c8fa40a6799f5549512231816fc"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/generation-v2.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/app-v2-plan.json": {
+      "bytes": 1844,
+      "sha256": "3fa6a52aa6ccbb5a36d11b2541303331ec5ae1f0eab155a3f5bef51a3f8136c5"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/inspection-final-plan.json": {
+      "bytes": 501,
+      "sha256": "5a487b30a1093ce0402b9b8e18be3e0dc4dd0e06c155e53be77c007fffb8846d"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/overlay-unit-v1.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prepare-plan.json": {
+      "bytes": 1048,
+      "sha256": "cf1928d42a5c3e77fcf751890cd99d6fb27cd0fdbb2cf8d359b21be19c9a6c34"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/candidate-install-v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prepare-v2-inputs.json": {
+      "bytes": 1047575,
+      "sha256": "58659e58360005615958725272662be5eb1aee1f7ff9b87a7ef4a678b1b2f0d4"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prepare-v3-result.json": {
+      "bytes": 6890,
+      "sha256": "cd68e30ece78b1d6344ca0ade177d64a14fb3afd60f2e1758f91795cb8da7eb8"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/scope-checkpoint-v1.json": {
+      "bytes": 12258260,
+      "sha256": "f18c2b8d432827725a4aa5376747e39b3bb7ca2ccfcbeeda1c458fb09f54ddbc"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/sdk-v2-inputs.json": {
+      "bytes": 1048443,
+      "sha256": "81a9dac5a8d940316d52ebb4629b6bf0cd49d1f853bd2452d393033b3e41d07c"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/contact.go.txt": {
+      "bytes": 1539,
+      "sha256": "0ec6648e04d2cded14b5149238107838a75f1574d904d817d569ce0d39cfd4d6"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/candidate-install-v2.stdout": {
+      "bytes": 25591,
+      "sha256": "4a15c45d9856e40e75203caa1f35e1a3bd338a84a9b4878f505f56e98a424a40"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prepare-check-attempt-v1-source.py": {
+      "bytes": 1479,
+      "sha256": "c638b6dbc59f235a2501e5b449d63e8f28d52ff5d542c5c71c975e848891a7da"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/execute-attempt-v1-source.py": {
+      "bytes": 3207,
+      "sha256": "e6548c486212f38d343cabfdb4cf2bdef709d7269409aaf04ff80d030c47c7cc"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/grouped-attempt-v1-source.py": {
+      "bytes": 1611,
+      "sha256": "a583cca0ffb1d1fcb191c37b439a02d4ea2ab079f3ffd50d1741b2daa26e4fb6"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/builds-inputs.json": {
+      "bytes": 1048702,
+      "sha256": "d6a155aaa522f57833316a20dc7e9b48bb6f6216130fbab727c5bd319e08a97a"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/inspect-sdk-v1-source.py": {
+      "bytes": 4014,
+      "sha256": "52fac7788357ad93dabdd2a73e2deb09ff70301ae7bb02b1102d98f532ee54a3"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/generation-check-v2.py": {
+      "bytes": 1363,
+      "sha256": "f271af592e895c82d57384fc26e54e32f8adba68efb3850e3023eec3e03da402"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/generation-v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/app-inputs.json": {
+      "bytes": 1049629,
+      "sha256": "d06daf46d3bbed72d7fdbfe4c5468f471ff487c99d7b37afd0aed714d2cd7250"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/sdk-inspection.json": {
+      "bytes": 1083575,
+      "sha256": "fcce91d8db42da5af8d40c143f1aac9d8e7343f01abb425e832245ea8df79193"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/verify-app-v1-source.py": {
+      "bytes": 2723,
+      "sha256": "5c855cd099248ab67089eb698711a9d53e2e38c46fc49c53dcc9a5e43ce2776d"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/internal-overlay-correction-review.json": {
+      "bytes": 3603,
+      "sha256": "023b8f44fe5f16cfcd2cbe66f5c40065174cd7ef03cceba6d315f40ecd8dc1b1"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/app-plan.json": {
+      "bytes": 2178,
+      "sha256": "8835ba4e8768019f575ece44ceaea9b81fdf937a13fb4d7559caffa1338f8c08"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/overlay-unit-v1.stderr": {
+      "bytes": 4804,
+      "sha256": "2e2f67ab2c0f6fa55bcf27087d1e71e270630312c9d1bd727a6371fa6f68cb62"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/grouped.py": {
+      "bytes": 1692,
+      "sha256": "f322a76d157697db30989fd77b1a78f453d7da99bfe1af3d962c3fcfa3811437"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/app-v2-inputs.json": {
+      "bytes": 1049111,
+      "sha256": "9a1f788fba2178c5f273efbb0cff4d78968c6a9eaad47dad1781fb301c6fd145"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/candidate-install.stdout": {
+      "bytes": 25591,
+      "sha256": "4a15c45d9856e40e75203caa1f35e1a3bd338a84a9b4878f505f56e98a424a40"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/overlay-unit-v3.stderr": {
+      "bytes": 4009,
+      "sha256": "dbc615fc7e1484cb94f0d3d508677e92995323e7858c487b294defe4e7e6659c"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/clean-verify.py": {
+      "bytes": 1862,
+      "sha256": "baad3e49f214142f3a2fd606d4a6f51a6a66dd0ec551e451474b0429a00c0e2b"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/inspect-sdk-attempt-v1-source.py": {
+      "bytes": 4134,
+      "sha256": "0f4c8ee9295e6984f6fab486a43fa4aeed9de0765520e68bdf3836a06cecdbea"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/inspection-final-inputs.json": {
+      "bytes": 1047362,
+      "sha256": "a9ea3b660ed9c83b86770a660d3c13d25c9917e4a1e4176297974ba5599d9d47"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/overlay-tests.py.txt": {
+      "bytes": 13921,
+      "sha256": "049b88fd25939ce69b46f137c24746d648c53daa19d5488f64eeb01ce3758380"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/builds-v2-inputs.json": {
+      "bytes": 1048602,
+      "sha256": "5b57e716cb1c0599965bdd3a00b02353585ec81f0af3c867b5638f4f7d58509b"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/generation-result.json": {
+      "bytes": 3686,
+      "sha256": "f625cb46ef7688b19b54e3ccf06ae7e4fc549f9a92b878ec527997bcaf81ab14"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/design-review.json": {
+      "bytes": 17859,
+      "sha256": "df61aedecf809701ef13e421b202043f3cf7448bc86364b321a5cee561726003"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/builds-v2-plan.json": {
+      "bytes": 1375,
+      "sha256": "2326f5453023156c2886fabcbef4da48e38bf414b2f69e73a86de0f3f6e22a5d"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/sdk-plan.json": {
+      "bytes": 1773,
+      "sha256": "900c7dfb8fd609f13438208ca9d00c1a056695d97d9314ebd664230778f63a05"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/generation-refusal.stderr": {
+      "bytes": 573,
+      "sha256": "a7613ed4647479b988d94c8a1ed18cd03b4bac18f51ded8851303467226c2a43"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prepare-v4-inputs.json": {
+      "bytes": 1047965,
+      "sha256": "721053e94634939f16cce2ac2e123e176f5228809ed185e317453559ab2f25ae"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/prepare-check.py": {
+      "bytes": 1569,
+      "sha256": "dfa587bda1709998014fc5a8b45663015f2e3f06543b0584314bd9453f3ea0cc"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-package/stdout": {
+      "bytes": 225,
+      "sha256": "9affc438388cf822540dd04c978fc30b0cea5a137bf7bfc895563a9bf3934744"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-package/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-package/owned.json": {
+      "bytes": 2972,
+      "sha256": "f291aed398445229527c4a915f64705962c899c7e9751949b9b1ed687746c1f9"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/fresh-preparation/stdout": {
+      "bytes": 26948,
+      "sha256": "c781441880721354a922cd22c572a29157253832064b9a3e736c66e805996d0f"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/fresh-preparation/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/fresh-preparation/owned.json": {
+      "bytes": 2195,
+      "sha256": "713a7d44bb809fb2332792dd4557194e1e7a8afbf012b69d234bb8001a1c1954"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-package-v2/stdout": {
+      "bytes": 228,
+      "sha256": "3d9b5c33fa408ac51b61cc13d01c2bb7aabe17748405edcf92a572f98fc63b78"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-package-v2/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-package-v2/owned.json": {
+      "bytes": 2895,
+      "sha256": "4f20cd7ae05dc66ee4773ce222bc033c8608bac3b9c45107d187661f88202097"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-inspection-v2/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-inspection-v2/stderr": {
+      "bytes": 324,
+      "sha256": "aa71ea52791cde67503ed898b55ddb52d60af490201571bab348f7577218d208"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-inspection-v2/owned.json": {
+      "bytes": 2364,
+      "sha256": "1bc8beacb55c3e4e4c28eb2fa415e7f174758212e23178b21ceaf3a510b9c0c2"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/generation-renewal/stdout": {
+      "bytes": 62,
+      "sha256": "149480f429edd2604ce299dc8b2171aa554d23ecc502ee42f2fa3ef785b5a2b5"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/generation-renewal/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/generation-renewal/owned.json": {
+      "bytes": 2326,
+      "sha256": "83c7c2b11b86196e54c8f432134bfc68f2937e76c33a2d96cf5f618faaa7a4d8"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-inspection-v3/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-inspection-v3/stderr": {
+      "bytes": 388,
+      "sha256": "dcd487ecf173c88f2b485fe48b03313f84e1c7f66774b5e77c3881bb6f9d2d63"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-inspection-v3/owned.json": {
+      "bytes": 2283,
+      "sha256": "9e5cabcf3efb3a7f52f97d7e56aa9f64da9f0c73f99b51d4d72e00521ef09921"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/affected-units-final/stdout": {
+      "bytes": 264,
+      "sha256": "045d4288eb306866149013d9a46ee637160ea8d1a9a6ca58aa3e8f095419ca41"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/affected-units-final/stderr": {
+      "bytes": 8845,
+      "sha256": "e9161d8b2bf0681a11996dcbe3cbefbefffb7fee9c97e5d1e58e2e7edecca951"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/affected-units-final/owned.json": {
+      "bytes": 2302,
+      "sha256": "e1df23a02e1ac16b2994676985a602b180762e3e5f24d73e4f72049dd9b0f2ea"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/all-mains-corrected/stdout": {
+      "bytes": 601,
+      "sha256": "5bad0687ad9d77741279b8766de487c9ff6882fd5c632d2e5640d44f697f9e97"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/all-mains-corrected/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/all-mains-corrected/owned.json": {
+      "bytes": 2338,
+      "sha256": "655b614653f67f91577e0656454cab92044ecf0dcc337595054828f1ae90dbec"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/app-verification/stdout": {
+      "bytes": 157,
+      "sha256": "d5fd4eb0419fc3093bae4d9e2287a0429a193c50a3058506f4c9311a4416cc91"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/app-verification/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/app-verification/owned.json": {
+      "bytes": 2435,
+      "sha256": "64845113435d1ad62d3c9d2ef816eea0758f27810bc6a30f4d338af8b9e40405"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/cpu-raster-v1/stdout": {
+      "bytes": 52666,
+      "sha256": "ba51ab9993d1337c743de369377d14bcc73545d25a7afa250c46a3c19266aaa6"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/cpu-raster-v1/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/cpu-raster-v1/owned.json": {
+      "bytes": 2274,
+      "sha256": "6da4ea6b19371782c7fb83200c1817a799dc7ecee855b1fa7f9397fe66247135"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/generation-final/stdout": {
+      "bytes": 62,
+      "sha256": "149480f429edd2604ce299dc8b2171aa554d23ecc502ee42f2fa3ef785b5a2b5"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/generation-final/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/generation-final/owned.json": {
+      "bytes": 2441,
+      "sha256": "20058ca41335fbbbba29cfbdb2c115ca47cc2b7376a97828ffbb5842eff0d874"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/contact-sheets/stdout": {
+      "bytes": 45,
+      "sha256": "80362c40b176cdb0691e1926dc92cdc6f915dd06e7ed6209f4be1e71d72f154f"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/contact-sheets/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/contact-sheets/owned.json": {
+      "bytes": 2481,
+      "sha256": "62d016496de2d808cbfb7aa0411e383c44231f912fa6fcd53567469bc5328cf1"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/relocation-final/stdout": {
+      "bytes": 1423,
+      "sha256": "c241eabddc330f41fc64ea86d2a5843970b0251d7b8002628da0bf59669a0602"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/relocation-final/stderr": {
+      "bytes": 3701,
+      "sha256": "fe4ee9f2941d1afa220dc98c860715285a7a9372ab8a7e3b0ad4c66b00d49f9a"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/relocation-final/owned.json": {
+      "bytes": 2539,
+      "sha256": "b457149b37489cea79f849690c1eeaf447d355aeaf39bd2ab908d50767dc1003"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-inspection/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-inspection/stderr": {
+      "bytes": 1053,
+      "sha256": "558d7c0b48b05b1df216a321cb4ef6d574639c9d67a13b2abb830bc14208ceef"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-inspection/owned.json": {
+      "bytes": 2452,
+      "sha256": "cb72d2c68814884b408c8779f24a1b0c0e995df5e10804172eae2234b1030c2f"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/fresh-preparation-v4/stdout": {
+      "bytes": 26980,
+      "sha256": "b917a2a1f1424550ea292129cff52f649acead3a72d3a79776e09c0b5f932c88"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/fresh-preparation-v4/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/fresh-preparation-v4/owned.json": {
+      "bytes": 2197,
+      "sha256": "661e7d7b8fb142abac791fec3634062aa065580c7df41950f3205ba5d886646a"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/fresh-preparation-v3/stdout": {
+      "bytes": 24595,
+      "sha256": "645c671fc74a2cfb31e3b5c4ff2b9656b27ca45b19c8acb57692232e3266c17b"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/fresh-preparation-v3/stderr": {
+      "bytes": 290,
+      "sha256": "718cce37f48d70da66149ef6a8521efc668605a2c799f611c3b1810ac1c14e6a"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/fresh-preparation-v3/owned.json": {
+      "bytes": 2197,
+      "sha256": "bd75c97d51c70105c5e103d0ff77ebf2476dc97a72bf0ba2a7ebc3232d4e5018"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/app-notice-validation/stdout": {
+      "bytes": 34,
+      "sha256": "dc3153745001467df9a30e71983ef6d9a760915b171c2e570aa1a32d45f8cf69"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/app-notice-validation/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/app-notice-validation/owned.json": {
+      "bytes": 2447,
+      "sha256": "b3fa27a0645b08d7b0d2aa87e79960e28216deddcc56d0acf764f69d8b668207"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/units-v4-v3/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/units-v4-v3/stderr": {
+      "bytes": 4009,
+      "sha256": "605406eeeced041590c2e1e0e0a3b11440f492eafb5461721e4a3c8f4bee6425"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/units-v4-v3/owned.json": {
+      "bytes": 2194,
+      "sha256": "987fe9ff10c80cf149d1dd1283f2b36295a3b8f61505141c717fc590bfe05574"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/units-v4-v4/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/units-v4-v4/stderr": {
+      "bytes": 4009,
+      "sha256": "d97ba544387525782cd1cd626ea0f9faf8335d85a41660465867f31ec407701f"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/units-v4-v4/owned.json": {
+      "bytes": 2194,
+      "sha256": "e0e5b4d910d59fde0682969e9490a260c8ff6b061888b6c911089923214f6b40"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/units-v4-v2/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/units-v4-v2/stderr": {
+      "bytes": 4940,
+      "sha256": "e1d966e1e7b92d8c023258614ecd71b6eee1763da2a08e7fe79c63775976c7dc"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/units-v4-v2/owned.json": {
+      "bytes": 2194,
+      "sha256": "a3af691085f54fc94d319ad77047a4382eaaff278fee13ad1f8e7a0b5112447e"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/app-notice-bundle/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/app-notice-bundle/stderr": {
+      "bytes": 1049,
+      "sha256": "e2ecc260567ae96812c23af016f51ee3a03dd5b46180d797b0e62e5882f798ba"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/app-notice-bundle/owned.json": {
+      "bytes": 2440,
+      "sha256": "eeac74511254c7e9e3ac7421e108e7f3ff34cfb477a8649c895ef8939cd11be6"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/all-mains-final/stdout": {
+      "bytes": 42,
+      "sha256": "507f2019450fa192b80345d0b089929eafe3e4e8140a9b6d8335d2d2d34af6bd"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/all-mains-final/stderr": {
+      "bytes": 328,
+      "sha256": "08adf8bea992e64b43de999365d6f15a5ac70452648373f57eab56fd9c8f413e"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/all-mains-final/owned.json": {
+      "bytes": 2338,
+      "sha256": "ee83c75a87ce225b6186e25380763a61e3fbdd0f65999f62f6c694d89348495b"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/units-v4/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/units-v4/stderr": {
+      "bytes": 4009,
+      "sha256": "0a0cef1c06bd15e8db51074b15da146e44f9923d73160b43bfb22ebd45b5adca"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/units-v4/owned.json": {
+      "bytes": 2192,
+      "sha256": "f6e003d5b4713208ca86ed4a961a57c716de1e31d1edd188f8ca2d360083bcb1"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-inspection-final/stdout": {
+      "bytes": 2728,
+      "sha256": "154372fe98e6e9d1bd570f89cca6a98ad4f11d90d2d7f5729b6d04301b81e424"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-inspection-final/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-inspection-final/owned.json": {
+      "bytes": 2370,
+      "sha256": "6f5d831a04ac224b27696b59131e57db236706ed2227075ae944ea5a4c77d337"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/cpu-raster-v1-v4/stdout": {
+      "bytes": 52666,
+      "sha256": "1df3b3a71a5c167764adbd8a4696c959b1a06cbf7143126da86bcf4317221b2f"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/cpu-raster-v1-v4/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/cpu-raster-v1-v4/owned.json": {
+      "bytes": 2279,
+      "sha256": "c540e666b666b6491968d2eabbcd5cabc23a705d1dc0c3ff883a776c8cc36dc2"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-owned-native-build/stdout": {
+      "bytes": 422,
+      "sha256": "674ab7646d0c8cf378d7f32f3217d1a7dca2ac2146f5171dde520c812de29e29"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-owned-native-build/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/sdk-owned-native-build/owned.json": {
+      "bytes": 2524,
+      "sha256": "17903f876408a73b01c31d5ea3abafaba2c3f9ff11f671e1762624bf44b1867c"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/app-package-final/stdout": {
+      "bytes": 303,
+      "sha256": "288d924b4ad3733494324d08502dd13753c2f6645c45febe29661064ad7883ee"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/app-package-final/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/commands/app-package-final/owned.json": {
+      "bytes": 2955,
+      "sha256": "09950df667b332ae9ea88e233aaf0504511f890f67660fe5979cae25eb49cad7"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/4-graph.stdout": {
+      "bytes": 31927,
+      "sha256": "d0891fae8d1dd58ab7ca49826f8f19dbf208cc8389d093eedc516caa6d082787"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/3-graph.stdout": {
+      "bytes": 31933,
+      "sha256": "47a9aa4f26856b91944c5e9ac1b89e96d1c95c5cfa243bf3dcac9a4c2564d7a5"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/4-metadata-0.stdout": {
+      "bytes": 5894,
+      "sha256": "9e895c6cee838060c6e79d426f36208c32306323c4a2a930c84e861b6fd410f8"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/2-metadata-0.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-2.stdout": {
+      "bytes": 5611,
+      "sha256": "8d11cebd12f69074bf9eea9cacf050bfa00c93c32280e77b741f7ac77e3b1f1c"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/9-list.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/6-build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/9-graph.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/1-build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/1-metadata-0.stdout": {
+      "bytes": 785,
+      "sha256": "84887be0132a52b0677af63aefc3ab539bd3508e08763f5669debb971671223e"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/3-list.stdout": {
+      "bytes": 16593,
+      "sha256": "39106662123e60a2229437ab5cdc167e2c050b2d185467cf211ebab1828c128a"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-12.stdout": {
+      "bytes": 5619,
+      "sha256": "97a8bae947f0b07789617274749d1104546643f292ced5dbfd6a1a8b53f56070"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/10-graph.stdout": {
+      "bytes": 31933,
+      "sha256": "cf6e1f4650aa3a61bd715bd0feb03b89e000f29dce3a1d29c8b6bab25c9c3c75"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/7-metadata-0.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/tagged-metadata.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/tagged-build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-list.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/12-build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-6.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/5-metadata-0.stdout": {
+      "bytes": 5896,
+      "sha256": "c6012dc88f925683fa97752aecd0d5aec4c8e051828bdd57c62253f2a3722989"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-10.stdout": {
+      "bytes": 795,
+      "sha256": "e4297e60489fd64b22b2e09ecd248e775ccb4d9ca9fdf7878afe5a1490d2e042"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/6-list.stdout": {
+      "bytes": 16721,
+      "sha256": "a69b69ee889baa8f6274285c20142e1a0fedc655dcd132afcd0bc5d48dddd00b"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/3-metadata-0.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/11-list.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/8-graph.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/7-build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/2-graph.stdout": {
+      "bytes": 31936,
+      "sha256": "f24a7cb1dda37d4a6a148db9fc363654a0cd599bb091746a5eb9f50783fcaf2c"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-4.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/5-graph.stdout": {
+      "bytes": 31930,
+      "sha256": "a53f00d778652ca6877df3b0d876c9b1dbbdae871904b9387eb38a2476585d00"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/5-list.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/12-list.stdout": {
+      "bytes": 16338,
+      "sha256": "380ddd50ae9ecbfb3549a03744898bf2bc839386fdc894f53bbcb3194ace1f19"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-8.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-0.stdout": {
+      "bytes": 5617,
+      "sha256": "59182d1acf229f7fa266a4f46cb12f8a8e42673dac2c328f51ed0f6e738f9a0d"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/6-metadata-0.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-14.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/11-graph.stdout": {
+      "bytes": 875,
+      "sha256": "d11353abe1c7cd949a41561717b8f683ed613df01e1272936b67c7b1073ef397"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/6-metadata-0.stdout": {
+      "bytes": 5900,
+      "sha256": "10598a8a20889b28cc40bc53ef8f5a10ccf06fdc486485ffc84384721e7e7824"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-0.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/11-graph.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-14.stdout": {
+      "bytes": 5607,
+      "sha256": "99d00d178bf63a51a35478db695c051fea379af1d10c94ee097fd731ece74433"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-build.stderr": {
+      "bytes": 2515,
+      "sha256": "dbdabd27b5fccb515ea6bb71081ca6387a69a67a163f5c3a113f08e9bc064598"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/3-metadata-0.stdout": {
+      "bytes": 5898,
+      "sha256": "419a0621e66212a8a3b2c04399124343263148b8b1ce611113079c2a90066514"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/6-list.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-10.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/7-build.stderr": {
+      "bytes": 1123,
+      "sha256": "272fa0309d1fa6bfd8ba4c904c5d350582215bce1379777072bf2ab9d18c2c75"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/8-graph.stdout": {
+      "bytes": 31945,
+      "sha256": "d1927a2a291f5e65b970a4d89a0278d99abd547728602e27e9afe60bf25e6cbf"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/11-list.stdout": {
+      "bytes": 1777,
+      "sha256": "95288110d57b48358e8a2233e5218041381aa9844af14cce63afdaef60f2abf4"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/5-metadata-0.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/5-list.stdout": {
+      "bytes": 16050,
+      "sha256": "4deb0c0e3a77cddccc83b50b4deb6ab9755f161c229da05aa7272ccf56d97a90"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-8.stdout": {
+      "bytes": 5612,
+      "sha256": "6c4aeb594c15dcd56839542478947ea584f42a16bbe12090eaa325cd71d065b7"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/12-list.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-4.stdout": {
+      "bytes": 5605,
+      "sha256": "f70cbe81bf77c77f86600b03a76021ec4187eab91753ce25528c7dab4e8fe4b9"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/2-graph.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/5-graph.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/tagged-metadata.stdout": {
+      "bytes": 5679,
+      "sha256": "b6d88422aa772a99eb14631eef70fc007907b43484bcfc4d1cb020fcc6dab907"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/7-metadata-0.stdout": {
+      "bytes": 5906,
+      "sha256": "1c2f6132e91ce76145e43d5023a75ee5c6280a8c7f2f4b43cd14bf42bc2785bc"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/10-graph.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/1-metadata-0.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/3-list.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-12.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-6.stdout": {
+      "bytes": 3977,
+      "sha256": "b591ef13aba4130d8497eb1103603204f4d1944cb081094437dc9235c67f27fb"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/tagged-build.stderr": {
+      "bytes": 1141,
+      "sha256": "3872c740e8b284e40c36ec217ed6af7057d636653e0aec715942a865d2e93926"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/12-build.stderr": {
+      "bytes": 1123,
+      "sha256": "d8507cdae276d0058f62673c0bdaa50e0dc5035b9831a64d928fc8399a495be4"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-list.stdout": {
+      "bytes": 272544,
+      "sha256": "5b5c4e7bac4847ebc378a1697ef6370a02f693df80f56d3839d974ad65443092"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/2-metadata-0.stdout": {
+      "bytes": 5900,
+      "sha256": "efce2e677b9b58bef68a5d0253629fbdeba3165c746f633e4c5f115059739cd7"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/4-graph.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/3-graph.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/4-metadata-0.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/9-graph.stdout": {
+      "bytes": 31942,
+      "sha256": "ae534a67839c5d90ce740fdb5686ac9415b3c9842ba186f7479140a645556b17"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/6-build.stderr": {
+      "bytes": 1120,
+      "sha256": "9bbdbf7892bf88fc4b245d657f328c4c7f614e31222a38233d6bfaf28f1beb7d"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/1-build.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/9-list.stdout": {
+      "bytes": 16368,
+      "sha256": "104747a25fc639d017ba51ced3e65d980438264c5c64e0cca99d1331a34fd763"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-7.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/12-graph.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/12-metadata-0.stdout": {
+      "bytes": 5906,
+      "sha256": "16a71d1059fbd1af3c3ba7ec18b4ffe7e26a266bac41b946da7198b83cf44bfd"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-13.stdout": {
+      "bytes": 5615,
+      "sha256": "2ea4caaf3556136a9aed661c311317f4be4350e4ff5b923e8945539cdefe1fcb"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/10-build.stderr": {
+      "bytes": 1133,
+      "sha256": "99589f8fc884dd60590a98f06ae83894f7d5570213874cf14c5dc788acce17db"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/1-graph.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/8-metadata-0.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/9-build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/6-graph.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/4-list.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-3.stdout": {
+      "bytes": 5613,
+      "sha256": "b55c54d3ad70ae2361ed9a8597f33b4d3ce4152498cfeabad3f1488866e8d99e"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/3-build.stderr": {
+      "bytes": 1119,
+      "sha256": "a41d134156b454a960682fa4942b24571eb8bc97efa5f87c0e5a77d7760d44ab"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/10-list.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/7-list.stdout": {
+      "bytes": 17541,
+      "sha256": "3791b2bbfa49e76b1863b456bf51cd65886eb133406455d8dcd47da7aa4b0e32"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/4-build.stderr": {
+      "bytes": 1117,
+      "sha256": "e7cf0732b288fc72b6feb0432e972278c62817f49cf9a7a653bb9e359fba1812"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/1-list.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/2-list.stdout": {
+      "bytes": 16150,
+      "sha256": "cfaa76b92ee3ac9329d637e9e06fd3ff0b470adcafc5e37ab712b0d73bda8cc9"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-1.stdout": {
+      "bytes": 796,
+      "sha256": "3b44c308d55a2f519680e7c927f4b75cd60b5efa7de61fc7c53f8e5e84239b4b"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/9-metadata-0.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-5.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/8-list.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-9.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/5-build.stderr": {
+      "bytes": 1118,
+      "sha256": "630057f4b64015e7b89dcaf20de1befa855e9eed47bcdc0bb9ae4b0f7af0f6e5"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/2-build.stderr": {
+      "bytes": 1120,
+      "sha256": "83efdcaaee6f76c468367e9c70625f02c873d6b7ef13804e108d462b18ecebc6"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/7-graph.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/8-build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-graph.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/10-metadata-0.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-11.stdout": {
+      "bytes": 5618,
+      "sha256": "5b7162b1617fb10dfb908e5fd5b034fde662f25eeeb9f0208cc4830d047281d0"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/5-build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-9.stdout": {
+      "bytes": 5610,
+      "sha256": "03258ad434df637caff2b26604a939f86c0da1ffbad7446eeaefc5287bb5437c"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/2-build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/9-metadata-0.stdout": {
+      "bytes": 5904,
+      "sha256": "16a5af38acea414807cc7f25e6f877c023af5da8b301f415dd42e050cde3650b"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-5.stdout": {
+      "bytes": 5611,
+      "sha256": "47cd3aa7b414d4270dd8cdd016500a432eae3a4cdaa89cf2027463f2b4291643"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/8-list.stdout": {
+      "bytes": 16978,
+      "sha256": "ef8737d1cd4fd3626866f050100f4d6107d0dd1e846ab4af88249e184c9353bc"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/10-metadata-0.stdout": {
+      "bytes": 5912,
+      "sha256": "42e3b3f479389defaf455c2df471fbfd30afb5163b6968aa70ac8e20f941d6c1"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-11.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/8-build.stderr": {
+      "bytes": 1123,
+      "sha256": "34c179c525b033efc13b1e35011b773b637fc649eb1df794d84986debc83431d"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/7-graph.stdout": {
+      "bytes": 31945,
+      "sha256": "850255f4b76947ac7b4e12ca9ad2196067f4ef07efeed27f07dc736dbc763289"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-graph.stdout": {
+      "bytes": 31171,
+      "sha256": "b240922874720ab8cc7db5dbea45d1f4366833f273689508d0fbbbe1119afcf6"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/1-list.stdout": {
+      "bytes": 4384,
+      "sha256": "2b54d35babd42e4144ead66059ace435401870feb079972eee738d1b8545c235"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/2-list.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/4-list.stdout": {
+      "bytes": 16492,
+      "sha256": "0aa967db09c589b4161556cd622ed7859a4d919850484e1a082aa4dc9f17b7ef"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/8-metadata-0.stdout": {
+      "bytes": 5906,
+      "sha256": "2385e07d256c07acf85e01e522db82c5c3fa14cd6095a85a67ea43c001a3f237"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/1-graph.stdout": {
+      "bytes": 869,
+      "sha256": "7813e4f1242cdd969e66c9b00bdfaeae5748dd845a65d2f6b2867f972fc2f479"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/6-graph.stdout": {
+      "bytes": 31936,
+      "sha256": "c4319e86bf9e3e681e1299c33cd37fb50269a63ed5b911dbbb4cac0aacb026f6"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/9-build.stderr": {
+      "bytes": 1122,
+      "sha256": "ff380dd4c95b4db8099baae52e42d726704e1556ee38d9801a52756c80836601"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/10-list.stdout": {
+      "bytes": 40176,
+      "sha256": "177c84ab6905fecf99de1e1dbbccc18c0a7ebee89d79de3e74cb928d1b06a22a"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/3-build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-3.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/4-build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/7-list.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-7.stdout": {
+      "bytes": 5615,
+      "sha256": "f82df2a37e7acf0ac059782417a23b26b8f637ba986c710fbd2f1c64fbf9c605"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/12-graph.stdout": {
+      "bytes": 31945,
+      "sha256": "44a3a7975a5ce2985e50f3a0a3b4ba34a10dbf5ef4a370645b1700867be6d9e2"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/0-metadata-13.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/12-metadata-0.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs-v2/10-build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-2.stdout": {
+      "bytes": 5611,
+      "sha256": "8d11cebd12f69074bf9eea9cacf050bfa00c93c32280e77b741f7ac77e3b1f1c"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-12.stdout": {
+      "bytes": 5619,
+      "sha256": "97a8bae947f0b07789617274749d1104546643f292ced5dbfd6a1a8b53f56070"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-list.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-6.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-10.stdout": {
+      "bytes": 795,
+      "sha256": "e4297e60489fd64b22b2e09ecd248e775ccb4d9ca9fdf7878afe5a1490d2e042"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-4.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-8.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-0.stdout": {
+      "bytes": 5617,
+      "sha256": "59182d1acf229f7fa266a4f46cb12f8a8e42673dac2c328f51ed0f6e738f9a0d"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-14.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-0.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-14.stdout": {
+      "bytes": 5607,
+      "sha256": "99d00d178bf63a51a35478db695c051fea379af1d10c94ee097fd731ece74433"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-build.stderr": {
+      "bytes": 2515,
+      "sha256": "0f10f90010e7357f0a30f14f0f0ecfbaef882367724d66575f7eac5485dbcffe"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-10.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-8.stdout": {
+      "bytes": 5612,
+      "sha256": "6c4aeb594c15dcd56839542478947ea584f42a16bbe12090eaa325cd71d065b7"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-4.stdout": {
+      "bytes": 5605,
+      "sha256": "f70cbe81bf77c77f86600b03a76021ec4187eab91753ce25528c7dab4e8fe4b9"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-12.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-6.stdout": {
+      "bytes": 3977,
+      "sha256": "b591ef13aba4130d8497eb1103603204f4d1944cb081094437dc9235c67f27fb"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-list.stdout": {
+      "bytes": 273119,
+      "sha256": "dbe91fdc2fbe0a2701f416e3cfe10df5ad69e854afbc42c2d9b0e7d8831fd85b"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-7.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-13.stdout": {
+      "bytes": 5615,
+      "sha256": "2ea4caaf3556136a9aed661c311317f4be4350e4ff5b923e8945539cdefe1fcb"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/1-graph.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-3.stdout": {
+      "bytes": 5613,
+      "sha256": "b55c54d3ad70ae2361ed9a8597f33b4d3ce4152498cfeabad3f1488866e8d99e"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-1.stdout": {
+      "bytes": 796,
+      "sha256": "3b44c308d55a2f519680e7c927f4b75cd60b5efa7de61fc7c53f8e5e84239b4b"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-5.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-9.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-graph.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-11.stdout": {
+      "bytes": 5618,
+      "sha256": "5b7162b1617fb10dfb908e5fd5b034fde662f25eeeb9f0208cc4830d047281d0"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-9.stdout": {
+      "bytes": 5610,
+      "sha256": "03258ad434df637caff2b26604a939f86c0da1ffbad7446eeaefc5287bb5437c"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-5.stdout": {
+      "bytes": 5611,
+      "sha256": "47cd3aa7b414d4270dd8cdd016500a432eae3a4cdaa89cf2027463f2b4291643"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-11.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-graph.stdout": {
+      "bytes": 31171,
+      "sha256": "b240922874720ab8cc7db5dbea45d1f4366833f273689508d0fbbbe1119afcf6"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/1-graph.stdout": {
+      "bytes": 869,
+      "sha256": "7813e4f1242cdd969e66c9b00bdfaeae5748dd845a65d2f6b2867f972fc2f479"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-3.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-7.stdout": {
+      "bytes": 5615,
+      "sha256": "f82df2a37e7acf0ac059782417a23b26b8f637ba986c710fbd2f1c64fbf9c605"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-cursors/mains-logs/0-metadata-13.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/private/tmp/vellum-owned-cursors-e17d359-v3/relocated SDK/vellum-v0.1.0-alpha.2/SDK_MANIFEST.json": {
+      "bytes": 1151186,
+      "sha256": "67c9a4e56665483c453a4551ff1a60a44c677ef53a5ab4e0c18e195037b008f7"
+    },
+    "/private/tmp/vellum-owned-cursors-e17d359-v3/relocated SDK/vellum-v0.1.0-alpha.2/THIRD_PARTY_INVENTORY.json": {
+      "bytes": 120078,
+      "sha256": "465e3d752a1e72d2cc60515e2c979997fd66e5d3c9faafca0c81afa833219b67"
+    },
+    "/private/tmp/vellum-owned-cursors-e17d359-v3/sdk.tar.gz": {
+      "bytes": 30145026,
+      "sha256": "33504ff40f24605b71dede2d19ec91f2834895252efa33030ee976d2176cb7cd"
+    },
+    "/private/tmp/vellum-owned-cursors-e17d359-v3/owned native build/build-receipt.json": {
+      "bytes": 3537,
+      "sha256": "27380864e52bca3b9785f90ad321eff6a99e8faac780f87d7efe9b01cb66d23d"
+    },
+    "/private/tmp/vellum-owned-cursors-e17d359-v3/owned native build/inventory.json": {
+      "bytes": 4329864,
+      "sha256": "412241d098d5ec976e2cbc5513d8cba5714588ed15624e767213dff106d4d255"
+    },
+    "/private/tmp/vellum-owned-cursors-e17d359-v3/owned native build/vellum-workbench": {
+      "bytes": 61305698,
+      "sha256": "3d788e548cc35d433dafd6e30287608ca6f0b08ea9ffdc74463282aeea8f02b8"
+    },
+    "/private/tmp/vellum-owned-cursors-e17d359-v3/owned native build/vellum-workbench.map": {
+      "bytes": 13341038,
+      "sha256": "161df5f14f444dccaee3613072253627e2c8087dc0b4bfbf4bd18111c7580ef5"
+    },
+    "/private/tmp/vellum-owned-cursors-e17d359/contact-dark-false.png": {
+      "bytes": 166491,
+      "sha256": "6fd33f0c5b740fc4d0f84363b09b63ee5bb657030859d6322a7cad3aaac4dfe1"
+    },
+    "/private/tmp/vellum-owned-cursors-e17d359/contact-dark-true.png": {
+      "bytes": 151967,
+      "sha256": "6a8523962f94779f076d993f20ad43fa0f465a2aec67d7890a6e473e7dc09495"
+    }
+  }
+}

@@ -162,6 +162,13 @@ hash-pinned preparation. All font/runtime bytes remain unchanged. Fresh recipe
 and collector checks pass; Selawik modification/reserved-name provenance, broader
 asset applicability, distribution approval and full M6 remain open.
 
+The [cursor artwork contract](cursor-artwork.md) replaces all 39 built-in SVGs
+with original MIT-licensed Vellum geometric artwork through bounded, pinned
+preparation overlays. Public identities and existing rendering/custom fallback
+semantics remain. This changes executable inputs and requires fresh SDK/build
+checks; it does not establish physical cursor, native lifetime, other asset
+applicability or M6 acceptance.
+
 ## Finish line
 
 Finish the Go-native framework on the local Mac: an independently consumable SDK

@@ -1,0 +1,582 @@
+--- /dev/null
++++ b/cursors/LICENSE_VELLUM.txt
+@@ -0,0 +1,27 @@
++MIT License
++
++Copyright (c) 2026 Davin Hills
++
++Permission is hereby granted, free of charge, to any
++person obtaining a copy of this software and associated
++documentation files (the "Software"), to deal in the
++Software without restriction, including without
++limitation the rights to use, copy, modify, merge,
++publish, distribute, sublicense, and/or sell copies of
++the Software, and to permit persons to whom the Software
++is furnished to do so, subject to the following
++conditions:
++
++The above copyright notice and this permission notice
++shall be included in all copies or substantial portions
++of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
++ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
++TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
++PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
++SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
++CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
++OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
++IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
++DEALINGS IN THE SOFTWARE.
+--- /dev/null
++++ b/cursors/NOTICE.md
+@@ -0,0 +1,16 @@
++# Vellum cursor artwork notice
++
++The SVGs in this prepared fork's cursors/svg directory are original geometric
++Vellum artwork, copyright (c) 2026 Davin Hills, provided under the adjacent
++LICENSE_VELLUM.txt (MIT). They replace all 39 prior built-in SVGs. The same original zoom-in artwork also
++replaces the duplicated SVG regression fixture at svg/testdata/svg/zoom-in.svg. Hotspots and
++hashes are recorded in owned-assets.json. The Vellum source contains the
++reproducible generator and exact pinned overlay inputs.
++
++The cursor Go code retains its Cogent Core BSD copyright and license. Other
++module assets and dependencies retain their own declarations. This notice is
++specific to the replacement SVG artwork and grants no rights over other assets.
++
++CPU raster checks cover both schemes, five sizes and primary-geometry hotspots.
++They do not establish physical-pointer behavior, native cursor lifetime cleanup,
++or full Mac distribution approval. Those remain separate acceptance gates.
+--- a/cursors/README.md
++++ b/cursors/README.md
+@@ -1,4 +1,12 @@
+-# cursors
++# Cursors
+ 
+-Cursors provides Go constant names for cursors as SVG files. These cursors are sourced from [daviddarnes/mac-cursors](https://github.com/daviddarnes/mac-cursors), which are from macOS and are licensed under the [Apple User Agreement](https://images.apple.com/legal/sla/docs/OSX1011.pdf).
++The Vellum prepared fork uses 39 original geometric cursor SVGs, authored by
++Davin Hills in 2026 and distributed under LICENSE_VELLUM.txt (MIT). The pinned
++source and reproducible generator are in drivers/cogent/native/assets/cursors
++in the Vellum repository. owned-assets.json records exact hashes and hotspots.
+ 
++All existing public cursor identities and the theme color-substitution contract
++are retained. The cursor Go implementation keeps its original Cogent Core BSD
++license; the artwork notice does not relabel that implementation or the module.
++
++See NOTICE.md for scope and remaining native qualification.
+--- /dev/null
++++ b/cursors/cursorimg/owned_art_test.go
+@@ -0,0 +1,126 @@
++// Copyright (c) 2026 Davin Hills. SPDX-License-Identifier: MIT.
++package cursorimg
++
++import (
++	"bytes"
++	"cogentcore.org/core/colors"
++	"cogentcore.org/core/colors/matcolor"
++	"cogentcore.org/core/cursors"
++	"cogentcore.org/core/enums"
++	"cogentcore.org/core/math32"
++	_ "cogentcore.org/core/paint/renderers"
++	"cogentcore.org/core/svg"
++	"fmt"
++	"image"
++	"testing"
++)
++
++// Embedded Cursor supplies the public enum interface, while String selects an
++// existing SVG. No built-in hotspot entry exists for this application enum.
++type vellumApplicationCursor struct {
++	cursors.Cursor
++	name string
++}
++
++func (c vellumApplicationCursor) String() string { return c.name }
++
++func TestVellumOwnedRasterMatrix(t *testing.T) {
++	oldTheme := matcolor.SchemeIsDark
++	oldCache := Cursors
++	t.Cleanup(func() { colors.SetScheme(oldTheme); Cursors = oldCache })
++	count := 0
++	for _, dark := range []bool{false, true} {
++		colors.SetScheme(dark)
++		Cursors = make(map[enums.Enum]map[int]*Cursor)
++		for _, cursor := range cursors.CursorValues()[1:] {
++			for _, size := range []int{16, 24, 32, 48, 64} {
++				t.Run(fmt.Sprintf("dark=%v/%s/%d", dark, cursor, size), func(t *testing.T) {
++					body, err := cursors.SVG(cursor.String())
++					if err != nil {
++						t.Fatal(err)
++					}
++					sv := svg.NewSVG(math32.Vec2(float32(size), float32(size)))
++					if err := sv.ReadXML(bytes.NewReader(body)); err != nil {
++						t.Fatal(err)
++					}
++					primary := sv.RenderImage()
++					bounds := image.Rect(0, 0, size, size)
++					if primary.Bounds() != bounds {
++						t.Fatal("primary bounds", primary.Bounds())
++					}
++					hot := cursors.Hotspots[cursor].Mul(size).Div(256)
++					if !hot.In(bounds) {
++						t.Fatal("hotspot outside image", hot)
++					}
++					_, _, _, alpha := primary.At(hot.X, hot.Y).RGBA()
++					if alpha < 0x1000 {
++						t.Fatalf("hotspot misses unshadowed primary geometry: %v alpha=%d", hot, alpha)
++					}
++					ink, colored := 0, 0
++					for y := 0; y < size; y++ {
++						for x := 0; x < size; x++ {
++							r, g, b, a := primary.At(x, y).RGBA()
++							if a > 0x1000 {
++								ink++
++								if r != g || g != b {
++									colored++
++								}
++							}
++						}
++					}
++					if ink < size*size/50 || ink > size*size*4/5 {
++						t.Fatal("empty or excessive cursor coverage", ink)
++					}
++					for _, p := range []image.Point{{0, 0}, {size - 1, 0}, {0, size - 1}, {size - 1, size - 1}} {
++						_, _, _, a := primary.At(p.X, p.Y).RGBA()
++						if a != 0 {
++							t.Fatal("clipped cursor corner", p)
++						}
++					}
++					switch cursor {
++					case cursors.Copy, cursors.Progress, cursors.NotAllowed, cursors.Poof:
++						if colored == 0 {
++							t.Fatal("lost semantic badge color")
++						}
++					}
++					rendered, err := Get(cursor, size)
++					if err != nil {
++						t.Fatal(err)
++					}
++					expected := image.Rect(0, 0, size+size/16, size+size/16)
++					if rendered.Size != size || rendered.Hotspot != hot || rendered.Image.Bounds() != expected {
++						t.Fatal("rendered cursor contract", rendered)
++					}
++					cached, err := Get(cursor, size)
++					if err != nil || cached != rendered {
++						t.Fatal("same enum/size cache identity", err)
++					}
++					count++
++				})
++			}
++		}
++	}
++	if count != 390 {
++		t.Fatal("incomplete raster matrix", count)
++	}
++}
++
++func TestVellumOwnedNoneAndCustomFallback(t *testing.T) {
++	old := Cursors
++	Cursors = make(map[enums.Enum]map[int]*Cursor)
++	t.Cleanup(func() { Cursors = old })
++	if _, err := Get(cursors.None, 32); err == nil {
++		t.Fatal("None gained an image")
++	}
++	custom := vellumApplicationCursor{cursors.Cursor(-1), "arrow"}
++	rendered, err := Get(custom, 32)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if rendered.Hotspot != image.Pt(16, 16) {
++		t.Fatal("custom cursor fallback changed", rendered.Hotspot)
++	}
++	if _, err := Get(vellumApplicationCursor{cursors.Cursor(-2), "vellum-unknown"}, 32); err == nil {
++		t.Fatal("unknown custom cursor gained an image")
++	}
++}
+--- a/cursors/cursors.go
++++ b/cursors/cursors.go
+@@ -117,22 +117,22 @@
+ // of the cursor, on a scale of 0-256, which is scaled to the size of
+ // the cursor later on.
+ var Hotspots = map[enums.Enum]image.Point{
+-	Arrow:               image.Pt(88, 80),
+-	ContextMenu:         image.Pt(72, 80),
++	Arrow:               image.Pt(40, 32),
++	ContextMenu:         image.Pt(40, 32),
+ 	Help:                image.Pt(128, 128),
+-	Pointer:             image.Pt(104, 76),
+-	Progress:            image.Pt(64, 24),
+-	Wait:                image.Pt(132, 127),
+-	Cell:                image.Pt(125, 128),
++	Pointer:             image.Pt(110, 34),
++	Progress:            image.Pt(40, 32),
++	Wait:                image.Pt(128, 128),
++	Cell:                image.Pt(128, 128),
+ 	Crosshair:           image.Pt(128, 128),
+ 	Text:                image.Pt(128, 128),
+-	VerticalText:        image.Pt(128, 124),
+-	Alias:               image.Pt(156, 80),
+-	Copy:                image.Pt(64, 24),
++	VerticalText:        image.Pt(128, 128),
++	Alias:               image.Pt(40, 32),
++	Copy:                image.Pt(40, 32),
+ 	Move:                image.Pt(128, 128),
+-	NotAllowed:          image.Pt(64, 24),
+-	Grab:                image.Pt(124, 124),
+-	Grabbing:            image.Pt(124, 124),
++	NotAllowed:          image.Pt(40, 32),
++	Grab:                image.Pt(128, 144),
++	Grabbing:            image.Pt(128, 144),
+ 	ResizeCol:           image.Pt(128, 128),
+ 	ResizeRow:           image.Pt(128, 128),
+ 	ResizeUp:            image.Pt(128, 128),
+@@ -151,9 +151,9 @@
+ 	ResizeNS:            image.Pt(128, 128),
+ 	ResizeNESW:          image.Pt(128, 128),
+ 	ResizeNWSE:          image.Pt(128, 128),
+-	ZoomIn:              image.Pt(128, 128),
+-	ZoomOut:             image.Pt(128, 128),
++	ZoomIn:              image.Pt(118, 108),
++	ZoomOut:             image.Pt(118, 108),
+ 	ScreenshotSelection: image.Pt(128, 128),
+ 	ScreenshotWindow:    image.Pt(128, 128),
+-	Poof:                image.Pt(64, 24),
++	Poof:                image.Pt(40, 32),
+ }
+--- /dev/null
++++ b/cursors/owned-assets.json
+@@ -0,0 +1,246 @@
++{
++  "extent": 256,
++  "files": {
++    "alias.svg": "839ef963fffa41847cd384d9cfcd690a586cd677620ca842e59a5abd6b3e615c",
++    "arrow.svg": "76b9d98a43b11ea355ea3861a942d76047faa6bc4530d43b7feebb6395f909fb",
++    "cell.svg": "f29118db8fab2d467eed879c45db01c654f02d43119532709862ec1ab09cc408",
++    "context-menu.svg": "f85fdf6c35c3b237982f10967fb45e3844a0206aaac5f01dc8c5160c12721dc8",
++    "copy.svg": "778ef744ea8a673a6f5c53057c647449eb19021aaf4257e188a0ce7f610c8f67",
++    "crosshair.svg": "d0b5ec8d63e92ef454150a20fde27971b3a82e6fd944f6f6c02d20ebbc1e487f",
++    "grab.svg": "218f8bbea99bf7a68b53228ffc07eccd77896c72cc9186b9c057f2b80b781938",
++    "grabbing.svg": "53ed97cb6270a6eb0257677b38effa88f15b8998ac2eefc5b22b97ed7402391e",
++    "help.svg": "f4ff335a25798d819a6d6ed9ee57085162514ced72a7f829e0e365dca9d34b9a",
++    "move.svg": "6a090bd589ee746e30cf44587ca7ec0691b959747897d31483bded8f014fb293",
++    "not-allowed.svg": "59c1afc4577e445d8aa78b16b7959ee573be7c34b3a0852ea9c0bd6f8418c2da",
++    "pointer.svg": "7e264397e41ee8111303c53066397daf9890d861373dd81174b3cd4e7badeab9",
++    "poof.svg": "5e4e945f0b752356c7bb0835a4c167b72786d475948e72e66eb690155bdcd646",
++    "progress.svg": "d1223ae1bda439a68042a93102bbab366e321cd319c24f17136b32a46d7f8803",
++    "resize-col.svg": "54f126fb05925fe6cc5f16d577d3e35c1b89daf6e2249adaa78c333250f4ada6",
++    "resize-down.svg": "bc257824650bdad2893ed613a6c5bd20293cd4d0a49d6d998173175ce5512c7c",
++    "resize-e.svg": "d73f4af44a03435dd8f74e75821a940efb918dae5cf6adda4b192ccdf3f5f895",
++    "resize-ew.svg": "bf6d21586b0be6b5ea0ff3418300c0d44bdee356cecd80a33727092fdeb03b7e",
++    "resize-left.svg": "ac11d98ae352194b3383cf62881aaad156c24820eb7e838ab548b1f3cbf94995",
++    "resize-n.svg": "78c484c4eb0561a7baff21f446fa1f9a492f7933833ad3ab761a9bcc9092c391",
++    "resize-ne.svg": "b0289001b500cef0576a29423d37ce9acc94c28d9cc81574e831671ba77a7e71",
++    "resize-nesw.svg": "66e065eb6691209a9a3738b444ce55815684f943f1c6352bae58d261a7827d18",
++    "resize-ns.svg": "54eecd90170c78200672f6260bc4a1544f35d0fcbfa4405890c7f1a4ca268c9d",
++    "resize-nw.svg": "61c59c1831e1c118b43b0d3b1f61cee1c8e939841ff6db144e76e829591a4f77",
++    "resize-nwse.svg": "acca4d275ead60faceb0b3f40d5097083199f07b0bdcff73034dd2ff25eaacdf",
++    "resize-right.svg": "d73f4af44a03435dd8f74e75821a940efb918dae5cf6adda4b192ccdf3f5f895",
++    "resize-row.svg": "ad9ce19426ee3d47ce89e29fd07cceb230a4bde43c326a60f0c56f7d6e5fe200",
++    "resize-s.svg": "bc257824650bdad2893ed613a6c5bd20293cd4d0a49d6d998173175ce5512c7c",
++    "resize-se.svg": "28434a094bfb4dfe3261f7952b27585184115a21611ddc561b55c9cac980217f",
++    "resize-sw.svg": "6c035e739d1bbecf804c391e3ad50e530af8ed6928c6fbc869876d4c12e6fee8",
++    "resize-up.svg": "78c484c4eb0561a7baff21f446fa1f9a492f7933833ad3ab761a9bcc9092c391",
++    "resize-w.svg": "ac11d98ae352194b3383cf62881aaad156c24820eb7e838ab548b1f3cbf94995",
++    "screenshot-selection.svg": "dc695f40c6f79d84a5e8ec3107de5d61d451c0848cba0d6a8f6750440a44fa2c",
++    "screenshot-window.svg": "1a66a1991140489e509b371ea8d9cfd0696623595ec4ba1876a64e7184307d38",
++    "text.svg": "a1ed54736fe9c42e8633fee9bae966c3a05f005b252e57d1b0b5d89aba9fea8e",
++    "vertical-text.svg": "0ecbc8374efc19c90c47a415ea6fa6c7b1138798cbdc35c070eeabcec110a28a",
++    "wait.svg": "b51f8333b22ede74340c3148553877ca0f42cf063da1db76063bcae6f466adb5",
++    "zoom-in.svg": "e23b2e3f2e05c5f98ac21bd3509a77b3b833112e7476bd16b278fcca5fa6ff10",
++    "zoom-out.svg": "23cf96c14187f80fe794b97aaeaf666d16b2bfded7cce2e0040be383eac8a72f"
++  },
++  "hotspots_256": {
++    "alias": [
++      40,
++      32
++    ],
++    "arrow": [
++      40,
++      32
++    ],
++    "cell": [
++      128,
++      128
++    ],
++    "context-menu": [
++      40,
++      32
++    ],
++    "copy": [
++      40,
++      32
++    ],
++    "crosshair": [
++      128,
++      128
++    ],
++    "grab": [
++      128,
++      144
++    ],
++    "grabbing": [
++      128,
++      144
++    ],
++    "help": [
++      128,
++      128
++    ],
++    "move": [
++      128,
++      128
++    ],
++    "not-allowed": [
++      40,
++      32
++    ],
++    "pointer": [
++      110,
++      34
++    ],
++    "poof": [
++      40,
++      32
++    ],
++    "progress": [
++      40,
++      32
++    ],
++    "resize-col": [
++      128,
++      128
++    ],
++    "resize-down": [
++      128,
++      128
++    ],
++    "resize-e": [
++      128,
++      128
++    ],
++    "resize-ew": [
++      128,
++      128
++    ],
++    "resize-left": [
++      128,
++      128
++    ],
++    "resize-n": [
++      128,
++      128
++    ],
++    "resize-ne": [
++      128,
++      128
++    ],
++    "resize-nesw": [
++      128,
++      128
++    ],
++    "resize-ns": [
++      128,
++      128
++    ],
++    "resize-nw": [
++      128,
++      128
++    ],
++    "resize-nwse": [
++      128,
++      128
++    ],
++    "resize-right": [
++      128,
++      128
++    ],
++    "resize-row": [
++      128,
++      128
++    ],
++    "resize-s": [
++      128,
++      128
++    ],
++    "resize-se": [
++      128,
++      128
++    ],
++    "resize-sw": [
++      128,
++      128
++    ],
++    "resize-up": [
++      128,
++      128
++    ],
++    "resize-w": [
++      128,
++      128
++    ],
++    "screenshot-selection": [
++      128,
++      128
++    ],
++    "screenshot-window": [
++      128,
++      128
++    ],
++    "text": [
++      128,
++      128
++    ],
++    "vertical-text": [
++      128,
++      128
++    ],
++    "wait": [
++      128,
++      128
++    ],
++    "zoom-in": [
++      118,
++      108
++    ],
++    "zoom-out": [
++      118,
++      108
++    ]
++  },
++  "license": "MIT",
++  "public_cursor_names": [
++    "alias",
++    "arrow",
++    "cell",
++    "context-menu",
++    "copy",
++    "crosshair",
++    "grab",
++    "grabbing",
++    "help",
++    "move",
++    "not-allowed",
++    "pointer",
++    "poof",
++    "progress",
++    "resize-col",
++    "resize-down",
++    "resize-e",
++    "resize-ew",
++    "resize-left",
++    "resize-n",
++    "resize-ne",
++    "resize-nesw",
++    "resize-ns",
++    "resize-nw",
++    "resize-nwse",
++    "resize-right",
++    "resize-row",
++    "resize-s",
++    "resize-se",
++    "resize-sw",
++    "resize-up",
++    "resize-w",
++    "screenshot-selection",
++    "screenshot-window",
++    "text",
++    "vertical-text",
++    "wait",
++    "zoom-in",
++    "zoom-out"
++  ],
++  "schema": 1,
++  "scope": "Original geometric Vellum cursor artwork"
++}
+--- /dev/null
++++ b/cursors/owned_art_test.go
+@@ -0,0 +1,85 @@
++// Copyright (c) 2026 Davin Hills. SPDX-License-Identifier: MIT.
++package cursors
++
++import (
++	"bytes"
++	"crypto/sha256"
++	"encoding/hex"
++	"encoding/json"
++	"image"
++	"io/fs"
++	"os"
++	"reflect"
++	"sort"
++	"strings"
++	"testing"
++)
++
++func TestVellumOwnedArtworkManifest(t *testing.T) {
++	data, err := os.ReadFile("owned-assets.json")
++	if err != nil {
++		t.Fatal(err)
++	}
++	var m struct {
++		Schema   int
++		License  string
++		Extent   int
++		Files    map[string]string
++		Hotspots map[string][2]int `json:"hotspots_256"`
++		Names    []string          `json:"public_cursor_names"`
++	}
++	if err := json.Unmarshal(data, &m); err != nil {
++		t.Fatal(err)
++	}
++	if m.Schema != 1 || m.License != "MIT" || m.Extent != 256 {
++		t.Fatal("wrong artwork metadata", m)
++	}
++	names := []string{"arrow", "context-menu", "help", "pointer", "progress", "wait", "cell", "crosshair", "text", "vertical-text", "alias", "copy", "move", "not-allowed", "grab", "grabbing", "resize-col", "resize-row", "resize-up", "resize-right", "resize-down", "resize-left", "resize-n", "resize-e", "resize-s", "resize-w", "resize-ne", "resize-nw", "resize-se", "resize-sw", "resize-ew", "resize-ns", "resize-nesw", "resize-nwse", "zoom-in", "zoom-out", "screenshot-selection", "screenshot-window", "poof"}
++	values := CursorValues()
++	if len(values) != 40 || values[0] != None || None != 0 || len(m.Files) != 39 || len(m.Hotspots) != 39 {
++		t.Fatal("cursor identities changed")
++	}
++	for i, name := range names {
++		cursor := values[i+1]
++		if int(cursor) != i+1 || cursor.String() != name {
++			t.Fatalf("public identity changed at %d: %v", i, cursor)
++		}
++		body, err := fs.ReadFile(Cursors, "svg/"+name+".svg")
++		if err != nil {
++			t.Fatal(err)
++		}
++		digest := sha256.Sum256(body)
++		if hex.EncodeToString(digest[:]) != m.Files[name+".svg"] {
++			t.Fatal("artwork checksum", name)
++		}
++		if !strings.Contains(string(body), "SPDX-License-Identifier: MIT") || !strings.Contains(string(body), `viewBox="0 0 256 256"`) {
++			t.Fatal("artwork declaration/extent", name)
++		}
++		hot := m.Hotspots[name]
++		if Hotspots[cursor] != image.Pt(hot[0], hot[1]) {
++			t.Fatal("hotspot metadata", name)
++		}
++	}
++	sort.Strings(names)
++	if !reflect.DeepEqual(names, m.Names) {
++		t.Fatal("manifest identities")
++	}
++	entries, err := fs.ReadDir(Cursors, "svg")
++	if err != nil || len(entries) != 39 {
++		t.Fatal("embedded artwork set", err, len(entries))
++	}
++	fixture, err := os.ReadFile("../svg/testdata/svg/zoom-in.svg")
++	if err != nil {
++		t.Fatal(err)
++	}
++	zoom, err := fs.ReadFile(Cursors, "svg/zoom-in.svg")
++	if err != nil || !bytes.Equal(fixture, zoom) {
++		t.Fatal("SVG regression fixture must use original Vellum artwork", err)
++	}
++	if _, err := SVG("none"); err == nil {
++		t.Fatal("None unexpectedly has an image")
++	}
++	if _, err := SVG("vellum-unknown"); err == nil {
++		t.Fatal("unknown cursor unexpectedly has an image")
++	}
++}

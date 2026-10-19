@@ -892,6 +892,227 @@
               "sha256": "1c579a4ebdc9eb32e85c6c6eb95718c4aea2b0d4ab07291f901f15f6e61c8a81"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/assets/cursors",
+          "inputs": "native/patches/ownedcursors/original-hashes.json",
+          "outputs": "native/patches/ownedcursors/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/ownedcursors/0089-owned-cursor-artwork.patch",
+              "sha256": "7f5c8208b74e5e52942d361e5645c1b8b7a7b4661bfc89e8e2b159a9ae48ca82"
+            }
+          ],
+          "assets": [
+            {
+              "source": "native/assets/cursors/alias.svg",
+              "target": "cursors/svg/alias.svg",
+              "sha256": "839ef963fffa41847cd384d9cfcd690a586cd677620ca842e59a5abd6b3e615c"
+            },
+            {
+              "source": "native/assets/cursors/arrow.svg",
+              "target": "cursors/svg/arrow.svg",
+              "sha256": "76b9d98a43b11ea355ea3861a942d76047faa6bc4530d43b7feebb6395f909fb"
+            },
+            {
+              "source": "native/assets/cursors/cell.svg",
+              "target": "cursors/svg/cell.svg",
+              "sha256": "f29118db8fab2d467eed879c45db01c654f02d43119532709862ec1ab09cc408"
+            },
+            {
+              "source": "native/assets/cursors/context-menu.svg",
+              "target": "cursors/svg/context-menu.svg",
+              "sha256": "f85fdf6c35c3b237982f10967fb45e3844a0206aaac5f01dc8c5160c12721dc8"
+            },
+            {
+              "source": "native/assets/cursors/copy.svg",
+              "target": "cursors/svg/copy.svg",
+              "sha256": "778ef744ea8a673a6f5c53057c647449eb19021aaf4257e188a0ce7f610c8f67"
+            },
+            {
+              "source": "native/assets/cursors/crosshair.svg",
+              "target": "cursors/svg/crosshair.svg",
+              "sha256": "d0b5ec8d63e92ef454150a20fde27971b3a82e6fd944f6f6c02d20ebbc1e487f"
+            },
+            {
+              "source": "native/assets/cursors/grab.svg",
+              "target": "cursors/svg/grab.svg",
+              "sha256": "218f8bbea99bf7a68b53228ffc07eccd77896c72cc9186b9c057f2b80b781938"
+            },
+            {
+              "source": "native/assets/cursors/grabbing.svg",
+              "target": "cursors/svg/grabbing.svg",
+              "sha256": "53ed97cb6270a6eb0257677b38effa88f15b8998ac2eefc5b22b97ed7402391e"
+            },
+            {
+              "source": "native/assets/cursors/help.svg",
+              "target": "cursors/svg/help.svg",
+              "sha256": "f4ff335a25798d819a6d6ed9ee57085162514ced72a7f829e0e365dca9d34b9a"
+            },
+            {
+              "source": "native/assets/cursors/move.svg",
+              "target": "cursors/svg/move.svg",
+              "sha256": "6a090bd589ee746e30cf44587ca7ec0691b959747897d31483bded8f014fb293"
+            },
+            {
+              "source": "native/assets/cursors/not-allowed.svg",
+              "target": "cursors/svg/not-allowed.svg",
+              "sha256": "59c1afc4577e445d8aa78b16b7959ee573be7c34b3a0852ea9c0bd6f8418c2da"
+            },
+            {
+              "source": "native/assets/cursors/pointer.svg",
+              "target": "cursors/svg/pointer.svg",
+              "sha256": "7e264397e41ee8111303c53066397daf9890d861373dd81174b3cd4e7badeab9"
+            },
+            {
+              "source": "native/assets/cursors/poof.svg",
+              "target": "cursors/svg/poof.svg",
+              "sha256": "5e4e945f0b752356c7bb0835a4c167b72786d475948e72e66eb690155bdcd646"
+            },
+            {
+              "source": "native/assets/cursors/progress.svg",
+              "target": "cursors/svg/progress.svg",
+              "sha256": "d1223ae1bda439a68042a93102bbab366e321cd319c24f17136b32a46d7f8803"
+            },
+            {
+              "source": "native/assets/cursors/resize-col.svg",
+              "target": "cursors/svg/resize-col.svg",
+              "sha256": "54f126fb05925fe6cc5f16d577d3e35c1b89daf6e2249adaa78c333250f4ada6"
+            },
+            {
+              "source": "native/assets/cursors/resize-down.svg",
+              "target": "cursors/svg/resize-down.svg",
+              "sha256": "bc257824650bdad2893ed613a6c5bd20293cd4d0a49d6d998173175ce5512c7c"
+            },
+            {
+              "source": "native/assets/cursors/resize-e.svg",
+              "target": "cursors/svg/resize-e.svg",
+              "sha256": "d73f4af44a03435dd8f74e75821a940efb918dae5cf6adda4b192ccdf3f5f895"
+            },
+            {
+              "source": "native/assets/cursors/resize-ew.svg",
+              "target": "cursors/svg/resize-ew.svg",
+              "sha256": "bf6d21586b0be6b5ea0ff3418300c0d44bdee356cecd80a33727092fdeb03b7e"
+            },
+            {
+              "source": "native/assets/cursors/resize-left.svg",
+              "target": "cursors/svg/resize-left.svg",
+              "sha256": "ac11d98ae352194b3383cf62881aaad156c24820eb7e838ab548b1f3cbf94995"
+            },
+            {
+              "source": "native/assets/cursors/resize-n.svg",
+              "target": "cursors/svg/resize-n.svg",
+              "sha256": "78c484c4eb0561a7baff21f446fa1f9a492f7933833ad3ab761a9bcc9092c391"
+            },
+            {
+              "source": "native/assets/cursors/resize-ne.svg",
+              "target": "cursors/svg/resize-ne.svg",
+              "sha256": "b0289001b500cef0576a29423d37ce9acc94c28d9cc81574e831671ba77a7e71"
+            },
+            {
+              "source": "native/assets/cursors/resize-nesw.svg",
+              "target": "cursors/svg/resize-nesw.svg",
+              "sha256": "66e065eb6691209a9a3738b444ce55815684f943f1c6352bae58d261a7827d18"
+            },
+            {
+              "source": "native/assets/cursors/resize-ns.svg",
+              "target": "cursors/svg/resize-ns.svg",
+              "sha256": "54eecd90170c78200672f6260bc4a1544f35d0fcbfa4405890c7f1a4ca268c9d"
+            },
+            {
+              "source": "native/assets/cursors/resize-nw.svg",
+              "target": "cursors/svg/resize-nw.svg",
+              "sha256": "61c59c1831e1c118b43b0d3b1f61cee1c8e939841ff6db144e76e829591a4f77"
+            },
+            {
+              "source": "native/assets/cursors/resize-nwse.svg",
+              "target": "cursors/svg/resize-nwse.svg",
+              "sha256": "acca4d275ead60faceb0b3f40d5097083199f07b0bdcff73034dd2ff25eaacdf"
+            },
+            {
+              "source": "native/assets/cursors/resize-right.svg",
+              "target": "cursors/svg/resize-right.svg",
+              "sha256": "d73f4af44a03435dd8f74e75821a940efb918dae5cf6adda4b192ccdf3f5f895"
+            },
+            {
+              "source": "native/assets/cursors/resize-row.svg",
+              "target": "cursors/svg/resize-row.svg",
+              "sha256": "ad9ce19426ee3d47ce89e29fd07cceb230a4bde43c326a60f0c56f7d6e5fe200"
+            },
+            {
+              "source": "native/assets/cursors/resize-s.svg",
+              "target": "cursors/svg/resize-s.svg",
+              "sha256": "bc257824650bdad2893ed613a6c5bd20293cd4d0a49d6d998173175ce5512c7c"
+            },
+            {
+              "source": "native/assets/cursors/resize-se.svg",
+              "target": "cursors/svg/resize-se.svg",
+              "sha256": "28434a094bfb4dfe3261f7952b27585184115a21611ddc561b55c9cac980217f"
+            },
+            {
+              "source": "native/assets/cursors/resize-sw.svg",
+              "target": "cursors/svg/resize-sw.svg",
+              "sha256": "6c035e739d1bbecf804c391e3ad50e530af8ed6928c6fbc869876d4c12e6fee8"
+            },
+            {
+              "source": "native/assets/cursors/resize-up.svg",
+              "target": "cursors/svg/resize-up.svg",
+              "sha256": "78c484c4eb0561a7baff21f446fa1f9a492f7933833ad3ab761a9bcc9092c391"
+            },
+            {
+              "source": "native/assets/cursors/resize-w.svg",
+              "target": "cursors/svg/resize-w.svg",
+              "sha256": "ac11d98ae352194b3383cf62881aaad156c24820eb7e838ab548b1f3cbf94995"
+            },
+            {
+              "source": "native/assets/cursors/screenshot-selection.svg",
+              "target": "cursors/svg/screenshot-selection.svg",
+              "sha256": "dc695f40c6f79d84a5e8ec3107de5d61d451c0848cba0d6a8f6750440a44fa2c"
+            },
+            {
+              "source": "native/assets/cursors/screenshot-window.svg",
+              "target": "cursors/svg/screenshot-window.svg",
+              "sha256": "1a66a1991140489e509b371ea8d9cfd0696623595ec4ba1876a64e7184307d38"
+            },
+            {
+              "source": "native/assets/cursors/text.svg",
+              "target": "cursors/svg/text.svg",
+              "sha256": "a1ed54736fe9c42e8633fee9bae966c3a05f005b252e57d1b0b5d89aba9fea8e"
+            },
+            {
+              "source": "native/assets/cursors/vertical-text.svg",
+              "target": "cursors/svg/vertical-text.svg",
+              "sha256": "0ecbc8374efc19c90c47a415ea6fa6c7b1138798cbdc35c070eeabcec110a28a"
+            },
+            {
+              "source": "native/assets/cursors/wait.svg",
+              "target": "cursors/svg/wait.svg",
+              "sha256": "b51f8333b22ede74340c3148553877ca0f42cf063da1db76063bcae6f466adb5"
+            },
+            {
+              "source": "native/assets/cursors/zoom-in.svg",
+              "target": "cursors/svg/zoom-in.svg",
+              "sha256": "e23b2e3f2e05c5f98ac21bd3509a77b3b833112e7476bd16b278fcca5fa6ff10"
+            },
+            {
+              "source": "native/assets/cursors/zoom-out.svg",
+              "target": "cursors/svg/zoom-out.svg",
+              "sha256": "23cf96c14187f80fe794b97aaeaf666d16b2bfded7cce2e0040be383eac8a72f"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/assets/cursors",
+          "inputs": "native/patches/ownedcursors/fixture-original-hashes.json",
+          "outputs": "native/patches/ownedcursors/fixture-output-hashes.json",
+          "patches": [],
+          "assets": [
+            {
+              "source": "native/assets/cursors/zoom-in.svg",
+              "target": "svg/testdata/svg/zoom-in.svg",
+              "sha256": "e23b2e3f2e05c5f98ac21bd3509a77b3b833112e7476bd16b278fcca5fa6ff10"
+            }
+          ]
         }
       ]
     },
