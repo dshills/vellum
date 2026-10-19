@@ -612,3 +612,8 @@ select an ignored capsule. The private manifest retains pending audit status;
 matching library bytes, module origin and copied Go notices do not establish
 source attestation, binary ABI/runtime compatibility or complete component/rights
 closure. Observed build/linkage and admitted native qualification remain required.
+
+
+## Owned embedded-asset declaration candidates
+
+Inventory the mandatory root LICENSE and conventional named notices in ancestor directories of actual Go-selected embedded assets for owned/Main modules. Bound and sort discovery, deduplicate module/file identities, refuse redirected/nonregular inputs, exclude unrelated sibling trees, and recheck bytes and discovery at the final snapshot. Expose those original hashes through framework_declarations and asset nearby_notice_candidates. This is candidate discovery, not legal applicability or distribution approval. App packaging continues to transport the explicit executable-bound notice bundle supplied by its caller.

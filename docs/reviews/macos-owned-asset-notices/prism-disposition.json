@@ -1,0 +1,9 @@
+{
+  "finding_id": "a1ed86547af8c574",
+  "disposition": "intentional_policy_no_source_change",
+  "reason": "The release spec explicitly requires bounded discovery and refusal of redirected/nonregular declaration inputs. The single visited counter limits aggregate work over all selected ancestors; resetting per directory would remove that total-work bound. A conventional notice name occupied by a directory or FIFO is refused rather than silently omitted from the candidate inventory. These cases are explicit refusals, not a claim that every module fits the configured 20000-entry budget.",
+  "controls_sha256": "fe381ede3e86fec3a76241eae430d726976a31e9cb012762c165089545a8dedb",
+  "raw_prism_sha256": "733300236054eb739158c7e79c502f0c27919357b841cca162ebf19e6b08ea0a",
+  "unresolved_actionable_findings": 0,
+  "native_performance_qualification": false
+}

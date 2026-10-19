@@ -1,0 +1,43 @@
+{
+  "files": [
+    "docs/reviews/macos-busy-paint-retry/README.md",
+    "docs/reviews/macos-busy-paint-retry/checks.json",
+    "docs/reviews/macos-busy-paint-retry/independent-review.json",
+    "docs/reviews/macos-busy-paint-retry/scope.json",
+    "docs/reviews/macos-owned-asset-notices/README.md",
+    "docs/reviews/macos-owned-asset-notices/checks.json",
+    "docs/reviews/macos-owned-asset-notices/independent-review.json",
+    "docs/reviews/macos-owned-asset-notices/private99-package-summary.json",
+    "docs/reviews/macos-owned-asset-notices/scope.json",
+    "drivers/cogent/native/dependencies.json",
+    "drivers/cogent/native/patches/paintretry/0100-busy-paint-retry.patch",
+    "drivers/cogent/native/patches/paintretry/README.md",
+    "drivers/cogent/native/patches/paintretry/original-hashes.json",
+    "drivers/cogent/native/patches/paintretry/output-hashes.json",
+    "drivers/cogent/prepare_test.py",
+    "scripts/distribution-inventory.py",
+    "scripts/distribution-inventory_test.py",
+    "specs/macos-responsiveness.md",
+    "specs/release.md"
+  ],
+  "bytes": 70440,
+  "sha256": "625840f2ce758eba5223c1be87227ad21896061579e8ff9ca8a60abe4a5e841d",
+  "phase_paths": {
+    "busy": [
+      "drivers/cogent/native/dependencies.json",
+      "drivers/cogent/prepare_test.py",
+      "specs/macos-responsiveness.md",
+      "drivers/cogent/native/patches/paintretry/original-hashes.json",
+      "drivers/cogent/native/patches/paintretry/output-hashes.json",
+      "drivers/cogent/native/patches/paintretry/0100-busy-paint-retry.patch",
+      "drivers/cogent/native/patches/paintretry/README.md",
+      "docs/reviews/macos-busy-paint-retry"
+    ],
+    "collector": [
+      "scripts/distribution-inventory.py",
+      "scripts/distribution-inventory_test.py",
+      "specs/release.md",
+      "docs/reviews/macos-owned-asset-notices"
+    ]
+  }
+}

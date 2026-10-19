@@ -1,0 +1,81 @@
+{
+  "approved": true,
+  "source_ready": true,
+  "unresolved_findings": [],
+  "scope": "Independent read-only review of two-file owned selected-embed declaration collector correction. Not a checkpoint/commit admission or legal/applicability approval.",
+  "final_files": {
+    "scripts/distribution-inventory.py": "0f146bebd48d88d53657e5abd0e5d7b0d5f7d54d6b1743f72e2569b09074ed85",
+    "scripts/distribution-inventory_test.py": "6add0b04356db20e6f3a3ff8e5d97146d83a8dd07e80b7bda5804ac69c6518a0"
+  },
+  "patch_sha256": "a5f511ed6c5c7910f2212998b7affe94661f6ca8cfabc4735d1c9a02b52fe88f",
+  "observations": [
+    {
+      "claim": "Owned modules retain required root LICENSE before supplementary discovery.",
+      "source": "final/scripts/distribution-inventory.py:511-518"
+    },
+    {
+      "claim": "Discovery uses only selected embedded assets belonging to those owned modules; ancestors are enumerated once and only immediate entries inspected. No recursion into siblings/build trees/nested modules.",
+      "source": "final/scripts/distribution-inventory.py:169-207"
+    },
+    {
+      "claim": "MAX_FILES caps distinct ancestor directories, all examined directory entries and admitted declarations; file_identity supplies regular-path and per-file byte checks. Output order is sorted by(module,file), independent of directory enumeration and relocation.",
+      "source": "final/scripts/distribution-inventory.py:145-161,177-208"
+    },
+    {
+      "claim": "New declarations join framework_declarations and nearby_notice_candidates. They are included in final input-byte rechecks and rediscovered after Go metadata re-observation, refusing changes/removal/addition.",
+      "source": "final/scripts/distribution-inventory.py:538-548,556-581"
+    },
+    {
+      "claim": "Existing declared_notice naming/exclusion policy remains unchanged; SOURCE.json and unselected sibling notices are excluded. Rights/applicability stay review-required and distribution_audit pending.",
+      "source": "final/scripts/release-sdk.py:167-175;final/scripts/distribution-inventory.py:586"
+    }
+  ],
+  "evidence": {
+    "python_total_methods": 37,
+    "new_collect_methods_in_total": 7,
+    "baseline_negative_methods": 6,
+    "baseline_failed_method_names": [
+      "test_collect_owned_notice_bytes_and_directory_entries_remain_bounded",
+      "test_collect_refuses_owned_notice_drift_after_discovery",
+      "test_collect_selected_owned_svg_original_ancestor_declarations_and_relocation"
+    ],
+    "baseline_failure_details": "Four unittest failure records across three method names because the bounds method has both entry and ancestor failing subtests. Negative exit1 is preserved and expected; it is not a successful baseline implementation.",
+    "actual_receipts": "Both recorded Python processes terminal with group absence and complete matching log hashes; no rerun performed.",
+    "test_assessment": "Controls use actual collect() with real temporary asset/declaration bytes and mocked Go subprocess/module metadata. They discriminate nearby candidate transport, relocation, root LICENSE requirement, symlink/FIFO, changed/new declarations, byte/entry/ancestor bounds.",
+    "patch_assessment": "Exact unified diff independently reconstructed from retained baseline/final two files and matched byte-for-byte."
+  },
+  "limits": [
+    "No source edits, tests, Go builds, native/provider or Git actions in this review.",
+    "Did not re-review or qualify separate current99 actual4441 selected embeds/application evidence; this review covers the collector change and recorded Python controls.",
+    "Discovery names candidate declarations and does not establish notice applicability, complete rights, package distribution approval or full M6/Mac closure.",
+    "App notice construction/release gates remain unchanged; transport beyond this collector requires the existing app constructor or explicit current99 supplement.",
+    "No general adversarial atomic filesystem snapshot guarantee is introduced; this uses the existing regular-path and final byte/re-discovery observation boundaries."
+  ],
+  "inputs": {
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/README.md": "eeffeb8894eb3353bcb46e41fa528f7ab467f7ca9444e3bed880146e6175d3ba",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/baseline/scripts/distribution-inventory.py": "815c0e32c163004d22c566fa94a42094b119dfc266a46a6776b599d32049ab6e",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/baseline/scripts/distribution-inventory_test.py": "d07096098b78f9d6ef0d3907801f13dda2172445439ae82c37c148c03e6282f5",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/baseline-inputs.json": "0cdbd1fdfcfd6dc9bd4c1f2bbded982190d5c20379779467a88d9c1d9c79f003",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/checks-final-v3/owned.json": "bc0a4af515f0bd57d7af2ef97ccd2bb9892b2aee7ba2a493385f08b11d660971",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/checks-final-v3/stderr": "9f29a84f44b90a340ed4cd564b0d86fe32e51e0151144aa913adecb1b23eeb01",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/checks-final-v3/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/checks-final-v3.json": "166d43ded56d712a0aff9b1ece9ea3c31dd69b1f22bd0353344a3609bbf44644",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/checks-negative-v3/owned.json": "067811794ea8add50ecf82cd52a4c8aff73fd166c9b3656dffc5413a5f0bb164",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/checks-negative-v3/stderr": "f5c16e5ef2fe7f006dad9589a8790d2eadb77f9414f773c2cf8a12dd6c2fca40",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/checks-negative-v3/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/checks-negative-v3.json": "cf322a66d00abb36c60b2937fdfa45d10b9e044a91f8935877f5e98c86c96e5b",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/collector.patch": "a5f511ed6c5c7910f2212998b7affe94661f6ca8cfabc4735d1c9a02b52fe88f",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/final/scripts/artifact_io.py": "c2f4a6cc7d07e039350d31e23c3e5a574a79756444ab84e41ab09feff6d2a4e5",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/final/scripts/child_process.py": "f907c7c6ce54871c9693be9fd8a9088cf09bd22cabc4e48d3abc7191f75bc7e6",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/final/scripts/distribution-inventory.py": "0f146bebd48d88d53657e5abd0e5d7b0d5f7d54d6b1743f72e2569b09074ed85",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/final/scripts/distribution-inventory_test.py": "6add0b04356db20e6f3a3ff8e5d97146d83a8dd07e80b7bda5804ac69c6518a0",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/final/scripts/native_archive.py": "b186e30cf34577b0c1ccc4d25f5c090981afac25a0840942de0e83087ca4b541",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/final/scripts/native_gpu.py": "2e7c76e72dcb489ee405dd54bdca95392c6e907ed3822dc46242425cf9ae54e4",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/final/scripts/release-sdk.py": "b606a191777eac7680df9db416632a7beffea361f5b92b34713fb6e43d7cd3e7",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/final/scripts/sdk_environment.py": "e100d93ed7ca190725c8e10d1b721cb56f2d86a5f12643b53b4ee198a79b4311",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/negative-result.json": "1e7c4793d4fed771636ad73311c933283b23c9892473694f1ecefb352afb00f2",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/negative.py": "fe44894bc45c47b7105df238b6cc036c702149dbd235781d9ae6e8c7da602d5b",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/result.json": "ba60e75776b01e1305acca719ab742e02212ad376fe1bab64146190a52b5a84e",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m6-current99/collector-correction/run-checks.py": "d998183059170b050f762df4cf75bc1cdcc1a9b9f6cd0ab238c5455b4d1a277e"
+  }
+}

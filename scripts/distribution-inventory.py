@@ -166,6 +166,50 @@ def nearby_notices(name, module):
             if PurePosixPath(item["file"]).parent in parents]
 
 
+def owned_asset_declarations(assets, roots, declarations):
+    """Add named ancestor notices for selected owned-module embeds only.
+
+    These are candidate declarations, not an applicability decision. Inspect
+    immediate entries in selected ancestors; never walk an owned build tree.
+    """
+    found = {(record["module"], record["file"]): record for record in declarations}
+    owned = {record["module"] for record in declarations}
+    if len(found) > MAX_FILES:
+        raise ValueError("owned asset notices exceed file-count bound")
+    directories = set()
+    for asset in assets:
+        module = asset["module"]
+        if module not in owned:
+            continue
+        base = roots[module]
+        release.require_regular_source(base, base / asset["file"])
+        for parent in PurePosixPath(asset["file"]).parents:
+            key = module, parent.as_posix()
+            if key not in directories and len(directories) == MAX_FILES:
+                raise ValueError("owned asset notice search exceeds ancestor-count bound")
+            directories.add(key)
+    visited = 0
+    for module, relative in sorted(directories):
+        base, parent = roots[module], PurePosixPath(relative)
+        current = base
+        for part in parent.parts:
+            current /= part
+            if current.is_symlink() or not current.is_dir():
+                raise ValueError("owned asset notice ancestor must be a regular directory")
+        with os.scandir(current) as entries:
+            for entry in entries:
+                if visited == MAX_FILES:
+                    raise ValueError("owned asset notice search exceeds file-count bound")
+                visited += 1
+                name = (parent / entry.name).as_posix()
+                if not release.declared_notice(Path(name)) or (module, name) in found:
+                    continue
+                if len(found) == MAX_FILES:
+                    raise ValueError("owned asset notices exceed file-count bound")
+                found[module, name] = {"module": module, **file_identity(base, name)}
+    return [found[key] for key in sorted(found)]
+
+
 def normalize_flag(flag, roots):
     # Replace only actual path prefixes, longest first; no substring matching.
     prefix = flag[:2] if flag.startswith(("-L", "-F")) and len(flag) > 2 else ""
@@ -491,6 +535,15 @@ def collect(root, include_untracked=False, binary=None, link_map=None):
         suffix = path.suffix.lower()
         record["kind"] = "font-candidate" if suffix in FONT_SUFFIXES else "native-file-candidate" if suffix in NATIVE_SUFFIXES else "sdk-file"
         sources.append(record)
+    root_declarations = declarations
+    declarations = owned_asset_declarations(builds["embedded_assets"], roots, root_declarations)
+    owned = {record["module"] for record in declarations}
+    for module in owned:
+        notice_by_module[module] = {"license_files": [record for record in declarations
+                                                      if record["module"] == module]}
+    for asset in builds["embedded_assets"]:
+        if asset["module"] in owned:
+            asset["nearby_notice_candidates"] = nearby_notices(asset["file"], notice_by_module[asset["module"]])
     # Capture patch/pin identity in addition to hashes of the prepared files.
     pin_record = file_identity(root, "drivers/cogent/native/dependencies.json")
     toolchain_roots = {"GOROOT": toolchain_root, "GOROOT-parent": toolchain_root.parent}
@@ -522,6 +575,8 @@ def collect(root, include_untracked=False, binary=None, link_map=None):
         raise ValueError("Go build metadata changed during inventory collection")
     if standard_library_inventory(latest_packages, toolchain_root) != standard:
         raise ValueError("standard-library inputs or declarations changed during collection")
+    if owned_asset_declarations(builds["embedded_assets"], roots, root_declarations) != declarations:
+        raise ValueError("owned asset declarations changed during collection")
     latest_state, latest_sources = source_snapshot(root, include_untracked)
     if [name for name, _ in latest_sources] != [record["file"] for record in sources]:
         raise ValueError("SDK source set changed during inventory collection")

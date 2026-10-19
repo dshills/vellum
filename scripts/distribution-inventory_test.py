@@ -525,5 +525,140 @@ class SDKSourceChecks(unittest.TestCase):
                     self.assertEqual(list(root.rglob('__pycache__')),[])
 
 
+class OwnedAssetDeclarationChecks(unittest.TestCase):
+    def fixture(self, base):
+        helper = InventoryChecks()
+        fixture = helper.fixture(base)
+        root, driver = fixture[:2]
+        symbols = driver / "native/assets/symbols"
+        sibling = driver / "native/assets/unselected"
+        symbols.mkdir(parents=True)
+        sibling.mkdir()
+        (symbols / "rain.svg").write_bytes(b'<svg xmlns="http://www.w3.org/2000/svg"/>\n')
+        (symbols / "LICENSE_APACHE.txt").write_bytes(b"original Apache declaration\n")
+        (symbols / "NOTICE.md").write_bytes(b"original source attribution\n")
+        (symbols / "SOURCE.json").write_bytes(b'{"scope":"source receipt, not a license"}\n')
+        (sibling / "NOTICE.md").write_bytes(b"unselected sibling declaration\n")
+        fixture[4][1]["EmbedFiles"] = ["native/assets/symbols/rain.svg"]
+        fixture[6].extend((p.relative_to(root).as_posix(), p) for p in symbols.iterdir())
+        return helper, fixture
+
+    def test_collect_selected_owned_svg_original_ancestor_declarations_and_relocation(self):
+        reports = []
+        for _ in range(2):
+            with tempfile.TemporaryDirectory() as temporary:
+                helper, fixture = self.fixture(Path(temporary))
+                result = helper.collect_fixture(fixture)
+                asset = result["embedded_assets"][0]
+                self.assertEqual(asset["file"], "native/assets/symbols/rain.svg")
+                self.assertEqual(asset["sha256"], hashlib.sha256(b'<svg xmlns="http://www.w3.org/2000/svg"/>\n').hexdigest())
+                self.assertEqual(asset["kind"], "embedded-asset")
+                self.assertEqual(asset["nearby_notice_candidates"], [
+                    "LICENSE", "native/assets/symbols/LICENSE_APACHE.txt", "native/assets/symbols/NOTICE.md"])
+                self.assertEqual(asset["rights_status"], "review-required")
+                declarations = {(r["module"], r["file"]): r for r in result["framework_declarations"]}
+                for name in asset["nearby_notice_candidates"]:
+                    record = declarations["example.com/driver", name]
+                    self.assertEqual(record["sha256"], hashlib.sha256((fixture[1] / name).read_bytes()).hexdigest())
+                self.assertNotIn(("example.com/driver", "native/assets/symbols/SOURCE.json"), declarations)
+                self.assertNotIn(("example.com/driver", "native/assets/unselected/NOTICE.md"), declarations)
+                self.assertEqual(result["distribution_audit"], "pending")
+                self.assertFalse(result["runtime_executed"])
+                reports.append(result)
+        self.assertEqual(reports[0], reports[1])
+
+    def test_collect_owned_root_license_remains_required(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            helper, fixture = self.fixture(Path(temporary))
+            (fixture[1] / "LICENSE").unlink()
+            with self.assertRaisesRegex(ValueError, "regular file"):
+                helper.collect_fixture(fixture)
+
+    def test_collect_refuses_selected_asset_ancestor_and_notice_symlinks(self):
+        for mode in ["ancestor", "notice"]:
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as temporary:
+                base = Path(temporary)
+                helper, fixture = self.fixture(base)
+                symbols = fixture[1] / "native/assets/symbols"
+                if mode == "ancestor":
+                    destination = base / "redirected symbols"
+                    symbols.rename(destination)
+                    symbols.symlink_to(destination, target_is_directory=True)
+                else:
+                    notice = symbols / "NOTICE.md"
+                    target = base / "other original declaration"
+                    notice.rename(target)
+                    notice.symlink_to(target)
+                with self.assertRaisesRegex(ValueError, "symlink"):
+                    helper.collect_fixture(fixture)
+
+    def test_collect_refuses_nonregular_adjacent_notice_without_opening_it(self):
+        import os
+        with tempfile.TemporaryDirectory() as temporary:
+            helper, fixture = self.fixture(Path(temporary))
+            notice = fixture[1] / "native/assets/symbols/NOTICE.md"
+            notice.unlink()
+            os.mkfifo(notice)
+            with self.assertRaisesRegex(ValueError, "regular file"):
+                helper.collect_fixture(fixture)
+
+    def test_collect_refuses_owned_notice_drift_after_discovery(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            helper, fixture = self.fixture(Path(temporary))
+            real_identity = inventory.file_identity
+            changed = []
+            def mutate(base, name):
+                record = real_identity(base, name)
+                if name == "native/assets/symbols/NOTICE.md" and not changed:
+                    (base / name).write_bytes(b"changed after the observed declaration\n")
+                    changed.append(name)
+                return record
+            with mock.patch.object(inventory, "file_identity", side_effect=mutate):
+                with self.assertRaisesRegex(ValueError, "inventory input changed"):
+                    helper.collect_fixture(fixture)
+            self.assertEqual(changed, ["native/assets/symbols/NOTICE.md"])
+
+    def test_collect_refuses_adjacent_notice_added_after_discovery(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            helper, fixture = self.fixture(Path(temporary))
+            original = inventory.owned_asset_declarations
+            calls = []
+            def discover(*args):
+                result = original(*args)
+                if not calls:
+                    (fixture[1] / "native/assets/symbols/OFL.txt").write_bytes(b"late declaration")
+                calls.append(result)
+                return result
+            with mock.patch.object(inventory, "owned_asset_declarations", side_effect=discover):
+                with self.assertRaisesRegex(ValueError, "owned asset declarations changed"):
+                    helper.collect_fixture(fixture)
+            self.assertEqual(len(calls), 2)
+
+    def test_collect_owned_notice_bytes_and_directory_entries_remain_bounded(self):
+        for mode in ["bytes", "entries", "ancestors"]:
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as temporary:
+                helper, fixture = self.fixture(Path(temporary))
+                symbols = fixture[1] / "native/assets/symbols"
+                if mode == "bytes":
+                    (symbols / "NOTICE.md").write_bytes(b"x" * 65)
+                    setting, limit, reason = "MAX_FILE_BYTES", 64, "file bound"
+                elif mode == "entries":
+                    for i in range(25):
+                        (symbols / ("unrelated-" + str(i))).write_bytes(b"not a declaration")
+                    setting, limit, reason = "MAX_FILES", 20, "notice search exceeds file-count bound"
+                else:
+                    before = symbols / "rain.svg"
+                    after = symbols.joinpath(*(["nested"] * 12), "rain.svg")
+                    after.parent.mkdir(parents=True)
+                    before.rename(after)
+                    fixture[4][1]["EmbedFiles"] = [after.relative_to(fixture[1]).as_posix()]
+                    fixture[6][:] = [(after.relative_to(fixture[0]).as_posix(), after) if path == before else (name, path)
+                                     for name, path in fixture[6]]
+                    setting, limit, reason = "MAX_FILES", 10, "notice search exceeds ancestor-count bound"
+                with mock.patch.object(inventory, setting, limit):
+                    with self.assertRaisesRegex(ValueError, reason):
+                        helper.collect_fixture(fixture)
+
+
 if __name__ == "__main__":
     unittest.main()
