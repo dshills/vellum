@@ -1,0 +1,312 @@
+{
+  "schema": 1,
+  "base": "42e00b2f157fc75bbea77e23e2b42c4f60d4d2a7",
+  "scope": "Four exact typesetting test fonts; supplemental notices, no rights approval",
+  "units": {
+    "methods": 40,
+    "seconds": 1.976,
+    "passed": true,
+    "baseline_preparation": {
+      "methods": 11,
+      "failures": 1,
+      "reason": "existing upstreamstage88 omitted by stale order expectation"
+    }
+  },
+  "preparation": {
+    "result": "PASS_FRESH_FONT_NOTICE_PREPARATION_AND_COLLECTION",
+    "existing_files_unchanged": 292,
+    "added_files": {
+      "font/LICENSE_ROBOTO.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "font/OFL_AMIRI.txt": "b8cb059605ed384a35d449bf50a8f7c0e3cd0b752e5289e6c2e9ce0d2d04ac30",
+      "font/OFL_SELAWIK.txt": "77b7c2506d4efb22e09c8ccf10159f4956eab3ef7c007fef95de136bcf45300c",
+      "font/LICENSE_UBUNTU.txt": "2f0015108d68627bd788d313f529c21ff4da2c2c42a5e1f3883acc83480f9002",
+      "font/NOTICE.fonts.md": "670610bc07df59ac653ef338cc3e4207a99c085ab9f9464f62574f72ba29e68d"
+    },
+    "prepared_files": 297,
+    "negative_controls": [
+      "changed font refuses notice attachment",
+      "preexisting new notice refuses replacement",
+      "missing required output notices refuse",
+      "changed output declaration refuses"
+    ],
+    "module_license_files": [
+      "LICENSE"
+    ],
+    "module_version": "v0.3.5-0.20260418130854-c41d02a44bec",
+    "module_sum": "h1:qkk9+cZlaY8920dQrhY8GoI91N72f58XmJgGDkkDiaA=",
+    "notice_count": 7
+  },
+  "sdk": {
+    "result": "PASS_ACTUAL_SDK_FONT_NOTICE_EXPORT",
+    "archive": {
+      "archive": "/private/tmp/vellum-test-font-notices-42e00b2-v2/sdk.tar.gz",
+      "sha256": "980ff9b3a49b858722a1f8e1493d2749877a385f796278800f9035762aa89e2c",
+      "version": "v0.1.0-alpha.2",
+      "modules": 89,
+      "private_build": true
+    },
+    "sdk": "/private/tmp/vellum-test-font-notices-42e00b2-v2/relocated SDK/vellum-v0.1.0-alpha.2",
+    "sdk_files": 8063,
+    "added": [
+      "THIRD_PARTY_NOTICES/4cb6edc9670664b2/font/LICENSE_ROBOTO.txt",
+      "THIRD_PARTY_NOTICES/4cb6edc9670664b2/font/LICENSE_UBUNTU.txt",
+      "THIRD_PARTY_NOTICES/4cb6edc9670664b2/font/NOTICE.fonts.md",
+      "THIRD_PARTY_NOTICES/4cb6edc9670664b2/font/OFL_AMIRI.txt",
+      "THIRD_PARTY_NOTICES/4cb6edc9670664b2/font/OFL_SELAWIK.txt",
+      "drivers/cogent/build/typesetting/font/LICENSE_ROBOTO.txt",
+      "drivers/cogent/build/typesetting/font/LICENSE_UBUNTU.txt",
+      "drivers/cogent/build/typesetting/font/NOTICE.fonts.md",
+      "drivers/cogent/build/typesetting/font/OFL_AMIRI.txt",
+      "drivers/cogent/build/typesetting/font/OFL_SELAWIK.txt",
+      "drivers/cogent/native/patches/testfontnotices/0005-test-font-notices.patch",
+      "drivers/cogent/native/patches/testfontnotices/README.md",
+      "drivers/cogent/native/patches/testfontnotices/original-hashes.json",
+      "drivers/cogent/native/patches/testfontnotices/output-hashes.json"
+    ],
+    "changed": [
+      "THIRD_PARTY_INVENTORY.json",
+      "drivers/cogent/native/dependencies.json",
+      "drivers/cogent/prepare_test.py",
+      "specs/macos-delivery.md",
+      "specs/release.md"
+    ],
+    "unchanged_payload_files": 8043,
+    "module_count": 89,
+    "boundaries_unchanged": true,
+    "rights_status": "review-required",
+    "distribution_audit": "pending"
+  },
+  "owned_commands": {
+    "units": {
+      "exit_code": 0,
+      "terminal": true,
+      "group_absent": true
+    },
+    "preparation": {
+      "exit_code": 0,
+      "terminal": true,
+      "group_absent": true
+    },
+    "SDK": {
+      "exit_code": 0,
+      "terminal": true,
+      "group_absent": true
+    }
+  },
+  "limitations": [
+    "Official-family declaration identity is distinct from exact font binary origin",
+    "Selawik modified/subset history and reserved-name permission unresolved",
+    "Runtime/native/font bytes unchanged; earlier build/app/all-main evidence reused only",
+    "No native app/physical/manual/presentation/lifecycle/rights/fullMac qualification"
+  ],
+  "artifacts": {
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/implementation.json": {
+      "bytes": 1972,
+      "sha256": "6fd3e846eec6ee606e70898f1627e28c80a558bbcdbb7ea0f7a3320f6e4cc023"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/design-review.json": {
+      "bytes": 11457,
+      "sha256": "f817b8f8fda156e123a1d09fa289652070220d113ecfb063488ff818be4c0c50"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/preparation-result.json": {
+      "bytes": 2857,
+      "sha256": "4465d6c7707df1435f972546efe868fe34b28da61a6004fb691a1871a7136ffc"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/checks-inputs.json": {
+      "bytes": 8867610,
+      "sha256": "0c8dd2e85830946ff929deedc6266252410d8454170bb5900e074623575e91bf"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/checks-result.json": {
+      "bytes": 6585,
+      "sha256": "a7f152216f70860dbb974b5a85e842986a666ac81c9235839d043a9d33a94051"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/sdk-inputs.json": {
+      "bytes": 9570017,
+      "sha256": "d50160bc1bd8becead939577dd17f226e4c56c39e2e821471aeeae36adb8501c"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/sdk-result.json": {
+      "bytes": 5572,
+      "sha256": "dc3ae7d056a7067a3a864c417f6101d6cdf7348abf65623dac38b24534593f39"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/run-checks.py": {
+      "bytes": 4329,
+      "sha256": "8db5c04ceadbcd7de0b7f140ca68db1412a95a2a2f5e2acd9978284fa56a78d9"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/prepare-typesetting.py": {
+      "bytes": 4555,
+      "sha256": "76812a6ed3906d5c806bd99a30cd15dedaa035814d1601f76854e4aaf47dc56d"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/units.py": {
+      "bytes": 597,
+      "sha256": "12aef42cd886dde49a28f1e83db53a952a172a82ed59c3d4e5c22d897a5e4170"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/package-sdk.py": {
+      "bytes": 7494,
+      "sha256": "38552b15f491b5330a2c4145410272d08842f88257111f79e620e3b43528bd08"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/grouped.py": {
+      "bytes": 1616,
+      "sha256": "5686321b15c53f7e5fe861479dd6499d03b878755c7ae3fbef0ec8b83b222421"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/baseline-prepare.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/baseline-prepare.stderr": {
+      "bytes": 3209,
+      "sha256": "bca284fed5374709c2affde1edada283c19d747d265010d9b864a5246151bc56"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/attempt-v1/prepare-typesetting.py": {
+      "bytes": 4552,
+      "sha256": "f7031eee08ea2a9dbd4a404e30d057aef696268a216b57f3242e61931b64d3e3"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/attempt-v1/units.py": {
+      "bytes": 597,
+      "sha256": "12aef42cd886dde49a28f1e83db53a952a172a82ed59c3d4e5c22d897a5e4170"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/attempt-v1/checks-result.json": {
+      "bytes": 315,
+      "sha256": "242d84e940699a27fb3f72c6de58f693016d8ef5aee461f91e09acaa064b2e9f"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/attempt-v1/stop-checks": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/attempt-v1/run-checks.py": {
+      "bytes": 4305,
+      "sha256": "ce366d82ea107101074248d71cc0de342a925085c58a5cd95f76dcf9ec2a5dcd"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/attempt-v1/checks-inputs.json": {
+      "bytes": 8867610,
+      "sha256": "bd4d6f1281d9f255f5df896a83844c962d32a3f8edb04ceab97dcbfe20c52959"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/checks/units/stdout": {
+      "bytes": 264,
+      "sha256": "2e383ffb2fa7933685aeac5d3c8b88b713d653ec5b5596de9503b40b3669ae63"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/checks/units/stderr": {
+      "bytes": 6567,
+      "sha256": "d4262d25f7f20a31a4f7ee423fde7da863bfbf413d29b08f517b3971f8e7ae6e"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/checks/units/owned.json": {
+      "bytes": 2068,
+      "sha256": "27a985d12e696587cf998f936dacac94e4cbed5ff45b3ea1ce68b0fe9e3d136c"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/checks/preparation/stdout": {
+      "bytes": 1303,
+      "sha256": "98133f881c708179452e22b91ae4947cd621cd137af395f83cf4e06c8ad95dfe"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/checks/preparation/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/checks/preparation/owned.json": {
+      "bytes": 2082,
+      "sha256": "569e37054047bbeded4cf30ac01966aa9be362527ace01e831670ef7dfa992aa"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/sdk-command/package/stdout": {
+      "bytes": 232,
+      "sha256": "5942646cbf2f4963261f1a424034f17b92598ba61386852f5e6cc6bd5d5a2dba"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/sdk-command/package/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/sdk-command/package/owned.json": {
+      "bytes": 2687,
+      "sha256": "461969ed76f58a88c4a9bd19521f34a2c42f8366df48286e1152451dca338673"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/roboto-blob.json": {
+      "bytes": 15944,
+      "sha256": "470b9f26fb837adb13db7ab3328e5dd638b1f7973e516a1fa45a407a3b2c451e"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/selawik-LICENSE.txt": {
+      "bytes": 4509,
+      "sha256": "77b7c2506d4efb22e09c8ccf10159f4956eab3ef7c007fef95de136bcf45300c"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/ubuntu-commit.json": {
+      "bytes": 213456,
+      "sha256": "82f76faa52ba328b02e8bd0e548d77838b00817cb558431ac00ceee79b838e2f"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/roboto-LICENSE.txt": {
+      "bytes": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/ubuntu-tree.json": {
+      "bytes": 4004,
+      "sha256": "24d96e842b4f27d22c2ee41ec9df1d87cfacec2fe9d767a03bb54e0dc9989d56"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/ubuntu-LICENSE.txt": {
+      "bytes": 4673,
+      "sha256": "2f0015108d68627bd788d313f529c21ff4da2c2c42a5e1f3883acc83480f9002"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/roboto-commit.json": {
+      "bytes": 5292,
+      "sha256": "a2591e25403987339e40861ae0ddbc0182a11c0e8fdf99b14147d25100271792"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/selawik-tree.json": {
+      "bytes": 1049,
+      "sha256": "ca152fca47e9c86b623583276ef54c8175caa3d016d600da2c360bac80383932"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/selawik-commit.json": {
+      "bytes": 7887,
+      "sha256": "519b3a64fefb74c82e79eba4250fad07eb8050ce13b45aa9cad1794dd2dab66e"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/ubuntu-source.json": {
+      "bytes": 454,
+      "sha256": "8c7ccfeb2e06c58fa282e2b65cb9bf1d3ad87f1250eaf9f836864c592ef7e41b"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/roboto-tree.json": {
+      "bytes": 2553,
+      "sha256": "b58a94e8861c8e54694a80ff27d77bd1f976752354ae494476617bd18a663e5e"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/selawik-source.json": {
+      "bytes": 434,
+      "sha256": "143cc82fb81a95d929d08c60c838d3f7b22b866a0dadb58151ffe006d2100f56"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/roboto-source.json": {
+      "bytes": 433,
+      "sha256": "51f5cd8d9d66d53586b883d5f089d33bcf8c4b0767ff6c4742181e1086c1e257"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/selawik-blob.json": {
+      "bytes": 6504,
+      "sha256": "fbd30d1f85176c3e0a0e4013c5f5e6e91d104b0ceee6133ab22b7f744b001c3a"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-test-font-notices/ubuntu-blob.json": {
+      "bytes": 6733,
+      "sha256": "b26b2e38e86a22f704196f8589ee7c9a88d46bd5eb31a43199ec988ee1f53de4"
+    },
+    "/private/tmp/vellum-test-font-notices-42e00b2-v2/sdk.tar.gz": {
+      "bytes": 30122320,
+      "sha256": "980ff9b3a49b858722a1f8e1493d2749877a385f796278800f9035762aa89e2c"
+    },
+    "/private/tmp/vellum-test-font-notices-42e00b2-v2/relocated SDK/vellum-v0.1.0-alpha.2/SDK_MANIFEST.json": {
+      "bytes": 1144054,
+      "sha256": "8441159c1858b728c94223caeba77ae080ba1edd34f521714cdfd082749bd308"
+    },
+    "/private/tmp/vellum-test-font-notices-42e00b2-v2/relocated SDK/vellum-v0.1.0-alpha.2/THIRD_PARTY_INVENTORY.json": {
+      "bytes": 119650,
+      "sha256": "438bd27e6d3805b666c33981b9199ba7078d2e1f9cf6093960f4ebd15bbb17ba"
+    },
+    "/private/tmp/vellum-test-font-notices-42e00b2-v2/typesetting/font/LICENSE_ROBOTO.txt": {
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "/private/tmp/vellum-test-font-notices-42e00b2-v2/typesetting/font/OFL_AMIRI.txt": {
+      "bytes": 4387,
+      "sha256": "b8cb059605ed384a35d449bf50a8f7c0e3cd0b752e5289e6c2e9ce0d2d04ac30"
+    },
+    "/private/tmp/vellum-test-font-notices-42e00b2-v2/typesetting/font/OFL_SELAWIK.txt": {
+      "bytes": 4509,
+      "sha256": "77b7c2506d4efb22e09c8ccf10159f4956eab3ef7c007fef95de136bcf45300c"
+    },
+    "/private/tmp/vellum-test-font-notices-42e00b2-v2/typesetting/font/LICENSE_UBUNTU.txt": {
+      "bytes": 4673,
+      "sha256": "2f0015108d68627bd788d313f529c21ff4da2c2c42a5e1f3883acc83480f9002"
+    },
+    "/private/tmp/vellum-test-font-notices-42e00b2-v2/typesetting/font/NOTICE.fonts.md": {
+      "bytes": 4174,
+      "sha256": "670610bc07df59ac653ef338cc3e4207a99c085ab9f9464f62574f72ba29e68d"
+    }
+  }
+}

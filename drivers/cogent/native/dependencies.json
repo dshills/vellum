@@ -942,6 +942,17 @@
               "sha256": "d49f8008779ea6496268ac8daa04fbd3353b4de0e845d003ee553a0fdd0d7f78"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/testfontnotices",
+          "inputs": "native/patches/testfontnotices/original-hashes.json",
+          "outputs": "native/patches/testfontnotices/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/testfontnotices/0005-test-font-notices.patch",
+              "sha256": "fbc958851085e7281486c554a740140d1cc3c9a49b206f33f4a5adc09cf5aba9"
+            }
+          ]
         }
       ]
     }

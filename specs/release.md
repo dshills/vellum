@@ -111,6 +111,26 @@ native archive bundle does not close those Go-module gaps. Applicable declaratio
 or a reviewed dependency replacement remain required; the distribution audit
 stays pending. No runtime, SDK or Mac milestone changes at this checkpoint.
 
+## Typesetting test-font supplemental notices
+
+The pinned typesetting recipe now adds five text notices outside fixture paths:
+full Roboto Apache, Amiri OFL, Selawik OFL and Ubuntu Font Licence texts, plus a
+mapping of the four exact test-font hashes to observed copyrights, declared
+licenses and source text identities. The Roboto/Amiri bodies are verbatim copies
+of existing testdata declarations. The other two texts are pinned official family
+notices; they do not authenticate the exact shipped font binaries. All existing
+font, readme, declaration and runtime bytes remain unchanged.
+
+The existing collector includes these as supplemental asset declarations. Its
+fixture exclusion and module-own-license rules remain unchanged. Original module
+version/checksum attribution is retained. Input/output recipe pins require the
+original seven font/readme/declaration files and five absent/new notice paths.
+
+Selawik's modified/subset history and reserved-name permission remain unresolved;
+this patch does not infer approval from a family notice. Other native/font/asset
+applicability and owner distribution decisions remain open. See the
+[test-font notice checkpoint](../docs/reports/macos-test-font-notices/README.md).
+
 ## Recorded native release assertion
 
 The [16 October release identity check](../docs/reports/macos-native-release-identity/README.md)

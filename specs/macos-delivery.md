@@ -156,6 +156,12 @@ The candidate is a disclosed precommit snapshot, and the app was not launched.
 This closes the SDK build-tool blocker, while final native app acceptance,
 component/asset applicability, owner distribution approval and full M6 stay open.
 
+The [test-font notice checkpoint](../docs/reports/macos-test-font-notices/README.md)
+adds discoverable full declarations for the four typesetting test fonts through
+hash-pinned preparation. All font/runtime bytes remain unchanged. Fresh recipe
+and collector checks pass; Selawik modification/reserved-name provenance, broader
+asset applicability, distribution approval and full M6 remain open.
+
 ## Finish line
 
 Finish the Go-native framework on the local Mac: an independently consumable SDK
