@@ -1,0 +1,120 @@
+{
+  "raw_retained_findings": 1,
+  "finding_id": "1852012913705093",
+  "unresolved_actionable_findings": 0,
+  "independent_review": {
+    "schema": 1,
+    "result": "PASS_INDEPENDENT_PRISM_DISPOSITION_DOCUMENT_FATAL_ONLY_CONTRACT",
+    "finding_id": "1852012913705093",
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "raw_prism_sha256": "323be1a944b30b7dbda1e0a73c09110071828853395652036bd018bbac49beb9",
+    "complete_provider_scope": {
+      "files": 30,
+      "bytes": 137342,
+      "chunks": 1,
+      "calls": 1
+    },
+    "disposition": "Valid documentation clarification about Core partial global application on loader failure. No demonstrated current-caller continuation or shadowed-error semantic defect. Accept the suggested explicit fatal-only contract comment; do not introduce a partial settings rollback.",
+    "accepted_provider_fix": {
+      "type": "comment_only",
+      "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/internal/nativefixture/geometry.go",
+      "proposed_comment": "// Any error is terminal for the disposable fixture: stop before creating windows.\n// A failed settings load can already have applied defaults; this helper does not\n// roll those changes back. Do not ignore the error or retry in the same process.",
+      "implementation_or_tests_change_required": false,
+      "pending_root_application": true
+    },
+    "evidence": {
+      "Core_load_failure": "Actual loadSettings applies defaults and se.Apply even when Open returns an error; LoadAllSettings collects errors after applying all settings. Existing helper has not promised transactional rollback.",
+      "explicit_error_returns": "The local if-initializer err is intentionally tested and explicitly returned with return nil, err. Explicit return expressions assign the named result; shadowing does not discard or zero the nonnil loader error. Invalid zoom also explicitly returns nil,error. There is no naked return in the shadowed block.",
+      "all7current_callers": "Every current command handles the nonnil error before restore deferral or app.New. Panic callers terminate; run-error callers return to main and exit1; gallery/workbench must prints and exits1. No current caller ignores/retries the error or proceeds to fixture window creation.",
+      "scope": "Internal sequential disposable-fixture startup utility; no init function or public preference/concurrency API. Gallery/workbench existing conditional fixture modes only.",
+      "existing_spec": "Native-window-lifecycle spec explicitly states no rollback of defaults already applied by a failed load. The proposed nearby function comment makes terminal handling and no in-process retry/ignore visible at the API.",
+      "rollback_choice": "Restoring only prior Zoom or saver cannot undo arbitrary Settings.Apply side effects and could falsely imply transactionality. That broader implementation is unnecessary for current terminal startup scope.",
+      "test_meaning": "Existing in-memory failure control intentionally permits its Apply to run, yet asserts marker error, nil restore and no installed geometry override. This is compatible with partial loaded defaults; it is not a rollback test."
+    },
+    "callers": [
+      {
+        "command": "window-size-smoke",
+        "error_path": "panic(err)",
+        "terminal_before_app_construction": true,
+        "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/cmd/window-size-smoke/main.go",
+        "sha256": "da705b9453e7f6987b94049cfc64411fecd3ec8f793f5d959865e3ed0c499b6e"
+      },
+      {
+        "command": "window-cycle-smoke",
+        "error_path": "return err",
+        "terminal_before_app_construction": true,
+        "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/cmd/window-cycle-smoke/main.go",
+        "sha256": "b5e3e207a277fe25c4152c0c7b5eb41c1c45dc7b8f0dc3145daa9a7d80050350"
+      },
+      {
+        "command": "breadcrumb-smoke",
+        "error_path": "return err",
+        "terminal_before_app_construction": true,
+        "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/cmd/breadcrumb-smoke/main_native.go",
+        "sha256": "d6d18252b538d39be511df6949f0a96058a66a15e0dccddd3f1ce8243d21d43f"
+      },
+      {
+        "command": "tab-close-smoke",
+        "error_path": "return err",
+        "terminal_before_app_construction": true,
+        "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/cmd/tab-close-smoke/main_native.go",
+        "sha256": "bd0a9f4719cfda4c35ad0da961e79a54359be1b3a6d71021ce78f8b05f8f5b1c"
+      },
+      {
+        "command": "accessibility-smoke",
+        "error_path": "panic(err)",
+        "terminal_before_app_construction": true,
+        "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/cmd/accessibility-smoke/main.go",
+        "sha256": "b3453dcf23badfae9aa28082e9b95af054c8edab8fd07802471d3a2272e1ccc6"
+      },
+      {
+        "command": "gallery",
+        "error_path": "must(err)",
+        "terminal_before_app_construction": true,
+        "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/cmd/gallery/main.go",
+        "sha256": "bc007585ec2162deffe6c7171525a4ad478795018e99f4e4e601c0f8936ff4f1"
+      },
+      {
+        "command": "workbench",
+        "error_path": "must(err)",
+        "terminal_before_app_construction": true,
+        "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/cmd/workbench/main.go",
+        "sha256": "c3828628da16fae1617b3f91fb0893ae7b72332f2b76af17f1933e8297c585d1"
+      }
+    ],
+    "source_comment_contract_ready": true,
+    "unresolved_implementation_findings": [],
+    "comment_only_followup_needed_before_final_disposition_closure": true,
+    "inputs": {
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-busy-completion-integrated/prism.json": "323be1a944b30b7dbda1e0a73c09110071828853395652036bd018bbac49beb9",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/internal/nativefixture/geometry.go": "3b0740d153aba5f95d72f84ac4529648e12bebebcbc6b0fed8ff7bc9c5c7fc54",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/internal/nativefixture/geometry_test.go": "2cde01fd00915aa701b62f3ca22d58b3629bda0983faae47aee2d6672641586f",
+      "/private/tmp/vellum-macos-native-results-97aee13/specs/native-window-lifecycle.md": "7e4aaece94202944e13b85310bc8078785fc42f5cd6f8b42af309c233797a4fc",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/core/settings.go": "96f20161b5eab6d5477e991f677b66687c8d53aaf4d7eec9bea39d2880847f76",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/core/body.go": "41af542510bb84bddc36f8d2a2e8c6771fcb96bfb1e4619bcb62b498bc508ac4",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/cmd/workbench/endurance.go": "0525418d698699f7d340d8ccb6e791f631c8e8b6bcdb3c0763ff26eda897f719",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-native-fixture-geometry-integrated/root-review.json": "f912ea1d5010cef0f74d3031ff29cca7a4e93d2f8fabb5af6989f7146416bd3c",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-native-fixture-geometry/independent-review.json": "392cd50df723a13a07f81393edb71bdcd6fe26007634ec037ce178e9d7f375d2",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/cmd/window-size-smoke/main.go": "da705b9453e7f6987b94049cfc64411fecd3ec8f793f5d959865e3ed0c499b6e",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/cmd/window-cycle-smoke/main.go": "b5e3e207a277fe25c4152c0c7b5eb41c1c45dc7b8f0dc3145daa9a7d80050350",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/cmd/breadcrumb-smoke/main_native.go": "d6d18252b538d39be511df6949f0a96058a66a15e0dccddd3f1ce8243d21d43f",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/cmd/tab-close-smoke/main_native.go": "bd0a9f4719cfda4c35ad0da961e79a54359be1b3a6d71021ce78f8b05f8f5b1c",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/cmd/accessibility-smoke/main.go": "b3453dcf23badfae9aa28082e9b95af054c8edab8fd07802471d3a2272e1ccc6",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/cmd/gallery/main.go": "bc007585ec2162deffe6c7171525a4ad478795018e99f4e4e601c0f8936ff4f1",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/cmd/workbench/main.go": "c3828628da16fae1617b3f91fb0893ae7b72332f2b76af17f1933e8297c585d1"
+    },
+    "tests_native_build_provider_or_source_edits_performed": false,
+    "limits": [
+      "This record reviews the currently staged helper/callers and concrete proposed comment. Root must apply and verify the comment-only delta before marking the provider finding addressed.",
+      "No new runtime/settings/native acceptance is inferred and no full rollback is claimed."
+    ]
+  },
+  "resolution": "Documented existing fatal-only fixture error contract at function, no rollback promise or implementation change. All seven callers already stop before app creation on error.",
+  "raw_Prism_sha256": "323be1a944b30b7dbda1e0a73c09110071828853395652036bd018bbac49beb9",
+  "post_review_comment_sha256": "4d9e02d5f5650492e1f660179ffe6d5e46a8d7775daf0e8257277f75c00ca1ef",
+  "full_original_review_diff_sha256": "fc453d2f8361543938f7f64427f7758ca5e7712de5807e6523a48b3cbedcc6fd",
+  "source_logic_changed_after_review": false,
+  "root_applied_comment_verified": true,
+  "final_status": "RESOLVED_DOCUMENTED_FATAL_ONLY_CONTRACT"
+}

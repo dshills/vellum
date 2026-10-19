@@ -1348,6 +1348,17 @@
               "sha256": "2218ccad8f9d0df5818c14a59ce9e4ff290ad9e4e97a538cb2edff50f44381c4"
             }
           ]
+        },
+        {
+          "origin": "Vellum completion-triggered busy dirty rescan",
+          "inputs": "native/patches/paintcompletion/original-hashes.json",
+          "outputs": "native/patches/paintcompletion/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/paintcompletion/0103-busy-completion-rescan.patch",
+              "sha256": "8a15eb8e037c1ee34bf74a1beeb7c3bebba6423cb5e49324fcfdd635112671cf"
+            }
+          ]
         }
       ]
     },

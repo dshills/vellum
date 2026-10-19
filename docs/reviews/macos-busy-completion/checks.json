@@ -1,0 +1,97 @@
+{
+  "core-race": {
+    "exit_code": 0,
+    "seconds": 14.304192167008296,
+    "owned": {
+      "created": true,
+      "pid": 13234,
+      "group": 13234,
+      "terminal": true,
+      "group_absent": true,
+      "exit_code": 0,
+      "errors": [],
+      "observation": {
+        "group": 13234,
+        "members": [],
+        "observation_sha256": "e5831b20637d7c629d0c1be84806a35e2c67457a13b6ce04323ebb8cf6bcbefc"
+      }
+    },
+    "pins_stable": true,
+    "logs": {
+      "stdout": {
+        "bytes": 6462,
+        "sha256": "50cdb2c0c6ea3cbe9524502b2849f7f74e11b65fdc72a7fcd83ed74999d79a1c"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "native_executed": false,
+    "full_receipt_sha256": "4f00d1d3743d98cc6bd61435e868005e7e86812a4602355cc56b7b5eb3534600"
+  },
+  "core-vet": {
+    "exit_code": 0,
+    "seconds": 2.1047050419729203,
+    "owned": {
+      "created": true,
+      "pid": 13233,
+      "group": 13233,
+      "terminal": true,
+      "group_absent": true,
+      "exit_code": 0,
+      "errors": [],
+      "observation": {
+        "group": 13233,
+        "members": [],
+        "observation_sha256": "4f9e943a9a8c3330ce03dc98777e6681f8530cff2c50fd1396ea314e4b15a96e"
+      }
+    },
+    "pins_stable": true,
+    "logs": {
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "native_executed": false,
+    "full_receipt_sha256": "a37abaf8fcb31a53e8efdc5219387720442560dbd52fbd9fcb3a0f4a1e16b609"
+  },
+  "prepare-tests": {
+    "exit_code": 0,
+    "seconds": 1.0403842909727246,
+    "owned": {
+      "created": true,
+      "pid": 13227,
+      "group": 13227,
+      "terminal": true,
+      "group_absent": true,
+      "exit_code": 0,
+      "errors": [],
+      "observation": {
+        "group": 13227,
+        "members": [],
+        "observation_sha256": "e8ca49685abda87a053041f46e8452b51d6ccc0e537f5b96bf097c4cf0933c55"
+      }
+    },
+    "pins_stable": true,
+    "logs": {
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 128,
+        "sha256": "3986dce301f6c7b6872e2c9ca312058c022f53b6c2d348c518f68cc4897baac8"
+      }
+    },
+    "native_executed": false,
+    "full_receipt_sha256": "2ae4dd5be9c9c2b7e506da7dbf358ce26714f5082df8c178c9ebcd419fb73608"
+  },
+  "root_top_level_race_methods": 44,
+  "prepare_methods": 29
+}

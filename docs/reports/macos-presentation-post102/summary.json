@@ -1,0 +1,205 @@
+{
+  "head": "04ce5192833b71b04cc2e964e011917e85620b81",
+  "result": "FAILED_SOURCE102_SCOPE_REVIEWED_NO_RELEASE_QUALIFICATION",
+  "release_qualified": false,
+  "M3_qualified": false,
+  "M4_qualified": false,
+  "completed_valid_serial_cases": [
+    "serial-grid-cpu",
+    "serial-tree-gpu"
+  ],
+  "failed_case": "paced-grid-gpu",
+  "unexecuted_case": "paced-tree-cpu",
+  "actual_owned_groups": 23,
+  "all_recorded_groups_terminal_and_observed_absent_at_audit": true,
+  "cases": {
+    "serial-grid-cpu": {
+      "status": "VALID_SERIAL_NATIVE_FEEDBACK_JOURNAL",
+      "cadence_eligible": false,
+      "input_latency_threshold_ms": 33.3,
+      "input_latency_p95_ms": 38.65712496917695,
+      "previous_source101_input_latency_p95_ms": 34.80116662103683,
+      "input_latency_p95_change_ms": 3.8559583481401205,
+      "interval_p95_ms": 16.66679175104946,
+      "interval_max_ms": 16.66683331131935,
+      "within18_333ms": 119,
+      "interval_denominator": 119,
+      "CPU_elapsed_p95_ms": {
+        "QueuedNS": 0.011,
+        "InputNS": 0.012667,
+        "AcquireNS": 0.037625,
+        "TotalUIWorkNS": 4.043915
+      },
+      "native_host_phase_p95_ms": {
+        "ReceiptToFinalAcquire": 16.32645830977708,
+        "FinalAcquireToPresented": 22.49862509779632
+      },
+      "prefix": {
+        "prefix_records": 251,
+        "before_total": 251,
+        "prefix_presented": 251,
+        "prefix_tag0": 3,
+        "before_total_tag0": 3,
+        "prefix_armed": 248,
+        "prefix_tagged_intermediate": 0,
+        "prefix_skipped": 0
+      }
+    },
+    "serial-tree-gpu": {
+      "status": "VALID_SERIAL_NATIVE_FEEDBACK_JOURNAL",
+      "cadence_eligible": false,
+      "input_latency_threshold_ms": 33.3,
+      "input_latency_p95_ms": 39.502458297647536,
+      "previous_source101_input_latency_p95_ms": 52.64833336696029,
+      "input_latency_p95_change_ms": -13.145875069312751,
+      "interval_p95_ms": 16.666750074364245,
+      "interval_max_ms": 16.66679175104946,
+      "within18_333ms": 119,
+      "interval_denominator": 119,
+      "CPU_elapsed_p95_ms": {
+        "QueuedNS": 0.006083,
+        "InputNS": 0.006959,
+        "AcquireNS": 0.028792,
+        "TotalUIWorkNS": 5.372416
+      },
+      "native_host_phase_p95_ms": {
+        "ReceiptToFinalAcquire": 17.081749974749982,
+        "FinalAcquireToPresented": 23.108999943360686
+      },
+      "prefix": {
+        "prefix_records": 256,
+        "before_total": 256,
+        "prefix_presented": 256,
+        "prefix_tag0": 6,
+        "before_total_tag0": 6,
+        "prefix_armed": 250,
+        "prefix_tagged_intermediate": 0,
+        "prefix_skipped": 0
+      }
+    },
+    "paced-grid-gpu": {
+      "status": "FAILED_DIAGNOSTIC_UNQUALIFIED_RAW_DESCRIPTION_ONLY",
+      "cadence_eligible": false,
+      "input_latency_threshold_ms": 33.3,
+      "input_latency_p95_ms": 39.62337505072355,
+      "previous_source101_input_latency_p95_ms": 52.57595831062645,
+      "input_latency_p95_change_ms": -12.952583259902894,
+      "interval_p95_ms": 16.666750074364245,
+      "interval_max_ms": 33.333375002257526,
+      "within18_333ms": 597,
+      "interval_denominator": 599,
+      "CPU_elapsed_p95_ms": {
+        "QueuedNS": 0.010458,
+        "InputNS": 0.0145,
+        "AcquireNS": 0.03825,
+        "TotalUIWorkNS": 3.781669
+      },
+      "native_host_phase_p95_ms": {
+        "ReceiptToFinalAcquire": 16.71037496998906,
+        "FinalAcquireToPresented": 23.2946666656062
+      },
+      "prefix": {
+        "prefix_records": 734,
+        "before_total": 734,
+        "prefix_presented": 731,
+        "prefix_tag0": 6,
+        "before_total_tag0": 6,
+        "prefix_armed": 728,
+        "prefix_tagged_intermediate": 0,
+        "prefix_skipped": 3
+      },
+      "CPU_pacing": {
+        "planned_duration_ns": 10000000000,
+        "actual_cpu_end_ns": 10036948500,
+        "enqueue_return_to_ack_observation_ms": {
+          "count": 600,
+          "p50": 16.123958,
+          "p95": 17.142209,
+          "p99": 18.147958,
+          "max": 34.136834
+        },
+        "iteration_ms": {
+          "count": 600,
+          "p50": 16.291583,
+          "p95": 17.351041,
+          "p99": 18.333958,
+          "max": 34.303375
+        },
+        "ack_to_inspection_ms": {
+          "count": 600,
+          "p50": 0.0095,
+          "p95": 0.019375,
+          "p99": 0.047416,
+          "max": 6.222166
+        },
+        "cpu_overrun_ns": 36948500,
+        "max_slot_overrun_ns": null
+      },
+      "classification": "All600 armed measured timestamps are retained descriptive observations only; FAILED_DIAGNOSTIC grants no numeric gate acceptance."
+    }
+  },
+  "failure_analysis": {
+    "first_receipt": 981907.3978588335,
+    "rejected_record": {
+      "Sequence": 3,
+      "Scope": 1,
+      "Tag": 0,
+      "Generation": 0,
+      "Composition": 6,
+      "Armed": false,
+      "DrawableID": 2,
+      "Acquired": 981907.4000455836,
+      "Presented": 0,
+      "State": "skipped"
+    },
+    "rejected_after_first_receipt_ms": 2.1867500618100166,
+    "all_skips": [
+      {
+        "Sequence": 1,
+        "Scope": 1,
+        "Tag": 0,
+        "Generation": 0,
+        "Composition": 2,
+        "Armed": false,
+        "DrawableID": 0,
+        "Acquired": 981907.3789195835,
+        "Presented": 0,
+        "State": "skipped",
+        "relative_first_receipt_ms": -18.939250032417476
+      },
+      {
+        "Sequence": 2,
+        "Scope": 1,
+        "Tag": 0,
+        "Generation": 0,
+        "Composition": 4,
+        "Armed": false,
+        "DrawableID": 1,
+        "Acquired": 981907.3873558335,
+        "Presented": 0,
+        "State": "skipped",
+        "relative_first_receipt_ms": -10.50299999769777
+      },
+      {
+        "Sequence": 3,
+        "Scope": 1,
+        "Tag": 0,
+        "Generation": 0,
+        "Composition": 6,
+        "Armed": false,
+        "DrawableID": 2,
+        "Acquired": 981907.4000455836,
+        "Presented": 0,
+        "State": "skipped",
+        "relative_first_receipt_ms": 2.1867500618100166
+      }
+    ],
+    "capacity_overflow": false,
+    "recorder_failed": false,
+    "all_728_armed_presented": true,
+    "why_refused": "The strict startup predicate requires terminal skipped/unarmed/tag0/generation0/Presented0 AND Acquired strictly before first receipt. Sequence3 fails the time fence by2.186750ms. No record or measured callback was evicted.",
+    "validator_disposition": "Keep FAILED_DIAGNOSTIC refused. Public validator requires CAPTURED_DIAGNOSTIC and empty RunError before timing acceptance. No reclassification, threshold relaxation or retry."
+  },
+  "reviewer_recommendation": "Do not qualify or retain source102 lower-latency request as a successful default experiment on this evidence. Revert the narrow optional Mac/Metal request to the prior source101 policy, preserving stage100/101 and all raw102 failures, unless a separately reviewed further experiment is chosen. All three observed p95 input latencies remain above33.3ms; the paced journal fails the unchanged strict startup fence. Native phase improvement in some cases is descriptive and insufficient to claim a successful release policy. Do not weaken/reclassify the failed capture to retain the request.",
+  "development_decision": "Root retains source102 only as explicitly EXPERIMENTAL while evaluating a separately reviewed Core103 busy-retry candidate. This is no release adoption, failure reclassification, validator change or native retry."
+}

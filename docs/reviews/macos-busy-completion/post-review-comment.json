@@ -1,0 +1,11 @@
+{
+  "finding": "1852012913705093",
+  "change": "Function comment explicitly documents existing terminal-fixture error contract/no rollback/no retry.",
+  "implementation_unchanged": true,
+  "exact_old_sha256": "88207c4e0233ab401b3ed6269fb140d96a349a7889009f3ceabf51cf10d36c3f",
+  "exact_new_sha256": "3b0740d153aba5f95d72f84ac4529648e12bebebcbc6b0fed8ff7bc9c5c7fc54",
+  "path": "drivers/cogent/internal/nativefixture/geometry.go",
+  "added_comment": "// Any error is terminal for this disposable fixture: stop before creating windows.\n// Loading may apply defaults before failing; this helper does not roll back Core\n// settings and must not be retried or ignored in the same process.\n",
+  "tests_not_repeated": "Comment-only change; original source-bound integrated race/vet/build evidence retained.",
+  "raw_Prism_sha256": "323be1a944b30b7dbda1e0a73c09110071828853395652036bd018bbac49beb9"
+}

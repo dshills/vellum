@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "cc5fd244760dea5e74b2bc6c35678123",
+  "repo": {
+    "root": "/private/tmp/vellum-macos-native-results-97aee13",
+    "head": "04ce5192833b71b04cc2e964e011917e85620b81",
+    "branch": "codex/macos-native-results"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "1852012913705093",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Settings load failure leaves global state partially mutated",
+      "message": "The test-visible contract says a failed load refuses override, but LoadAllSettings may have applied defaults (including a nonzero Zoom) before returning the error. Since the error is returned and not retried, callers panic or return, so impact is limited. However the shadowed `err` inside the if hides the named return and the function mutates global state on the failure path with no rollback, so a caller that ignores the error would continue with partially loaded settings.",
+      "suggestion": "On load failure, restore the prior AppearanceSettings.Zoom (and any other captured state) before returning, or document it explicitly as a fatal-only path.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/internal/nativefixture/geometry.go",
+          "lines": {
+            "start": 19,
+            "end": 19
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "global-state",
+        "location-corrected"
+      ],
+      "evidence": "if err := core.LoadAllSettings(); err != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4447,
+    "totalMs": 4564
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 30,
+    "bytes": 137342,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 64939,
+        "output": 348,
+        "costUSD": 0.133358
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
