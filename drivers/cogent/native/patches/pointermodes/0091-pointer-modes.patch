@@ -1,0 +1,1543 @@
+--- a/system/driver/desktop/cursor.go
++++ b/system/driver/desktop/cursor.go
+@@ -23,12 +23,17 @@
+ 
+ type Cursor struct {
+ 	system.CursorBase
+-	mu       sync.Mutex
+-	window   *Window
+-	app      *App
+-	owner    *nativeCursorOwner // stable pointer; contents accessed only on native main
+-	closed   bool
+-	sequence uint64
++	mu                             sync.Mutex
++	window                         *Window
++	app                            *App
++	owner                          *nativeCursorOwner // stable pointer; contents accessed only on native main
++	closed                         bool
++	sequence                       uint64
++	pointer                        *nativePointerOwner // stable; native-main contents only
++	modeSequence, positionSequence uint64
++	wantEnabled, wantRaw           bool
++	mode                           int
++	modeKnown                      bool
+ }
+ 
+ var _ system.Cursor = (*Cursor)(nil)
+@@ -39,7 +44,9 @@
+ 	TheCursor.mu.Unlock()
+ 	defaults.Cur = nil
+ 	w.publishCursorScale()
+-	cu := &Cursor{CursorBase: defaults, window: w, app: w.App}
++	cu := &Cursor{CursorBase: defaults, window: w, app: w.App, wantEnabled: true, mode: glfw.CursorNormal, modeKnown: true}
++	cu.pointer = newNativePointerOwner(glfwPointerBackend(w))
++	cu.pointer.live = func() bool { return w.pointerLive() }
+ 	cu.owner = newNativeCursorOwner(nativeCursorBackend{
+ 		create: func(ci *cursorimg.Cursor) (any, error) {
+ 			// The exact pinned GLFW binding may return &Cursor{NULL} without an error.
+@@ -96,24 +103,13 @@
+ 	}
+ 	target.mu.Lock()
+ 	defer target.mu.Unlock()
+-	return !target.closed && target.Vis
+-}
+-
+-// Hide/Show preserve the legacy visibility-status contract. Actual GLFW input
+-// mode remains controlled by Window.SetCursorEnabled (including raw/disabled).
+-func (cu *Cursor) Hide() { cu.visibility(false) }
+-func (cu *Cursor) Show() { cu.visibility(true) }
+-func (cu *Cursor) visibility(v bool) {
+-	target := cu.facadeTarget()
+-	if target == nil {
+-		return
+-	}
+-	target.mu.Lock()
+-	defer target.mu.Unlock()
+-	if !target.closed {
+-		target.Vis = v
+-	}
+-}
++	return !target.closed && target.modeKnown && target.mode == glfw.CursorNormal
++}
++
++// Hide and Show apply per-window native mode and retain the shown preference
++// while relative (disabled) mode is active. Readback reports GLFW logical state.
++func (cu *Cursor) Hide() { _ = cu.modeRequest(func(c *Cursor) { c.Vis = false }) }
++func (cu *Cursor) Show() { _ = cu.modeRequest(func(c *Cursor) { c.Vis = true }) }
+ 
+ // SetSize changes the requested size and retires pending requests. Call Set to
+ // apply it to the native cursor; Current reports the applied enum, not its size.
+@@ -209,6 +205,7 @@
+ 	cu.mu.Lock()
+ 	defer cu.mu.Unlock()
+ 	cu.closed = true
++	cu.modeKnown = false
+ 	cu.Cur = nil
+ 	cu.Vis = false
+ 	cu.Size = units.Value{}
+@@ -223,7 +220,7 @@
+ 	}
+ 	cu.retireStatus()
+ 	delete(a.cursorOwners, cu)
+-	cu.owner.close()
++	drainAll(cu.pointer.close, cu.owner.close)
+ }
+ func (a *App) closeCursors() {
+ 	fs := make([]func(), 0, len(a.cursorOwners))
+--- a/system/driver/desktop/cursor_lifetime_vellum_test.go
++++ b/system/driver/desktop/cursor_lifetime_vellum_test.go
+@@ -178,7 +178,9 @@
+ 		w.DevicePixelRatio = 2
+ 		w.publishCursorScale()
+ 		o, _ := fakeCursors()
+-		cu := &Cursor{CursorBase: system.CursorBase{Size: units.Dp(32), Vis: true}, window: w, app: a, owner: o}
++		cu := &Cursor{CursorBase: system.CursorBase{Size: units.Dp(32), Vis: true}, window: w, app: a, owner: o, wantEnabled: true, mode: glfw.CursorNormal, modeKnown: true}
++		cu.pointer, _ = fakePointer()
++		cu.pointer.live = func() bool { return w.pointerLive() }
+ 		w.cursor = cu
+ 		if a.cursorOwners == nil {
+ 			a.cursorOwners = map[*Cursor]struct{}{}
+@@ -348,7 +350,7 @@
+ 	a.nativeOnMain(func() { panic("native failure") })
+ }
+ func TestVellumCursorConcurrentStatus(t *testing.T) {
+-	_, cu, _, _ := cursorHarness(t)
++	a, cu, _, q := cursorHarness(t)
+ 	var wg sync.WaitGroup
+ 	for i := 0; i < 4; i++ {
+ 		wg.Add(1)
+@@ -363,7 +365,19 @@
+ 			}
+ 		}()
+ 	}
+-	wg.Wait()
++	done := make(chan struct{})
++	go func() { wg.Wait(); close(done) }()
++loop:
++	for {
++		select {
++		case call := <-q:
++			a.ExecuteMain(call)
++		case <-done:
++			break loop
++		case <-time.After(15 * time.Second):
++			t.Fatal("status queue stalled")
++		}
++	}
+ 	cu.retireStatus()
+ 	cu.SetSize(units.Value{Custom: func(*units.Context) float32 { return 32 }})
+ 	if !reflect.DeepEqual(cu.Size, units.Value{}) {
+--- a/system/driver/desktop/event.go
++++ b/system/driver/desktop/event.go
+@@ -10,7 +10,6 @@
+ 	"cogentcore.org/core/base/fileinfo/mimedata"
+ 	"cogentcore.org/core/events"
+ 	"cogentcore.org/core/events/key"
+-	"cogentcore.org/core/math32"
+ 	"cogentcore.org/core/system"
+ 	"github.com/go-gl/glfw/v3.4/glfw"
+ )
+@@ -75,19 +74,27 @@
+ 	TheApp.SendEmptyEvent()
+ }
+ 
++// MousePosToPoint converts native coordinates to window pixels, flooring
++// fractional positions. Invalid input returns (-1,-1); routing uses checked form.
++func (w *Window) MousePosToPoint(x, y float64) image.Point {
++	p, ok := w.pointerPoint(x, y)
++	if !ok {
++		return image.Pt(-1, -1)
++	}
++	return p
++}
+ func (w *Window) CurMousePosPoint(gw *glfw.Window) image.Point {
+-	xp, yp := gw.GetCursorPos()
+-	return w.MousePosToPoint(xp, yp)
+-}
+-
+-func (w *Window) MousePosToPoint(x, y float64) image.Point {
+-	var where image.Point
+-	if TheApp.Platform() == system.MacOS {
+-		where = image.Pt(int(w.DevicePixelRatio*float32(x)), int(w.DevicePixelRatio*float32(y)))
+-	} else {
+-		where = image.Pt(int(x), int(y))
+-	}
+-	return where
++	x, y := gw.GetCursorPos()
++	return w.MousePosToPoint(x, y)
++}
++func (w *Window) checkedMousePosition(gw *glfw.Window) (image.Point, uint64, uint64, bool) {
++	if !w.pointerLive() {
++		return image.Point{}, 0, 0, false
++	}
++	packed, focus := w.cursorScale.Load(), w.pointerFocus.Load()
++	x, y := gw.GetCursorPos()
++	p, ok := w.pointerPointAt(x, y, packed)
++	return p, packed, focus, ok
+ }
+ 
+ func (w *Window) MouseButtonEvent(gw *glfw.Window, button glfw.MouseButton, action glfw.Action, mod glfw.ModifierKey) {
+@@ -106,38 +113,38 @@
+ 	if mod&glfw.ModControl != 0 { // special case: control always = RMB  can undo this downstream..
+ 		but = events.Right
+ 	}
+-	where := w.CurMousePosPoint(gw)
+-	w.Event.MouseButton(typ, but, where, mods)
++	where, packed, focus, ok := w.checkedMousePosition(gw)
++	if !ok {
++		return
++	}
++	if !w.admitPointerButton(typ, but, where, mods, packed, focus) {
++		return
++	}
+ 	TheApp.SendEmptyEvent()
+ }
+ 
+ func (w *Window) ScrollEvent(gw *glfw.Window, xoff, yoff float64) {
+-	delta := math32.Vec2(float32(xoff), float32(yoff)).MulScalar(-10)
+-	if TheApp.Platform() == system.MacOS {
+-		delta.SetMulScalar(w.DevicePixelRatio)
+-	} else {
+-		delta.SetMulScalar(4) // other platforms need a bigger multiplier in general
+-	}
+-	where := w.CurMousePosPoint(gw)
+-	w.Event.Scroll(where, delta)
++	where, packed, _, ok := w.checkedMousePosition(gw)
++	if !ok {
++		return
++	}
++	if !w.admitPointerScroll(where, xoff, yoff, packed) {
++		return
++	}
+ 	TheApp.SendEmptyEvent()
+ }
+ 
+ func (w *Window) CursorPosEvent(gw *glfw.Window, x, y float64) {
+-	if w.Event.ResettingPos {
+-		return
+-	}
+-	where := w.MousePosToPoint(x, y)
+-	if !w.CursorEnabled {
+-		w.Event.ResettingPos = true
+-		if TheApp.Platform() == system.MacOS {
+-			w.Glw.SetCursorPos(float64(w.Event.Last.MousePos.X)/float64(w.DevicePixelRatio), float64(w.Event.Last.MousePos.Y)/float64(w.DevicePixelRatio))
+-		} else {
+-			w.Glw.SetCursorPos(float64(w.Event.Last.MousePos.X), float64(w.Event.Last.MousePos.Y))
+-		}
+-		w.Event.ResettingPos = false
+-	}
+-	w.Event.MouseMove(where)
++	if w.Event.ResettingPos || !w.pointerLive() {
++		return
++	}
++	packed, focus := w.cursorScale.Load(), w.pointerFocus.Load()
++	where, ok := w.pointerPointAt(x, y, packed)
++	if !ok || !w.admitPointerMove(where, packed, focus) {
++		return
++	}
++	// GLFW owns disabled-mode virtual coordinates/recentering.
++
+ 	TheApp.SendEmptyEvent()
+ }
+ 
+@@ -153,8 +160,11 @@
+ 	for i, s := range names {
+ 		md[i] = mimedata.NewTextData(s)
+ 	}
+-	where := w.CurMousePosPoint(gw)
+-	w.Event.DropExternal(where, md)
++	where, packed, focus, ok := w.checkedMousePosition(gw)
++	if !ok {
++		return
++	}
++	w.admitPointerDrop(where, md, packed, focus)
+ }
+ 
+ // TODO: should this be a map?
+--- /dev/null
++++ b/system/driver/desktop/pointer_vellum.go
+@@ -0,0 +1,502 @@
++// Copyright 2026 Vellum contributors. SPDX-License-Identifier: MIT.
++package desktop
++
++import (
++	"fmt"
++	"image"
++	"math"
++	"strconv"
++
++	"cogentcore.org/core/base/fileinfo/mimedata"
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/events/key"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/system"
++	"cogentcore.org/core/system/driver/base"
++	"github.com/go-gl/glfw/v3.4/glfw"
++)
++
++// All backend functions and nativePointerOwner contents belong to native main.
++// GLFW readback is logical driver state, not physical/compositor verification.
++type nativePointerBackend struct {
++	rawSupported func() bool
++	mode         func() int
++	setMode      func(int)
++	raw          func() bool
++	setRaw       func(bool)
++	canPosition  func() bool
++	position     func() (float64, float64)
++	setPosition  func(float64, float64)
++}
++type nativePointerOwner struct {
++	backend                                        nativePointerBackend
++	capabilityKnown, rawSupported, touched, closed bool
++	busy                                           bool
++	callbackDepth                                  int
++	cleanup                                        func()
++	live                                           func() bool
++	modeWritten                                    bool
++}
++
++func newNativePointerOwner(b nativePointerBackend) *nativePointerOwner {
++	return &nativePointerOwner{backend: b}
++}
++func glfwPointerBackend(w *Window) nativePointerBackend {
++	return nativePointerBackend{
++		rawSupported: glfw.RawMouseMotionSupported,
++		mode:         func() int { return w.Glw.GetInputMode(glfw.CursorMode) },
++		setMode:      func(m int) { w.Glw.SetInputMode(glfw.CursorMode, m) },
++		raw:          func() bool { return w.Glw.GetInputMode(glfw.RawMouseMotion) == glfw.True },
++		setRaw: func(v bool) {
++			n := glfw.False
++			if v {
++				n = glfw.True
++			}
++			w.Glw.SetInputMode(glfw.RawMouseMotion, n)
++		},
++		canPosition: func() bool {
++			return w.Glw.GetAttrib(glfw.Focused) == glfw.True && w.Glw.GetAttrib(glfw.Visible) == glfw.True && w.Glw.GetAttrib(glfw.Iconified) != glfw.True
++		},
++		position:    func() (float64, float64) { return w.Glw.GetCursorPos() },
++		setPosition: func(x, y float64) { w.Glw.SetCursorPos(x, y) },
++	}
++}
++func pointerModeKnown(m int) bool {
++	return m == glfw.CursorNormal || m == glfw.CursorHidden || m == glfw.CursorDisabled
++}
++
++// Backend calls may reenter status/close. Refuse nested mutations and check the
++// exact target lifetime both before and after every callback, without a mutex.
++func (o *nativePointerOwner) valid() bool {
++	return o != nil && !o.closed && (o.live == nil || o.live())
++}
++func (o *nativePointerOwner) call(f func()) bool {
++	if !o.valid() {
++		return false
++	}
++	o.callbackDepth++
++	// Full retirement can reenter a setter before it finishes changing state.
++	// Restore after that callback unwinds, even if it panics; preserve first panic.
++	drainAll(f, func() {
++		o.callbackDepth--
++		if o.callbackDepth == 0 && o.cleanup != nil {
++			cleanup := o.cleanup
++			o.cleanup = nil
++			cleanup()
++		}
++	})
++	return o.valid()
++}
++func (o *nativePointerOwner) begin() bool {
++	if !o.valid() || o.busy {
++		return false
++	}
++	o.busy = true
++	return true
++}
++func (o *nativePointerOwner) read() (m int, r, known bool) {
++	if !o.call(func() { m = o.backend.mode() }) {
++		return 0, false, false
++	}
++	if !o.call(func() { r = o.backend.raw() }) {
++		return 0, false, false
++	}
++	return m, r, pointerModeKnown(m) && (!r || m == glfw.CursorDisabled)
++}
++func (o *nativePointerOwner) position() (x, y float64, ok bool) {
++	if !o.begin() {
++		return 0, 0, false
++	}
++	defer func() { o.busy = false }()
++	ok = o.call(func() { x, y = o.backend.position() })
++	return
++}
++
++// apply gates each dependent setter on observed state. Unsupported raw motion
++// is a supported fallback; the Cocoa backend must not receive even setRaw(false).
++func (o *nativePointerOwner) apply(m int, r bool) (mode int, raw, known bool, err error) {
++	if !o.begin() {
++		return 0, false, false, fmt.Errorf("desktop: pointer owner closed")
++	}
++	defer func() { o.busy = false }()
++	o.modeWritten = false
++	if !o.capabilityKnown {
++		if !o.call(func() { o.rawSupported = o.backend.rawSupported() }) {
++			return 0, false, false, fmt.Errorf("desktop: pointer retired")
++		}
++		o.capabilityKnown = true
++	}
++	r = r && m == glfw.CursorDisabled && o.rawSupported
++	mode, raw, known = o.read()
++	refuse := func() (int, bool, bool, error) { return mode, raw, known, fmt.Errorf("desktop: pointer mode refused") }
++	if !known {
++		return refuse()
++	}
++	if raw && (!r || m != glfw.CursorDisabled) {
++		if !o.rawSupported {
++			return refuse()
++		}
++		o.touched = true
++		if !o.call(func() { o.backend.setRaw(false) }) {
++			return 0, false, false, fmt.Errorf("desktop: pointer retired")
++		}
++		mode, raw, known = o.read()
++		if !known || raw {
++			return refuse()
++		}
++	}
++	if mode != m {
++		o.touched = true
++		o.modeWritten = true
++		if !o.call(func() { o.backend.setMode(m) }) {
++			return 0, false, false, fmt.Errorf("desktop: pointer retired")
++		}
++		mode, raw, known = o.read()
++		if !known || mode != m {
++			return refuse()
++		}
++	}
++	if r && !raw {
++		if mode != glfw.CursorDisabled {
++			return refuse()
++		}
++		o.touched = true
++		if !o.call(func() { o.backend.setRaw(true) }) {
++			return 0, false, false, fmt.Errorf("desktop: pointer retired")
++		}
++		mode, raw, known = o.read()
++	}
++	if !known || mode != m || raw != r {
++		return refuse()
++	}
++	return mode, raw, known, nil
++}
++func (o *nativePointerOwner) close() {
++	if o == nil || o.closed {
++		return
++	}
++	o.closed = true
++	b, touched, supported := o.backend, o.touched, o.rawSupported
++	o.backend = nativePointerBackend{}
++	o.live = nil
++	if !touched {
++		return
++	}
++	// References clear immediately; one bounded restoration closure survives only
++	// until an active backend callback returns. Never restore before its final write.
++	cleanup := func() {
++		drainAll(func() {
++			if supported {
++				b.setRaw(false)
++			}
++		}, func() { b.setMode(glfw.CursorNormal) })
++	}
++	if o.callbackDepth > 0 {
++		o.cleanup = cleanup
++		return
++	}
++	cleanup()
++}
++
++func (cu *Cursor) modeRequest(change func(*Cursor)) error {
++	target := cu.facadeTarget()
++	if target == nil {
++		return fmt.Errorf("desktop: no pointer window")
++	}
++	cu = target
++	cu.mu.Lock()
++	if cu.closed || cu.modeSequence == ^uint64(0) {
++		cu.mu.Unlock()
++		return fmt.Errorf("desktop: pointer retired")
++	}
++	change(cu)
++	cu.modeSequence++
++	seq := cu.modeSequence
++	m := glfw.CursorNormal
++	if !cu.wantEnabled {
++		m = glfw.CursorDisabled
++	} else if !cu.Vis {
++		m = glfw.CursorHidden
++	}
++	raw := cu.wantRaw
++	w, a := cu.window, cu.app
++	cu.mu.Unlock()
++	if w == nil || a == nil {
++		return fmt.Errorf("desktop: no pointer window")
++	}
++	err := base.ErrMainStopped
++	a.nativeOnMain(func() {
++		cu.mu.Lock()
++		valid := !cu.closed && cu.window == w && cu.modeSequence == seq
++		cu.mu.Unlock()
++		if !valid || w.Glw == nil {
++			err = fmt.Errorf("desktop: pointer request retired")
++			return
++		}
++		if cu.pointer.busy {
++			err = fmt.Errorf("desktop: pointer mutation is reentrant")
++			return
++		}
++		mode, _, known, e := cu.pointer.apply(m, raw)
++		err = e
++		cu.mu.Lock()
++		if !cu.closed {
++			cu.mode, cu.modeKnown = mode, known
++			w.CursorEnabled = known && mode != glfw.CursorDisabled
++		}
++		cu.mu.Unlock()
++		// Mode changes alter GLFW virtual coordinates; only producer position is
++		// rebased. Drag anchor and event/down timestamps retain their original values.
++		if w.pointerLive() {
++			if !known {
++				w.pointerFocus.Add(1)
++			} else if cu.pointer.modeWritten {
++				packed, focus := w.cursorScale.Load(), w.pointerFocus.Load()
++				x, y, ok := cu.pointer.position()
++				if !ok || !w.rebasePointerAt(x, y, packed, focus) {
++					if w.pointerLive() {
++						w.pointerFocus.Add(1)
++					}
++					err = fmt.Errorf("desktop: pointer mode baseline unavailable")
++				}
++			}
++		}
++	})
++	return err
++}
++func finite(v float64) bool { return !math.IsNaN(v) && !math.IsInf(v, 0) }
++func pointComponent(v float64) bool {
++	bound := math.Ldexp(1, strconv.IntSize-1)
++	return finite(v) && v >= -bound && v < bound
++}
++func (w *Window) pointerDPR() float64 {
++	return float64(math.Float32frombits(uint32(w.cursorScale.Load())))
++}
++func (w *Window) pointerPoint(x, y float64) (image.Point, bool) {
++	return w.pointerPointAt(x, y, w.cursorScale.Load())
++}
++func (w *Window) pointerPointAt(x, y float64, packed uint64) (image.Point, bool) {
++	if w.App.Platform() == system.MacOS {
++		dpr := float64(math.Float32frombits(uint32(packed)))
++		if !finite(dpr) || dpr <= 0 {
++			return image.Point{}, false
++		}
++		x *= dpr
++		y *= dpr
++	}
++	if !pointComponent(x) || !pointComponent(y) {
++		return image.Point{}, false
++	}
++	return image.Pt(int(math.Floor(x)), int(math.Floor(y))), true
++}
++func (w *Window) pointerLive() bool {
++	cu := w.cursor
++	if cu == nil {
++		return false
++	}
++	cu.mu.Lock()
++	defer cu.mu.Unlock()
++	return !cu.closed
++}
++func subtractFits(a, b int) bool {
++	max := int(^uint(0) >> 1)
++	min := -max - 1
++	return !(b > 0 && a < min+b || b < 0 && a > max+b)
++}
++func pointSubtractFits(a, b image.Point) bool {
++	return subtractFits(a.X, b.X) && subtractFits(a.Y, b.Y)
++}
++func (w *Window) pointerDeltasFit(p image.Point, rebase bool) bool {
++	if !rebase && !pointSubtractFits(p, w.Event.Last.MousePos) {
++		return false
++	}
++	return w.Event.Last.MouseButtonType != events.MouseDown || pointSubtractFits(p, w.Event.Last.MouseDownPos)
++}
++
++// Producer acknowledgements record only the snapshot used for conversion.
++// A concurrent DPR/focus publication stays distinguishable on the next event.
++func (w *Window) rebasePointerAt(x, y float64, packed, focus uint64) bool {
++	p, ok := w.pointerPointAt(x, y, packed)
++	if ok && w.pointerLive() && w.pointerDeltasFit(p, true) {
++		w.Event.Last.MousePos = p
++		w.pointerDPRUsed = uint32(packed)
++		w.pointerFocusUsed = focus
++		return true
++	}
++	return false
++}
++func (w *Window) admitPointerMove(where image.Point, packed, focus uint64) bool {
++	if !w.pointerLive() {
++		return false
++	}
++	rebase := w.pointerDPRUsed != uint32(packed) || w.pointerFocusUsed != focus
++	if !w.pointerDeltasFit(where, rebase) {
++		return false
++	}
++	if rebase {
++		w.Event.Last.MousePos = where
++	}
++	w.pointerDPRUsed = uint32(packed)
++	w.pointerFocusUsed = focus
++	w.Event.MouseMove(where)
++	return true
++}
++func (w *Window) setMousePos(x, y float64) error {
++	// Guard both domains before GLFW can store disabled virtual coordinates.
++	if !pointComponent(x) || !pointComponent(y) {
++		return fmt.Errorf("desktop: invalid pixel position")
++	}
++	cu := w.cursor
++	if cu == nil {
++		return fmt.Errorf("desktop: no pointer window")
++	}
++	cu.mu.Lock()
++	if cu.closed || cu.positionSequence == ^uint64(0) {
++		cu.mu.Unlock()
++		return fmt.Errorf("desktop: pointer retired")
++	}
++	cu.positionSequence++
++	seq := cu.positionSequence
++	a := cu.app
++	cu.mu.Unlock()
++	if a == nil {
++		return fmt.Errorf("desktop: no pointer app")
++	}
++	err := base.ErrMainStopped
++	a.nativeOnMain(func() {
++		cu.mu.Lock()
++		valid := !cu.closed && cu.window == w && cu.positionSequence == seq
++		cu.mu.Unlock()
++		if !valid || w.Glw == nil || cu.pointer == nil || cu.pointer.closed {
++			err = fmt.Errorf("desktop: pointer request retired")
++			return
++		}
++		packed, focus := w.cursorScale.Load(), w.pointerFocus.Load()
++		nx, ny := x, y
++		if a.Platform() == system.MacOS {
++			dpr := float64(math.Float32frombits(uint32(packed)))
++			if !finite(dpr) || dpr <= 0 {
++				err = fmt.Errorf("desktop: invalid pointer scale")
++				return
++			}
++			nx /= dpr
++			ny /= dpr
++		}
++		if !pointComponent(nx) || !pointComponent(ny) {
++			err = fmt.Errorf("desktop: invalid native position")
++			return
++		}
++		o := cu.pointer
++		if !o.begin() {
++			err = fmt.Errorf("desktop: pointer busy or retired")
++			return
++		}
++		defer func() { o.busy = false }()
++		eligible := false
++		if !o.call(func() { eligible = o.backend.canPosition() }) || !eligible {
++			err = fmt.Errorf("desktop: pointer window not eligible")
++			return
++		}
++		m, _, known := cu.pointer.read()
++		if !known {
++			cu.mu.Lock()
++			cu.modeKnown = false
++			cu.mu.Unlock()
++			err = fmt.Errorf("desktop: unknown pointer mode")
++			return
++		}
++		if m == glfw.CursorDisabled {
++			p, ok := w.pointerPointAt(nx, ny, packed)
++			if !ok || !w.pointerDeltasFit(p, true) {
++				err = fmt.Errorf("desktop: virtual position delta overflow")
++				return
++			}
++		}
++		if !o.call(func() { o.backend.setPosition(nx, ny) }) {
++			err = fmt.Errorf("desktop: pointer retired")
++			return
++		}
++		var rx, ry float64
++		if !o.call(func() { rx, ry = o.backend.position() }) {
++			err = fmt.Errorf("desktop: pointer retired")
++			return
++		}
++		if _, ok := w.pointerPointAt(rx, ry, packed); !ok {
++			if m == glfw.CursorDisabled && w.pointerLive() {
++				w.pointerFocus.Add(1)
++			}
++			err = fmt.Errorf("desktop: invalid pointer readback")
++			return
++		}
++		if m == glfw.CursorDisabled {
++			if !w.rebasePointerAt(rx, ry, packed, focus) {
++				if w.pointerLive() {
++					w.pointerFocus.Add(1)
++				}
++				err = fmt.Errorf("desktop: virtual position rebase refused")
++				return
++			}
++		}
++		err = nil
++	})
++	return err
++}
++
++func (w *Window) acknowledgePointer(packed, focus uint64) {
++	w.pointerDPRUsed = uint32(packed)
++	w.pointerFocusUsed = focus
++}
++func (w *Window) admitPointerButton(typ events.Types, but events.Buttons, p image.Point, mods key.Modifiers, packed, focus uint64) bool {
++	if !w.pointerLive() {
++		return false
++	}
++	rebase := w.pointerDPRUsed != uint32(packed) || w.pointerFocusUsed != focus
++	if typ != events.MouseDown && w.Event.Last.MouseButtonType == events.MouseDown {
++		if !w.pointerDeltasFit(p, rebase) {
++			return false
++		}
++		if rebase {
++			w.Event.Last.MousePos = p
++		}
++	}
++	w.acknowledgePointer(packed, focus)
++	w.Event.MouseButton(typ, but, p, mods)
++	return true
++}
++func (w *Window) admitPointerDrop(p image.Point, md mimedata.Mimes, packed, focus uint64) bool {
++	if !w.pointerLive() {
++		return false
++	}
++	w.acknowledgePointer(packed, focus)
++	w.Event.DropExternal(p, md)
++	return true
++}
++func (w *Window) admitPointerScroll(p image.Point, x, y float64, packed uint64) bool {
++	if !w.pointerLive() {
++		return false
++	}
++	d, ok := w.pointerScrollDeltaAt(x, y, packed)
++	if !ok {
++		return false
++	}
++	w.Event.Scroll(p, d)
++	return true
++}
++func (w *Window) pointerScrollDelta(xoff, yoff float64) (math32.Vector2, bool) {
++	return w.pointerScrollDeltaAt(xoff, yoff, w.cursorScale.Load())
++}
++func (w *Window) pointerScrollDeltaAt(xoff, yoff float64, packed uint64) (math32.Vector2, bool) {
++	scale := -40.0
++	if w.App.Platform() == system.MacOS {
++		dpr := float64(math.Float32frombits(uint32(packed)))
++		if !finite(dpr) || dpr <= 0 {
++			return math32.Vector2{}, false
++		}
++		scale = -10 * dpr
++	}
++	dx, dy := xoff*scale, yoff*scale
++	if !finite(dx) || !finite(dy) || math.Abs(dx) > math.MaxFloat32 || math.Abs(dy) > math.MaxFloat32 {
++		return math32.Vector2{}, false
++	}
++	return math32.Vec2(float32(dx), float32(dy)), true
++}
+--- /dev/null
++++ b/system/driver/desktop/pointer_vellum_test.go
+@@ -0,0 +1,701 @@
++// Copyright 2026 Vellum contributors. SPDX-License-Identifier: MIT.
++package desktop
++
++import (
++	"errors"
++	"image"
++	"math"
++	"reflect"
++	"runtime"
++	"strconv"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/cursors"
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/system/driver/base"
++	"github.com/go-gl/glfw/v3.4/glfw"
++)
++
++type fakePointerBackend struct {
++	mode                                            int
++	raw, supported, eligible, refuseMode, refuseRaw bool
++	x, y                                            float64
++	calls                                           []string
++	writes                                          int
++	inspect                                         func()
++	panicRaw                                        bool
++}
++
++func fakePointer() (*nativePointerOwner, *fakePointerBackend) {
++	f := &fakePointerBackend{mode: glfw.CursorNormal, eligible: true}
++	check := func() {
++		if f.inspect != nil {
++			f.inspect()
++		}
++	}
++	return newNativePointerOwner(nativePointerBackend{
++		rawSupported: func() bool { check(); f.calls = append(f.calls, "cap"); return f.supported },
++		mode:         func() int { check(); return f.mode }, raw: func() bool { check(); return f.raw },
++		setMode: func(m int) {
++			check()
++			f.calls = append(f.calls, "mode:"+strconv.Itoa(m))
++			if !f.refuseMode {
++				f.mode = m
++			}
++		},
++		setRaw: func(v bool) {
++			check()
++			f.calls = append(f.calls, "raw:"+strconv.FormatBool(v))
++			if f.panicRaw {
++				panic("raw restore")
++			}
++			if !f.refuseRaw {
++				f.raw = v
++			}
++		},
++		canPosition: func() bool { check(); return f.eligible }, position: func() (float64, float64) { check(); return f.x, f.y },
++		setPosition: func(x, y float64) { check(); f.calls = append(f.calls, "warp"); f.writes++; f.x, f.y = x, y },
++	}), f
++}
++func pointerHarness(t *testing.T) (*App, *Cursor, *fakePointerBackend, chan base.FuncRun) {
++	a, c, _, q := cursorHarness(t)
++	o, f := fakePointer()
++	c.pointer = o
++	w := c.window
++	o.live = func() bool { return w.pointerLive() }
++	return a, c, f, q
++}
++func runPointer(t *testing.T, a *App, q chan base.FuncRun, f func()) {
++	t.Helper()
++	if err := cursorRun(t, a, q, func() error { f(); return nil }); err != nil {
++		t.Fatal(err)
++	}
++}
++func TestVellumPointerVisibilityRelativeAndWindowIsolation(t *testing.T) {
++	a, c, f, q := pointerHarness(t)
++	w := c.window
++	runPointer(t, a, q, c.Hide)
++	if f.mode != glfw.CursorHidden || c.IsVisible() || !w.IsCursorEnabled() {
++		t.Fatal("Hide did not apply enabled-hidden mode")
++	}
++	runPointer(t, a, q, func() { w.SetCursorEnabled(false, true) })
++	runPointer(t, a, q, c.Show)
++	if f.mode != glfw.CursorDisabled || c.IsVisible() || w.IsCursorEnabled() || f.raw {
++		t.Fatal("unsupported raw fallback or disabled show")
++	}
++	runPointer(t, a, q, c.Hide)
++	runPointer(t, a, q, func() { w.SetCursorEnabled(true, false) })
++	if f.mode != glfw.CursorHidden || c.IsVisible() || !w.IsCursorEnabled() {
++		t.Fatal("hidden preference lost")
++	}
++	runPointer(t, a, q, c.Show)
++	if f.mode != glfw.CursorNormal || !c.IsVisible() {
++		t.Fatal("show refused")
++	}
++	for other := range a.cursorOwners {
++		if other != c && (!other.IsVisible() || other.pointer.touched) {
++			t.Fatal("other window changed")
++		}
++	}
++	for _, call := range f.calls {
++		if call == "raw:false" || call == "raw:true" {
++			t.Fatal("unsupported raw setter", f.calls)
++		}
++	}
++}
++func TestVellumPointerRawOrderingAndReadback(t *testing.T) {
++	o, f := fakePointer()
++	f.supported = true
++	if _, _, _, err := o.apply(glfw.CursorDisabled, true); err != nil {
++		t.Fatal(err)
++	}
++	if !reflect.DeepEqual(f.calls, []string{"cap", "mode:" + strconv.Itoa(glfw.CursorDisabled), "raw:true"}) {
++		t.Fatal(f.calls)
++	}
++	f.calls = nil
++	f.refuseRaw = true
++	if m, r, k, err := o.apply(glfw.CursorNormal, false); err == nil || m != glfw.CursorDisabled || !r || !k || !reflect.DeepEqual(f.calls, []string{"raw:false"}) {
++		t.Fatal("left disabled before raw stopped", m, r, k, err, f.calls)
++	}
++	f.refuseRaw = false
++	f.calls = nil
++	if _, _, _, err := o.apply(glfw.CursorHidden, false); err != nil || !reflect.DeepEqual(f.calls, []string{"raw:false", "mode:" + strconv.Itoa(glfw.CursorHidden)}) {
++		t.Fatal(err, f.calls)
++	}
++	f.calls = nil
++	f.refuseMode = true
++	if m, r, k, err := o.apply(glfw.CursorDisabled, true); err == nil || m != glfw.CursorHidden || r || !k || len(f.calls) != 1 {
++		t.Fatal("raw enabled before disabled readback", m, r, k, err, f.calls)
++	}
++}
++func TestVellumPointerUnknownReadbackInvalidatesStatus(t *testing.T) {
++	a, c, f, q := pointerHarness(t)
++	f.mode = -123
++	if err := cursorRun(t, a, q, func() error { return c.modeRequest(func(c *Cursor) { c.Vis = false }) }); err == nil {
++		t.Fatal("unknown accepted")
++	}
++	if c.IsVisible() || c.window.IsCursorEnabled() || c.modeKnown {
++		t.Fatal("stale successful status")
++	}
++}
++func TestVellumPointerCompleteIntentSupersessionAndImageIndependence(t *testing.T) {
++	a, c, f, q := pointerHarness(t)
++	done := make(chan error, 1)
++	go func() { done <- c.modeRequest(func(c *Cursor) { c.Vis = false }) }()
++	first := <-q
++	secondDone := make(chan error, 1)
++	go func() { secondDone <- c.modeRequest(func(c *Cursor) { c.wantEnabled = false }) }()
++	second := <-q
++	a.ExecuteMain(second)
++	a.ExecuteMain(first)
++	if <-done == nil || <-secondDone != nil || f.mode != glfw.CursorDisabled {
++		t.Fatal("superseded native request applied")
++	}
++	runPointer(t, a, q, func() { c.window.SetCursorEnabled(true, false) })
++	if f.mode != glfw.CursorHidden {
++		t.Fatal("merged hidden preference lost")
++	}
++	if err := cursorRun(t, a, q, func() error { return c.Set(cursors.Arrow) }); err != nil {
++		t.Fatal(err)
++	}
++	if f.mode != glfw.CursorHidden || c.IsVisible() {
++		t.Fatal("image request altered mode")
++	}
++}
++func TestVellumPointerNativeThreadNoWindowOrStatusLock(t *testing.T) {
++	runtime.LockOSThread()
++	defer runtime.UnlockOSThread()
++	a, c, f, q := pointerHarness(t)
++	a.cursorThread.Store(nativeCursorThread())
++	thread := nativeCursorThread()
++	w := c.window
++	f.inspect = func() {
++		if nativeCursorThread() != thread {
++			t.Error("worker native call")
++		}
++		_ = c.IsVisible()
++		_ = w.IsCursorEnabled()
++	}
++	w.Mu.Lock()
++	defer w.Mu.Unlock()
++	if err := c.modeRequest(func(c *Cursor) { c.Vis = false }); err != nil {
++		t.Fatal(err)
++	}
++	if err := w.setMousePos(13.5, -2.25); err != nil {
++		t.Fatal(err)
++	}
++	if len(q) != 0 {
++		t.Fatal("direct owner queued")
++	}
++}
++func TestVellumPointerStartupStopRetireAndQueuedCancellation(t *testing.T) {
++	a, c, _, _ := cursorFixture(t, false)
++	done := make(chan error, 1)
++	go func() { done <- c.modeRequest(func(c *Cursor) { c.Vis = false }) }()
++	select {
++	case <-done:
++		t.Fatal("prequeue worker returned")
++	case <-time.After(20 * time.Millisecond):
++	}
++	q, _ := a.InitMainQueue()
++	call := <-q
++	c.retireStatus()
++	a.ExecuteMain(call)
++	if <-done == nil || c.pointer.touched {
++		t.Fatal("retired queued request applied")
++	}
++	a.StopMain()
++	if err := c.modeRequest(func(c *Cursor) { c.Vis = true }); err == nil {
++		t.Fatal("closed reopened")
++	}
++	b, c2, _, _ := cursorFixture(t, false)
++	b.StopMain()
++	if err := c2.window.setMousePos(1, 2); !errors.Is(err, base.ErrMainStopped) {
++		t.Fatal(err)
++	}
++	if err := c2.modeRequest(func(c *Cursor) { c.Vis = false }); !errors.Is(err, base.ErrMainStopped) {
++		t.Fatal(err)
++	}
++}
++func TestVellumPointerCleanupPanicDrainsImagesAndRestoresMode(t *testing.T) {
++	a, c, f, q := pointerHarness(t)
++	f.supported = true
++	runPointer(t, a, q, func() { c.window.SetCursorEnabled(false, true) })
++	if err := cursorRun(t, a, q, func() error { return c.Set(cursors.Arrow) }); err != nil {
++		t.Fatal(err)
++	}
++	f.panicRaw = true
++	func() {
++		defer func() {
++			if recover() != "raw restore" {
++				t.Error("wrong panic")
++			}
++		}()
++		a.retireCursor(c)
++	}()
++	if !c.pointer.closed || c.pointer.backend.mode != nil || !c.owner.closed || len(c.owner.entries) != 0 || f.mode != glfw.CursorNormal {
++		t.Fatal("incomplete cleanup")
++	}
++	if _, ok := a.cursorOwners[c]; ok {
++		t.Fatal("retained registry entry")
++	}
++	a.retireCursor(c)
++}
++func TestVellumPointerPositionScaleEligibilityAndInvalidDomains(t *testing.T) {
++	a, c, f, q := pointerHarness(t)
++	w := c.window
++	done := make(chan error, 1)
++	go func() { done <- w.setMousePos(15.5, -5.5) }()
++	call := <-q
++	w.DevicePixelRatio = 4
++	w.publishCursorScale()
++	a.ExecuteMain(call)
++	if err := <-done; err != nil || f.x != 3.875 || f.y != -1.375 {
++		t.Fatal("stale scale", err, f.x, f.y)
++	}
++	f.eligible = false
++	before := f.writes
++	last := w.Event.Last
++	if err := cursorRun(t, a, q, func() error { return w.setMousePos(2, 3) }); err == nil || f.writes != before || w.Event.Last != last {
++		t.Fatal("ineligible warp")
++	}
++	f.eligible = true
++	bound := math.Ldexp(1, strconv.IntSize-1)
++	for _, v := range []float64{math.NaN(), math.Inf(1), math.Inf(-1), bound, -2 * bound, 1e308} {
++		if err := w.setMousePos(v, 0); err == nil {
++			t.Fatal("invalid outgoing pixel", v)
++		}
++	}
++	w.DevicePixelRatio = 0.001
++	w.publishCursorScale()
++	if err := cursorRun(t, a, q, func() error { return w.setMousePos(bound/2, 0) }); err == nil || f.writes != before {
++		t.Fatal("overflowing native virtual position")
++	}
++	w.DevicePixelRatio = float32(math.NaN())
++	w.publishCursorScale()
++	if err := cursorRun(t, a, q, func() error { return w.setMousePos(1, 2) }); err == nil || f.writes != before {
++		t.Fatal("invalid DPR warp")
++	}
++}
++func TestVellumPointerPositionSupersession(t *testing.T) {
++	a, c, f, q := pointerHarness(t)
++	w := c.window
++	d1, d2 := make(chan error, 1), make(chan error, 1)
++	go func() { d1 <- w.setMousePos(10, 20) }()
++	first := <-q
++	go func() { d2 <- w.setMousePos(30, 40) }()
++	second := <-q
++	a.ExecuteMain(second)
++	a.ExecuteMain(first)
++	if <-d1 == nil || <-d2 != nil || f.writes != 1 || f.x != 15 || f.y != 20 {
++		t.Fatal("stale warp applied")
++	}
++}
++func takePointerEvent(t *testing.T, w *Window) *events.Mouse {
++	t.Helper()
++	ev, ok := w.Event.Deque.PollEvent()
++	if !ok {
++		t.Fatal("missing event")
++	}
++	m, ok := ev.(*events.Mouse)
++	if !ok {
++		t.Fatalf("wrong event %T", ev)
++	}
++	return m
++}
++func TestVellumPointerDisabledVirtualMovementAndExplicitRebase(t *testing.T) {
++	a, c, f, q := pointerHarness(t)
++	w := c.window
++	runPointer(t, a, q, func() { w.SetCursorEnabled(false, true) })
++	if err := cursorRun(t, a, q, func() error { return w.setMousePos(100, 200) }); err != nil {
++		t.Fatal(err)
++	}
++	if w.Event.Last.MousePos != image.Pt(100, 200) || f.writes != 1 {
++		t.Fatal("virtual baseline not rebased")
++	}
++	w.CursorPosEvent(nil, 51, 102)
++	m := takePointerEvent(t, w)
++	if m.Where != image.Pt(102, 204) || m.Prev != image.Pt(100, 200) {
++		t.Fatal(m)
++	}
++	w.CursorPosEvent(nil, 52, 104)
++	m = takePointerEvent(t, w)
++	if m.Where != image.Pt(104, 208) || m.Prev != image.Pt(102, 204) || f.writes != 1 {
++		t.Fatal("manual recenter or incorrect relative coordinates", m)
++	}
++}
++func TestVellumPointerCheckedConversionAndNoInvalidEventMutation(t *testing.T) {
++	_, c, _, _ := pointerHarness(t)
++	w := c.window
++	if p := w.MousePosToPoint(-0.125, 1.625); p != image.Pt(-1, 3) {
++		t.Fatal("fraction flooring", p)
++	}
++	w.pointerDPRUsed = uint32(w.cursorScale.Load())
++	w.Event.Last.MousePos = image.Pt(11, 12)
++	saved := w.Event.Last
++	bound := math.Ldexp(1, strconv.IntSize-1)
++	for _, v := range []float64{math.NaN(), math.Inf(1), bound, 1e308} {
++		w.CursorPosEvent(nil, v, 2)
++	}
++	if w.Event.Last != saved {
++		t.Fatal("invalid event mutated source")
++	}
++	if _, ok := w.Event.Deque.PollEvent(); ok {
++		t.Fatal("invalid event queued")
++	}
++	min := -int(^uint(0)>>1) - 1
++	w.Event.Last.MousePos = image.Pt(min, 0)
++	w.CursorPosEvent(nil, 1, 0)
++	if w.Event.Last.MousePos.X != min {
++		t.Fatal("overflowing Prev subtraction admitted")
++	}
++	w.Event.Last.MousePos = image.Point{}
++	w.Event.Last.MouseButtonType = events.MouseDown
++	w.Event.Last.MouseDownPos = image.Pt(min, 0)
++	w.CursorPosEvent(nil, 1, 0)
++	if w.Event.Last.MousePos != (image.Point{}) {
++		t.Fatal("overflowing Start subtraction admitted")
++	}
++	c.retireStatus()
++	saved = w.Event.Last
++	w.CursorPosEvent(nil, 2, 3)
++	if w.Event.Last != saved {
++		t.Fatal("closed event mutation")
++	}
++}
++func TestVellumPointerDPRDirtyBaselinePreservesDragAnchorAndTime(t *testing.T) {
++	_, c, _, _ := pointerHarness(t)
++	w := c.window
++	w.Event.Last.MousePos = image.Pt(30, 40)
++	w.Event.Last.MouseDownPos = image.Pt(5, 6)
++	w.Event.Last.MouseButtonType = events.MouseDown
++	downTime := w.Event.Last.MouseDownTime
++	w.DevicePixelRatio = 4
++	w.publishCursorScale()
++	w.CursorPosEvent(nil, 10, 20)
++	m := takePointerEvent(t, w)
++	if m.Where != image.Pt(40, 80) || m.Prev != m.Where || m.Start != image.Pt(5, 6) || w.Event.Last.MouseDownTime != downTime || w.pointerDPRUsed != uint32(w.cursorScale.Load()) {
++		t.Fatal("DPR jump or anchor/time changed", m)
++	}
++	w.pointerFocus.Add(1) // same request issued by native Focused(true)
++	w.CursorPosEvent(nil, 20, 30)
++	m = takePointerEvent(t, w)
++	if m.Prev != m.Where || m.Start != image.Pt(5, 6) {
++		t.Fatal("focus baseline")
++	}
++}
++
++func TestVellumPointerRetirementAtEveryBackendStep(t *testing.T) {
++	// Every getter and setter is adversarially reentrant; after its retirement
++	// callback no later native callback or producer mutation may occur.
++	for _, full := range []bool{false, true} {
++		for _, kind := range []string{"mode", "position"} {
++			for step := 1; step <= map[string]int{"mode": 10, "position": 5}[kind]; step++ {
++				t.Run(strconv.FormatBool(full)+kind+strconv.Itoa(step), func(t *testing.T) {
++					a, c, f, q := pointerHarness(t)
++					w := c.window
++					f.supported = true
++					count, retired, late := 0, false, 0
++					f.inspect = func() {
++						if retired {
++							late++
++							return
++						}
++						count++
++						if count == step {
++							retired = true
++							f.inspect = nil
++							if full {
++								a.retireCursor(c)
++							} else {
++								c.retireStatus()
++							}
++							f.inspect = func() { late++ }
++						}
++					}
++					saved := w.Event.Last
++					err := cursorRun(t, a, q, func() error {
++						if kind == "mode" {
++							return c.modeRequest(func(c *Cursor) { c.wantEnabled = false; c.wantRaw = true })
++						}
++						return w.setMousePos(20, 40)
++					})
++					f.inspect = nil
++					if !retired {
++						t.Fatal("retirement point not reached", step, count)
++					}
++					if full && (f.mode != glfw.CursorNormal || f.raw) {
++						t.Fatal("inflight setter overwrote final restoration", f.mode, f.raw)
++					}
++					allowedLate := 0
++					if full && c.pointer.touched {
++						allowedLate = 2
++					} // deferred rawfalse+normal restoration only
++					if retired && (err == nil || late != allowedLate || w.Event.Last != saved) {
++						t.Fatal("continued after retirement", err, late, count, w.Event.Last)
++					}
++				})
++			}
++		}
++	}
++}
++func TestVellumPointerNestedMutationsRefusedAndNoOpDoesNotRebase(t *testing.T) {
++	runtime.LockOSThread()
++	defer runtime.UnlockOSThread()
++	a, c, f, _ := pointerHarness(t)
++	a.cursorThread.Store(nativeCursorThread())
++	w := c.window
++	var nested error
++	f.inspect = func() { f.inspect = nil; nested = w.setMousePos(20, 30) }
++	if err := c.modeRequest(func(c *Cursor) { c.Vis = false }); err != nil || nested == nil || f.writes != 0 {
++		t.Fatal("nested mutation", err, nested)
++	}
++	w.Event.Last.MousePos = image.Pt(101, 102)
++	f.x, f.y = 200, 300
++	saved := w.Event.Last
++	if err := c.modeRequest(func(c *Cursor) { c.Vis = false }); err != nil || w.Event.Last != saved {
++		t.Fatal("no-op mode rebased", err)
++	}
++	f.refuseMode = true
++	if err := c.modeRequest(func(c *Cursor) { c.Vis = true }); err == nil {
++		t.Fatal("refused mode reported applied")
++	}
++}
++func TestVellumPointerConcurrentPublicationCannotLoseRebase(t *testing.T) {
++	_, c, _, _ := pointerHarness(t)
++	w := c.window
++	oldScale, oldFocus := w.cursorScale.Load(), w.pointerFocus.Load()
++	p, ok := w.pointerPointAt(10, 20, oldScale)
++	if !ok {
++		t.Fatal("snapshot")
++	}
++	w.DevicePixelRatio = 4
++	w.publishCursorScale()
++	w.pointerFocus.Add(1)
++	if !w.admitPointerMove(p, oldScale, oldFocus) {
++		t.Fatal("old admitted snapshot")
++	}
++	takePointerEvent(t, w)
++	w.CursorPosEvent(nil, 11, 21)
++	m := takePointerEvent(t, w)
++	if m.Prev != m.Where || m.Where != image.Pt(44, 84) || w.pointerFocusUsed != w.pointerFocus.Load() || w.pointerDPRUsed != uint32(w.cursorScale.Load()) {
++		t.Fatal("new publication erased", m)
++	}
++}
++func TestVellumPointerButtonAcknowledgesBaselineBeforeFirstDrag(t *testing.T) {
++	_, c, _, _ := pointerHarness(t)
++	w := c.window
++	w.pointerFocus.Add(1)
++	w.DevicePixelRatio = 4
++	w.publishCursorScale()
++	scale, focus := w.cursorScale.Load(), w.pointerFocus.Load()
++	if !w.admitPointerButton(events.MouseDown, events.Left, image.Pt(40, 80), 0, scale, focus) {
++		t.Fatal("down")
++	}
++	takePointerEvent(t, w)
++	w.CursorPosEvent(nil, 11, 21)
++	m := takePointerEvent(t, w)
++	if m.Prev != image.Pt(40, 80) || m.Where != image.Pt(44, 84) || m.Start != image.Pt(40, 80) {
++		t.Fatal("first physical drag delta lost", m)
++	}
++}
++func TestVellumPointerScrollFiniteBoundaries(t *testing.T) {
++	_, c, _, _ := pointerHarness(t)
++	w := c.window
++	d, ok := w.pointerScrollDelta(1.5, -2.5)
++	if !ok || d.X != -30 || d.Y != 50 {
++		t.Fatal(d, ok)
++	}
++	for _, n := range []float64{math.NaN(), math.Inf(1), 1e308, math.MaxFloat32} {
++		if _, ok := w.pointerScrollDelta(n, 0); ok {
++			t.Fatal("invalid scroll admitted", n)
++		}
++	}
++	w.DevicePixelRatio = 0
++	w.publishCursorScale()
++	if _, ok := w.pointerScrollDelta(1, 1); ok {
++		t.Fatal("invalid scroll scale")
++	}
++}
++
++func TestVellumPointerNestedModeFromReadbackPreservesAppliedStatus(t *testing.T) {
++	runtime.LockOSThread()
++	defer runtime.UnlockOSThread()
++	a, c, f, _ := pointerHarness(t)
++	a.cursorThread.Store(nativeCursorThread())
++	w := c.window
++	old := c.pointer.backend.position
++	var nested error
++	c.pointer.backend.position = func() (float64, float64) {
++		c.pointer.backend.position = old
++		nested = c.modeRequest(func(c *Cursor) { c.Vis = true })
++		return old()
++	}
++	if err := c.modeRequest(func(c *Cursor) { c.Vis = false }); err != nil || nested == nil || !c.modeKnown || c.mode != glfw.CursorHidden || c.IsVisible() || !w.IsCursorEnabled() || f.mode != glfw.CursorHidden {
++		t.Fatal("nested refusal erased applied state", err, nested, c.modeKnown, c.mode)
++	}
++	if err := c.modeRequest(func(*Cursor) {}); err != nil || !c.IsVisible() {
++		t.Fatal("retained intent retry", err)
++	}
++}
++func TestVellumPointerDirtyReleaseAndDropPreserveNextDelta(t *testing.T) {
++	_, c, _, _ := pointerHarness(t)
++	w := c.window
++	scale := w.cursorScale.Load()
++	w.admitPointerButton(events.MouseDown, events.Left, image.Pt(4, 6), 0, scale, 0)
++	takePointerEvent(t, w)
++	w.pointerFocus.Add(1)
++	focus := w.pointerFocus.Load()
++	if !w.admitPointerButton(events.MouseUp, events.Left, image.Pt(40, 60), 0, scale, focus) {
++		t.Fatal("release")
++	}
++	m := takePointerEvent(t, w)
++	if m.Prev != m.Where || m.Start != image.Pt(4, 6) {
++		t.Fatal("release focus jump", m)
++	}
++	w.pointerFocus.Add(1)
++	focus = w.pointerFocus.Load()
++	if !w.admitPointerDrop(image.Pt(50, 70), nil, scale, focus) {
++		t.Fatal("drop")
++	}
++	if _, ok := w.Event.Deque.PollEvent(); !ok {
++		t.Fatal("missing drop")
++	}
++	w.CursorPosEvent(nil, 26, 36)
++	m = takePointerEvent(t, w)
++	if m.Where != image.Pt(52, 72) || m.Prev != image.Pt(50, 70) {
++		t.Fatal("first post-drop delta lost", m)
++	}
++}
++func TestVellumPointerScrollSnapshotAndRetiredRouting(t *testing.T) {
++	_, c, _, _ := pointerHarness(t)
++	w := c.window
++	scale := w.cursorScale.Load()
++	w.DevicePixelRatio = 4
++	w.publishCursorScale()
++	if !w.admitPointerScroll(image.Pt(20, 40), 1, -1, scale) {
++		t.Fatal("scroll")
++	}
++	ev, ok := w.Event.Deque.PollEvent()
++	if !ok {
++		t.Fatal("missing scroll")
++	}
++	scroll, ok := ev.(*events.MouseScroll)
++	if !ok || scroll.Delta.X != -20 || scroll.Delta.Y != 20 {
++		t.Fatal("mixed position/delta scale", ev)
++	}
++	saved := w.Event.Last
++	usedDPR, usedFocus := w.pointerDPRUsed, w.pointerFocusUsed
++	c.retireStatus()
++	if w.admitPointerDrop(image.Pt(2, 3), nil, scale, 0) || w.admitPointerScroll(image.Pt(2, 3), 1, 1, scale) || w.Event.Last != saved || w.pointerDPRUsed != usedDPR || w.pointerFocusUsed != usedFocus {
++		t.Fatal("retired source mutated")
++	}
++	if _, ok := w.Event.Deque.PollEvent(); ok {
++		t.Fatal("retired event queued")
++	}
++}
++
++func TestVellumPointerReadbackPublicationRemainsPending(t *testing.T) {
++	for _, kind := range []string{"mode", "warp"} {
++		t.Run(kind, func(t *testing.T) {
++			a, c, _, q := pointerHarness(t)
++			w := c.window
++			if kind == "warp" {
++				runPointer(t, a, q, func() { w.SetCursorEnabled(false, false) })
++			}
++			old := c.pointer.backend.position
++			c.pointer.backend.position = func() (float64, float64) {
++				x, y := old()
++				w.DevicePixelRatio = 4
++				w.publishCursorScale()
++				w.pointerFocus.Add(1)
++				return x, y
++			}
++			var err error
++			if kind == "mode" {
++				err = cursorRun(t, a, q, func() error { return c.modeRequest(func(c *Cursor) { c.Vis = false }) })
++			} else {
++				err = cursorRun(t, a, q, func() error { return w.setMousePos(20, 40) })
++			}
++			if err != nil || w.pointerDPRUsed == uint32(w.cursorScale.Load()) || w.pointerFocusUsed == w.pointerFocus.Load() {
++				t.Fatal("readback erased concurrent publication", err)
++			}
++			w.CursorPosEvent(nil, 11, 21)
++			m := takePointerEvent(t, w)
++			if m.Prev != m.Where {
++				t.Fatal("readback focus/scale jump", m)
++			}
++		})
++	}
++}
++func TestVellumPointerDisabledWarpRejectsUnrepresentableDragDelta(t *testing.T) {
++	a, c, f, q := pointerHarness(t)
++	w := c.window
++	runPointer(t, a, q, func() { w.SetCursorEnabled(false, false) })
++	w.Event.Last.MouseButtonType = events.MouseDown
++	w.Event.Last.MouseDownPos = image.Pt(-int(^uint(0)>>1)-1, 0)
++	saved := w.Event.Last
++	writes := f.writes
++	err := cursorRun(t, a, q, func() error { return w.setMousePos(1, 0) })
++	if err == nil || f.writes != writes || w.Event.Last != saved {
++		t.Fatal("overflowing drag virtual warp", err, f.writes, writes)
++	}
++	// A backend can refuse/clamp/move independently: failed readback rebase is
++	// reported as refusal rather than success with stale producer coordinates.
++	w.Event.Last.MouseDownPos = image.Point{}
++	old := c.pointer.backend.position
++	c.pointer.backend.position = func() (float64, float64) { return math.Inf(1), 0 }
++	if err = cursorRun(t, a, q, func() error { return w.setMousePos(1, 0) }); err == nil {
++		t.Fatal("invalid readback reported success")
++	}
++	c.pointer.backend.position = old
++}
++
++func TestVellumPointerFailedReadbackForcesNextBaseline(t *testing.T) {
++	for _, kind := range []string{"mode", "unknown-mode", "warp"} {
++		t.Run(kind, func(t *testing.T) {
++			a, c, f, q := pointerHarness(t)
++			w := c.window
++			if kind == "warp" {
++				runPointer(t, a, q, func() { w.SetCursorEnabled(false, false) })
++			}
++			w.Event.Last.MousePos = image.Pt(10, 20)
++			w.acknowledgePointer(w.cursorScale.Load(), w.pointerFocus.Load())
++			used := w.pointerFocusUsed
++			oldPosition := c.pointer.backend.position
++			c.pointer.backend.position = func() (float64, float64) { return math.Inf(1), 0 }
++			oldMode := c.pointer.backend.mode
++			if kind == "unknown-mode" {
++				c.pointer.backend.mode = func() int {
++					if f.mode == glfw.CursorNormal {
++						return f.mode
++					}
++					return -123
++				}
++			}
++			err := cursorRun(t, a, q, func() error {
++				if kind == "warp" {
++					return w.setMousePos(100, 200)
++				}
++				return c.modeRequest(func(c *Cursor) { c.Vis = false })
++			})
++			if err == nil || w.Event.Last.MousePos != image.Pt(10, 20) || w.pointerFocus.Load() == used || w.pointerFocusUsed != used {
++				t.Fatal("failed readback acknowledged stale baseline", err)
++			}
++			if kind == "unknown-mode" && (f.mode != glfw.CursorHidden || !c.pointer.modeWritten || c.modeKnown) {
++				t.Fatal("unknown readback did not follow native setter")
++			}
++			if kind == "mode" && (!c.modeKnown || c.mode != glfw.CursorHidden || !w.IsCursorEnabled() || c.IsVisible()) {
++				t.Fatal("partial mode status lost")
++			}
++			c.pointer.backend.position = oldPosition
++			c.pointer.backend.mode = oldMode
++			w.CursorPosEvent(nil, 51, 102)
++			m := takePointerEvent(t, w)
++			if m.Where != image.Pt(102, 204) || m.Prev != m.Where {
++				t.Fatal("stale pre-operation delta after failed readback", m)
++			}
++		})
++	}
++}
+--- a/system/driver/desktop/window.go
++++ b/system/driver/desktop/window.go
+@@ -35,6 +35,9 @@
+ 	presentationComposition uint64 // monotonic under Mu
+ 	closeOnce               sync.Once
+ 	cursorScale             atomic.Uint64 // packed DPI/DPR, published under Mu after creation
++	pointerFocus            atomic.Uint64 // focus rebase publication, never cleared by producer
++	pointerFocusUsed        uint64        // native producer only
++	pointerDPRUsed          uint32        // native producer only
+ 	cursor                  *Cursor       // published before the window, retained closed after teardown
+ 	composerPointer         atomic.Pointer[composer.ComposerDrawer]
+ 	base.WindowMulti[*App, *composer.ComposerDrawer]
+@@ -536,29 +539,25 @@
+ 	w.Compose = nil
+ }
+ 
+-func (w *Window) SetMousePos(x, y float64) {
+-	if !w.IsVisible() {
+-		return
+-	}
+-	w.Mu.Lock()
+-	defer w.Mu.Unlock()
+-	if TheApp.Platform() == system.MacOS {
+-		w.Glw.SetCursorPos(x/float64(w.DevicePixelRatio), y/float64(w.DevicePixelRatio))
+-	} else {
+-		w.Glw.SetCursorPos(x, y)
+-	}
+-}
+-
++// SetMousePos accepts window pixel coordinates, including fractional/outside
++// positions. Native positioning requires a live focused, visible window.
++func (w *Window) SetMousePos(x, y float64) { _ = w.setMousePos(x, y) }
++
++// SetCursorEnabled controls relative mode. Raw motion is optional; unsupported
++// platforms use ordinary relative motion. Hide/Show preference survives this.
+ func (w *Window) SetCursorEnabled(enabled, raw bool) {
+-	w.CursorEnabled = enabled
+-	if enabled {
+-		w.Glw.SetInputMode(glfw.CursorMode, glfw.CursorNormal)
+-	} else {
+-		w.Glw.SetInputMode(glfw.CursorMode, glfw.CursorDisabled)
+-		if raw && glfw.RawMouseMotionSupported() {
+-			w.Glw.SetInputMode(glfw.RawMouseMotion, glfw.True)
+-		}
+-	}
++	if w.cursor != nil {
++		_ = w.cursor.modeRequest(func(c *Cursor) { c.wantEnabled, c.wantRaw = enabled, raw })
++	}
++}
++func (w *Window) IsCursorEnabled() bool {
++	cu := w.cursor
++	if cu == nil {
++		return false
++	}
++	cu.mu.Lock()
++	defer cu.mu.Unlock()
++	return !cu.closed && cu.modeKnown && cu.mode != glfw.CursorDisabled
+ }
+ 
+ ////////  Window Callbacks
+@@ -648,6 +647,7 @@
+ 	}
+ 	// w.Flgs.SetFlag(focused, system.Focused)
+ 	if focused {
++		w.pointerFocus.Add(1) // Cocoa may recenter after this callback returns.
+ 		w.Event.Window(events.WinFocus)
+ 	} else {
+ 		w.Event.Last.MousePos = image.Point{-1, -1} // key for preventing random click to same location
+@@ -667,7 +667,8 @@
+ 
+ // publishCursorScale runs under Mu, or before the new window is published.
+ func (w *Window) publishCursorScale() {
+-	w.cursorScale.Store(uint64(math.Float32bits(w.LogDPI))<<32 | uint64(math.Float32bits(w.DevicePixelRatio)))
++	packed := uint64(math.Float32bits(w.LogDPI))<<32 | uint64(math.Float32bits(w.DevicePixelRatio))
++	w.cursorScale.Store(packed)
+ }
+ func (w *Window) SetLogicalDPI(dpi float32) {
+ 	w.Mu.Lock()

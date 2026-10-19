@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "scope": "source and offscreen native pointer mode/routing controls; no live qualification",
+  "baseline": "0dd27a70a431ee95d08797da982e57b96836323c",
+  "prepared_modules": {
+    "upstream": 6004,
+    "typesetting": 297
+  },
+  "new_test_methods": [
+    "TestVellumPointerVisibilityRelativeAndWindowIsolation",
+    "TestVellumPointerRawOrderingAndReadback",
+    "TestVellumPointerUnknownReadbackInvalidatesStatus",
+    "TestVellumPointerCompleteIntentSupersessionAndImageIndependence",
+    "TestVellumPointerNativeThreadNoWindowOrStatusLock",
+    "TestVellumPointerStartupStopRetireAndQueuedCancellation",
+    "TestVellumPointerCleanupPanicDrainsImagesAndRestoresMode",
+    "TestVellumPointerPositionScaleEligibilityAndInvalidDomains",
+    "TestVellumPointerPositionSupersession",
+    "TestVellumPointerDisabledVirtualMovementAndExplicitRebase",
+    "TestVellumPointerCheckedConversionAndNoInvalidEventMutation",
+    "TestVellumPointerDPRDirtyBaselinePreservesDragAnchorAndTime",
+    "TestVellumPointerRetirementAtEveryBackendStep",
+    "TestVellumPointerNestedMutationsRefusedAndNoOpDoesNotRebase",
+    "TestVellumPointerConcurrentPublicationCannotLoseRebase",
+    "TestVellumPointerButtonAcknowledgesBaselineBeforeFirstDrag",
+    "TestVellumPointerScrollFiniteBoundaries",
+    "TestVellumPointerNestedModeFromReadbackPreservesAppliedStatus",
+    "TestVellumPointerDirtyReleaseAndDropPreserveNextDelta",
+    "TestVellumPointerScrollSnapshotAndRetiredRouting",
+    "TestVellumPointerReadbackPublicationRemainsPending",
+    "TestVellumPointerDisabledWarpRejectsUnrepresentableDragDelta",
+    "TestVellumPointerFailedReadbackForcesNextBaseline"
+  ],
+  "selected_top_level_race_methods": 86,
+  "raster_matrix_cases": 390,
+  "full_race_controller": {
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pointer-modes/headless-v6-controller-result.json",
+    "sha256": "bcd9b6ccd732a1f857120bff22196a76f524352ade7957acf4e8b0837f495daa"
+  },
+  "final_focused_controller": {
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pointer-modes/headless-v7-controller-result.json",
+    "sha256": "bab80d39903818581cb733adb8975505c36d5faa92e5f2dfcd772f35305154ea"
+  },
+  "production_source_identical_between_runs": true,
+  "test_only_strengthening": [
+    "upstream/system/driver/desktop/pointer_vellum_test.go"
+  ],
+  "stage_patch_sha256": "d1f83988a3f5c23a0fd263e8edb90080c92448dec35b45541bd19133b69ee0b4",
+  "result": "PASS_HEADLESS_COMMANDS",
+  "native_executed": false,
+  "mac_complete": false
+}

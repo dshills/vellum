@@ -720,3 +720,10 @@ The [cursor ownership checkpoint](cursor-ownership.md) defines per-window native
 ownership, bounded shared/per-window retention, theme synchronization and terminal
 drain. Its automated fake-backend/race evidence does not close physical cursor,
 DPI, visibility-mode or M4 native/endurance qualification.
+
+The [desktop pointer mode checkpoint](desktop-pointer-modes.md) adds native-owned
+visibility/relative/position operations and checked routing. Source/fake-backend
+evidence supersedes the earlier status-only Hide/Show implementation gap. Cocoa
+physical pointer/visibility/capture, DPI/focus transitions and M4/M5 live gates
+remain open; measured 60 Hz remains the release gate and 4 ms an optimization
+target.

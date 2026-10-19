@@ -1124,6 +1124,17 @@
               "sha256": "66e493c922bbb3f2ac816e692d6a9c7b98a45ba80064097c49585996990f0715"
             }
           ]
+        },
+        {
+          "origin": "Vellum pointer modes",
+          "inputs": "native/patches/pointermodes/original-hashes.json",
+          "outputs": "native/patches/pointermodes/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/pointermodes/0091-pointer-modes.patch",
+              "sha256": "d1f83988a3f5c23a0fd263e8edb90080c92448dec35b45541bd19133b69ee0b4"
+            }
+          ]
         }
       ]
     },
