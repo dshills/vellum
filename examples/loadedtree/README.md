@@ -117,3 +117,16 @@ See the [capture contract](../../specs/presentation-capture.md) and current
 [Mac release policy](../../specs/macos-responsiveness.md); the earlier 4 ms budgets
 remain optimization targets. No real presentation journal has been qualified by
 this checkpoint.
+
+## Fixed-deadline 60 Hz workload
+
+`-perf -nodes=100000 -perf-samples=600 -perf-60hz
+-perf-presentation=/private/tmp/new-loadedtree-60hz.json` selects a separate
+10-second planned workload. Use the flags on one command line and a new file.
+It retains every planned slot, late backlog, generation-bound viewport change
+and actual native feedback. Per-event stdout/memory profiling stays outside
+the cohort; validation/owner polling stays included. The version 2 analyzer uses
+N-1 final-state intervals and reports collapsed states and overruns explicitly.
+See the [paced contract](../../specs/paced-presentation.md) for exact bounds,
+commands and qualification limits. These tools have not yet qualified live 60 Hz
+performance, physical input or the remaining Mac release workloads.

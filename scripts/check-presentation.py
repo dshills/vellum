@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate a serial native feedback journal. Does not qualify 60 Hz cadence."""
+"""Validate serial/paced native feedback. Execution provenance remains external."""
 import argparse,hashlib,json,math,re,sys,os,stat
 from pathlib import Path
 MAX_BYTES=64<<20
@@ -82,12 +82,94 @@ def percentile(values,p):
  need(bool(values),'no percentile observations');return sorted(values)[math.ceil(len(values)*p)-1]
 def stats(values):return {'count':len(values),'p50':percentile(values,.5),'p95':percentile(values,.95),'p99':percentile(values,.99),'max':max(values)}
 
+def pace_view(value,tree):
+ keys=['ScrollX','ScrollY','Width','Height','Bounds','Scale','Visible','Rows','Columns','Retained','Materialized','LayoutSHA256']
+ obj(value,keys)
+ for key in ['ScrollX','ScrollY']:integer(value[key],hi=10_000_000)
+ for key in ['Width','Height']:integer(value[key],1,65536)
+ bounds=array(value['Bounds'],4);need(len(bounds)==4,'paced bounds count')
+ for v in bounds:integer(v,-1_000_000,1_000_000)
+ need(bounds[0]<bounds[2]and bounds[1]<bounds[3],'paced bounds empty')
+ need(number(value['Scale'],True)<=16,'paced scale differs')
+ cap=500 if tree else 4096
+ for key in ['Visible','Rows','Columns','Retained','Materialized']:integer(value[key],hi=cap)
+ need(value['Visible']<=value['Materialized'],'paced visible/materialized count')
+ if tree:need(value['Visible']>=64 and value['Rows']==value['Visible']and value['Columns']==1 and value['ScrollX']==0,'paced tree workload differs')
+ else:need(value['Visible']>=400 and value['Rows']>=50 and value['Columns']>=8,'paced grid workload differs')
+ need(type(value['LayoutSHA256'])is str and re.fullmatch('[0-9a-f]{64}',value['LayoutSHA256'])is not None,'paced layout hash differs')
+ return value
+
+def pace_observation(value,tree):
+ obj(value,['Tag','Generation','Frame','View'])
+ for key in ['Tag','Generation','Frame']:integer(value[key],1)
+ pace_view(value['View'],tree);return value
+
+def pace_delta(index,tree):
+ if tree:return(0,12 if index%32<16 else-12)
+ phase=index%64;dy=12 if phase<32 else-12
+ dx=96 if phase in[7,15,23,31]else-96 if phase in[39,47,55,63]else 0
+ return dx,dy
+
+def native_rounding_ns(value):
+ return math.ceil(math.ulp(value)*1e9+math.ulp(value*1e9))+2
+
+def validate_pacing(value,config,cpu,receipts,armed,ordered,measured):
+ obj(value,['Hz','Clock','Method','PlannedEndNS','Started','Completed','HoldStartNS','HoldEndNS','Failure','Initial','Slots'])
+ count=config['Samples'];tree=config['Method']=='routed-tree-scroll'
+ need(count>=600 and config['Paced']is True and not config['Novel'],'paced sample/config bound')
+ need(integer(value['Hz'],60,60)==60 and value['Clock']=='Go monotonic relative nanoseconds; separate from native host clock'and value['Method']=='absolute rational deadlines; serial CPU acknowledgement; retained backlog','paced clock/method differs')
+ need(boolean(value['Started'])and boolean(value['Completed'])and text(value['Failure'])=='','paced cohort did not complete')
+ offset=lambda index:index*1_000_000_000//60
+ need(integer(value['PlannedEndNS'])==offset(count),'paced planned end changed')
+ slots=array(value['Slots'],2048);need(len(slots)==count,'paced slots omitted')
+ tags=[tag for tag in ordered if tag in measured]
+ initial=pace_observation(value['Initial'],tree)
+ initial_tag=config['Warmup']+2 if tree else(1<<32)+config['Warmup']
+ need(initial['Tag']==initial_tag and initial['Generation']==cpu[initial_tag]['Generation']and initial['View']['ScrollX']==initial['View']['ScrollY']==0,'paced initial/warmup baseline differs')
+ previous=initial;previous_end=0;lower_origin=None;upper_origin=None;last_precision=0
+ for index,slot in enumerate(slots):
+  obj(slot,['Index','Tag','ScheduledNS','State','StartNS','DispatchNS','EnqueuedNS','AcknowledgedNS','InspectedNS','EndNS','Observation'])
+  need(integer(slot['Index'])==index and integer(slot['Tag'],1)==tags[index]and integer(slot['ScheduledNS'])==offset(index)and slot['State']=='completed','paced planned slot identity differs')
+  times=[integer(slot[key],hi=(1<<63)-1)for key in ['StartNS','DispatchNS','EnqueuedNS','AcknowledgedNS','InspectedNS','EndNS']]
+  need(times==sorted(times)and times[0]>=offset(index)and times[0]>=previous_end,'paced timeline regressed/early/concurrent');previous_end=times[-1]
+  observed=pace_observation(slot['Observation'],tree);view=observed['View'];before=previous['View'];dx,dy=pace_delta(index,tree)
+  need(observed['Tag']==slot['Tag']and observed['Generation']==cpu[slot['Tag']]['Generation']==previous['Generation']+1 and observed['Frame']>previous['Frame'],'paced CPU/generation/frame identity differs')
+  need(view['ScrollX']==before['ScrollX']+dx and view['ScrollY']==before['ScrollY']+dy,'paced viewport clamped/no-op')
+  need(all(view[key]==before[key]for key in ['Width','Height','Bounds','Scale']),'paced geometry changed')
+  # The native receipt occurs inside the measured Go dispatch/return bracket.
+  # Unknown clock origins are aligned by an intersection, never by arbitrary
+  # subtraction. Retain explicit rounding uncertainty for native float seconds.
+  at=receipts[slot['Tag']]['Received'];native_ns=round(at*1e9);precision=native_rounding_ns(at);last_precision=max(last_precision,precision)
+  lo=native_ns-slot['EnqueuedNS']-precision;hi=native_ns-slot['DispatchNS']+precision
+  lower_origin=lo if lower_origin is None else max(lower_origin,lo)
+  upper_origin=hi if upper_origin is None else min(upper_origin,hi)
+  previous=observed
+ need(lower_origin<=upper_origin,'paced Go/native receipt brackets inconsistent')
+ hold_start=integer(value['HoldStartNS'],hi=(1<<63)-1);hold_end=integer(value['HoldEndNS'],hi=(1<<63)-1)
+ need(hold_start>=previous_end and hold_end>=max(hold_start,value['PlannedEndNS']),'paced immutable end/hold differs')
+ presentation_times=[armed[tag]['Presented']for tag in tags]
+ intervals=[(right-left)*1000 for left,right in zip(presentation_times,presentation_times[1:])]
+ anomalies=[{'left_tag':tags[index],'right_tag':tags[index+1],'milliseconds':gap}for index,gap in enumerate(intervals)if gap<=0]
+ limit=1100/60;long=[{'left_tag':tags[index],'right_tag':tags[index+1],'milliseconds':gap}for index,gap in enumerate(intervals)if gap>limit]
+ stalls=[row for row in long if row['milliseconds']>2000/60]
+ passing=sum(0<gap<=limit for gap in intervals);denominator=count-1
+ lateness=[slot['StartNS']-slot['ScheduledNS']for slot in slots]
+ misses=[{'index':index,'overrun_ns':slot['EndNS']-offset(index+1)}for index,slot in enumerate(slots)if slot['EndNS']>offset(index+1)]
+ debt=[max(0,slot['EndNS']-offset(index+1))for index,slot in enumerate(slots)]
+ worst_consecutive=run=0
+ for v in debt:
+  run=run+1 if v>0 else 0;worst_consecutive=max(worst_consecutive,run)
+ first_native_ns=round(presentation_times[0]*1e9);last_native_ns=round(presentation_times[-1]*1e9)
+ first_precision=native_rounding_ns(presentation_times[0]);last_endpoint_precision=native_rounding_ns(presentation_times[-1])
+ return {'result':'VALID_PACED_NATIVE_FEEDBACK_JOURNAL','paced_metrics':{'planned_states':count,'ordered_distinct_final_times':not anomalies,'distinct_final_presentation_times':len(set(presentation_times)),'interval_population':'one final armed state per scheduled tag, in request order; no warmup anchor; N-1 intervals','interval_count':denominator,'intervals_ms':intervals,'interval_stats_ms':stats(intervals),'within_1_1_period':passing,'within_fraction':passing/denominator,'over_1_1_period':long,'over_two_periods':stalls,'collapsed_or_reordered_states':anomalies,'cadence_threshold_met':not anomalies and passing*100>=99*denominator,'planned_duration_ns':value['PlannedEndNS'],'actual_hold_end_ns':hold_end,'final_work_overrun_ns':max(0,slots[-1]['EndNS']-value['PlannedEndNS']),'start_lateness_ns':stats(lateness),'iteration_ns':stats([s['EndNS']-s['StartNS']for s in slots]),'dispatch_to_enqueue_return_ns':stats([s['EnqueuedNS']-s['DispatchNS']for s in slots]),'enqueue_return_to_ack_observation_ns':stats([s['AcknowledgedNS']-s['EnqueuedNS']for s in slots]),'ack_to_inspection_ns':stats([s['InspectedNS']-s['AcknowledgedNS']for s in slots]),'iteration_deadline_misses':misses,'worst_schedule_debt_ns':max(debt),'worst_consecutive_deadline_misses':worst_consecutive,'clock_correlation_model':'conditional constant origin offset and common nanosecond rate over cohort; receipt call brackets, not independent clock calibration','native_origin_bracket_ns':[lower_origin,upper_origin],'clock_origin_uncertainty_ns':upper_origin-lower_origin,'native_receipt_rounding_bound_ns':last_precision,'native_presentation_rounding_bound_ns':max(first_precision,last_endpoint_precision),'first_scheduled_to_presented_ms_bounds':[(first_native_ns-first_precision-upper_origin)/1e6,(first_native_ns+first_precision-lower_origin)/1e6],'final_presentation_after_planned_end_ms_bounds':[(last_native_ns-last_endpoint_precision-upper_origin-value['PlannedEndNS'])/1e6,(last_native_ns+last_endpoint_precision-lower_origin-value['PlannedEndNS'])/1e6],'held_tail':'idle; no extra changing interval; callback drain/teardown separate','release_qualified':False}}
+
 def validate(journal,source,binary_sha256,go_version='go1.25.6'):
- obj(journal,['Schema','Result','Window','RunError','CutoffMethod','BinarySHA256','Config','Build','ContinuousWork','WorkerRetired','RuntimeReturned','AcquisitionCutoff','ReceiptCutoff','BeforeClose','AfterClose'])
- need(journal['Schema']=='vellum-presentation-capture-v1'and journal['Result']=='CAPTURED_DIAGNOSTIC'and journal['RunError']=='','failed or unsupported capture')
- need(journal['Window']=='perf'and boolean(journal['ContinuousWork'])is False and boolean(journal['WorkerRetired'])is True and boolean(journal['RuntimeReturned'])is True,'method/worker scope differs')
+ paced=type(journal)is dict and journal.get('Schema')=='vellum-presentation-capture-v2'
+ obj(journal,['Schema','Result','Window','RunError','CutoffMethod','BinarySHA256','Config','Build','ContinuousWork','WorkerRetired','RuntimeReturned','AcquisitionCutoff','ReceiptCutoff','BeforeClose','AfterClose']+(['Pacing']if paced else[]))
+ need(journal['Schema']in['vellum-presentation-capture-v1','vellum-presentation-capture-v2']and journal['Result']=='CAPTURED_DIAGNOSTIC'and journal['RunError']=='','failed or unsupported capture')
+ need(journal['Window']=='perf'and boolean(journal['ContinuousWork'])is paced and boolean(journal['WorkerRetired'])is True and boolean(journal['RuntimeReturned'])is True,'method/worker scope differs')
  need(journal['CutoffMethod']=='acquisition-sequence prefix at completed CPU cohort','cutoff method differs')
- config=obj(journal['Config'],['Method','Samples','Warmup','DataSize','Variable','Deep','Novel','GPURequested'])
+ config=obj(journal['Config'],['Method','Samples','Warmup','DataSize','Variable','Deep','Novel','GPURequested']+(['Paced']if paced else[]))
  samples=integer(config['Samples'],120,2048);warmup=integer(config['Warmup'],32,2048);size=integer(config['DataSize'],1,1_000_000)
  for key in ['Variable','Deep','Novel','GPURequested']:boolean(config[key])
  if config['Method']=='routed-grid-scroll':
@@ -132,7 +214,12 @@ def validate(journal,source,binary_sha256,go_version='go1.25.6'):
   latencies.append({'tag':tag,'generation':cpu[tag]['Generation'],'sequence':sample['Sequence'],'role':'measured'if tag in measured else'setup'if tag in setup else'warmup','milliseconds':latency})
  times=sorted(sample['Presented']for sample in prefix)
  intervals=[(right-left)*1000 for left,right in zip(times,times[1:])]
- return {'result':'VALID_SERIAL_NATIVE_FEEDBACK_JOURNAL','source':source,'source_binding':'matching clean VCS stamp plus external build/launch binding'if vcs_present else'external build/launch binding required; VCS stamp absent','binary_sha256':binary_sha256,'method':config['Method'],'config':config,'latencies':latencies,'measured_input_latency_ms':stats([s['milliseconds']for s in latencies if s['role']=='measured']),'prefix_presentations':len(prefix),'prefix_intervals_ms':intervals,'equal_presentation_times':sum(v==0 for v in intervals),'tail_records':len(after)-cutoff,'before_state_counts':before_counts,'after_state_counts':after_counts,'cadence_qualified':False,'physical_latency_qualified':False,'actual_gpu_route':'not established by this journal','provenance':'JSON validation requires external binary/native-library/workload execution binding; synthetic data is not native evidence'}
+ result={'result':'VALID_SERIAL_NATIVE_FEEDBACK_JOURNAL','source':source,'source_binding':'matching clean VCS stamp plus external build/launch binding'if vcs_present else'external build/launch binding required; VCS stamp absent','binary_sha256':binary_sha256,'method':config['Method'],'config':config,'latencies':latencies,'measured_input_latency_ms':stats([s['milliseconds']for s in latencies if s['role']=='measured']),'prefix_presentations':len(prefix),'prefix_intervals_ms':intervals,'equal_presentation_times':sum(v==0 for v in intervals),'tail_records':len(after)-cutoff,'before_state_counts':before_counts,'after_state_counts':after_counts,'cadence_qualified':False,'physical_latency_qualified':False,'actual_gpu_route':'not established by this journal','provenance':'JSON validation requires external binary/native-library/workload execution binding; synthetic data is not native evidence'}
+
+ if paced:
+  result.update(validate_pacing(journal['Pacing'],config,cpu,receipts,armed,ordered,measured))
+  result['paced_metrics']['input_latency_threshold_met']=result['measured_input_latency_ms']['p95']<=33.3
+ return result
 
 def main():
  parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('journal',type=Path);parser.add_argument('--sha256',required=True);parser.add_argument('--source',required=True);parser.add_argument('--binary-sha256',required=True);parser.add_argument('--go-version',default='go1.25.6');args=parser.parse_args()

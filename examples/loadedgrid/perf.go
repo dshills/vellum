@@ -27,6 +27,7 @@ type perfConfig struct {
 	SourceDetails       bool
 	InputDetails        string
 	PresentationDetails string
+	Paced               bool
 	GPUSceneRendering   bool
 }
 
@@ -47,6 +48,9 @@ func validatePerfModes(perf, smoke, sourceDetails bool, profile, allocation stri
 }
 
 func (c perfConfig) validate() error {
+	if c.Paced && (c.PresentationDetails == "" || c.Samples < 600 || c.Novel) {
+		return errors.New("paced workload: requires -perf-presentation and 600..2048 samples")
+	}
 	if !validPresentationPath(c.PresentationDetails) || c.PresentationDetails != "" && (c.SourceDetails || c.CPUProfile != "" || c.AllocationProfile != "" || c.InputDetails != "") {
 		return errors.New("loadedgrid perf: presentation capture requires a new separate diagnostic path and mode")
 	}

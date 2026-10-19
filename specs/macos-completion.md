@@ -9,6 +9,14 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
+The [paced presentation checkpoint](../docs/reports/macos-paced-presentation/README.md)
+implements an opt-in fixed-deadline 60 Hz grid/tree workload and strict version 2
+journal analysis, preserving late/unstarted work and collapsed-display anomalies.
+This is preparation and headless evidence. Actual callback/clock/lifecycle proof,
+five-run native performance and the other representative M3 workflows remain
+open; no Mac milestone is closed or private SDK refreshed.
+
+
 The [serial capture checkpoint](../docs/reports/macos-presentation-capture/README.md)
 adds opt-in stored grid/tree journals and a strict offline validator. Race tests,
 vet, native builds and synthetic journal controls pass. No real native feedback

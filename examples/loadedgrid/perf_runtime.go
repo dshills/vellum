@@ -53,6 +53,10 @@ func perfEmit(event string, value map[string]any) error {
 	return json.NewEncoder(os.Stdout).Encode(value)
 }
 func (c perfConfig) emit(event string, value map[string]any) error {
+	if c.Paced {
+		value["paced_workload"] = true
+		value["scheduled_hz"] = perfPaceHz
+	}
 	return perfEmit(event, markPresentationRecord(value, c.PresentationDetails != ""))
 }
 func newPerfProgram(ctx context.Context, c perfConfig) (*perfProgram, map[string]any, error) {
@@ -253,6 +257,9 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
 	if err = c.emit("grid.perf.ready", map[string]any{"window_geometry_guard": 1, "native_window": windowGeometry, "rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "alloc_profile": c.AllocationProfile != "", "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "warmup": c.Warmup, "memory_after_warm_gc": warmMemory, "initial_geometry": initial.Bounds, "warm_start_viewport": initial.Viewport, "warm_end_viewport": warmFinal.Viewport, "warm_start_generation": initial.Generation, "warm_end_generation": warmFinal.Generation, "warm_callbacks": warmCallbacks}); err != nil {
 		return err
 	}
+	if c.Paced {
+		return p.measurePaced(ctx, m, c, capture, windowGeometry)
+	}
 	stopAllocation, err := startPerfAllocationProfile(c.AllocationProfile)
 	if err != nil {
 		return err
@@ -361,7 +368,7 @@ func runPerf(c perfConfig) (terminal error) {
 	if err != nil {
 		return err
 	}
-	capture, err := startPerfPresentation(c.PresentationDetails, m, presentationCaptureConfig{Method: "routed-grid-scroll", Samples: c.Samples, Warmup: c.Warmup, DataSize: c.Rows, Variable: c.Variable, Novel: c.Novel, GPURequested: c.GPUSceneRendering})
+	capture, err := startPerfPresentation(c.PresentationDetails, m, presentationCaptureConfig{Method: "routed-grid-scroll", Samples: c.Samples, Warmup: c.Warmup, DataSize: c.Rows, Variable: c.Variable, Novel: c.Novel, GPURequested: c.GPUSceneRendering, Paced: c.Paced})
 	if err != nil {
 		return err
 	}

@@ -32,9 +32,13 @@ type treePerfConfig struct {
 	Deep                             bool
 	GPUSceneRendering, SourceDetails bool
 	PresentationDetails              string
+	Paced                            bool
 }
 
 func (c treePerfConfig) validate() error {
+	if c.Paced && (c.PresentationDetails == "" || c.Samples < 600) {
+		return errors.New("paced workload: requires -perf-presentation and 600..2048 samples")
+	}
 	if !validPresentationPath(c.PresentationDetails) || c.PresentationDetails != "" && c.SourceDetails {
 		return errors.New("loadedtree perf: presentation capture requires a separate diagnostic path and mode")
 	}
@@ -109,6 +113,10 @@ func (p *treePerfProgram) describe() ui.Node {
 func treePerfMemory() runtime.MemStats { var s runtime.MemStats; runtime.ReadMemStats(&s); return s }
 func (c treePerfConfig) record(event string, value map[string]any) map[string]any {
 	value = markPresentationRecord(value, c.PresentationDetails != "")
+	if c.Paced {
+		value["paced_workload"] = true
+		value["scheduled_hz"] = perfPaceHz
+	}
 	value["event"] = event
 	value["gpu_scene_rendering"] = c.GPUSceneRendering
 	value["source_details"] = c.SourceDetails
@@ -289,6 +297,9 @@ func (p *treePerfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c
 	if err = c.emit("tree.perf.ready", map[string]any{"nodes": c.Nodes, "deep": c.Deep, "warmup": c.Warmup, "geometry": warmGeometry, "memory": warmMemory}); err != nil {
 		return err
 	}
+	if c.Paced {
+		return p.measurePaced(ctx, m, c, capture)
+	}
 	for i := 0; i < c.Samples; i++ {
 		before := treePerfMemory()
 		beforeCount, err := p.callbackCount(ctx)
@@ -397,7 +408,7 @@ func runTreePerf(c treePerfConfig) (terminal error) {
 	if err != nil {
 		return err
 	}
-	capture, err := startPerfPresentation(c.PresentationDetails, metrics, presentationCaptureConfig{Method: "routed-tree-scroll", Samples: c.Samples, Warmup: c.Warmup, DataSize: c.Nodes, Deep: c.Deep, GPURequested: c.GPUSceneRendering})
+	capture, err := startPerfPresentation(c.PresentationDetails, metrics, presentationCaptureConfig{Method: "routed-tree-scroll", Samples: c.Samples, Warmup: c.Warmup, DataSize: c.Nodes, Deep: c.Deep, GPURequested: c.GPUSceneRendering, Paced: c.Paced})
 	if err != nil {
 		return err
 	}

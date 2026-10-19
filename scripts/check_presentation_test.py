@@ -6,9 +6,9 @@ p=Path(__file__).with_name('check-presentation.py');s=importlib.util.spec_from_f
 SOURCE='7'*40
 BINARY='a'*64
 
-def fixture(tree=False):
- config={'Method':'routed-tree-scroll'if tree else'routed-grid-scroll','Samples':120,'Warmup':64,'DataSize':10000,'Variable':False,'Deep':False,'Novel':False,'GPURequested':False}
- tags=list(range(1,187))if tree else list(range((1<<32)+1,(1<<32)+65))+list(range(1,121))
+def fixture(tree=False,sample_count=120):
+ config={'Method':'routed-tree-scroll'if tree else'routed-grid-scroll','Samples':sample_count,'Warmup':64,'DataSize':10000,'Variable':False,'Deep':False,'Novel':False,'GPURequested':False}
+ tags=list(range(1,64+sample_count+3))if tree else list(range((1<<32)+1,(1<<32)+65))+list(range(1,sample_count+1))
  frames=[];inputs=[];samples=[]
  for index,tag in enumerate(tags):
   at=10+index*.016
@@ -148,4 +148,100 @@ class PresentationJournalTests(unittest.TestCase):
     m.MAX_BYTES=8
     with self.assertRaises(ValueError):m.load(path,hashlib.sha256(raw).hexdigest())
    finally:m.MAX_BYTES=old
+def paced_fixture(tree=False):
+ j=fixture(tree,600);j['Schema']='vellum-presentation-capture-v2';j['ContinuousWork']=True;j['Config']['Paced']=True
+ config=j['Config'];tags=[f['Tag']for f in j['BeforeClose']['Frames']['Samples']][-600:];cpu={f['Tag']:f for f in j['BeforeClose']['Frames']['Samples']};tag_index={tag:i for i,tag in enumerate(tags)}
+ for receipt in j['BeforeClose']['Presentation']['Inputs']:
+  if receipt['Tag']in tag_index:receipt['Received']=20+(tag_index[receipt['Tag']]*1_000_000_000//60+1_500_000)/1e9
+ receipts={r['Tag']:r['Received']for r in j['BeforeClose']['Presentation']['Inputs']}
+ for native in j['BeforeClose']['Presentation']['Samples']:
+  if native['Tag']in tag_index:native['Acquired']=receipts[native['Tag']]+.001;native['Presented']=receipts[native['Tag']]+.010
+ initial_tag=config['Warmup']+2 if tree else(1<<32)+config['Warmup']
+ view={'ScrollX':0,'ScrollY':0,'Width':1299,'Height':1060,'Bounds':[0,0,1299,1060],'Scale':1,'Visible':64 if tree else 512,'Rows':64,'Columns':1 if tree else 8,'Retained':70 if tree else 700,'Materialized':66 if tree else 700,'LayoutSHA256':'c'*64}
+ initial={'Tag':initial_tag,'Generation':cpu[initial_tag]['Generation'],'Frame':1000,'View':copy.deepcopy(view)};slots=[]
+ for i,tag in enumerate(tags):
+  phase=i%64;dx=0 if tree else 96 if phase in[7,15,23,31]else -96 if phase in[39,47,55,63]else 0
+  dy=(12 if i%32<16 else -12)if tree else(12 if phase<32 else -12)
+  view['ScrollX']+=dx;view['ScrollY']+=dy;scheduled=i*1_000_000_000//60
+  slots.append({'Index':i,'Tag':tag,'ScheduledNS':scheduled,'State':'completed','StartNS':scheduled+100000,'DispatchNS':scheduled+1000000,'EnqueuedNS':scheduled+2000000,'AcknowledgedNS':scheduled+4000000,'InspectedNS':scheduled+5000000,'EndNS':scheduled+6000000,'Observation':{'Tag':tag,'Generation':cpu[tag]['Generation'],'Frame':1001+i,'View':copy.deepcopy(view)}})
+ j['Pacing']={'Hz':60,'Clock':'Go monotonic relative nanoseconds; separate from native host clock','Method':'absolute rational deadlines; serial CPU acknowledgement; retained backlog','PlannedEndNS':10_000_000_000,'Started':True,'Completed':True,'HoldStartNS':slots[-1]['EndNS'],'HoldEndNS':10_000_000_000,'Failure':'','Initial':initial,'Slots':slots}
+ sync_paced(j);return j
+
+def sync_paced(j):
+ replace_after_prefix(j);before=j['BeforeClose'];j['AfterClose']['Frames']=copy.deepcopy(before['Frames']);j['AfterClose']['Presentation']['Inputs']=copy.deepcopy(before['Presentation']['Inputs'])
+ last=j['BeforeClose']['Presentation']['Samples'][-1]
+ tail=j['AfterClose']['Presentation']['Samples'][-1];tail['Acquired']=last['Acquired']+1;tail['Composition']=last['Composition']+1
+
+class PacedJournalTests(unittest.TestCase):
+ def test_declared_grid_offsets_and_initial_horizontal_phase(self):
+  # Independent checkpoints of the Go consumer's published64-event path.
+  expected={7:(96,96),15:(192,192),23:(288,288),31:(384,384),39:(288,288),47:(192,192),55:(96,96),63:(0,0)}
+  x=y=0
+  for i in range(64):
+   dx,dy=m.pace_delta(i,False);x+=dx;y+=dy
+   if i<7:self.assertEqual(x,0)
+   if i in expected:self.assertEqual((x,y),expected[i])
+ def test_clock_bounds_include_endpoint_rounding(self):
+  p=m.validate(paced_fixture(),SOURCE,BINARY)['paced_metrics'];origin_width=p['clock_origin_uncertainty_ns']/1e6
+  for name in['first_scheduled_to_presented_ms_bounds','final_presentation_after_planned_end_ms_bounds']:
+   left,right=p[name];self.assertGreater(right-left,origin_width+.000001)
+  self.assertIn('common nanosecond rate',p['clock_correlation_model'])
+
+ def test_grid_tree_paced_final_state_population(self):
+  for tree in[False,True]:
+   out=m.validate(paced_fixture(tree),SOURCE,BINARY);p=out['paced_metrics']
+   self.assertEqual(out['result'],'VALID_PACED_NATIVE_FEEDBACK_JOURNAL');self.assertEqual(p['interval_count'],599);self.assertEqual(len(p['intervals_ms']),599);self.assertTrue(p['cadence_threshold_met']);self.assertTrue(p['input_latency_threshold_met']);self.assertFalse(out['cadence_qualified']);self.assertFalse(p['release_qualified']);self.assertGreaterEqual(p['clock_origin_uncertainty_ns'],0)
+ def test_paced_cannot_relabel_legacy_or_omit_slots(self):
+  for kind in['relabel-only','extra-field-legacy','remove-slot','duplicate-tag','move-end','early-slot','unstarted','failed','wrong-clock','wrong-hz','initial-generation','native-bracket']:
+   with self.subTest(kind=kind):
+    j=paced_fixture();p=j['Pacing']
+    if kind=='relabel-only':j=fixture();j['Schema']='vellum-presentation-capture-v2'
+    if kind=='extra-field-legacy':j['Schema']='vellum-presentation-capture-v1';j['ContinuousWork']=False
+    if kind=='remove-slot':p['Slots'].pop()
+    if kind=='duplicate-tag':p['Slots'][1]['Tag']=p['Slots'][0]['Tag']
+    if kind=='move-end':p['PlannedEndNS']+=1
+    if kind=='early-slot':p['Slots'][1]['StartNS']=p['Slots'][1]['ScheduledNS']-1
+    if kind=='unstarted':p['Slots'][1]['State']='planned'
+    if kind=='failed':p['Failure']='canceled'
+    if kind=='wrong-clock':p['Clock']='native timestamp minus Go timer'
+    if kind=='wrong-hz':p['Hz']=True
+    if kind=='initial-generation':p['Initial']['Generation']+=1
+    if kind=='native-bracket':p['Slots'][5]['DispatchNS']+=10000000;p['Slots'][5]['EnqueuedNS']+=10000000;p['Slots'][5]['AcknowledgedNS']+=10000000;p['Slots'][5]['InspectedNS']+=10000000;p['Slots'][5]['EndNS']+=10000000
+    with self.assertRaises(ValueError):m.validate(j,SOURCE,BINARY)
+ def test_noop_clamped_or_changed_geometry_refused(self):
+  for key,value in [('ScrollY',0),('Width',20),('Bounds',[0,0,10,10]),('Scale',2),('Visible',1),('LayoutSHA256','bad')]:
+   j=paced_fixture();j['Pacing']['Slots'][0]['Observation']['View'][key]=value
+   with self.subTest(key=key),self.assertRaises(ValueError):m.validate(j,SOURCE,BINARY)
+ def test_equal_or_reordered_display_states_never_pass(self):
+  for reordered in[False,True]:
+   j=paced_fixture();finals=[s for s in j['BeforeClose']['Presentation']['Samples']if s['Armed']and s['Tag']<1<<32];finals[10]['Presented']=finals[11]['Presented']+(.0001 if reordered else 0);sync_paced(j)
+   p=m.validate(j,SOURCE,BINARY)['paced_metrics'];self.assertFalse(p['cadence_threshold_met']);self.assertFalse(p['ordered_distinct_final_times']);self.assertTrue(p['collapsed_or_reordered_states'])
+ def test_intermediate_draws_cannot_dilute_final_state_gaps(self):
+  j=paced_fixture();native=j['BeforeClose']['Presentation']['Samples'];finals=[s for s in native if s['Armed']and s['Tag']<1<<32]
+  for s in finals[300:]:s['Presented']+=.1
+  expanded=[]
+  for original in native:
+   expanded.append(original)
+   if original['Tag']<1<<32:
+    for i in range(2):
+     clone=copy.deepcopy(original);clone.update(Tag=0,Generation=0,Armed=False,Acquired=original['Acquired']+(i+1)*.000001,Presented=original['Presented']+(i+1)*.000001);expanded.append(clone)
+  for i,s in enumerate(expanded,1):s['Sequence']=s['Composition']=i
+  j['BeforeClose']['Presentation']['Samples']=expanded;sync_paced(j)
+  out=m.validate(j,SOURCE,BINARY);self.assertGreater(len(out['prefix_intervals_ms']),1000);p=out['paced_metrics'];self.assertEqual(p['interval_count'],599);self.assertEqual(len(p['over_two_periods']),1);self.assertFalse(p['input_latency_threshold_met'])
+ def test_backlog_and_final_overrun_are_reported(self):
+  j=paced_fixture();p=j['Pacing']
+  # Fixed deadlines stay unchanged while the serial work queue runs at25ms.
+  for i,slot in enumerate(p['Slots']):
+   start=i*25000000+100000
+   for key,delta in [('StartNS',0),('DispatchNS',1000000),('EnqueuedNS',2000000),('AcknowledgedNS',20000000),('InspectedNS',23000000),('EndNS',24900000)]:slot[key]=start+delta
+  tags={slot['Tag']:slot for slot in p['Slots']}
+  for r in j['BeforeClose']['Presentation']['Inputs']:
+   if r['Tag']in tags:r['Received']=20+(tags[r['Tag']]['DispatchNS']+500000)/1e9
+  receipts={r['Tag']:r['Received']for r in j['BeforeClose']['Presentation']['Inputs']}
+  for s in j['BeforeClose']['Presentation']['Samples']:
+   if s['Tag']in tags:s['Acquired']=receipts[s['Tag']]+.001;s['Presented']=receipts[s['Tag']]+.01
+  p['HoldStartNS']=p['HoldEndNS']=p['Slots'][-1]['EndNS'];sync_paced(j)
+  out=m.validate(j,SOURCE,BINARY)['paced_metrics'];self.assertFalse(out['cadence_threshold_met']);self.assertGreater(out['final_work_overrun_ns'],0);self.assertGreater(out['worst_schedule_debt_ns'],0);self.assertTrue(out['iteration_deadline_misses'])
+
+
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,386 @@
+{
+  "scope": "macos-paced-presentation-cc2ec6a",
+  "base_commit": "cc2ec6a24c17dd66d6f7796d79683f2a867486aa",
+  "checks": [
+    {
+      "check": "checks-v2-grid",
+      "receipt_sha256": "524fb464ee464e5935dce1284ed1853ce279e1c1761791ed6d1b6a5ba4bb7373",
+      "seconds": 23.49366720789112,
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "bytes": 11791,
+          "sha256": "a00db4d9d0920a56c06f43afc3d22b9c6694055e46c133b63408bb7f22f00d89"
+        },
+        "stderr": {
+          "bytes": 1128,
+          "sha256": "e31a5cc4c4fb808bb15b8b98c0b6b3ae5bb832c6081af7d0e07446f405326546"
+        }
+      },
+      "owned": {
+        "created": true,
+        "pid": 88578,
+        "group": 88578,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 88578,
+          "members": [],
+          "observation_sha256": "b7deec98b85df05a80bab5daf4b94e6c4834e600445c1e16b8563a8bbe890a51"
+        }
+      },
+      "top_level_test_methods": [
+        "TestActualLoadedGridWorkerRoutingAndFilterFIFO",
+        "TestActualLoadedGridAsyncEditingDraftAndConflict",
+        "TestActualLoadedGridAsyncEditRemovesFilteredRow",
+        "TestWorkerLatestQueryCancelCreditsAndRefusedSubmit",
+        "TestOwnerDomainCASStaleDraftAndFilteredEdit",
+        "TestWindowCloseRevokesResultButCanceledWorkerRetainsCredit",
+        "TestExternalRefusesPendingSettlementWithoutStrandingSave",
+        "TestFilterSettlementReadsAcknowledgedValueAndRefusesStaleWork",
+        "TestPerfWarmupRefusesOffsetsExtraCallbacksAndLayoutDrift",
+        "TestPerfInputLedgerExclusiveFailureEvidence",
+        "TestPerfActualViewportAndRoutedScroll",
+        "TestPaceAbsoluteRationalDeadlinesAndIdleTail",
+        "TestPaceOverloadRetainsEveryOriginalSlot",
+        "TestPaceCancellationAndFailureRetainUnstartedSlots",
+        "TestPaceRefusesBoundsEarlyClockAndReentry",
+        "TestPaceStoredEvidenceDetachedBoundedAndRevoked",
+        "TestPerfPresentationSeparateMode",
+        "TestPacedModeRequiresBoundedSeparateJournal",
+        "TestPacedGridDeclaredTrajectoryOffsets",
+        "TestPresentationCaptureExclusiveFileAndFailurePreservation",
+        "TestPresentationCaptureNoAfterCloseClaimBeforeWorkerRetirement",
+        "TestPresentationCaptureAdmissionDisabledSymlinkAndCancellation",
+        "TestPresentationPrefixLossCannotBeFilteredByDraining",
+        "TestPresentationWorkerJoinRequiresTerminalAck",
+        "TestPresentationExecutableHashIsBoundedAndStable",
+        "TestPresentationRecordsCannotMasqueradeAsOrdinary",
+        "TestPresentationCaptureSetupFailureHasNoAfterCloseClaim",
+        "TestPresentationFrozenPrefixRequiresEntireCompletedCohort",
+        "TestPerfProfileWriterBudgetAndStickyFailure",
+        "TestPerfAllocationExclusivePairAndFailure",
+        "TestPerfAllocationSnapshotsBoundedAndFinishOnce",
+        "TestPerfAllocationDisabledInvalidAndRuntimeSnapshot",
+        "TestPerfProfileExclusiveAdmissionAndDisabled",
+        "TestPerfConfigAndClosedWarmTrajectory",
+        "TestPerfAllocationModeRequiresSeparateExplicitPerf",
+        "TestPerfSourceDetailsRequireExplicitPerfAndBoundedRecorder",
+        "TestPerfNestedSourceCostsDoNotBecomeAdditionalUIWork",
+        "TestPerfVariableRowsUseStoredSourceAndExactIndex",
+        "TestPerfGeometryCountsRenderedClipsAndIgnoresDomainOrdinal",
+        "TestPerfSourceCounterOverflowRefuses",
+        "TestPerfWindowObservationUsesQueuedMainAndDetachedValues",
+        "TestPerfWindowObservationRefusesStoppedWrongAndClosed",
+        "TestStoredRecordsImmutableDenseIndexAndCapabilities",
+        "TestStoredMillionRowsLogicalAndHeapMemory",
+        "TestGenerationAndCopyCancellationBounds"
+      ],
+      "binary": null
+    },
+    {
+      "check": "checks-v1-tree",
+      "receipt_sha256": "f2e4287b08499aa0207f6e5a85849b5dd7052634d22efc2f544a3bd66453ec7b",
+      "seconds": 17.874727624934167,
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "bytes": 9436,
+          "sha256": "d7d7f3b9e8480a56593db22c95960db2870d2c1c4e119f882e86cdee9366681a"
+        },
+        "stderr": {
+          "bytes": 1128,
+          "sha256": "9c62edbd4d29b0a54d446b75b3a4ea926581051ddc11edaeecae18f98f594619"
+        }
+      },
+      "owned": {
+        "created": true,
+        "pid": 87237,
+        "group": 87237,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 87237,
+          "members": [],
+          "observation_sha256": "fbce248fc477eed9fa7c9c469ea4826e7012cf41a7e495c2e867e8a73a819ccd"
+        }
+      },
+      "top_level_test_methods": [
+        "TestActualStoredTreeRoutesAndWorkers",
+        "TestActualTreeDisclosureUsesWorker",
+        "TestActualCancelInitialLoaderBeforeWorker",
+        "TestStoredTreeDataHugeBranchDeepChain",
+        "TestWorkerLatestCancellationHiddenSelection",
+        "TestCanceledLoadAndWindowResultRefusal",
+        "TestIndexCommitRetainsCurrentCursorAndViewport",
+        "TestConsumerDomainCASAndHeldFilterCancellation",
+        "TestCompleteRefusalCancelAndRequestRetirement",
+        "TestCancelPublishedLoaderRejectsOlderToken",
+        "TestFailedPreparationCannotRetireNewerAdmission",
+        "TestPaceAbsoluteRationalDeadlinesAndIdleTail",
+        "TestPaceOverloadRetainsEveryOriginalSlot",
+        "TestPaceCancellationAndFailureRetainUnstartedSlots",
+        "TestPaceRefusesBoundsEarlyClockAndReentry",
+        "TestPaceStoredEvidenceDetachedBoundedAndRevoked",
+        "TestTreePerfPresentationSeparateMode",
+        "TestPacedModeRequiresBoundedSeparateJournal",
+        "TestPresentationCaptureExclusiveFileAndFailurePreservation",
+        "TestPresentationCaptureNoAfterCloseClaimBeforeWorkerRetirement",
+        "TestPresentationCaptureAdmissionDisabledSymlinkAndCancellation",
+        "TestPresentationPrefixLossCannotBeFilteredByDraining",
+        "TestPresentationWorkerJoinRequiresTerminalAck",
+        "TestPresentationExecutableHashIsBoundedAndStable",
+        "TestPresentationRecordsCannotMasqueradeAsOrdinary",
+        "TestPresentationCaptureSetupFailureHasNoAfterCloseClaim",
+        "TestPresentationFrozenPrefixRequiresEntireCompletedCohort",
+        "TestTreePerfConfigAndTrajectory",
+        "TestTreePerfGeometryRequiresActualClippedWorkload",
+        "TestTreePerfInspectionDistinguishesStartupAndRetirement",
+        "TestTreePerfModesAndSourceCapacity"
+      ],
+      "binary": null
+    },
+    {
+      "check": "checks-v2-vet-grid",
+      "receipt_sha256": "d0c7e53584bd7cd4abb28a8c67604fc5c84be0251e40f8735b887d8fac8d5746",
+      "seconds": 1.5729717500507832,
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1023,
+          "sha256": "b586f077f5fc3f7a5c486b121b620d8cf2abca7c9f7da20c478a10b1de320614"
+        }
+      },
+      "owned": {
+        "created": true,
+        "pid": 88548,
+        "group": 88548,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 88548,
+          "members": [],
+          "observation_sha256": "f6d81a2a53c72fde391df20342727848f7c691087223f9280beffbe5f5fd592e"
+        }
+      },
+      "top_level_test_methods": [],
+      "binary": null
+    },
+    {
+      "check": "checks-v1-vet-tree",
+      "receipt_sha256": "8516ede256535b7d34553db3f0b2a19047afce9e566d8351f0fb12aa22b2aadc",
+      "seconds": 3.108895583078265,
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1023,
+          "sha256": "b586f077f5fc3f7a5c486b121b620d8cf2abca7c9f7da20c478a10b1de320614"
+        }
+      },
+      "owned": {
+        "created": true,
+        "pid": 87239,
+        "group": 87239,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 87239,
+          "members": [],
+          "observation_sha256": "16c7dfa4d5dcd28e2d34e9dfaf7e186d37c750ef66e4eb3aa1890a924ece07a3"
+        }
+      },
+      "top_level_test_methods": [],
+      "binary": null
+    },
+    {
+      "check": "checks-v1-compile-grid",
+      "receipt_sha256": "7cf6bca016b95a840de4426b6f9731379b5ce1430af9e5d810b815b4c36e0f4a",
+      "seconds": 7.652102208929136,
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1123,
+          "sha256": "272fa0309d1fa6bfd8ba4c904c5d350582215bce1379777072bf2ab9d18c2c75"
+        }
+      },
+      "owned": {
+        "created": true,
+        "pid": 87243,
+        "group": 87243,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 87243,
+          "members": [],
+          "observation_sha256": "ee2e5741171d05ba26a8a2ec26e8013729e31254fc52392b050b1eaf924e94c5"
+        }
+      },
+      "top_level_test_methods": [],
+      "binary": {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-paced-presentation-cc2ec6a/checks-v1-compile-grid-unused",
+        "sha256": "9394c1bbabbb0ff1a0248d4a997278b61de0ee5101aa15501429763959e24d18",
+        "native_launch_admitted": false
+      }
+    },
+    {
+      "check": "checks-v1-compile-tree",
+      "receipt_sha256": "2e9bdd963e1a0a4bde76c388ef37e11c0f25196584200a75be54b47e495795e0",
+      "seconds": 6.6460544160800055,
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1123,
+          "sha256": "34c179c525b033efc13b1e35011b773b637fc649eb1df794d84986debc83431d"
+        }
+      },
+      "owned": {
+        "created": true,
+        "pid": 87266,
+        "group": 87266,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 87266,
+          "members": [],
+          "observation_sha256": "2bb77504979548280005e31ee4d9f67bc6793e31370c5336aa0606951e44bd5e"
+        }
+      },
+      "top_level_test_methods": [],
+      "binary": {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-paced-presentation-cc2ec6a/checks-v1-compile-tree-unused",
+        "sha256": "62c6bfe7c1f43ea7d897dd19a43b2fac36be3b3ade9935f27743333b2eaeb7cd",
+        "native_launch_admitted": false
+      }
+    },
+    {
+      "check": "checks-v2-python",
+      "receipt_sha256": "2f41c15cb61568acd3273dba4d89148326d851e494ab0d43b2967f3a7a96cd9c",
+      "seconds": 2.475235874997452,
+      "exit_code": 0,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1722,
+          "sha256": "f6995afb6adf627dc5150dad99d0edaffaddd1d8d53147aab6dbf033c6beb040"
+        }
+      },
+      "owned": {
+        "created": true,
+        "pid": 88532,
+        "group": 88532,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 88532,
+          "members": [],
+          "observation_sha256": "a2d8c07e68ec3c908bdd5c7b5f7daa8b0d186df4cc4c82721ebdfa732ea46dc6"
+        }
+      },
+      "top_level_test_methods": [
+        "test_backlog_and_final_overrun_are_reported",
+        "test_clock_bounds_include_endpoint_rounding",
+        "test_declared_grid_offsets_and_initial_horizontal_phase",
+        "test_equal_or_reordered_display_states_never_pass",
+        "test_grid_tree_paced_final_state_population",
+        "test_intermediate_draws_cannot_dilute_final_state_gaps",
+        "test_noop_clamped_or_changed_geometry_refused",
+        "test_paced_cannot_relabel_legacy_or_omit_slots",
+        "test_both_methods_all_tags_and_zero_drawable_id",
+        "test_bounded_strict_file_loading",
+        "test_cli_validates_binary_hash_and_remains_nonqualifying",
+        "test_composition_identity_cannot_be_reused_or_changed",
+        "test_external_modfile_without_vcs_requires_binary_binding",
+        "test_generation_intermediate_and_presentation_order",
+        "test_missing_duplicate_unknown_and_capacity_controls",
+        "test_nonregular_and_symlink_input_refused_without_blocking",
+        "test_same_composition_may_repeat_with_identical_stamp",
+        "test_schema_clock_identity_loss_and_scope_controls"
+      ],
+      "binary": null
+    }
+  ],
+  "build_info": {
+    "grid": {
+      "binary_sha256": "9394c1bbabbb0ff1a0248d4a997278b61de0ee5101aa15501429763959e24d18",
+      "metadata_sha256": "027f06dfa925601a278e8947c1062c8646098dfedfd2608e6557e11d464f60be",
+      "VCS_stamp_present": false,
+      "application_executed": false
+    },
+    "tree": {
+      "binary_sha256": "62c6bfe7c1f43ea7d897dd19a43b2fac36be3b3ade9935f27743333b2eaeb7cd",
+      "metadata_sha256": "dc08e54d6b318f6e21fe18c0eaf91799c1ab00999246f48870ba00c99a2fdc57",
+      "VCS_stamp_present": false,
+      "application_executed": false
+    }
+  },
+  "clock_sources": [
+    {
+      "path": "/Users/dshills/Development/Go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.6.darwin-arm64/src/runtime/sys_darwin_arm64.s",
+      "sha256": "ed13300c4e6013d32915d418d19d136d879ea2cb1c0998396ad5fba36155c520",
+      "matching_lines": [
+        147,
+        157
+      ]
+    },
+    {
+      "path": "/Users/dshills/Development/Go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.6.darwin-arm64/src/runtime/sys_darwin.go",
+      "sha256": "b5af4aaa566eac3a5cb2b929c0c020e2754ec09dc20608a408573b32fdef29fb",
+      "matching_lines": [
+        366,
+        371,
+        373,
+        374,
+        376,
+        377
+      ]
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/QuartzCore.framework/Headers/CABase.h",
+      "sha256": "ee22f9f63506b4fd384d7f504706afefb683af6ebd1aedc649856127033b0a5c",
+      "matching_lines": [
+        125,
+        127
+      ]
+    }
+  ],
+  "native_window_or_actual_feedback_executed": false,
+  "actual_pacing_qualified": false,
+  "physical_latency_qualified": false,
+  "framework_backend_changed": false,
+  "SDK_changed": false,
+  "prepared_native_sources_changed": false,
+  "gates_closed": []
+}

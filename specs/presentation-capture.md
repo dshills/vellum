@@ -10,7 +10,7 @@ parts of the workload. Their intervals cannot qualify the sustained
 ## Run and validate
 
 Build the examples with the prepared native driver as described in their READMEs.
-Use an optimized, non-race Darwin ARM64 binary with Go1.25.6 for this initial
+Use an optimized, non-race Darwin ARM64 binary with Go 1.25.6 for this initial
 validator. The following commands are examples for a desktop-available session;
 this checkpoint has not executed them against a native window.
 
@@ -90,3 +90,10 @@ close M3 or certify physical input latency. A continuously changing producer and
 five-run pacing campaign remain separate work, after real callback/clock/lifecycle
 proof. [Checkpoint evidence](../docs/reports/macos-presentation-capture/README.md)
 covers code and headless checks only.
+
+## Separate paced mode
+
+The [fixed-deadline workload](paced-presentation.md) uses `-perf-60hz`, at least 600
+changing states and a version 2 journal. This file's serial version 1 format and
+noncadence interpretation remain valid. Both share the fixed acquisition prefix,
+loss/refusal policy and worker/runtime retirement boundary.

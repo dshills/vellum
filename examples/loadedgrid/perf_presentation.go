@@ -29,6 +29,7 @@ type presentationCaptureConfig struct {
 	Method                              string
 	Samples, Warmup, DataSize           int
 	Variable, Deep, Novel, GPURequested bool
+	Paced                               bool `json:",omitempty"`
 }
 type perfPresentationCapture struct {
 	metrics                *cogent.PresentationMetrics
@@ -43,6 +44,7 @@ type perfPresentationCapture struct {
 	before                 *presentationCapturePoint
 	sealed, finished       bool
 	sealError, finishError error
+	pacing                 *perfPacingJournal
 }
 
 func validPresentationPath(path string) bool {
@@ -263,6 +265,9 @@ func (c *perfPresentationCapture) Finish(runError error, workerRetired, runtimeR
 			c.sealError = errors.Join(c.sealError, errors.New("presentation capture: post-close recorder is not terminal"))
 		}
 	}
+	if c.config.Paced && (c.pacing == nil || !c.pacing.Completed || c.pacing.Failure != "") {
+		c.sealError = errors.Join(c.sealError, errors.New("paced workload: cohort not completed"))
+	}
 	terminal := errors.Join(runError, c.sealError)
 	result := "CAPTURED_DIAGNOSTIC"
 	message := ""
@@ -281,7 +286,11 @@ func (c *perfPresentationCapture) Finish(runError error, workerRetired, runtimeR
 		AcquisitionCutoff                                            uint64
 		ReceiptCutoff                                                int
 		BeforeClose, AfterClose                                      *presentationCapturePoint
-	}{"vellum-presentation-capture-v1", result, "perf", message, "acquisition-sequence prefix at completed CPU cohort", c.binarySHA256, c.config, c.build, false, workerRetired, runtimeReturned, c.cutoff, c.receiptCutoff, c.before, after}
+		Pacing                                                       *perfPacingJournal `json:",omitempty"`
+	}{Schema: "vellum-presentation-capture-v1", Result: result, Window: "perf", RunError: message, CutoffMethod: "acquisition-sequence prefix at completed CPU cohort", BinarySHA256: c.binarySHA256, Config: c.config, Build: c.build, ContinuousWork: c.config.Paced, WorkerRetired: workerRetired, RuntimeReturned: runtimeReturned, AcquisitionCutoff: c.cutoff, ReceiptCutoff: c.receiptCutoff, BeforeClose: c.before, AfterClose: after, Pacing: c.pacing}
+	if c.config.Paced {
+		value.Schema = "vellum-presentation-capture-v2"
+	}
 	writer := &presentationCaptureWriter{target: c.file, remaining: presentationCaptureMaxBytes}
 	c.finishError = errors.Join(c.sealError, json.NewEncoder(writer).Encode(value), c.file.Close())
 	return c.finishError

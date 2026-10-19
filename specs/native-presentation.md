@@ -97,3 +97,10 @@ was captured here; serial scroll intervals do not qualify sustained 60 Hz pacing
 Callback/clock/lifecycle proof and a continuously changing campaign remain open.
 
 See the [capture contract](presentation-capture.md) for flags, bounds and provenance.
+
+## Fixed-deadline workload
+
+The [paced consumer contract](paced-presentation.md) adds a separate opt-in 60 Hz
+grid/tree workload and version 2 journal. It retains fixed deadlines, all backlog
+and a final-state-only interval denominator. Headless checks do not establish
+live callback delivery or close the measured Mac gate.
