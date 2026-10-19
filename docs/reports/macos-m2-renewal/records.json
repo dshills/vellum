@@ -1,0 +1,527 @@
+{
+  "source_commit": "93b47306ba6cc4ad3ac03253f5e01723505b0603",
+  "result": "PASS_CURRENT_ELEVEN_M2_METHODS",
+  "actual_native_executed": true,
+  "result_sha256": "c1faa1be47f4298816be234179298e15dc44a2007b5287bc438cb7cbd091a4ce",
+  "plan_sha256": "82ab8743d8e7dfd3f800b87773cbc71554d37b998c80ad0f2291acaad6deb887",
+  "admission_sha256": "8f013ab545abc7f9907df097ecd6fdc96b56124c5e5e77bee4a041eafb5157e4",
+  "controller_review_sha256": "897100935d07bf260bc16a635eb29b8d9da29bd00dad7ea7a3315ead1ad1bdb7",
+  "software_transfer_sha256": "92eea1236d556235509ae3e4f099dcaf58c67daec1ac7f1f9e3536933e0a9e1d",
+  "cases": {
+    "tabs": {
+      "result": "PASS_NATIVE_TABS",
+      "summary": {
+        "result": "PASS_SOURCE_ASSERTED_NATIVE_TABS",
+        "stages": 8,
+        "close_requests": 6,
+        "native_text_edits": 1,
+        "native_decision_changes": 1,
+        "selection_callbacks": 0,
+        "cleanup": {
+          "tracked_registrations_retired": true,
+          "visible_window_titles": [],
+          "sampled_windows": [
+            {
+              "Title": "",
+              "Visible": false,
+              "Miniaturized": false,
+              "Key": false,
+              "OcclusionVisible": false,
+              "Frame": [
+                0,
+                0,
+                500,
+                500
+              ],
+              "OrderedIndex": -1,
+              "Opaque": false,
+              "Alpha": 1,
+              "Level": 0,
+              "IdentityAvailable": true,
+              "WindowClass": "NSKVONotifying_TUINSWindow",
+              "ContentViewClass": "NSView",
+              "WindowNumber": 156747
+            }
+          ],
+          "native_deallocation_verified": false
+        },
+        "reopened_A_identity_source_asserted_only": true
+      },
+      "seconds": 1.632900791009888,
+      "raw_logs": {
+        "stdout": {
+          "bytes": 30068,
+          "sha256": "472424f1dcec821eb28b34afee203cf49bcc6c6072b088f4404b72ba317e8f09"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "group": 86350,
+      "terminal_group_absent": true,
+      "post_observation": {
+        "boundary_matches": true,
+        "inputs_stable": true,
+        "lease_held": true
+      }
+    },
+    "breadcrumb": {
+      "result": "PASS_NATIVE_BREADCRUMB",
+      "summary": {
+        "result": "PASS_SOURCE_ASSERTED_NATIVE_BREADCRUMB",
+        "stages": 12,
+        "requests": 3,
+        "accepted_requests": 2,
+        "rejected_requests": 1,
+        "cleanup": {
+          "tracked_registrations_retired": true,
+          "visible_window_titles": [],
+          "sampled_windows": [
+            {
+              "Title": "",
+              "Visible": false,
+              "Miniaturized": false,
+              "Key": false,
+              "OcclusionVisible": false,
+              "Frame": [
+                0,
+                0,
+                500,
+                500
+              ],
+              "OrderedIndex": -1,
+              "Opaque": false,
+              "Alpha": 1,
+              "Level": 0,
+              "IdentityAvailable": true,
+              "WindowClass": "NSKVONotifying_TUINSWindow",
+              "ContentViewClass": "NSView",
+              "WindowNumber": 156756
+            }
+          ],
+          "native_deallocation_verified": false
+        },
+        "stale_path_guard_isolation_verified": false
+      },
+      "seconds": 1.5214442500146106,
+      "raw_logs": {
+        "stdout": {
+          "bytes": 40905,
+          "sha256": "45712b1a7b931ad3c880a56d4510716addadf923536175271e7d53a98c8619b3"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "group": 86480,
+      "terminal_group_absent": true,
+      "post_observation": {
+        "boundary_matches": true,
+        "inputs_stable": true,
+        "lease_held": true
+      }
+    },
+    "color": {
+      "result": "PASS_NATIVE_COLOR",
+      "summary": {
+        "result": "PASS_SOURCE_ASSERTED_NATIVE_COLOR",
+        "steps": 8,
+        "edit_callbacks": 7,
+        "invalid_callbacks": 1,
+        "raw_native_snapshots_in_output": false,
+        "cleanup": {
+          "tracked_registrations_retired": true,
+          "visible_window_titles": [],
+          "sampled_windows": [
+            {
+              "Title": "",
+              "Visible": false,
+              "Miniaturized": false,
+              "Key": false,
+              "OcclusionVisible": false,
+              "Frame": [
+                0,
+                0,
+                500,
+                500
+              ],
+              "OrderedIndex": -1,
+              "Opaque": false,
+              "Alpha": 1,
+              "Level": 0,
+              "IdentityAvailable": true,
+              "WindowClass": "NSKVONotifying_TUINSWindow",
+              "ContentViewClass": "NSView",
+              "WindowNumber": 156765
+            }
+          ],
+          "native_deallocation_verified": false
+        }
+      },
+      "seconds": 1.5366378750186414,
+      "raw_logs": {
+        "stdout": {
+          "bytes": 2702,
+          "sha256": "986c94328625e82966e2fdf06c8750b8343065b82c430faa01b95568e0ebaed1"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "group": 86579,
+      "terminal_group_absent": true,
+      "post_observation": {
+        "boundary_matches": true,
+        "inputs_stable": true,
+        "lease_held": true
+      }
+    },
+    "control": {
+      "result": "PASS_NATIVE_CONTROL",
+      "summary": {
+        "result": "PASS_NATIVE_CONTROLS",
+        "observations": 21,
+        "inputs": 57,
+        "selection_proposals": 3,
+        "numeric_proposals": 7,
+        "outside_actions": 1,
+        "known_font_diagnostics": 0,
+        "session": {
+          "Started": true,
+          "Closed": true,
+          "Pending": false,
+          "LiveWindows": 0,
+          "Issued": 291
+        },
+        "physical_input_verified": false,
+        "visibility_correlations": 122,
+        "completed_frame_requests": 78,
+        "startup_refusals": 44,
+        "visibility_does_not_prove_readiness": true
+      },
+      "seconds": 5.315718750003725,
+      "raw_logs": {
+        "stdout": {
+          "bytes": 230257,
+          "sha256": "45b556f51836b046a1855d1cafa9ed189ac75c49da440930daf83e4ed1434275"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "group": 86670,
+      "terminal_group_absent": true,
+      "post_observation": {
+        "boundary_matches": true,
+        "inputs_stable": true,
+        "lease_held": true
+      }
+    },
+    "choice": {
+      "result": "PASS_NATIVE_CHOICE",
+      "summary": {
+        "result": "PASS_NATIVE_CHOICES",
+        "observations": 23,
+        "inputs": 30,
+        "callbacks": {
+          "enable": 2,
+          "switch": 2,
+          "pin": 2,
+          "selection": 6,
+          "number": 5,
+          "ordinary_action": 1
+        },
+        "known_font_diagnostics": 0,
+        "session": {
+          "Started": true,
+          "Closed": true,
+          "Pending": false,
+          "LiveWindows": 0,
+          "Issued": 189
+        },
+        "physical_input_verified": false,
+        "slider_drag_verified": false,
+        "progress_pixels_verified": false,
+        "visibility_correlations": 97,
+        "completed_frame_requests": 53,
+        "startup_refusals": 44,
+        "visibility_does_not_prove_readiness": true
+      },
+      "seconds": 3.120222916943021,
+      "raw_logs": {
+        "stdout": {
+          "bytes": 388463,
+          "sha256": "de692c1a05616620759c01765ce72047273beebfce40b9aca0455ac5f7b67966"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "group": 86754,
+      "terminal_group_absent": true,
+      "post_observation": {
+        "boundary_matches": true,
+        "inputs_stable": true,
+        "lease_held": true
+      }
+    },
+    "navigation": {
+      "result": "PASS_NATIVE_NAVIGATION",
+      "summary": {
+        "result": "PASS_NATIVE_NAVIGATION",
+        "observations": 41,
+        "inputs": 47,
+        "list_proposals": 8,
+        "action_proposals": 2,
+        "check_proposals": 3,
+        "outside_actions": 1,
+        "known_font_diagnostics": 0,
+        "session": {
+          "Started": true,
+          "Closed": true,
+          "Pending": false,
+          "LiveWindows": 0,
+          "Issued": 338
+        },
+        "physical_input_verified": false,
+        "native_pixels_verified": false,
+        "visibility_correlations": 139,
+        "completed_frame_requests": 97,
+        "startup_refusals": 42,
+        "visibility_does_not_prove_readiness": true
+      },
+      "seconds": 4.598712250008248,
+      "raw_logs": {
+        "stdout": {
+          "bytes": 581829,
+          "sha256": "f82f0b024606cb23d0c408debe43095aff58ac8a483282447e946b650343c073"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "group": 86844,
+      "terminal_group_absent": true,
+      "post_observation": {
+        "boundary_matches": true,
+        "inputs_stable": true,
+        "lease_held": true
+      }
+    },
+    "media": {
+      "result": "PASS_NATIVE_MEDIA",
+      "summary": {
+        "result": "PASS_NATIVE_MEDIA",
+        "observations": 42,
+        "inputs": 71,
+        "toolbar_actions": 1,
+        "breadcrumb_requests": 3,
+        "fit_requests": 3,
+        "image_replacements": 1,
+        "color_edits": 6,
+        "invalid_colors": 1,
+        "session": {
+          "Started": true,
+          "Closed": true,
+          "Pending": false,
+          "LiveWindows": 0,
+          "Issued": 419
+        },
+        "known_font_diagnostics": 0,
+        "physical_input_verified": false,
+        "native_pixels_verified": false,
+        "visibility_correlations": 159,
+        "completed_frame_requests": 116,
+        "startup_refusals": 43,
+        "visibility_does_not_prove_readiness": true
+      },
+      "seconds": 6.700391625054181,
+      "raw_logs": {
+        "stdout": {
+          "bytes": 787147,
+          "sha256": "222225c35133de44da038dab0b8d3cd0a906a394492729326a90e63a98d5e178"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "group": 86918,
+      "terminal_group_absent": true,
+      "post_observation": {
+        "boundary_matches": true,
+        "inputs_stable": true,
+        "lease_held": true
+      }
+    },
+    "structure": {
+      "result": "PASS_NATIVE_STRUCTURE",
+      "summary": {
+        "result": "PASS_NATIVE_STRUCTURE",
+        "observations": 42,
+        "inputs": 50,
+        "details_proposals": 8,
+        "split_proposals": 6,
+        "page_proposals": 5,
+        "document_closes": 3,
+        "document_selections": 1,
+        "section_actions": 1,
+        "session": {
+          "Started": true,
+          "Closed": true,
+          "Pending": false,
+          "LiveWindows": 0,
+          "Issued": 326
+        },
+        "known_font_diagnostics": 0,
+        "physical_input_verified": false,
+        "native_pixels_verified": false,
+        "visibility_correlations": 136,
+        "completed_frame_requests": 92,
+        "startup_refusals": 44,
+        "visibility_does_not_prove_readiness": true
+      },
+      "seconds": 4.967359749949537,
+      "raw_logs": {
+        "stdout": {
+          "bytes": 684098,
+          "sha256": "04eb183bca5a8725b265750fef4115db9c80c998b288ec77f6056bf9b99bb084"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "group": 87030,
+      "terminal_group_absent": true,
+      "post_observation": {
+        "boundary_matches": true,
+        "inputs_stable": true,
+        "lease_held": true
+      }
+    },
+    "text": {
+      "result": "PASS_NATIVE_TEXT",
+      "summary": {
+        "result": "PASS_NATIVE_TEXT",
+        "observations": 33,
+        "inputs": 68,
+        "name_requests": 4,
+        "editor_changes": 9,
+        "undo": 5,
+        "redo": 1,
+        "dialog_opens": 3,
+        "dismisses": 1,
+        "applies": 1,
+        "session": {
+          "Started": true,
+          "Closed": true,
+          "Pending": false,
+          "LiveWindows": 0,
+          "Issued": 380
+        },
+        "physical_input_verified": false,
+        "native_pixels_verified": false,
+        "visibility_correlations": 145,
+        "completed_frame_requests": 104,
+        "startup_refusals": 41,
+        "visibility_does_not_prove_readiness": true
+      },
+      "seconds": 6.419328292016871,
+      "raw_logs": {
+        "stdout": {
+          "bytes": 293686,
+          "sha256": "2d38578567bca22ebdb85fd038c79ea51c5795c9dcb6bea7f3157615b39cf876"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "group": 87150,
+      "terminal_group_absent": true,
+      "post_observation": {
+        "boundary_matches": true,
+        "inputs_stable": true,
+        "lease_held": true
+      }
+    },
+    "workspace-10000": {
+      "result": "PASS_NATIVE_WORKSPACE_10000",
+      "summary": {
+        "rows": 10000,
+        "known_fixture_font_diagnostics": 0,
+        "operations": 216,
+        "captures": 27,
+        "native_scheduling": "autonomous",
+        "physical_input": false,
+        "full_mac_qualified": false
+      },
+      "seconds": 8.174291375093162,
+      "raw_logs": {
+        "stdout": {
+          "bytes": 2175058,
+          "sha256": "d8d5f1407f99ff3c79597aece1b5b84574837c32754b80d648a9d8bda3d12030"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "group": 87273,
+      "terminal_group_absent": true,
+      "post_observation": {
+        "boundary_matches": true,
+        "inputs_stable": true,
+        "lease_held": true
+      }
+    },
+    "workspace-1000000": {
+      "result": "PASS_NATIVE_WORKSPACE_1000000",
+      "summary": {
+        "rows": 1000000,
+        "known_fixture_font_diagnostics": 0,
+        "operations": 216,
+        "captures": 27,
+        "native_scheduling": "autonomous",
+        "physical_input": false,
+        "full_mac_qualified": false
+      },
+      "seconds": 9.111793749965727,
+      "raw_logs": {
+        "stdout": {
+          "bytes": 2181123,
+          "sha256": "13afab65f003a7f74d959ffa7839ec21bd3fd53333773a77cb0c4dad49013a1f"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "group": 87633,
+      "terminal_group_absent": true,
+      "post_observation": {
+        "boundary_matches": true,
+        "inputs_stable": true,
+        "lease_held": true
+      }
+    }
+  },
+  "post_campaign": {
+    "boundary_matches": true,
+    "inputs_stable": true,
+    "lease_held": true
+  },
+  "errors": null,
+  "finalization_errors": [],
+  "native_deallocation_verified": false,
+  "physical_input_verified": false,
+  "presentation_performance_qualified": false,
+  "full_mac_complete": false
+}

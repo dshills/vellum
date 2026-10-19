@@ -125,6 +125,16 @@ open. This work uses no native windows or system preference changes.
 
 ## M2 workspace and catalogue
 
+The [current eleven-method renewal](../docs/reports/macos-m2-renewal/README.md)
+passes on source `93b4730`, including dedicated Tab-close/Breadcrumb/ColorPicker
+Cocoa actions, all six catalogue/text records and both complete native workspace
+records. The original six software batch runs also pass unchanged. Together
+with the existing dedicated-contract audit, this closes the controlled M2
+functional gate. The following paragraphs retain earlier historical results;
+physical/human, broader native pixels/deallocation, performance and M3–M7 remain
+open. No full Mac completion or final SDK acceptance follows from M2.
+
+
 The [M2 headless checkpoint](../docs/reports/macos-workspace-acceptance/README.md)
 passes the full professional workspace record at both row counts and batches
 1/7/64: 1,296 operations and 162 frozen observations, with unchanged records and

@@ -1,0 +1,84 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "4481753da36223c1a1a3a3b40fa5d361",
+  "repo": {
+    "root": "/private/tmp/vellum-macos-native-results-97aee13",
+    "head": "93b47306ba6cc4ad3ac03253f5e01723505b0603",
+    "branch": "codex/macos-native-results"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4337,
+    "totalMs": 4356
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 23966,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 12214,
+        "output": 362,
+        "costUSD": 0.028048
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "e5c039e954f53b7e",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "M2 'Complete' status omits source-asserted limits of Cocoa records",
+        "message": "The report states the total is 323 inputs / 202 observations across six catalogue/text records. The records.json inputs sum to 57+30+47+71+50+68=323, and observations sum to 21+23+41+42+42+33=202, so this matches. However, the README table lists the tab/Breadcrumb/Color results as 'stages' and 'transitions' while the summary results are PASS_SOURCE_ASSERTED_*, yet delivery spec says 'Complete' without qualifying these as source-asserted only.",
+        "suggestion": "State in the M2 status row that the three dedicated Cocoa records are source-asserted, not native-snapshot verified.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "specs/macos-delivery.md",
+            "lines": {
+              "start": 594,
+              "end": 4
+            }
+          }
+        ],
+        "tags": [
+          "scope"
+        ],
+        "evidence": "      \"result\": \"PASS_NATIVE_TABS\",",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in specs/macos-delivery.md"
+    }
+  ],
+  "suppressed": []
+}
