@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "reviewer": "/root/measurement_review",
+  "created_utc": "2026-10-19T21:22:43.271866+00:00",
+  "result": "PRISM_PREMATURE_TERMINAL_REJECTED_BUT_RELATED_TOTAL_CPU_ACCOUNTING_CORRECTION_REQUIRED",
+  "approved": false,
+  "source_edits": false,
+  "test_or_native_launches": false,
+  "git_mutations": false,
+  "provider_calls": 0,
+  "prism": {
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m3-current/integrated/prism.json",
+    "sha256": "4ae67ddc02fa949818611d1ba93e2102b1a9aa3d8f15f4edfe409153a3708dd2",
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 13,
+      "bytes": 48822,
+      "chunks": 1,
+      "llmCalls": 1,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 25939,
+          "output": 484,
+          "costUSD": 0.056718
+        }
+      ],
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    }
+  },
+  "finding_adjudication": {
+    "id": "c86e04973fae0d89",
+    "premature_owner_terminal": "NOT_REACHABLE_ON_REVIEWED_CODE",
+    "evidence": [
+      "FrameTrace.endEvent increments groupDone only for the next actual matched pointer, then sets inputDone only when groupDone equals the full bounded group length.",
+      "OwnerTag requires inputDone && !ownerDone, and GroupOwnerWork independently requires inputDone. The first event of a two-event group therefore cannot close the owner terminal, even if a Custom drain occurs before the second event.",
+      "The existing Core two-event regression explicitly invokes GroupOwnerWork after the first dispatch and asserts OwnerTag remains0; CommitGroup requires inputDone, ownerDone, reconciled and no ready/armed/rendering state."
+    ],
+    "suggested_early_terminal_fix": "No early-terminal guard correction needed. Do not weaken those terminal checks."
+  },
+  "findings": [
+    {
+      "id": "derived-group-cpu-accounting",
+      "severity": "medium",
+      "priority": 2,
+      "title": "Whole-group CPU work omits owner and reconciliation before final input dispatch",
+      "files": [
+        "drivers/cogent/desktop_measurement.go:175",
+        "drivers/cogent/build/upstream/core/frame_trace.go:112",
+        "drivers/cogent/build/upstream/core/frame_trace.go:251",
+        "drivers/cogent/manual_offscreen.go:707"
+      ],
+      "reason": "ownerStart uses OwnerTag, which returns0 while inputDone is false. Early Custom drains therefore record neither OwnerNS nor ReconcileNS. These costs are outside the original matched input dispatch interval, so InputNS does not contain them either. A later event/final ack may perform additional changed reconciliation, pass the independent accepted-state check and arm normally. TotalUIWorkNS then sums incomplete owner/reconcile costs while appearing to represent the routed logical input group.",
+      "concrete_reachable_native_schedule": [
+        "A KeyDown that creates KeyDown+KeyChord produces two distinct bounded source events. DesktopSession.handle publishes each reserved group node through a separate native Deque.Send call, then publishes the ack.",
+        "During those separate Send calls a concurrent accepted app.Post can invoke wake\u2192Source.Custom and enqueue an ordinary wake between the first and second group nodes. Window pending was cleared by the originating admission Custom, so a wake can be admitted. Source.Custom itself uses Deque.Send.",
+        "The first native input handler posts its owner action. The interleaved ordinary Custom then drains that action (plus any earlier harmless worker callback) and reconciles its changed view. Only one original input has ended, so inputDone=false; ownerStart and reconcileStart return0 and neither elapsed stage is counted.",
+        "The second original input posts another owner action; the final request ack drains/reconciles it. The final view can match the independently expected combined application transition and commit successfully. OwnerNS/ReconcileNS include only the later stages, omitting earlier potentially expensive work."
+      ],
+      "manual_schedule": "Manual.Step also drains the owner after each dispatched native event outside manualImplementation.custom, then refreshes before the next event. Those real drains are currently outside the new owner hook entirely. Software results cannot qualify native timing, but this is an appropriate routing regression seam.",
+      "impact_boundary": "Receipt\u2192actual-presentation wall latency still includes the omitted elapsed work. This is CPU-stage/TotalUIWorkNS diagnostic accuracy, not a claim that an early native composition or 60Hz latency passes incorrectly. Synchronous owner.Do called inside an original input is already inside InputNS and must not be double counted.",
+      "recommended_resolution": "Separate accumulation of observed owner/reconcile work for an active original group from the final input/owner terminal. Accumulate each relevant originating drain and reconciliation after original dispatch has begun; preserve ownerDone/inputDone/CommitGroup requirements so early work cannot arm. Instrument Manual.Step separate drains as needed for honest routing tests. Alternatively explicitly expose/document partial final-drain-only stage metrics and do not call/use their sum as total group UI work.",
+      "regression_request": "Add a controlled two-event Core case with known owner/reconcile durations between events and after the final event. Assert early work contributes to final totals while OwnerTag/commit remain ineligible until the full input terminal. Add a driver/manual actual two-event FIFO case with an owner drain/refresh between events to ensure the hooks account for it, retaining explicit refusal of software-native success. No native/performance claim from controlled terminals."
+    }
+  ],
+  "unresolved_findings": [
+    "derived-group-cpu-accounting"
+  ],
+  "review_scope": "Source-only adjudication; no new runtime experiment or provider call. This later accounting finding supersedes the earlier no-material-findings approval for commit readiness until resolved.",
+  "source_hashes": {
+    "drivers/cogent/desktop_measurement.go": "b2ecc56e0bc08b264a985c43b52cece2f35cbfe019a3d1ab1daead82f6632147",
+    "drivers/cogent/desktop_session.go": "1989f3920a5335ce93d9d34e5fcfdfc1ddd3d9d04d541b11e37c174d58cabe4a",
+    "drivers/cogent/driver.go": "432346831deb0129cae4087e464a2c911e44ac41ab9ac50a3132e2980bdbc53c",
+    "drivers/cogent/manual_offscreen.go": "3580adb2fe93915534f9b61f114a084e855c3f018900c4d47c0eaade0d4ddfe5",
+    "drivers/cogent/build/upstream/core/frame_trace.go": "24abece92e3e067ebae9d807f1be0bf0eeff4c3a7229ccfd5c3210808dd37bf7",
+    "drivers/cogent/build/upstream/events/source.go": "7c697720f84fb2c5fa03d00e1a2afcfc8e9b06071c1e3b972f021efc7a43178c",
+    "drivers/cogent/build/upstream/events/deque.go": "c331b975d31b351532749b9a5c6a2feae1cf29f0cbed5e0064b9ea64af68d71b",
+    "drivers/cogent/build/upstream/core/frame_trace_group_vellum_test.go": "448bdbcbad4a6fc8ce150cb66e8796e1e6971403dc8566f9a259f0459d0e0340",
+    "specs/native-presentation.md": "be4699380613cd0f39e808c80ff7b6c89c4d744d8a729e700ad2bd0936acb9b8"
+  }
+}

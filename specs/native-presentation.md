@@ -104,3 +104,76 @@ The [paced consumer contract](paced-presentation.md) adds a separate opt-in 60 H
 grid/tree workload and version 2 journal. It retains fixed deadlines, all backlog
 and a final-state-only interval denominator. Headless checks do not establish
 live callback delivery or close the measured Mac gate.
+
+## Opt-in desktop routed-input transactions
+
+`NewMeasuredDesktopSession(capacity)` adds bounded routed-Go-input measurement
+without changing `DesktopSession.Input` or `Frame`. Install the session together
+with `Driver.PresentationMetrics`; `FrameMetrics` remains mutually exclusive.
+`MeasureInput(ctx, ref, input, expectation)` validates the current originating
+frame/target, reserves the original initialized event group and records the
+native host-time receipt immediately before publishing it to the native FIFO.
+The preliminary session request/target-validation queue is outside that receipt
+boundary. Go monotonic `ReceiptStartedAt`/`ReceiptFinishedAt` bracket the native
+clock read; capture consumers must subtract their monotonic origin before JSON
+serialization. Wall-clock or `time.Time` JSON conversion loses that evidence.
+It does not call `Frame` or force an artificial response paint.
+
+The event group remains unarmed through actual dispatch and owner work. The
+originating owner drain and changed-view reconciliation must finish before the
+expectation runs at most once on the UI owner (earlier failures skip it). That observational callback checks an
+independently expected change against an application baseline, rejects no-ops,
+refused or unrelated changes, and returns a positive application/model revision.
+The framework cannot prove an arbitrary callback's honesty. Callbacks must not
+mutate, wait, enter blocking native/session APIs or retain native objects.
+An incomplete owner drain, invalid lifetime or missing changed reconciliation
+fails the measurement without arming a composition.
+
+The request tag, actual reconciled window-view generation and accepted
+application revision are distinct. `DesktopInputMeasurement` retains the native
+incarnation `Scope`, CPU `Frame`, `ViewRevisionBefore` and `AcceptedRevision`.
+Join scope/tag/view generation to actual native acquisition/composition feedback;
+a completed CPU composition alone does not prove display presentation. Earlier
+or in-flight compositions retain their unarmed identity. A new view invalidation
+after arming fails the pending observation rather than labeling newer state with
+the older view generation; already completed historical frames remain immutable. The accepted revision
+never substitutes for native frame generation. Detached history retains no window
+references or expectation closures. A routed
+cancellation keeps its bounded request/window reservation only until the native
+input/owner terminal or window retirement.
+
+Capacity1..65536 counts every admitted measured request, including failures and
+cancellations, without eviction. Only one session request is pending. Original
+input groups contain at most four events. Cancellation before routing removes
+the queued request; after routing it fails measurement but cannot retract the
+event group's possible effects. The trace stays reserved until actual input and
+owner terminals, or window retirement. Nonvisual setup inputs use ordinary
+`Input`; expected visual updates cannot be reclassified as no-ops to improve a
+measurement population.
+
+This checkpoint supplies the correlation capability and headless regression
+evidence only. Software composition must refuse native timing success;
+controlled Core composition terminals are not live Metal feedback. The existing
+workspace measurement consumer/journal schema, managed Cocoa-input and AX method
+adapters, actual resize callback correlation and five-run representative60Hz
+campaign remain separate work. No M3 or full Mac release gate is closed here.
+
+Grouped CPU diagnostics accumulate actual originating-window owner drains and
+reconciliation after the first original event has dispatched, including work
+between the original events. Those accounting tokens do not close the input or
+owner terminal: the full original group and a following drain must still finish
+before checked arming. Admission/setup work before original dispatch is excluded.
+`OwnerNS` measures the observed owner-drain intervals, which can also contain
+other admitted app work from the same batch; it is not exclusive per-callback
+CPU attribution. Synchronous owner work inside original input dispatch is already
+part of `InputNS` and is not counted twice. `TotalUIWorkNS` sums these observed
+elapsed stages; the receipt-to-presentation host-clock latency independently
+includes all intervening queue waits and elapsed work.
+
+Unarmed compositions after the first original dispatch contribute their observed
+render/compose stages too. Their acquisition identity remains unarmed; they do
+not become the final response by later acceptance. A known earlier trace failure
+blocks the state-observation callback. Failed grouped records retain their final
+observed input/owner stage sum even when failure preceded the remaining terminal
+work. Drawable acquisition/present-call waits remain separate counters rather
+than additions to `TotalUIWorkNS`, consistent with existing frame diagnostics.

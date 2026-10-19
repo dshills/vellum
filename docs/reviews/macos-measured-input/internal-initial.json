@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "reviewer": "/root/measurement_review",
+  "result": "APPROVED_CHECKPOINT1_SOURCE_REVIEW",
+  "approved": true,
+  "created_utc": "2026-10-19T21:17:15.345425+00:00",
+  "findings": [],
+  "unresolved_findings": [],
+  "scope": "Read-only independent source and recorded-evidence review of routed-Go-input correlation; not a native or release acceptance run.",
+  "source_edits": false,
+  "git_mutations": false,
+  "test_or_native_launches": false,
+  "provider_calls": 0,
+  "source_worktree": "/private/tmp/vellum-m3-input-presentation-dc3fc63",
+  "source_files": {
+    "drivers/cogent/desktop_measurement.go": "b2ecc56e0bc08b264a985c43b52cece2f35cbfe019a3d1ab1daead82f6632147",
+    "drivers/cogent/desktop_measurement_offscreen_test.go": "af7316fb2abc46a4f396539cb619303088550b4ce5016555be0f673d4365e1b8",
+    "drivers/cogent/desktop_session.go": "1989f3920a5335ce93d9d34e5fcfdfc1ddd3d9d04d541b11e37c174d58cabe4a",
+    "drivers/cogent/driver.go": "9fcb7681f657b3406780fa608e7fe7be7ecd0033c94eef729a39bd222809a852",
+    "drivers/cogent/manual_offscreen.go": "3580adb2fe93915534f9b61f114a084e855c3f018900c4d47c0eaade0d4ddfe5",
+    "drivers/cogent/native/README.md": "b24954187304b2f48ff1c2258f80a75be18503630a4aad0ec91ab4dcd2905ef4",
+    "drivers/cogent/native/dependencies.json": "92db27e67b37b9e1392bef16b57019657ab4d149f89394f9c8f069d6cb6a782f",
+    "drivers/cogent/prepare_test.py": "34817eaf67f976d8d01b04b948ec29f837ab0b8c104b0d4491cece5716df0eb4",
+    "drivers/cogent/native/patches/desktopmeasurement/0098-desktop-input-measurement.patch": "18e2cfa58a37a0e2c7bc2c1f41712d12096c01397a177244def584a6cda22555",
+    "drivers/cogent/native/patches/desktopmeasurement/original-hashes.json": "322abb5e20a1d8f8cf1f3024f777dad63d21f7696a697c6dc055aeab31587b1e",
+    "drivers/cogent/native/patches/desktopmeasurement/output-hashes.json": "f597a3dc31a961c99c6f454e7a64f07b1da9f82214846dcf1216be4dbd71f3cd",
+    "drivers/cogent/native/patches/desktopmeasurement/README.md": "28350b2876eb676bd6346a833837aa6d60f5733a292c2477fb259182af611b6d",
+    "specs/native-presentation.md": "be4699380613cd0f39e808c80ff7b6c89c4d744d8a729e700ad2bd0936acb9b8"
+  },
+  "source_files_digest": "77847c363cdee800371aa266925572c7589c7cf739cb6389adb5d12e6f43bdce",
+  "evidence": {
+    "author_result": "/private/tmp/vellum-m3-input-presentation-dc3fc63/drivers/cogent/build/measurement-check/result.json",
+    "author_result_sha256": "0c431f30eb050d1edd624f56c017ce0e3e0c8ee58c74fe0881cdfddc5a504d64",
+    "all_declared_source_hashes_verified": true,
+    "all_recorded_log_hashes_verified": true,
+    "fresh_tests_rerun_by_reviewer": false,
+    "test_limits": "Full driver race precedes final measured invalidation guard, JSON omission and stage98 renumber; final focused race/Core race/vet/native compile logs cover that delta. Native test binary was compiled only."
+  },
+  "reviewed_invariants": [
+    "The original initialized private-source event identities are captured before publishing their reserved FIFO nodes. Deferred nodes resist compression and unwrap only at actual dispatch. BeginGroup is bounded to four distinct pointer events, and only one session request can remain pending.",
+    "Original event dispatch completes before GroupOwnerWork. Changed originating-window reconciliation records the actual DesktopSession view revision. The once-only expectation is cleared before invocation and runs under app owner without session mutex; incomplete ordinary/ready owner work, no change, refusal, stale lifetime or changed generation fails the observation.",
+    "Request tag, accepted application revision and backend view generation stay separate. CommitGroup receives the reconciled driver view generation, not request tag or caller accepted revision. Original acquisition-time frameArmed/frameGeneration capture prevents retroactive success of intermediate compositions.",
+    "The measured path does not call Frame or add NeedsRender. Ordinary Custom wake scheduling remains the original path. Software FIFO tests refuse native composition success; separate controlled Core terminals are explicitly synthetic state-machine checks.",
+    "Post-arming new view invalidation fails a pending trace. Already completed historical frames remain immutable. A real completed CPU frame still needs independent native feedback joined by scope/tag/generation.",
+    "Cancellation before routing removes request-owned deferred nodes and clears the expectation. Routed cancellation fails measurement but retains the bounded trace reservation through actual input and owner terminals. Window/driver retirement clears trace/window/session ownership. Detached retained samples contain no callbacks or native/application references.",
+    "Capacity is explicit, monotonic and non-evicting for admitted measured requests including failures. Failure strings are copied under bounded lengths; retained sample snapshots are copied. Measurement receipt uses the same native host clock as presentation and retains narrow Go-monotonic brackets without lossy JSON wall-clock conversion.",
+    "Default sessions have no measurement state; existing Input/Frame entry points, native policy and single-event FrameTrace behavior remain distinct. DesktopSession and FrameMetrics remain mutually exclusive."
+  ],
+  "recipe": {
+    "stage": 98,
+    "patch_sha256_verified": true,
+    "prepared_output_hashes_verified": true,
+    "input_frame_trace_hash_matches_parent_stage97_prepared_file": true,
+    "new_core_test_uses_controlled_composition_only": true
+  },
+  "integration": {
+    "worktree": "/private/tmp/vellum-m3-measurement-93b4730",
+    "baseline": "93b47306ba6cc4ad3ac03253f5e01723505b0603",
+    "integration_record_sha256": "24af7eff0ba1ef0a82b842c261eb8700d89d027c05b895449748440066c31267",
+    "actual_integrated_files": {
+      "drivers/cogent/desktop_measurement.go": "b2ecc56e0bc08b264a985c43b52cece2f35cbfe019a3d1ab1daead82f6632147",
+      "drivers/cogent/desktop_measurement_offscreen_test.go": "af7316fb2abc46a4f396539cb619303088550b4ce5016555be0f673d4365e1b8",
+      "drivers/cogent/desktop_session.go": "1989f3920a5335ce93d9d34e5fcfdfc1ddd3d9d04d541b11e37c174d58cabe4a",
+      "drivers/cogent/driver.go": "432346831deb0129cae4087e464a2c911e44ac41ab9ac50a3132e2980bdbc53c",
+      "drivers/cogent/manual_offscreen.go": "3580adb2fe93915534f9b61f114a084e855c3f018900c4d47c0eaade0d4ddfe5",
+      "drivers/cogent/native/README.md": "b24954187304b2f48ff1c2258f80a75be18503630a4aad0ec91ab4dcd2905ef4",
+      "drivers/cogent/native/dependencies.json": "1270445c92436d25607673baea6ba1df528bd7ef2df11d8cb3dfff8297d3f986",
+      "drivers/cogent/prepare_test.py": "3737040e225e3e1d4850f50db2e41bb18606ca08e78e76edd19b073a43d02eb2",
+      "drivers/cogent/native/patches/desktopmeasurement/0098-desktop-input-measurement.patch": "18e2cfa58a37a0e2c7bc2c1f41712d12096c01397a177244def584a6cda22555",
+      "drivers/cogent/native/patches/desktopmeasurement/original-hashes.json": "322abb5e20a1d8f8cf1f3024f777dad63d21f7696a697c6dc055aeab31587b1e",
+      "drivers/cogent/native/patches/desktopmeasurement/output-hashes.json": "f597a3dc31a961c99c6f454e7a64f07b1da9f82214846dcf1216be4dbd71f3cd",
+      "drivers/cogent/native/patches/desktopmeasurement/README.md": "28350b2876eb676bd6346a833837aa6d60f5733a292c2477fb259182af611b6d",
+      "specs/native-presentation.md": "be4699380613cd0f39e808c80ff7b6c89c4d744d8a729e700ad2bd0936acb9b8"
+    },
+    "all_actual_hashes_verified": true,
+    "only_authored_files_differing_from_agent_source": [
+      "drivers/cogent/driver.go",
+      "drivers/cogent/native/dependencies.json",
+      "drivers/cogent/prepare_test.py"
+    ],
+    "reviewed_deltas": "Driver retains the parent stage97 Label allocation styler; manifest inserts independent stage97 directly before98 and is otherwise identical; preparation assertion becomes contiguous1..98. Other ten authored files match agent bytes. No measurement behavior delta found.",
+    "integrated_reproduction_and_checks": "Parent owns preparation/test execution; reviewer did not duplicate commands."
+  },
+  "remaining_acceptance": [
+    "Finish parent-owned integrated preparation and affected checks, Prism checkpoint review, then commit according to repository process.",
+    "Implement the versioned workspace measurement consumer/journal validation, native managed Cocoa/AX input methods and actual resize correlation before their performance claims.",
+    "Run actual native composition/presentation integration and five-run representative60Hz campaign. This review and compiled native binary provide no physical pointer, actual Metal callback, native deallocation or M3/full Mac closure evidence.",
+    "Originating-window response only: independently expected affected secondary-window response remains explicitly outside this checkpoint."
+  ]
+}

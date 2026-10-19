@@ -1,0 +1,288 @@
+// Copyright (c) 2026 Davin Hills. SPDX-License-Identifier: MIT.
+package cogent
+
+import (
+	"context"
+	"errors"
+	"strings"
+	"time"
+
+	"cogentcore.org/core/core"
+	"cogentcore.org/core/events"
+	"cogentcore.org/core/system/driver/desktop"
+	"github.com/dshills/vellum/app"
+)
+
+// DesktopInputExpectation runs at most once on the application owner, after the actual
+// originating input group, owner drain and view reconciliation, before arming a
+// composition. It must only observe state: validate the independently expected
+// change against the caller's baseline, reject no-ops/refused/unrelated updates,
+// and return a positive accepted application/model revision. Do not wait or call
+// blocking native/session APIs. The framework cannot prove a callback's honesty.
+// The returned revision is separate from the backend view generation and tag.
+type DesktopInputExpectation func() (acceptedRevision uint64, err error)
+
+// DesktopInputMeasurement is detached evidence of a routed Go input's completed
+// composition. Frame.Generation is the actual reconciled window-view revision;
+// AcceptedRevision belongs to the independently validated application model.
+// Completion does not imply actual presentation: join Frame.Tag/Generation and
+// the window incarnation scope to the separate PresentationMetrics journal.
+type DesktopInputMeasurement struct {
+	Scope uint64
+	// ReceiptStartedAt/FinishedAt enclose only the native host clock read.
+	// Subtract the consumer's Go monotonic origin before serialization; time.Time
+	// JSON/wall-clock conversion does not preserve this correlation evidence.
+	ReceiptStartedAt, ReceiptFinishedAt time.Time `json:"-"`
+	Frame                               FrameSample
+	ViewRevisionBefore                  uint64
+	AcceptedRevision                    uint64
+}
+
+type DesktopMeasurementsSnapshot struct {
+	Samples  []DesktopInputMeasurement
+	Pending  bool
+	Capacity int
+}
+
+type desktopMeasurements struct {
+	capacity int
+	samples  []DesktopInputMeasurement
+	clock    func() float64 // fixed native clock; controlled stand-in only in package tests
+}
+type desktopMeasuredRequest struct {
+	index                               int
+	check                               DesktopInputExpectation
+	before, reconciled, accepted        uint64
+	scope                               uint64
+	receiptStartedAt, receiptFinishedAt time.Time
+	completed                           bool
+}
+
+// NewMeasuredDesktopSession enables bounded measured input in the existing
+// native integration session. Capacity1..65536 counts every admitted measured
+// request, including failed/canceled ones; records are never evicted. Install
+// Driver.PresentationMetrics too; FrameMetrics remains mutually exclusive.
+// Ordinary Input/Frame retain their existing behavior. Native text callbacks,
+// AX actions and resize are not measured by this routed-Go-input method.
+func NewMeasuredDesktopSession(capacity int) (*DesktopSession, error) {
+	if capacity < 1 || capacity > 65536 {
+		return nil, ErrDesktopBudget
+	}
+	s := NewDesktopSession()
+	s.measurements = &desktopMeasurements{capacity: capacity, samples: make([]DesktopInputMeasurement, 0, capacity), clock: desktop.PresentationHostTime}
+	return s, nil
+}
+
+// MeasureInput routes the same actual events as Input, preserving current frame
+// and target/lifetime checks. Only operations publishing a changed reconciled
+// view are eligible; nonvisual setup inputs use Input. No Frame/forced repaint
+// substitutes for the response. One request is pending across the entire session.
+// The call returns after CPU composition, not after display feedback. Never call
+// it while holding the application owner or a native callback. Cancellation of an
+// already routed event group fails measurement but cannot retract its effects;
+// its trace remains reserved until FIFO/owner terminal or window retirement.
+func (s *DesktopSession) MeasureInput(ctx context.Context, ref app.WindowRef, in DesktopInput, check DesktopInputExpectation) (DesktopInputMeasurement, error) {
+	if check == nil {
+		return DesktopInputMeasurement{}, ErrDesktopSession
+	}
+	if err := validateDesktopInput(in); err != nil {
+		return DesktopInputMeasurement{}, err
+	}
+	r, err := s.submitWithExpectation(ctx, ref, 5, in, check)
+	if err != nil {
+		return DesktopInputMeasurement{}, err
+	}
+	out := s.waitReply(r)
+	return out.measurement, out.err
+}
+
+// Measurements returns detached retained records. Pending records are included
+// with Completed=false; they must never be treated as successful evidence.
+func (s *DesktopSession) Measurements() DesktopMeasurementsSnapshot {
+	if s == nil || s.self != s {
+		return DesktopMeasurementsSnapshot{}
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.reapLocked()
+	if s.measurements == nil {
+		return DesktopMeasurementsSnapshot{}
+	}
+	return DesktopMeasurementsSnapshot{Samples: append([]DesktopInputMeasurement(nil), s.measurements.samples...), Pending: s.pending != nil && s.pending.measured != nil, Capacity: s.measurements.capacity}
+}
+
+func boundedDesktopMeasurementFailure(err error) string {
+	if err == nil {
+		return ""
+	}
+	message := err.Error()
+	if len(message) > 1024 {
+		message = message[:1024]
+	}
+	return strings.Clone(message)
+}
+func desktopFrameSample(window string, v core.FrameTraceSample) FrameSample {
+	if len(v.Failure) > 1152 {
+		v.Failure = strings.Clone(v.Failure[:1152])
+	}
+	return FrameSample{Tag: v.Tag, Window: window, Generation: v.Generation, QueuedNS: v.QueuedNS, InputNS: v.InputNS, OwnerNS: v.OwnerNS, ReconcileNS: v.ReconcileNS, LayoutPaintNS: v.LayoutPaintNS, GatherNS: v.GatherNS, RasterUploadNS: v.RasterUploadNS, EncodeSubmitNS: v.EncodeSubmitNS, AcquireNS: v.AcquireNS, PresentCallNS: v.PresentCallNS, TotalUIWorkNS: v.TotalUIWorkNS, Completed: v.Completed, Unavailable: v.Unavailable, Failure: v.Failure}
+}
+func (s *DesktopSession) completeMeasuredLocked(r *desktopRequest, v core.FrameTraceSample) DesktopInputMeasurement {
+	x := r.measured
+	out := DesktopInputMeasurement{Scope: x.scope, ReceiptStartedAt: x.receiptStartedAt, ReceiptFinishedAt: x.receiptFinishedAt, Frame: desktopFrameSample(r.binding.windowID(), v), ViewRevisionBefore: x.before, AcceptedRevision: x.accepted}
+	s.measurements.samples[x.index] = out
+	x.completed = true
+	x.check = nil
+	return out
+}
+func (b *desktopWindow) windowID() string {
+	if b.window != nil {
+		return b.window.window.ID
+	}
+	return ""
+}
+func (s *DesktopSession) refuseMeasuredLocked(r *desktopRequest, err error) DesktopInputMeasurement {
+	if err == nil {
+		err = ErrDesktopSession
+	}
+	return s.completeMeasuredLocked(r, core.FrameTraceSample{Tag: r.tag, Failure: boundedDesktopMeasurementFailure(err)})
+}
+func (s *DesktopSession) beginMeasuredLocked(r *desktopRequest, group []events.Event) error {
+	b := r.binding
+	if b.window.presentation == nil {
+		return ErrFrameMetricsConfig
+	}
+	r.measured.before = b.revision
+	r.measured.scope = b.window.presentation.scope
+	s.measurements.samples[r.measured.index].Scope = r.measured.scope
+	s.measurements.samples[r.measured.index].ViewRevisionBefore = r.measured.before
+	if err := b.trace.BeginGroup(r.tag, group); err != nil {
+		return err
+	}
+	// Same native host clock as actual drawable acquisition/presentation, sampled
+	// immediately before publishing the actual input nodes to their original FIFO.
+	r.measured.receiptStartedAt = time.Now()
+	at := s.measurements.clock()
+	r.measured.receiptFinishedAt = time.Now()
+	if !b.window.presentation.recorder.Receipt(b.window.presentation.scope, r.tag, at) {
+		b.trace.Retire(r.tag, "native input receipt refused")
+		b.trace.Take()
+		return errors.New("cogent: native input receipt refused")
+	}
+	return nil
+}
+
+func (s *DesktopSession) ownerStart(w *nativeWindow) (uint64, time.Time) {
+	if s == nil {
+		return 0, time.Time{}
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	r := s.pending
+	if r == nil || r.kind != 6 || r.binding.window != w {
+		return 0, time.Time{}
+	}
+	tag := r.binding.trace.OwnerTag()
+	if tag == 0 {
+		return 0, time.Time{}
+	}
+	return tag, time.Now()
+}
+func (s *DesktopSession) ownerEnd(w *nativeWindow, tag uint64, start time.Time, failure error) {
+	if s == nil || tag == 0 {
+		return
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if r := s.pending; r != nil && r.kind == 6 && r.tag == tag && r.binding.window == w {
+		r.binding.trace.GroupOwnerWork(tag, time.Since(start).Nanoseconds())
+		if failure != nil {
+			r.binding.trace.Fail(tag, "originating owner drain: "+boundedDesktopMeasurementFailure(failure))
+		}
+	}
+}
+func (s *DesktopSession) reconcileStart(w *nativeWindow) (uint64, time.Time) {
+	if s == nil {
+		return 0, time.Time{}
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	r := s.pending
+	if r == nil || r.kind != 6 || r.binding.window != w {
+		return 0, time.Time{}
+	}
+	tag := r.binding.trace.ReconcileTag()
+	if tag == 0 {
+		return 0, time.Time{}
+	}
+	return tag, time.Now()
+}
+func (s *DesktopSession) reconcileEnd(w *nativeWindow, tag uint64, start time.Time) {
+	if s == nil || tag == 0 {
+		return
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if r := s.pending; r != nil && r.kind == 6 && r.tag == tag && r.binding.window == w {
+		r.binding.trace.Reconciled(tag, time.Since(start).Nanoseconds())
+		r.measured.reconciled = r.binding.revision
+	}
+}
+
+// Called at the originating FIFO ack, after driver's checked owner drain and
+// refresh, under native event/render ownership. No session lock enters user code.
+func (s *DesktopSession) finishMeasuredInput(w *nativeWindow, r *desktopRequest) {
+	s.mu.Lock()
+	if s.pending != r || r.done.Load() {
+		s.mu.Unlock()
+		return
+	}
+	check := r.measured.check
+	r.measured.check = nil
+	generation := r.binding.revision
+	ready := r.measured.reconciled == generation && generation > r.measured.before && r.binding.trace.GroupReady(r.tag)
+	owner := s.owner
+	s.mu.Unlock()
+	var accepted uint64
+	var failure error
+	if r.ctx.Err() != nil {
+		failure = r.ctx.Err()
+	} else if !ready || check == nil {
+		failure = errors.New("cogent: measured input did not reconcile a changed view")
+	} else {
+		ownerFailure := withWindowOwner(owner, r.ref, func() {
+			pending := owner.Pending()
+			if pending.Ordinary != 0 || pending.ReadyCompletions != 0 || pending.Dispatching != 0 {
+				failure = errors.New("cogent: measured originating owner drain incomplete")
+				return
+			}
+			accepted, failure = check()
+			if failure == nil && accepted == 0 {
+				failure = errors.New("cogent: accepted application revision must be positive")
+			}
+		})
+		failure = errors.Join(ownerFailure, failure)
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.pending != r || r.done.Load() {
+		return
+	}
+	if r.ctx.Err() != nil {
+		failure = r.ctx.Err()
+	}
+	if r.ref.Context().Err() != nil || r.binding.window != w || w.closing.Load() {
+		failure = ErrDesktopClosed
+	}
+	if failure == nil && r.binding.revision != generation {
+		failure = ErrDesktopPending
+	}
+	if failure == nil {
+		r.measured.accepted = accepted
+		failure = r.binding.trace.CommitGroup(r.tag, generation)
+	}
+	if failure != nil {
+		r.binding.trace.Fail(r.tag, "measured input: "+boundedDesktopMeasurementFailure(failure))
+	}
+	s.reapLocked()
+}

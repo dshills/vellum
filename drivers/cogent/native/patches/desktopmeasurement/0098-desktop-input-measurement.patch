@@ -1,0 +1,446 @@
+--- a/core/frame_trace.go
++++ b/core/frame_trace.go
+@@ -31,6 +31,9 @@
+ type frameTracePending struct {
+ 	FrameTraceSample
+ 	event                                                                                         events.Event
++	group                                                                                         []events.Event
++	groupDone                                                                                     int
++	transaction                                                                                   bool
+ 	queued                                                                                        time.Time
+ 	inputDone, ownerExpected, transition, ownerDone, reconciled, armed, rendering, ready, retired bool
+ 	frameGeneration                                                                               uint64 // captured together with frameArmed
+@@ -76,6 +79,83 @@
+ 	}
+ 	return nil
+ }
++
++// BeginGroup traces one bounded originating FIFO input group. Unlike Begin,
++// owner/reconcile completion cannot arm this transaction until CommitGroup.
++// Callers must supply actual event identities, then close the checked owner
++// drain with GroupOwnerWork. No event, callback or generation is manufactured.
++func (trace *FrameTrace) BeginGroup(tag uint64, group []events.Event) error {
++	if tag == 0 || len(group) == 0 || len(group) > 4 {
++		return errors.New("core: invalid traced input group")
++	}
++	for i, e := range group {
++		if e == nil || reflect.ValueOf(e).Kind() != reflect.Pointer || reflect.ValueOf(e).IsNil() {
++			return errors.New("core: invalid traced input group")
++		}
++		for _, earlier := range group[:i] {
++			if earlier == e {
++				return errors.New("core: duplicate traced input")
++			}
++		}
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if trace.pending != nil {
++		return ErrFrameTraceBusy
++	}
++	trace.pending = &frameTracePending{FrameTraceSample: FrameTraceSample{Tag: tag}, group: append([]events.Event(nil), group...), transaction: true, ownerExpected: true, queued: time.Now()}
++	return nil
++}
++
++// GroupOwnerWork accumulates observed originating owner drains after dispatch
++// has begun. Only a drain after the final input closes the owner terminal;
++// intermediate work cannot arm a composition or assert an application transition.
++func (trace *FrameTrace) GroupOwnerWork(tag uint64, duration int64) {
++	if trace == nil || tag == 0 {
++		return
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.Tag == tag && p.transaction && p.groupDone > 0 && !p.armed {
++		p.OwnerNS += duration
++		if p.inputDone {
++			p.ownerDone = true
++		}
++	}
++}
++
++// CommitGroup arms only a checked reconciled view generation. The caller must
++// independently validate accepted application state before committing, while
++// holding event/render ownership. A previous composition remains unarmed.
++func (trace *FrameTrace) CommitGroup(tag, generation uint64) error {
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if !trace.groupReadyLocked(tag) || generation == 0 {
++		return errors.New("core: traced input group is not reconciled")
++	}
++	p := trace.pending
++	p.Generation = generation
++	p.transition = true
++	p.armed = true
++	return nil
++}
++
++// GroupReady checks the actual original group/owner/reconcile terminals and
++// excludes a known earlier failure or in-flight composition before app-state
++// observation. This is not a reservation: CommitGroup rechecks the same gate.
++func (trace *FrameTrace) GroupReady(tag uint64) bool {
++	if trace == nil || tag == 0 {
++		return false
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	return trace.groupReadyLocked(tag)
++}
++func (trace *FrameTrace) groupReadyLocked(tag uint64) bool {
++	p := trace.pending
++	return p != nil && p.Tag == tag && p.transaction && p.inputDone && p.ownerDone && p.reconciled && !p.ready && !p.armed && !p.rendering
++}
++
+ func (trace *FrameTrace) CurrentTag() uint64 {
+ 	if trace == nil {
+ 		return 0
+@@ -89,11 +169,20 @@
+ 	trace.mu.Lock()
+ 	defer trace.mu.Unlock()
+ 	p := trace.pending
+-	if p == nil || p.event != event {
++	if p == nil {
+ 		return 0, time.Time{}
+ 	}
++	if p.transaction {
++		if p.groupDone >= len(p.group) || p.group[p.groupDone] != event {
++			return 0, time.Time{}
++		}
++	} else if p.event != event {
++		return 0, time.Time{}
++	}
+ 	start := time.Now()
+-	p.QueuedNS = start.Sub(p.queued).Nanoseconds()
++	if !p.transaction || p.groupDone == 0 {
++		p.QueuedNS = start.Sub(p.queued).Nanoseconds()
++	}
+ 	trace.active.Store(p.Tag)
+ 	return p.Tag, start
+ }
+@@ -105,8 +194,14 @@
+ 	trace.mu.Lock()
+ 	defer trace.mu.Unlock()
+ 	if p := trace.pending; p != nil && p.Tag == tag {
+-		p.InputNS = time.Since(start).Nanoseconds()
+-		p.inputDone = true
++		if p.transaction {
++			p.InputNS += time.Since(start).Nanoseconds()
++			p.groupDone++
++			p.inputDone = p.groupDone == len(p.group)
++		} else {
++			p.InputNS = time.Since(start).Nanoseconds()
++			p.inputDone = true
++		}
+ 		if !p.ownerExpected {
+ 			p.ownerDone = true
+ 			if !p.ready {
+@@ -131,15 +226,23 @@
+ 	}
+ }
+ 
+-// OwnerTag identifies a received input awaiting its posted owner work.
++// OwnerTag identifies work after original input dispatch has begun. A grouped
++// transaction keeps recording intermediate drains until arming; this accounting
++// token alone does not imply the complete input or owner terminal.
+ func (trace *FrameTrace) OwnerTag() uint64 {
+ 	if trace == nil {
+ 		return 0
+ 	}
+ 	trace.mu.Lock()
+ 	defer trace.mu.Unlock()
+-	if p := trace.pending; p != nil && p.inputDone && !p.ownerDone {
+-		return p.Tag
++	if p := trace.pending; p != nil {
++		if p.transaction {
++			if p.groupDone > 0 && !p.armed && (!p.ready || !p.ownerDone) {
++				return p.Tag
++			}
++		} else if p.inputDone && !p.ownerDone {
++			return p.Tag
++		}
+ 	}
+ 	return 0
+ }
+@@ -173,8 +276,14 @@
+ 	}
+ 	trace.mu.Lock()
+ 	defer trace.mu.Unlock()
+-	if p := trace.pending; p != nil && p.ownerDone && !p.reconciled && !p.ready {
+-		return p.Tag
++	if p := trace.pending; p != nil && !p.ready {
++		if p.transaction {
++			if p.groupDone > 0 && !p.armed {
++				return p.Tag
++			}
++		} else if p.ownerDone && !p.reconciled {
++			return p.Tag
++		}
+ 	}
+ 	return 0
+ }
+@@ -184,10 +293,12 @@
+ 	}
+ 	trace.mu.Lock()
+ 	defer trace.mu.Unlock()
+-	if p := trace.pending; p != nil && p.Tag == tag && p.ownerDone && !p.ready {
++	if p := trace.pending; p != nil && p.Tag == tag && !p.ready && (p.transaction && p.groupDone > 0 && !p.armed || !p.transaction && p.ownerDone) {
+ 		p.ReconcileNS += duration
+ 		p.reconciled = true
+-		p.armed = true
++		if !p.transaction {
++			p.armed = true
++		}
+ 	}
+ }
+ func (trace *FrameTrace) startFrame() uint64 {
+@@ -196,7 +307,7 @@
+ 	}
+ 	trace.mu.Lock()
+ 	defer trace.mu.Unlock()
+-	if p := trace.pending; p != nil && p.inputDone && !p.rendering && !p.ready {
++	if p := trace.pending; p != nil && (p.inputDone || p.transaction && p.groupDone > 0) && !p.rendering && !p.ready {
+ 		p.rendering = true
+ 		p.frameArmed = p.armed
+ 		p.frameGeneration = p.Generation
+@@ -248,7 +359,7 @@
+ 		if !submitted && p.Failure == "" {
+ 			p.Failure = "composition did not submit a measured frame"
+ 		}
+-		p.TotalUIWorkNS = p.InputNS + p.OwnerNS + p.ReconcileNS + p.LayoutPaintNS + p.GatherNS + p.RasterUploadNS + p.EncodeSubmitNS
++		p.TotalUIWorkNS = frameTraceWorkTotal(p.FrameTraceSample)
+ 		p.ready = p.frameArmed || !submitted
+ 	}
+ }
+@@ -303,6 +414,10 @@
+ 		p.ready = true
+ 	}
+ }
++func frameTraceWorkTotal(s FrameTraceSample) int64 {
++	return s.InputNS + s.OwnerNS + s.ReconcileNS + s.LayoutPaintNS + s.GatherNS + s.RasterUploadNS + s.EncodeSubmitNS
++}
++
+ func (trace *FrameTrace) Take() (FrameTraceSample, bool) {
+ 	if trace == nil {
+ 		return FrameTraceSample{}, false
+@@ -311,6 +426,11 @@
+ 	defer trace.mu.Unlock()
+ 	if p := trace.pending; p != nil && p.ready && (p.retired || p.inputDone && p.ownerDone && !p.rendering) {
+ 		out := p.FrameTraceSample
++		if p.transaction {
++			// A failed intermediate composition may precede remaining input/owner work.
++			// Retain the final observed stage sum rather than its earlier prefix total.
++			out.TotalUIWorkNS = frameTraceWorkTotal(out)
++		}
+ 		trace.pending = nil
+ 		return out, true
+ 	}
+--- /dev/null
++++ b/core/frame_trace_group_vellum_test.go
+@@ -0,0 +1,207 @@
++package core
++
++import (
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/system/composer"
++	"errors"
++	"testing"
++)
++
++// Controlled composition terminals, never real native callback evidence.
++func TestVellumFrameTraceGroupCausalOwnerReconcileAndNoRetroactiveArm(t *testing.T) {
++	tr := &FrameTrace{}
++	first, second := &events.CustomEvent{}, &events.CustomEvent{}
++	if err := tr.BeginGroup(21, []events.Event{first, second}); err != nil {
++		t.Fatal(err)
++	}
++	if err := tr.CommitGroup(21, 8); err == nil {
++		t.Fatal("armed before original events")
++	}
++	// Admission/setup before any original dispatch is outside this group.
++	tr.GroupOwnerWork(21, 101)
++	tr.Reconciled(21, 103)
++	if tr.OwnerTag() != 0 || tr.ReconcileTag() != 0 || tr.startFrame() != 0 || tr.GroupReady(21) || tr.pending.OwnerNS != 0 || tr.pending.ReconcileNS != 0 {
++		t.Fatal("pre-input work was counted")
++	}
++	tag, start := tr.startEvent(first)
++	tr.endEvent(tag, start)
++	if tr.OwnerTag() != 21 || tr.ReconcileTag() != 21 {
++		t.Fatal("intermediate accounting unavailable")
++	}
++	tr.GroupOwnerWork(21, 11)
++	tr.Reconciled(21, 13)
++	if tr.pending.ownerDone || tr.pending.inputDone || tr.pending.armed {
++		t.Fatal("group terminal before all events")
++	}
++	if err := tr.CommitGroup(21, 8); err == nil {
++		t.Fatal("intermediate work armed a composition")
++	}
++	if tr.pending.OwnerNS != 11 || tr.pending.ReconcileNS != 13 {
++		t.Fatal("intermediate work omitted")
++	}
++	// A supported real-prefix terminal is controlled here, never native proof.
++	if tr.startFrame() != 21 || tr.pending.frameArmed {
++		t.Fatal("missing unarmed between-event frame")
++	}
++	if tag, generation, armed := tr.presentationStamp(21); tag != 21 || generation != 0 || armed {
++		t.Fatal("intermediate frame acquired final identity", tag, generation, armed)
++	}
++	tr.frameWork(21, 3, 5)
++	tr.finishFrame(21, composer.ComposeTiming{Supported: true, Submitted: true, RasterUploadNS: 7, EncodeSubmitNS: 11, AcquireNS: 13, PresentCallNS: 17})
++	if tr.GroupReady(21) {
++		t.Fatal("prefix frame made original group complete")
++	}
++	tag, start = tr.startEvent(second)
++	tr.endEvent(tag, start)
++	if tr.OwnerTag() != 21 {
++		t.Fatal("missing original dispatch terminal")
++	}
++	if tag := tr.startFrame(); tag != 21 {
++		t.Fatal("missing intermediate tag")
++	}
++	tr.GroupOwnerWork(21, 17)
++	tr.Reconciled(21, 19)
++	if err := tr.CommitGroup(21, 8); err == nil {
++		t.Fatal("retroactively armed in-flight intermediate")
++	}
++	tr.finishFrame(21, composer.ComposeTiming{Supported: true, Submitted: true})
++	if _, ok := tr.Take(); ok {
++		t.Fatal("unarmed intermediate finalized")
++	}
++	if !tr.GroupReady(21) {
++		t.Fatal("final original/owner/reconcile gate missing")
++	}
++	if err := tr.CommitGroup(21, 8); err != nil {
++		t.Fatal(err)
++	}
++	if tr.startFrame() != 21 || !tr.pending.frameArmed || tr.pending.frameGeneration != 8 {
++		t.Fatal("wrong armed identity")
++	}
++	if tag, generation, armed := tr.presentationStamp(21); tag != 21 || generation != 8 || !armed {
++		t.Fatal("wrong final identity", tag, generation, armed)
++	}
++	tr.frameWork(21, 19, 23)
++	tr.finishFrame(21, composer.ComposeTiming{Supported: true, Submitted: true, RasterUploadNS: 29, EncodeSubmitNS: 31, AcquireNS: 37, PresentCallNS: 41})
++	got, ok := tr.Take()
++	if !ok || !got.Completed || got.Tag != 21 || got.Generation != 8 || got.OwnerNS != 28 || got.ReconcileNS != 32 || got.LayoutPaintNS != 22 || got.GatherNS != 28 || got.RasterUploadNS != 36 || got.EncodeSubmitNS != 42 || got.AcquireNS != 50 || got.PresentCallNS != 58 || got.TotalUIWorkNS != got.InputNS+188 {
++		t.Fatalf("terminal %+v/%v", got, ok)
++	}
++	if tr.Pending() {
++		t.Fatal("retained event group")
++	}
++}
++func TestVellumFrameTraceGroupCancellationPreservesInputAndOwnerTerminals(t *testing.T) {
++	tr := &FrameTrace{}
++	e := &events.CustomEvent{}
++	if err := tr.BeginGroup(5, []events.Event{e}); err != nil {
++		t.Fatal(err)
++	}
++	tr.Fail(5, "canceled")
++	if _, ok := tr.Take(); ok {
++		t.Fatal("cancellation released queued input")
++	}
++	tag, start := tr.startEvent(e)
++	tr.endEvent(tag, start)
++	if _, ok := tr.Take(); ok {
++		t.Fatal("cancellation released queued owner work")
++	}
++	tr.GroupOwnerWork(5, 7)
++	if got, ok := tr.Take(); !ok || got.Completed || got.Failure != "canceled" {
++		t.Fatalf("canceled terminal %+v/%v", got, ok)
++	}
++	if err := tr.BeginGroup(6, []events.Event{e}); err != nil {
++		t.Fatal(err)
++	}
++	tr.Retire(6, "window closed")
++	if got, ok := tr.Take(); !ok || got.Failure != "window closed" {
++		t.Fatal("retirement did not release queued references")
++	}
++}
++func TestVellumFrameTraceGroupBoundsIdentityAndOrdinaryCompatibility(t *testing.T) {
++	e := &events.CustomEvent{}
++	for _, group := range [][]events.Event{nil, {nil}, {e, e}, {e, &events.CustomEvent{}, &events.CustomEvent{}, &events.CustomEvent{}, &events.CustomEvent{}}} {
++		tr := &FrameTrace{}
++		if err := tr.BeginGroup(1, group); err == nil {
++			t.Fatal("invalid group admitted")
++		}
++	}
++	tr := &FrameTrace{}
++	if err := tr.BeginGroup(1, []events.Event{e}); err != nil {
++		t.Fatal(err)
++	}
++	if err := tr.Begin(2, e); !errors.Is(err, ErrFrameTraceBusy) {
++		t.Fatal("parallel ordinary trace admitted", err)
++	}
++	tr.Retire(1, "done")
++	tr.Take()
++	if err := tr.Begin(2, e); err != nil {
++		t.Fatal("ordinary trace broken", err)
++	}
++	tag, start := tr.startEvent(e)
++	tr.endEvent(tag, start)
++	if got, ok := tr.Take(); !ok || got.Failure != "traced input did not post owner work" {
++		t.Fatal("ordinary no-handler behavior changed")
++	}
++}
++
++func TestVellumFrameTraceGroupCanceledBetweenEventsKeepsFinalTerminal(t *testing.T) {
++	tr := &FrameTrace{}
++	first, second := &events.CustomEvent{}, &events.CustomEvent{}
++	if err := tr.BeginGroup(31, []events.Event{first, second}); err != nil {
++		t.Fatal(err)
++	}
++	tag, start := tr.startEvent(first)
++	tr.endEvent(tag, start)
++	tr.GroupOwnerWork(31, 7)
++	tr.Reconciled(31, 11)
++	if tr.startFrame() != 31 {
++		t.Fatal("missing canceled prefix frame")
++	}
++	tr.frameWork(31, 2, 3)
++	tr.finishFrame(31, composer.ComposeTiming{Supported: true, Submitted: true, RasterUploadNS: 5, EncodeSubmitNS: 7})
++	tr.Fail(31, "canceled")
++	if _, ok := tr.Take(); ok {
++		t.Fatal("cancellation released incomplete original group")
++	}
++	tag, start = tr.startEvent(second)
++	tr.endEvent(tag, start)
++	if tr.OwnerTag() != 31 {
++		t.Fatal("canceled group lost final drain token")
++	}
++	tr.GroupOwnerWork(31, 13)
++	got, ok := tr.Take()
++	if !ok || got.Completed || got.Failure != "canceled" || got.OwnerNS != 20 || got.ReconcileNS != 11 || got.TotalUIWorkNS != got.InputNS+48 {
++		t.Fatalf("canceled group accounting/terminal %+v/%v", got, ok)
++	}
++}
++
++func TestVellumFrameTraceGroupUnsupportedPrefixRetainsFinalStageSum(t *testing.T) {
++	tr := &FrameTrace{}
++	first, second := &events.CustomEvent{}, &events.CustomEvent{}
++	if err := tr.BeginGroup(41, []events.Event{first, second}); err != nil {
++		t.Fatal(err)
++	}
++	tag, start := tr.startEvent(first)
++	tr.endEvent(tag, start)
++	tr.GroupOwnerWork(41, 7)
++	tr.Reconciled(41, 11)
++	if tr.startFrame() != 41 {
++		t.Fatal("missing prefix frame")
++	}
++	tr.frameWork(41, 13, 17)
++	tr.finishFrame(41, composer.ComposeTiming{Failure: "unsupported compositor", RasterUploadNS: 19, EncodeSubmitNS: 23})
++	if tr.GroupReady(41) {
++		t.Fatal("known earlier failure reached acceptance gate")
++	}
++	if _, ok := tr.Take(); ok {
++		t.Fatal("prefix failure released original input/owner reservation")
++	}
++	tag, start = tr.startEvent(second)
++	tr.endEvent(tag, start)
++	tr.GroupOwnerWork(41, 29)
++	tr.pending.InputNS = 31 // Controlled total; this is not an actual CPU measurement.
++	got, ok := tr.Take()
++	if !ok || got.Completed || got.Failure != "unsupported compositor" || got.OwnerNS != 36 || got.TotalUIWorkNS != 150 {
++		t.Fatalf("late terminal work omitted %+v/%v", got, ok)
++	}
++}

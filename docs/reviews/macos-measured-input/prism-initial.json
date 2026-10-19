@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "1b6aeddd33f31f9ba3e27c8793ce1f84",
+  "repo": {
+    "root": "/private/tmp/vellum-m3-measurement-93b4730",
+    "head": "93b47306ba6cc4ad3ac03253f5e01723505b0603",
+    "branch": "codex/m3-measurement-integration"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "c86e04973fae0d89",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Owner terminal may close on an earlier drain",
+      "message": "In the manual offscreen custom() handler, ownerStart is called before the tag/kind checks, but beginMeasuredLocked arms ownerExpected only after BeginGroup. Meanwhile ownerEnd calls GroupOwnerWork on every custom event, including the ordinary admission/ack events. GroupOwnerWork requires inputDone, so a premature call is ignored, but each of the two group events is followed by a separate owner drain call. With multiple events the first drain may mark ownerDone before later events were dispatched, because GroupOwnerWork only checks inputDone and OwnerTag requires it as well. This is fragile and could close the owner phase on the wrong drain.",
+      "suggestion": "Record owner work only for the drain that follows the final group event dispatch, and add a test with a two-event group asserting OwnerNS accumulates across drains.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/desktop_measurement.go",
+          "lines": {
+            "start": 197,
+            "end": 198
+          }
+        }
+      ],
+      "tags": [
+        "ordering",
+        "location-corrected"
+      ],
+      "evidence": "if r := s.pending; r != nil \u0026\u0026 r.kind == 6 \u0026\u0026 r.tag == tag \u0026\u0026 r.binding.window == w {\n\t\tr.binding.trace.GroupOwnerWork(tag, time.Since(start).Nanoseconds())",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5457,
+    "totalMs": 5506
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 13,
+    "bytes": 48822,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 25939,
+        "output": 484,
+        "costUSD": 0.056718
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

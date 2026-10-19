@@ -1,0 +1,92 @@
+{
+  "base_commit": "316053284f6011a63e5b50c267048c2e9c3ff3f7",
+  "implementation_files": {
+    "drivers/cogent/desktop_measurement.go": "7397d858f283cb244fbc772a1584cef12e8109b5a88576e62318e3bce109e961",
+    "drivers/cogent/desktop_measurement_offscreen_test.go": "b2709defd068b5de85841fbb16b5a75bf734de310438b30491c35025f5d46cde",
+    "drivers/cogent/desktop_session.go": "1989f3920a5335ce93d9d34e5fcfdfc1ddd3d9d04d541b11e37c174d58cabe4a",
+    "drivers/cogent/driver.go": "432346831deb0129cae4087e464a2c911e44ac41ab9ac50a3132e2980bdbc53c",
+    "drivers/cogent/manual_offscreen.go": "2cbe5a9e349886f16c3bd63df8c477b6d1d28d209e40e9967ec2e857149c677a",
+    "drivers/cogent/native/README.md": "b24954187304b2f48ff1c2258f80a75be18503630a4aad0ec91ab4dcd2905ef4",
+    "drivers/cogent/native/dependencies.json": "fe43982d049893e5bbb80fbd994c3203ca59de13ffac6ba0eb01676c1bfd3eac",
+    "drivers/cogent/prepare_test.py": "3737040e225e3e1d4850f50db2e41bb18606ca08e78e76edd19b073a43d02eb2",
+    "drivers/cogent/native/patches/desktopmeasurement/0098-desktop-input-measurement.patch": "bce8bf2a99efee2b652a79df6cbe5d12b7e3916ae77ac053925beb0a6a3afb47",
+    "drivers/cogent/native/patches/desktopmeasurement/original-hashes.json": "322abb5e20a1d8f8cf1f3024f777dad63d21f7696a697c6dc055aeab31587b1e",
+    "drivers/cogent/native/patches/desktopmeasurement/output-hashes.json": "aec0618476cea8295934809b8f1e45895b598642c1b9abd00a90c9dfe7f5efb7",
+    "drivers/cogent/native/patches/desktopmeasurement/README.md": "194b1e5a20cefe6e4fc45c778b160009a162fedc94d81eb07a426420b4901567",
+    "specs/native-presentation.md": "f83b09b504d3292b717a01354982d94f2cb5752910b3d034836d94340ab810de"
+  },
+  "review_composition_verified": true,
+  "review_composition": "Initial13-file staged diff plus8-file correction diff applied to base commit reconstruct all13 final implementation hashes exactly.",
+  "initial_review_diff_sha256": "57e55a149eac6194ea3b1d497ec408ead94a72f53126adb84b2b74b34bb1bceb",
+  "correction_review_diff_sha256": "c0ebd8da2a07e9d8553ac0c3d7f2e691f28ecce8708e8f31100073f1847155b8",
+  "final_checks": {
+    "layout-race": {
+      "receipt_sha256": "02a6086d9d039c73bbaf186b90f1cd73a66e19064cd86c8bce8bd6209d1f762f",
+      "seconds": 18.008088874979876,
+      "logs": {
+        "stdout": {
+          "bytes": 53,
+          "sha256": "4ae446e7b6f7a4641da3fe0fde4fd0dd2f10ee82fd6e56685b8ff9bf9f425756"
+        },
+        "stderr": {
+          "bytes": 1089,
+          "sha256": "ed3f02a0a0904f943f79adb77fc8f60ecb9df736d0119f855c1d58a320569e95"
+        }
+      },
+      "terminal_group_absent": true
+    },
+    "core-race": {
+      "receipt_sha256": "85c2c0406b662b7d4f03c3d414f1f23a72edb474ef14c158caca4e48e15f6b77",
+      "seconds": 12.761329457978718,
+      "logs": {
+        "stdout": {
+          "bytes": 37,
+          "sha256": "c104e3e455ec3cc3ca2b342cb1d635e121985e3a4fc1442f10c97c6a27344f1d"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "terminal_group_absent": true
+    },
+    "driver-vet": {
+      "receipt_sha256": "afcf1c1064f1e69d074413de59be979f542600267233325aecfa20b15e2426c8",
+      "seconds": 6.432318959035911,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 989,
+          "sha256": "130830518c67afc14acec1dc25e44a924aa3b4f5a759b399dc0cd986bea939f0"
+        }
+      },
+      "terminal_group_absent": true
+    },
+    "native-compile": {
+      "receipt_sha256": "e93994e403da3037eedbd8ca83e2283cdbf61247e9b13c40158ff90eda753aa8",
+      "seconds": 19.766321999952197,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1089,
+          "sha256": "ed3f02a0a0904f943f79adb77fc8f60ecb9df736d0119f855c1d58a320569e95"
+        }
+      },
+      "terminal_group_absent": true
+    }
+  },
+  "preparation": {
+    "stages": "1..98",
+    "reproduced": true,
+    "checks_passed": 29
+  },
+  "scope": "Routed Go input receipt and CPU composition support; controlled intermediate/final frame tests and observer classification are not actual native presentation/physical/IME/AX/resize or M3 qualification.",
+  "native_test_binary_executed": false,
+  "M3_complete": false
+}

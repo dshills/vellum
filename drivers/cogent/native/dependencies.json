@@ -1201,6 +1201,17 @@
               "sha256": "963dcfddcf29ad27a0f07f49cb76de8013e69fc7dae2ebe6bf0f98ded2466e6d"
             }
           ]
+        },
+        {
+          "origin": "Vellum bounded desktop input measurement",
+          "inputs": "native/patches/desktopmeasurement/original-hashes.json",
+          "outputs": "native/patches/desktopmeasurement/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/desktopmeasurement/0098-desktop-input-measurement.patch",
+              "sha256": "bce8bf2a99efee2b652a79df6cbe5d12b7e3916ae77ac053925beb0a6a3afb47"
+            }
+          ]
         }
       ]
     },

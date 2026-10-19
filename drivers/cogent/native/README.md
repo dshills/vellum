@@ -259,3 +259,10 @@ the tab shape with other layout caches. Retained160/162DPI typography/selection/
 pixel restoration and direct-scene bundled-font fixture coverage accompany the
 [editor body/gutter patch](patches/editorbodyfont/README.md). No public API,
 native acquisition/lifecycle behavior or retained SDK bytes change.
+
+Stage0098 adds bounded originating input-group transactions to `FrameTrace` for
+opt-in DesktopSession measurements. Actual events and owner/reconcile terminals
+precede explicit arming; earlier compositions remain unarmed. It does not alter
+ordinary single-event tracing or supply native callback/performance qualification.
+See [the stage](patches/desktopmeasurement/README.md) and
+[measurement contract](../../../specs/native-presentation.md).

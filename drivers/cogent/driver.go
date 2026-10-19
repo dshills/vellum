@@ -190,6 +190,8 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				return
 			}
 			d.DesktopSession.invalidate(w)
+			desktopTag, desktopStart := d.DesktopSession.reconcileStart(w)
+			defer d.DesktopSession.reconcileEnd(w, desktopTag, desktopStart)
 			metricTag, metricStart := w.metrics.reconcileStart()
 			defer w.metrics.reconcileEnd(metricTag, metricStart)
 			n := w.window.View()
@@ -472,8 +474,10 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 		metricTag, metricStart := w.metrics.ownerStart()
 		func() {
 			defer w.metrics.ownerEnd(metricTag, metricStart)
+			desktopTag, desktopStart := d.DesktopSession.ownerStart(w)
 			handleTextEvent(w, e)
-			a.Drain()
+			drainErr := a.Drain()
+			d.DesktopSession.ownerEnd(w, desktopTag, desktopStart, drainErr)
 			syncTopology()
 		}()
 		refresh(w)

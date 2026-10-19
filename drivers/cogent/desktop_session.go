@@ -46,6 +46,7 @@ type DesktopSession struct {
 	windows      map[app.WindowRef]*desktopWindow
 	pending      *desktopRequest
 	next         uint64
+	measurements *desktopMeasurements
 }
 type desktopWindow struct {
 	window                             *nativeWindow
@@ -54,20 +55,22 @@ type desktopWindow struct {
 	revision, completedRevision, frame uint64
 }
 type desktopRequest struct {
-	session *DesktopSession
-	binding *desktopWindow
-	ref     app.WindowRef
-	ctx     context.Context
-	kind    uint8
-	tag     uint64
-	input   DesktopInput
-	reply   chan desktopReply
-	done    atomic.Bool
+	session  *DesktopSession
+	binding  *desktopWindow
+	ref      app.WindowRef
+	ctx      context.Context
+	kind     uint8
+	tag      uint64
+	input    DesktopInput
+	reply    chan desktopReply
+	done     atomic.Bool
+	measured *desktopMeasuredRequest
 }
 type desktopReply struct {
-	snapshot   DesktopSnapshot
-	visibility DesktopWindowVisibility
-	err        error
+	snapshot    DesktopSnapshot
+	visibility  DesktopWindowVisibility
+	err         error
+	measurement DesktopInputMeasurement
 }
 type desktopFIFO struct {
 	events.Event
@@ -191,6 +194,11 @@ func (s *DesktopSession) invalidate(w *nativeWindow) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if b := s.windows[w.window.Ref()]; b != nil {
+		if r := s.pending; r != nil && r.measured != nil && r.binding == b && r.measured.accepted != 0 {
+			// A new view cannot paint under the earlier armed generation. Fail only
+			// pending work; a completed historic composition remains immutable.
+			b.trace.Fail(r.tag, "measured view invalidated after final arming")
+		}
 		if b.revision == math.MaxUint64 {
 			s.closed = true
 		} else {
@@ -210,7 +218,9 @@ func (s *DesktopSession) retire(w *nativeWindow) {
 	}
 	if r := s.pending; r != nil && r.binding == b {
 		b.trace.Retire(r.tag, "native window retired")
-		b.trace.Take()
+		if sample, ok := b.trace.Take(); ok && r.measured != nil {
+			s.completeMeasuredLocked(r, sample)
+		}
 		s.finishLocked(r, desktopReply{err: ErrDesktopClosed})
 	}
 	w.body.Scene.SetOriginCustomHandler(nil)
@@ -228,7 +238,9 @@ func (s *DesktopSession) close() {
 	s.closed = true
 	if r := s.pending; r != nil {
 		r.binding.trace.Retire(r.tag, "native driver retired")
-		r.binding.trace.Take()
+		if sample, ok := r.binding.trace.Take(); ok && r.measured != nil {
+			s.completeMeasuredLocked(r, sample)
+		}
 		s.finishLocked(r, desktopReply{err: ErrDesktopClosed})
 	}
 	for ref, b := range s.windows {
@@ -249,11 +261,19 @@ func (s *DesktopSession) finishLocked(r *desktopRequest, reply desktopReply) {
 	if s.pending == r {
 		s.pending = nil
 	}
+	if r.measured != nil {
+		r.measured.check = nil
+		if !r.measured.completed {
+			reply.measurement = s.refuseMeasuredLocked(r, reply.err)
+		} else {
+			reply.measurement = s.measurements.samples[r.measured.index]
+		}
+	}
 	r.reply <- reply
 }
 func (s *DesktopSession) reapLocked() {
 	r := s.pending
-	if r == nil || r.kind != 2 {
+	if r == nil || r.kind != 2 && r.kind != 6 {
 		return
 	}
 	sample, ok := r.binding.trace.Take()
@@ -261,17 +281,27 @@ func (s *DesktopSession) reapLocked() {
 		return
 	}
 	reply := desktopReply{}
+	if r.measured != nil {
+		r.measured.check = nil
+		reply.measurement = s.completeMeasuredLocked(r, sample)
+	}
 	if err := r.ctx.Err(); err != nil {
 		reply.err = err
 	} else if !sample.Completed || sample.Failure != "" || sample.Unavailable {
 		reply.err = &DesktopCompositionError{Failure: sample.Failure, Unavailable: sample.Unavailable && !sample.Completed && sample.Failure != ""}
 	} else {
 		r.binding.frame = r.tag
+		if r.measured != nil {
+			r.binding.completedRevision = sample.Generation
+		}
 		reply.snapshot.Frame = r.tag
 	}
 	s.finishLocked(r, reply)
 }
 func (s *DesktopSession) submit(ctx context.Context, ref app.WindowRef, kind uint8, input DesktopInput) (*desktopRequest, error) {
+	return s.submitWithExpectation(ctx, ref, kind, input, nil)
+}
+func (s *DesktopSession) submitWithExpectation(ctx context.Context, ref app.WindowRef, kind uint8, input DesktopInput, check DesktopInputExpectation) (*desktopRequest, error) {
 	if s == nil || s.self != s || ctx == nil || ref == (app.WindowRef{}) {
 		return nil, ErrDesktopSession
 	}
@@ -298,8 +328,18 @@ func (s *DesktopSession) submit(ctx context.Context, ref app.WindowRef, kind uin
 	if s.next == math.MaxUint64 {
 		return nil, ErrDesktopBudget
 	}
+	if kind == 5 && (s.measurements == nil || check == nil) {
+		return nil, ErrDesktopSession
+	}
+	if kind == 5 && len(s.measurements.samples) >= s.measurements.capacity {
+		return nil, ErrDesktopBudget
+	}
 	s.next++
 	r := &desktopRequest{session: s, binding: b, ref: ref, ctx: ctx, kind: kind, tag: s.next, input: input, reply: make(chan desktopReply, 1)}
+	if kind == 5 {
+		r.measured = &desktopMeasuredRequest{index: len(s.measurements.samples), check: check, before: b.revision}
+		s.measurements.samples = append(s.measurements.samples, DesktopInputMeasurement{Frame: FrameSample{Tag: r.tag, Window: b.window.window.ID}, ViewRevisionBefore: b.revision})
+	}
 	event := &events.CustomEvent{}
 	event.Data = r
 	event.Typ = events.Custom
@@ -320,6 +360,12 @@ func (s *DesktopSession) cancel(r *desktopRequest) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.pending != r || r.done.Load() {
+		return
+	}
+	if r.kind == 6 {
+		r.measured.check = nil
+		r.binding.trace.Fail(r.tag, "measured input canceled")
+		s.reapLocked()
 		return
 	}
 	if r.kind == 2 {
@@ -482,6 +528,10 @@ func (s *DesktopSession) handle(w *nativeWindow, e events.Event) bool {
 		s.mu.Unlock()
 		return true
 	}
+	if r.kind == 6 {
+		s.finishMeasuredInput(w, r)
+		return true
+	}
 	if r.kind == 3 {
 		s.mu.Lock()
 		s.finishLocked(r, desktopReply{})
@@ -509,7 +559,7 @@ func (s *DesktopSession) handle(w *nativeWindow, e events.Event) bool {
 		if failure != nil {
 			return
 		}
-		if r.kind == 1 {
+		if r.kind == 1 || r.kind == 5 {
 			if r.input.Frame != frame {
 				failure = ErrDesktopPending
 				return
@@ -549,6 +599,8 @@ func (s *DesktopSession) handle(w *nativeWindow, e events.Event) bool {
 	}
 
 	in := r.input
+	previousSource := b.source.Last
+	previousFrame := b.frame
 	b.frame = 0 // Native input can change focus or paint without an application dirty view.
 	b.source.Last.Mods = in.Modifiers
 	switch in.Type {
@@ -561,14 +613,30 @@ func (s *DesktopSession) handle(w *nativeWindow, e events.Event) bool {
 	case events.Scroll:
 		b.source.Scroll(in.Position, in.Delta)
 	}
+	group := make([]events.Event, 0, 2)
 	for {
 		ev, ok := b.source.Deque.PollEvent()
 		if !ok {
 			break
 		}
+		group = append(group, ev)
+	}
+	if r.measured != nil {
+		if err := s.beginMeasuredLocked(r, group); err != nil {
+			b.source.Last = previousSource
+			b.frame = previousFrame
+			s.finishLocked(r, desktopReply{err: err})
+			return true
+		}
+	}
+	for _, ev := range group {
 		source.Deque.Send(&desktopFIFO{Event: ev, request: r})
 	}
+
 	r.kind = 3
+	if r.measured != nil {
+		r.kind = 6
+	}
 	ack := &events.CustomEvent{}
 	ack.Data = r
 	ack.Typ = events.Custom

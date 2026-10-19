@@ -289,6 +289,9 @@ func (p *manualImplementation) refresh(w *managedManualWindow) error {
 		if !p.owner.TakeDirty(n.window.Ref()) {
 			return
 		}
+		n.desktop.invalidate(n)
+		desktopTag, desktopStart := n.desktop.reconcileStart(n)
+		defer n.desktop.reconcileEnd(n, desktopTag, desktopStart)
 		w.layoutPending = true
 		view := n.window.View()
 		release, err := p.prepareManualView(n.window.ID, view)
@@ -365,11 +368,38 @@ func (p *manualImplementation) refresh(w *managedManualWindow) error {
 	p.fail(errors.Join(err, updateErr))
 	return errors.Join(err, updateErr)
 }
+
+// drainOwnerMeasured covers the separate between-event drain in Step. Custom
+// handlers already account their own originating drain. A Driver session has at
+// most one pending request, so only its original window contributes this work.
+func (p *manualImplementation) drainOwnerMeasured(maximum int) (int, error) {
+	var session *DesktopSession
+	var origin *nativeWindow
+	var tag uint64
+	var start time.Time
+	for _, w := range p.windowList() {
+		candidate := w.state.desktop
+		if current, began := candidate.ownerStart(w.state); current != 0 {
+			session, origin, tag, start = candidate, w.state, current, began
+			break
+		}
+	}
+	processed, err := p.owner.DrainN(maximum)
+	if session != nil {
+		session.ownerEnd(origin, tag, start, err)
+	}
+	return processed, err
+}
+
 func (p *manualImplementation) custom(n *nativeWindow, e events.Event) {
 	n.pending.Store(false)
+	desktopTag, desktopStart := n.desktop.ownerStart(n)
+	var drainErr error
+	defer func() { n.desktop.ownerEnd(n, desktopTag, desktopStart, drainErr) }()
 	handleTextEvent(n, e)
 	if p.ownerBudget > 0 {
 		processed, err := p.owner.DrainN(min(p.config.OwnerBatch, p.ownerBudget))
+		drainErr = err
 		p.dispatched += processed
 		p.ownerBudget -= processed
 		p.fail(err)
@@ -698,7 +728,7 @@ func (m *Manual) Step(ctx context.Context, maximum int) (ManualStepResult, error
 			}
 		}
 		if remaining > 0 && p.owner.Context().Err() == nil {
-			processed, err := p.owner.DrainN(min(remaining, p.config.OwnerBatch))
+			processed, err := p.drainOwnerMeasured(min(remaining, p.config.OwnerBatch))
 			remaining -= processed
 			result.OwnerCallbacks += processed
 			progress = progress || processed > 0
