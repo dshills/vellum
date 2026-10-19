@@ -333,6 +333,7 @@ func EnqueueGridScroll(ctx context.Context, a *app.Application, model *virtual.G
 		admission = &GridInputRecord{Kind: "enqueue", Tag: tag, Scale: measurement.Scale, RequestedX: dx, RequestedY: dy,
 			PhysicalX: event.Delta.X, PhysicalY: event.Delta.Y, GenerationBefore: s.Generation, ViewportBefore: s.Viewport}
 	}
+	recordPresentationReceipt(b.window, tag)
 	source.Deque.Send(&tracedScrollEvent{MouseScroll: event})
 	return nil
 }

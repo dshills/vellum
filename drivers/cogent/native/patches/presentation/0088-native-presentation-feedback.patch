@@ -1,0 +1,709 @@
+--- a/core/frame_trace.go
++++ b/core/frame_trace.go
+@@ -33,7 +33,8 @@
+ 	event                                                                                         events.Event
+ 	queued                                                                                        time.Time
+ 	inputDone, ownerExpected, transition, ownerDone, reconciled, armed, rendering, ready, retired bool
+-	frameArmed                                                                                    bool // captured at composition start, never inferred at finish
++	frameGeneration                                                                               uint64 // captured together with frameArmed
++	frameArmed                                                                                    bool   // captured at composition start, never inferred at finish
+ }
+ 
+ // FrameTrace retains at most one interaction and owns no callback. Install it
+@@ -198,6 +199,7 @@
+ 	if p := trace.pending; p != nil && p.inputDone && !p.rendering && !p.ready {
+ 		p.rendering = true
+ 		p.frameArmed = p.armed
++		p.frameGeneration = p.Generation
+ 		return p.Tag
+ 	}
+ 	return 0
+--- /dev/null
++++ b/core/presentation.go
+@@ -0,0 +1,38 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package core
++
++import "cogentcore.org/core/system"
++
++// Native frame stamps carry immutable acquisition-time identity. The backend
++// supplies composition ordinals. A pre-armed frame cannot inherit a later owner
++// transition, even if drawable acquisition waits until that transition finishes.
++func (trace *FrameTrace) presentationStamp(tag uint64) (uint64, uint64, bool) {
++	if trace == nil || tag == 0 {
++		return 0, 0, false
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.Tag == tag && p.rendering && !p.ready {
++		return p.Tag, p.frameGeneration, p.frameArmed
++	}
++	return 0, 0, false
++}
++func beginPresentationFrame(window system.Window, trace *FrameTrace, tag uint64) func() {
++	observer, ok := window.(interface {
++		PresentationEnabled() bool
++		BeginPresentationFrame(uint64, uint64, bool)
++		EndPresentationFrame()
++	})
++	if !ok || !observer.PresentationEnabled() {
++		return nil
++	}
++	input, generation, armed := trace.presentationStamp(tag)
++	observer.BeginPresentationFrame(input, generation, armed)
++	return observer.EndPresentationFrame
++}
++func redrawCachedObserved(window system.Window) bool {
++	if end := beginPresentationFrame(window, nil, 0); end != nil {
++		defer end()
++	}
++	return redrawCached(window.Composer())
++}
+--- /dev/null
++++ b/core/presentation_test.go
+@@ -0,0 +1,81 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package core
++
++import (
++	"cogentcore.org/core/system"
++	"cogentcore.org/core/system/composer"
++	"testing"
++)
++
++func TestVellumPresentationStampCapturesPreArmGeneration(t *testing.T) {
++	trace := &FrameTrace{}
++	event := traceScroll()
++	if err := trace.Begin(3, event); err != nil {
++		t.Fatal(err)
++	}
++	tag, start := trace.startEvent(event)
++	trace.ExpectOwner(tag)
++	trace.endEvent(tag, start)
++	if trace.startFrame() != 3 {
++		t.Fatal("prefix")
++	}
++	trace.Transition(3, 9)
++	trace.OwnerWork(3, 1)
++	trace.Reconciled(3, 1)
++	input, generation, armed := trace.presentationStamp(3)
++	if input != 3 || generation != 0 || armed {
++		t.Fatal(input, generation, armed)
++	}
++	trace.finishFrame(3, composer.ComposeTiming{Supported: true, Submitted: true})
++	if trace.startFrame() != 3 {
++		t.Fatal("final")
++	}
++	input, generation, armed = trace.presentationStamp(3)
++	if input != 3 || generation != 9 || !armed {
++		t.Fatal(input, generation, armed)
++	}
++	trace.finishFrame(3, composer.ComposeTiming{Supported: true, Submitted: true})
++	if input, generation, armed = trace.presentationStamp(3); input != 0 || generation != 0 || armed {
++		t.Fatal("terminal frame stamp leaked")
++	}
++}
++
++type presentationWindowFixture struct {
++	system.Window
++	enabled         bool
++	tag, generation uint64
++	armed           bool
++	starts, ends    int
++}
++
++func (w *presentationWindowFixture) PresentationEnabled() bool { return w.enabled }
++func (w *presentationWindowFixture) BeginPresentationFrame(tag, generation uint64, armed bool) {
++	w.starts++
++	w.tag = tag
++	w.generation = generation
++	w.armed = armed
++}
++func (w *presentationWindowFixture) EndPresentationFrame() { w.ends++ }
++func TestVellumPresentationBracketingDisabledUntracedAndUnwind(t *testing.T) {
++	w := &presentationWindowFixture{}
++	if beginPresentationFrame(w, nil, 0) != nil || w.starts != 0 {
++		t.Fatal("disabled path")
++	}
++	w.enabled = true
++	func() {
++		defer func() {
++			if recover() == nil {
++				t.Fatal("fixture did not unwind")
++			}
++		}()
++		end := beginPresentationFrame(w, nil, 0)
++		if end == nil {
++			t.Fatal("no scope")
++		}
++		defer end()
++		panic("fixture unwind")
++	}()
++	if w.starts != 1 || w.ends != 1 || w.tag != 0 || w.generation != 0 || w.armed {
++		t.Fatal(w)
++	}
++}
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -767,7 +767,7 @@
+ 		if !w.SystemWindow.Lock() {
+ 			return
+ 		}
+-		redrawn := redrawCached(w.SystemWindow.Composer())
++		redrawn := redrawCachedObserved(w.SystemWindow)
+ 		w.SystemWindow.Unlock()
+ 		if redrawn {
+ 			w.requestPaintAfter(100*time.Millisecond - sinceResize)
+@@ -968,6 +968,9 @@
+ 		return
+ 	}
+ 	defer w.SystemWindow.Unlock()
++	if end := beginPresentationFrame(w.SystemWindow, nil, 0); end != nil {
++		defer end()
++	}
+ 	cp.Compose()
+ }
+ 
+@@ -1048,6 +1051,9 @@
+ 		return
+ 	}
+ 	defer w.SystemWindow.Unlock()
++	if end := beginPresentationFrame(w.SystemWindow, trace, tag); end != nil {
++		defer end()
++	}
+ 	if trace.sourceDetails {
+ 		if measured, ok := cp.(interface{ ComposeMeasuredWithSourceDetails() composer.ComposeTiming }); ok {
+ 			trace.finishFrame(tag, measured.ComposeMeasuredWithSourceDetails())
+--- a/system/driver/desktop/app.go
++++ b/system/driver/desktop/app.go
+@@ -146,7 +146,7 @@
+ 	}
+ 
+ 	func() {
+-		surf := gpu.Instance().CreateSurface(nativeSurfaceDescriptor(w.Glw))
++		surf := gpu.Instance().CreateSurface(nativeSurfaceDescriptor(w))
+ 		var fbsz image.Point
+ 		fbsz.X, fbsz.Y = w.Glw.GetFramebufferSize()
+ 		if fbsz == (image.Point{}) {
+--- /dev/null
++++ b/system/driver/desktop/presentation_darwin.go
+@@ -0,0 +1,104 @@
++//go:build darwin
++
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package desktop
++
++/*
++#cgo CFLAGS: -x objective-c
++#cgo LDFLAGS: -framework QuartzCore -framework Metal
++#include "presentation_darwin.h"
++*/
++import "C"
++import "errors"
++
++var presentationRegistry nativePresentationRegistry
++
++// SetPresentationObserver installs once on a live native window. The observer
++// must obey PresentationObserver's concurrency and retirement contract.
++func (w *Window) SetPresentationObserver(observer PresentationObserver) error {
++	if C.vellumPresentationAvailable() == 0 {
++		return errors.New("desktop: native presentation feedback requires macOS10.15.4 or later")
++	}
++	if !w.Lock() {
++		return errors.New("desktop: closed presentation window")
++	}
++	defer w.Unlock()
++	if w.nativeLayer == nil || w.presentationToken.Load() != 0 {
++		return errors.New("desktop: presentation observer unavailable or already installed")
++	}
++	token, err := presentationRegistry.register(observer)
++	if err != nil {
++		return err
++	}
++	C.vellumPresentationObserver(w.nativeLayer, C.uint64_t(token))
++	w.presentationToken.Store(token)
++	return nil
++}
++
++// PresentationHostTime returns the same host-time domain as MTLDrawable.presentedTime.
++// Sampling it does not acquire any window/main-thread lock.
++func PresentationHostTime() float64 { return float64(C.vellumPresentationHostTime()) }
++
++// RecordPresentationReceipt samples host time without waiting for the window's
++// render lock, before enqueue. A concurrent retirement revokes the scalar token.
++func (w *Window) RecordPresentationReceipt(tag uint64) {
++	if w == nil {
++		return
++	}
++	if token := w.presentationToken.Load(); token != 0 {
++		at := float64(C.vellumPresentationHostTime())
++		presentationRegistry.receipt(token, tag, at)
++	}
++}
++
++// PresentationEnabled and Begin/End require the existing window render lock.
++func (w *Window) PresentationEnabled() bool { return w.presentationToken.Load() != 0 }
++func (w *Window) BeginPresentationFrame(tag, generation uint64, armed bool) {
++	if !w.PresentationEnabled() {
++		return
++	}
++	// The recorder exhausts its bounded budget long before this guard. Never
++	// reuse an ordinal even if a caller leaves observation installed indefinitely.
++	if w.presentationComposition == ^uint64(0) {
++		w.closePresentationObserver()
++		return
++	}
++	w.presentationComposition++
++	flag := C.int(0)
++	if armed {
++		flag = 1
++	}
++	C.vellumPresentationFrame(w.nativeLayer, C.uint64_t(tag), C.uint64_t(generation), C.uint64_t(w.presentationComposition), flag)
++}
++func (w *Window) EndPresentationFrame() { C.vellumPresentationFrame(w.nativeLayer, 0, 0, 0, 0) }
++
++// closePresentationObserver requires Mu, before surface/view teardown. Handlers
++// own only scalar IDs and may complete later; removal does no window callback.
++func (w *Window) closePresentationObserver() {
++	token := w.presentationToken.Swap(0)
++	if w.nativeLayer != nil {
++		C.vellumPresentationObserver(w.nativeLayer, 0)
++	}
++	w.nativeLayer = nil
++	presentationRegistry.close(token)
++}
++
++//export vellumGoDrawableAcquired
++func vellumGoDrawableAcquired(token, tag, generation, composition C.uint64_t, armed C.int, at C.double) C.uint64_t {
++	return C.uint64_t(presentationRegistry.acquire(uint64(token), PresentationFrame{uint64(tag), uint64(generation), uint64(composition), armed != 0}, float64(at)))
++}
++
++//export vellumGoDrawableUnavailable
++func vellumGoDrawableUnavailable(token, tag, generation, composition C.uint64_t, armed C.int, at C.double) {
++	presentationRegistry.unavailable(uint64(token), PresentationFrame{uint64(tag), uint64(generation), uint64(composition), armed != 0}, float64(at))
++}
++
++//export vellumGoDrawablePresented
++func vellumGoDrawablePresented(token, sequence, drawable C.uint64_t, at C.double) {
++	presentationRegistry.presented(uint64(token), uint64(sequence), uint64(drawable), float64(at))
++}
++
++//export vellumGoPresentationReceipt
++func vellumGoPresentationReceipt(token, tag C.uint64_t, at C.double) {
++	presentationRegistry.receipt(uint64(token), uint64(tag), float64(at))
++}
+--- /dev/null
++++ b/system/driver/desktop/presentation_darwin.h
+@@ -0,0 +1,11 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++#ifndef VELLUM_PRESENTATION_DARWIN_H
++#define VELLUM_PRESENTATION_DARWIN_H
++#include <stdint.h>
++void *vellumNewPresentationLayer(void);
++void vellumPresentationObserver(void *layer, uint64_t token);
++void vellumPresentationFrame(void *layer, uint64_t tag, uint64_t generation, uint64_t composition, int armed);
++void vellumPresentationReceipt(void *layer, uint64_t tag);
++double vellumPresentationHostTime(void);
++int vellumPresentationAvailable(void);
++#endif
+--- /dev/null
++++ b/system/driver/desktop/presentation_darwin.m
+@@ -0,0 +1,89 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++#import <QuartzCore/CAMetalLayer.h>
++#import <QuartzCore/CAMediaTiming.h>
++#import <Metal/MTLDrawable.h>
++#include <os/lock.h>
++#include "presentation_darwin.h"
++
++// Cgo exports receive scalars only. No Go pointer or native window is captured.
++extern uint64_t vellumGoDrawableAcquired(uint64_t, uint64_t, uint64_t, uint64_t, int, double);
++extern void vellumGoDrawableUnavailable(uint64_t, uint64_t, uint64_t, uint64_t, int, double);
++extern void vellumGoDrawablePresented(uint64_t, uint64_t, uint64_t, double);
++extern void vellumGoPresentationReceipt(uint64_t, uint64_t, double);
++
++typedef struct {
++ uint64_t token, tag, generation, composition;
++ int armed;
++} VellumPresentationStamp;
++
++// Only Vellum's own layer overrides acquisition; no global method replacement.
++@interface VellumPresentationLayer : CAMetalLayer {
++ os_unfair_lock _stampLock;
++ uint64_t _observerToken;
++ VellumPresentationStamp _stamp;
++}
++- (void)setObserverToken:(uint64_t)token;
++- (void)setTag:(uint64_t)tag generation:(uint64_t)generation composition:(uint64_t)composition armed:(int)armed;
++- (VellumPresentationStamp)captureStamp;
++@end
++@implementation VellumPresentationLayer
++- (id)init {
++ if ((self=[super init])) { _stampLock=(os_unfair_lock)OS_UNFAIR_LOCK_INIT; _observerToken=0; _stamp=(VellumPresentationStamp){0}; }
++ return self;
++}
++- (void)setObserverToken:(uint64_t)token {
++ os_unfair_lock_lock(&_stampLock);
++ _stamp=(VellumPresentationStamp){.token=token};
++ __atomic_store_n(&_observerToken,token,__ATOMIC_RELEASE);
++ os_unfair_lock_unlock(&_stampLock);
++}
++- (void)setTag:(uint64_t)tag generation:(uint64_t)generation composition:(uint64_t)composition armed:(int)armed {
++ if (!__atomic_load_n(&_observerToken,__ATOMIC_ACQUIRE))return;
++ os_unfair_lock_lock(&_stampLock);
++ _stamp.tag=tag;_stamp.generation=generation;_stamp.composition=composition;_stamp.armed=armed;
++ os_unfair_lock_unlock(&_stampLock);
++}
++- (VellumPresentationStamp)captureStamp {
++ if (!__atomic_load_n(&_observerToken,__ATOMIC_ACQUIRE))return (VellumPresentationStamp){0};
++ os_unfair_lock_lock(&_stampLock);
++ VellumPresentationStamp stamp=_stamp;
++ os_unfair_lock_unlock(&_stampLock);
++ return stamp;
++}
++- (id<CAMetalDrawable>)nextDrawable {
++ // Keep super's autoreleased return lifetime. A local pool here could drain it
++ // before the WebGPU caller retains the drawable.
++ id<CAMetalDrawable> drawable=[super nextDrawable];
++ VellumPresentationStamp stamp=[self captureStamp];
++ if (!stamp.token)return drawable;
++ double acquired=CACurrentMediaTime();
++ if (!drawable) {
++  vellumGoDrawableUnavailable(stamp.token,stamp.tag,stamp.generation,stamp.composition,stamp.armed,acquired);
++  return nil;
++ }
++ uint64_t sequence=vellumGoDrawableAcquired(stamp.token,stamp.tag,stamp.generation,stamp.composition,stamp.armed,acquired);
++ if (sequence) {
++  // Only immutable integers are closed over: neither self nor drawable/window.
++  uint64_t token=stamp.token;
++  [drawable addPresentedHandler:^(id<MTLDrawable> shown) {
++   @autoreleasepool { vellumGoDrawablePresented(token,sequence,shown.drawableID,shown.presentedTime); }
++  }];
++ }
++ return drawable;
++}
++@end
++
++void *vellumNewPresentationLayer(void) { return (__bridge void *)[VellumPresentationLayer layer]; }
++void vellumPresentationObserver(void *layer,uint64_t token) { [(VellumPresentationLayer *)layer setObserverToken:token]; }
++void vellumPresentationFrame(void *layer,uint64_t tag,uint64_t generation,uint64_t composition,int armed) {
++ [(VellumPresentationLayer *)layer setTag:tag generation:generation composition:composition armed:armed];
++}
++void vellumPresentationReceipt(void *layer,uint64_t tag) {
++ if(!layer)return;
++ VellumPresentationStamp stamp=[(VellumPresentationLayer *)layer captureStamp];
++ if(stamp.token)vellumGoPresentationReceipt(stamp.token,tag,CACurrentMediaTime());
++}
++
++double vellumPresentationHostTime(void) { return CACurrentMediaTime(); }
++
++int vellumPresentationAvailable(void) { if (@available(macOS 10.15.4,*))return 1;return 0; }
+--- /dev/null
++++ b/system/driver/desktop/presentation_other.go
+@@ -0,0 +1,17 @@
++//go:build !darwin
++
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package desktop
++
++import "errors"
++
++func (w *Window) SetPresentationObserver(PresentationObserver) error {
++	return errors.New("desktop: native presentation feedback requires macOS")
++}
++func (w *Window) RecordPresentationReceipt(uint64)            {}
++func (w *Window) PresentationEnabled() bool                   { return false }
++func (w *Window) BeginPresentationFrame(uint64, uint64, bool) {}
++func (w *Window) EndPresentationFrame()                       {}
++func (w *Window) closePresentationObserver()                  {}
++
++func PresentationHostTime() float64 { return 0 }
+--- /dev/null
++++ b/system/driver/desktop/presentation_registry.go
+@@ -0,0 +1,94 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package desktop
++
++import (
++	"errors"
++	"sync"
++	"sync/atomic"
++)
++
++// PresentationFrame identifies the composition at drawable acquisition. Armed
++// and Generation belong to that composition, not to a later owner transition.
++type PresentationFrame struct {
++	Tag, Generation, Composition uint64
++	Armed                        bool
++}
++
++// PresentationObserver is an internal backend sink. Methods must be concurrent,
++// nonblocking and safe after Closed; they must not call window/main-thread APIs.
++// A callback admitted immediately before retirement may enter after Closed.
++// A sink must revoke its recording authority atomically, as Recorder.Close does.
++type PresentationObserver interface {
++	Receipt(tag uint64, hostTime float64)
++	Acquired(frame PresentationFrame, hostTime float64) uint64
++	Unavailable(frame PresentationFrame, hostTime float64)
++	Presented(sequence, drawable uint64, hostTime float64)
++	Closed()
++}
++type nativeSubscription struct {
++	observer PresentationObserver
++	closed   atomic.Bool
++}
++type nativePresentationRegistry struct {
++	mu      sync.Mutex
++	next    uint64
++	entries map[uint64]*nativeSubscription
++}
++
++var errNativePresentationBudget = errors.New("desktop: native presentation observer budget exhausted")
++
++func (r *nativePresentationRegistry) register(observer PresentationObserver) (uint64, error) {
++	if observer == nil {
++		return 0, errors.New("desktop: nil presentation observer")
++	}
++	r.mu.Lock()
++	defer r.mu.Unlock()
++	if len(r.entries) >= 64 || r.next == ^uint64(0) {
++		return 0, errNativePresentationBudget
++	}
++	r.next++
++	if r.entries == nil {
++		r.entries = make(map[uint64]*nativeSubscription)
++	}
++	r.entries[r.next] = &nativeSubscription{observer: observer}
++	return r.next, nil
++}
++func (r *nativePresentationRegistry) lookup(token uint64) *nativeSubscription {
++	r.mu.Lock()
++	s := r.entries[token]
++	r.mu.Unlock()
++	return s
++}
++func (r *nativePresentationRegistry) receipt(token, tag uint64, at float64) {
++	if s := r.lookup(token); s != nil && !s.closed.Load() {
++		s.observer.Receipt(tag, at)
++	}
++}
++func (r *nativePresentationRegistry) acquire(token uint64, frame PresentationFrame, at float64) uint64 {
++	if s := r.lookup(token); s != nil && !s.closed.Load() {
++		return s.observer.Acquired(frame, at)
++	}
++	return 0
++}
++func (r *nativePresentationRegistry) unavailable(token uint64, frame PresentationFrame, at float64) {
++	if s := r.lookup(token); s != nil && !s.closed.Load() {
++		s.observer.Unavailable(frame, at)
++	}
++}
++func (r *nativePresentationRegistry) presented(token, sequence, drawable uint64, at float64) {
++	if s := r.lookup(token); s != nil && !s.closed.Load() {
++		s.observer.Presented(sequence, drawable, at)
++	}
++}
++func (r *nativePresentationRegistry) close(token uint64) {
++	r.mu.Lock()
++	s := r.entries[token]
++	delete(r.entries, token)
++	if s != nil {
++		s.closed.Store(true)
++	}
++	r.mu.Unlock()
++	if s != nil {
++		s.observer.Closed()
++	}
++}
+--- /dev/null
++++ b/system/driver/desktop/presentation_registry_test.go
+@@ -0,0 +1,101 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package desktop
++
++import (
++	"sync"
++	"sync/atomic"
++	"testing"
++)
++
++type presentationRegistryFixture struct {
++	registry                           *nativePresentationRegistry
++	token                              uint64
++	closed                             atomic.Bool
++	acquires, completions, unavailable atomic.Uint64
++}
++
++func (*presentationRegistryFixture) Receipt(uint64, float64) {}
++func (f *presentationRegistryFixture) Acquired(PresentationFrame, float64) uint64 {
++	if f.closed.Load() {
++		return 0
++	}
++	return f.acquires.Add(1)
++}
++func (f *presentationRegistryFixture) Unavailable(PresentationFrame, float64) {
++	if !f.closed.Load() {
++		f.unavailable.Add(1)
++	}
++}
++func (f *presentationRegistryFixture) Presented(uint64, uint64, float64) {
++	if !f.closed.Load() {
++		f.completions.Add(1)
++	}
++}
++func (f *presentationRegistryFixture) Closed() { f.closed.Store(true); f.registry.lookup(f.token) }
++func TestVellumPresentationRegistryLimitsAndNoTokenReuse(t *testing.T) {
++	var registry nativePresentationRegistry
++	if _, err := registry.register(nil); err == nil {
++		t.Fatal("nil observer")
++	}
++	for i := uint64(1); i <= 64; i++ {
++		f := &presentationRegistryFixture{registry: &registry}
++		token, err := registry.register(f)
++		if err != nil || token != i {
++			t.Fatal(token, err)
++		}
++		f.token = token
++	}
++	if _, err := registry.register(&presentationRegistryFixture{}); err == nil {
++		t.Fatal("observer budget")
++	}
++	first := registry.lookup(1)
++	registry.close(1)
++	registry.close(1)
++	if !first.closed.Load() {
++		t.Fatal("retirement")
++	}
++	f := &presentationRegistryFixture{registry: &registry}
++	token, err := registry.register(f)
++	f.token = token
++	if err != nil || token != 65 {
++		t.Fatal("token reused", token, err)
++	}
++	registry.close(1)
++	if registry.lookup(token) == nil {
++		t.Fatal("old close retired replacement")
++	}
++	for i := uint64(2); i <= 65; i++ {
++		registry.close(i)
++	}
++	registry.next = ^uint64(0)
++	if _, err := registry.register(f); err == nil {
++		t.Fatal("token overflow")
++	}
++}
++func TestVellumPresentationRegistryConcurrentAcquireAndRetirement(t *testing.T) {
++	for cycle := 0; cycle < 32; cycle++ {
++		var registry nativePresentationRegistry
++		f := &presentationRegistryFixture{registry: &registry}
++		token, err := registry.register(f)
++		if err != nil {
++			t.Fatal(err)
++		}
++		f.token = token
++		var workers sync.WaitGroup
++		workers.Add(2)
++		go func() {
++			defer workers.Done()
++			for i := 0; i < 64; i++ {
++				if seq := registry.acquire(token, PresentationFrame{}, 1); seq != 0 {
++					registry.presented(token, seq, 0, 2)
++				}
++				registry.unavailable(token, PresentationFrame{}, 3)
++			}
++		}()
++		go func() { defer workers.Done(); registry.close(token) }()
++		workers.Wait()
++		if !f.closed.Load() || registry.lookup(token) != nil || registry.acquire(token, PresentationFrame{}, 4) != 0 {
++			t.Fatal("callback authority survived close")
++		}
++	}
++}
+--- a/system/driver/desktop/surface_darwin.go
++++ b/system/driver/desktop/surface_darwin.go
+@@ -15,12 +15,13 @@
+ import (
+ 	"unsafe"
+ 
+-	"github.com/go-gl/glfw/v3.4/glfw"
+ 	"github.com/oliverbestmann/webgpu/wgpu"
+ )
+ 
+-func nativeSurfaceDescriptor(window *glfw.Window) *wgpu.SurfaceDescriptor {
++func nativeSurfaceDescriptor(window *Window) *wgpu.SurfaceDescriptor {
++	layer := C.vellumMetalLayerFromWindow(unsafe.Pointer(window.Glw.GetCocoaWindow()))
++	window.nativeLayer = layer
+ 	return &wgpu.SurfaceDescriptor{MetalLayer: &wgpu.SurfaceSourceMetalLayer{
+-		Layer: C.vellumMetalLayerFromWindow(unsafe.Pointer(window.GetCocoaWindow())),
++		Layer: layer,
+ 	}}
+ }
+--- a/system/driver/desktop/surface_layer_darwin.h
++++ b/system/driver/desktop/surface_layer_darwin.h
+@@ -3,6 +3,7 @@
+ // The upstream license and pinned provenance accompany owned patch 0047.
+ #import <Cocoa/Cocoa.h>
+ #import <QuartzCore/CAMetalLayer.h>
++#include "presentation_darwin.h"
+ 
+ static void *vellumMetalLayerFromWindow(void *nativeWindow) {
+  @autoreleasepool {
+@@ -11,7 +12,7 @@
+   // No view means no owner after pool drainage. Never return a dangling layer.
+   if(!view)return NULL;
+   [view setWantsLayer:YES];
+-  CAMetalLayer *layer = [CAMetalLayer layer];
++  CAMetalLayer *layer = (__bridge CAMetalLayer *)vellumNewPresentationLayer();
+   // NSView.layer is strong. The view owns the borrowed descriptor pointer after
+   // this temporary pool drains; surface teardown precedes view destruction.
+   [view setLayer:layer];
+--- a/system/driver/desktop/surface_other.go
++++ b/system/driver/desktop/surface_other.go
+@@ -6,11 +6,10 @@
+ package desktop
+ 
+ import (
+-	"github.com/go-gl/glfw/v3.4/glfw"
+ 	"github.com/oliverbestmann/webgpu/wgpu"
+ 	"github.com/oliverbestmann/webgpu/wgpuglfw"
+ )
+ 
+-func nativeSurfaceDescriptor(window *glfw.Window) *wgpu.SurfaceDescriptor {
+-	return wgpuglfw.GetSurfaceDescriptor(window)
++func nativeSurfaceDescriptor(window *Window) *wgpu.SurfaceDescriptor {
++	return wgpuglfw.GetSurfaceDescriptor(window.Glw)
+ }
+--- a/system/driver/desktop/window.go
++++ b/system/driver/desktop/window.go
+@@ -14,6 +14,7 @@
+ 	"log"
+ 	"sync"
+ 	"sync/atomic"
++	"unsafe"
+ 
+ 	"cogentcore.org/core/events"
+ 	"cogentcore.org/core/gpu"
+@@ -27,9 +28,12 @@
+ 
+ // Window is the implementation of [system.Window] for the desktop platform.
+ type Window struct {
+-	Native          NativeAttachment
+-	closeOnce       sync.Once
+-	composerPointer atomic.Pointer[composer.ComposerDrawer]
++	Native                  NativeAttachment
++	nativeLayer             unsafe.Pointer // borrowed from content view, under Mu
++	presentationToken       atomic.Uint64
++	presentationComposition uint64 // monotonic under Mu
++	closeOnce               sync.Once
++	composerPointer         atomic.Pointer[composer.ComposerDrawer]
+ 	base.WindowMulti[*App, *composer.ComposerDrawer]
+ 
+ 	// Glw is the glfw window associated with this window
+@@ -496,6 +500,7 @@
+ // releaseNativeResources runs on the main thread, including failed creation.
+ func (w *Window) releaseNativeResources() {
+ 	w.composerPointer.Store(nil)
++	w.closePresentationObserver()
+ 	if w.Native != nil {
+ 		w.Native.Close()
+ 		w.Native = nil

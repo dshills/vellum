@@ -881,6 +881,17 @@
               "sha256": "f0e9cf2762ca6e4d98eb892b0f086149ddff4c611ac526548da08e00b933c711"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/presentation",
+          "inputs": "native/patches/presentation/original-hashes.json",
+          "outputs": "native/patches/presentation/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/presentation/0088-native-presentation-feedback.patch",
+              "sha256": "1c579a4ebdc9eb32e85c6c6eb95718c4aea2b0d4ab07291f901f15f6e61c8a81"
+            }
+          ]
         }
       ]
     },

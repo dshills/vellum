@@ -50,6 +50,8 @@ type Driver struct {
 	// FrameMetrics opts into bounded diagnostic samples for explicitly tagged
 	// routed grid/tree input; ordinary frames do not pay for timing calls.
 	FrameMetrics *FrameMetrics
+	// PresentationMetrics opts into bounded native display feedback on macOS.
+	PresentationMetrics *PresentationMetrics
 }
 type record struct {
 	scope    app.WindowRef
@@ -75,6 +77,7 @@ type nativeWindow struct {
 	input            atomic.Pointer[textWindow]
 	visibility       atomic.Pointer[windowVisibility]
 	metrics          *frameWindowMetrics
+	presentation     *presentationSink
 	desktop          *DesktopSession
 	source           atomic.Pointer[events.Source]
 	pending, closing atomic.Bool
@@ -83,6 +86,9 @@ type nativeWindow struct {
 func (d Driver) Run(ctx context.Context, a *app.Application) error {
 	if d.DesktopSession != nil && d.FrameMetrics != nil {
 		return ErrDesktopSession
+	}
+	if d.PresentationMetrics != nil && !d.PresentationMetrics.valid() {
+		return ErrFrameMetricsConfig
 	}
 	if d.FrameMetrics != nil && !d.FrameMetrics.valid() {
 		return ErrFrameMetricsConfig
@@ -235,6 +241,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					closeTextWindow(w)
 					closeAccessibility(w, "driver-unlaunched-cleanup")
 					w.metrics.retire()
+					w.presentation.Closed()
 					w.body.Scene.SetOriginCustomHandler(nil)
 					d.DesktopSession.retire(w)
 					nativeUnmountServices(w.body)
@@ -278,6 +285,14 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			w := &nativeWindow{window: spec}
 			buildErr := a.Do(func() {
 				w.body = core.NewBody(spec.Title)
+				if d.PresentationMetrics != nil {
+					var err error
+					w.presentation, err = d.PresentationMetrics.bind(spec.ID)
+					if err != nil {
+						failWindow(w, err)
+						return
+					}
+				}
 				w.body.Scene.GPUSceneRendering = d.GPUSceneRendering
 				setGridScrollReuse(w.body.Scene, d.ExperimentalGridScrollReuse)
 				if d.FrameMetrics != nil {
@@ -318,6 +333,10 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				shown.Store(true)
 				if w.closing.Load() {
 					go rw.SystemWindow.CloseReq()
+					return
+				}
+				if err := attachPresentation(w, rw.SystemWindow); err != nil {
+					failWindow(w, err)
 					return
 				}
 				if err := configureRendering(rw.SystemWindow, d.ContinuousRendering); err != nil {
@@ -402,6 +421,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					closeTextWindow(w)
 					closeAccessibility(w, "driver-window-cleanup")
 					w.metrics.retire()
+					w.presentation.Closed()
 					w.body.Scene.SetOriginCustomHandler(nil)
 					d.DesktopSession.retire(w)
 					nativeUnmountServices(w.body)

@@ -58,6 +58,12 @@ static id factory(id receiver,SEL selector) {
 #endif
 #include VELLUM_LAYER_SOURCE
 
+// Link the actual owned layer override; these callbacks never record data in
+// this separate property-ownership fixture.
+uint64_t vellumGoDrawableAcquired(uint64_t a,uint64_t b,uint64_t c,uint64_t d,int e,double f) { (void)a;(void)b;(void)c;(void)d;(void)e;(void)f;return 0; }
+void vellumGoDrawableUnavailable(uint64_t a,uint64_t b,uint64_t c,uint64_t d,int e,double f) { (void)a;(void)b;(void)c;(void)d;(void)e;(void)f; }
+void vellumGoDrawablePresented(uint64_t a,uint64_t b,uint64_t c,double d) { (void)a;(void)b;(void)c;(void)d; }
+void vellumGoPresentationReceipt(uint64_t a,uint64_t b,double c) { (void)a;(void)b;(void)c; }
 static int check(void) {
  Method method=class_getClassMethod(CAMetalLayer.class,@selector(layer));
  IMP original=method_getImplementation(method);factoryOriginal=original;

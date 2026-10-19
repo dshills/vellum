@@ -9,9 +9,19 @@
 #include VELLUM_AX_SOURCE
 int vellumAXAction(uint64_t a,uint64_t b,char *c,char *d,char *e){return 0;}
 void vellumAXResult(uint64_t a,char *b){}
+// Link the current visibility callback; this teardown fixture posts no visibility notifications.
+void vellumWindowVisibility(uint64_t token,int visible){(void)token;(void)visible;}
+// Minimal inert window protocol for the current observer's initial sample.
+// No NSWindow/NSApplication or display connection is constructed.
+@interface VellumPoolWindow : NSObject
+- (NSWindowOcclusionState)occlusionState;
+@end
+@implementation VellumPoolWindow
+- (NSWindowOcclusionState)occlusionState { return 0; }
+@end
 static int check(void){
  // Keep the enclosing pool alive throughout: teardown must own its drainage.
- NSObject *window=[NSObject new];NSView *view=[[NSView alloc]initWithFrame:NSZeroRect];
+ VellumPoolWindow *window=[VellumPoolWindow new];NSView *view=[[NSView alloc]initWithFrame:NSZeroRect];
  Class original=object_getClass(view);
  for(uint64_t cycle=1;cycle<=100;cycle++){
   if(!vellumAXAttach(cycle,(__bridge void *)view,(__bridge void *)window))return 2;

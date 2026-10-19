@@ -72,8 +72,9 @@ safety requirements. This is not approval to ship unbounded growth or stale work
 ## Immediate completion work
 
 1. Finish the three dedicated Cocoa methods in M2 when the desktop is available.
-2. Add the missing bounded native presentation feedback and verify its identity,
-   timestamp, loss and lifecycle accounting before the 60 Hz campaign.
+2. Qualify the implemented [bounded native presentation recorder](native-presentation.md)
+   with real Metal feedback, timestamp/loss identity and native lifecycle checks
+   before the 60 Hz campaign. Headless checks do not establish display feedback.
 3. Measure the existing candidate against this policy before selecting another
    rendering optimization. A failing 60 Hz workload gets a focused repair.
 4. Complete resources/endurance, real Mac workflows, SDK/rights and final audit

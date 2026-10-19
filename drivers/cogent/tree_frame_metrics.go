@@ -83,6 +83,7 @@ func EnqueueTreeScroll(ctx context.Context, a *app.Application, model *virtual.O
 	b.tag = tag
 	m.tags[tag] = 0
 	b.stop = context.AfterFunc(ctx, func() { b.trace.Fail(tag, ctx.Err().Error()) })
+	recordPresentationReceipt(b.window, tag)
 	source.Deque.Send(&tracedScrollEvent{MouseScroll: event})
 	return nil
 }

@@ -9,6 +9,15 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
+The [native presentation checkpoint](../docs/reports/macos-native-presentation/README.md)
+implements optional bounded display recording and passes headless accounting,
+actual Darwin bridge compilation and controlled drawable callbacks. It has not
+run with a real native drawable. Stage88 changes the owned Metal layer, so older
+native records retain their original source/configuration scope; affected render
+and lifecycle behavior needs renewal before current-candidate qualification.
+The desktop remains deferred while the owner is online.
+
+
 Updated 19 October 2026. The latest complete table matrix measures `a2b4143`
 Go code with stage0080 overlays over the retained source-built native library.
 The unchanged private SDK uses clean `abe67c6`, Go 1.25.6 and stage0079. Four serial starter/drawing/3D/imaging native source-assertion/readback
@@ -525,8 +534,8 @@ required. Estimate remaining time from those actual results.
 | Milestone | Current status | Next action / evidence needed |
 | --- | --- | --- |
 | M1 | Complete in source; incorporated in current private SDK | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); exact helper bytes are included in the [current SDK](../docs/reports/macos-sdk-stage0079/README.md). Full final artifact acceptance remains in M6. |
-| M2 | Partial; current workspace, text and five catalogue records pass; three Cocoa methods open | [Current workflow](../docs/reports/macos-current-workflows/README.md) qualifies native workspace 432/54 and text 68/33. [Current catalogue/audit](../docs/reports/macos-current-catalogue/README.md) qualifies five records 255/169 and maps actual assertions for 205 executed tests. Dedicated tab-close, Breadcrumb and ColorPicker Cocoa-selector methods remain unqualified; renew and review those before M2 closure. Physical/human workflows remain M5. |
-| M3 | Open; measured 60 Hz presentation/input acceptance is pending | [Current table matrix](../docs/reports/macos-grid-current/README.md) misses the historical 4 ms optimization target in 33/40 runs; all 40 meet 6 ms p99. It does not measure actual presentation. Under the [owner-selected policy](macos-responsiveness.md), add bounded native feedback, measure the existing candidate and fix actual 60 Hz failures before choosing another renderer experiment. Prior rejected experiments and all original results remain preserved. |
+| M2 | Partial; prior scoped records pass; three Cocoa methods and affected stage88 native renewal remain open | [Current workflow](../docs/reports/macos-current-workflows/README.md) qualifies native workspace 432/54 and text 68/33. [Current catalogue/audit](../docs/reports/macos-current-catalogue/README.md) qualifies five records 255/169 and maps actual assertions for 205 executed tests. Dedicated tab-close, Breadcrumb and ColorPicker Cocoa-selector methods remain unqualified; renew and review those before M2 closure. Physical/human workflows remain M5. |
+| M3 | Open; measured 60 Hz presentation/input acceptance is pending | [Current table matrix](../docs/reports/macos-grid-current/README.md) misses the historical 4 ms optimization target in 33/40 runs; all 40 meet 6 ms p99. It does not measure actual presentation. Under the [owner-selected policy](macos-responsiveness.md), qualify the [implemented recorder](native-presentation.md) with real native feedback, measure the existing candidate and fix actual 60 Hz failures before choosing another renderer experiment. Prior rejected experiments and all original results remain preserved. |
 | M4 | Partial; current SDK preflight and sampled idle CPU pass | [Two composed cycles/66 native checks and four eligible 60-second CPU intervals](../docs/reports/macos-sdk-lifecycle-stage0079/README.md) pass with owned process-group absence and framework-tracked retirement. Extra admissions remain unattributed; one hidden Cocoa window remains unclassified, so native deallocation/leak closure stays open. Original sandbox harness failure is preserved. OS wakeups/presentation, full memory/resource accounting, ten-minute activity, 1,000-cycle and overnight gates remain open. |
 | M5 | Partial; foreground tests deferred while owner is online | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
 | M6 | Partial; current SDK incorporation and scoped consumption pass | The [current SDK](../docs/reports/macos-sdk-stage0079/README.md) (7,879 payload files plus `SDK_MANIFEST.json`, 7,880 total) passes actual Go 1.25.6 relocated consumer/public-contract checks, 26 default main builds plus one tagged helper and 28-font metadata mapping. [Four native SDK cases](../docs/reports/macos-sdk-native-stage0079/README.md) pass source assertions/readbacks/owned closure. The [standard-library input checkpoint](../docs/reports/macos-stdlib-inputs/README.md) now binds selected Go package source/declaration bytes and refuses their drift in owned builds; it does not approve notice applicability. Final candidate/application-bundle acceptance, broader native/human workflows, exact runtime/font/non-font/generated-asset rights and owner distribution approval remain. |

@@ -23,8 +23,11 @@ def main():
         for name,source in sources.items():
             fixture=STAGE/(name+'_test.m');binary=Path(temporary)/name
             selector={'surface_pool':'VELLUM_LAYER_SOURCE','input_pool':'VELLUM_INPUT_SOURCE','accessibility_pool':'VELLUM_AX_SOURCE'}[name]
-            inputs={str(f):hashlib.sha256(f.read_bytes()).hexdigest()for f in [fixture,source,DRIVER/'internal/textinput/input.h']}
+            implementation=source.parent/"presentation_darwin.m" if name=="surface_pool" else None
+            extra=[implementation,implementation.with_suffix(".h")] if implementation else []
+            inputs={str(f):hashlib.sha256(f.read_bytes()).hexdigest()for f in [fixture,source,DRIVER/'internal/textinput/input.h',*extra]}
             argv=['/usr/bin/clang','-fobjc-arc'if name=='accessibility_pool'else'-fno-objc-arc','-Wno-unused-parameter','-I',str(DRIVER/'internal/textinput'),'-D'+selector+'="'+str(source)+'"',str(fixture),'-framework','Cocoa','-framework','QuartzCore','-framework','Carbon','-o',str(binary)]
+            if implementation:argv[1:1]=["-fblocks",str(implementation),"-framework","Metal"]
             compiled=run_child(argv,env=env,capture_output=True,timeout=30)
             record={'fixture':name,'live_tests':False,'inputs':inputs,'compile_argv':argv,'compile_exit':compiled.returncode,'compile_stdout':compiled.stdout.decode(),'compile_stderr':compiled.stderr.decode(),'binary_sha256':hashlib.sha256(binary.read_bytes()).hexdigest()if binary.exists()else None}
             if compiled.returncode==0:
