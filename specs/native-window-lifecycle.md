@@ -149,3 +149,14 @@ This scoped evidence remains separate from native deallocation, presentation,
 physical/human workflows and complete Mac qualification. The preceding private
 wire-format failure stays failed/sealed; deterministic original/fixed Foundation
 wire fixtures and a distinct corrected admission establish that test correction.
+
+## AppKit-only lifetime reference
+
+The [AppKit hidden-window reference](../docs/reports/macos-appkit-window-reference/README.md)
+records a sealed activation-policy refusal and a successful, independently audited
+plain/text-client comparison against the source101 baseline. Standard AppKit text
+operations created one persistent hidden `TUINSWindow` while the fixture's own
+window/view weak references expired by the fixed observations. All windows remain
+counted. Runtime class/image metadata supports a text-service lifetime candidate;
+it does not identify the historical KVO wrapper or establish Vellum deallocation.
+This observation adds no class whitelist, leak qualification or M4 acceptance.

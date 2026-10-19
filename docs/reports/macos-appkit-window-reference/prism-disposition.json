@@ -1,0 +1,29 @@
+{
+  "raw_retained_findings": 1,
+  "discarded_findings": [],
+  "independent_disposition": {
+    "approved": true,
+    "reviewers": [
+      "root",
+      "measurement_review"
+    ],
+    "finding_ids": [
+      "24aa4fb2695acdef"
+    ],
+    "unresolved_actionable_findings": 0,
+    "disposition": "Non-actionable documentation warning; no source change needed. Preserve raw provider finding.",
+    "reason": "Native independent audit and report summary agree: serial grid CPU p95=34.801ms, paced grid GPU requested p95=52.576ms; all four latency gates false. Serial cadence explicitly not eligible; only two paced cohorts pass cadence. Title/prose say cadence restored for those paced cohorts and latency remains open. Provider message itself says this is not a defect and suggests no change unless serial figures mislabeled. No mislabeling found.",
+    "source_changed": false,
+    "inputs": {
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-metal-latency-integrated/prism.json": "d8cba754aae47e8567cd570c2e6584dc59f5314b2fd6e01f954789b25e600a6f",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source101/native-result-review.json": "268ff520d0128d9f521c539c7494d6a53b29cd75e1f0a614e392f2e53bcda844",
+      "/private/tmp/vellum-macos-native-results-97aee13/docs/reports/macos-presentation-post101/summary.json": "0cba77bd2e631c3249d7ecc20c4966c0e8fbfb24a71f2dd12ce984fc84aff43d",
+      "/private/tmp/vellum-macos-native-results-97aee13/docs/reports/macos-presentation-post101/README.md": "8d340c9b84f010732edf90ce8a858f852a1b2bdafceffa00ed2d6621e68d7735"
+    }
+  },
+  "unresolved_actionable_findings": 0,
+  "source_changed_after_review": false,
+  "raw_Prism_sha256": "d8cba754aae47e8567cd570c2e6584dc59f5314b2fd6e01f954789b25e600a6f",
+  "full_diff_sha256": "f0083d5690a6c32d93617f882cefbac15895e981b3168e40769dec7c7604a698",
+  "scope": "One complete provider call covers two separately committed checkpoints; raw native journals independently locally reviewed and SHA-bound, not wholly provider input. Metal native effect still unproven; M3/M4 remain open."
+}

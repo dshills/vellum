@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "5c3c7075c101a4880afcfaef567307fd",
+  "repo": {
+    "root": "/private/tmp/vellum-macos-native-results-97aee13",
+    "head": "8ba9ca617d5c01d40fd9785a2896b8153bdc4772",
+    "branch": "codex/macos-native-results"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "24aa4fb2695acdef",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Serial latency figures presented without gate status",
+      "message": "The report says the source101 grid latency was 52.576 ms on paced cohorts, but the serial grid CPU case is listed at 34.801 ms, and the summary marks input_latency_p95_gate false. Serial-grid at 34.801 ms exceeds 33.3 ms, so this is consistent, but the title and prose claim 'cadence restored' only for paced cohorts. This is not a defect in itself, so confidence is low.",
+      "suggestion": "No change needed unless the serial figures are mislabeled.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "docs/reports/macos-presentation-post101/README.md",
+          "lines": {
+            "start": 7,
+            "end": 7
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "location-corrected"
+      ],
+      "evidence": "+| Serial grid, CPU scene |34.801 ms| Diagnostic, not paced acceptance |",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5931,
+    "totalMs": 5998
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 23,
+    "bytes": 95900,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 46316,
+        "output": 326,
+        "costUSD": 0.095892
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

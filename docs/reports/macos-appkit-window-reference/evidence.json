@@ -1,0 +1,294 @@
+{
+  "schema": 1,
+  "result": "APPKIT_REFERENCE_OBSERVATIONS_ONLY",
+  "source101_commit": "8ba9ca617d5c01d40fd9785a2896b8153bdc4772",
+  "M4_closed": false,
+  "native_leak_qualified": false,
+  "historical_object_identity_proven": false,
+  "class_whitelist_added": false,
+  "external_records": {
+    "locator": "Development artifacts/macos-m4-appkit-reference; keys below relative to this sealed local checkpoint. Raw logs are retained externally, not embedded in repository.",
+    "sha256": {
+      "appkit_reference.m": "250bab588b95ac0c77495306e09a3d52afbbfc8f5654a9af30f223a056b7d463",
+      "plan.json": "d40f1196c6f681547216e3d652dc302550554b52b9535d7e0c3b013b08902f1a",
+      "root-admission.json": "3ba4a76059b69d3434922de688ab2a2816e9bd7fbad507c947f176f6a12bdb15",
+      "root-result.json": "429a1df4014a4593e545a183809dfafa87013f392ac9de5f28a690e363c4698f",
+      "plain-command.json": "27c71813dd95f6e4e164f41b644a2a255847530d5c4ed4c35f48ac0990979749",
+      "plain/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "plain/stderr": "e8ac248df75b3b599adbc22f970b2a1457bd245df169535cfdcb3eee1bca46de",
+      "v2/appkit_reference.m": "16f252a8049e83c1521c3b73ffdf5a380ad6c115e2d65ecbca07e14fb8044b57",
+      "v2/native_window_snapshot.h": "052dc2111c246dfe6d5ca2082a1fdae609b72f7a35f6cf28369f5c8081b32672",
+      "v2/plan.json": "46f5c097eb9147367845b9cc338a57de4d0bd99a0e981a65e1ce116f59d13084",
+      "v2/root-admission.json": "a973fb3f452bbc36b86aa58758c5020ca60f3624bac5f6f9872ca603bdebc975",
+      "v2/root-result.json": "e8a78c5c32bd6887b3633464845301cea83918c9a9e93a5cc82a07867e1528ae",
+      "v2/native-result-review.json": "c47597c19bf223d3d1e35bdbf3ae4b7d8def20001a7c7724bdb318221e45ae70",
+      "v2/compiler-path-command.json": "ea83fbb7cadfcdcdfd108477872572b6f052c5251018511f410badd85511839d",
+      "v2/sdk-path-command.json": "64c916c223397425b22479606e4139efef1b48a33b5d33fc8f0e883b33158299",
+      "v2/compiler-version-command.json": "e19607782f835e166410c4be612cbdb093a55cdbac1852f4ea4a2e2e7d9e8ab6",
+      "v2/build-command.json": "8ed7a19862083d242daf90668c14591261c00aa39556aac3f31c6590756cdcad",
+      "v2/plain-command.json": "8440e75f968cf9d546a852aaeed836a0cd7294730cc5c5ccdf59d097d2a62039",
+      "v2/text-command.json": "69e08092acc302bf29b2eaf589ae72f48ae686e78b775becaa04a3f3f0895295",
+      "v2/plain/stdout": "3c4128fbd7c019128bde18eeaec046c02a240ca98482a3ec217be6b044854389",
+      "v2/plain/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "v2/text/stdout": "1888d77fe03cc356565dd286710db2e9cbbf6a32c179e91bba2b430098c22585",
+      "v2/text/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "independent_audit": {
+    "result": "PASS_REVIEWED_APPKIT_REFERENCE_OBSERVATIONS_ONLY",
+    "checks_count": 454,
+    "sha256": "c47597c19bf223d3d1e35bdbf3ae4b7d8def20001a7c7724bdb318221e45ae70"
+  },
+  "v1": {
+    "result": "FAILED_OR_CANCELED",
+    "plain_exit_code": 1,
+    "stdout_records": 0,
+    "stderr": "AppKit reference refused: process-local prohibited activation policy refused",
+    "failure_before_first_inventory_and_explicit_fixture_cycles": true,
+    "initial_activation_policy": "not observed",
+    "retroactively_passed": false,
+    "source_policy_check": "need([NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited], @\"process-local prohibited activation policy refused\");"
+  },
+  "v2": {
+    "result": "PASS_APPKIT_REFERENCE_OBSERVATIONS",
+    "modes": {
+      "plain": {
+        "records": 15,
+        "inventory_records": 14,
+        "pid": 87542,
+        "owned_cycles": 2,
+        "activation_policy": {
+          "Before": 2,
+          "Desired": 2,
+          "Readback": 2,
+          "SetterAttempted": false,
+          "SetterReturned": null
+        },
+        "max_observed_windows": 1,
+        "max_observed_runtime_classes": 4,
+        "all_owned_weak_expired_at_terminal": true,
+        "operating_system": "Version 26.6.2 (Build 25G83)",
+        "owned_window_weak": "Expired after each owned pool drain, both cycles",
+        "owned_view_weak": "Expired after each owned pool drain, both cycles",
+        "native_seconds": 1.5491531660000009,
+        "all_inventory_main_thread": true,
+        "monotonic_uptime": true,
+        "terminal_window_count": 0
+      },
+      "text": {
+        "records": 15,
+        "inventory_records": 14,
+        "pid": 87558,
+        "owned_cycles": 2,
+        "activation_policy": {
+          "Before": 2,
+          "Desired": 2,
+          "Readback": 2,
+          "SetterAttempted": false,
+          "SetterReturned": null
+        },
+        "max_observed_windows": 2,
+        "max_observed_runtime_classes": 7,
+        "all_owned_weak_expired_at_terminal": true,
+        "operating_system": "Version 26.6.2 (Build 25G83)",
+        "owned_window_weak": "Expired after each owned pool drain, both cycles",
+        "owned_view_weak": "Still live after owned pool drain and at100ms; expired by500ms, both cycles",
+        "native_seconds": 1.2819160830000005,
+        "all_inventory_main_thread": true,
+        "monotonic_uptime": true,
+        "first_service_window_phase": "local-text-client-exercised, cycle0",
+        "terminal_window_count": 1
+      }
+    },
+    "persistent_reference_window": {
+      "window": {
+        "Alpha": 1,
+        "ContentViewClass": "NSView",
+        "ContentViewClassChain": [
+          "NSView",
+          "NSResponder",
+          "NSObject"
+        ],
+        "Frame": [
+          0,
+          0,
+          500,
+          500
+        ],
+        "IdentityAvailable": true,
+        "Key": false,
+        "Level": 0,
+        "Miniaturized": false,
+        "OcclusionVisible": false,
+        "Opaque": false,
+        "OrderedIndex": -1,
+        "OwnedFixtureView": 0,
+        "OwnedFixtureWindow": 0,
+        "Title": "",
+        "Visible": false,
+        "WindowClass": "TUINSWindow",
+        "WindowClassChain": [
+          "TUINSWindow",
+          "NSWindow",
+          "NSResponder",
+          "NSObject"
+        ],
+        "WindowNumber": 157696
+      },
+      "class": {
+        "BundleIdentifier": "com.apple.TextInputUIMac",
+        "BundlePath": "/System/Library/PrivateFrameworks/TextInputUIMacHelper.framework",
+        "Class": "TUINSWindow",
+        "RuntimeImage": "/System/Library/PrivateFrameworks/TextInputUIMacHelper.framework/Versions/A/TextInputUIMacHelper",
+        "RuntimeImageAvailable": 1,
+        "Superclass": "NSWindow"
+      },
+      "first_phase": "local-text-client-exercised",
+      "cycle": 0,
+      "pid": 87558
+    },
+    "KVO_wrapper_observed": false,
+    "weak_markers_raw_format": "Inventory weak/ownership markers are numeric0/1 from Objective-C comparisons; terminal result BOOLs are JSONtrue/false."
+  },
+  "protocol": {
+    "cycles_per_process": 2,
+    "inventory_records_per_process": 14,
+    "result_records_per_process": 1,
+    "main_thread_snapshots": true,
+    "drains_ms": [
+      100,
+      400
+    ],
+    "last_fixed_observation_ms": 500,
+    "bounded_window_count": 64,
+    "bounded_runtime_class_count": 64,
+    "bounded_superclass_levels": 16,
+    "max_json_record_bytes": 524288,
+    "max_stream_bytes": 8388608,
+    "native_watchdog_seconds": 30,
+    "non_native_watchdog_seconds": 60,
+    "physical_or_global_input": false,
+    "preferences_or_input_source_changes": false,
+    "private_class_construction_or_selectors": false,
+    "local_text_operations": [
+      "first responder",
+      "inputContext getter",
+      "insertText",
+      "setMarkedText",
+      "unmarkText",
+      "discardMarkedText"
+    ],
+    "activation_setter_attempted_in_actual_v2": false
+  },
+  "build": {
+    "compiler": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+    "compiler_sha256": "1590ac950a3d627817d09ade5cb60b2115f17a72182a3141e010b4bcc482a0c9",
+    "compiler_version_stdout": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin25.6.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+    "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+    "xcrun_sdk_stdout": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk",
+    "binary": "/private/tmp/vellum-m4-appkit-reference-source101-v2/appkit-reference",
+    "binary_sha256": "33a6fb00908f8b83570d6ba76cebe17469427da20f966ed6d145228af0f6de0a",
+    "direct_dynamic_dependencies": [
+      "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit",
+      "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+      "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+      "/usr/lib/libobjc.A.dylib",
+      "/usr/lib/libSystem.B.dylib"
+    ]
+  },
+  "runtime_guards": {
+    "shared_exclusive_lease": true,
+    "owned_groups": [
+      {
+        "name": "compiler-path",
+        "pid": 87453,
+        "group": 87453,
+        "seconds": 0.030128708999999976,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "name": "sdk-path",
+        "pid": 87455,
+        "group": 87455,
+        "seconds": 0.028873125000000055,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "name": "compiler-version",
+        "pid": 87457,
+        "group": 87457,
+        "seconds": 0.02833720900000003,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "name": "build",
+        "pid": 87477,
+        "group": 87477,
+        "seconds": 0.46922787500000007,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "name": "plain",
+        "pid": 87542,
+        "group": 87542,
+        "seconds": 1.5491531660000009,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "name": "text",
+        "pid": 87558,
+        "group": 87558,
+        "seconds": 1.2819160830000005,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      }
+    ],
+    "all_reported_terminal_absent": true,
+    "signal0_groups_existing_at_independent_audit": [],
+    "geometry_unchanged": true,
+    "source_sdk_unchanged": true,
+    "before_after_raw_geometry_dictionaries_serialized": false,
+    "guard_scope": "Pinned root wrapper calls source101 boundary before build and inside shared lease before/after the cases. It compares run-local geometry before/after. Those comparisons passed; raw before/after geometry dictionaries were not separately serialized by this reference wrapper.",
+    "source101_tracked_files": 5842,
+    "source101_prepared_files": 6321,
+    "retained_sdk_files": 8281,
+    "later_T_source102_integration_is_separate": true,
+    "root_wrapper_sha256": "9f432eec1fcacc8610cca8c6e11c8740508c2d54600e1ded4b37806d6bfe030c"
+  },
+  "repository_sources": {
+    "fixtures/appkit_reference_v2.m": {
+      "sha256": "16f252a8049e83c1521c3b73ffdf5a380ad6c115e2d65ecbca07e14fb8044b57",
+      "provenance": "Byte-identical actual v2 source; Vellum contributors MIT SPDX notice"
+    },
+    "fixtures/native_window_snapshot.h": {
+      "sha256": "052dc2111c246dfe6d5ca2082a1fdae609b72f7a35f6cf28369f5c8081b32672",
+      "provenance": "Byte-identical repository drivers/cogent/native_window_snapshot.h; covered by root MIT LICENSE; no Apple SDK source copied"
+    },
+    "LICENSE": {
+      "sha256": "07c4328563b9066be35c2ac90c6744e6ac904882fd2355ea82d7f0756c940b43",
+      "license": "MIT"
+    },
+    "fixtures/appkit_reference_v1.m": {
+      "sha256": "250bab588b95ac0c77495306e09a3d52afbbfc8f5654a9af30f223a056b7d463",
+      "provenance": "Byte-identical actual v1 source; Vellum contributors MIT SPDX notice; failed attempt remains failed"
+    }
+  },
+  "limits": [
+    "This AppKit-only observation supports an OS text-service-created lifetime candidate without Vellum being necessary. Runtime code origin is not an ownership/deallocation capability.",
+    "It neither reproduces the historical KVO wrapper class nor identifies a cross-process historical window. Same geometry/class family does not establish object identity.",
+    "Two cycles and fixed drains are not a leak/endurance test or proof that retained Vellum/native/GPU resources are released. No whitelist, count exclusion or M4/Mac closure follows.",
+    "The refused v1 attempt and historical source99 failed evidence remain unchanged. This package performs no new native run, build or performance measurement.",
+    "Standard AppKit reproduces the text-service lifetime candidate without Vellum; a fresh bound Vellum comparison is still needed before interpreting the historical anomaly."
+  ]
+}
