@@ -1,0 +1,69 @@
+{
+  "head": "8ba9ca617d5c01d40fd9785a2896b8153bdc4772",
+  "result": "STRUCTURAL_CAPTURE_AND_60HZ_CADENCE_PASS_INPUT_LATENCY_FAIL",
+  "concise_summary": {
+    "outcome": "Structural native capture PASS. The 60 Hz cadence numeric threshold is restored for these two paced workloads, but routed input latency still FAILS. No full M3 or framework release qualification.",
+    "cases": {
+      "serial-grid-cpu": {
+        "latency_p95_ms": 34.801,
+        "final_interval_p95_ms": 16.66679,
+        "within_18_333ms": 119,
+        "interval_denominator": 119,
+        "cadence_gate": "not eligible: serial diagnostic",
+        "input_latency_p95_gate": false,
+        "prefix_acquisitions": 251,
+        "prefix_tag0": 3
+      },
+      "serial-tree-gpu": {
+        "latency_p95_ms": 52.648,
+        "final_interval_p95_ms": 16.66679,
+        "within_18_333ms": 119,
+        "interval_denominator": 119,
+        "cadence_gate": "not eligible: serial diagnostic",
+        "input_latency_p95_gate": false,
+        "prefix_acquisitions": 257,
+        "prefix_tag0": 7
+      },
+      "paced-grid-gpu": {
+        "latency_p95_ms": 52.576,
+        "final_interval_p95_ms": 16.66679,
+        "within_18_333ms": 596,
+        "interval_denominator": 599,
+        "cadence_gate": true,
+        "input_latency_p95_gate": false,
+        "prefix_acquisitions": 734,
+        "prefix_tag0": 6
+      },
+      "paced-tree-cpu": {
+        "latency_p95_ms": 50.431,
+        "final_interval_p95_ms": 16.66679,
+        "within_18_333ms": 598,
+        "interval_denominator": 599,
+        "cadence_gate": true,
+        "input_latency_p95_gate": false,
+        "prefix_acquisitions": 733,
+        "prefix_tag0": 3
+      }
+    },
+    "paired_paced_stages": {
+      "paced-grid-gpu": {
+        "InputNS_p95_ms_previous": 14.4505,
+        "InputNS_p95_ms_current": 0.012625,
+        "TotalUIWork_p95_ms_previous": 18.482999,
+        "TotalUIWork_p95_ms_current": 3.596918,
+        "ack_observation_p95_ms_previous": 34.252417,
+        "ack_observation_p95_ms_current": 17.256625,
+        "acquire_to_present_p95_ms_current": 36.26270836684853
+      },
+      "paced-tree-cpu": {
+        "InputNS_p95_ms_previous": 14.043458,
+        "InputNS_p95_ms_current": 0.010042,
+        "TotalUIWork_p95_ms_previous": 20.164667,
+        "TotalUIWork_p95_ms_current": 4.891457,
+        "ack_observation_p95_ms_previous": 34.255292,
+        "ack_observation_p95_ms_current": 15.254875,
+        "acquire_to_present_p95_ms_current": 35.91058333404362
+      }
+    }
+  }
+}

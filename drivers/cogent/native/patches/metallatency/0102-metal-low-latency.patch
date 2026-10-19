@@ -1,0 +1,22 @@
+--- a/gpu/surface.go
++++ b/gpu/surface.go
+@@ -7,6 +7,7 @@
+ import (
+ 	"fmt"
+ 	"image"
++	"runtime"
+ 	"sync"
+ 
+ 	"cogentcore.org/core/base/errors"
+@@ -176,6 +177,11 @@
+ 		AlphaMode:   caps.AlphaModes[0],
+ 		ViewFormats: viewFmts,
+ 	}
++	// Prefer the two-drawable Metal swapchain for interactive Mac windows.
++	// Other backends retain their existing default; native caps clamp the hint.
++	if runtime.GOOS == "darwin" && sf.GPU.Properties.BackendType == wgpu.BackendTypeMetal {
++		sf.config.DesiredMaximumFrameLatency = 1
++	}
+ 
+ 	sf.Format.Format = viewFmt
+ 	sf.Config()

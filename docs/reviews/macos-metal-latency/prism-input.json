@@ -1,0 +1,73 @@
+{
+  "base": "8ba9ca617d5c01d40fd9785a2896b8153bdc4772",
+  "sha256": "f0083d5690a6c32d93617f882cefbac15895e981b3168e40769dec7c7604a698",
+  "bytes": 95900,
+  "files": [
+    "docs/reports/macos-appkit-window-reference/README.md",
+    "docs/reports/macos-appkit-window-reference/evidence.json",
+    "docs/reports/macos-appkit-window-reference/fixtures/appkit_reference_v1.m",
+    "docs/reports/macos-appkit-window-reference/fixtures/appkit_reference_v2.m",
+    "docs/reports/macos-appkit-window-reference/fixtures/native_window_snapshot.h",
+    "docs/reports/macos-presentation-post101/README.md",
+    "docs/reports/macos-presentation-post101/evidence.json",
+    "docs/reports/macos-presentation-post101/summary.json",
+    "docs/reviews/macos-metal-latency/README.md",
+    "docs/reviews/macos-metal-latency/checks.json",
+    "docs/reviews/macos-metal-latency/independent-review.json",
+    "docs/reviews/macos-metal-latency/proposal.md",
+    "docs/reviews/macos-metal-latency/scope.json",
+    "docs/reviews/macos-metal-latency/source-proof.json",
+    "drivers/cogent/native/dependencies.json",
+    "drivers/cogent/native/patches/metallatency/0102-metal-low-latency.patch",
+    "drivers/cogent/native/patches/metallatency/README.md",
+    "drivers/cogent/native/patches/metallatency/original-hashes.json",
+    "drivers/cogent/native/patches/metallatency/output-hashes.json",
+    "drivers/cogent/prepare_test.py",
+    "specs/macos-delivery.md",
+    "specs/macos-responsiveness.md",
+    "specs/native-window-lifecycle.md"
+  ],
+  "phases": {
+    "M4_AppKit_reference": [
+      "docs/reports/macos-appkit-window-reference",
+      "specs/native-window-lifecycle.md"
+    ],
+    "Core102_Metal_latency_request": [
+      "drivers/cogent/native/dependencies.json",
+      "drivers/cogent/prepare_test.py",
+      "drivers/cogent/native/patches/metallatency",
+      "specs/macos-delivery.md",
+      "specs/macos-responsiveness.md",
+      "docs/reports/macos-presentation-post101",
+      "docs/reviews/macos-metal-latency"
+    ]
+  },
+  "file_sha256": {
+    "docs/reports/macos-appkit-window-reference/README.md": "c7b934f9551306c76c96971c241da583ef907a1b2277895bf1808286bcf9a88e",
+    "docs/reports/macos-appkit-window-reference/evidence.json": "82c7f35cdee0068462d55b0be5595cd79842966ad9b631ff36a31037ae74ff32",
+    "docs/reports/macos-appkit-window-reference/fixtures/appkit_reference_v1.m": "250bab588b95ac0c77495306e09a3d52afbbfc8f5654a9af30f223a056b7d463",
+    "docs/reports/macos-appkit-window-reference/fixtures/appkit_reference_v2.m": "16f252a8049e83c1521c3b73ffdf5a380ad6c115e2d65ecbca07e14fb8044b57",
+    "docs/reports/macos-appkit-window-reference/fixtures/native_window_snapshot.h": "052dc2111c246dfe6d5ca2082a1fdae609b72f7a35f6cf28369f5c8081b32672",
+    "docs/reports/macos-presentation-post101/README.md": "8d340c9b84f010732edf90ce8a858f852a1b2bdafceffa00ed2d6621e68d7735",
+    "docs/reports/macos-presentation-post101/evidence.json": "897c440022517623ba7552854fb0bfeb82c3cce8e9ec3ca25e3e5fbe8a6bef17",
+    "docs/reports/macos-presentation-post101/summary.json": "0cba77bd2e631c3249d7ecc20c4966c0e8fbfb24a71f2dd12ce984fc84aff43d",
+    "docs/reviews/macos-metal-latency/README.md": "be4a91a9f1473ca9a339caac72c6c40fe4d9d65d23ed4fb0b61c0c07c5fcf8ca",
+    "docs/reviews/macos-metal-latency/checks.json": "9650a4fe258af1136db7556413113e503671aeb50c06bdcf2f31cb16fefa9e66",
+    "docs/reviews/macos-metal-latency/independent-review.json": "618efa1cdd56083dc7d2eecca9c67e10404119cdf511b53e6329cda7f8f9b66d",
+    "docs/reviews/macos-metal-latency/proposal.md": "5b357af38a610910c98bc828b0e16458d5f2d243289289e748bfbcc9c2476696",
+    "docs/reviews/macos-metal-latency/scope.json": "9a8cffe25202179ca3e83e89a6644b518977d9ed02c8b3aef2c62131beef7f64",
+    "docs/reviews/macos-metal-latency/source-proof.json": "8a299c7bf34f566e7ccaabeca1be8a1f3fe2e1432efcbd5469a20389d53a751f",
+    "drivers/cogent/native/dependencies.json": "53b1a7829364ca9d21a2912687787008226ad055087d18558b9f5f09e0cb6982",
+    "drivers/cogent/native/patches/metallatency/0102-metal-low-latency.patch": "2218ccad8f9d0df5818c14a59ce9e4ff290ad9e4e97a538cb2edff50f44381c4",
+    "drivers/cogent/native/patches/metallatency/README.md": "1edf681a13ed941c854ffbf275dc6c158244cf7caed8b08fc51e5cca92ace204",
+    "drivers/cogent/native/patches/metallatency/original-hashes.json": "70f9d0ad94e3f4e70ba9dbca824874617c9c8a439f887e897b7fd886784d0d59",
+    "drivers/cogent/native/patches/metallatency/output-hashes.json": "37fe358480b8591aee799e349882d6fcf9397489e1ce806f4f549097e7a9518b",
+    "drivers/cogent/prepare_test.py": "22e2c0476392f47ace614ffc264daaa5a40123912bf46d7cde5bb5d4b4c41d33",
+    "specs/macos-delivery.md": "cbe2c9890b357197d67fe83c0bcc1da96875f4c0a53b1eb8f558f0b770deec9a",
+    "specs/macos-responsiveness.md": "f4f5b4e0497bae9ac6362a6290d85e89b7602b35f1bc533739c4f5c28fb00db2",
+    "specs/native-window-lifecycle.md": "30561de6f11c6d469b32e5536b800f8c839abb16378c28f101e0eaa42448c6a5"
+  },
+  "one_shared_Prism_call": true,
+  "raw_native_journals_fully_in_provider_input": false,
+  "independent_local_journal_reviews_preserved": true
+}

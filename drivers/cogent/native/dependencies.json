@@ -1337,6 +1337,17 @@
               "sha256": "1dd9e692a43ed1a69e4c6b04f7477df4368782b70d7bb28dfac54711c4ccb55a"
             }
           ]
+        },
+        {
+          "origin": "Vellum Mac Metal surface latency policy",
+          "inputs": "native/patches/metallatency/original-hashes.json",
+          "outputs": "native/patches/metallatency/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/metallatency/0102-metal-low-latency.patch",
+              "sha256": "2218ccad8f9d0df5818c14a59ce9e4ff290ad9e4e97a538cb2edff50f44381c4"
+            }
+          ]
         }
       ]
     },
