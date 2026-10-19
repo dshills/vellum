@@ -1,0 +1,83 @@
+# Mac release responsiveness policy
+
+The owner selected this policy on 19 October 2026: **“Use measured 60 Hz
+responsiveness as the release gate; keep 4 ms as an optimization target.”**
+This decision supersedes treating the prototype's provisional CPU budgets as
+mandatory Mac release thresholds. It does not establish a passing measurement.
+
+## Release scope
+
+The initial Mac release targets the tested local Mac configuration at 60 Hz.
+120/144 Hz remain additional performance tiers to measure and document; they
+are not prerequisites for this 60 Hz release. Compatibility and high-DPI support
+must still be stated accurately for the configurations actually tested.
+
+The release decision uses sustained, measured frame pacing and input response
+for representative professional workflows: the composed workspace, fixed and
+variable 10k/1M stored tables with matched visible work, representative trees,
+text/property editing, canvas interaction and resize. A button-only animation or
+empty frame loop does not qualify the framework. Preserve functional assertions,
+data sizes, sample counts, raw samples and ordinary/diagnostic separation.
+
+## Measured acceptance
+
+Use the existing 60 Hz pacing/input criteria from the measurement contract:
+
+- During continuously changing visible work, at least 99% of presentation
+  intervals meet the 1.1-times-period criterion (18.333 ms at 60 Hz). Report all
+  intervals longer than two periods, including outliers.
+- Routed-input receipt to the corresponding actual presentation has p95 no
+  greater than 33.3 ms. Record the input method; automated routing does not
+  establish physical input-to-photon latency.
+- Resize remains responsive, with no application-caused stall over 50 ms.
+  Report observed resize timing and separate any known OS modal behavior.
+
+These retain the existing end-to-end criteria; the owner changed which budgets
+govern release, not the recorded results. Record the actual refresh, scale,
+power/configuration, optimized build, source identity and measurement boundary.
+Use warmup and at least five measured runs, retaining p50/p95/p99/max and failures.
+Refresh/compositor quantization must be identified and any alternative cadence
+criterion declared before its campaign; it cannot be an after-the-fact excuse.
+
+Presentation means native display feedback. A successful Surface.Present call,
+GPU submission, CPU-work duration, timer tick or software frame completion does
+not prove presentation. Unavailable feedback leaves the measured gate open.
+Dropped, missing or nonpositive presentation timestamps must not disappear from
+the accounting. Occluded/minimized/idle phases retain their own lifecycle and
+idle checks; an idle application is not required to repaint at 60 Hz.
+
+## Optimization targets and prior evidence
+
+Keep 4 ms p95 / 6 ms p99 UI work, the 60/120/144 Hz CPU sub-budgets, startup,
+layout, shaping, allocation and GPU-time budgets as reported optimization
+targets. An isolated miss does not block this Mac release when the required
+60 Hz responsiveness and the remaining functional/safety gates pass. The 0.4 ms
+gain/four-of-five-pairs rule was an experiment-adoption policy, not a user release
+requirement; it no longer obliges another renderer redesign before measuring
+the release gate. Preserve existing rejected experiments and their sealed scopes.
+New performance changes still need demonstrated benefit, correctness and no
+material regression on the supported release path.
+
+The historical table matrix still misses its original 4 ms target in 33/40 runs.
+It did not measure actual presentation, so it neither passes nor fails the new
+release gate. No result, golden, timing sample or prior failure is relabeled.
+
+Correctness, exact commands/history and input ordering, accessibility/platform
+workflows, lifecycle cleanup, bounded resources, explicit allocation/admission
+limits, idle/endurance checks, final SDK/notice checks and the final audit remain
+required. The provisional footprint numbers remain reported targets; ownership,
+bounded retention, declared cache limits and leak/regression checks remain hard
+safety requirements. This is not approval to ship unbounded growth or stale work.
+
+## Immediate completion work
+
+1. Finish the three dedicated Cocoa methods in M2 when the desktop is available.
+2. Add the missing bounded native presentation feedback and verify its identity,
+   timestamp, loss and lifecycle accounting before the 60 Hz campaign.
+3. Measure the existing candidate against this policy before selecting another
+   rendering optimization. A failing 60 Hz workload gets a focused repair.
+4. Complete resources/endurance, real Mac workflows, SDK/rights and final audit
+   under M4–M7. Full Mac completion remains open.
+
+See [delivery plan](macos-delivery.md), [measurement contract](prototype-plan.md#measurement-contract)
+and [Mac completion scope](macos-completion.md).

@@ -1,6 +1,15 @@
 # Mac framework delivery plan
 
-Updated 18 October 2026. The latest complete table matrix measures `a2b4143`
+**Current Mac release policy (19 October 2026):** the owner selected measured
+60 Hz responsiveness as the release gate and retained 4 ms as an optimization
+target. The [release policy](macos-responsiveness.md) supersedes treating the
+provisional work/footprint budgets below as mandatory Mac release thresholds.
+Historical results retain their original targets and pass/fail labels; they do
+not establish presentation or close the new gate. Functional correctness,
+lifecycle, bounded-resource safety and final delivery checks remain required.
+
+
+Updated 19 October 2026. The latest complete table matrix measures `a2b4143`
 Go code with stage0080 overlays over the retained source-built native library.
 The unchanged private SDK uses clean `abe67c6`, Go 1.25.6 and stage0079. Four serial starter/drawing/3D/imaging native source-assertion/readback
 cases now pass from that exact SDK on this Mac. Two composed lifecycle cycles
@@ -117,7 +126,7 @@ settled. New controls are added only to close a specific documented application
 gap; the existing control catalogue is the milestone baseline. This preserves
 the requested breadth without making completion depend on an unlimited widget list.
 
-Full Mac completion requires every milestone below. An alpha label, compilation,
+Full Mac completion requires every milestone below under the current release policy. An alpha label, compilation,
 native readback or a smaller successful fixture cannot replace an open gate.
 Public upload, tagging, signing/notarization with an owner's identity, and changes
 to system input/accessibility preferences are not implicitly authorized here.
@@ -195,7 +204,7 @@ acceptance results. Rows can overlap only as described under execution order.
 | --- | --- | --- | --- |
 | M1 | Fix SDK command cancellation ownership in `scripts/child_process.py`; cover child creation, active communication and repeated cancellation during cleanup. Preserve caller signal policy and normal output/error behavior. | Real headless process tests show SIGTERM and SIGINT under supported POSIX main-thread/default-handler conditions cancel the owned child group and propagate failure, including the creation boundary; no live owned descendant remains. Existing SDK-script regressions pass. Worker-thread/custom-handler limits are explicit. | No |
 | M2 | Close the representative application workflow using the existing public workbench/replay consumers and controls catalogue. Run the full 216-operation professional workspace record, plus command/history, worker cancellation, save/open/dirty close, dock/float/redock, two-window survival and large-data edits. Add only missing assertions or product fixes needed for these paths. | The complete record matches model, focus, semantics, selection, geometry and defined captures across owner batches 1/7/64. Native smoke variants cover 10k/1M rows with the same domain validations. The existing 18-action native smoke is not substituted for the full record. All controls in `controls.md` and linked dedicated contracts have a named acceptance scenario and gaps are resolved. | Headless work now; native integration later |
-| M3 | Resolve ordinary frame cost, then qualify table, tree, text/layout, canvas, input and resize against the existing workloads. Start from retained current profiles and an ordinary release baseline; implement one measured bottleneck fix at a time. Keep CPU/GPU modes and diagnostics separate. | The applicable budget matrix below passes on the required geometry/workload with five measured release runs, complete raw samples and unchanged thresholds. Larger datasets have the required matched visible work. GPU-route requests alone do not establish actual route coverage. | Quiet desktop for native measurements |
+| M3 | Qualify measured 60 Hz responsiveness on representative table, tree, text/layout, canvas, input and resize workloads. Add missing actual presentation feedback before timing acceptance. Repair demonstrated release-path failures; retain CPU work budgets as optimization targets. | The [current Mac release policy](macos-responsiveness.md) passes with source/configuration-bound native presentation and input/pacing evidence. Historical 4/6 ms CPU misses remain reported; they alone do not block release or require another rendering redesign. | Quiet desktop for native measurements |
 | M4 | Close memory/resource and integrated endurance gates after the functional/performance fixes stabilize. Attribute Go, native/font and framework-controlled GPU retention; repair unbounded ownership or over-budget components. | Required memory/allocation budgets pass; at least ten minutes of composed activity, 1,000 composed lifecycle cycles and one complete eight-hour visible/occluded/minimized/background soak finish with joined workers, clean tracked teardown and no unbounded retention. Full idle CPU, wakeup and present requirements pass, not CPU alone. | Quiet desktop; overnight for soak |
 | M5 | Complete real Mac usability: palette placement, canvas selection/pan/zoom, docking, keyboard-only controls, text/IME and VoiceOver, menus/choosers/clipboard/file drops, tray/notifications as declared, resize and display/DPI transitions. Use the existing demo suite and probe. | The native workflow matrix below is exercised with expected domain results and cleanup. Automated routing, PID-directed native input and physical/human verification are recorded separately. Required human/display/IME cases remain open until actually performed. | Yes; some cases require a human or display hardware |
 | M6 | Close the actual Go/native/Rust/font/asset component and notice inventory for shipped bytes; produce the final clean SDK and example application bundle. Verify independently from a relocated extraction without checkout paths or development-only environment variables. Document tested OS/GPU/toolchain and build/signing/notarization steps. | All dependency/rights and release gates in `release.md` are satisfied for the intended artifact; generator, public contracts and all shipped demos build, required native consumers run, and the packaged app works outside the source tree. Signing/notarization or public publication that needs owner identity/approval remains an explicit external action, never a simulated pass. | Most inventory/build work now; packaged app acceptance later |
@@ -245,6 +254,11 @@ No automatic input-source, VoiceOver, clipboard or preference changes: use only
 explicitly authorized tests and restore any authorized temporary state changes.
 
 ## Execution order and work while the Mac is occupied
+
+For current M3 work, the [release policy's immediate tasks](macos-responsiveness.md#immediate-completion-work)
+supersede architecture-first directions in the historical experiment notes below.
+Measure 60 Hz presentation/input behavior before proposing another renderer change.
+
 
 1. **M1 source checkpoint complete.** The production SDK cancellation fix and
    its 107-method headless acceptance are [recorded here](../docs/reviews/macos-sdk-cancellation/README.md).
@@ -476,7 +490,7 @@ implementation checkpoint; it is not rerun after each documentation edit.
   code only when an identified required assertion cannot otherwise be tested.
   Use a 90-minute investigation timebox before explicitly reassessing a failed
   approach. A timebox never waives the gate; a renderer that cannot meet the
-  target requires an implementation/architecture decision against the same goal.
+  release target requires an implementation/architecture decision against the same goal. A provisional optimization-target miss alone does not trigger this rule.
 - Test changed behavior and its real dependents first. Run the broader headless
   suite once per stable implementation milestone; repeat only for new failures,
   affected code changes or unresolved concerns. Run native measurements only on
@@ -495,28 +509,26 @@ implementation checkpoint; it is not rerun after each documentation edit.
 
 ## Forecast and closure ledger
 
-The largest uncertainty is M3: the unchanged frame targets have repeatedly
-failed. A completion date before that is resolved would be speculative. M1 is
-complete in source, and M2's full headless replay and catalogue map are complete.
-The full matrix, rejected M3-A/tile-culling comparisons and rejected row-fragment
-feasibility are recorded. M3 now needs a separate material architecture decision
-against the same targets. Do not continue tuning the rejected prototype.
-The independent [M6 minimum-Go source check](../docs/reports/macos-minimum-go/README.md)
-passes. The current private SDK also passes minimum-Go relocated/all-default-main
-and four native source-assertion cases; final candidate acceptance and rights
-closure remain open. Return to the architecture decision; rerun the full matrix
-only after an adopted change. Update the remaining estimate from those results.
-An eight-hour final soak,
-human accessibility/input verification and required display availability must
-be budgeted in addition to implementation time.
+M3 requires actual presentation/input evidence for the owner-selected 60 Hz
+release gate. Historical CPU-work misses remain optimization evidence and do
+not establish a failed 60 Hz user experience. Measure the existing candidate
+before selecting another rendering experiment; keep the previous rejected
+experiments and their original results intact.
+
+M1 is complete in source. M2's current workspace/text and five catalogue records
+pass, with three dedicated Cocoa methods still open. The private SDK passes its
+scoped minimum-Go/relocation/native checks; final candidate and rights closure
+remain M6 work. The ten-minute activity, 1,000-cycle and eight-hour final soak,
+human accessibility/input verification and supported display checks remain
+required. Estimate remaining time from those actual results.
 
 | Milestone | Current status | Next action / evidence needed |
 | --- | --- | --- |
 | M1 | Complete in source; incorporated in current private SDK | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); exact helper bytes are included in the [current SDK](../docs/reports/macos-sdk-stage0079/README.md). Full final artifact acceptance remains in M6. |
 | M2 | Partial; current workspace, text and five catalogue records pass; three Cocoa methods open | [Current workflow](../docs/reports/macos-current-workflows/README.md) qualifies native workspace 432/54 and text 68/33. [Current catalogue/audit](../docs/reports/macos-current-catalogue/README.md) qualifies five records 255/169 and maps actual assertions for 205 executed tests. Dedicated tab-close, Breadcrumb and ColorPicker Cocoa-selector methods remain unqualified; renew and review those before M2 closure. Physical/human workflows remain M5. |
-| M3 | Failing / incomplete; current table matrix measured | [Current Go table matrix](../docs/reports/macos-grid-current/README.md): 7/40 run-p95s meet 4 ms, 33 fail; all 40 p99s meet 6 ms. Only fixed-height million-row GPU meets both targets in all five runs (median run-p95 3.840415 ms). Eight separate final-scene diagnostics and exact 10k/1M geometry pass, with the original validator failure/recovery preserved. The [render-local style experiment](../docs/reports/macos-grid-paint/README.md) reduces allocation but fails the frozen latency bar (CPU/GPU median p95 gains 0.058/0.150 ms; CPU 3/5 improved pairs and worse median p99). It stays private and is rejected; no further style/cache tuning or conditional matrix is run. Next close the remaining native M2 catalogue coverage, then select a materially different measured M3 implementation. The [earlier table matrix](../docs/reports/macos-grid-matrix/README.md) and rejected culling/row-fragment/resolved-shape experiments remain historical. The [tree/local-layout prototype](../docs/reports/macos-tree-local-layout/README.md) remains rejected (0/5 improved pairs each CPU/GPU); no further local-tree/cache tuning is adopted. Full tree/general UI, remaining performance and M4–M7 gates stay open. |
+| M3 | Open; measured 60 Hz presentation/input acceptance is pending | [Current table matrix](../docs/reports/macos-grid-current/README.md) misses the historical 4 ms optimization target in 33/40 runs; all 40 meet 6 ms p99. It does not measure actual presentation. Under the [owner-selected policy](macos-responsiveness.md), add bounded native feedback, measure the existing candidate and fix actual 60 Hz failures before choosing another renderer experiment. Prior rejected experiments and all original results remain preserved. |
 | M4 | Partial; current SDK preflight and sampled idle CPU pass | [Two composed cycles/66 native checks and four eligible 60-second CPU intervals](../docs/reports/macos-sdk-lifecycle-stage0079/README.md) pass with owned process-group absence and framework-tracked retirement. Extra admissions remain unattributed; one hidden Cocoa window remains unclassified, so native deallocation/leak closure stays open. Original sandbox harness failure is preserved. OS wakeups/presentation, full memory/resource accounting, ten-minute activity, 1,000-cycle and overnight gates remain open. |
-| M5 | Partial; live checks authorized while owner is away | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
+| M5 | Partial; foreground tests deferred while owner is online | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
 | M6 | Partial; current SDK incorporation and scoped consumption pass | The [current SDK](../docs/reports/macos-sdk-stage0079/README.md) (7,879 payload files plus `SDK_MANIFEST.json`, 7,880 total) passes actual Go 1.25.6 relocated consumer/public-contract checks, 26 default main builds plus one tagged helper and 28-font metadata mapping. [Four native SDK cases](../docs/reports/macos-sdk-native-stage0079/README.md) pass source assertions/readbacks/owned closure. The [standard-library input checkpoint](../docs/reports/macos-stdlib-inputs/README.md) now binds selected Go package source/declaration bytes and refuses their drift in owned builds; it does not approve notice applicability. Final candidate/application-bundle acceptance, broader native/human workflows, exact runtime/font/non-font/generated-asset rights and owner distribution approval remain. |
 | M7 | Open | Requirement-by-requirement final audit after all preceding gates close. |
 

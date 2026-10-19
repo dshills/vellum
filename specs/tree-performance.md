@@ -1,5 +1,14 @@
 # Stored-tree warm performance
 
+**Current Mac release policy (19 October 2026):** the owner selected measured
+60 Hz responsiveness as the release gate and retained 4 ms as an optimization
+target. The [release policy](macos-responsiveness.md) supersedes treating the
+provisional work/footprint budgets below as mandatory Mac release thresholds.
+Historical results retain their original targets and pass/fail labels; they do
+not establish presentation or close the new gate. Functional correctness,
+lifecycle, bounded-resource safety and final delivery checks remain required.
+
+
 The Mac `examples/loadedtree -perf` consumer uses one live native window and a
 sealed 10,000- or 100,000-node dataset with a huge branch and a separate deep
 chain. Stored generation/construction and initial expanded indexing precede

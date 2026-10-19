@@ -1,5 +1,14 @@
 # macOS framework completion
 
+**Current Mac release policy (19 October 2026):** the owner selected measured
+60 Hz responsiveness as the release gate and retained 4 ms as an optimization
+target. The [release policy](macos-responsiveness.md) supersedes treating the
+provisional work/footprint budgets below as mandatory Mac release thresholds.
+Historical results retain their original targets and pass/fail labels; they do
+not establish presentation or close the new gate. Functional correctness,
+lifecycle, bounded-resource safety and final delivery checks remain required.
+
+
 Execution order, milestone exit criteria and limits on investigation/review are
 maintained in the [Mac delivery plan](macos-delivery.md). This file retains the
 full acceptance scope and historical evidence.

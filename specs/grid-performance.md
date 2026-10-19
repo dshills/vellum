@@ -1,5 +1,14 @@
 # Stored-table performance measurement
 
+**Current Mac release policy (19 October 2026):** the owner selected measured
+60 Hz responsiveness as the release gate and retained 4 ms as an optimization
+target. The [release policy](macos-responsiveness.md) supersedes treating the
+provisional work/footprint budgets below as mandatory Mac release thresholds.
+Historical results retain their original targets and pass/fail labels; they do
+not establish presentation or close the new gate. Functional correctness,
+lifecycle, bounded-resource safety and final delivery checks remain required.
+
+
 This workload measures the P6 warm table-scroll target on the local macOS
 backend. It does not establish the complete P6 table/tree gate, P11 endurance,
 physical input-to-photon latency or professional application performance.
