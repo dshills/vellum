@@ -1,0 +1,82 @@
+{
+  "head": "3d426825da9656501332a4e45c99185d3493ab97",
+  "structural_capture": "PASS_ALL4",
+  "measured_60Hz_release_gate": "FAIL",
+  "release_qualified": false,
+  "cases": {
+    "serial-grid-cpu": {
+      "structural_result": "VALID_SERIAL_NATIVE_FEEDBACK_JOURNAL",
+      "native_seconds": 9.817009082999999,
+      "latency": {
+        "count": 120,
+        "p50": 63.609124976210296,
+        "p95": 64.31762501597404,
+        "p99": 64.57462499383837,
+        "max": 67.28299998212606
+      },
+      "prefix_records": 251,
+      "prefix_presentations": 251,
+      "startup_skipped": 0
+    },
+    "serial-tree-gpu": {
+      "structural_result": "VALID_SERIAL_NATIVE_FEEDBACK_JOURNAL",
+      "native_seconds": 9.654982500000003,
+      "latency": {
+        "count": 120,
+        "p50": 64.51725005172193,
+        "p95": 65.15866669360548,
+        "p99": 65.70141669362783,
+        "max": 80.34954173490405
+      },
+      "prefix_records": 257,
+      "prefix_presentations": 257,
+      "startup_skipped": 0
+    },
+    "paced-grid-gpu": {
+      "structural_result": "VALID_PACED_NATIVE_FEEDBACK_JOURNAL",
+      "native_seconds": 24.884891999999994,
+      "latency": {
+        "count": 600,
+        "p50": 64.85195830464363,
+        "p95": 65.47787494491786,
+        "p99": 65.76887506525964,
+        "max": 81.9308334030211
+      },
+      "prefix_records": 735,
+      "prefix_presentations": 733,
+      "startup_skipped": 2,
+      "interval_count": 599,
+      "interval_p95_ms": 33.33345823921263,
+      "within_18_333ms": 2,
+      "within_fraction": 0.00333889816360601,
+      "cadence_threshold_met": false,
+      "input_latency_threshold_met": false,
+      "planned_ns": 10000000000,
+      "actual_hold_end_ns": 20002937042
+    },
+    "paced-tree-cpu": {
+      "structural_result": "VALID_PACED_NATIVE_FEEDBACK_JOURNAL",
+      "native_seconds": 25.058776375000008,
+      "latency": {
+        "count": 600,
+        "p50": 64.06025006435812,
+        "p95": 65.1405417593196,
+        "p99": 65.41820825077593,
+        "max": 67.69920838996768
+      },
+      "prefix_records": 733,
+      "prefix_presentations": 733,
+      "startup_skipped": 0,
+      "interval_count": 599,
+      "interval_p95_ms": 33.33341667894274,
+      "within_18_333ms": 3,
+      "within_fraction": 0.005008347245409015,
+      "cadence_threshold_met": false,
+      "input_latency_threshold_met": false,
+      "planned_ns": 10000000000,
+      "actual_hold_end_ns": 19996087084
+    }
+  },
+  "prior_failed_source99_capture_preserved": true,
+  "next": "Guarded redundant cursor handoff experiment; no claim it explains or fixes timing yet"
+}

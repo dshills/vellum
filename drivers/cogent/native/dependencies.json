@@ -1326,6 +1326,17 @@
               "sha256": "637250be319149ab60f4dcd3bcfff94aef3f52e641d68c0cff98544b40e5d246"
             }
           ]
+        },
+        {
+          "origin": "Vellum successful cursor image reuse",
+          "inputs": "native/patches/cursorfastpath/original-hashes.json",
+          "outputs": "native/patches/cursorfastpath/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/cursorfastpath/0101-successful-cursor-image-noop.patch",
+              "sha256": "1dd9e692a43ed1a69e4c6b04f7477df4368782b70d7bb28dfac54711c4ccb55a"
+            }
+          ]
         }
       ]
     },

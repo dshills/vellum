@@ -1,0 +1,10 @@
+{
+  "retained_findings": 0,
+  "discarded_finding": "0cbd6fdfae985b31",
+  "disposition": "No actionable source defect. Raw discarded concern reviewed rather than hidden.",
+  "reason": "The provider itself identifies a conservative performance miss rather than a correctness hole. Every failed or pending request advances sequence before doing work; unchanged appliedSequence therefore cannot equal the next request sequence minus one. The next same-image request must use native admission; after success it republishes a current mirror and subsequent duplicates may reuse it. Existing invalidator/interleaving/later-refusal tests exercise this ordering. The cached Cur assignment has the prior successful native confirmation plus exact key/generation/scale/live/open-main guards; it deliberately needs no new native assignment. Clearing the mirror on failure would not strengthen this sequence guard.",
+  "raw_prism_sha256": "0187f4b4d1a40d79551f603c0d2756bb1e1ca48647712ed58e3190e4a567d24a",
+  "source_changed_after_review": false,
+  "unresolved_actionable_findings": 0,
+  "new_native_improvement_proven": false
+}

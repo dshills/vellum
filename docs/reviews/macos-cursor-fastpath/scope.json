@@ -1,0 +1,22 @@
+{
+  "base": "3d426825da9656501332a4e45c99185d3493ab97",
+  "implementation_files": {
+    "drivers/cogent/native/dependencies.json": "a9fa81116004cb1079f2ea531a0d42de5f2573f8db9094f94cde732d9e474089",
+    "drivers/cogent/prepare_test.py": "3bb9ce453766f7f9d68f9a6ff176daccffddddad1b5f0614240d3116f2d7ddcf",
+    "specs/macos-responsiveness.md": "dd431a6594546c9a1fe19ec5ccab6b304d3205a328101ee740422e7914fbfc5e",
+    "specs/macos-delivery.md": "cdfa3217e546d8636e140a4320a146f204aebfd931148ff7d71705af13444a60",
+    "drivers/cogent/native/patches/cursorfastpath/0101-successful-cursor-image-noop.patch": "1dd9e692a43ed1a69e4c6b04f7477df4368782b70d7bb28dfac54711c4ccb55a",
+    "drivers/cogent/native/patches/cursorfastpath/original-hashes.json": "42422e9f5c3e8ba660589c8da9dd5b77e3c9f20c6b200d7dd20c12e05b5e3b3e",
+    "drivers/cogent/native/patches/cursorfastpath/output-hashes.json": "e6298e52b22ba8bea8fafcfd77fe374924015cd860f96fcf940ca56c2a8feb5e",
+    "drivers/cogent/native/patches/cursorfastpath/README.md": "b2ea2d541c02c7fe96aa115f207387224469d701cff49c4cf3ee0d7fb9a8a9ba",
+    "docs/reports/macos-presentation-post100/evidence.json": "fb4e045cb6fe8aa673191ea3d3306562132b84245b6f727cbb56ef65a6d740c9",
+    "docs/reports/macos-presentation-post100/summary.json": "f2c0a35569836f29d9165b38cbab0587a8ba09526d77b513d2d9d0d638fc2afd",
+    "docs/reports/macos-presentation-post100/README.md": "a6d8a50cef62cb67d532cb697ed6c071baca48dc1bc3d4ad61f1cdac68eca9d0"
+  },
+  "author_result_sha256": "d9256e322d78250ab57afc98672aa2b6a076f10e50574fadf197f0c995f7a619",
+  "patch_sha256": "1dd9e692a43ed1a69e4c6b04f7477df4368782b70d7bb28dfac54711c4ccb55a",
+  "independent_review_sha256": "63db26877897d3f5b1973eaa156560f162ffbed4b0dd9c849e49b689f3e657c3",
+  "prepared_Core_files": 6022,
+  "new_native_executed": false,
+  "responsiveness_gate": "OPEN; preceding actual source100 failed"
+}

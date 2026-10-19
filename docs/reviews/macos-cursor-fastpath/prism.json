@@ -1,0 +1,85 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "62c5247cacbe3beea7c710b0e5da86af",
+  "repo": {
+    "root": "/private/tmp/vellum-macos-native-results-97aee13",
+    "head": "3d426825da9656501332a4e45c99185d3493ab97",
+    "branch": "codex/macos-native-results"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5489,
+    "totalMs": 5559
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 15,
+    "bytes": 69173,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 33529,
+        "output": 479,
+        "costUSD": 0.071848
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "0cbd6fdfae985b31",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Fast-path mirror may go stale after failed native apply",
+        "message": "The mirror is published only inside a native-main callback after apply succeeds. The preceding-sequence check is the only guard against an assignment that was admitted but has not yet run. The mirror can then be stale relative to what native main will apply. Example: request N is queued and not yet applied, and N+1 is a duplicate of the older applied key. Because cu.appliedSequence == seq-1 would fail in that case, this is mostly guarded. However, a failed or refused request N that does not advance appliedSequence leaves the fast path permanently disabled until the next successful native admission. This is a conservative performance miss, not a correctness hole. Cursor.Cur is also set on the fast path without any native confirmation.",
+        "suggestion": "Add a test showing that the fast path stays correct after a native assignment fails while a mirror from an earlier success exists. Consider clearing the mirror on apply failure.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/cursorfastpath/0101-successful-cursor-image-noop.patch",
+            "lines": {
+              "start": 197,
+              "end": 205
+            }
+          }
+        ],
+        "tags": [
+          "cursor",
+          "concurrency"
+        ],
+        "evidence": "cu.sequence == seq \u0026\u0026 cu.appliedSequence != 0 \u0026\u0026 cu.appliedSequence == seq-1 \u0026\u0026",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/cursorfastpath/0101-successful-cursor-image-noop.patch"
+    }
+  ],
+  "suppressed": []
+}

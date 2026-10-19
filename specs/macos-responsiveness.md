@@ -87,3 +87,10 @@ and [Mac completion scope](macos-completion.md).
 ## Coalescing busy paint requests
 
 A paint request received while composition owns the render context must schedule a later dirty-state rescan. Busy work alone must not force another unchanged composition. Queued input/scene/sprite/rebuild invalidations must remain visible to that scan, and resize/cache fallback must retain its separate required composition. Test unchanged retry, actual queued dirty pixels and resize fallback independently. Stage0100 implements this scheduler correction; native timing comparison is required before attributing a performance improvement. No latency/cadence threshold changes.
+
+
+## Reusing a successfully applied cursor image
+
+A repeated cursor request may omit the owned pixel copy and synchronous native-main handoff only after resolving and validating the requested enum, units, raster and current generation. Require the same live window, unchanged packed display scale and pixel size, exact preceding successful cursor-request sequence, a valid bounded standard RGBA raster, normal known enabled/nonraw mode, no explicit mode request, and an open main queue. Publish only a genuinely successful native assignment; retire its mirror with the window. Failed, superseded, size/theme/scale-changing, stopped or malformed requests must retain normal validation/ordering. Any explicit visibility/capture/raw-mode request permanently retains the existing path for that window. Native cursor-owner state remains confined to native main.
+
+Stage0101 implements this narrow optimization. Software tests verify duplicate queue/copy avoidance and invalidation, with an original-source negative control. A fresh source-bound native comparison is required before attributing a cadence or latency improvement. The source100 native record in [the checkpoint report](../docs/reports/macos-presentation-post100/README.md) remains a measured 60 Hz failure; its thresholds and populations are unchanged.

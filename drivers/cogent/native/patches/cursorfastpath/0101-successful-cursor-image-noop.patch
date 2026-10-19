@@ -1,0 +1,522 @@
+--- a/system/driver/desktop/cursor.go
++++ b/system/driver/desktop/cursor.go
+@@ -4,6 +4,7 @@
+ 
+ import (
+ 	"fmt"
++	"image"
+ 	"math"
+ 	"reflect"
+ 	"sync"
+@@ -23,12 +24,17 @@
+ 
+ type Cursor struct {
+ 	system.CursorBase
+-	mu                             sync.Mutex
+-	window                         *Window
+-	app                            *App
+-	owner                          *nativeCursorOwner // stable pointer; contents accessed only on native main
+-	closed                         bool
+-	sequence                       uint64
++	mu       sync.Mutex
++	window   *Window
++	app      *App
++	owner    *nativeCursorOwner // stable pointer; contents accessed only on native main
++	closed   bool
++	sequence uint64
++	// Detached mirror published only after a successful native assignment.
++	// These fields belong to mu; native owner state remains native-main-only.
++	appliedKey                     nativeCursorKey
++	appliedSequence, appliedScale  uint64
++	appliedPixels                  int
+ 	pointer                        *nativePointerOwner // stable; native-main contents only
+ 	modeSequence, positionSequence uint64
+ 	wantEnabled, wantRaw           bool
+@@ -166,6 +172,31 @@
+ 	if err != nil {
+ 		return err
+ 	}
++	key := nativeCursorKey{ci, generation}
++	// Get and custom unit conversion still run on every request. Only a known
++	// standard raster from the immediately preceding successful assignment can
++	// omit the owned copy and synchronous native roundtrip. Explicit mode changes
++	// conservatively retain the normal path thereafter, including pending calls.
++	// Keep the existing
++	// generation admission rule: a subsequent theme/reset may overlap an already
++	// admitted assignment. Caller-owned raw cache mutations still need external
++	// synchronization; malformed raster headers retain Copy's refusal path.
++	if reusableCursorRaster(ci, pixels) && cursorimg.IsCurrent(generation) {
++		cu.mu.Lock()
++		unchanged := !cu.closed && cu.window == w && cu.app == a &&
++			cu.sequence == seq && cu.appliedSequence != 0 && cu.appliedSequence == seq-1 &&
++			cu.appliedKey == key && cu.appliedPixels == pixels && cu.appliedScale == packed &&
++			cu.modeSequence == 0 && cu.modeKnown && cu.mode == glfw.CursorNormal && cu.wantEnabled && !cu.wantRaw &&
++			w.cursorScale.Load() == packed && !w.IsClosed() && !a.MainStopped()
++		if unchanged {
++			cu.appliedSequence = seq
++			cu.Cur = cursor
++		}
++		cu.mu.Unlock()
++		if unchanged {
++			return nil
++		}
++	}
+ 	owned, err := cursorimg.Copy(ci, pixels)
+ 	if err != nil {
+ 		return err
+@@ -183,17 +214,43 @@
+ 			err = fmt.Errorf("desktop: cursor generation changed")
+ 			return
+ 		}
+-		err = cu.owner.apply(nativeCursorKey{ci, generation}, owned)
++		err = cu.owner.apply(key, owned)
+ 		if err == nil {
+ 			cu.mu.Lock()
+ 			if !cu.closed {
+ 				cu.Cur = cursor
++				cu.appliedKey, cu.appliedSequence = key, seq
++				cu.appliedScale, cu.appliedPixels = packed, pixels
+ 			}
+ 			cu.mu.Unlock()
+ 		}
+ 	})
+ 	return err
+ }
++
++// reusableCursorRaster keeps the early no-op narrower than Copy's accepted
++// image interface. It invokes no caller callbacks and admits only a valid RGBA
++// header with enough backing storage. Other images retain the ordinary Copy path.
++func reusableCursorRaster(ci *cursorimg.Cursor, pixels int) bool {
++	if ci == nil || ci.Size != pixels || pixels < 1 || pixels > cursorimg.MaxSize {
++		return false
++	}
++	im, ok := ci.Image.(*image.RGBA)
++	if !ok || im == nil {
++		return false
++	}
++	b := im.Rect
++	limit := pixels + pixels/16
++	if b.Min != (image.Point{}) || b.Dx() < 1 || b.Dy() < 1 || b.Max.X > limit || b.Max.Y > limit || !ci.Hotspot.In(b) {
++		return false
++	}
++	row := 4 * b.Dx()
++	if im.Stride < row || len(im.Pix) < row {
++		return false
++	}
++	return b.Dy() == 1 || im.Stride <= (len(im.Pix)-row)/(b.Dy()-1)
++}
++
+ func (a *App) nativeOnMain(f func()) {
+ 	if id := a.cursorThread.Load(); id != 0 && id == nativeCursorThread() {
+ 		a.ExecuteMain(base.FuncRun{F: f})
+@@ -207,6 +264,8 @@
+ 	cu.closed = true
+ 	cu.modeKnown = false
+ 	cu.Cur = nil
++	cu.appliedKey = nativeCursorKey{}
++	cu.appliedSequence, cu.appliedScale, cu.appliedPixels = 0, 0, 0
+ 	cu.Vis = false
+ 	cu.Size = units.Value{}
+ 	cu.window = nil
+--- a/system/driver/desktop/cursor_fastpath_vellum_test.go
++++ b/system/driver/desktop/cursor_fastpath_vellum_test.go
+@@ -0,0 +1,399 @@
++// Copyright 2026 Vellum contributors. SPDX-License-Identifier: MIT.
++package desktop
++
++import (
++	"errors"
++	"image"
++	"math"
++	"runtime"
++	"sync/atomic"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/colors"
++	"cogentcore.org/core/colors/matcolor"
++	"cogentcore.org/core/cursors"
++	"cogentcore.org/core/cursors/cursorimg"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/system/composer"
++	"cogentcore.org/core/system/driver/base"
++)
++
++// Actual Cursor.Set and native queue admission, using the existing fake native
++// allocator/binder. The live composer token is software-only; no GLFW API runs.
++func fastCursorFixture(t *testing.T) (*App, *Cursor, *Cursor, chan base.FuncRun) {
++	t.Helper()
++	a, c1, c2, q := cursorHarness(t)
++	for _, cu := range []*Cursor{c1, c2} {
++		cu.window.composerPointer.Store(&composer.ComposerDrawer{})
++	}
++	return a, c1, c2, q
++}
++func fastCursorQueue(t *testing.T, a *App, q chan base.FuncRun, fn func() error) error {
++	t.Helper()
++	done := make(chan error, 1)
++	go func() { done <- fn() }()
++	select {
++	case call := <-q:
++		a.ExecuteMain(call)
++	case err := <-done:
++		t.Fatalf("request omitted required native admission: %v", err)
++	case <-time.After(2 * time.Second):
++		t.Fatal("native admission did not arrive")
++	}
++	select {
++	case err := <-done:
++		return err
++	case <-time.After(2 * time.Second):
++		t.Fatal("native request did not retire")
++	}
++	return nil
++}
++func fastCursorNoQueue(t *testing.T, a *App, q chan base.FuncRun, fn func() error) error {
++	t.Helper()
++	done := make(chan error, 1)
++	go func() { done <- fn() }()
++	select {
++	case err := <-done:
++		return err
++	case call := <-q:
++		a.ExecuteMain(call)
++		select {
++		case <-done:
++		case <-time.After(2 * time.Second):
++			t.Fatal("unexpected queued request did not retire")
++		}
++		t.Fatal("duplicate cursor entered native queue")
++	case <-time.After(2 * time.Second):
++		t.Fatal("cursor caller did not retire")
++	}
++	return nil
++}
++func TestVellumCursorFastDuplicateSkipsNativeQueue(t *testing.T) {
++	a, cu, _, q := fastCursorFixture(t)
++	if err := fastCursorQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++		t.Fatal(err)
++	}
++	for i := 0; i < 4; i++ {
++		if err := fastCursorNoQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++			t.Fatal(err)
++		}
++	}
++	if cu.Current() != cursors.Arrow {
++		t.Fatal("accepted duplicate did not preserve Current")
++	}
++}
++func TestVellumCursorFastInvalidatorsRetainNativeAdmission(t *testing.T) {
++	for _, kind := range []string{"size", "scale-same-pixels", "reset", "theme", "failed-request", "different-image"} {
++		t.Run(kind, func(t *testing.T) {
++			a, cu, _, q := fastCursorFixture(t)
++			if err := fastCursorQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++				t.Fatal(err)
++			}
++			next := cursors.Arrow
++			switch kind {
++			case "size":
++				cu.SetSize(units.Dp(32)) // even an equal request retires ordering
++			case "scale-same-pixels":
++				w := cu.window
++				w.Mu.Lock()
++				w.LogDPI = math.Nextafter32(w.LogDPI, float32(math.Inf(1)))
++				w.publishCursorScale()
++				w.Mu.Unlock()
++			case "reset":
++				cursorimg.Clear()
++			case "theme":
++				scheme, dark := colors.Scheme, matcolor.SchemeIsDark
++				t.Cleanup(func() { colors.SetScheme(dark); colors.Scheme = scheme })
++				colors.SetScheme(!dark)
++			case "failed-request":
++				if err := cu.Set(cursors.None); err == nil {
++					t.Fatal("None unexpectedly accepted")
++				}
++			case "different-image":
++				next = cursors.Text
++			}
++			if err := fastCursorQueue(t, a, q, func() error { return cu.Set(next) }); err != nil {
++				t.Fatal(err)
++			}
++			if cu.Current() != next {
++				t.Fatal("new image not published")
++			}
++		})
++	}
++}
++func TestVellumCursorFastInFlightRequestCannotBeBypassed(t *testing.T) {
++	a, cu, _, q := fastCursorFixture(t)
++	if err := fastCursorQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++		t.Fatal(err)
++	}
++	old := make(chan error, 1)
++	go func() { old <- cu.Set(cursors.Text) }()
++	var first base.FuncRun
++	select {
++	case first = <-q:
++	case <-time.After(2 * time.Second):
++		t.Fatal("older call not admitted")
++	}
++	newer := make(chan error, 1)
++	go func() { newer <- cu.Set(cursors.Arrow) }()
++	var second base.FuncRun
++	select {
++	case second = <-q:
++	case err := <-newer:
++		a.ExecuteMain(first)
++		<-old
++		t.Fatalf("in-flight request was bypassed: %v", err)
++	case <-time.After(2 * time.Second):
++		a.ExecuteMain(first)
++		<-old
++		t.Fatal("newer call did not queue")
++	}
++	a.ExecuteMain(first)
++	a.ExecuteMain(second)
++	if err := <-old; err == nil {
++		t.Fatal("older native assignment was not retired")
++	}
++	if err := <-newer; err != nil || cu.Current() != cursors.Arrow {
++		t.Fatal("newer exact image not applied", err)
++	}
++}
++func TestVellumCursorFastSuccessfulBindAfterLaterRefusalStillPublishes(t *testing.T) {
++	a, cu, _, q := fastCursorFixture(t)
++	bind := cu.owner.backend.bind
++	cu.owner.backend.bind = func(h any) {
++		bind(h)
++		if h != nil {
++			if err := cu.Set(cursors.None); err == nil {
++				t.Error("None accepted during native bind")
++			}
++		}
++	}
++	if err := fastCursorQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++		t.Fatal(err)
++	}
++	cu.owner.backend.bind = bind
++	if cu.Current() != cursors.Arrow {
++		t.Fatal("successful native assignment was suppressed")
++	}
++	// Failed sequence2 intervened during successful sequence1. Same image must
++	// still make one native admission before its mirror can be reused.
++	if err := fastCursorQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++		t.Fatal(err)
++	}
++}
++func TestVellumCursorFastClosedAndStoppedNeverSucceed(t *testing.T) {
++	for _, kind := range []string{"closed", "stopped", "exhausted"} {
++		t.Run(kind, func(t *testing.T) {
++			a, cu, _, q := fastCursorFixture(t)
++			if err := fastCursorQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++				t.Fatal(err)
++			}
++			switch kind {
++			case "closed":
++				cu.retireStatus()
++			case "stopped":
++				a.StopMain()
++			case "exhausted":
++				cu.mu.Lock()
++				cu.sequence = ^uint64(0)
++				cu.mu.Unlock()
++			}
++			err := cu.Set(cursors.Arrow)
++			if err == nil {
++				t.Fatal("terminal duplicate falsely succeeded")
++			}
++			if kind == "stopped" && !errors.Is(err, base.ErrMainStopped) {
++				t.Fatal("changed stopped refusal", err)
++			}
++		})
++	}
++}
++func TestVellumCursorFastFacadeRemainsWindowBound(t *testing.T) {
++	a, c1, c2, q := fastCursorFixture(t)
++	for _, cu := range []*Cursor{c1, c2} {
++		if err := fastCursorQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++			t.Fatal(err)
++		}
++	}
++	previous := TheApp
++	TheApp = a
++	defer func() { TheApp = previous }()
++	for _, cu := range []*Cursor{c1, c2, c1} {
++		a.Mu.Lock()
++		a.CtxWindow = cu.window
++		a.Mu.Unlock()
++		if err := fastCursorNoQueue(t, a, q, func() error { return TheCursor.Set(cursors.Arrow) }); err != nil {
++			t.Fatal(err)
++		}
++		if TheCursor.Current() != cursors.Arrow {
++			t.Fatal("facade lost current exact window")
++		}
++	}
++}
++func TestVellumCursorFastCustomUnitsStillRunAndRetire(t *testing.T) {
++	a, cu, _, q := fastCursorFixture(t)
++	calls := 0
++	value := units.Dp(32)
++	value.Custom = func(*units.Context) float32 { calls++; return 32 }
++	cu.SetSize(value)
++	if err := fastCursorQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++		t.Fatal(err)
++	}
++	if err := fastCursorNoQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++		t.Fatal(err)
++	}
++	if calls != 2 {
++		t.Fatal("custom conversion omitted", calls)
++	}
++	value.Custom = func(*units.Context) float32 { cu.SetSize(units.Dp(32)); return 32 }
++	cu.SetSize(value)
++	if err := fastCursorQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err == nil {
++		t.Fatal("reentrant size request did not retire old request")
++	}
++}
++func TestVellumCursorFastMalformedRasterRetainsCopyRefusal(t *testing.T) {
++	for _, kind := range []string{"nil-image", "size", "hotspot"} {
++		t.Run(kind, func(t *testing.T) {
++			a, cu, _, q := fastCursorFixture(t)
++			if err := fastCursorQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++				t.Fatal(err)
++			}
++			ci, err := cursorimg.Get(cursors.Arrow, 32)
++			if err != nil {
++				t.Fatal(err)
++			}
++			original := *ci
++			defer func() { *ci = original }()
++			switch kind {
++			case "nil-image":
++				ci.Image = nil
++			case "size":
++				ci.Size = 0
++			case "hotspot":
++				ci.Hotspot = image.Pt(999, 999)
++			}
++			if err := cu.Set(cursors.Arrow); err == nil {
++				t.Fatal("malformed duplicate omitted original Copy refusal")
++			}
++		})
++	}
++}
++func TestVellumCursorFastDuplicateAvoidsRasterCopyAllocation(t *testing.T) {
++	a, cu, _, q := fastCursorFixture(t)
++	cu.SetSize(units.Dp(256))
++	if err := fastCursorQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++		t.Fatal(err)
++	}
++	// A pump keeps an accidental slow implementation bounded and gives a real
++	// queue count. No native API is called by the fixture backend.
++	stop, joined := make(chan struct{}), make(chan struct{})
++	var queued atomic.Int64
++	go func() {
++		defer close(joined)
++		for {
++			select {
++			case <-stop:
++				return
++			case call := <-q:
++				queued.Add(1)
++				a.ExecuteMain(call)
++			}
++		}
++	}()
++	var before, after runtime.MemStats
++	runtime.ReadMemStats(&before)
++	var err error
++	const n = 16
++	for i := 0; i < n; i++ {
++		if err = cu.Set(cursors.Arrow); err != nil {
++			break
++		}
++	}
++	runtime.ReadMemStats(&after)
++	close(stop)
++	<-joined
++	if err != nil {
++		t.Fatal(err)
++	}
++	if queued.Load() != 0 {
++		t.Fatal("duplicate native roundtrip", queued.Load())
++	}
++	// One256px RGBA copy needs at least256KiB. Sixteen copies exceed4MiB.
++	// Leave1MiB for all metadata/runtime allocation: this catches copying while
++	// avoiding a brittle zero-allocation or compiler-specific count promise.
++	if delta := after.TotalAlloc - before.TotalAlloc; delta > 1<<20 {
++		t.Fatal("duplicate retained full raster-copy allocation", delta)
++	}
++}
++
++func TestVellumCursorFastModeRequestsRetainNativeAdmission(t *testing.T) {
++	for _, kind := range []string{"hide-show", "disabled", "raw-intent", "unknown"} {
++		t.Run(kind, func(t *testing.T) {
++			a, cu, _, q := fastCursorFixture(t)
++			if err := fastCursorQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++				t.Fatal(err)
++			}
++			switch kind {
++			case "hide-show":
++				if err := fastCursorQueue(t, a, q, func() error { cu.Hide(); return nil }); err != nil {
++					t.Fatal(err)
++				}
++				if err := fastCursorQueue(t, a, q, func() error { cu.Show(); return nil }); err != nil {
++					t.Fatal(err)
++				}
++			case "disabled":
++				if err := fastCursorQueue(t, a, q, func() error { cu.window.SetCursorEnabled(false, false); return nil }); err != nil {
++					t.Fatal(err)
++				}
++			case "raw-intent":
++				if err := fastCursorQueue(t, a, q, func() error { cu.window.SetCursorEnabled(true, true); return nil }); err != nil {
++					t.Fatal(err)
++				}
++			case "unknown":
++				cu.mu.Lock()
++				cu.modeKnown = false
++				cu.mu.Unlock()
++			}
++			cu.mu.Lock()
++			beforeMode, beforeKnown := cu.mode, cu.modeKnown
++			cu.mu.Unlock()
++			if err := fastCursorQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++				t.Fatal(err)
++			}
++			cu.mu.Lock()
++			same := cu.mode == beforeMode && cu.modeKnown == beforeKnown
++			cu.mu.Unlock()
++			if !same {
++				t.Fatal("image assignment changed pointer mode status")
++			}
++		})
++	}
++}
++
++func TestVellumCursorFastDefaultConstructorIsEligible(t *testing.T) {
++	a, previous, _, q := fastCursorFixture(t)
++	// Use the actual constructor called by App.newWindowOnMain, with no native
++	// allocation: construction only installs backend closures. Substitute those
++	// closures before exercising Set or cleanup against the software live token.
++	TheCursor.mu.Lock()
++	defaults := TheCursor.CursorBase
++	TheCursor.Size = units.Dp(32)
++	TheCursor.mu.Unlock()
++	defer func() { TheCursor.mu.Lock(); TheCursor.CursorBase = defaults; TheCursor.mu.Unlock() }()
++	w := previous.window
++	cu := newWindowCursor(w)
++	w.cursor = cu
++	cu.owner, _ = fakeCursors()
++	cu.pointer, _ = fakePointer()
++	cu.pointer.live = func() bool { return w.pointerLive() }
++	if cu.modeSequence != 0 || !cu.modeKnown || !cu.wantEnabled || cu.wantRaw {
++		t.Fatal("default constructor excludes ordinary pointer mode")
++	}
++	if err := fastCursorQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++		t.Fatal(err)
++	}
++	if err := fastCursorNoQueue(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++		t.Fatal(err)
++	}
++}

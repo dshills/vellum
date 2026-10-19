@@ -1,0 +1,373 @@
+{
+  "result": "STRUCTURAL_NATIVE_CAPTURE_PASS_60HZ_RELEASE_FAIL",
+  "structural_capture_pass": true,
+  "sixty_hz_release_pass": false,
+  "release_qualified": false,
+  "head": "3d426825da9656501332a4e45c99185d3493ab97",
+  "plan_sha256": "033be0a337e5b5f52fdbbe6fb49dcaf577fb4908d3ad7994dce9b5962979e69f",
+  "stage_interpretation": "CPU stage values are elapsed CPU-side intervals, including pauses, not thread CPU utilization, GPU execution or native presentation time. QueuedNS remains single-digit microseconds at median. InputNS remains about13\u201314ms for grid and increases for paired serial-tree from p50 2.362ms to13.614ms (p95 2.604ms to14.253ms). Paired paced-grid enqueue-return to CPU acknowledgement observation stays about33ms (p95 34.133ms to34.252ms). This supports investigating routed handler/CPU-completion/poll scheduling separately from duplicate native acquisition count; it does not identify a new cause. Native receipt-to-present remains a separate same-native-clock measurement.",
+  "retirement": {
+    "actual_commands": [
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-grid-gpu/native-command.json",
+        "pid": 62544,
+        "group": 62544,
+        "seconds": 24.884891999999994,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-grid-cpu/native-command.json",
+        "pid": 61504,
+        "group": 61504,
+        "seconds": 9.817009082999999,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-tree-gpu/native-command.json",
+        "pid": 62158,
+        "group": 62158,
+        "seconds": 9.654982500000003,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-tree-cpu/native-command.json",
+        "pid": 62909,
+        "group": 62909,
+        "seconds": 25.058776375000008,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-tree-cpu/before/display-command.json",
+        "pid": 62800,
+        "group": 62800,
+        "seconds": 0.36142475000002605,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-tree-cpu/before/power-settings-command.json",
+        "pid": 62859,
+        "group": 62859,
+        "seconds": 0.16229850000001989,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-tree-cpu/before/os-command.json",
+        "pid": 62879,
+        "group": 62879,
+        "seconds": 0.15588649999997983,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-tree-cpu/before/power-command.json",
+        "pid": 62817,
+        "group": 62817,
+        "seconds": 0.15760166699999445,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-tree-cpu/after/display-command.json",
+        "pid": 63194,
+        "group": 63194,
+        "seconds": 0.3485662919999868,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-tree-cpu/after/power-settings-command.json",
+        "pid": 63236,
+        "group": 63236,
+        "seconds": 0.15698658299999124,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-tree-cpu/after/os-command.json",
+        "pid": 63258,
+        "group": 63258,
+        "seconds": 0.15560541700000385,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-tree-cpu/after/power-command.json",
+        "pid": 63215,
+        "group": 63215,
+        "seconds": 0.16247429200001307,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-tree-gpu/before/display-command.json",
+        "pid": 61801,
+        "group": 61801,
+        "seconds": 0.34661108400000273,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-tree-gpu/before/power-settings-command.json",
+        "pid": 61848,
+        "group": 61848,
+        "seconds": 0.1605828750000029,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-tree-gpu/before/os-command.json",
+        "pid": 61942,
+        "group": 61942,
+        "seconds": 0.18627587499999976,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-tree-gpu/before/power-command.json",
+        "pid": 61824,
+        "group": 61824,
+        "seconds": 0.16062879199999713,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-tree-gpu/after/display-command.json",
+        "pid": 62276,
+        "group": 62276,
+        "seconds": 0.35661545799999317,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-tree-gpu/after/power-settings-command.json",
+        "pid": 62336,
+        "group": 62336,
+        "seconds": 0.1614912919999938,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-tree-gpu/after/os-command.json",
+        "pid": 62356,
+        "group": 62356,
+        "seconds": 0.15778025000000184,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-tree-gpu/after/power-command.json",
+        "pid": 62321,
+        "group": 62321,
+        "seconds": 0.16042283299999838,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-grid-cpu/before/display-command.json",
+        "pid": 61390,
+        "group": 61390,
+        "seconds": 0.47040787500000025,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-grid-cpu/before/power-settings-command.json",
+        "pid": 61451,
+        "group": 61451,
+        "seconds": 0.1610157499999989,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-grid-cpu/before/os-command.json",
+        "pid": 61466,
+        "group": 61466,
+        "seconds": 0.1605653750000009,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-grid-cpu/before/power-command.json",
+        "pid": 61431,
+        "group": 61431,
+        "seconds": 0.1630432500000012,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-grid-cpu/after/display-command.json",
+        "pid": 61662,
+        "group": 61662,
+        "seconds": 0.3702433340000013,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-grid-cpu/after/power-settings-command.json",
+        "pid": 61699,
+        "group": 61699,
+        "seconds": 0.16203495799999956,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-grid-cpu/after/os-command.json",
+        "pid": 61748,
+        "group": 61748,
+        "seconds": 0.16065108299999764,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/serial-grid-cpu/after/power-command.json",
+        "pid": 61685,
+        "group": 61685,
+        "seconds": 0.16077283399999942,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-grid-gpu/before/display-command.json",
+        "pid": 62433,
+        "group": 62433,
+        "seconds": 0.43590604199999916,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-grid-gpu/before/power-settings-command.json",
+        "pid": 62493,
+        "group": 62493,
+        "seconds": 0.1630775,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-grid-gpu/before/os-command.json",
+        "pid": 62514,
+        "group": 62514,
+        "seconds": 0.15945416700000692,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-grid-gpu/before/power-command.json",
+        "pid": 62456,
+        "group": 62456,
+        "seconds": 0.1674451669999968,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-grid-gpu/after/display-command.json",
+        "pid": 62682,
+        "group": 62682,
+        "seconds": 0.3423781249999962,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-grid-gpu/after/power-settings-command.json",
+        "pid": 62724,
+        "group": 62724,
+        "seconds": 0.15737508399999456,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-grid-gpu/after/os-command.json",
+        "pid": 62739,
+        "group": 62739,
+        "seconds": 0.15613262499999792,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      },
+      {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/paced-grid-gpu/after/power-command.json",
+        "pid": 62704,
+        "group": 62704,
+        "seconds": 0.15764104200000872,
+        "exit_code": 0,
+        "terminal": true,
+        "group_absent": true
+      }
+    ],
+    "command_count": 36,
+    "all_recorded_terminal_absent": true,
+    "current_signal0_existing_groups": [],
+    "lease_open_descriptors_reported": false,
+    "worker_runtime_scope_terminal_all_cases": true
+  },
+  "limits": [
+    "This independently reads and recomputes structural/timing invariants from genuine pre-existing bound artifacts; it launches no native app and reruns no validator/test.",
+    "Serial final-state intervals are descriptive and ineligible for sustained cadence qualification. Old paced-grid statistics remain explicitly descriptive from its refused FAILED_DIAGNOSTIC journal. Old paced-tree was never run.",
+    "Actual native callbacks and same-domain timestamps are observed; GPU request alone does not establish GPU route, and scope closure/process retirement does not prove complete Cocoa/Metal deallocation.",
+    "Four cases and one comparison do not meet the five-run80-case full framework release matrix. Physical input latency, first paint, other workloads and final Mac milestones remain outside this limited evidence."
+  ],
+  "full_review": {
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-source100/native-result-review.json",
+    "sha256": "43bd930b320a38e39de49a422ca1c5e8dc748c5dabcde8018e758bf9ccbf29fd"
+  },
+  "raw_records": {
+    "result.json": "09ef420b3ed89c917eb0ce470e6bf56e7cca955a4df5169f0b3d1dac8c40c6c8",
+    "binding.json": "3518a7153ab9e285d665a90bf18dc51ee528b8f08cb9c6de5dd08e242578e4d4",
+    "native-admission.json": "9693982bc0de529295981c145e4f88478cfc7d7f94b74be60f8751c91fb6e577",
+    "serial-grid-cpu/result.json": "8cf9ae936736e1b3c17f4ada096057f30135b418d7390198a584015d9c230f69",
+    "serial-grid-cpu/native-command.json": "87dd91b1625d8aaf4b34a764d4a07b349249a74b0a567e324771303312c63437",
+    "serial-grid-cpu/presentation.json": "85b42dfb9a5faeb0e3b8f41917c3530123551ce91e965d6a5adf5def02b15922",
+    "serial-grid-cpu/sealed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "serial-tree-gpu/result.json": "c4481e0b8094ae56eb4d687c136eafc56ddcd7f20521f6dc774640ede5e1d90d",
+    "serial-tree-gpu/native-command.json": "81b91bff37dfab809e4eeb37a2e1aca60db15023bc82cb541cefc086320f0a86",
+    "serial-tree-gpu/presentation.json": "e218ff95acb131a7723361d2c3624f9864105a3f8062fc64b365d4c8d7b7d3d0",
+    "serial-tree-gpu/sealed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "paced-grid-gpu/result.json": "2d931fd039e46bbfd252226b95167c4b2f9d166810a2f9ead7939a48c4b048a5",
+    "paced-grid-gpu/native-command.json": "13cedc043efef1ffb3a8e988398fcf3400f138d3f5ab22f498d2d3e607b9071b",
+    "paced-grid-gpu/presentation.json": "100cc5d7333ebe70c8505598f65b263f2a685f12803bb2d76c68a6ab83c49c5f",
+    "paced-grid-gpu/sealed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "paced-tree-cpu/result.json": "0ba170551e968f433aa130145c864600300f7e03bc26dc7b09b7c73fdd45825d",
+    "paced-tree-cpu/native-command.json": "35647d252d4c1b62d14f50250be52cc14b89773e25a9b191071951f827def315",
+    "paced-tree-cpu/presentation.json": "6c7b8c89bfb0dca9406745ba6c64b226ded5b47494d97a5f975f255f91d1f33c",
+    "paced-tree-cpu/sealed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

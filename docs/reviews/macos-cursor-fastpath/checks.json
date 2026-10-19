@@ -1,0 +1,137 @@
+{
+  "race": {
+    "exit_code": 1,
+    "seconds": 52.588733791,
+    "owned": {
+      "created": true,
+      "pid": 69541,
+      "group": 69541,
+      "terminal": true,
+      "group_absent": true,
+      "exit_code": 1,
+      "errors": [],
+      "observation": {
+        "group": 69541,
+        "members": [],
+        "observation_sha256": "a8ab2b061ff23ea500a9b632f61759ed5a3ee1d4a979781b6d93cba6f0eb2f16"
+      }
+    },
+    "pins_stable": true,
+    "logs": {
+      "stdout": {
+        "bytes": 82025,
+        "sha256": "6a2959131d86bcad9de706ac7960163297b9a1c3a60494b2f5f30af1a1b813e9"
+      },
+      "stderr": {
+        "bytes": 101,
+        "sha256": "df41a2ec9495979b980cf425e30e787398e668b66d9ed0a4a0753159680454ef"
+      }
+    },
+    "native_executed": false,
+    "full_receipt_sha256": "e78b4c5b0a7724edeb126ba2874f13764016c680cac56306d5f41f78f04d80fe"
+  },
+  "vet": {
+    "exit_code": 0,
+    "seconds": 7.0881669160000005,
+    "owned": {
+      "created": true,
+      "pid": 69514,
+      "group": 69514,
+      "terminal": true,
+      "group_absent": true,
+      "exit_code": 0,
+      "errors": [],
+      "observation": {
+        "group": 69514,
+        "members": [],
+        "observation_sha256": "8439772e1fdaefc1415673fd9a3be07175fcdac4c8304ec9f711768e66cbad73"
+      }
+    },
+    "pins_stable": true,
+    "logs": {
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "native_executed": false,
+    "full_receipt_sha256": "27656d975eddd132c826416e80627d4861375981228ba52d7f7c251dda437678"
+  },
+  "prepare-tests": {
+    "exit_code": 0,
+    "seconds": 2.304567166,
+    "owned": {
+      "created": true,
+      "pid": 69550,
+      "group": 69550,
+      "terminal": true,
+      "group_absent": true,
+      "exit_code": 0,
+      "errors": [],
+      "observation": {
+        "group": 69550,
+        "members": [],
+        "observation_sha256": "6efb887864ce7158a78bc67904015393d9b47a0b35bb7380b29fb3644fc107e2"
+      }
+    },
+    "pins_stable": true,
+    "logs": {
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 128,
+        "sha256": "3986dce301f6c7b6872e2c9ca312058c022f53b6c2d348c518f68cc4897baac8"
+      }
+    },
+    "native_executed": false,
+    "full_receipt_sha256": "3fa7cf1a4585f50ae039bafbb47518f1eff726f80d9aed6fa11dc02bff4acfc5"
+  },
+  "cursor-contracts": {
+    "exit_code": 0,
+    "seconds": 43.052058583000004,
+    "owned": {
+      "created": true,
+      "pid": 70168,
+      "group": 70168,
+      "terminal": true,
+      "group_absent": true,
+      "exit_code": 0,
+      "errors": [],
+      "observation": {
+        "group": 70168,
+        "members": [],
+        "observation_sha256": "4d870d733bc420f3357a39b80805354bc6d9bcb96499156d91b1c94d405df302"
+      }
+    },
+    "pins_stable": true,
+    "logs": {
+      "stdout": {
+        "bytes": 52857,
+        "sha256": "5d8ae8bba9dc2a24746a4129e8a6f90fec54ea1ba0a900d7f72955fd211e8c60"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "native_executed": false,
+    "full_receipt_sha256": "bc620b231a2725b82cc859b4b84de3afd2524d3fdd90e3d1828bfbb778274a82"
+  },
+  "legacy_reference_fixture_disposition": {
+    "expanded_command_exit": 1,
+    "failed_methods": [
+      "TestCursors",
+      "TestHotspot"
+    ],
+    "cause": "Pinned upstream cursorimg/testdata reference files are absent; legacy snapshot generators attempt source writes and correctly fail under the source-denying test sandbox. No references were generated or updated. Full desktop and base packages pass in that command; five cursor contract methods pass again in a separate race command.",
+    "separate_contract_methods": 5,
+    "root_race_passed_top_level_methods": 101,
+    "source_protection_kept": true
+  }
+}

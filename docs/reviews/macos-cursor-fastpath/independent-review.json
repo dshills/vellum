@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "result": "PASS_INDEPENDENT_READONLY_CORE101_CURSOR_FASTPATH_REVIEW",
+  "approved": true,
+  "scope": "Actual frozen two-file Core101 candidate, exact stage101 recipe and retained fake-backend test/vet/negative evidence. No application/native performance qualification.",
+  "base_head": "3d426825da9656501332a4e45c99185d3493ab97",
+  "candidate_source_hashes": {
+    "system/driver/desktop/cursor.go": "18cfb9b3742945adef39aa410216cbacd97ea1fa99530d1b0a68ded770c13774",
+    "system/driver/desktop/cursor_fastpath_vellum_test.go": "43313605f20fbbf41a57aeab24c318f54faea1accd4afe5a4d1b638c8e125292"
+  },
+  "patch_sha256": "1dd9e692a43ed1a69e4c6b04f7477df4368782b70d7bb28dfac54711c4ccb55a",
+  "reviewed_files": {
+    "candidate-core/system/driver/desktop/cursor.go": "18cfb9b3742945adef39aa410216cbacd97ea1fa99530d1b0a68ded770c13774",
+    "candidate-core/system/driver/desktop/cursor_fastpath_vellum_test.go": "43313605f20fbbf41a57aeab24c318f54faea1accd4afe5a4d1b638c8e125292",
+    "recipe/native/patches/cursorfastpath/0101-successful-cursor-image-noop.patch": "1dd9e692a43ed1a69e4c6b04f7477df4368782b70d7bb28dfac54711c4ccb55a",
+    "recipe/native/patches/cursorfastpath/original-hashes.json": "42422e9f5c3e8ba660589c8da9dd5b77e3c9f20c6b200d7dd20c12e05b5e3b3e",
+    "recipe/native/patches/cursorfastpath/output-hashes.json": "e6298e52b22ba8bea8fafcfd77fe374924015cd860f96fcf940ca56c2a8feb5e",
+    "recipe/stage-0101.json": "30d8b074d86e4b5591046e83de4d3d9e6f5e2a2970955915e0b61f5d17a3aed7",
+    "recipe/dependencies-delta.json": "66fc87166cc68d199f8adc9e281adeccf4c9cbdb3702cb85613a5a0fdbc97ef1",
+    "baseline.json": "9c44d36593ad60cec4362aff731415f1025626e780ad6641153bb9f5b0b52979",
+    "baseline-vector.json": "ae82f3944ff3df44ed7379c038be57df9b5d3a51511af97764f47d7be10f91d9",
+    "candidate-vector.json": "c3f45cbe1059a75f02a4a31ab9f2a59c88591b8dc8b37ab81d45bb21a454203f",
+    "preparation-result.json": "d0a8d2578f28fdd5f1420f8591149bd11ba4be93a97831062fcf1f45eb6058a7",
+    "checks/result-v2.json": "f9783cbb1f7ec09603a8d4dfc6693500e82189059bc74f051f235c3107371f0d",
+    "checks/result-negative.json": "5f629dcac690e3d3eb532833cba8a757eeb7280310b70765058701794a6151f8"
+  },
+  "unchanged_safety_support": {
+    "system/driver/desktop/cursor_owner.go": "12f1a2e7ed27d527ca8ddba6c679f89d3018d94412f2f9f394640254b793aae5",
+    "system/driver/desktop/pointer_vellum.go": "57ada8a65ecc5eafe1eb4091afe4e0583012080554d9f5e0e86c244440d1a2cf",
+    "system/driver/base/app.go": "f7c39f21a905e044e12a5e24f8bb708b26b04d1aaae4f08dfef26c8f7ff914dd",
+    "system/driver/base/helpers.go": "98e64f472e915ffed8878ffbe13d5be52ebce4b82664fa04dd0f76a43c3c559d",
+    "cursors/cursorimg/cursorimg.go": "f699f85e64b0fac607b7066892649e6abd57ec0f023d48610159b37aa65904e1"
+  },
+  "checks": [
+    {
+      "name": "focused-v2",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "seconds": 10.648268166,
+      "terminal": true,
+      "owned_group_absent": true,
+      "raw_logs_verified": true
+    },
+    {
+      "name": "cursor-regressions-v2",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "seconds": 3.306126625000001,
+      "terminal": true,
+      "owned_group_absent": true,
+      "raw_logs_verified": true
+    },
+    {
+      "name": "vet-v2",
+      "exit_code": 0,
+      "expected_exit": 0,
+      "seconds": 6.371819334000001,
+      "terminal": true,
+      "owned_group_absent": true,
+      "raw_logs_verified": true
+    },
+    {
+      "name": "original-code-negative",
+      "exit_code": 1,
+      "expected_exit": 1,
+      "seconds": 5.729605583,
+      "terminal": true,
+      "owned_group_absent": true,
+      "raw_logs_verified": true
+    }
+  ],
+  "new_test_methods": [
+    "TestVellumCursorFastDuplicateSkipsNativeQueue",
+    "TestVellumCursorFastInvalidatorsRetainNativeAdmission",
+    "TestVellumCursorFastInFlightRequestCannotBeBypassed",
+    "TestVellumCursorFastSuccessfulBindAfterLaterRefusalStillPublishes",
+    "TestVellumCursorFastClosedAndStoppedNeverSucceed",
+    "TestVellumCursorFastFacadeRemainsWindowBound",
+    "TestVellumCursorFastCustomUnitsStillRunAndRetire",
+    "TestVellumCursorFastMalformedRasterRetainsCopyRefusal",
+    "TestVellumCursorFastDuplicateAvoidsRasterCopyAllocation",
+    "TestVellumCursorFastModeRequestsRetainNativeAdmission",
+    "TestVellumCursorFastDefaultConstructorIsEligible"
+  ],
+  "findings": [],
+  "unresolved_findings": [],
+  "reasoning": [
+    "Initial request increment, invalid size/enum failure and sequence exhaustion retain their ordering. Early success requires the exact preceding successfully applied sequence plus exact managed raster/generation, current generation, fresh resolved pixels and packed scale. Intervening queued, failed or SetSize requests force ordinary native admission.",
+    "Fast-path mirror is under cu.mu, independent of native-only owner active/entries. Same exact window/app, atomic live composer and MainStopped guard prevent retired/stopped success; no w.Mu is acquired. MainStopped uses its own lock without callbacks or cursor-lock acquisition, so the checked lock order has no new cycle. Explicit modeSequence0/known normal/enabled/nonraw guard retains conservative fallback after mode requests.",
+    "Custom unit conversion, Get/generation work and fallback Copy remain outside cu.mu. The shortcut accepts only callback-free valid RGBA headers with zero origin, bounded dimensions/hotspot and sufficient stride/backing storage; arithmetic is bounded before multiplication/division. Invalid/custom image paths retain ordinary Copy behavior.",
+    "Only owner.apply nil publishes the mirror, carrying that actual successful seq. Publishing an older success after a newer refusal preserves actual Current behavior while the strict preceding-seq check prevents treating it as the latest admitted request. Retirement clears every mirror reference. Failure/panic/stopped paths cannot manufacture a successful mirror.",
+    "Eleven actual Cursor.Set fixture methods cover queue elision, invalidators, ordering, later refusal, stopped/closed/exhausted state, exact facade window, custom conversion, malformed raster, allocation effect, mode fallback and constructor eligibility. Baseline overlay specifically fails duplicate-queue expectation, establishing a meaningful old-source negative. Retained race regressions and vet pass; no reviewer rerun.",
+    "Prepared stage101 input hashes match current100 C cursor source and absent new test; isolated reproduction vector changes only cursor.go and adds the new test. Original native owner/pointer/generation/queue support remains byte-identical. Root still owns full integration/preparation and checkpoint review."
+  ],
+  "source_edits_by_reviewer": false,
+  "tests_rerun": false,
+  "provider_calls": 0,
+  "Git_or_native_operations": false,
+  "native_performance_verified": false,
+  "performance_gate_passed": false,
+  "limitations": [
+    "Race/vet/negative evidence is software fake-backend evidence from native-linked test binaries, not physical cursor or actual native workload evidence.",
+    "Permanent fallback after any explicit mode request is a conservative scope limit; broader mode reuse is not claimed.",
+    "Fresh actual post101 native comparison is required; the source100 approximately65ms p95/60Hz failure remains open."
+  ]
+}
