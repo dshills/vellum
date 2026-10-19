@@ -102,3 +102,8 @@ N-1 final-state intervals and reports collapsed states and overruns explicitly.
 See the [paced contract](../../specs/paced-presentation.md) for exact bounds,
 commands and qualification limits. These tools have not yet qualified live 60 Hz
 performance, physical input or the remaining Mac release workloads.
+
+Performance fixtures initialize Core settings before disabling window geometry
+persistence, and restore the loaded process-local policy after teardown. Saved
+settings are read, never saved by this guard. Settings errors or invalid zoom
+refuse the fixture before native setup. The ordinary interactive demo is unchanged.

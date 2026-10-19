@@ -16,7 +16,6 @@ import (
 	"sync"
 	"time"
 
-	"cogentcore.org/core/core"
 	"cogentcore.org/core/text/fonts"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/drivers/cogent"
@@ -345,7 +344,11 @@ func runTreePerf(c treePerfConfig) (terminal error) {
 	if err := c.validate(); err != nil {
 		return err
 	}
-	core.DebugSettings.DisableWindowGeometrySaver = true
+	restoreGeometry, err := isolatePerfGeometry()
+	if err != nil {
+		return err
+	}
+	defer restoreGeometry()
 	build, ok := debug.ReadBuildInfo()
 	if !ok {
 		return errors.New("loadedtree perf: release build metadata unavailable")

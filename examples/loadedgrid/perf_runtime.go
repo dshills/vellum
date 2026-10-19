@@ -354,9 +354,14 @@ func newPerfFrameMetrics(c perfConfig) (*cogent.FrameMetrics, error) {
 func runPerf(c perfConfig) (terminal error) {
 	// Disposable measurements must neither restore nor persist application
 	// window geometry. Restore this process-local switch after native teardown.
-	previousGeometrySaver := core.DebugSettings.DisableWindowGeometrySaver
-	core.DebugSettings.DisableWindowGeometrySaver = true
-	defer func() { core.DebugSettings.DisableWindowGeometrySaver = previousGeometrySaver }()
+	if err := c.validate(); err != nil {
+		return err
+	}
+	restoreGeometry, err := isolatePerfGeometry()
+	if err != nil {
+		return err
+	}
+	defer restoreGeometry()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 	p, metadata, err := newPerfProgram(ctx, c)

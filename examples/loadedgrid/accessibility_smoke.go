@@ -187,9 +187,11 @@ func (p *perfProgram) checkGridAccessibility(ctx context.Context, metrics *cogen
 
 func runGridAccessibilitySmoke(rows int, variable bool) error {
 	// Keep this separate acceptance path as isolated as ordinary perf mode.
-	previousGeometrySaver := core.DebugSettings.DisableWindowGeometrySaver
-	core.DebugSettings.DisableWindowGeometrySaver = true
-	defer func() { core.DebugSettings.DisableWindowGeometrySaver = previousGeometrySaver }()
+	restoreGeometry, err := isolatePerfGeometry()
+	if err != nil {
+		return err
+	}
+	defer restoreGeometry()
 	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
 	p, _, err := newPerfProgram(ctx, perfConfig{Rows: rows, Variable: variable, Samples: 120, Warmup: 128})

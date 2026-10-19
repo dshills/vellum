@@ -97,3 +97,14 @@ The [fixed-deadline workload](paced-presentation.md) uses `-perf-60hz`, at least
 changing states and a version 2 journal. This file's serial version 1 format and
 noncadence interpretation remain valid. Both share the fixed acquisition prefix,
 loss/refusal policy and worker/runtime retirement boundary.
+
+## Settings initialization and geometry isolation
+
+Stored grid/tree performance consumers load Core settings, when not already
+initialized, before applying the process-local geometry persistence override.
+This prevents the first Body's lazy settings load from restoring a saved policy
+after the override. Load failure or nonfinite/nonpositive zoom refuses native
+setup; successful teardown restores the loaded policy. The grid accessibility
+fixture shares this guard. The guard reads settings without saving them and
+does not change OS preferences. It does not independently prove native geometry
+or replace the capture's external execution and display evidence.
