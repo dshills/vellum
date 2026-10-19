@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "scope": "source and headless cursor ownership; no native qualification",
+  "baseline": "09edc1a6604d3f6ed308a6bf3ef506cc8b681bf5",
+  "prepared_modules": {
+    "upstream": 6002,
+    "typesetting": 297
+  },
+  "new_test_methods": [
+    "TestVellumCursorBoundsAndLRU",
+    "TestVellumCursorGenerationsAndLegacyOwnedCopy",
+    "TestVellumCursorThemeConcurrencyAndCallbacks",
+    "TestVellumCursorNativeBoundsPinningAndFailure",
+    "TestVellumCursorNativeGenerationAndPendingPanic",
+    "TestVellumCursorExactWindowAndWorkerDispatch",
+    "TestVellumCursorOrderingCancellationAndScale",
+    "TestVellumCursorCloseQueueStopAndTerminalRegistry",
+    "TestVellumCursorDirectMainFailureStopsAdmission",
+    "TestVellumCursorConcurrentStatus",
+    "TestVellumCursorPinnedGLFWNullWrapperAndShape",
+    "TestVellumCursorWorkerWaitsForQueuePublication",
+    "TestVellumCursorDirectMainDoesNotTakeWindowLock",
+    "TestVellumCursorSuccessfulBindPublishesDespiteLaterRefusal",
+    "TestVellumWindowWorkerCreationWaitsForNativeQueue",
+    "TestVellumWindowDirectMainCreationUsesFailureBarrier"
+  ],
+  "total_top_level_methods_in_selected_race_run": 55,
+  "raster_matrix_cases": 390,
+  "headless_controller": {
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-cursor-ownership/headless-v6-controller-result.json",
+    "sha256": "1e4d1db78c490e9977217ca9bf8dc592c74c7df965cfbfff856cfebb058c6939"
+  },
+  "stage_patch_sha256": "66e493c922bbb3f2ac816e692d6a9c7b98a45ba80064097c49585996990f0715",
+  "result": "PASS_HEADLESS_COMMANDS",
+  "native_executed": false,
+  "mac_complete": false
+}

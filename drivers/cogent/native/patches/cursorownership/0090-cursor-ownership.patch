@@ -1,0 +1,1743 @@
+--- a/colors/matcolor.go
++++ b/colors/matcolor.go
+@@ -6,6 +6,7 @@
+ 
+ import (
+ 	"image/color"
++	"sync"
+ 
+ 	"cogentcore.org/core/colors/matcolor"
+ )
+@@ -45,16 +46,35 @@
+ // given [matcolor.Key]. It should be used instead of [SetSchemes]
+ // if you want more specific control over the color scheme.
+ func SetSchemesFromKey(key *matcolor.Key) {
++	themeMu.Lock()
++	defer themeMu.Unlock()
+ 	Palette = matcolor.NewPalette(key)
+ 	Schemes = matcolor.NewSchemes(Palette)
+-	SetScheme(matcolor.SchemeIsDark)
++	setScheme(matcolor.SchemeIsDark)
+ }
++
++// ThemeID identifies a theme transaction without a wrapping integer counter.
++type ThemeID struct{ token *byte }
++
++var themeMu sync.RWMutex
++var themeID = ThemeID{new(byte)}
++
++// ReadTheme holds a read lease over the global theme until the returned release
++// function is called exactly once. Never call a theme setter or a user callback
++// within the lease. Raw global theme writes require caller synchronization.
++func ReadTheme() (ThemeID, func()) { themeMu.RLock(); return themeID, themeMu.RUnlock }
+ 
+ // SetScheme sets the value of [Scheme] to either [Schemes.Dark]
+ // or [Schemes.Light], based on the given value of whether the
+ // color scheme should be dark. It also sets the value of
+ // [matcolor.SchemeIsDark].
+ func SetScheme(isDark bool) {
++	themeMu.Lock()
++	defer themeMu.Unlock()
++	setScheme(isDark)
++}
++func setScheme(isDark bool) {
++	themeID = ThemeID{new(byte)}
+ 	matcolor.SchemeIsDark = isDark
+ 	if isDark {
+ 		Scheme = &Schemes.Dark
+--- a/core/settings.go
++++ b/core/settings.go
+@@ -216,7 +216,7 @@
+ func UpdateAll() { //types:add
+ 	// Some caches are invalid now:
+ 	clear(gradient.Cache)
+-	clear(cursorimg.Cursors)
++	cursorimg.Clear()
+ 
+ 	for _, w := range AllRenderWindows.snapshot() {
+ 		rc := w.mains.renderContext
+--- a/cursors/cursorimg/cursorimg.go
++++ b/cursors/cursorimg/cursorimg.go
+@@ -1,91 +1,289 @@
+ // Copyright (c) 2023, Cogent Core. All rights reserved.
+-// Use of this source code is governed by a BSD-style
+-// license that can be found in the LICENSE file.
+-
+-// Package cursorimg provides the cached rendering of SVG cursors to images.
++// Use of this source code is governed by a BSD-style license in LICENSE.
++
++// Package cursorimg provides bounded rendering of SVG cursors to images.
+ package cursorimg
+ 
+ import (
+ 	"bytes"
++	"container/list"
+ 	"fmt"
+ 	"image"
++	"image/color"
+ 	"image/draw"
+-	_ "image/png"
++	"reflect"
++	"sync"
+ 
+ 	"cogentcore.org/core/colors"
+ 	"cogentcore.org/core/colors/gradient"
++	"cogentcore.org/core/colors/matcolor"
+ 	"cogentcore.org/core/cursors"
+ 	"cogentcore.org/core/enums"
+ 	"cogentcore.org/core/math32"
+ 	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/renderers/rasterx"
+ 	"cogentcore.org/core/svg"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
+ )
+ 
+-// Cursor represents a cached rendered cursor, with the [image.Image]
+-// of the cursor and its hotspot.
++// Cursor is a cached raster. Treat its image and metadata as read-only while in
++// use; retained caller references are outside the framework cache budget.
+ type Cursor struct {
+-	// The cached image of the cursor.
+-	Image image.Image
+-	// The size of the cursor.
+-	Size int
+-	// The hotspot is expressed in terms of raw cursor pixels.
++	Image   image.Image
++	Size    int
+ 	Hotspot image.Point
+ }
+ 
+-// Cursors contains all of the cached rendered cursors, specified first
+-// by cursor enum and then by size.
++const (
++	MaxSize    = 256
++	MaxEntries = 64
++	MaxBytes   = 8 << 20
++)
++
++// Cursors is the legacy enum/size map. Direct reads/writes need caller-side
++// exclusion from Get/Clear. Newly injected rasters are validated and copied to
++// bounded owned pixels on first Get; pointer identity then holds until eviction.
++// Arbitrary direct writes and images retained by applications are not budgeted.
+ var Cursors = map[enums.Enum]map[int]*Cursor{}
+ 
+-// Get returns the cursor object corresponding to the given cursor enum,
+-// with the given size. If it is not already cached in [Cursors], it renders and caches it.
+-//
+-// It automatically replaces literal colors in svg with appropriate scheme colors as follows:
+-//   - #fff: [colors.Palette].Neutral.ToneUniform(100)
+-//   - #000: [colors.Palette].Neutral.ToneUniform(0)
+-//   - #f00: [colors.Scheme].Error.Base
+-//   - #0f0: [colors.Scheme].Success.Base
+-//   - #ff0: [colors.Scheme].Warn.Base
+-func Get(cursor enums.Enum, size int) (*Cursor, error) {
+-	sm := Cursors[cursor]
+-	if sm == nil {
+-		sm = map[int]*Cursor{}
+-		Cursors[cursor] = sm
+-	}
+-	if c, ok := sm[size]; ok {
+-		return c, nil
+-	}
+-
+-	name := cursor.String()
+-	hot, ok := cursors.Hotspots[cursor]
++type Generation struct {
++	theme colors.ThemeID
++	reset *byte
++}
++type key struct {
++	cursor enums.Enum
++	size   int
++}
++type entry struct {
++	key    key
++	cursor *Cursor
++	bytes  int
++}
++
++var cache = struct {
++	sync.Mutex
++	entries    map[key]*list.Element
++	lru        list.List
++	bytes      int
++	generation Generation
++}{entries: make(map[key]*list.Element), generation: Generation{reset: new(byte)}}
++
++func clearLocked() {
++	clear(Cursors)
++	clear(cache.entries)
++	cache.lru.Init()
++	cache.bytes = 0
++	cache.generation.reset = new(byte)
++}
++func syncLocked(theme colors.ThemeID) {
++	if cache.generation.theme == (colors.ThemeID{}) {
++		cache.generation.theme = theme
++	}
++	if cache.generation.theme != theme || (len(Cursors) == 0 && len(cache.entries) > 0) {
++		clearLocked()
++		cache.generation.theme = theme
++	}
++}
++
++// Clear invalidates managed rasters and generations. Native owners retire their
++// stale inactive handles on the next Set, and their active handle on replacement
++// or close. This function does not call a native backend.
++func Clear() { cache.Lock(); defer cache.Unlock(); clearLocked() }
++
++// IsCurrent is the validation point for a native assignment. A subsequent Clear
++// or theme update may overlap that already admitted assignment.
++func IsCurrent(g Generation) bool {
++	theme, release := colors.ReadTheme()
++	defer release()
++	cache.Lock()
++	defer cache.Unlock()
++	syncLocked(theme)
++	return cache.generation == g
++}
++func removeLocked(e *list.Element) {
++	v := e.Value.(entry)
++	delete(cache.entries, v.key)
++	cache.lru.Remove(e)
++	cache.bytes -= v.bytes
++	if sm := Cursors[v.key.cursor]; sm != nil && sm[v.key.size] == v.cursor {
++		delete(sm, v.key.size)
++		if len(sm) == 0 {
++			delete(Cursors, v.key.cursor)
++		}
++	}
++}
++func lookupLocked(k key) (*Cursor, *Cursor) {
++	c := Cursors[k.cursor][k.size]
++	if e := cache.entries[k]; e != nil {
++		if c == e.Value.(entry).cursor {
++			cache.lru.MoveToFront(e)
++			return c, nil
++		}
++		removeLocked(e)
++	}
++	return nil, c
++}
++
++// Copy validates a raster before copying arbitrary caller pixels. No framework
++// locks are held while invoking Image.Bounds/At. The result owns exactly its
++// bounded RGBA storage, including when the input is a tiny view of a huge image.
++func Copy(c *Cursor, size int) (*Cursor, error) {
++	if c == nil || c.Image == nil || size < 1 || size > MaxSize || c.Size != size {
++		return nil, fmt.Errorf("cursorimg: invalid raster")
++	}
++	b := c.Image.Bounds()
++	limit := size + size/16
++	if b.Min != (image.Point{}) || b.Dx() < 1 || b.Dy() < 1 || b.Max.X > limit || b.Max.Y > limit || !c.Hotspot.In(b) {
++		return nil, fmt.Errorf("cursorimg: invalid raster geometry")
++	}
++	dst := image.NewRGBA(b)
++	// Avoid draw's implementation-specific fast paths: custom images may carry
++	// arbitrary backing storage or callbacks, neither is retained by this copy.
++	for y := 0; y < b.Max.Y; y++ {
++		for x := 0; x < b.Max.X; x++ {
++			dst.Set(x, y, c.Image.At(x, y))
++		}
++	}
++	return &Cursor{dst, size, c.Hotspot}, nil
++}
++func validEnum(c enums.Enum) bool {
++	if c == nil {
++		return false
++	}
++	v := reflect.ValueOf(c)
++	return v.Comparable() && !(v.Kind() == reflect.Pointer && v.IsNil())
++}
++
++// Get returns a raster using the same validation and generation path as native
++// adapters. Sizes outside 1..256 and invalid enum identities are refused before
++// allocation. Successful entries share identity while retained in the LRU.
++func Get(c enums.Enum, size int) (*Cursor, error) {
++	r, _, err := GetWithGeneration(c, size)
++	return r, err
++}
++
++func GetWithGeneration(c enums.Enum, size int) (*Cursor, Generation, error) {
++	if size < 1 || size > MaxSize || !validEnum(c) {
++		return nil, Generation{}, fmt.Errorf("cursorimg: invalid cursor or size")
++	}
++	k := key{c, size}
++	for attempt := 0; attempt < 3; attempt++ {
++		theme, release := colors.ReadTheme()
++		cache.Lock()
++		syncLocked(theme)
++		g := cache.generation
++		found, custom := lookupLocked(k)
++		cache.Unlock()
++		release()
++		if found != nil {
++			return found, g, nil
++		}
++		var r *Cursor
++		var err error
++		if custom != nil {
++			r, err = Copy(custom, size)
++		} else {
++			r, err = render(c, size, theme)
++		}
++		if err != nil {
++			return nil, Generation{}, err
++		}
++		theme, release = colors.ReadTheme()
++		cache.Lock()
++		syncLocked(theme)
++		if cache.generation != g {
++			cache.Unlock()
++			release()
++			continue
++		}
++		found, currentCustom := lookupLocked(k)
++		if found != nil {
++			cache.Unlock()
++			release()
++			return found, g, nil
++		}
++		if currentCustom != custom {
++			cache.Unlock()
++			release()
++			continue
++		}
++		n := len(r.Image.(*image.RGBA).Pix)
++		for cache.lru.Len() >= MaxEntries || cache.bytes+n > MaxBytes {
++			removeLocked(cache.lru.Back())
++		}
++		if Cursors == nil {
++			Cursors = make(map[enums.Enum]map[int]*Cursor)
++		}
++		if Cursors[c] == nil {
++			Cursors[c] = make(map[int]*Cursor)
++		}
++		Cursors[c][size] = r
++		cache.entries[k] = cache.lru.PushFront(entry{k, r, n})
++		cache.bytes += n
++		cache.Unlock()
++		release()
++		return r, g, nil
++	}
++	return nil, Generation{}, fmt.Errorf("cursorimg: cursor or theme changed during rendering")
++}
++
++// Built-in cursor SVGs contain only geometry. An empty, known Go shaper avoids
++// SVG's replaceable global shaper factory and system-font scanning entirely.
++var cursorShapeShaper = shapedgt.NewShaperWithFonts(nil)
++
++func render(c enums.Enum, size int, want colors.ThemeID) (*Cursor, error) {
++	// String and arbitrary color-image callbacks must execute outside every lock.
++	name := c.String()
++	theme, release := colors.ReadTheme()
++	if theme != want {
++		release()
++		return nil, fmt.Errorf("cursorimg: theme changed")
++	}
++	neutralKey, dark := colors.Palette.Neutral.Key, matcolor.SchemeIsDark
++	palette := [3]image.Image{colors.Scheme.Error.Base, colors.Scheme.Success.Base, colors.Scheme.Warn.Base}
++	shadowSource := colors.Scheme.Shadow
++	release()
++	var fixed [5]color.RGBA
++	tones := matcolor.NewTones(neutralKey)
++	white, black := 100, 0
++	if dark {
++		white, black = black, white
++	}
++	fixed[0], fixed[1] = tones.AbsTone(white), tones.AbsTone(black)
++	for i, v := range palette {
++		fixed[i+2] = colors.ToUniform(v)
++	}
++	shadowColor := colors.ToUniform(shadowSource)
++	b, err := cursors.SVGWithColors(name, fixed)
++	if err != nil {
++		return nil, err
++	}
++	theme, release = colors.ReadTheme()
++	defer release()
++	if theme != want {
++		return nil, fmt.Errorf("cursorimg: theme changed")
++	}
++	// SVG construction also reads text defaults from the global theme. Keep that
++	// complete read interval protected, and use a known CPU renderer rather than
++	// invoking the application's replaceable image-renderer callback in the lease.
++	sv := svg.NewSVG(math32.Vec2(float32(size), float32(size)))
++	sv.TextShaper = cursorShapeShaper
++	if err = sv.ReadXML(bytes.NewReader(b)); err != nil {
++		return nil, fmt.Errorf("cursorimg: %s: %w", name, err)
++	}
++	rs := rasterx.New(math32.Vec2(float32(size), float32(size))).(*rasterx.Renderer)
++	defer rs.Release()
++	rs.Render(sv.Render(nil).RenderDone())
++	img := rs.Image()
++	blur := size / 16
++	bounds := image.Rect(0, 0, size+blur, size+blur)
++	shadow := image.NewRGBA(bounds)
++	draw.DrawMask(shadow, bounds, gradient.ApplyOpacity(image.NewUniform(shadowColor), 0.25), image.Point{}, img, image.Point{}, draw.Src)
++	shadow = pimage.GaussianBlur(shadow, float64(blur))
++	draw.Draw(shadow, bounds, img, image.Point{}, draw.Over)
++	hot, ok := cursors.Hotspots[c]
+ 	if !ok {
+ 		hot = image.Pt(128, 128)
+ 	}
+-
+-	sv := svg.NewSVG(math32.Vec2(float32(size), float32(size)))
+-	b, err := cursors.SVG(name)
+-	if err != nil {
+-		return nil, err
+-	}
+-	err = sv.ReadXML(bytes.NewReader(b))
+-	if err != nil {
+-		return nil, fmt.Errorf("error opening SVG file for cursor %q: %w", name, err)
+-	}
+-	img := sv.RenderImage()
+-
+-	blurRadius := size / 16
+-	bounds := img.Bounds()
+-	// We need to add extra space so that the shadow doesn't get clipped.
+-	bounds.Max = bounds.Max.Add(image.Pt(blurRadius, blurRadius))
+-	shadow := image.NewRGBA(bounds)
+-	draw.DrawMask(shadow, shadow.Bounds(), gradient.ApplyOpacity(colors.Scheme.Shadow, 0.25), image.Point{}, img, image.Point{}, draw.Src)
+-	shadow = pimage.GaussianBlur(shadow, float64(blurRadius))
+-	draw.Draw(shadow, shadow.Bounds(), img, image.Point{}, draw.Over)
+-
+-	c := &Cursor{
+-		Image:   shadow,
+-		Size:    size,
+-		Hotspot: hot.Mul(size).Div(256),
+-	}
+-	sm[size] = c
+-	return c, nil
+-}
++	return &Cursor{shadow, size, hot.Mul(size).Div(256)}, nil
++}
+--- /dev/null
++++ b/cursors/cursorimg/lifetime_vellum_test.go
+@@ -0,0 +1,157 @@
++// Copyright 2026 Vellum contributors. SPDX-License-Identifier: MIT.
++package cursorimg
++
++import (
++	"image"
++	"image/color"
++	"math"
++	"sync"
++	"testing"
++
++	"cogentcore.org/core/colors"
++	"cogentcore.org/core/colors/matcolor"
++	"cogentcore.org/core/cursors"
++)
++
++func cursorTestReset(t *testing.T) {
++	t.Helper()
++	oldDark := matcolor.SchemeIsDark
++	t.Cleanup(func() { colors.SetScheme(oldDark) })
++	Clear()
++	t.Cleanup(Clear)
++}
++func TestVellumCursorBoundsAndLRU(t *testing.T) {
++	cursorTestReset(t)
++	for _, n := range []int{math.MinInt, -1, 0, 257, math.MaxInt} {
++		if _, err := Get(cursors.Arrow, n); err == nil {
++			t.Fatal("size accepted", n)
++		}
++	}
++	for i := 0; i < 200; i++ {
++		if _, err := Get(vellumApplicationCursor{cursors.Cursor(-i - 100), "unknown"}, 32); err == nil {
++			t.Fatal("unknown admitted")
++		}
++	}
++	if len(Cursors) != 0 || len(cache.entries) != 0 {
++		t.Fatal("failed requests retained entries")
++	}
++	first, err := Get(cursors.Arrow, 16)
++	if err != nil {
++		t.Fatal(err)
++	}
++	for size := 17; size < 90; size++ {
++		if _, err := Get(cursors.Arrow, size); err != nil {
++			t.Fatal(err)
++		}
++	}
++	if len(cache.entries) > MaxEntries || len(Cursors[cursors.Arrow]) > MaxEntries || cache.bytes > MaxBytes {
++		t.Fatal("unbounded count")
++	}
++	next, err := Get(cursors.Arrow, 16)
++	if err != nil || next == first {
++		t.Fatal("LRU failed to evict", err)
++	}
++	// Distinct custom identities force max-size raster retention past byte budget.
++	for i := 0; i < 32; i++ {
++		if _, err := Get(vellumApplicationCursor{cursors.Cursor(-i - 1), "arrow"}, 256); err != nil {
++			t.Fatal(err)
++		}
++	}
++	if cache.bytes > MaxBytes || len(cache.entries) > MaxEntries || cache.bytes == 0 {
++		t.Fatal("byte budget", cache.bytes)
++	}
++	if len(cache.entries) >= 32 {
++		t.Fatal("byte budget did not evict")
++	}
++}
++func TestVellumCursorGenerationsAndLegacyOwnedCopy(t *testing.T) {
++	cursorTestReset(t)
++	_, g, err := GetWithGeneration(cursors.Arrow, 32)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if !IsCurrent(g) {
++		t.Fatal("fresh generation stale")
++	}
++	Clear()
++	if IsCurrent(g) {
++		t.Fatal("Clear did not revoke generation")
++	}
++	// Same-size subimage with large stride/storage must become a tiny owned copy.
++	backing := image.NewRGBA(image.Rect(0, 0, 2048, 2048))
++	backing.Set(0, 0, color.White)
++	custom := vellumApplicationCursor{cursors.Cursor(-40), "custom-no-svg"}
++	injected := &Cursor{backing.SubImage(image.Rect(0, 0, 1, 1)), 32, image.Point{}}
++	Cursors[custom] = map[int]*Cursor{32: injected}
++	owned, g, err := GetWithGeneration(custom, 32)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if owned == injected || len(owned.Image.(*image.RGBA).Pix) != 4 || cache.bytes != 4 {
++		t.Fatal("retained caller backing")
++	}
++	again, _, err := GetWithGeneration(custom, 32)
++	if err != nil || again != owned {
++		t.Fatal("adopted identity", err)
++	}
++	backing.Set(0, 0, color.Black)
++	if owned.Image.At(0, 0) != (color.RGBA{R: 255, G: 255, B: 255, A: 255}) {
++		t.Fatal("caller mutation changed copy")
++	}
++	clear(Cursors)
++	if IsCurrent(g) {
++		t.Fatal("legacy clear not detected")
++	}
++	_, g, err = GetWithGeneration(cursors.Arrow, 32)
++	if err != nil {
++		t.Fatal(err)
++	}
++	colors.SetScheme(true)
++	if IsCurrent(g) {
++		t.Fatal("theme did not revoke generation")
++	}
++	colors.SetScheme(false)
++}
++
++// Reentry controls exercise actual enum/image callbacks without a cache or theme
++// lock, including callbacks that acquire the official theme writer lock.
++type reentrantImage struct {
++	image.Image
++	f func()
++}
++
++func (i reentrantImage) At(x, y int) color.Color { i.f(); return i.Image.At(x, y) }
++func TestVellumCursorThemeConcurrencyAndCallbacks(t *testing.T) {
++	cursorTestReset(t)
++	scheme := colors.Scheme
++	oldShadow := scheme.Shadow
++	t.Cleanup(func() { scheme.Shadow = oldShadow })
++	colors.Scheme.Shadow = reentrantImage{image.Black, func() { colors.SetScheme(false) }}
++	if _, err := Get(cursors.Arrow, 32); err == nil {
++		t.Fatal("theme-changing callback accepted stale raster")
++	}
++	scheme.Shadow = oldShadow
++	colors.SetScheme(false)
++	var wg sync.WaitGroup
++	wg.Add(3)
++	go func() {
++		defer wg.Done()
++		for i := 0; i < 40; i++ {
++			colors.SetScheme(i%2 == 0)
++		}
++	}()
++	for j := 0; j < 2; j++ {
++		go func() {
++			defer wg.Done()
++			for i := 0; i < 40; i++ {
++				r, g, err := GetWithGeneration(cursors.Arrow, 32)
++				if err == nil && (r == nil || g == (Generation{})) {
++					t.Error("invalid successful request")
++				}
++				Clear()
++			}
++		}()
++	}
++	wg.Wait()
++	colors.SetScheme(false)
++}
+--- a/cursors/svg.go
++++ b/cursors/svg.go
+@@ -8,6 +8,7 @@
+ 	"bytes"
+ 	"fmt"
+ 	"image"
++	"image/color"
+ 	"io/fs"
+ 
+ 	"cogentcore.org/core/colors"
+@@ -40,3 +41,16 @@
+ 	}
+ 	return b
+ }
++
++// SVGWithColors reads an embedded cursor using a caller-owned uniform palette
++// in white, black, error, success, warning order. It reads no global theme state.
++func SVGWithColors(name string, palette [5]color.RGBA) ([]byte, error) {
++	b, err := fs.ReadFile(Cursors, "svg/"+name+".svg")
++	if err != nil {
++		return nil, err
++	}
++	for i, old := range [...]string{"#fff", "#000", "#f00", "#0f0", "#ff0"} {
++		b = bytes.ReplaceAll(b, []byte(fmt.Sprintf("%q", old)), []byte(fmt.Sprintf("%q", colors.AsHex(palette[i]))))
++	}
++	return b, nil
++}
+--- a/system/driver/desktop/app.go
++++ b/system/driver/desktop/app.go
+@@ -14,6 +14,7 @@
+ 	"image"
+ 	"log"
+ 	"runtime"
++	"sync/atomic"
+ 	"time"
+ 
+ 	"cogentcore.org/core/gpu"
+@@ -44,7 +45,9 @@
+ }
+ 
+ type App struct {
+-	mainCleanup mainCleanups
++	mainCleanup  mainCleanups
++	cursorThread atomic.Uintptr
++	cursorOwners map[*Cursor]struct{} // native-main-owned, includes pending close windows
+ 	// lastScreenPoll is protected by Mu; each window has its own paint loop.
+ 	lastScreenPoll time.Time
+ 
+@@ -73,7 +76,7 @@
+ func (a *App) MainLoop() {
+ 	defer func() {
+ 		a.StopMain()
+-		a.mainCleanup.finish(func() { desktopEvents.stop(glfw.Terminate) })
++		a.mainCleanup.finish(func() { defer desktopEvents.stop(glfw.Terminate); a.closeCursors() })
+ 	}()
+ 	queue, stopped := a.InitMainQueue()
+ 	if a.Platform() == system.MacOS {
+@@ -96,6 +99,7 @@
+ 
+ // InitGPU initializes glfw, gpu, and the screens.
+ func (a *App) InitGPU() {
++	a.cursorThread.Store(nativeCursorThread())
+ 	if err := desktopEvents.start(glfw.Init); err != nil {
+ 		log.Fatalln("system/driver/desktop failed to initialize glfw:", err)
+ 	}
+@@ -105,10 +109,8 @@
+ 
+ func (a *App) NewWindow(opts *system.NewWindowOptions) (system.Window, error) {
+ 	var window system.Window
+-	var err error
+-	if !a.RunOnMainIfOpen(func() { window, err = a.newWindowOnMain(opts) }) {
+-		return nil, base.ErrMainStopped
+-	}
++	err := base.ErrMainStopped
++	a.nativeOnMain(func() { window, err = a.newWindowOnMain(opts) })
+ 	return window, err
+ }
+ 
+@@ -161,6 +163,8 @@
+ 		w.Compose = &composer.ComposerDrawer{Drawer: w.Draw}
+ 		w.composerPointer.Store(w.Compose)
+ 	}()
++
++	w.cursor = newWindowCursor(w)
+ 
+ 	if a.NativeAttach != nil {
+ 		func() {
+@@ -217,8 +221,12 @@
+ }
+ 
+ func (a *App) Cursor(win system.Window) system.Cursor {
++	w, ok := win.(*Window)
++	if !ok || w == nil || w.App != a || w.cursor == nil {
++		return &Cursor{closed: true}
++	}
+ 	a.Mu.Lock()
+-	a.CtxWindow = win.(*Window)
++	a.CtxWindow = w
+ 	a.Mu.Unlock()
+-	return TheCursor
+-}
++	return w.cursor
++}
+--- a/system/driver/desktop/cursor.go
++++ b/system/driver/desktop/cursor.go
+@@ -1,89 +1,240 @@
+ // Copyright 2023 Cogent Core. All rights reserved.
+-// Use of this source code is governed by a BSD-style
+-// license that can be found in the LICENSE file.
+-
++// Use of this source code is governed by a BSD-style license in LICENSE.
+ package desktop
+ 
+ import (
++	"fmt"
++	"math"
++	"reflect"
+ 	"sync"
+ 
+ 	"cogentcore.org/core/cursors/cursorimg"
+ 	"cogentcore.org/core/enums"
+-	"cogentcore.org/core/math32"
+ 	"cogentcore.org/core/styles/units"
+ 	"cogentcore.org/core/system"
++	"cogentcore.org/core/system/driver/base"
+ 	"github.com/go-gl/glfw/v3.4/glfw"
+ )
+ 
+-// TheCursor is the single [system.Cursor] for the desktop platform
+-var TheCursor = &Cursor{CursorBase: system.CursorBase{Vis: true, Size: units.Dp(32)}, cursors: map[enums.Enum]map[int]*glfw.Cursor{}}
+-
+-// Cursor is the [cursor.Cursor] implementation for the desktop platform
++// TheCursor is the legacy desktop facade. Prefer App.Cursor(window), which is
++// bound to that exact window. SetSize on the facade supplies new-window defaults.
++// Raw CursorBase fields remain source-compatible; use methods for synchronization.
++var TheCursor = &Cursor{CursorBase: system.CursorBase{Vis: true, Size: units.Dp(32)}}
++
+ type Cursor struct {
+ 	system.CursorBase
+-
+-	// cursors are the cached glfw cursors
+-	cursors map[enums.Enum]map[int]*glfw.Cursor
+-
+-	// mu is a mutex protecting access to the cursors
+-	mu sync.Mutex
+-
+-	// prevSize is the cached previous size
+-	prevSize int
+-
+-	// unitContext is the unit context used for converting the cursor size to dots.
+-	unitContext *units.Context
+-}
+-
+-func (cu *Cursor) Set(cursor enums.Enum) error {
++	mu       sync.Mutex
++	window   *Window
++	app      *App
++	owner    *nativeCursorOwner // stable pointer; contents accessed only on native main
++	closed   bool
++	sequence uint64
++}
++
++var _ system.Cursor = (*Cursor)(nil)
++
++func newWindowCursor(w *Window) *Cursor {
++	TheCursor.mu.Lock()
++	defaults := TheCursor.CursorBase
++	TheCursor.mu.Unlock()
++	defaults.Cur = nil
++	w.publishCursorScale()
++	cu := &Cursor{CursorBase: defaults, window: w, app: w.App}
++	cu.owner = newNativeCursorOwner(nativeCursorBackend{
++		create: func(ci *cursorimg.Cursor) (any, error) {
++			// The exact pinned GLFW binding may return &Cursor{NULL} without an error.
++			// Validate its known shape before allocating, then reject its zero wrapper.
++			if !glfwCursorLayoutSupported(reflect.TypeOf(glfw.Cursor{})) {
++				return nil, fmt.Errorf("desktop: unsupported GLFW cursor layout")
++			}
++			h := glfw.CreateCursor(ci.Image, ci.Hotspot.X, ci.Hotspot.Y)
++			if !glfwCursorAllocated(h) {
++				return nil, fmt.Errorf("desktop: GLFW cursor allocation refused")
++			}
++			return h, nil
++		},
++		bind: func(h any) {
++			if h == nil {
++				w.Glw.SetCursor(nil)
++			} else {
++				w.Glw.SetCursor(h.(*glfw.Cursor))
++			}
++		},
++		destroy: func(h any) { h.(*glfw.Cursor).Destroy() },
++	})
++	if w.App.cursorOwners == nil {
++		w.App.cursorOwners = make(map[*Cursor]struct{})
++	}
++	w.App.cursorOwners[cu] = struct{}{}
++	return cu
++}
++func (cu *Cursor) facadeTarget() *Cursor {
++	if cu != TheCursor {
++		return cu
++	}
++	TheApp.Mu.Lock()
++	w := TheApp.CtxWindow
++	TheApp.Mu.Unlock()
++	if w == nil {
++		return nil
++	}
++	return w.cursor
++}
++func (cu *Cursor) Current() enums.Enum {
++	target := cu.facadeTarget()
++	if target == nil {
++		return nil
++	}
++	target.mu.Lock()
++	defer target.mu.Unlock()
++	return target.Cur
++}
++func (cu *Cursor) IsVisible() bool {
++	target := cu.facadeTarget()
++	if target == nil {
++		return false
++	}
++	target.mu.Lock()
++	defer target.mu.Unlock()
++	return !target.closed && target.Vis
++}
++
++// Hide/Show preserve the legacy visibility-status contract. Actual GLFW input
++// mode remains controlled by Window.SetCursorEnabled (including raw/disabled).
++func (cu *Cursor) Hide() { cu.visibility(false) }
++func (cu *Cursor) Show() { cu.visibility(true) }
++func (cu *Cursor) visibility(v bool) {
++	target := cu.facadeTarget()
++	if target == nil {
++		return
++	}
++	target.mu.Lock()
++	defer target.mu.Unlock()
++	if !target.closed {
++		target.Vis = v
++	}
++}
++
++// SetSize changes the requested size and retires pending requests. Call Set to
++// apply it to the native cursor; Current reports the applied enum, not its size.
++func (cu *Cursor) SetSize(size units.Value) {
+ 	cu.mu.Lock()
+ 	defer cu.mu.Unlock()
+-	if cu.unitContext == nil {
+-		cu.unitContext = &units.Context{}
+-		cu.unitContext.Defaults()
+-	}
+-	cu.unitContext.DPI = TheApp.CtxWindow.LogDPI
+-	if TheApp.Platform() == system.MacOS {
+-		// The DPR is automatically applied to cursors on macOS already, so we cannot apply it here.
+-		cu.unitContext.DPI /= TheApp.CtxWindow.DevicePixelRatio
+-	}
+-
+-	// If the cursorimg cache got cleared (probably due to a theme change),
+-	// we have to clear our cache as well.
+-	if len(cursorimg.Cursors) == 0 {
+-		clear(cu.cursors)
+-		cu.prevSize = 0
+-	}
+-
+-	sizef := cu.Size.ToDots(cu.unitContext)
+-	// Multiples of 2 are less blurry on macOS Retina displays
+-	// (TODO: make cursors less blurry on macOS Retina displays:
+-	// https://github.com/cogentcore/core/issues/1373).
+-	size := int(math32.Round(sizef/2) * 2)
+-	if cursor == cu.Cur && size == cu.prevSize { // we already have, so we don't need to set again
+-		return nil
+-	}
+-	sm := cu.cursors[cursor]
+-	if sm == nil {
+-		sm = map[int]*glfw.Cursor{}
+-		cu.cursors[cursor] = sm
+-	}
+-	if cur, ok := sm[size]; ok {
+-		TheApp.CtxWindow.Glw.SetCursor(cur)
+-		cu.prevSize = size
+-		cu.Cur = cursor
+-		return nil
+-	}
+-
+-	ci, err := cursorimg.Get(cursor, size)
++	if !cu.closed {
++		cu.Size = size
++		if cu.sequence != ^uint64(0) {
++			cu.sequence++
++		}
++	}
++}
++func (cu *Cursor) Set(cursor enums.Enum) error {
++	target := cu.facadeTarget()
++	if target == nil {
++		return fmt.Errorf("desktop: cursor has no window")
++	}
++	return target.set(cursor)
++}
++func (cu *Cursor) set(cursor enums.Enum) error {
++	cu.mu.Lock()
++	if cu.closed || cu.sequence == ^uint64(0) {
++		cu.mu.Unlock()
++		return fmt.Errorf("desktop: cursor closed or sequence exhausted")
++	}
++	cu.sequence++
++	seq := cu.sequence
++	size := cu.Size
++	w, a := cu.window, cu.app
++	cu.mu.Unlock()
++	if w == nil || a == nil {
++		return fmt.Errorf("desktop: cursor has no window")
++	}
++	// Atomic geometry publication also permits Set from a main callback while
++	// existing Close holds w.Mu across its final native queue wait.
++	packed := w.cursorScale.Load()
++	dpi, dpr := math.Float32frombits(uint32(packed>>32)), math.Float32frombits(uint32(packed))
++	uc := units.NewContext()
++	uc.DPI = dpi
++	if a.Platform() == system.MacOS {
++		if dpr <= 0 {
++			return fmt.Errorf("desktop: invalid cursor scale")
++		}
++		uc.DPI /= dpr
++	}
++	// Custom units may call arbitrary application code: invoke outside all locks.
++	dots := float64(size.ToDots(uc))
++	if math.IsNaN(dots) || math.IsInf(dots, 0) || dots < 1 || dots > cursorimg.MaxSize {
++		return fmt.Errorf("desktop: invalid cursor size")
++	}
++	pixels := int(math.Round(dots/2) * 2)
++	ci, generation, err := cursorimg.GetWithGeneration(cursor, pixels)
+ 	if err != nil {
+ 		return err
+ 	}
+-	h := ci.Hotspot
+-	gc := glfw.CreateCursor(ci.Image, h.X, h.Y)
+-	sm[size] = gc
+-	TheApp.CtxWindow.Glw.SetCursor(gc)
+-	cu.prevSize = size
+-	cu.Cur = cursor
+-	return nil
+-}
++	owned, err := cursorimg.Copy(ci, pixels)
++	if err != nil {
++		return err
++	}
++	err = base.ErrMainStopped
++	a.nativeOnMain(func() {
++		cu.mu.Lock()
++		valid := !cu.closed && cu.sequence == seq && cu.window == w
++		cu.mu.Unlock()
++		if !valid || w.Glw == nil {
++			err = fmt.Errorf("desktop: cursor request retired")
++			return
++		}
++		if !cursorimg.IsCurrent(generation) {
++			err = fmt.Errorf("desktop: cursor generation changed")
++			return
++		}
++		err = cu.owner.apply(nativeCursorKey{ci, generation}, owned)
++		if err == nil {
++			cu.mu.Lock()
++			if !cu.closed {
++				cu.Cur = cursor
++			}
++			cu.mu.Unlock()
++		}
++	})
++	return err
++}
++func (a *App) nativeOnMain(f func()) {
++	if id := a.cursorThread.Load(); id != 0 && id == nativeCursorThread() {
++		a.ExecuteMain(base.FuncRun{F: f})
++		return
++	}
++	a.RunOnMainQueued(f)
++}
++func (cu *Cursor) retireStatus() {
++	cu.mu.Lock()
++	defer cu.mu.Unlock()
++	cu.closed = true
++	cu.Cur = nil
++	cu.Vis = false
++	cu.Size = units.Value{}
++	cu.window = nil
++	cu.app = nil
++}
++
++// retireCursor runs on native main, including failed creation and app shutdown.
++func (a *App) retireCursor(cu *Cursor) {
++	if cu == nil {
++		return
++	}
++	cu.retireStatus()
++	delete(a.cursorOwners, cu)
++	cu.owner.close()
++}
++func (a *App) closeCursors() {
++	fs := make([]func(), 0, len(a.cursorOwners))
++	for cu := range a.cursorOwners {
++		item := cu
++		fs = append(fs, func() { a.retireCursor(item) })
++	}
++	drainAll(fs...)
++}
++
++func glfwCursorLayoutSupported(typ reflect.Type) bool {
++	return typ != nil && typ.Kind() == reflect.Struct && typ.NumField() == 1 && typ.Field(0).Name == "data" && typ.Field(0).Type.Kind() == reflect.Pointer
++}
++func glfwCursorAllocated(h *glfw.Cursor) bool { return h != nil && *h != (glfw.Cursor{}) }
+--- /dev/null
++++ b/system/driver/desktop/cursor_lifetime_vellum_test.go
+@@ -0,0 +1,507 @@
++// Copyright 2026 Vellum contributors. SPDX-License-Identifier: MIT.
++package desktop
++
++import (
++	"errors"
++	"image"
++	"math"
++	"reflect"
++	"runtime"
++	"sync"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/cursors"
++	"cogentcore.org/core/cursors/cursorimg"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/system"
++	"cogentcore.org/core/system/composer"
++	"cogentcore.org/core/system/driver/base"
++	"github.com/go-gl/glfw/v3.4/glfw"
++)
++
++// This backend never calls GLFW or creates a native window. Integers represent
++// owned handles and callbacks record the executing native-thread token.
++type fakeCursorBackend struct {
++	next         int
++	live         map[int]bool
++	destroyed    map[int]int
++	bound        int
++	threads      []uintptr
++	fail         bool
++	bindPanic    bool
++	destroyPanic bool
++}
++
++func fakeCursors() (*nativeCursorOwner, *fakeCursorBackend) {
++	f := &fakeCursorBackend{live: map[int]bool{}, destroyed: map[int]int{}}
++	o := newNativeCursorOwner(nativeCursorBackend{
++		create: func(*cursorimg.Cursor) (any, error) {
++			f.threads = append(f.threads, nativeCursorThread())
++			if f.fail {
++				return nil, errors.New("refused")
++			}
++			f.next++
++			f.live[f.next] = true
++			return f.next, nil
++		},
++		bind: func(h any) {
++			f.threads = append(f.threads, nativeCursorThread())
++			if f.bindPanic {
++				panic("bind")
++			}
++			if h == nil {
++				f.bound = 0
++			} else {
++				f.bound = h.(int)
++				if !f.live[f.bound] {
++					panic("dead handle bound")
++				}
++			}
++		},
++		destroy: func(h any) {
++			id := h.(int)
++			f.threads = append(f.threads, nativeCursorThread())
++			f.destroyed[id]++
++			if !f.live[id] || f.destroyed[id] != 1 {
++				panic("double destroy")
++			}
++			delete(f.live, id)
++			if f.destroyPanic {
++				panic("destroy")
++			}
++		},
++	})
++	return o, f
++}
++func fakeRaster(size int) *cursorimg.Cursor {
++	return &cursorimg.Cursor{Image: image.NewRGBA(image.Rect(0, 0, size+size/16, size+size/16)), Size: size}
++}
++func TestVellumCursorNativeBoundsPinningAndFailure(t *testing.T) {
++	o, f := fakeCursors()
++	var g cursorimg.Generation
++	var latest *cursorimg.Cursor
++	for i := 0; i < 100; i++ {
++		latest = fakeRaster(256)
++		if err := o.apply(nativeCursorKey{latest, g}, latest); err != nil {
++			t.Fatal(err)
++		}
++		if len(o.entries) > nativeCursorEntries || o.bytes > nativeCursorBytes || len(f.live) != len(o.entries) {
++			t.Fatal("native budget violated")
++		}
++		if !f.live[f.bound] {
++			t.Fatal("active handle evicted")
++		}
++	}
++	active := f.bound
++	f.fail = true
++	r := fakeRaster(256)
++	if err := o.apply(nativeCursorKey{r, g}, r); err == nil || f.bound != active || !f.live[active] {
++		t.Fatal("refusal changed active cursor", err)
++	}
++	f.fail = false
++	o.close()
++	o.close()
++	if len(f.live) != 0 || len(o.entries) != 0 || o.bytes != 0 || f.bound != 0 || o.backend.create != nil {
++		t.Fatal("retained native resources")
++	}
++	if err := o.apply(nativeCursorKey{latest, g}, latest); err == nil {
++		t.Fatal("closed owner reopened")
++	}
++}
++func TestVellumCursorNativeGenerationAndPendingPanic(t *testing.T) {
++	cursorimg.Clear()
++	defer cursorimg.Clear()
++	_, g1, err := cursorimg.GetWithGeneration(cursors.Arrow, 32)
++	if err != nil {
++		t.Fatal(err)
++	}
++	cursorimg.Clear()
++	_, g2, err := cursorimg.GetWithGeneration(cursors.Arrow, 32)
++	if err != nil {
++		t.Fatal(err)
++	}
++	o, f := fakeCursors()
++	r := fakeRaster(32)
++	if err := o.apply(nativeCursorKey{r, g1}, r); err != nil {
++		t.Fatal(err)
++	}
++	first := f.bound
++	second := fakeRaster(32)
++	if err := o.apply(nativeCursorKey{second, g2}, second); err != nil {
++		t.Fatal(err)
++	}
++	if f.live[first] || f.destroyed[first] != 1 {
++		t.Fatal("stale active handle leaked")
++	}
++	f.bindPanic = true
++	third := fakeRaster(32)
++	func() {
++		defer func() {
++			if recover() != "bind" {
++				t.Error("missing bind failure")
++			}
++		}()
++		o.apply(nativeCursorKey{third, g2}, third)
++	}()
++	if len(f.live) != 2 {
++		t.Fatal("pending handle ownership lost")
++	}
++	f.bindPanic = false
++	f.destroyPanic = true
++	func() {
++		defer func() {
++			if recover() != "destroy" {
++				t.Error("missing destroy failure")
++			}
++		}()
++		o.close()
++	}()
++	if len(f.live) != 0 || o.bytes != 0 || len(o.entries) != 0 {
++		t.Fatal("panic prevented remaining cleanup")
++	}
++}
++func cursorHarness(t *testing.T) (*App, *Cursor, *Cursor, chan base.FuncRun) {
++	return cursorFixture(t, true)
++}
++func cursorFixture(t *testing.T, publish bool) (*App, *Cursor, *Cursor, chan base.FuncRun) {
++	t.Helper()
++	a := &App{}
++	a.This = &stoppedCreationApp{}
++	var queue chan base.FuncRun
++	if publish {
++		queue, _ = a.InitMainQueue()
++	}
++	makeCursor := func() *Cursor {
++		w := &Window{WindowMulti: base.NewWindowMulti[*App, *composer.ComposerDrawer](a, &system.NewWindowOptions{}), Glw: &glfw.Window{}}
++		w.LogDPI = 320
++		w.DevicePixelRatio = 2
++		w.publishCursorScale()
++		o, _ := fakeCursors()
++		cu := &Cursor{CursorBase: system.CursorBase{Size: units.Dp(32), Vis: true}, window: w, app: a, owner: o}
++		w.cursor = cu
++		if a.cursorOwners == nil {
++			a.cursorOwners = map[*Cursor]struct{}{}
++		}
++		a.cursorOwners[cu] = struct{}{}
++		return cu
++	}
++	c1, c2 := makeCursor(), makeCursor()
++	t.Cleanup(func() { a.StopMain(); a.closeCursors(); cursorimg.Clear() })
++	return a, c1, c2, queue
++}
++func cursorRun(t *testing.T, a *App, q chan base.FuncRun, fn func() error) error {
++	t.Helper()
++	done := make(chan error, 1)
++	go func() { done <- fn() }()
++	select {
++	case call := <-q:
++		a.ExecuteMain(call)
++	case err := <-done:
++		return err
++	case <-time.After(15 * time.Second):
++		t.Fatal("cursor dispatch did not arrive")
++	}
++	select {
++	case err := <-done:
++		return err
++	case <-time.After(5 * time.Second):
++		t.Fatal("cursor caller did not finish")
++	}
++	return nil
++}
++func TestVellumCursorExactWindowAndWorkerDispatch(t *testing.T) {
++	runtime.LockOSThread()
++	defer runtime.UnlockOSThread()
++	a, c1, c2, q := cursorHarness(t)
++	thread := nativeCursorThread()
++	for _, cu := range []*Cursor{c1, c2, c1} {
++		if err := cursorRun(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++			t.Fatal(err)
++		}
++		if cu.Current() != cursors.Arrow || cu.owner.active == nil {
++			t.Fatal("window cursor not bound")
++		}
++	}
++	if c1.owner == c2.owner || c1.owner.active == c2.owner.active {
++		t.Fatal("native state shared between windows")
++	}
++	// Verify the same exact requested window is retained after context mutation.
++	if a.Cursor(c1.window) != c1 || a.Cursor(c2.window) != c2 {
++		t.Fatal("shared facade returned")
++	}
++	if err := cursorRun(t, a, q, func() error { return c1.Set(cursors.Text) }); err != nil {
++		t.Fatal(err)
++	}
++	if c1.Current() != cursors.Text || c2.Current() != cursors.Arrow {
++		t.Fatal("cross-window mutation")
++	}
++	for _, cu := range []*Cursor{c1, c2} {
++		for e := cu.owner.lru.Front(); e != nil; e = e.Next() {
++			if e.Value.(nativeCursorEntry).handle == nil {
++				t.Fatal("no handle")
++			}
++		}
++	}
++	// Inspect dispatch token with a backend callback installed on the actual owner.
++	oldBind := c1.owner.backend.bind
++	defer func() { c1.owner.backend.bind = oldBind }()
++	c1.owner.backend.bind = func(h any) {
++		if nativeCursorThread() != thread {
++			t.Error("native backend ran on worker")
++		}
++		oldBind(h)
++	}
++	if err := cursorRun(t, a, q, func() error { return c1.Set(cursors.Crosshair) }); err != nil {
++		t.Fatal(err)
++	}
++}
++func TestVellumCursorOrderingCancellationAndScale(t *testing.T) {
++	a, cu, _, q := cursorHarness(t)
++	entered, release := make(chan struct{}), make(chan struct{})
++	custom := units.Dp(32)
++	custom.Custom = func(ctx *units.Context) float32 { close(entered); <-release; return ctx.DPI / 5 }
++	cu.SetSize(custom)
++	oldDone := make(chan error, 1)
++	go func() { oldDone <- cu.Set(cursors.Arrow) }()
++	<-entered
++	cu.SetSize(units.Dp(32))
++	if err := cursorRun(t, a, q, func() error { return cu.Set(cursors.Text) }); err != nil {
++		t.Fatal(err)
++	}
++	close(release)
++	select {
++	case call := <-q:
++		a.ExecuteMain(call)
++	case <-time.After(15 * time.Second):
++		t.Fatal("old request not dispatched")
++	}
++	if err := <-oldDone; err == nil || cu.Current() != cursors.Text {
++		t.Fatal("older request overwrote newer", err)
++	}
++	expected := int(math.Round(float64(units.Dp(32).Value)*160/160/2) * 2)
++	if cu.owner.active.Value.(nativeCursorEntry).key.raster.Size != expected {
++		t.Fatal("mac DPI/DPR applied twice")
++	}
++	// Clear between admission and main execution must refuse and preserve current.
++	done := make(chan error, 1)
++	go func() { done <- cu.Set(cursors.Arrow) }()
++	select {
++	case call := <-q:
++		cursorimg.Clear()
++		a.ExecuteMain(call)
++	case <-time.After(15 * time.Second):
++		t.Fatal("request not dispatched")
++	}
++	if err := <-done; err == nil || cu.Current() != cursors.Text {
++		t.Fatal("stale generation assigned")
++	}
++}
++func TestVellumCursorCloseQueueStopAndTerminalRegistry(t *testing.T) {
++	a, c1, c2, q := cursorHarness(t)
++	if err := cursorRun(t, a, q, func() error { return c1.Set(cursors.Arrow) }); err != nil {
++		t.Fatal(err)
++	}
++	if err := cursorRun(t, a, q, func() error { return c2.Set(cursors.Arrow) }); err != nil {
++		t.Fatal(err)
++	}
++	done := make(chan error, 1)
++	go func() { done <- c1.Set(cursors.Text) }()
++	select {
++	case call := <-q:
++		c1.retireStatus()
++		a.ExecuteMain(call)
++	case <-time.After(15 * time.Second):
++		t.Fatal("request not queued")
++	}
++	if err := <-done; err == nil {
++		t.Fatal("closed window admitted")
++	}
++	a.retireCursor(c1)
++	if c1.window != nil || c1.app != nil || c1.Cur != nil || c1.Size.Custom != nil || len(a.cursorOwners) != 1 {
++		t.Fatal("closed references retained")
++	}
++	a.StopMain()
++	if err := c2.Set(cursors.Text); !errors.Is(err, base.ErrMainStopped) {
++		t.Fatal("stopped queue returned", err)
++	}
++	// A window removed from App.Windows still belongs to the terminal registry.
++	if a.NWindows() != 0 {
++		t.Fatal("fixture unexpectedly attached")
++	}
++	a.closeCursors()
++	a.closeCursors()
++	if len(a.cursorOwners) != 0 || !c2.closed || c2.owner.bytes != 0 {
++		t.Fatal("terminal registry retained resources")
++	}
++}
++func TestVellumCursorDirectMainFailureStopsAdmission(t *testing.T) {
++	runtime.LockOSThread()
++	defer runtime.UnlockOSThread()
++	a := &App{}
++	a.cursorThread.Store(nativeCursorThread())
++	defer func() {
++		if recover() != "native failure" || !a.MainStopped() {
++			t.Error("native main panic was not terminal")
++		}
++	}()
++	a.nativeOnMain(func() { panic("native failure") })
++}
++func TestVellumCursorConcurrentStatus(t *testing.T) {
++	_, cu, _, _ := cursorHarness(t)
++	var wg sync.WaitGroup
++	for i := 0; i < 4; i++ {
++		wg.Add(1)
++		go func() {
++			defer wg.Done()
++			for j := 0; j < 100; j++ {
++				cu.Current()
++				cu.IsVisible()
++				cu.Hide()
++				cu.Show()
++				cu.SetSize(units.Dp(32))
++			}
++		}()
++	}
++	wg.Wait()
++	cu.retireStatus()
++	cu.SetSize(units.Value{Custom: func(*units.Context) float32 { return 32 }})
++	if !reflect.DeepEqual(cu.Size, units.Value{}) {
++		t.Fatal("closed cursor retained callback")
++	}
++}
++
++func TestVellumCursorPinnedGLFWNullWrapperAndShape(t *testing.T) {
++	if !glfwCursorLayoutSupported(reflect.TypeOf(glfw.Cursor{})) {
++		t.Fatal("pinned cursor layout changed")
++	}
++	for _, typ := range []reflect.Type{nil, reflect.TypeOf(0), reflect.TypeOf(struct{ data int }{}), reflect.TypeOf(struct{ wrong *int }{}), reflect.TypeOf(struct {
++		data  *int
++		extra int
++	}{})} {
++		if glfwCursorLayoutSupported(typ) {
++			t.Fatal("unsupported layout accepted", typ)
++		}
++	}
++	if glfwCursorAllocated(nil) || glfwCursorAllocated(&glfw.Cursor{}) {
++		t.Fatal("NULL wrapper accepted as native allocation")
++	}
++}
++func TestVellumCursorWorkerWaitsForQueuePublication(t *testing.T) {
++	a, cu, _, _ := cursorFixture(t, false)
++	done := make(chan error, 1)
++	go func() { done <- cu.Set(cursors.Arrow) }()
++	select {
++	case err := <-done:
++		t.Fatal("worker ran before publication", err)
++	case <-time.After(50 * time.Millisecond):
++	}
++	q, _ := a.InitMainQueue()
++	select {
++	case call := <-q:
++		a.ExecuteMain(call)
++	case <-time.After(15 * time.Second):
++		t.Fatal("worker not released by publication")
++	}
++	if err := <-done; err != nil || cu.Current() != cursors.Arrow {
++		t.Fatal("published worker failed", err)
++	}
++}
++func TestVellumCursorDirectMainDoesNotTakeWindowLock(t *testing.T) {
++	runtime.LockOSThread()
++	defer runtime.UnlockOSThread()
++	a, cu, _, _ := cursorHarness(t)
++	a.cursorThread.Store(nativeCursorThread())
++	if _, err := cursorimg.Get(cursors.Arrow, 32); err != nil {
++		t.Fatal(err)
++	}
++	w := cu.window
++	w.Mu.Lock()
++	var once sync.Once
++	unlock := func() { once.Do(w.Mu.Unlock) }
++	defer unlock()
++	done := make(chan struct{})
++	watcher := make(chan struct{})
++	go func() {
++		defer close(watcher)
++		select {
++		case <-done:
++		case <-time.After(time.Second):
++			t.Error("Set waited on window lock from main")
++			unlock()
++		}
++	}()
++	err := cu.Set(cursors.Arrow)
++	close(done)
++	<-watcher
++	if err != nil || cu.Current() != cursors.Arrow {
++		t.Fatal("direct main Set failed", err)
++	}
++}
++func TestVellumCursorSuccessfulBindPublishesDespiteLaterRefusal(t *testing.T) {
++	a, cu, _, q := cursorHarness(t)
++	oldBind := cu.owner.backend.bind
++	cu.owner.backend.bind = func(h any) {
++		oldBind(h)
++		if h == nil {
++			return
++		}
++		later := make(chan error, 1)
++		go func() { later <- cu.Set(cursors.None) }()
++		select {
++		case err := <-later:
++			if err == nil {
++				t.Error("None was accepted")
++			}
++		case <-time.After(time.Second):
++			t.Error("later refusing request blocked during bind")
++		}
++	}
++	defer func() { cu.owner.backend.bind = oldBind }()
++	if err := cursorRun(t, a, q, func() error { return cu.Set(cursors.Arrow) }); err != nil {
++		t.Fatal(err)
++	}
++	if cu.Current() != cursors.Arrow {
++		t.Fatal("successful OS assignment was not published")
++	}
++}
++
++func TestVellumWindowWorkerCreationWaitsForNativeQueue(t *testing.T) {
++	a := &App{}
++	a.This = &stoppedCreationApp{}
++	type result struct {
++		w   system.Window
++		err error
++	}
++	done := make(chan result, 1)
++	go func() { w, err := a.NewWindow(nil); done <- result{w, err} }()
++	select {
++	case r := <-done:
++		t.Fatal("window worker used inline startup fallback", r.err)
++	case <-time.After(50 * time.Millisecond):
++	}
++	// No screens are configured: an incorrectly inline callback would return a
++	// no-screen error without calling GLFW, making this a safe negative control.
++	a.StopMain()
++	select {
++	case r := <-done:
++		if r.w != nil || !errors.Is(r.err, base.ErrMainStopped) {
++			t.Fatal("stopped startup creation", r.err)
++		}
++	case <-time.After(time.Second):
++		t.Fatal("stopped startup worker blocked")
++	}
++}
++func TestVellumWindowDirectMainCreationUsesFailureBarrier(t *testing.T) {
++	runtime.LockOSThread()
++	defer runtime.UnlockOSThread()
++	a := &App{}
++	a.This = &stoppedCreationApp{}
++	a.cursorThread.Store(nativeCursorThread())
++	a.InitMainQueue() // direct main must not redispatch to this unserviced queue
++	w, err := a.NewWindow(nil)
++	if w != nil || err == nil || errors.Is(err, base.ErrMainStopped) {
++		t.Fatal("direct main did not enter no-screen validation", err)
++	}
++	a.StopMain()
++}
+--- /dev/null
++++ b/system/driver/desktop/cursor_owner.go
+@@ -0,0 +1,150 @@
++// Copyright 2026 Vellum contributors. SPDX-License-Identifier: MIT.
++package desktop
++
++import (
++	"cogentcore.org/core/cursors/cursorimg"
++	"container/list"
++	"fmt"
++)
++
++const nativeCursorEntries = 16
++const nativeCursorBytes = 1 << 20
++
++type nativeCursorBackend struct {
++	create  func(*cursorimg.Cursor) (any, error)
++	bind    func(any)
++	destroy func(any)
++}
++type nativeCursorKey struct {
++	raster     *cursorimg.Cursor
++	generation cursorimg.Generation
++}
++type nativeCursorEntry struct {
++	key    nativeCursorKey
++	handle any
++	bytes  int
++}
++
++// All fields and backend callbacks belong exclusively to the native main owner.
++// active and pending allocations count toward the same limits as inactive LRU.
++type nativeCursorOwner struct {
++	backend nativeCursorBackend
++	entries map[nativeCursorKey]*list.Element
++	lru     list.List
++	active  *list.Element
++	bytes   int
++	closed  bool
++}
++
++func newNativeCursorOwner(b nativeCursorBackend) *nativeCursorOwner {
++	return &nativeCursorOwner{backend: b, entries: make(map[nativeCursorKey]*list.Element)}
++}
++func (o *nativeCursorOwner) remove(e *list.Element) {
++	v := e.Value.(nativeCursorEntry)
++	delete(o.entries, v.key)
++	o.lru.Remove(e)
++	o.bytes -= v.bytes
++	if o.active == e {
++		o.active = nil
++	}
++	// Remove ownership before the native call: a native panic is terminal, and
++	// final teardown must never call Destroy twice on an uncertain native result.
++	o.backend.destroy(v.handle)
++}
++func (o *nativeCursorOwner) apply(k nativeCursorKey, pixels *cursorimg.Cursor) error {
++	if o.closed {
++		return fmt.Errorf("desktop: cursor closed")
++	}
++	// Preserve the current assignment across theme invalidation and allocation
++	// refusal; retire stale inactive handles immediately and the old active one
++	// only after a valid replacement has been bound.
++	for e := o.lru.Back(); e != nil; {
++		prev := e.Prev()
++		if e != o.active && e.Value.(nativeCursorEntry).key.generation != k.generation {
++			o.remove(e)
++		}
++		e = prev
++	}
++	if e := o.entries[k]; e != nil {
++		if e != o.active {
++			o.backend.bind(e.Value.(nativeCursorEntry).handle)
++			o.active = e
++		}
++		o.lru.MoveToFront(e)
++		return nil
++	}
++	// pixels is a separately owned bounded RGBA snapshot, never an application
++	// image/subimage. Admission precedes the backend allocation.
++	n := pixels.Image.Bounds().Dx() * pixels.Image.Bounds().Dy() * 4
++	if n <= 0 || n > nativeCursorBytes/2 {
++		return fmt.Errorf("desktop: cursor pixel budget")
++	}
++	for len(o.entries) >= nativeCursorEntries || o.bytes+n > nativeCursorBytes {
++		victim := o.lru.Back()
++		if victim == o.active {
++			victim = victim.Prev()
++		}
++		if victim == nil {
++			return fmt.Errorf("desktop: active cursor fills budget")
++		}
++		o.remove(victim)
++	}
++	handle, err := o.backend.create(pixels)
++	if err != nil {
++		return err
++	}
++	if handle == nil {
++		return fmt.Errorf("desktop: native cursor allocation refused")
++	}
++	old := o.active
++	e := o.lru.PushFront(nativeCursorEntry{k, handle, n})
++	o.entries[k] = e
++	o.bytes += n
++	// Pending ownership is registered before bind so terminal cleanup owns it
++	// if GLFW panics. The old active handle remains pinned until bind succeeds.
++	o.backend.bind(handle)
++	o.active = e
++	if old != nil && old.Value.(nativeCursorEntry).key.generation != k.generation {
++		o.remove(old)
++	}
++	return nil
++}
++
++// drainAll runs every cleanup despite a panic, then preserves the first panic.
++// GLFW termination is separately deferred by App.MainLoop.
++func drainAll(fs ...func()) {
++	var first any
++	panicked := false
++	for _, f := range fs {
++		func() {
++			returned := false
++			defer func() {
++				if !returned {
++					p := recover()
++					if !panicked {
++						first = p
++						panicked = true
++					}
++				}
++			}()
++			f()
++			returned = true
++		}()
++	}
++	if panicked {
++		panic(first)
++	}
++}
++func (o *nativeCursorOwner) close() {
++	if o.closed {
++		return
++	}
++	o.closed = true
++	fs := []func(){func() { o.backend.bind(nil) }}
++	for e := o.lru.Back(); e != nil; e = e.Prev() {
++		item := e
++		fs = append(fs, func() { o.remove(item) })
++	}
++	defer func() { o.active = nil; o.entries = nil; o.backend = nativeCursorBackend{}; o.lru.Init(); o.bytes = 0 }()
++	drainAll(fs...)
++}
+--- /dev/null
++++ b/system/driver/desktop/cursor_thread.go
+@@ -0,0 +1,20 @@
++// Copyright 2026 Vellum contributors. SPDX-License-Identifier: MIT.
++package desktop
++
++/*
++#include <stdint.h>
++#ifdef _WIN32
++#include <windows.h>
++static uintptr_t vellumCursorThread(void) {return (uintptr_t)GetCurrentThreadId();}
++#else
++#include <pthread.h>
++static uintptr_t vellumCursorThread(void) {return (uintptr_t)pthread_self();}
++#endif
++*/
++import "C"
++
++// InitGPU records this token on the locked native initialization thread. Unlike
++// RunOnMainIfOpen's legacy pre-loop inline fallback, cursor work on a worker must
++// wait for queue publication. Comparing native thread IDs also permits calls
++// already inside a native callback without redispatching into its own queue.
++func nativeCursorThread() uintptr { return uintptr(C.vellumCursorThread()) }
+--- a/system/driver/desktop/window.go
++++ b/system/driver/desktop/window.go
+@@ -12,6 +12,7 @@
+ import (
+ 	"image"
+ 	"log"
++	"math"
+ 	"sync"
+ 	"sync/atomic"
+ 	"unsafe"
+@@ -33,6 +34,8 @@
+ 	presentationToken       atomic.Uint64
+ 	presentationComposition uint64 // monotonic under Mu
+ 	closeOnce               sync.Once
++	cursorScale             atomic.Uint64 // packed DPI/DPR, published under Mu after creation
++	cursor                  *Cursor       // published before the window, retained closed after teardown
+ 	composerPointer         atomic.Pointer[composer.ComposerDrawer]
+ 	base.WindowMulti[*App, *composer.ComposerDrawer]
+ 
+@@ -196,6 +199,7 @@
+ setScreen:
+ 	w.Mu.Lock()
+ 	defer w.Mu.Unlock()
++	defer w.publishCursorScale()
+ 	w.ScreenWindow = sc.Name
+ 	w.PhysDPI = sc.PhysicalDPI
+ 	if w.DevicePixelRatio != sc.DevicePixelRatio {
+@@ -483,6 +487,9 @@
+ 		return
+ 	}
+ 	w.closeOnce.Do(func() {
++		if w.cursor != nil {
++			w.cursor.retireStatus()
++		}
+ 		// Stop native callbacks before application cleanup and before GPU/view release.
+ 		w.App.RunOnMainQueued(func() {
+ 			if w.Native != nil {
+@@ -500,6 +507,7 @@
+ // releaseNativeResources runs on the main thread, including failed creation.
+ func (w *Window) releaseNativeResources() {
+ 	w.composerPointer.Store(nil)
++	w.App.retireCursor(w.cursor)
+ 	w.closePresentationObserver()
+ 	if w.Native != nil {
+ 		w.Native.Close()
+@@ -596,6 +604,7 @@
+ 	w.PixelSize = fbsz
+ 	w.PhysDPI = sc.PhysicalDPI
+ 	w.LogDPI = sc.LogicalDPI
++	w.publishCursorScale()
+ 	// Keep surface reconfiguration inside composer ownership: an acquired
+ 	// presentation texture must not be invalidated before queue submission.
+ 	w.Draw.System.Renderer.SetSize(w.PixelSize)
+@@ -655,3 +664,14 @@
+ 		w.Event.Window(events.WinMinimize)
+ 	}
+ }
++
++// publishCursorScale runs under Mu, or before the new window is published.
++func (w *Window) publishCursorScale() {
++	w.cursorScale.Store(uint64(math.Float32bits(w.LogDPI))<<32 | uint64(math.Float32bits(w.DevicePixelRatio)))
++}
++func (w *Window) SetLogicalDPI(dpi float32) {
++	w.Mu.Lock()
++	defer w.Mu.Unlock()
++	w.LogDPI = dpi
++	w.publishCursorScale()
++}

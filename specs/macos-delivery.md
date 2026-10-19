@@ -715,3 +715,8 @@ is sealed. No full M2/M5/M3–M7 gate closes or SDK/prepared bytes change. Conti
 at the actual drawable availability/ownership boundary before another complete
 structural/text/modal admission; do not infer readiness from shown state or
 retry a sealed case. Earlier failed native cases retain their own unknown causes.
+
+The [cursor ownership checkpoint](cursor-ownership.md) defines per-window native
+ownership, bounded shared/per-window retention, theme synchronization and terminal
+drain. Its automated fake-backend/race evidence does not close physical cursor,
+DPI, visibility-mode or M4 native/endurance qualification.

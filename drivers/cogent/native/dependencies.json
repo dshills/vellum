@@ -1113,6 +1113,17 @@
               "sha256": "e23b2e3f2e05c5f98ac21bd3509a77b3b833112e7476bd16b278fcca5fa6ff10"
             }
           ]
+        },
+        {
+          "origin": "Vellum cursor ownership",
+          "inputs": "native/patches/cursorownership/original-hashes.json",
+          "outputs": "native/patches/cursorownership/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/cursorownership/0090-cursor-ownership.patch",
+              "sha256": "66e493c922bbb3f2ac816e692d6a9c7b98a45ba80064097c49585996990f0715"
+            }
+          ]
         }
       ]
     },
