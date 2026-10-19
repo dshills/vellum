@@ -1,0 +1,108 @@
+--- a/core/html.go
++++ b/core/html.go
+@@ -166,7 +166,7 @@
+ 			return err
+ 		}
+ 	}
+-	err = e.EncodeToken(xml.EndElement{se.Name})
++	err = e.EncodeToken(xml.EndElement{Name: se.Name})
+ 	if err != nil {
+ 		return err
+ 	}
+--- a/core/mainstage.go
++++ b/core/mainstage.go
+@@ -292,7 +292,7 @@
+ 	}
+ 
+ 	if st.NewWindow || current == nil {
+-		sc.Resize(math32.Geom2DInt{st.renderContext.geom.Pos, sz})
++		sc.Resize(math32.Geom2DInt{Pos: st.renderContext.geom.Pos, Size: sz})
+ 		win := st.newRenderWindow()
+ 		mainRenderWindows.add(win)
+ 		setCurrentRenderWindow(win)
+@@ -382,7 +382,7 @@
+ 
+ 	if st.NewWindow {
+ 		st.Mains = nil
+-		sc.Resize(math32.Geom2DInt{st.renderContext.geom.Pos, sz})
++		sc.Resize(math32.Geom2DInt{Pos: st.renderContext.geom.Pos, Size: sz})
+ 		st.Type = WindowStage            // critical: now is its own window!
+ 		sc.SceneGeom.Pos = image.Point{} // ignore pos
+ 		win := st.newRenderWindow()
+--- a/core/textfield.go
++++ b/core/textfield.go
+@@ -1277,7 +1277,7 @@
+ 	if effst == effed {
+ 		return
+ 	}
+-	tf.renderVisible.SelectRegion(textpos.Range{effst, effed})
++	tf.renderVisible.SelectRegion(textpos.Range{Start: effst, End: effed})
+ }
+ 
+ // renderHighlights renders the highlights regions, if any, underneath the text
+@@ -1290,7 +1290,7 @@
+ 		if effst == effed {
+ 			return
+ 		}
+-		tf.renderVisible.HighlightRegion(textpos.Range{effst, effed})
++		tf.renderVisible.HighlightRegion(textpos.Range{Start: effst, End: effed})
+ 	}
+ }
+ 
+--- a/core/layout_test.go
++++ b/core/layout_test.go
+@@ -193,11 +193,11 @@
+ 	longText = "This is a test of the layout logic, which is pretty complex and requires some experimenting to understand how it all works.  The styling and behavior is the same as the CSS / HTML Flex model, except we only support Grow, not Shrink. "
+ 
+ 	frameSizes = [5]math32.Vector2{
+-		{20, 100},
+-		{80, 20},
+-		{60, 80},
+-		{40, 120},
+-		{150, 100},
++		{X: 20, Y: 100},
++		{X: 80, Y: 20},
++		{X: 60, Y: 80},
++		{X: 40, Y: 120},
++		{X: 150, Y: 100},
+ 	}
+ )
+ 
+--- a/core/renderbench_test.go
++++ b/core/renderbench_test.go
+@@ -37,18 +37,6 @@
+ 			w.renderWindow() // Note: MUST remove "go" in renderwindow.go call to w.renderAsync!
+ 		}
+ 	})
+-	return // comment to do profile too
+-	b.AssertRender(bm, "table/profile", func() {
+-		w := b.Scene.RenderWindow()
+-		// startCPUMemoryProfile()
+-		startTargetedProfile()
+-		for range 200 {
+-			b.Scene.NeedsRender()
+-			w.renderWindow() // Note: MUST remove "go" in renderwindow.go call to w.renderAsync!
+-		}
+-		endTargetedProfile()
+-		// endCPUMemoryProfile()
+-	})
+ }
+ 
+ // Note: MUST remove "go" in renderwindow.go call to w.renderAsync!
+@@ -68,16 +56,4 @@
+ 			w.renderWindow() // Note: MUST remove "go" in renderwindow.go call to w.renderAsync!
+ 		}
+ 	})
+-	return // comment to do profile too
+-	b.AssertRender(bm, "form/profile", func() {
+-		w := b.Scene.RenderWindow()
+-		// startCPUMemoryProfile()
+-		startTargetedProfile()
+-		for range 200 {
+-			b.Scene.NeedsRender()
+-			w.renderWindow() // Note: MUST remove "go" in renderwindow.go call to w.renderAsync!
+-		}
+-		endTargetedProfile()
+-		// endCPUMemoryProfile()
+-	})
+ }

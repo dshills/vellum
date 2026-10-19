@@ -1,0 +1,31 @@
+{
+  "result": "PASS_CORE_DEFAULT_VET_AND_OFFSCREEN_CHECKS",
+  "selected_race_methods": [
+    "TestToHTML",
+    "TestVellumLocalLayoutSliderRenderReachesQuiescence",
+    "TestVellumManualIndependentWindowsClockAndDPI",
+    "TestVellumPointerCapturePreservesDialogLocalCoordinates",
+    "TestVellumRenderedGeometryScrollAndWrap",
+    "TestVellumVerticalMovementRefreshesEditedLayout",
+    "TestVellumMaskedInteractionKeepsUnchangedLayout"
+  ],
+  "compiled_listed_benchmarks": [
+    "BenchmarkTable",
+    "BenchmarkForm"
+  ],
+  "benchmarks_executed": false,
+  "native_executed": false,
+  "default_core_events_desktop_base_vet_passed": true,
+  "previous_core_diagnostics_cleared": 12,
+  "old_failed_receipts_preserved": true,
+  "normal_benchmark_prefixes_identical": true,
+  "new_regression_methods": 0,
+  "mac_complete": false,
+  "schema": 1,
+  "baseline": "b4f5f1f1bf74f32e31f5543cb9b06be36ad6f5b9",
+  "checks_artifact": {
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-core-vet/checks-artifact-result.json",
+    "sha256": "7a43ace04183f26098f11cb4a49f5120b111940007c444d60058c6bd174f6186"
+  },
+  "patch_sha256": "845b8c018f55b2b0103e308602217d1ed2eba1a867c4bf95ed0bda3e8456a791"
+}

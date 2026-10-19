@@ -734,3 +734,10 @@ through queue compression. Automated race and original-code failure controls
 qualify source routing only. Twelve inherited default Core vet diagnostics remain
 tracked for the M7 source quality audit; physical input, actual presentation,
 measured 60 Hz and all remaining Mac acceptance/distribution gates stay open.
+
+The [Core source quality checkpoint](core-source-quality.md) clears the twelve
+previously recorded default Core vet diagnostics. Ten literal sites preserve
+their values with named fields; two unreachable profiling tails are removed while
+normal benchmark bodies remain identical. Seven existing offscreen race methods
+and benchmark compilation/listing pass. This resolves the specific source audit
+follow-up from event coalescing; final M7 audit and native/Mac gates remain open.

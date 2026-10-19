@@ -1146,6 +1146,17 @@
               "sha256": "d85ef952d37e4a3fb60a64e7d733309406ee3a207938e7d129557156fe27b0f8"
             }
           ]
+        },
+        {
+          "origin": "Vellum Core vet cleanup",
+          "inputs": "native/patches/corevet/original-hashes.json",
+          "outputs": "native/patches/corevet/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/corevet/0093-core-vet.patch",
+              "sha256": "845b8c018f55b2b0103e308602217d1ed2eba1a867c4bf95ed0bda3e8456a791"
+            }
+          ]
         }
       ]
     },
