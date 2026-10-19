@@ -280,9 +280,9 @@ class PreparationChecks(unittest.TestCase):
         core, font = manifest["dependencies"]
         self.assertEqual(core["module"], "cogentcore.org/core")
         numbers = [int(Path(patch["file"]).name[:4]) for stage in core["stages"] for patch in stage["patches"]]
-        self.assertEqual(numbers, list(range(1, 90)))
+        self.assertEqual(numbers, list(range(1, 94)))
         font_numbers = [int(Path(patch["file"]).name[:4]) for stage in font["stages"] for patch in stage["patches"]]
-        self.assertEqual(font_numbers, list(range(1, 6)))
+        self.assertEqual(font_numbers, list(range(1, 7)))
         import hashlib
         for dependency in manifest["dependencies"]:
             self.assertTrue(dependency["sum"].startswith("h1:"))
@@ -294,6 +294,105 @@ class PreparationChecks(unittest.TestCase):
 
 
 class AssetOverlayChecks(unittest.TestCase):
+    def test_raw_descriptor_cleanup_on_stream_failure_directory_bound_and_success(self):
+        import errno
+        import os
+        from unittest import mock
+        original_open = os.open
+        with tempfile.TemporaryDirectory() as name:
+            regular = Path(name) / "file"
+            regular.write_bytes(b"data")
+            for case in ("wrapper-failure", "directory", "bound-rejection", "success"):
+                opened = []
+                def capture(*args, **kwargs):
+                    descriptor = original_open(*args, **kwargs)
+                    opened.append(descriptor)
+                    return descriptor
+                with self.subTest(case=case), mock.patch.object(prepare.os, "open", side_effect=capture):
+                    if case == "wrapper-failure":
+                        with mock.patch.object(prepare.os, "fdopen", side_effect=OSError("injected stream failure")):
+                            with self.assertRaisesRegex(OSError, "injected stream"):
+                                prepare._read_stage_file(regular, 4)
+                    elif case == "directory":
+                        with self.assertRaises((IsADirectoryError, RuntimeError)):
+                            prepare._read_stage_file(Path(name), 65536)
+                    elif case == "bound-rejection":
+                        with self.assertRaisesRegex(RuntimeError, "byte bound"):
+                            prepare._read_stage_file(regular, 1)
+                    else:
+                        self.assertEqual(prepare._read_stage_file(regular, 4)[0], b"data")
+                self.assertEqual(len(opened), 1)
+                with self.assertRaises(OSError) as error:
+                    os.fstat(opened[0])
+                self.assertEqual(error.exception.errno, errno.EBADF)
+
+    def test_explicit_font_limit_admits_large_original_and_result_preserving_default(self):
+        import hashlib
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as tmp:
+            owned, dest, stage, inputs, outputs = self.fixture(Path(tmp))
+            original, result = b"o" * 454405, b"n" * 454600
+            (dest / "b.svg").write_bytes(original)
+            (owned / "b.svg").write_bytes(result)
+            inputs["b.svg"] = hashlib.sha256(original).hexdigest()
+            outputs["b.svg"] = hashlib.sha256(result).hexdigest()
+            stage["assets"][1]["sha256"] = outputs["b.svg"]
+            self.save(owned, inputs, outputs)
+            before = {p.name: p.read_bytes() for p in dest.iterdir()}
+            with mock.patch.object(prepare, "ROOT", owned):
+                with self.assertRaisesRegex(RuntimeError, "exceeds byte bound"):
+                    prepare.apply_stage(stage, dest)
+                self.assertEqual(before, {p.name: p.read_bytes() for p in dest.iterdir()})
+                stage["asset_byte_limit"] = 512 << 10
+                prepare.apply_stage(stage, dest)
+            self.assertEqual((dest / "a.svg").read_bytes(), b"new-a.svg")
+            self.assertEqual((dest / "b.svg").read_bytes(), result)
+            self.assertEqual(prepare.MAX_ASSET_BYTES, 64 << 10)
+            self.assertEqual(prepare.MAX_STAGE_ASSET_BYTES, 4 << 20)
+
+    def test_stage_asset_byte_limit_is_exact_integer_and_capped_before_reads(self):
+        from unittest import mock
+        for value in (True, False, None, -1, 0, (512 << 10) + 1, 524288.0, "524288"):
+            with self.subTest(value=value), tempfile.TemporaryDirectory() as tmp:
+                owned, dest, stage, inputs, outputs = self.fixture(Path(tmp))
+                stage["asset_byte_limit"] = value
+                with mock.patch.object(prepare, "ROOT", owned), mock.patch.object(prepare, "_read_stage_file") as read:
+                    with self.assertRaisesRegex(RuntimeError, "Invalid stage asset byte limit"):
+                        prepare.apply_stage(stage, dest)
+                read.assert_not_called()
+                self.unchanged(dest)
+
+    def test_explicit_limit_keeps_source_target_and_aggregate_refusal_before_mutation(self):
+        import hashlib
+        from unittest import mock
+        for kind in ("source", "target", "aggregate"):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as tmp:
+                owned, dest, stage, inputs, outputs = self.fixture(Path(tmp))
+                stage["asset_byte_limit"] = 512 << 10
+                if kind == "aggregate":
+                    for name in ("a.svg", "b.svg"):
+                        data = b"n" * (400 << 10)
+                        (owned / name).write_bytes(data)
+                        outputs[name] = hashlib.sha256(data).hexdigest()
+                    for entry in stage["assets"]:
+                        entry["sha256"] = outputs[entry["target"]]
+                else:
+                    path = (owned if kind == "source" else dest) / "b.svg"
+                    path.write_bytes(b"x" * ((512 << 10) + 1))
+                    if kind == "source":
+                        outputs["b.svg"] = hashlib.sha256(path.read_bytes()).hexdigest()
+                        stage["assets"][1]["sha256"] = outputs["b.svg"]
+                    else:
+                        inputs["b.svg"] = hashlib.sha256(path.read_bytes()).hexdigest()
+                self.save(owned, inputs, outputs)
+                before = {p.name: p.read_bytes() for p in dest.iterdir()}
+                cap = (700 << 10) if kind == "aggregate" else prepare.MAX_STAGE_ASSET_BYTES
+                with mock.patch.object(prepare, "ROOT", owned), mock.patch.object(prepare, "MAX_STAGE_ASSET_BYTES", cap), mock.patch.object(prepare.subprocess, "run") as run:
+                    with self.assertRaisesRegex(RuntimeError, "exceeds byte bound"):
+                        prepare.apply_stage(stage, dest)
+                run.assert_not_called()
+                self.assertEqual(before, {p.name: p.read_bytes() for p in dest.iterdir()})
+
     def fixture(self, root):
         import hashlib
         owned, destination = root / "owned", root / "destination"
@@ -506,8 +605,8 @@ class AssetOverlayChecks(unittest.TestCase):
                         self.requests.append(n)
                         if len(self.requests) > 2: raise AssertionError("unbounded growing read")
                         return b"x" * n if growing else b""
-                def opened(fd, *args):
-                    stream = Reader(original(fd, "rb")); seen.append(stream); return stream
+                def opened(fd, *args, **kwargs):
+                    stream = Reader(original(fd, *args, **kwargs)); seen.append(stream); return stream
                 with mock.patch.object(prepare.os, "fdopen", side_effect=opened):
                     with self.assertRaisesRegex(RuntimeError, "grew|shortened"): prepare._read_stage_file(path, 10)
                 self.assertLessEqual(sum(seen[0].requests), 3); self.assertTrue(seen[0].stream.closed)

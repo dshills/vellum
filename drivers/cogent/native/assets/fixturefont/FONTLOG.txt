@@ -1,0 +1,37 @@
+Vellum Invalid Variation Fixture — revision 1, 2026-10-19
+
+This is intentionally malformed regression data, not a font for installation or
+normal UI rendering. The font remains under SIL OFL-1.1. The generator's Python
+code has a separate MIT license. Original Microsoft copyright, Reserved Font
+Name declaration, trademark, designer and license metadata are retained.
+
+Input fixture SHA256:
+720afadd389c79e39a02502e952fecb6f5d78eeca5f095c14b9963ead45a8f1c
+Input Git blob: 50f5fec513ab5bf4b066006316dbea4132bab397
+It was added by go-text/typesetting commit
+6cc35dbfae7d604d5c08cd1a695b927c769f6cb3 as
+opentype/api/font/test/Selawik-VF-Subset.ttf. That commit documents subsetting the
+glyf table while retaining variation tables for TestInvalidGVAR. The later move
+to font/testdata preserves the same blob. No earlier generation procedure or
+permission to use a Reserved Font Name for that historical subset is asserted.
+
+Vellum changes only primary name records 1, 3, 4 and 6 to distinct Vellum names.
+The other 22 name records retain their exact platform/encoding/language/ID and
+string bytes. Every non-name table payload is identical except the necessary
+head.checkSumAdjustment bytes. Table directory offsets, alignment padding and
+checksums are regenerated. In particular the malformed glyf/loca/gvar payloads
+are not repaired, decompiled or normalized. Existing invalid-GVAR refusal and
+eager/deferred outline tests must continue to pass.
+
+The prepared upstream filename is retained solely for test-path compatibility
+and source provenance. Its primary family/full/PostScript/unique identifiers
+are Vellum names. This does not claim Microsoft endorsement or new RFN permission.
+
+Original family declaration:
+https://github.com/microsoft/Selawik/blob/89362e84731d1f5777fa078fd4d5ebbd339e4378/LICENSE.txt
+Full declaration in OFL.txt is byte-identical to prepared font/OFL_SELAWIK.txt.
+Original fixture addition:
+https://github.com/go-text/typesetting/commit/6cc35dbfae7d604d5c08cd1a695b927c769f6cb3
+Naming guidance:
+https://openfontlicense.org/how-to-modify-ofl-fonts/
+https://openfontlicense.org/ofl-faq/ (3.8, 5.3, 5.9)

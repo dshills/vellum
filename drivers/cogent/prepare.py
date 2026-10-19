@@ -48,6 +48,7 @@ def verify_inputs(owned, hashes):
 # Text/binary asset overlays are admitted before a stage mutates its owned copy.
 MAX_STAGE_ASSETS = 256
 MAX_ASSET_BYTES = 64 << 10
+MAX_PINNED_ASSET_BYTES = 512 << 10
 MAX_STAGE_ASSET_BYTES = 4 << 20
 MAX_PATCH_BYTES = 8 << 20
 MAX_STAGE_PATCH_BYTES = 32 << 20
@@ -80,22 +81,27 @@ def _asset_identity(value):
 
 def _read_stage_file(path, bound):
     flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
-    with os.fdopen(os.open(path, flags), "rb") as stream:
-        before = os.fstat(stream.fileno())
-        if not stat.S_ISREG(before.st_mode) or before.st_size > bound:
-            raise RuntimeError("Stage file exceeds byte bound or is nonregular")
-        remaining, body = before.st_size, bytearray()
-        while remaining:
-            chunk = stream.read(min(65536, remaining))
-            if not chunk:
-                raise RuntimeError("Stage file shortened during admission")
-            body.extend(chunk)
-            remaining -= len(chunk)
-        if stream.read(1):
-            raise RuntimeError("Stage file grew beyond admitted size")
-        if (_asset_identity(os.fstat(stream.fileno())) != _asset_identity(before)
-                or _asset_identity(os.stat(path, follow_symlinks=False)) != _asset_identity(before)):
-            raise RuntimeError("Stage file changed during admission")
+    descriptor = os.open(path, flags)
+    try:
+        # This owner closes even when constructing the stream itself fails.
+        with os.fdopen(descriptor, "rb", closefd=False) as stream:
+            before = os.fstat(stream.fileno())
+            if not stat.S_ISREG(before.st_mode) or before.st_size > bound:
+                raise RuntimeError("Stage file exceeds byte bound or is nonregular")
+            remaining, body = before.st_size, bytearray()
+            while remaining:
+                chunk = stream.read(min(65536, remaining))
+                if not chunk:
+                    raise RuntimeError("Stage file shortened during admission")
+                body.extend(chunk)
+                remaining -= len(chunk)
+            if stream.read(1):
+                raise RuntimeError("Stage file grew beyond admitted size")
+            if (_asset_identity(os.fstat(stream.fileno())) != _asset_identity(before)
+                    or _asset_identity(os.stat(path, follow_symlinks=False)) != _asset_identity(before)):
+                raise RuntimeError("Stage file changed during admission")
+    finally:
+        os.close(descriptor)
     return bytes(body), before
 
 
@@ -184,6 +190,9 @@ def stage_assets(stage, destination, inputs, outputs, patches):
     entries = stage.get("assets", [])
     if type(entries) is not list or len(entries) > MAX_STAGE_ASSETS:
         raise RuntimeError("Stage asset count bound exceeded")
+    byte_limit = stage.get("asset_byte_limit", MAX_ASSET_BYTES)
+    if type(byte_limit) is not int or not 1 <= byte_limit <= MAX_PINNED_ASSET_BYTES:
+        raise RuntimeError("Invalid stage asset byte limit")
     snapshots, descriptors = [], []
     try:
         sources, targets = set(), set()
@@ -206,16 +215,16 @@ def stage_assets(stage, destination, inputs, outputs, patches):
         for entry in entries:
             source = _asset_path(ROOT, entry["source"])
             target = _asset_path(destination, entry["target"])
-            data, source_stat = _read_stage_file(source, min(MAX_ASSET_BYTES, MAX_STAGE_ASSET_BYTES - total))
+            data, source_stat = _read_stage_file(source, min(byte_limit, MAX_STAGE_ASSET_BYTES - total))
             total += len(data)
-            original, before = _read_stage_file(target, MAX_ASSET_BYTES)
+            original, before = _read_stage_file(target, byte_limit)
             if hashlib.sha256(data).hexdigest() != entry["sha256"] or hashlib.sha256(original).hexdigest() != inputs[entry["target"]]:
                 raise RuntimeError("Stage asset input or source checksum mismatch")
             source_id, target_id = (source_stat.st_dev, source_stat.st_ino), (before.st_dev, before.st_ino)
             if source_id in source_ids or target_id in target_ids:
                 raise RuntimeError("Stage asset file aliases are not supported")
             source_ids.add(source_id); target_ids.add(target_id)
-            snapshots.append({"target": entry["target"], "path": target, "before": before, "data": data})
+            snapshots.append({"target": entry["target"], "path": target, "before": before, "data": data, "byte_limit": byte_limit})
         if source_ids.intersection(target_ids):
             raise RuntimeError("Stage asset source and destination files overlap")
         # Open all writers without truncation before any stage patch/write.
@@ -247,7 +256,7 @@ def _write_stage_assets(snapshots):
             if written <= 0:
                 raise OSError("Stage asset write made no progress")
             view = view[written:]
-        body, current = _read_stage_file(item["path"], MAX_ASSET_BYTES)
+        body, current = _read_stage_file(item["path"], item["byte_limit"])
         if (body != item["data"] or (current.st_dev, current.st_ino) != (item["before"].st_dev, item["before"].st_ino)):
             raise RuntimeError("Stage asset output mismatch")
 

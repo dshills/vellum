@@ -1218,6 +1218,25 @@
               "sha256": "fbc958851085e7281486c554a740140d1cc3c9a49b206f33f4a5adc09cf5aba9"
             }
           ]
+        },
+        {
+          "origin": "Vellum renamed regression fixture",
+          "inputs": "native/patches/fixturefont/original-hashes.json",
+          "outputs": "native/patches/fixturefont/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/fixturefont/0006-fixture-font-name.patch",
+              "sha256": "5a4cd6e189a359a9276b9aa2ca9275bb1d35d756ae889c56f7626a9346d43eb9"
+            }
+          ],
+          "assets": [
+            {
+              "source": "native/assets/fixturefont/VellumInvalidVariationFixture.ttf",
+              "target": "font/testdata/Selawik-VF-Subset.ttf",
+              "sha256": "da19865fba69f007e37d7a5b87539094dc8628d9e3b4ab109b125432f5bf0ef1"
+            }
+          ],
+          "asset_byte_limit": 524288
         }
       ]
     }

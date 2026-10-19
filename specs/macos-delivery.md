@@ -741,3 +741,12 @@ their values with named fields; two unreachable profiling tails are removed whil
 normal benchmark bodies remain identical. Seven existing offscreen race methods
 and benchmark compilation/listing pass. This resolves the specific source audit
 follow-up from event coalescing; final M7 audit and native/Mac gates remain open.
+
+The [modified regression font checkpoint](fixture-font-naming.md) gives the
+distributed invalid-variation fixture distinct internal primary names while
+preserving original declarations and its deliberately malformed regression data.
+Generator, bounded preparation, real-parser race and actual notice transport
+checks pass, including an original-font negative control. All 4438 selected embed
+bytes and 12 runtime fonts remain unchanged. This is one concrete M6 correction;
+mixed icon origins and overall distribution applicability remain unresolved.
+No native or performance gate is closed by these offscreen checks.
