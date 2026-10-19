@@ -1,0 +1,218 @@
+--- a/core/text.go
++++ b/core/text.go
+@@ -340,7 +340,7 @@
+ 	if tx.paintText == nil || len(tx.Links) == 0 {
+ 		return nil, image.Rectangle{}
+ 	}
+-	tpos := tx.Geom.Pos.Content
++	tpos := tx.paintTextOrigin()
+ 	ri := tx.pixelToRune(pos)
+ 	for li := range tx.Links {
+ 		lr := &tx.Links[li]
+@@ -424,7 +424,22 @@
+ }
+ 
+ func (tx *Text) pixelToRune(pt image.Point) int {
+-	return tx.paintText.RuneAtPoint(math32.FromPoint(pt), tx.Geom.Pos.Content)
++	return tx.paintText.RuneAtPoint(math32.FromPoint(pt), tx.paintTextOrigin())
++}
++
++// paintTextOrigin positions the entire shaped text block inside the actual
++// content allocation. Shaping already aligns shorter lines to the longest
++// line; this adds only the remaining block-to-allocation horizontal offset.
++// Rendering and all pointer/selection/link coordinates must share this origin.
++func (tx *Text) paintTextOrigin() math32.Vector2 {
++	origin := tx.Geom.Pos.Content
++	if tx.paintText != nil {
++		spare := tx.Geom.Size.Actual.Content.X - tx.paintText.Bounds.Size().X
++		if spare > 0 {
++			origin.X += spare * tx.Styles.Text.Align.Factor()
++		}
++	}
++	return origin
+ }
+ 
+ // selectUpdate updates selection based on rune index
+@@ -576,6 +591,20 @@
+ 	return chg
+ }
+ 
++// SizeFinal preserves intrinsic wrapping during measurement but honors an
++// explicit Grow at final allocation. GrowWrap otherwise prevents the base
++// widget from expanding at all, leaving paragraph alignment no content space
++// and allowing parent content/item alignment to position the intrinsic block
++// twice within an already expanded allocation.
++func (tx *Text) SizeFinal() {
++	wrap := tx.Styles.GrowWrap
++	if tx.Styles.Grow.X > 0 || tx.Styles.Grow.Y > 0 {
++		tx.Styles.GrowWrap = false
++	}
++	defer func() { tx.Styles.GrowWrap = wrap }()
++	tx.WidgetBase.SizeFinal()
++}
++
+ func (tx *Text) Render() {
+ 	if tx.localTextPending {
+ 		tx.configTextAlloc(tx.Geom.Size.Alloc.Content)
+@@ -585,7 +614,7 @@
+ 	tx.paintText.SelectRegion(tx.selectRange)
+ 	tx.paintText.HighlightReset()
+ 	tx.paintText.HighlightRegion(tx.highlights...)
+-	tx.Scene.Painter.DrawText(tx.paintText, tx.Geom.Pos.Content)
++	tx.Scene.Painter.DrawText(tx.paintText, tx.paintTextOrigin())
+ }
+ 
+ //////// Search interface
+--- /dev/null
++++ b/core/text_alignment_vellum_test.go
+@@ -0,0 +1,150 @@
++//go:build offscreen
++
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package core
++
++import (
++	"math"
++	"testing"
++
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/text/text"
++)
++
++func TestVellumTextAlignmentOriginMatchesSelectionAndLinks(t *testing.T) {
++	for _, alignment := range []text.Aligns{text.Start, text.Center, text.End} {
++		t.Run(alignment.String(), func(t *testing.T) {
++			var tx *Text
++			m, body, _ := manualFixture(t, func(b *Body) {
++				tx = NewText(b).SetText(`<a href="https://example.com">12345</a>`)
++				tx.Styler(func(s *styles.Style) {
++					s.Min.Set(units.Dp(240), units.Dp(40))
++					s.Max.Set(units.Dp(240), units.Dp(40))
++					s.Grow.Set(0, 0)
++					s.Text.Align = alignment
++				})
++			})
++			drainManual(t, m)
++			rc := body.Scene.renderContext()
++			rc.Lock()
++			defer rc.Unlock()
++			origin := tx.paintTextOrigin()
++			spare := tx.Geom.Size.Actual.Content.X - tx.paintText.Bounds.Size().X
++			want := spare * alignment.Factor()
++			if spare < 100 || math.Abs(float64(origin.X-tx.Geom.Pos.Content.X-want)) > .01 {
++				t.Fatalf("origin=%v content=%v spare=%v want offset=%v", origin, tx.Geom.Pos.Content, spare, want)
++			}
++			for ri := 0; ri < 5; ri++ {
++				bounds := tx.paintText.RuneBounds(ri).Translate(origin)
++				point := bounds.Center().ToPoint()
++				if got := tx.pixelToRune(point); got != ri {
++					t.Fatalf("selection at rendered rune %d resolved %d", ri, got)
++				}
++				link, hit := tx.findLink(point)
++				if link == nil || !point.In(hit) || !point.In(bounds.ToRect()) {
++					t.Fatalf("link bounds missed rendered rune %d: %v", ri, hit)
++				}
++			}
++		})
++	}
++}
++
++func TestVellumTextAlignmentMultilineAddsOnlyBlockSpare(t *testing.T) {
++	var tx *Text
++	m, body, _ := manualFixture(t, func(b *Body) {
++		tx = NewText(b).SetText("123456789<br>12")
++		tx.Styler(func(s *styles.Style) {
++			s.Min.Set(units.Dp(240), units.Dp(80))
++			s.Max.Set(units.Dp(240), units.Dp(80))
++			s.Grow.Set(0, 0)
++			s.Text.Align = text.End
++		})
++	})
++	drainManual(t, m)
++	rc := body.Scene.renderContext()
++	rc.Lock()
++	defer rc.Unlock()
++	if len(tx.paintText.Lines) != 2 {
++		t.Fatalf("expected two lines, got %d", len(tx.paintText.Lines))
++	}
++	origin := tx.paintTextOrigin()
++	var right float32
++	for i, line := range tx.paintText.Lines {
++		edge := origin.X + line.Offset.X + line.Bounds.Max.X
++		if i == 0 {
++			right = edge
++		} else if math.Abs(float64(edge-right)) > 1 {
++			t.Fatalf("double-aligned line: edges %v %v", right, edge)
++		}
++	}
++	if math.Abs(float64(right-(tx.Geom.Pos.Content.X+tx.Geom.Size.Actual.Content.X))) > 1 {
++		t.Fatalf("aligned right edge %v missed content right", right)
++	}
++}
++
++func TestVellumTextAlignmentPreservesLinkedInteriorSpace(t *testing.T) {
++	var tx *Text
++	m, body, _ := manualFixture(t, func(b *Body) {
++		tx = NewText(b).SetText(`<a href="https://example.com">one two</a>`)
++		tx.Styler(func(s *styles.Style) {
++			s.Min.Set(units.Dp(300), units.Dp(60))
++			s.Max.Set(units.Dp(300), units.Dp(60))
++			s.Grow.Set(0, 0)
++			s.Font.Size.Dp(32)
++			s.Text.Align = text.End
++		})
++	})
++	drainManual(t, m)
++	rc := body.Scene.renderContext()
++	rc.Lock()
++	defer rc.Unlock()
++	origin := tx.paintTextOrigin()
++	for _, cell := range tx.paintText.InteractionLayout().Cells {
++		if cell.Range.Start != 3 {
++			continue
++		}
++		point := cell.Rect.Translate(origin).Center().ToPoint()
++		point.X = int(cell.Rect.Max.X + origin.X - 1)
++		if got := tx.pixelToRune(point); got != 3 {
++			t.Fatalf("linked space resolved rune %d", got)
++		}
++		if link, _ := tx.findLink(point); link == nil || link.URL != "https://example.com" {
++			t.Fatal("interior linked space lost hyperlink hit")
++		}
++		return
++	}
++	t.Fatal("missing interior space advance cell")
++}
++
++func TestVellumGrowingTextFillsFinalAllocationAndKeepsWrapping(t *testing.T) {
++	var tx *Text
++	m, body, _ := manualFixture(t, func(b *Body) {
++		column := NewFrame(b)
++		column.Styler(func(s *styles.Style) {
++			s.Direction = styles.Column
++			s.Min.X.Dp(240)
++			s.Max.X.Dp(240)
++			s.Align.Items = styles.Center
++			s.Align.Content = styles.Center
++		})
++		tx = NewText(column).SetText("one two three four five six seven eight nine ten")
++		tx.Styler(func(s *styles.Style) { s.Grow.Set(1, 0); s.Font.Size.Dp(24); s.Text.Align = text.Center })
++	})
++	drainManual(t, m)
++	rc := body.Scene.renderContext()
++	rc.Lock()
++	defer rc.Unlock()
++	if tx.Geom.Size.Actual.Content.X != tx.Geom.Size.Alloc.Content.X || tx.Geom.Size.Actual.Content.X < 230 {
++		t.Fatalf("explicit growth left intrinsic content size: %+v", tx.Geom.Size)
++	}
++	if !tx.Styles.GrowWrap || len(tx.paintText.Lines) < 2 {
++		t.Fatal("final allocation disabled wrapping measurement", tx.Styles.GrowWrap, len(tx.paintText.Lines))
++	}
++	for _, line := range tx.paintText.Lines {
++		if line.Bounds.Size().X > tx.Geom.Size.Actual.Content.X+1 {
++			t.Fatal("wrapped line exceeds final content", line.Bounds, tx.Geom.Size)
++		}
++	}
++}

@@ -1,0 +1,168 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "827e284ed1ad6924fc62ffc273002eaa",
+  "repo": {
+    "root": "/private/tmp/vellum-macos-native-results-97aee13",
+    "head": "ddf6c3ae7f51d54899647684ba190742314f51c6",
+    "branch": "codex/macos-native-results"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "b508b7f22236932e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Keys in the failure state report handled but do nothing",
+      "message": "After an error, pressing an operator such as + or = is reported handled but leaves the failure state unchanged. The pending expression is not cleared, so the key silently does nothing. Only a digit or AC can recover from the error. Operator and delete keys (including the Delete key via Backspace) return true with no effect, which is misleading for callers that use the return value.",
+      "suggestion": "Return false for keys that are ignored in the failure state, or reset the model on delete.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "examples/macapps/calculator/model.go",
+          "lines": {
+            "start": 209,
+            "end": 211
+          }
+        }
+      ],
+      "tags": [
+        "calculator",
+        "location-corrected"
+      ],
+      "evidence": "if m.failure != \"\" {\n\t\treturn key == \"delete\" || strings.Contains(\"+-*/=%±\", key) \u0026\u0026 len(key) == 1\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "15f4e87acf899131",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unguarded index into parts when fresh",
+      "message": "The delete branch indexes m.parts[len-2] when m.fresh is true. fresh can remain true after UseHistory or reset only if parts is non-empty, but the \"+/-*/\" operator branch also indexes m.parts[len-1] when fresh. Any path that sets fresh without parts would panic. The '=' branch and '%' branch clear parts but set fresh=false, so it is currently safe. However the '±' and failure paths rely on invariants that are not enforced.",
+      "suggestion": "Guard with len(m.parts) \u003e= 2 before indexing, treating a violation as a reset.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/macapps/calculator/model.go",
+          "lines": {
+            "start": 266,
+            "end": 269
+          }
+        }
+      ],
+      "tags": [
+        "calculator",
+        "panic",
+        "location-corrected"
+      ],
+      "evidence": "if m.fresh {\n\t\t\tm.entry = m.parts[len(m.parts)-2]\n\t\t\tm.parts = m.parts[:len(m.parts)-2]\n\t\t\tm.fresh = false",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "ec5813050139ee45",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "TextAlign validation path is untested through resolution",
+      "message": "The new validation accepts only Start, Center and End for TextAlign, which is correct. But the existing Style validation of Align and Justify is not shown in this diff, so an AlignStretch value could be rejected inconsistently. Calling Validate on a resolved style relies on Overlay and Validate agreeing, and no test covers the resolved-style path for TextAlign.",
+      "suggestion": "Add a test that runs ResolveStyle with an invalid TextAlign in the theme or node style and confirms the error is returned.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/style.go",
+          "lines": {
+            "start": 80,
+            "end": 80
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "location-corrected"
+      ],
+      "evidence": "if s.TextAlign.Set \u0026\u0026 s.TextAlign.Value != AlignStart \u0026\u0026 s.TextAlign.Value != AlignCenter \u0026\u0026 s.TextAlign.Value != AlignEnd {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 18186,
+    "totalMs": 8794
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 76,
+    "bytes": 309666,
+    "chunks": 3,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 160145,
+        "output": 1460,
+        "costUSD": 0.33489
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "d2788925e0dd65b1",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Title admission may reorder history relative to pending body edit",
+        "message": "In Notes Update, if before == after it returns nil, but Update calls flush which may journal entries; more importantly Select/SelectFolder/SetSearch accept calls clear status unconditionally. In Reminders, Add is invoked via AfterInput, but Undo from toolbar button is not wrapped: view calls m.Undo directly which itself uses AfterInput; fine. However Reminders openDetails is called from title/details buttons directly, and the dialog Dismiss uses cancelDetails. Low-confidence issue: Notes titleChanged when body composing skips BodyChanged, so a later title undo ordering may precede earlier body edit.",
+        "suggestion": "Flush the body edit before admitting a title when not composing, and re-flush after composition ends, to keep history order consistent.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "examples/macapps/notes/model.go",
+            "lines": {
+              "start": 228,
+              "end": 232
+            }
+          }
+        ],
+        "tags": [
+          "ordering"
+        ],
+        "evidence": "m.accept(err)\n\treturn err\n}\n\n// titleChanged admits",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in examples/macapps/notes/model.go"
+    }
+  ],
+  "suppressed": []
+}

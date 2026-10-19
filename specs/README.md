@@ -53,3 +53,5 @@ See [implementation status](../docs/implementation.md) for completed phases and
 measurement and matched 10k/100k wide/deep workloads.
 
 - [Named Canvas2D objects](canvas-accessibility.md): stable semantic identities, completed clipped frames and owner-held selection.
+
+- [macOS application examples](macos-app-examples.md): runnable Calculator, Notes, Weather and Reminders with public APIs and separate visual acceptance.

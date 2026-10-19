@@ -1,0 +1,11 @@
+# Native window chrome
+
+Stage 0094 adds immutable native creation options from Core Stage to the desktop window. The zero policy follows the existing GLFW path without Cocoa decoration changes. Nonzero desktop policy requires macOS; unified chrome requires macOS 11 and Dark requires macOS 10.14. This availability guard does not expand the framework support matrix.
+
+Unified mode installs a real, noncustomizable NSToolbar, retains OS-owned traffic lights, hides the title, and makes the titlebar transparent. It preserves the existing GLFW content view and future CAMetalLayer attachment. It does not change NSApp appearance, a delegate, first responder, or global system preferences. Per-window Light/Dark is independent of Vellum content theme.
+
+The same client-view width/height is preserved at creation and explicit resize. Full-size content includes the native header: the application must keep interactive Vellum controls below that native drag strip. This API does not turn a ui.Toolbar into native toolbar items. Header dimensions remain Cocoa-owned; no traffic-light offsets are hardcoded. Unified positioning uses the actual full-view screen top-left, with GLFW's existing global coordinate convention. Native-main creation/move/resize/setter operations publish a detached position snapshot for position and monitor-overlap queries. Default windows retain the original GLFW position path. Full-size frame constraints use actual view/frame insets rather than GLFW's nominal titlebar inset.
+
+New implementation and tests are MIT Vellum additions; original Core source remains under its existing declaration. No visual, physical, or native-runtime qualification is implied by applying this recipe.
+
+After GLFW restores a windowed monitor configuration, the recipe corrects both full-client size and position. The external hidden fixture can simulate GLFW's style/nominal-frame restoration without entering fullscreen or changing displays. It checks view/layer/button identity, actual screen origin and client extent. This does not qualify real fullscreen transitions. A consumer's fixed 52-point demo header reserve is scoped to the measured windowed configuration; native fullscreen/header changes require renewed layout handling.

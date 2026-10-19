@@ -1,0 +1,109 @@
+{
+  "approved": true,
+  "result": "ALL_RETAINED_AND_DISCARDED_FINDINGS_SUBSTANTIVELY_INSPECTED_NO_SOURCE_CHANGE_REQUIRED",
+  "scope": "Independent adjudication of the current Prism findings against unchanged final source; not independent authorship review or commit admission for every staged path.",
+  "run_id": "827e284ed1ad6924fc62ffc273002eaa",
+  "staged_diff_sha256": "27a62431559077875c46d3dec325b232b685b6d6f063bf1c187fd0590b0d26a5",
+  "staged_diff_bytes": 309666,
+  "source_matches_provider_input": true,
+  "raw_counts": {
+    "retained": 3,
+    "discarded": 1,
+    "suppressed": 0
+  },
+  "coverage": {
+    "files": 76,
+    "bytes": 309666,
+    "chunks": 3,
+    "llm_calls": 3,
+    "cache_hit": false,
+    "complete": true,
+    "skipped": [],
+    "truncated_bytes": 0,
+    "provider_exit_code": 1
+  },
+  "dispositions": [
+    {
+      "id": "b508b7f22236932e",
+      "provider_status": "retained",
+      "disposition": "REFUTED_AS_BUG_INTENTIONAL_ERROR_KEY_HANDLING",
+      "reason": "Press true is recognition/consumption, not a promise that state changed: saturated entry and a repeated decimal already return true without mutation. Error-state ASCII operator/delete keys intentionally leave Error visible; numeric/decimal entry and AC/Escape reset through the earlier branches. Both production button callbacks and command Execute invoke Press without using its boolean as a changed-state result. Returning true for consumed no-ops is coherent and the report identifies no violated recovery promise.",
+      "evidence": [
+        "calculator/model.go:173-211: normal saturation/repeated-decimal/error-key branches",
+        "calculator/model.go:160-168: reset clears failure, expression, parts and fresh/result flags",
+        "calculator/commands.go:Execute calls Press and returns nil",
+        "calculator/view.go:key Activate calls Press; no state-change interpretation of bool"
+      ]
+    },
+    {
+      "id": "15f4e87acf899131",
+      "provider_status": "retained",
+      "disposition": "REFUTED_PUBLIC_STATE_INVARIANT_PROVES_INDICES_SAFE",
+      "reason": "The only production assignment fresh=true follows append(parts, entry, key), establishing an even parts length of at least2. reset, successful equals, deletion that removes a pair, percent/sign, and fresh numeric entry clear fresh. UseHistory calls reset before setting result. Any path clearing parts because result is true is reached with fresh=false: result=true is established only by successful equals or UseHistory, both after fresh is cleared. Failure paths preserve existing parts or reset before new entry. Private fields cannot be independently changed through the public consumer API; the report explicitly concedes current paths are safe and supplies only a hypothetical future invalid assignment.",
+      "evidence": [
+        "calculator/model.go:227-228: sole fresh=true after pair append",
+        "calculator/model.go:160-168: reset invariant",
+        "calculator/model.go:231-258: sign/percent clear fresh without removing parts",
+        "calculator/model.go:260-270: pair deletion immediately clears fresh",
+        "calculator/model.go:300-302 and UseHistory: parts clearing/result admission preserves invariant"
+      ]
+    },
+    {
+      "id": "ec5813050139ee45",
+      "provider_status": "retained",
+      "disposition": "REFUTED_VALIDATION_PRESENT_TEST_SUGGESTION_ONLY",
+      "reason": "Style.Validate explicitly rejects a set TextAlign outside Start/Center/End. Overlay carries TextAlign, and ResolveStyle invokes s.Validate after theme/kind/legacy/node resolution, rejecting any invalid value that survives the overlay. Theme.Validate independently checks both raw theme styles and resolved default/kind styles. AlignStretch is not an offered ui.Alignment constant; Align/Justify already use the same three-value admission. A proposed additional test is not evidence of a missing validation path or a current defect.",
+      "evidence": [
+        "ui/style.go:Style.Validate TextAlign/Align/Justify branches",
+        "ui/style.go:Style.Overlay TextAlign copy",
+        "ui/style.go:ResolveStyle final s.Validate call",
+        "ui/style.go:Theme.Validate checks raw/resolved styles",
+        "ui/app_style_test.go:valid resolved TextAlign override and invalid enum validation"
+      ]
+    },
+    {
+      "id": "d2788925e0dd65b1",
+      "provider_status": "discarded",
+      "disposition": "NOT_SUBSTANTIATED_AFTER_ACTUAL_SOURCE_INSPECTION",
+      "mechanical_filter_not_relied_on": true,
+      "reason": "Update flushes committed body changes before comparing the proposed note. titleChanged already calls BodyChanged before recording a title whenever the independent body is not composing. During body preedit, an earlier committed title remains admissible by design, while destructive/history actions refuse active composition. In the supported native adapter, committed model Apply/CommitComposition and committedEditorChange run in the same owner processing path; a subsequent native preview cannot interleave before that committed Change callback. The report supplies no concrete supported sequence that reverses the committed history. Skipping body admission for live preedit avoids recording uncommitted text or discarding an earlier title.",
+      "evidence": [
+        "notes/model.go:392-408: Update validation/flush before equality",
+        "notes/model.go:428-456: explicit title admission and noncomposing BodyChanged",
+        "notes/model.go:ready/flush/Request: composition refusal and ordered settlement",
+        "drivers/cogent/editor.go:applyNativeText transaction updates model then immediately calls committedEditorChange on committed text change",
+        "notes/settlement_test.go:TestTitleCommitDuringBodyCompositionDoesNotDiscardEither and pending-title/Undo tests"
+      ]
+    }
+  ],
+  "unresolved_findings": [],
+  "source_edits_required": false,
+  "tests_or_native_or_provider_executed_by_reviewer": false,
+  "limits": [
+    "This disposition does not certify physical typing/IME/fullscreen, native presentation/performance, legal approval or complete Mac delivery.",
+    "Existing test code was read as corroboration; no tests were rerun and no execution result was invented.",
+    "No speculative defensive guards or validation-test churn is required by these findings."
+  ],
+  "inputs": {
+    "/private/tmp/vellum-macos-native-results-97aee13/examples/macapps/calculator/model.go": "b92b738fbc816c623bf38ae520eb60090cfec768dc16c3524efda7cb585c4c9c",
+    "/private/tmp/vellum-macos-native-results-97aee13/examples/macapps/calculator/commands.go": "7989d545f4c74328108b693b9d16d883ef9e66f7b1cc8eb0578a51bfa63baaa7",
+    "/private/tmp/vellum-macos-native-results-97aee13/examples/macapps/calculator/view.go": "55c4eaf760e82fe3bef4f9d4cdf260935d3cec0d0d8aff4c7d42e3941f6ec1ee",
+    "/private/tmp/vellum-macos-native-results-97aee13/examples/macapps/calculator/model_test.go": "421b45b3cba9cf56cca094a828de213fdc1d9a7c16c54b3f62e764ef95d33a43",
+    "/private/tmp/vellum-macos-native-results-97aee13/examples/macapps/calculator/README.md": "53b13ac70e6fb3cddbcf16e41b8fc3e510342c133cbca1f81895d7c494142ea3",
+    "/private/tmp/vellum-macos-native-results-97aee13/ui/style.go": "2b33cb7b6a9afa4913565145bdf134f58ff4c8d47609b16e5f7ae5fee575df39",
+    "/private/tmp/vellum-macos-native-results-97aee13/ui/app_style_test.go": "9050ffe2a000d388ecdbfa5aa3d714c4b79a063763c6aedd4fe8574ccec4460f",
+    "/private/tmp/vellum-macos-native-results-97aee13/examples/macapps/notes/model.go": "33adc03e425860ad56a822fe393ffd21c8cd8062bd0f4d67fb59e47849c9e3cb",
+    "/private/tmp/vellum-macos-native-results-97aee13/examples/macapps/notes/view.go": "4677e2249a1c922513f78add0a99fb1daf3e9ca0ad2bd3ef013ebb232612db18",
+    "/private/tmp/vellum-macos-native-results-97aee13/examples/macapps/notes/model_test.go": "e3514ebc61d6238358d9b75872b1ebf080cd229daf9b6d79cc9dd70dac1df947",
+    "/private/tmp/vellum-macos-native-results-97aee13/examples/macapps/notes/settlement_test.go": "a809c60582a72dee516f5d64e871f7eac36b7026f43828b2aeedf1b5ffdbd755",
+    "/private/tmp/vellum-macos-native-results-97aee13/examples/macapps/notes/README.md": "b57c7573708d3f9d2a436f11dd553b063380f6ff99cc06514dd9fed837af0052",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/editor.go": "56aa72f3b61db048cfcfd78277898ac7dfc0b55dc5f629d7b3f574e398090c27",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-app-examples/prism.json": "cad7c3cc5cd6a419115035dd1d365212d6e8a73632ee60e671ffcbdade954a31",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-app-examples/prism-execution.json": "2356098febbc3f59d12765a47c485c6f91b049b7a70020fadd3338538f42e113",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-app-examples/prism-input.json": "a30bdebb16266c37202c4625fa11f5cb221b56ca8c64a853f7963abd5f64edc4",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-app-examples/prism-rules.json": "299e0cd9b5358db253228320541b014966bcac153c1ceb2c0a1ad6abf436b30a",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-app-examples/prism.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-app-examples/prism.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-app-examples/reviewed-staged.diff": "27a62431559077875c46d3dec325b232b685b6d6f063bf1c187fd0590b0d26a5"
+  }
+}

@@ -9,35 +9,48 @@ import (
 type Symbol string
 
 const (
-	SymbolAdd      Symbol = "add"
-	SymbolRemove   Symbol = "remove"
-	SymbolCheck    Symbol = "check"
-	SymbolClose    Symbol = "close"
-	SymbolSearch   Symbol = "search"
-	SymbolSettings Symbol = "settings"
-	SymbolSave     Symbol = "save"
-	SymbolOpen     Symbol = "open"
-	SymbolUndo     Symbol = "undo"
-	SymbolRedo     Symbol = "redo"
-	SymbolCopy     Symbol = "copy"
-	SymbolCut      Symbol = "cut"
-	SymbolPaste    Symbol = "paste"
-	SymbolInfo     Symbol = "info"
-	SymbolWarning  Symbol = "warning"
-	SymbolDelete   Symbol = "delete"
-	SymbolLeft     Symbol = "left"
-	SymbolRight    Symbol = "right"
-	SymbolUp       Symbol = "up"
-	SymbolDown     Symbol = "down"
-	SymbolMenu     Symbol = "menu"
-	SymbolExpand   Symbol = "expand"
-	SymbolCollapse Symbol = "collapse"
+	SymbolAdd          Symbol = "add"
+	SymbolRemove       Symbol = "remove"
+	SymbolCheck        Symbol = "check"
+	SymbolClose        Symbol = "close"
+	SymbolSearch       Symbol = "search"
+	SymbolSettings     Symbol = "settings"
+	SymbolSave         Symbol = "save"
+	SymbolOpen         Symbol = "open"
+	SymbolUndo         Symbol = "undo"
+	SymbolRedo         Symbol = "redo"
+	SymbolCopy         Symbol = "copy"
+	SymbolCut          Symbol = "cut"
+	SymbolPaste        Symbol = "paste"
+	SymbolInfo         Symbol = "info"
+	SymbolWarning      Symbol = "warning"
+	SymbolDelete       Symbol = "delete"
+	SymbolLeft         Symbol = "left"
+	SymbolRight        Symbol = "right"
+	SymbolUp           Symbol = "up"
+	SymbolDown         Symbol = "down"
+	SymbolMenu         Symbol = "menu"
+	SymbolExpand       Symbol = "expand"
+	SymbolCollapse     Symbol = "collapse"
+	SymbolBackspace    Symbol = "backspace"
+	SymbolSidebar      Symbol = "sidebar"
+	SymbolCalculator   Symbol = "calculator"
+	SymbolSun          Symbol = "sun"
+	SymbolCloud        Symbol = "cloud"
+	SymbolRain         Symbol = "rain"
+	SymbolWind         Symbol = "wind"
+	SymbolSunrise      Symbol = "sunrise"
+	SymbolPartlyCloudy Symbol = "partly-cloudy"
+	SymbolCircle       Symbol = "circle"
+	SymbolCircleCheck  Symbol = "circle-check"
 )
 
 var symbols = [...]Symbol{SymbolAdd, SymbolRemove, SymbolCheck, SymbolClose,
 	SymbolSearch, SymbolSettings, SymbolSave, SymbolOpen, SymbolUndo, SymbolRedo,
 	SymbolCopy, SymbolCut, SymbolPaste, SymbolInfo, SymbolWarning, SymbolDelete,
-	SymbolLeft, SymbolRight, SymbolUp, SymbolDown, SymbolMenu, SymbolExpand, SymbolCollapse}
+	SymbolLeft, SymbolRight, SymbolUp, SymbolDown, SymbolMenu, SymbolExpand, SymbolCollapse,
+	SymbolBackspace, SymbolSidebar, SymbolCalculator, SymbolSun, SymbolCloud,
+	SymbolRain, SymbolWind, SymbolSunrise, SymbolPartlyCloudy, SymbolCircle, SymbolCircleCheck}
 
 // Symbols returns a detached list of all built-in symbol names.
 func Symbols() []Symbol { return append([]Symbol(nil), symbols[:]...) }

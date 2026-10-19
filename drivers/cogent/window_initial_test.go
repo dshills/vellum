@@ -27,3 +27,25 @@ func TestInitialWindowSizeDoesNotBecomePersistentBodyMinimum(t *testing.T) {
 		t.Fatal("application minimum overwritten")
 	}
 }
+
+func TestInitialWindowFixedSizePolicy(t *testing.T) {
+	for _, tc := range []struct {
+		name                 string
+		fixed, wantResizable bool
+	}{
+		{"default resizable", false, true},
+		{"fixed", true, false},
+		{"default after fixed", false, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			body := core.NewBody("fixed-size creation policy")
+			stage := initialWindowStage(body, app.Window{Width: 230, Height: 408, FixedSize: tc.fixed})
+			if stage.Resizable != tc.wantResizable {
+				t.Fatalf("Resizable=%v want%v for FixedSize=%v", stage.Resizable, tc.wantResizable, tc.fixed)
+			}
+			if stage.UseMinSize || stage.InitialSizeDP != math32.Vec2(230, 408) {
+				t.Fatal("fixed-size policy altered creation dimensions or content-minimum policy")
+			}
+		})
+	}
+}

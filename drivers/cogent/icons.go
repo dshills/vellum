@@ -3,7 +3,19 @@ package cogent
 import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/icons"
+	_ "embed"
 	"github.com/dshills/vellum/ui"
+)
+
+// These three unmodified Material Symbols carry their own Apache declaration
+// and exact source identities in native/assets/symbols.
+var (
+	//go:embed native/assets/symbols/rain.svg
+	rainSymbol string
+	//go:embed native/assets/symbols/sunrise.svg
+	sunriseSymbol string
+	//go:embed native/assets/symbols/partly-cloudy.svg
+	partlyCloudySymbol string
 )
 
 func nativeSymbol(symbol ui.Symbol) icons.Icon {
@@ -54,6 +66,28 @@ func nativeSymbol(symbol ui.Symbol) icons.Icon {
 		return icons.ExpandMore
 	case ui.SymbolCollapse:
 		return icons.ExpandLess
+	case ui.SymbolBackspace:
+		return icons.Backspace
+	case ui.SymbolSidebar:
+		return icons.SideNavigation
+	case ui.SymbolCalculator:
+		return icons.Calculate
+	case ui.SymbolSun:
+		return icons.Brightness7
+	case ui.SymbolCloud:
+		return icons.Cloud
+	case ui.SymbolRain:
+		return icons.Icon(rainSymbol)
+	case ui.SymbolWind:
+		return icons.Air
+	case ui.SymbolSunrise:
+		return icons.Icon(sunriseSymbol)
+	case ui.SymbolPartlyCloudy:
+		return icons.Icon(partlyCloudySymbol)
+	case ui.SymbolCircle:
+		return icons.RadioButtonUnchecked
+	case ui.SymbolCircleCheck:
+		return icons.CheckCircle
 	}
 	return icons.None // Validation refuses unknown names; empty clears prior artwork.
 }

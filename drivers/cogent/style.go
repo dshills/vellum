@@ -6,6 +6,7 @@ import (
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/text/rich"
+	"cogentcore.org/core/text/text"
 	"github.com/dshills/vellum/ui"
 )
 
@@ -60,6 +61,36 @@ func applyStyle(s *styles.Style, n ui.Node, theme ui.Theme) {
 	}
 	if value.Grow.Set {
 		s.Grow.Set(value.Grow.Value, value.Grow.Value)
+	}
+	if value.GrowX.Set {
+		s.Grow.X = value.GrowX.Value
+	}
+	if value.GrowY.Set {
+		s.Grow.Y = value.GrowY.Value
+	}
+	if value.TextAlign.Set {
+		// Button labels are intrinsic-width children. Text paragraph alignment
+		// alone cannot move their content within the button's allocation.
+		if n.Kind == ui.Button || n.Kind == ui.MenuButton {
+			s.Justify.Content = nativeAlignment(value.TextAlign.Value)
+		}
+		switch value.TextAlign.Value {
+		case ui.AlignCenter:
+			s.Text.Align = text.Center
+		case ui.AlignEnd:
+			s.Text.Align = text.End
+		default:
+			s.Text.Align = text.Start
+		}
+	}
+	if value.CornerRadius.Set {
+		s.Border.Radius.Set(units.Dp(value.CornerRadius.Value))
+	}
+	if value.Border.Set {
+		b := value.Border.Value
+		s.Border.Width.Set(units.Dp(b.Width))
+		s.Border.Style.Set(styles.BorderSolid)
+		s.Border.Color.Set(image.NewUniform(b.Color))
 	}
 	if value.Foreground.Set {
 		s.Color = image.NewUniform(value.Foreground.Value)

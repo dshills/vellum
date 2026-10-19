@@ -1,0 +1,70 @@
+--- a/core/mainstage.go
++++ b/core/mainstage.go
+@@ -413,12 +413,18 @@
+ 	opts.Flags.SetFlag(st.Fullscreen, system.Fullscreen)
+ 	if saved != nil && savedScreen != nil {
+ 		opts.Screen = savedScreen.ScreenNumber
+-		opts.Size, opts.Pos = saved.Size, saved.Pos
+-		opts.InitialSizeDP = math32.Vector2{}
++		opts.Pos = saved.Pos
++		// An explicit fixed viewport must not restore an earlier resizable size
++		// or maximized state. Position restoration remains independent.
++		fixedViewport := !st.Resizable && opts.HasInitialSizeDP()
++		if !fixedViewport {
++			opts.Size = saved.Size
++			opts.InitialSizeDP = math32.Vector2{}
++			opts.Flags.SetFlag(saved.Max, system.Maximized)
++		}
+ 		if AllRenderWindows.FindName(st.Title) != nil {
+ 			opts.Pos = opts.Pos.Add(image.Pt(20, 20))
+ 		}
+-		opts.Flags.SetFlag(saved.Max, system.Maximized)
+ 	}
+ 	return opts
+ }
+--- /dev/null
++++ b/core/fixed_initial_size_vellum_test.go
+@@ -0,0 +1,43 @@
++// Copyright (c) 2026 Davin Hills. SPDX-License-Identifier: MIT.
++package core
++
++import (
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/system"
++	"image"
++	"math"
++	"testing"
++)
++
++func TestFixedExplicitViewportIgnoresSavedSizeAndMaximization(t *testing.T) {
++	for _, tt := range []struct {
++		name      string
++		resizable bool
++		initial   math32.Vector2
++		fixed     bool
++	}{
++		{"explicit fixed", false, math32.Vec2(240, 420), true},
++		{"resizable", true, math32.Vec2(240, 420), false},
++		{"legacy fixed", false, math32.Vector2{}, false},
++		{"infinite fixed", false, math32.Vec2(float32(math.Inf(1)), 420), false},
++		{"NaN fixed", false, math32.Vec2(240, float32(math.NaN())), false},
++		{"partial fixed", false, math32.Vec2(0, 420), false},
++	} {
++		t.Run(tt.name, func(t *testing.T) {
++			stage := &Stage{Scene: &Scene{}, Resizable: tt.resizable, InitialSizeDP: tt.initial}
++			stage.Scene.SceneGeom.Size = image.Pt(123, 234)
++			saved := &windowGeometry{Size: image.Pt(800, 900), Pos: image.Pt(71, 82), Max: true}
++			opts := stage.initialWindowOptions(nil, saved, &system.Screen{ScreenNumber: 2})
++			if opts.Pos != saved.Pos || opts.Screen != 2 || opts.Flags.HasFlag(system.FixedSize) == tt.resizable {
++				t.Fatal("position/screen/resize changed", opts)
++			}
++			if tt.fixed {
++				if opts.InitialSizeDP != tt.initial || opts.Size == saved.Size || opts.Flags.HasFlag(system.Maximized) {
++					t.Fatal("saved size/max overrode explicit fixed viewport", opts)
++				}
++			} else if opts.InitialSizeDP != (math32.Vector2{}) || opts.Size != saved.Size || !opts.Flags.HasFlag(system.Maximized) {
++				t.Fatal("existing restored behavior changed", opts)
++			}
++		})
++	}
++}

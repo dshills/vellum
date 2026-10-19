@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "run_id": "827e284ed1ad6924fc62ffc273002eaa",
+  "reviewed_staged_diff_sha256": "27a62431559077875c46d3dec325b232b685b6d6f063bf1c187fd0590b0d26a5",
+  "reviewed_bytes": 309666,
+  "reviewed_files": 76,
+  "coverage_complete": true,
+  "omitted_or_truncated": false,
+  "raw_exit_code": 1,
+  "raw_counts": {
+    "low": 0,
+    "medium": 3,
+    "high": 0
+  },
+  "retained_findings_disposition": "all three refuted by root and independent source inspection",
+  "discarded_finding": "Notes ordering also inspected substantively; not substantiated",
+  "unresolved_findings": [],
+  "source_changes_after_review": false,
+  "post_review_files": [
+    "docs/reviews/macos-app-examples/prism.json",
+    "docs/reviews/macos-app-examples/adjudication.json",
+    "docs/reviews/macos-app-examples/certificate.json"
+  ],
+  "prism_report_sha256": "cad7c3cc5cd6a419115035dd1d365212d6e8a73632ee60e671ffcbdade954a31",
+  "independent_adjudication_sha256": "8e3b1ea6145259798433973faf8c9d6fca36ae434496ad15cbebd101aa0249b5",
+  "tests": "root race;focused driver/Core race;29prepare tests;fresh96stageprepare;all4example race/offscreen/vet;nativebuilds PASS",
+  "native_evidence": "keyboard/accessibility actions and screenshot captures; hardware pointer not qualified",
+  "visual_acceptance": "blocked; see report design-qa.md",
+  "full_mac_completion": false,
+  "public_distribution_approved": false
+}

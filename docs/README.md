@@ -25,3 +25,6 @@ are retained; current document links and tooling use the reorganized paths.
 
 - [Native integration session usage](desktop-integration.md).
 - [Full native workspace checkpoint](reports/macos-native-workspace/README.md).
+
+- [Native macOS application examples](../examples/macapps/README.md): independently runnable Go consumers and their working interactions.
+- [Native application checkpoint](reports/macos-app-examples/README.md): verification and remaining visual acceptance.

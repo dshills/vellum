@@ -1157,6 +1157,39 @@
               "sha256": "845b8c018f55b2b0103e308602217d1ed2eba1a867c4bf95ed0bda3e8456a791"
             }
           ]
+        },
+        {
+          "origin": "Vellum native window chrome",
+          "inputs": "native/patches/windowchrome/original-hashes.json",
+          "outputs": "native/patches/windowchrome/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/windowchrome/0094-window-chrome.patch",
+              "sha256": "7f7bb6d11b74cfdf3308128b0561462dbd287a62adf0f6a28f8394949aa4ee43"
+            }
+          ]
+        },
+        {
+          "origin": "Vellum text allocation alignment",
+          "inputs": "native/patches/textalign/original-hashes.json",
+          "outputs": "native/patches/textalign/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/textalign/0095-text-allocation-alignment.patch",
+              "sha256": "aff7323a510a59ce7e6f2b1b563f7f0086d09630c572ba2461118fda38656d53"
+            }
+          ]
+        },
+        {
+          "origin": "Vellum fixed initial viewport",
+          "inputs": "native/patches/fixedwindow/original-hashes.json",
+          "outputs": "native/patches/fixedwindow/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/fixedwindow/0096-fixed-window-viewport.patch",
+              "sha256": "73acf57cbb620aa763ef47ea7ffe750b3313598bb7447100c2e1b64093b29041"
+            }
+          ]
         }
       ]
     },

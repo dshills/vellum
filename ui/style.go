@@ -39,15 +39,28 @@ type Typography struct {
 	Italic bool
 }
 
+// Border is an app-local solid outline in device-independent pixels.
+// A zero width explicitly removes a native widget's resting outline.
+// Native keyboard-focus indicators retain precedence while a widget is focused.
+type Border struct {
+	Width float32
+	Color color.NRGBA
+}
+
 // Style contains independently optional properties. Align controls children on
 // the cross axis; Justify distributes children on the main axis. Grow sets both
 // axes. Foreground and Background use straight-alpha sRGB bytes.
 type Style struct {
-	Padding                Optional[Insets]
-	Gap                    Optional[float32]
-	Align, Justify         Optional[Alignment]
-	MinSize, MaxSize       Optional[Size]
-	Grow                   Optional[float32]
+	Padding          Optional[Insets]
+	Gap              Optional[float32]
+	Align, Justify   Optional[Alignment]
+	MinSize, MaxSize Optional[Size]
+	Grow             Optional[float32]
+	// GrowX/GrowY override Grow on one axis, useful for sidebars and rows.
+	GrowX, GrowY           Optional[float32]
+	TextAlign              Optional[Alignment]
+	CornerRadius           Optional[float32]
+	Border                 Optional[Border]
 	Foreground, Background Optional[color.NRGBA]
 	Typography             Optional[Typography]
 }
@@ -56,10 +69,16 @@ func finiteNonnegative(value float32) bool {
 	return value >= 0 && !math.IsNaN(float64(value)) && !math.IsInf(float64(value), 0)
 }
 func (s Style) Validate() error {
-	for name, property := range map[string]Optional[float32]{"gap": s.Gap, "grow": s.Grow} {
+	for name, property := range map[string]Optional[float32]{"gap": s.Gap, "grow": s.Grow, "horizontal grow": s.GrowX, "vertical grow": s.GrowY, "corner radius": s.CornerRadius} {
 		if property.Set && !finiteNonnegative(property.Value) {
 			return fmt.Errorf("ui: %s must be finite and nonnegative", name)
 		}
+	}
+	if s.Border.Set && !finiteNonnegative(s.Border.Value.Width) {
+		return fmt.Errorf("ui: border width must be finite and nonnegative")
+	}
+	if s.TextAlign.Set && s.TextAlign.Value != AlignStart && s.TextAlign.Value != AlignCenter && s.TextAlign.Value != AlignEnd {
+		return fmt.Errorf("ui: unsupported text alignment %q", s.TextAlign.Value)
 	}
 	if s.Padding.Set {
 		p := s.Padding.Value
@@ -121,6 +140,21 @@ func (s Style) Overlay(o Style) Style {
 	}
 	if o.Grow.Set {
 		s.Grow = o.Grow
+	}
+	if o.GrowX.Set {
+		s.GrowX = o.GrowX
+	}
+	if o.GrowY.Set {
+		s.GrowY = o.GrowY
+	}
+	if o.TextAlign.Set {
+		s.TextAlign = o.TextAlign
+	}
+	if o.CornerRadius.Set {
+		s.CornerRadius = o.CornerRadius
+	}
+	if o.Border.Set {
+		s.Border = o.Border
 	}
 	if o.Foreground.Set {
 		s.Foreground = o.Foreground

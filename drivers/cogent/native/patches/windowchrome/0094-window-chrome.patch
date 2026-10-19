@@ -1,0 +1,562 @@
+--- a/core/mainstage.go
++++ b/core/mainstage.go
+@@ -403,7 +403,7 @@
+ func (st *Stage) initialWindowOptions(screen *system.Screen, saved *windowGeometry, savedScreen *system.Screen) *system.NewWindowOptions {
+ 	opts := &system.NewWindowOptions{
+ 		Title: st.Title, Icon: appIconImages(), Size: st.Scene.SceneGeom.Size,
+-		Pos: st.Pos, Screen: st.Screen, InitialSizeDP: st.InitialSizeDP,
++		Pos: st.Pos, Screen: st.Screen, InitialSizeDP: st.InitialSizeDP, Chrome: st.WindowChrome,
+ 	}
+ 	if screen != nil {
+ 		opts.Screen = screen.ScreenNumber
+--- a/core/stage.go
++++ b/core/stage.go
+@@ -163,6 +163,9 @@
+ 	// It is applied before native show and is never a persistent layout minimum.
+ 	InitialSizeDP math32.Vector2 `set:"-"`
+ 
++	// WindowChrome is an immutable desktop creation policy.
++	WindowChrome system.WindowChrome `set:"-"`
++
+ 	// Resizable specifies whether a window on desktop platforms can
+ 	// be resized by the user, and whether a non-full same-window dialog can
+ 	// be resized by the user on any platform. It defaults to true.
+@@ -237,6 +240,12 @@
+ // SetInitialSizeDP sets the initial client-size request for a new desktop window.
+ func (st *Stage) SetInitialSizeDP(width, height float32) *Stage {
+ 	st.InitialSizeDP = math32.Vec2(width, height)
++	return st
++}
++
++// SetWindowChrome selects native creation chrome before any surface exists.
++func (st *Stage) SetWindowChrome(chrome system.WindowChrome) *Stage {
++	st.WindowChrome = chrome
+ 	return st
+ }
+ 
+--- /dev/null
++++ b/core/window_chrome_vellum_test.go
+@@ -0,0 +1,21 @@
++// Copyright (c) 2026 Davin Hills. SPDX-License-Identifier: MIT.
++package core
++
++import (
++	"cogentcore.org/core/system"
++	"testing"
++)
++
++func TestWindowChromeCopiedIntoCreationOptions(t *testing.T) {
++	stage := &Stage{Scene: &Scene{}}
++	if got := stage.initialWindowOptions(nil, nil, nil).Chrome; got != (system.WindowChrome{}) {
++		t.Fatal("defaultchanged", got)
++	}
++	policy := system.WindowChrome{Style: system.ChromeUnified, Appearance: system.AppearanceDark}
++	stage.SetWindowChrome(policy)
++	opts := stage.initialWindowOptions(nil, nil, nil)
++	stage.WindowChrome = system.WindowChrome{}
++	if opts.Chrome != policy {
++		t.Fatal("creationpolicy not owned", opts.Chrome)
++	}
++}
+--- a/system/driver/desktop/window.go
++++ b/system/driver/desktop/window.go
+@@ -29,6 +29,9 @@
+ 
+ // Window is the implementation of [system.Window] for the desktop platform.
+ type Window struct {
++	chrome               system.WindowChrome         // immutable before publication
++	chromeClientPosition atomic.Pointer[image.Point] // full-view top-left, published on native main
++
+ 	Native                  NativeAttachment
+ 	nativeLayer             unsafe.Pointer // borrowed from content view, under Mu
+ 	presentationToken       atomic.Uint64
+@@ -124,6 +127,9 @@
+ // newGlfwWindow makes a new glfw window for this window.
+ // It must be run on main.
+ func (w *Window) newGlfwWindow(opts *system.NewWindowOptions, sc *system.Screen) error {
++	if err := validateNativeWindowChrome(opts.Chrome); err != nil {
++		return err
++	}
+ 	// glfw.DefaultWindowHints()
+ 	if opts.Flags.HasFlag(system.FixedSize) {
+ 		glfw.WindowHint(glfw.Resizable, glfw.False)
+@@ -161,9 +167,16 @@
+ 	if err != nil {
+ 		return err
+ 	}
++	if err := applyNativeWindowChrome(glw, opts.Chrome); err != nil {
++		glw.Destroy()
++		return err
++	}
++	w.chrome = opts.Chrome
+ 	if !fullscreen {
+ 		pos := opts.Pos.Add(sc.Geometry.Min) // screen relative
+-		glw.SetPos(pos.X, pos.Y)
++		if !w.setChromePositionOnMain(glw, pos.X, pos.Y) {
++			glw.SetPos(pos.X, pos.Y)
++		}
+ 		w.Pos = pos
+ 	}
+ 	if opts.Icon != nil {
+@@ -224,7 +237,11 @@
+ 	defer w.App.Mu.Unlock()
+ 
+ 	var wgeom image.Rectangle
+-	wgeom.Min.X, wgeom.Min.Y = w.Glw.GetPos()
++	if p, ok := w.chromePositionSnapshot(); ok {
++		wgeom.Min = p
++	} else {
++		wgeom.Min.X, wgeom.Min.Y = w.Glw.GetPos()
++	}
+ 	var sz image.Point
+ 	sz.X, sz.Y = w.Glw.GetSize()
+ 	wgeom.Max = wgeom.Min.Add(sz)
+@@ -253,7 +270,11 @@
+ 		return w.Pos
+ 	}
+ 	var ps image.Point
+-	ps.X, ps.Y = w.Glw.GetPos()
++	if p, ok := w.chromePositionSnapshot(); ok {
++		ps = p
++	} else {
++		ps.X, ps.Y = w.Glw.GetPos()
++	}
+ 	w.Pos = ps
+ 	if screen != nil {
+ 		ps = ps.Sub(screen.Geometry.Min)
+@@ -295,7 +316,9 @@
+ 		if w.Glw == nil { // by time we got to main, could be diff
+ 			return
+ 		}
+-		w.Glw.SetSize(sz.X, sz.Y)
++		if !w.setChromeSizeOnMain(sz.X, sz.Y) {
++			w.Glw.SetSize(sz.X, sz.Y)
++		}
+ 	})
+ }
+ 
+@@ -317,7 +340,9 @@
+ 		if w.Glw == nil { // by time we got to main, could be diff
+ 			return
+ 		}
+-		w.Glw.SetPos(pos.X, pos.Y)
++		if !w.setChromePositionOnMain(w.Glw, pos.X, pos.Y) {
++			w.Glw.SetPos(pos.X, pos.Y)
++		}
+ 	})
+ }
+ 
+@@ -361,6 +386,10 @@
+ 		case w.Is(system.Fullscreen) && !fullscreen:
+ 			w.Flgs.SetFlag(false, system.Fullscreen)
+ 			w.Glw.SetMonitor(nil, pos.X, pos.Y, size.X, size.Y, glfw.DontCare)
++			// GLFW restores a nominal Cocoa content rect. Unified uses the full view.
++			if w.setChromeSizeOnMain(size.X, size.Y) {
++				w.setChromePositionOnMain(w.Glw, pos.X, pos.Y)
++			}
+ 		case fullscreen:
+ 			w.Flgs.SetFlag(true, system.Fullscreen)
+ 			if screen != nil {
+@@ -369,8 +398,12 @@
+ 			mon := w.App.Monitors[sc.ScreenNumber]
+ 			w.Glw.SetMonitor(mon, 0, 0, sc.PixelSize.X, sc.PixelSize.Y, glfw.DontCare)
+ 		default:
+-			w.Glw.SetSize(size.X, size.Y)
+-			w.Glw.SetPos(pos.X, pos.Y)
++			if !w.setChromeSizeOnMain(size.X, size.Y) {
++				w.Glw.SetSize(size.X, size.Y)
++			}
++			if !w.setChromePositionOnMain(w.Glw, pos.X, pos.Y) {
++				w.Glw.SetPos(pos.X, pos.Y)
++			}
+ 		}
+ 	}()
+ }
+@@ -395,10 +428,13 @@
+ 	if TheApp.Platform() == system.Windows && (position.X == -32000 || position.Y == -32000) {
+ 		return frameSize
+ 	}
+-	l, t, r, b := w.Glw.GetFrameSize()
++	l, t, r, b := w.chromeFrameSizeOnMain()
+ 	w.Mu.Lock()
+ 	w.FrameSize.Set(t, r, b, l)
+ 	frameSize, position = w.FrameSize, w.Pos
++	if p, ok := w.chromePositionSnapshot(); ok {
++		position = p
++	}
+ 	windowSize := w.WnSize
+ 	w.Mu.Unlock()
+ 	sc := w.Screen()
+@@ -563,6 +599,11 @@
+ ////////  Window Callbacks
+ 
+ func (w *Window) Moved(gw *glfw.Window, x, y int) {
++	// Capture on native main before handing the scalar geometry to the worker.
++	w.recordChromePositionOnMain(gw)
++	if p, ok := w.chromePositionSnapshot(); ok {
++		x, y = p.X, p.Y
++	}
+ 	go func() {
+ 		w.Mu.Lock()
+ 		w.Pos = image.Pt(x, y)
+@@ -574,6 +615,7 @@
+ }
+ 
+ func (w *Window) WinResized(gw *glfw.Window, width, height int) {
++	w.recordChromePositionOnMain(gw)
+ 	go func() {
+ 		// w.app.GetScreens()  // this can crash here on win disconnect..
+ 		if ScreenDebug {
+--- /dev/null
++++ b/system/driver/desktop/window_chrome_darwin.go
+@@ -0,0 +1,84 @@
++//go:build darwin
++
++// Copyright (c) 2026 Davin Hills. SPDX-License-Identifier: MIT.
++package desktop
++
++/*
++#cgo LDFLAGS: -framework Cocoa
++#include "window_chrome_darwin.h"
++*/
++import "C"
++import (
++	"cogentcore.org/core/system"
++	"fmt"
++	"github.com/go-gl/glfw/v3.4/glfw"
++	"image"
++	"log"
++	"unsafe"
++)
++
++func validateNativeWindowChrome(chrome system.WindowChrome) error { return chrome.Validate() }
++func applyNativeWindowChrome(window *glfw.Window, chrome system.WindowChrome) error {
++	if chrome == (system.WindowChrome{}) {
++		return nil
++	}
++	if C.vellumApplyWindowChrome(unsafe.Pointer(window.GetCocoaWindow()), C.int(chrome.Style), C.int(chrome.Appearance)) == 0 {
++		return fmt.Errorf("desktop: requested window chrome is unavailable")
++	}
++	return nil
++}
++
++// full-content size is measured from the existing GLFW view, not AppKit's
++// narrower nominal contentRect. Cocoa setters remain on native main.
++func (w *Window) setChromeSizeOnMain(width, height int) bool {
++	if w.chrome.Style != system.ChromeUnified {
++		return false
++	}
++	if w.Glw != nil {
++		if C.vellumSetFullContentSize(unsafe.Pointer(w.Glw.GetCocoaWindow()), C.double(width), C.double(height)) == 0 {
++			log.Printf("desktop: Cocoa refused unified client size %dx%d", width, height)
++		}
++	}
++	return true
++}
++func (w *Window) chromeFrameSizeOnMain() (left, top, right, bottom int) {
++	if w.chrome.Style == system.ChromeUnified && w.Glw != nil {
++		var l, t, r, b C.double
++		C.vellumFullContentFrameInsets(unsafe.Pointer(w.Glw.GetCocoaWindow()), &l, &t, &r, &b)
++		return int(l), int(t), int(r), int(b)
++	}
++	return w.Glw.GetFrameSize()
++}
++
++// Unified positions use the existing view's screen rect, in GLFW's global
++// top-left coordinate convention. Cocoa observation stays on native main.
++func (w *Window) recordChromePositionOnMain(glw *glfw.Window) {
++	if w.chrome.Style != system.ChromeUnified || glw == nil {
++		return
++	}
++	var x, y C.double
++	if C.vellumFullContentPosition(unsafe.Pointer(glw.GetCocoaWindow()), &x, &y) != 0 {
++		p := image.Pt(int(x), int(y))
++		w.chromeClientPosition.Store(&p)
++	}
++}
++func (w *Window) chromePositionSnapshot() (image.Point, bool) {
++	if w.chrome.Style == system.ChromeUnified {
++		if p := w.chromeClientPosition.Load(); p != nil {
++			return *p, true
++		}
++	}
++	return image.Point{}, false
++}
++func (w *Window) setChromePositionOnMain(glw *glfw.Window, x, y int) bool {
++	if w.chrome.Style != system.ChromeUnified {
++		return false
++	}
++	if glw != nil {
++		if C.vellumSetFullContentPosition(unsafe.Pointer(glw.GetCocoaWindow()), C.double(x), C.double(y)) == 0 {
++			log.Printf("desktop: Cocoa refused unified client position %d,%d", x, y)
++		}
++		w.recordChromePositionOnMain(glw)
++	}
++	return true
++}
+--- /dev/null
++++ b/system/driver/desktop/window_chrome_darwin.h
+@@ -0,0 +1,9 @@
++// Copyright (c) 2026 Davin Hills. SPDX-License-Identifier: MIT.
++#ifndef VELLUM_WINDOW_CHROME_H
++#define VELLUM_WINDOW_CHROME_H
++int vellumApplyWindowChrome(void *window,int style,int appearance);
++int vellumSetFullContentSize(void *window,double width,double height);
++void vellumFullContentFrameInsets(void *window,double *left,double *top,double *right,double *bottom);
++int vellumFullContentPosition(void*,double*,double*);
++int vellumSetFullContentPosition(void*,double,double);
++#endif
+--- /dev/null
++++ b/system/driver/desktop/window_chrome_darwin.m
+@@ -0,0 +1,101 @@
++// Copyright (c) 2026 Davin Hills. SPDX-License-Identifier: MIT.
++#import <Cocoa/Cocoa.h>
++#include <math.h>
++#include "window_chrome_darwin.h"
++
++// Called only on native main. No Go pointers, subclassing, swizzling or globals.
++int vellumSetFullContentSize(void *pointer,double width,double height) {
++ @autoreleasepool {
++  if (![NSThread isMainThread] || !pointer || !isfinite(width)||!isfinite(height)||width<=0||height<=0) return 0;
++  NSWindow *window=(__bridge NSWindow *)pointer;
++  NSView *view=window.contentView;
++  if(!view)return 0;
++  [view.superview layoutSubtreeIfNeeded];
++  NSRect frame=window.frame;
++  NSSize prior=view.bounds.size;
++  NSSize delta=NSMakeSize(frame.size.width-prior.width,frame.size.height-prior.height);
++  NSSize desired=NSMakeSize(width+delta.width,height+delta.height);
++  if(!isfinite(desired.width)||!isfinite(desired.height)||desired.width<=0||desired.height<=0)return 0;
++  frame.origin.y+=frame.size.height-desired.height;
++  frame.size=desired;
++  [window setFrame:frame display:NO];
++  [view.superview layoutSubtreeIfNeeded];
++  NSSize actual=view.bounds.size;
++  return fabs(actual.width-width)<=0.5 && fabs(actual.height-height)<=0.5;
++ }
++}
++int vellumApplyWindowChrome(void *pointer,int style,int appearance) {
++ @autoreleasepool {
++  if(![NSThread isMainThread]||!pointer||style<0||style>1||appearance<0||appearance>2)return 0;
++  if(style==0&&appearance==0)return 1;
++  NSWindow *window=(__bridge NSWindow *)pointer;
++  NSView *view=window.contentView;
++  if(!view)return 0;
++  NSSize client=view.bounds.size;
++  if(style==1) {
++   if(!(window.styleMask&NSWindowStyleMaskTitled))return 0;
++   if(@available(macOS 11.0,*)) {
++    NSToolbar *toolbar=[[NSToolbar alloc]initWithIdentifier:@"VellumUnifiedWindowToolbar"];
++    toolbar.allowsUserCustomization=NO;
++    toolbar.autosavesConfiguration=NO;
++    toolbar.displayMode=NSToolbarDisplayModeIconOnly;
++    window.styleMask|=NSWindowStyleMaskFullSizeContentView;
++    window.titleVisibility=NSWindowTitleHidden;
++    window.titlebarAppearsTransparent=YES;
++    window.toolbarStyle=NSWindowToolbarStyleUnified;
++    window.titlebarSeparatorStyle=NSTitlebarSeparatorStyleNone;
++    window.toolbar=toolbar; // retained by NSWindow; ends with the native owner.
++#if !__has_feature(objc_arc)
++    [toolbar release];
++#endif
++    window.movableByWindowBackground=NO; // controls below header keep their clicks.
++   } else return 0;
++  }
++  if(appearance==1)window.appearance=[NSAppearance appearanceNamed:NSAppearanceNameAqua];
++  if(appearance==2) {
++   if(@available(macOS 10.14,*))window.appearance=[NSAppearance appearanceNamed:NSAppearanceNameDarkAqua];
++   else return 0;
++  }
++  // Do not replace GLFWContentView, its delegate, first responder or Metal layer.
++  if(style==1&&!vellumSetFullContentSize(pointer,client.width,client.height))return 0;
++  return window.contentView==view;
++ }
++}
++void vellumFullContentFrameInsets(void *pointer,double *left,double *top,double *right,double *bottom){
++ if(left)*left=0;if(top)*top=0;if(right)*right=0;if(bottom)*bottom=0;
++ @autoreleasepool {
++  if(![NSThread isMainThread]||!pointer)return;
++  NSWindow *window=(__bridge NSWindow *)pointer;NSView *view=window.contentView;if(!view)return;
++  NSRect frame=window.frame;
++  NSRect content=[window convertRectToScreen:[view convertRect:view.bounds toView:nil]];
++  if(left)*left=fmax(0,NSMinX(content)-NSMinX(frame));
++  if(top)*top=fmax(0,NSMaxY(frame)-NSMaxY(content));
++  if(right)*right=fmax(0,NSMaxX(frame)-NSMaxX(content));
++  if(bottom)*bottom=fmax(0,NSMinY(content)-NSMinY(frame));
++ }
++}
++
++int vellumFullContentPosition(void *pointer,double *x,double *y) {
++ @autoreleasepool {
++  if(![NSThread isMainThread]||!pointer||!x||!y)return 0;
++  NSWindow *window=(__bridge NSWindow *)pointer;NSView *view=window.contentView;if(!view)return 0;
++  NSRect rect=[window convertRectToScreen:[view convertRect:view.bounds toView:nil]];
++  double px=NSMinX(rect),py=CGDisplayBounds(CGMainDisplayID()).size.height-NSMaxY(rect);
++  if(!isfinite(px)||!isfinite(py))return 0;
++  *x=px;*y=py;return 1;
++ }
++}
++int vellumSetFullContentPosition(void *pointer,double x,double y) {
++ @autoreleasepool {
++  if(![NSThread isMainThread]||!pointer||!isfinite(x)||!isfinite(y))return 0;
++  NSWindow *window=(__bridge NSWindow *)pointer;NSView *view=window.contentView;if(!view)return 0;
++  NSRect rect=[window convertRectToScreen:[view convertRect:view.bounds toView:nil]];
++  NSRect frame=window.frame;
++  frame.origin.x+=x-NSMinX(rect);
++  frame.origin.y+=CGDisplayBounds(CGMainDisplayID()).size.height-y-NSMaxY(rect);
++  if(!isfinite(frame.origin.x)||!isfinite(frame.origin.y))return 0;
++  [window setFrameOrigin:frame.origin];
++  double actualX,actualY;
++  return vellumFullContentPosition(pointer,&actualX,&actualY)&&fabs(actualX-x)<=.5&&fabs(actualY-y)<=.5;
++ }
++}
+--- /dev/null
++++ b/system/driver/desktop/window_chrome_darwin_vellum_test.go
+@@ -0,0 +1,47 @@
++//go:build darwin
++
++// Copyright (c) 2026 Davin Hills. SPDX-License-Identifier: MIT.
++package desktop
++
++import (
++	"cogentcore.org/core/system"
++	"image"
++	"testing"
++)
++
++func TestVellumWindowChromeDefaultHelpers(t *testing.T) {
++	w := &Window{}
++	p := image.Pt(91, 92)
++	w.chromeClientPosition.Store(&p)
++	if _, known := w.chromePositionSnapshot(); known {
++		t.Fatal("standard chrome used Unified position cache")
++	}
++	if w.setChromePositionOnMain(nil, 5, 6) || w.setChromeSizeOnMain(230, 408) {
++		t.Fatal("default chrome intercepted GLFW geometry")
++	}
++	w.recordChromePositionOnMain(nil)
++	if *w.chromeClientPosition.Load() != p {
++		t.Fatal("nil/default helper mutated geometry")
++	}
++}
++func TestVellumUnifiedPositionSnapshotIsDetached(t *testing.T) {
++	w := &Window{chrome: system.WindowChrome{Style: system.ChromeUnified}}
++	if _, known := w.chromePositionSnapshot(); known {
++		t.Fatal("unobserved geometry fabricated")
++	}
++	p := image.Pt(-300, 420)
++	w.chromeClientPosition.Store(&p)
++	got, known := w.chromePositionSnapshot()
++	if !known || got != p {
++		t.Fatal("position snapshot missing", got, known)
++	}
++	got.X = 999
++	again, known := w.chromePositionSnapshot()
++	if !known || again != p {
++		t.Fatal("snapshot aliased internal state")
++	}
++	w.recordChromePositionOnMain(nil)
++	if actual, _ := w.chromePositionSnapshot(); actual != p {
++		t.Fatal("nil native handle destroyed last observation")
++	}
++}
+--- /dev/null
++++ b/system/driver/desktop/window_chrome_other.go
+@@ -0,0 +1,28 @@
++//go:build !darwin
++
++// Copyright (c) 2026 Davin Hills. SPDX-License-Identifier: MIT.
++package desktop
++
++import (
++	"cogentcore.org/core/system"
++	"fmt"
++	"github.com/go-gl/glfw/v3.4/glfw"
++	"image"
++)
++
++func validateNativeWindowChrome(chrome system.WindowChrome) error {
++	if err := chrome.Validate(); err != nil {
++		return err
++	}
++	if chrome != (system.WindowChrome{}) {
++		return fmt.Errorf("desktop: explicit window chrome requires macOS")
++	}
++	return nil
++}
++func applyNativeWindowChrome(_ *glfw.Window, _ system.WindowChrome) error { return nil }
++func (w *Window) setChromeSizeOnMain(width, height int) bool              { return false }
++func (w *Window) chromeFrameSizeOnMain() (left, top, right, bottom int)   { return w.Glw.GetFrameSize() }
++
++func (w *Window) recordChromePositionOnMain(_ *glfw.Window)             {}
++func (w *Window) chromePositionSnapshot() (image.Point, bool)           { return image.Point{}, false }
++func (w *Window) setChromePositionOnMain(_ *glfw.Window, x, y int) bool { return false }
+--- a/system/window.go
++++ b/system/window.go
+@@ -265,6 +265,8 @@
+ 
+ // NewWindowOptions are optional arguments to NewWindow.
+ type NewWindowOptions struct {
++	Chrome WindowChrome
++
+ 	// StartHidden constructs a desktop GPU window without showing it. The owner
+ 	// must call Show explicitly when ready. Other drivers do not implement this.
+ 	StartHidden bool
+--- /dev/null
++++ b/system/window_chrome.go
+@@ -0,0 +1,33 @@
++// Copyright (c) 2026 Davin Hills. SPDX-License-Identifier: MIT.
++package system
++
++import "fmt"
++
++type ChromeStyle uint8
++
++const (
++	ChromeStandard ChromeStyle = iota
++	ChromeUnified
++)
++
++type WindowAppearance uint8
++
++const (
++	AppearanceAutomatic WindowAppearance = iota
++	AppearanceLight
++	AppearanceDark
++)
++
++// WindowChrome is copied into native creation before the surface is constructed.
++// Nonzero policy is currently macOS-only. Zero preserves native defaults.
++type WindowChrome struct {
++	Style      ChromeStyle
++	Appearance WindowAppearance
++}
++
++func (c WindowChrome) Validate() error {
++	if c.Style > ChromeUnified || c.Appearance > AppearanceDark {
++		return fmt.Errorf("system: invalid window chrome")
++	}
++	return nil
++}
+--- /dev/null
++++ b/system/window_chrome_vellum_test.go
+@@ -0,0 +1,19 @@
++// Copyright (c) 2026 Davin Hills. SPDX-License-Identifier: MIT.
++package system
++
++import "testing"
++
++func TestWindowChromeValidation(t *testing.T) {
++	for style := ChromeStandard; style <= ChromeUnified; style++ {
++		for appearance := AppearanceAutomatic; appearance <= AppearanceDark; appearance++ {
++			if err := (WindowChrome{style, appearance}).Validate(); err != nil {
++				t.Fatal(err)
++			}
++		}
++	}
++	for _, p := range []WindowChrome{{Style: 2}, {Appearance: 3}, {Style: 255, Appearance: 255}} {
++		if p.Validate() == nil {
++			t.Fatal("invalid policy admitted", p)
++		}
++	}
++}

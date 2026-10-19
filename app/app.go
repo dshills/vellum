@@ -24,14 +24,26 @@ var (
 type Config struct{ QueueCapacity, CompletionCapacity int }
 type Window struct {
 	ID, Title string
+	// Chrome is copied at registration and applied before the first native surface.
+	Chrome WindowChrome
 	// Width and Height are finite positive initial client-size requests. The
 	// native desktop driver interprets them in density-independent units (Dp),
 	// converts with the creation screen's logical DPI, and applies OS limits.
-	// Saved geometry takes precedence. These fields never set a resize minimum.
+	// Saved geometry takes precedence for resizable windows. An explicit fixed
+	// viewport keeps this size instead of a saved size/maximized state; saved
+	// position remains independent. These fields never set a resize minimum.
 	// Manual replay uses its explicit physical-pixel viewport instead.
 	Width, Height float32
-	View          func() ui.Node
-	reference     WindowRef
+	// FixedSize disables native user resizing at creation. Its default false
+	// preserves resizable windows. It does not set content minima/maxima or
+	// prevent backend/system geometry changes. See specs/macos-app-examples.md.
+	FixedSize bool
+	// DisableRootScrolling clips root content to the native/manual viewport
+	// instead of adding root scrollbars. Inner ui.Scroll containers still work.
+	// This is independent of FixedSize and defaults to false.
+	DisableRootScrolling bool
+	View                 func() ui.Node
+	reference            WindowRef
 	// CloseRequest runs on the UI owner for user/native close requests. Return
 	// false to keep the window open while showing an asynchronous confirmation.
 	// Once confirmed, CloseWindow can force teardown. Never block or nest Do.
@@ -105,6 +117,10 @@ func (a *Application) OpenWindow(w Window) (WindowRef, error) {
 	if w.ID == "" || w.Title == "" || !utf8.ValidString(w.Title) || strings.ContainsRune(w.Title, 0) || w.View == nil || w.Width <= 0 || w.Height <= 0 || math.IsNaN(float64(w.Width)) || math.IsNaN(float64(w.Height)) || math.IsInf(float64(w.Width), 0) || math.IsInf(float64(w.Height), 0) {
 		a.mu.Unlock()
 		return WindowRef{}, fmt.Errorf("vellum: invalid window")
+	}
+	if err := w.Chrome.Validate(); err != nil {
+		a.mu.Unlock()
+		return WindowRef{}, err
 	}
 	if _, exists := a.lifetimes[w.ID]; exists {
 		a.mu.Unlock()

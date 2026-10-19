@@ -404,6 +404,9 @@ func (p *manualImplementation) syncTopology(ctx context.Context) error {
 	}
 	active := map[string]app.WindowRef{}
 	for _, spec := range desired {
+		if spec.Chrome != (app.WindowChrome{}) {
+			return fmt.Errorf("cogent: native window chrome unavailable in offscreen sessions")
+		}
 		active[spec.ID] = spec.Ref()
 	}
 	for _, w := range p.windowList() {
@@ -444,6 +447,7 @@ func (p *manualImplementation) syncTopology(ctx context.Context) error {
 			n.body.Scene.GPUSceneRendering = p.config.GPUSceneRendering
 			setGridScrollReuse(n.body.Scene, p.config.ExperimentalGridScrollReuse)
 			n.host = newAccessibilityHost(n)
+			configureRootScrolling(n.body, n.host, spec)
 			bindWindowScope(n.host, p.owner, spec.Ref())
 			n.body.Styler(func(s *styles.Style) {
 				applyStyle(s, ui.Node{Kind: ui.Column}, p.config.Theme)

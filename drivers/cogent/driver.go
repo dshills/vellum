@@ -100,6 +100,11 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 	if len(a.Windows()) == 0 {
 		return fmt.Errorf("cogent: at least one registered window required")
 	}
+	for _, spec := range a.Windows() {
+		if err := validateWindowChromeSupport(spec); err != nil {
+			return err
+		}
+	}
 	if !processRun.CompareAndSwap(false, true) {
 		return fmt.Errorf("cogent: native main loop runs once per process")
 	}
@@ -282,6 +287,10 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			if exists || ctx.Err() != nil || spec.Ref().Context().Err() != nil {
 				continue
 			}
+			if err := validateWindowChromeSupport(spec); err != nil {
+				fail(err)
+				return
+			}
 			w := &nativeWindow{window: spec}
 			buildErr := a.Do(func() {
 				w.body = core.NewBody(spec.Title)
@@ -310,9 +319,11 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				bindWindowOriginCustom(w, d.DesktopSession, custom)
 				nativeMountServices(w.body, services)
 				configureInitialWindow(w.body)
+				configureWindowChromeContent(w.body, spec)
 				w.host = newAccessibilityHost(w)
+				configureRootScrolling(w.body, w.host, spec)
 				bindWindowScope(w.host, a, spec.Ref())
-				w.host.Styler(func(s *styles.Style) { s.Grow.Set(1, 1); s.Direction = styles.Column })
+				w.host.Styler(func(s *styles.Style) { s.Grow.Set(1, 1); s.Direction = styles.Column; s.Gap.Zero() })
 				bindAccessibilityKeyboard(w, a, d.OnError)
 			})
 			if buildErr != nil {
@@ -682,5 +693,5 @@ func configureInitialWindow(body *core.Body) {
 	body.Styler(func(s *styles.Style) { s.Grow.Set(1, 1) })
 }
 func initialWindowStage(body *core.Body, spec app.Window) *core.Stage {
-	return body.NewWindow().SetUseMinSize(false).SetInitialSizeDP(spec.Width, spec.Height)
+	return initialWindowChrome(body.NewWindow().SetUseMinSize(false).SetResizable(!spec.FixedSize).SetInitialSizeDP(spec.Width, spec.Height), spec)
 }

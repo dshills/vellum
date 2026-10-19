@@ -74,3 +74,17 @@ build and tests establish adapter compatibility with the pinned Cogent revision;
 font availability, platform appearance and cross-platform visual acceptance
 remain backend-specific checks. This API does not promise CSS layout, arbitrary
 font registration or main-axis space-between distribution.
+
+## Application surface controls
+
+`GrowX` and `GrowY` override the resolved `Grow` on their respective axes; each
+remains an independently optional property through all overlays. `TextAlign`
+positions Label glyphs or horizontal Button/MenuButton content at start, center
+or end. It does not change container cross-axis `Align`. Rendering, text
+selection and hyperlink interaction use the same origin. `CornerRadius` sets
+all four corners in Dp; `Border{Width, Color}` supplies a solid outline with
+straight-alpha sRGB color. Finite nonnegative widths/radii are required; explicit
+zero resets an outline/radius. Omission restores normal theme/native defaults on
+retained updates. Borders do not promise shadow or platform material controls.
+Native keyboard-focus indicators retain precedence over the resting border,
+including when its explicit width is zero.
