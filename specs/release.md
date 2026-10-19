@@ -81,6 +81,14 @@ configuration and source state produce equivalent reports across relocated
 module/cache paths for the recorded conventional linker paths. Unknown absolute
 linker flags remain literal evidence rather than being guessed or resolved.
 
+The [pinned Go-module declaration audit](../docs/reports/macos-module-declarations/README.md)
+confirms that all five WebGPU linker-module notice gaps exist in their exact
+upstream root/module-root trees, with matching selected Go source bytes. These
+are absent declarations, not collector omissions. The82-component source-built
+native archive bundle does not close those Go-module gaps. Applicable declarations
+or a reviewed dependency replacement remain required; the distribution audit
+stays pending. No runtime, SDK or Mac milestone changes at this checkpoint.
+
 ## Recorded native release assertion
 
 The [16 October release identity check](../docs/reports/macos-native-release-identity/README.md)

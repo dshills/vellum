@@ -1,0 +1,370 @@
+{
+  "schema": 1,
+  "base_commit": "f6d05b58e6fe45db81a1c93952a32f5af03e1611",
+  "result": "FIVE_PINNED_MODULE_DECLARATIONS_ABSENT",
+  "modules": [
+    {
+      "module": "github.com/oliverbestmann/webgpu/libs-android",
+      "version": "v0.0.0-20260628152806-6b27e30a172e",
+      "origin": {
+        "VCS": "git",
+        "URL": "https://github.com/oliverbestmann/webgpu",
+        "Subdir": "libs-android",
+        "Hash": "6b27e30a172e428c2e8aeedb4f69fed102d7a1ee"
+      },
+      "cached_origin_metadata_sha256": "58d5323ba2869969d1de72b326fb3a3962b242013c66d7938a34ba4faa8b5d75",
+      "cached_go_mod_sha256": "840d6e8878836ade50a8b6e2b7f9c5bbd732cf0c76637e8bd922f6354f730d2e",
+      "cached_lib_go_sha256": "f2712732fbbb76df21a5f2f874f694162412674a169c42bee227bfeaf070696e",
+      "repository_root_names": [
+        "README.md",
+        "libs-android"
+      ],
+      "module_root_names": [
+        "386",
+        "amd64",
+        "arm",
+        "arm64",
+        "go.mod",
+        "lib.go"
+      ],
+      "observations": {
+        "root": {
+          "uri": "https://api.github.com/repos/oliverbestmann/webgpu/contents?ref=6b27e30a172e428c2e8aeedb4f69fed102d7a1ee",
+          "file": "root.raw",
+          "bytes": 1783,
+          "sha256": "eb5d59e41fcd04bb257114dd12a1b0eac509c24c5824fe23a4e367f4ed0123fa",
+          "http_status": 200,
+          "retained_from_initial_fetch": true
+        },
+        "module-tree": {
+          "uri": "https://api.github.com/repos/oliverbestmann/webgpu/contents/libs-android?ref=6b27e30a172e428c2e8aeedb4f69fed102d7a1ee",
+          "file": "module-tree.raw",
+          "bytes": 5442,
+          "sha256": "16efc90128761e1d343d97c6fc1d91e6b9e7883cf3527762f114d1b76bf94d1c",
+          "http_status": 200,
+          "retained_from_initial_fetch": true
+        },
+        "README": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/6b27e30a172e428c2e8aeedb4f69fed102d7a1ee/README.md",
+          "file": "README.raw",
+          "bytes": 42,
+          "sha256": "e989b2688186a6207592878d03f50dfc4733743da38b00fde9d5d67eb68d0354",
+          "http_status": 200,
+          "retained_from_initial_fetch": true
+        },
+        "go.mod": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/6b27e30a172e428c2e8aeedb4f69fed102d7a1ee/libs-android/go.mod",
+          "file": "go.mod.raw",
+          "bytes": 53,
+          "sha256": "840d6e8878836ade50a8b6e2b7f9c5bbd732cf0c76637e8bd922f6354f730d2e",
+          "http_status": 200,
+          "retained_from_initial_fetch": true
+        },
+        "lib.go": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/6b27e30a172e428c2e8aeedb4f69fed102d7a1ee/libs-android/lib.go",
+          "file": "lib.go.raw",
+          "bytes": 306,
+          "sha256": "f2712732fbbb76df21a5f2f874f694162412674a169c42bee227bfeaf070696e",
+          "http_status": 200
+        },
+        "LICENSE": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/6b27e30a172e428c2e8aeedb4f69fed102d7a1ee/LICENSE",
+          "http_status": 404,
+          "no_payload_substituted": true
+        }
+      },
+      "declaration_found": false,
+      "status": "upstream-pinned-declaration-absent",
+      "rights_status": "unresolved; no terms inferred from newer repository, other module or native archive",
+      "scope": "Pinned repository root and module-root inventory plus exact go.mod/lib.go equality; not a legal conclusion or upstream attestation",
+      "go_sum": "h1:FX62Djj//RQiIrjnyo7oxhQJ4rdNlbzvLiICxTbE4z4="
+    },
+    {
+      "module": "github.com/oliverbestmann/webgpu/libs-darwin",
+      "version": "v0.0.0-20260628152755-66a5dfa57f8d",
+      "origin": {
+        "VCS": "git",
+        "URL": "https://github.com/oliverbestmann/webgpu",
+        "Subdir": "libs-darwin",
+        "Hash": "66a5dfa57f8dd22992aa1b90bbb67ffa9ec2b46c"
+      },
+      "cached_origin_metadata_sha256": "184a8739700996282c225b880340aaf96f5c8096482eb4d5ff5f8396886447fd",
+      "cached_go_mod_sha256": "13e0a3914b4c0bda9af31be4daa091f3c667bdd2d1d0f1562e60e36f48b92894",
+      "cached_libs_go_sha256": "f97ecd90e14992f1dbd7af04acee04df571fa3fb8567fe39e7838ab7800c9d58",
+      "repository_root_names": [
+        "README.md",
+        "libs-darwin"
+      ],
+      "module_root_names": [
+        "amd64",
+        "arm64",
+        "go.mod",
+        "libs.go"
+      ],
+      "observations": {
+        "root": {
+          "uri": "https://api.github.com/repos/oliverbestmann/webgpu/contents?ref=66a5dfa57f8dd22992aa1b90bbb67ffa9ec2b46c",
+          "file": "root.raw",
+          "bytes": 1777,
+          "sha256": "e466ce7896f591118bb79eae9b1e8e0e15507fcde2f7e640bb65a554b2cbbe1d",
+          "http_status": 200
+        },
+        "module-tree": {
+          "uri": "https://api.github.com/repos/oliverbestmann/webgpu/contents/libs-darwin?ref=66a5dfa57f8dd22992aa1b90bbb67ffa9ec2b46c",
+          "file": "module-tree.raw",
+          "bytes": 3711,
+          "sha256": "0e89e366af1d2bd876718e8f0e5b7a618ef97b91366dbbdbe543730e4f7dcdc1",
+          "http_status": 200
+        },
+        "README": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/66a5dfa57f8dd22992aa1b90bbb67ffa9ec2b46c/README.md",
+          "file": "README.raw",
+          "bytes": 42,
+          "sha256": "e989b2688186a6207592878d03f50dfc4733743da38b00fde9d5d67eb68d0354",
+          "http_status": 200
+        },
+        "go.mod": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/66a5dfa57f8dd22992aa1b90bbb67ffa9ec2b46c/libs-darwin/go.mod",
+          "file": "go.mod.raw",
+          "bytes": 52,
+          "sha256": "13e0a3914b4c0bda9af31be4daa091f3c667bdd2d1d0f1562e60e36f48b92894",
+          "http_status": 200
+        },
+        "libs.go": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/66a5dfa57f8dd22992aa1b90bbb67ffa9ec2b46c/libs-darwin/libs.go",
+          "file": "libs.go.raw",
+          "bytes": 219,
+          "sha256": "f97ecd90e14992f1dbd7af04acee04df571fa3fb8567fe39e7838ab7800c9d58",
+          "http_status": 200
+        },
+        "LICENSE": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/66a5dfa57f8dd22992aa1b90bbb67ffa9ec2b46c/LICENSE",
+          "http_status": 404,
+          "no_payload_substituted": true
+        }
+      },
+      "declaration_found": false,
+      "status": "upstream-pinned-declaration-absent",
+      "rights_status": "unresolved; no terms inferred from newer repository, other module or native archive",
+      "scope": "Pinned repository root and module-root inventory plus exact go.mod/libs.go equality; not a legal conclusion or upstream attestation",
+      "go_sum": "h1:DX7hw4Pmr73MNVEtOmEq4+nKH+rd8fSdL1a5PLHrqrE="
+    },
+    {
+      "module": "github.com/oliverbestmann/webgpu/libs-ios",
+      "version": "v0.0.0-20260628152757-fe2537e7ddac",
+      "origin": {
+        "VCS": "git",
+        "URL": "https://github.com/oliverbestmann/webgpu",
+        "Subdir": "libs-ios",
+        "Hash": "fe2537e7ddac1d0dfb6f2069750eca43074e8650"
+      },
+      "cached_origin_metadata_sha256": "d32db311ed3ccf8b2d943fd1b287598dddaa41fb370a104946b6b04c3465a8a3",
+      "cached_go_mod_sha256": "e1480eb1516632bf208c001fe1be366c109a6dca9085b5f6c1b7128998b1fd4e",
+      "cached_libs_go_sha256": "5279673982e21c2ae50211e02c805d970b0b24405bf7c449d2ee5aaa15ff66ab",
+      "repository_root_names": [
+        "README.md",
+        "libs-ios"
+      ],
+      "module_root_names": [
+        "amd64",
+        "arm64",
+        "go.mod",
+        "libs.go"
+      ],
+      "observations": {
+        "root": {
+          "uri": "https://api.github.com/repos/oliverbestmann/webgpu/contents?ref=fe2537e7ddac1d0dfb6f2069750eca43074e8650",
+          "file": "root.raw",
+          "bytes": 1759,
+          "sha256": "cefbf39c972a088cfa79ec36bcf2851402b728bdfbe064493a8603bdd40888d9",
+          "http_status": 200
+        },
+        "module-tree": {
+          "uri": "https://api.github.com/repos/oliverbestmann/webgpu/contents/libs-ios?ref=fe2537e7ddac1d0dfb6f2069750eca43074e8650",
+          "file": "module-tree.raw",
+          "bytes": 3645,
+          "sha256": "205473729e6534ceb6a971cbfd67efbe6afcf9ffc0a4c74e09d2b002967c0fbd",
+          "http_status": 200
+        },
+        "README": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/fe2537e7ddac1d0dfb6f2069750eca43074e8650/README.md",
+          "file": "README.raw",
+          "bytes": 42,
+          "sha256": "e989b2688186a6207592878d03f50dfc4733743da38b00fde9d5d67eb68d0354",
+          "http_status": 200
+        },
+        "go.mod": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/fe2537e7ddac1d0dfb6f2069750eca43074e8650/libs-ios/go.mod",
+          "file": "go.mod.raw",
+          "bytes": 49,
+          "sha256": "e1480eb1516632bf208c001fe1be366c109a6dca9085b5f6c1b7128998b1fd4e",
+          "http_status": 200
+        },
+        "libs.go": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/fe2537e7ddac1d0dfb6f2069750eca43074e8650/libs-ios/libs.go",
+          "file": "libs.go.raw",
+          "bytes": 142,
+          "sha256": "5279673982e21c2ae50211e02c805d970b0b24405bf7c449d2ee5aaa15ff66ab",
+          "http_status": 200
+        },
+        "LICENSE": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/fe2537e7ddac1d0dfb6f2069750eca43074e8650/LICENSE",
+          "http_status": 404,
+          "no_payload_substituted": true
+        }
+      },
+      "declaration_found": false,
+      "status": "upstream-pinned-declaration-absent",
+      "rights_status": "unresolved; no terms inferred from newer repository, other module or native archive",
+      "scope": "Pinned repository root and module-root inventory plus exact go.mod/libs.go equality; not a legal conclusion or upstream attestation",
+      "go_sum": "h1:WRnQIb1/k4Lgre6L/nl+FY+5QJggap5TY3hGsmDybp0="
+    },
+    {
+      "module": "github.com/oliverbestmann/webgpu/libs-linux",
+      "version": "v0.0.0-20260628152803-421b8a341d08",
+      "origin": {
+        "VCS": "git",
+        "URL": "https://github.com/oliverbestmann/webgpu",
+        "Subdir": "libs-linux",
+        "Hash": "421b8a341d0881131d657a01477d1499e9b8f1f1"
+      },
+      "cached_origin_metadata_sha256": "c81c87919be1706ba4674405d9cb9cc64677d94caae7cddf14570b1e16387d8c",
+      "cached_go_mod_sha256": "e8ed024e7523ce6c2468b8c23bbb242c235ce0262eedc5b34ec76226ab953b2a",
+      "cached_libs_go_sha256": "66e432fbcc1dbe7a8addb6f213f4d6488d644f42a4e73f57463a5526d9fd6b73",
+      "repository_root_names": [
+        "README.md",
+        "libs-linux"
+      ],
+      "module_root_names": [
+        "amd64",
+        "arm64",
+        "go.mod",
+        "libs.go"
+      ],
+      "observations": {
+        "root": {
+          "uri": "https://api.github.com/repos/oliverbestmann/webgpu/contents?ref=421b8a341d0881131d657a01477d1499e9b8f1f1",
+          "file": "root.raw",
+          "bytes": 1771,
+          "sha256": "ab8d0837e80159e10c5f861f2f6c0ec989dfe51de4471fec33e3f774b46f3c77",
+          "http_status": 200
+        },
+        "module-tree": {
+          "uri": "https://api.github.com/repos/oliverbestmann/webgpu/contents/libs-linux?ref=421b8a341d0881131d657a01477d1499e9b8f1f1",
+          "file": "module-tree.raw",
+          "bytes": 3689,
+          "sha256": "3f51138621b7baa3f0b24b6e531a0d77ecb88219c55a3f56e897bed2e26a9b55",
+          "http_status": 200
+        },
+        "README": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/421b8a341d0881131d657a01477d1499e9b8f1f1/README.md",
+          "file": "README.raw",
+          "bytes": 42,
+          "sha256": "e989b2688186a6207592878d03f50dfc4733743da38b00fde9d5d67eb68d0354",
+          "http_status": 200
+        },
+        "go.mod": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/421b8a341d0881131d657a01477d1499e9b8f1f1/libs-linux/go.mod",
+          "file": "go.mod.raw",
+          "bytes": 51,
+          "sha256": "e8ed024e7523ce6c2468b8c23bbb242c235ce0262eedc5b34ec76226ab953b2a",
+          "http_status": 200
+        },
+        "libs.go": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/421b8a341d0881131d657a01477d1499e9b8f1f1/libs-linux/libs.go",
+          "file": "libs.go.raw",
+          "bytes": 202,
+          "sha256": "66e432fbcc1dbe7a8addb6f213f4d6488d644f42a4e73f57463a5526d9fd6b73",
+          "http_status": 200
+        },
+        "LICENSE": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/421b8a341d0881131d657a01477d1499e9b8f1f1/LICENSE",
+          "http_status": 404,
+          "no_payload_substituted": true
+        }
+      },
+      "declaration_found": false,
+      "status": "upstream-pinned-declaration-absent",
+      "rights_status": "unresolved; no terms inferred from newer repository, other module or native archive",
+      "scope": "Pinned repository root and module-root inventory plus exact go.mod/libs.go equality; not a legal conclusion or upstream attestation",
+      "go_sum": "h1:bavZLYYgFIMOW3fMpta6CDWU/MfStheT17txHkKqui0="
+    },
+    {
+      "module": "github.com/oliverbestmann/webgpu/libs-windows",
+      "version": "v0.0.0-20260628152801-f47d1b682eb8",
+      "origin": {
+        "VCS": "git",
+        "URL": "https://github.com/oliverbestmann/webgpu",
+        "Subdir": "libs-windows",
+        "Hash": "f47d1b682eb818318a2e590970dfe2ae4bcf248b"
+      },
+      "cached_origin_metadata_sha256": "11ebe7aa81b1c840dc12667f7795a4ae2e53c1fa2239d79d47186841513b82f4",
+      "cached_go_mod_sha256": "14bcef5f40f532ff3ebde880a9e0653d594f028a7f770d788ecfe76b000e5d40",
+      "cached_libs_go_sha256": "c599bf5a2ea7d0b74513ea38dceb91e7d417dd02eb7e0111c71c75828599d620",
+      "repository_root_names": [
+        "README.md",
+        "libs-windows"
+      ],
+      "module_root_names": [
+        "386",
+        "amd64",
+        "arm64",
+        "go.mod",
+        "libs.go"
+      ],
+      "observations": {
+        "root": {
+          "uri": "https://api.github.com/repos/oliverbestmann/webgpu/contents?ref=f47d1b682eb818318a2e590970dfe2ae4bcf248b",
+          "file": "root.raw",
+          "bytes": 1783,
+          "sha256": "6ebecfb2f5389a8eed5324e42f3c61ee56359ea884dbefa0a75de0043f0158bd",
+          "http_status": 200
+        },
+        "module-tree": {
+          "uri": "https://api.github.com/repos/oliverbestmann/webgpu/contents/libs-windows?ref=f47d1b682eb818318a2e590970dfe2ae4bcf248b",
+          "file": "module-tree.raw",
+          "bytes": 4591,
+          "sha256": "ea79d660767026bb0e7e2ca85c6efe9ae4c63e98d558015968e28775faf5e17b",
+          "http_status": 200
+        },
+        "README": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/f47d1b682eb818318a2e590970dfe2ae4bcf248b/README.md",
+          "file": "README.raw",
+          "bytes": 42,
+          "sha256": "e989b2688186a6207592878d03f50dfc4733743da38b00fde9d5d67eb68d0354",
+          "http_status": 200
+        },
+        "go.mod": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/f47d1b682eb818318a2e590970dfe2ae4bcf248b/libs-windows/go.mod",
+          "file": "go.mod.raw",
+          "bytes": 53,
+          "sha256": "14bcef5f40f532ff3ebde880a9e0653d594f028a7f770d788ecfe76b000e5d40",
+          "http_status": 200
+        },
+        "libs.go": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/f47d1b682eb818318a2e590970dfe2ae4bcf248b/libs-windows/libs.go",
+          "file": "libs.go.raw",
+          "bytes": 346,
+          "sha256": "c599bf5a2ea7d0b74513ea38dceb91e7d417dd02eb7e0111c71c75828599d620",
+          "http_status": 200
+        },
+        "LICENSE": {
+          "uri": "https://raw.githubusercontent.com/oliverbestmann/webgpu/f47d1b682eb818318a2e590970dfe2ae4bcf248b/LICENSE",
+          "http_status": 404,
+          "no_payload_substituted": true
+        }
+      },
+      "declaration_found": false,
+      "status": "upstream-pinned-declaration-absent",
+      "rights_status": "unresolved; no terms inferred from newer repository, other module or native archive",
+      "scope": "Pinned repository root and module-root inventory plus exact go.mod/libs.go equality; not a legal conclusion or upstream attestation",
+      "go_sum": "h1:i+nU0u/5Fwwnqc6QXXk6Ivizue6YpdMGQbMwW2/frpY="
+    }
+  ],
+  "distribution_audit": "pending",
+  "native_or_build_executed": false,
+  "source_or_cache_changed": false,
+  "gates_closed": [],
+  "initial_fetch_failure": "Android source filename was lib.go, not the assumed libs.go. Four completed records and Android retained raw responses reused; only missing Android lib.go and explicit404License rechecked. Original fetch program/partials retained.",
+  "limits": "Root and module-root text declarations only; no recursive binary inspection, exact linked membership, complete generated/native rights or upstream attestation claimed."
+}

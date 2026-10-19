@@ -210,6 +210,14 @@ It fails and is sealed without retry. Direct/manual verification is now required
 no further native input operator work is queued. Existing offscreen routing and
 model tests remain separate evidence.
 
+The [pinned Go-module declaration audit](../docs/reports/macos-module-declarations/README.md)
+confirms that all five WebGPU linker-module notice gaps exist in their exact
+upstream root/module-root trees, with matching selected Go source bytes. These
+are absent declarations, not collector omissions. The82-component source-built
+native archive bundle does not close those Go-module gaps. Applicable declarations
+or a reviewed dependency replacement remain required; the distribution audit
+stays pending. No runtime, SDK or Mac milestone changes at this checkpoint.
+
 ## Ordered delivery backlog
 
 Each row ends in a stable, reviewed commit and a short result entry. Functional
