@@ -750,3 +750,8 @@ checks pass, including an original-font negative control. All 4438 selected embe
 bytes and 12 runtime fonts remain unchanged. This is one concrete M6 correction;
 mixed icon origins and overall distribution applicability remain unresolved.
 No native or performance gate is closed by these offscreen checks.
+
+
+## Embedded icon origins checkpoint (19 October 2026)
+
+[Stage 0099](../docs/reviews/macos-icon-origins/README.md) provides a complete 4,105-file provenance ledger, thirteen original neutral replacements and five per-file Apache modification notices. It preserves public exports and the preceding Material artwork pixels; old mixed-origin artwork is replaced rather than relicensed. All 4,090 resolved Material source links and every prepared SVG hash are independently checked. Race/raster, preparation and generator checks pass. The identified icon-chain defects are resolved; final source-bound SDK/application notice transport and relocated native consumption remain required M6 checks. This checkpoint does not approve public distribution or complete M6/Mac acceptance.

@@ -1,0 +1,3 @@
+# Apache Material change notices
+
+These five Material Symbols derivatives retain their preceding Core SVG bytes after a prominent XML comment. The comments identify the prior Core viewBox/LF changes and Vellum notice addition. No artwork is newly authored or relicensed here. The preserved full Apache license is LICENSE_APACHE. NOTICE.origins records exact preimage/prepared/prefix hashes and upstream source paths. Actual parser/raster tests compare every pixel against the hash-verified preceding Core bytes at four sizes and two tints. These are source and software-rendering controls, not distribution-rights approval or native UI verification.

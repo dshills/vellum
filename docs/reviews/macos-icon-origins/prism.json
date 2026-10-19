@@ -1,0 +1,113 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "cee27a2de8d7ad8a8d283d975bfb6799",
+  "repo": {
+    "root": "",
+    "head": "",
+    "branch": ""
+  },
+  "inputs": {
+    "mode": "snippet"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6699,
+    "totalMs": 6782
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 1,
+    "bytes": 91992,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 46249,
+        "output": 618,
+        "costUSD": 0.098678
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "ffeb5239d7951fa6",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Independent review pinned stale hashes",
+        "message": "The packet's reviewed hashes differ from the final pinned hashes. The independent-review.json lists dependencies.json 1d6e33..., patch 9191ce..., and output-hashes dff4b9..., while the final files carry 336bba..., 033bfa..., and 687ac5.... The review was sealed before the correction, and url-review.json covers only the URL fix. Hash-bound recipe drift is therefore not covered by a single review. The README hashes also differ from the SOURCE headers (README 7ea3ad vs 3d48cb).",
+        "suggestion": "Re-seal the review against the final hashes, or document the delta explicitly.",
+        "confidence": 0.55,
+        "locations": [
+          {
+            "path": "docs/reviews/macos-icon-origins/independent-review.json",
+            "lines": {
+              "start": 1,
+              "end": 1
+            }
+          }
+        ],
+        "tags": [
+          "integrity",
+          "provenance"
+        ],
+        "evidence": "\"icons/NOTICE_VELLUM.md\": \"9bafd43a5f80519cca564bafbddbdeca8b18f3b201cff4abeb95d57cbfed2a79\"",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "path not in diff"
+    },
+    {
+      "finding": {
+        "id": "a82dfc00dde9b5ff",
+        "severity": "medium",
+        "category": "maintainability",
+        "title": "Duplicate section added to delivery spec",
+        "message": "The same 'Embedded icon origins checkpoint' section is appended twice to the spec, with identical text. This causes duplicate headings and a doubled, confusing normative record.",
+        "suggestion": "Remove one of the two duplicate sections.",
+        "confidence": 0.9,
+        "locations": [
+          {
+            "path": "specs/macos-delivery.md",
+            "lines": {
+              "start": 754,
+              "end": 762
+            }
+          }
+        ],
+        "tags": [
+          "docs",
+          "duplicate"
+        ],
+        "evidence": "## Embedded icon origins checkpoint (19 October 2026)",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "path not in diff"
+    }
+  ],
+  "suppressed": []
+}

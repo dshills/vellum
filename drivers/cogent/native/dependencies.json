@@ -1212,6 +1212,109 @@
               "sha256": "bce8bf2a99efee2b652a79df6cbe5d12b7e3916ae77ac053925beb0a6a3afb47"
             }
           ]
+        },
+        {
+          "origin": "Vellum icon provenance and original neutral pictograms (0098 reserved for parallel M3; integrate 0099 after 0098)",
+          "inputs": "native/patches/iconorigins/original-hashes.json",
+          "outputs": "native/patches/iconorigins/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/iconorigins/0099-icon-origins.patch",
+              "sha256": "033bfabc569f92efb9b918f391a387bf89ed0872183bc5da2cd3f0e16a513d33"
+            }
+          ],
+          "assets": [
+            {
+              "source": "native/assets/iconorigins/file-exe.svg",
+              "target": "icons/svg/file-exe.svg",
+              "sha256": "f2d00430ae9456158a1a5448625451a98b4d0bc96849ff98afb5142ebb374ec4"
+            },
+            {
+              "source": "native/assets/iconorigins/file-markdown.svg",
+              "target": "icons/svg/file-markdown.svg",
+              "sha256": "c28f8b11083bd588af172ef8459b55b5b2d8932c05074edad011d89ccd55992a"
+            },
+            {
+              "source": "native/assets/iconorigins/git-hub.svg",
+              "target": "icons/svg/git-hub.svg",
+              "sha256": "fcfd07808f1fdba7f1c1b5c5012346c15f7297837b0c83dfe1c655afc54bee75"
+            },
+            {
+              "source": "native/assets/iconorigins/git.svg",
+              "target": "icons/svg/git.svg",
+              "sha256": "a9669b7af17c80084616a492406cb98599ec17e19308d1f7605c6e06f8b66cc4"
+            },
+            {
+              "source": "native/assets/iconorigins/go.svg",
+              "target": "icons/svg/go.svg",
+              "sha256": "18965ca2ef1daebcffabb5fb63a4aa430efc7ea0c4e3f4cb2334f468bab7bf32"
+            },
+            {
+              "source": "native/assets/iconorigins/json.svg",
+              "target": "icons/svg/json.svg",
+              "sha256": "d60544efa0ea51f3c55d115f8249d7c1c292677470c7db761ee5f23de7b8486f"
+            },
+            {
+              "source": "native/assets/iconorigins/latex.svg",
+              "target": "icons/svg/latex.svg",
+              "sha256": "3d57c27b2934b7d36d46ceec91d7cbdca07955deb827d78eecebe8a4020ef569"
+            },
+            {
+              "source": "native/assets/iconorigins/make.svg",
+              "target": "icons/svg/make.svg",
+              "sha256": "7eecf1bc43b9fccf799fc797a8f3094cd50f56da33f67458da7a3ea69f96fdc1"
+            },
+            {
+              "source": "native/assets/iconorigins/makefile.svg",
+              "target": "icons/svg/makefile.svg",
+              "sha256": "7eecf1bc43b9fccf799fc797a8f3094cd50f56da33f67458da7a3ea69f96fdc1"
+            },
+            {
+              "source": "native/assets/iconorigins/radio_button_partial.svg",
+              "target": "icons/svg/radio_button_partial.svg",
+              "sha256": "34252bd4f32a922716ff662b60b733e470337671b52519d7a37fe8d571b99c23"
+            },
+            {
+              "source": "native/assets/iconorigins/tex.svg",
+              "target": "icons/svg/tex.svg",
+              "sha256": "3d57c27b2934b7d36d46ceec91d7cbdca07955deb827d78eecebe8a4020ef569"
+            },
+            {
+              "source": "native/assets/iconorigins/toggle_mid.svg",
+              "target": "icons/svg/toggle_mid.svg",
+              "sha256": "698c21a3ff278298069be754dab648fc26f6e1ca26e2f7c0b3ec0ebfff28f8a1"
+            },
+            {
+              "source": "native/assets/iconorigins/toml.svg",
+              "target": "icons/svg/toml.svg",
+              "sha256": "85af7313420ecf926de803d4cf422d53ec6e396641ffe8757b23f6c787092e95"
+            },
+            {
+              "source": "native/assets/iconorigins/material-notices/check_box_outline_blank.svg",
+              "target": "icons/svg/check_box_outline_blank.svg",
+              "sha256": "65cd828eb8b8d45e2f0d2ecea91689d7df48c357708f8acdfef15f8932874c77"
+            },
+            {
+              "source": "native/assets/iconorigins/material-notices/toggle_off-fill.svg",
+              "target": "icons/svg/toggle_off-fill.svg",
+              "sha256": "85cd2ca3448093ed7fb9369f8d371f252dbc8736309bc75b67a72d4647db59f9"
+            },
+            {
+              "source": "native/assets/iconorigins/material-notices/toggle_off.svg",
+              "target": "icons/svg/toggle_off.svg",
+              "sha256": "2deb94fe3e6c27fde44021ac77fbfa62b290f9c4f1c9d43d52c19a127a95917f"
+            },
+            {
+              "source": "native/assets/iconorigins/material-notices/toggle_on-fill.svg",
+              "target": "icons/svg/toggle_on-fill.svg",
+              "sha256": "99789406e0f6bf22b3c48b2aaa488c38d7cc52d8f0953f7e7a8ad183a841ef9b"
+            },
+            {
+              "source": "native/assets/iconorigins/material-notices/toggle_on.svg",
+              "target": "icons/svg/toggle_on.svg",
+              "sha256": "a42e8c1f7df4db77d166e24e49457d49abb883978105a012095e35080f43fbc1"
+            }
+          ]
         }
       ]
     },
