@@ -1135,6 +1135,17 @@
               "sha256": "d1f83988a3f5c23a0fd263e8edb90080c92448dec35b45541bd19133b69ee0b4"
             }
           ]
+        },
+        {
+          "origin": "Vellum event coalescing",
+          "inputs": "native/patches/eventcoalescing/original-hashes.json",
+          "outputs": "native/patches/eventcoalescing/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/eventcoalescing/0092-event-coalescing.patch",
+              "sha256": "d85ef952d37e4a3fb60a64e7d733309406ee3a207938e7d129557156fe27b0f8"
+            }
+          ]
         }
       ]
     },

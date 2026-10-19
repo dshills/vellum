@@ -727,3 +727,10 @@ evidence supersedes the earlier status-only Hide/Show implementation gap. Cocoa
 physical pointer/visibility/capture, DPI/focus transitions and M4/M5 live gates
 remain open; measured 60 Hz remains the release gate and 4 ms an optimization
 target.
+
+The [event queue coalescing checkpoint](event-coalescing.md) preserves finite
+scroll samples, checked raw/local movement origins and unique/deferred barriers
+through queue compression. Automated race and original-code failure controls
+qualify source routing only. Twelve inherited default Core vet diagnostics remain
+tracked for the M7 source quality audit; physical input, actual presentation,
+measured 60 Hz and all remaining Mac acceptance/distribution gates stay open.

@@ -1,0 +1,535 @@
+--- a/events/deque.go
++++ b/events/deque.go
+@@ -11,6 +11,8 @@
+ 
+ import (
+ 	"fmt"
++	"image"
++	"math"
+ 	"sync"
+ )
+ 
+@@ -85,38 +87,22 @@
+ 
+ // Send adds an event to the end of the deque,
+ // replacing the last of the same type unless marked
+-// as Unique.
++// as Unique. Unsafe pointer/scroll aggregates remain separate samples;
++// neither side of a Unique or Deferred boundary may be replaced. Send transfers
++// ownership: the caller must not mutate ev after publication.
+ // They are returned by NextEvent in FIFO order.
+ func (q *Deque) Send(ev Event) {
+ 	q.LockAndInit()
+ 	defer q.Mu.Unlock()
+ 
+ 	n := len(q.Back)
+-	if !ev.IsUnique() && n > 0 {
+-		lev := q.Back[n-1]
+-		// Deferred nodes own FIFO positions and mailbox credit. Only nextBack's
+-		// Ready/Merge protocol may combine them; ordinary compression must not
+-		// replace a reserved action or a coalesced publication wake.
+-		_, deferred := lev.(DeferredEvent)
+-		if !deferred && ev.IsSame(lev) {
+-			q.Back[n-1] = ev // replace
+-			switch ev.Type() {
+-			case MouseMove, MouseDrag:
+-				me := ev.(*Mouse)
+-				le := lev.(*Mouse)
+-				me.Prev = le.Prev
+-				me.PrvTime = le.PrvTime
+-			case Scroll:
+-				me := ev.(*MouseScroll)
+-				le := lev.(*MouseScroll)
+-				me.Delta = me.Delta.Add(le.Delta)
+-			}
+-			q.Cond.Signal()
+-			if TraceEventCompression {
+-				fmt.Println("compressed back:", ev)
+-			}
+-			return
+-		}
++	if n > 0 && ordinaryReplacement(ev, q.Back[n-1]) && aggregateBack(ev, q.Back[n-1]) {
++		q.Back[n-1] = ev
++		q.Cond.Signal()
++		if TraceEventCompression {
++			fmt.Println("compressed back:", ev)
++		}
++		return
+ 	}
+ 	q.Back = append(q.Back, ev)
+ 	q.Cond.Signal()
+@@ -125,25 +111,94 @@
+ // SendFirst adds an event to the start of the deque.
+ // They are returned by NextEvent in LIFO order,
+ // and have priority over events sent via Send.
+-// This is typically reserved for window events.
++// This is typically reserved for window events. It keeps the latest eligible
++// notification unchanged rather than accumulating pointer data, and never
++// replaces either side of a Unique or Deferred boundary. Ownership transfers
++// to the queue as in Send; priority readiness behavior is unchanged.
+ func (q *Deque) SendFirst(ev Event) {
+ 	q.LockAndInit()
+ 	defer q.Mu.Unlock()
+ 
+ 	n := len(q.Front)
+-	if !ev.IsUnique() && n > 0 {
+-		lev := q.Front[n-1]
+-		if ev.IsSame(lev) {
+-			if TraceEventCompression {
+-				fmt.Println("compressed front:", ev)
+-			}
+-			q.Front[n-1] = ev // replace
+-			q.Cond.Signal()
+-			return
+-		}
++	if n > 0 && ordinaryReplacement(ev, q.Front[n-1]) {
++		if TraceEventCompression {
++			fmt.Println("compressed front:", ev)
++		}
++		q.Front[n-1] = ev
++		q.Cond.Signal()
++		return
+ 	}
+ 	q.Front = append(q.Front, ev)
+ 	q.Cond.Signal()
++}
++
++// ordinaryReplacement protects either side of a unique/deferred boundary.
++// Only nextBack's Ready/Merge protocol may combine deferred FIFO positions.
++func ordinaryReplacement(newer, older Event) bool {
++	if newer.IsUnique() || older.IsUnique() {
++		return false
++	}
++	if _, ok := newer.(DeferredEvent); ok {
++		return false
++	}
++	if _, ok := older.(DeferredEvent); ok {
++		return false
++	}
++	return newer.IsSame(older)
++}
++
++// aggregateBack validates every proposed field before publishing or mutating.
++// Refusal leaves both samples intact for separate FIFO delivery. Front retains
++// its existing latest-notification policy and does not aggregate pointer data.
++func aggregateBack(newer, older Event) bool {
++	switch newer.Type() {
++	case MouseMove, MouseDrag:
++		n, nok := newer.(*Mouse)
++		o, ook := older.(*Mouse)
++		if !nok || !ook || n == nil || o == nil {
++			return false
++		}
++		if _, ok := coalescedDifference(n.Where, o.Prev); !ok {
++			return false
++		}
++		local, ok := coalescedDifference(o.Prev, n.LocalOffset)
++		if !ok {
++			return false
++		}
++		if _, ok := coalescedDifference(n.WhereLocal, local); !ok {
++			return false
++		}
++		n.Prev, n.PrevLocal, n.PrvTime = o.Prev, local, o.PrvTime
++	case Scroll:
++		n, nok := newer.(*MouseScroll)
++		o, ook := older.(*MouseScroll)
++		if !nok || !ook || n == nil || o == nil {
++			return false
++		}
++		if !coalescedFinite(n.Delta.X) || !coalescedFinite(n.Delta.Y) || !coalescedFinite(o.Delta.X) || !coalescedFinite(o.Delta.Y) {
++			return false
++		}
++		sum := n.Delta.Add(o.Delta)
++		if !coalescedFinite(sum.X) || !coalescedFinite(sum.Y) {
++			return false
++		}
++		n.Delta = sum
++	}
++	return true
++}
++func coalescedFinite(v float32) bool { return !math.IsNaN(float64(v)) && !math.IsInf(float64(v), 0) }
++func coalescedSubtract(a, b int) (int, bool) {
++	max := int(^uint(0) >> 1)
++	min := -max - 1
++	if b > 0 && a < min+b || b < 0 && a > max+b {
++		return 0, false
++	}
++	return a - b, true
++}
++func coalescedDifference(a, b image.Point) (image.Point, bool) {
++	x, xok := coalescedSubtract(a.X, b.X)
++	y, yok := coalescedSubtract(a.Y, b.Y)
++	return image.Pt(x, y), xok && yok
+ }
+ 
+ // DeferredEvent occupies a FIFO position before its producer is ready. Ready
+--- /dev/null
++++ b/events/coalescing_vellum_test.go
+@@ -0,0 +1,366 @@
++// Copyright 2026 Vellum contributors. SPDX-License-Identifier: MIT.
++package events
++
++import (
++	"image"
++	"math"
++	"math/big"
++	"math/rand"
++	"reflect"
++	"strconv"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/math32"
++)
++
++func coalescingTake(t *testing.T, q *Deque, want ...Event) {
++	t.Helper()
++	for _, w := range want {
++		got, ok := q.PollEvent()
++		if !ok || got != w {
++			t.Fatalf("queue order/identity: got %T %p (%v),want %T %p", got, got, ok, w, w)
++		}
++	}
++	if _, ok := q.PollEvent(); ok {
++		t.Fatal("extra queued sample")
++	}
++}
++func coalescingMove(typ Types, where, prev, start, offset image.Point) *Mouse {
++	var m *Mouse
++	if typ == MouseDrag {
++		m = NewMouseDrag(Left, where, prev, start, 0)
++	} else {
++		m = NewMouseMove(NoButton, where, prev, 0)
++	}
++	m.Init()
++	m.SetLocalOff(offset)
++	return m
++}
++func TestVellumCoalescingFiniteScrollOverflowKeepsSamples(t *testing.T) {
++	for _, axis := range []int{0, 1} {
++		t.Run(strconv.Itoa(axis), func(t *testing.T) {
++			var q Deque
++			a, b := math32.Vec2(3, 5), math32.Vec2(7, 11)
++			if axis == 0 {
++				a.X, b.X = math.MaxFloat32, math.MaxFloat32
++			} else {
++				a.Y, b.Y = -math.MaxFloat32, -math.MaxFloat32
++			}
++			first, second := NewScroll(image.Pt(1, 2), a, 0), NewScroll(image.Pt(3, 4), b, 0)
++			first.Init()
++			second.Init()
++			before1, before2 := *first, *second
++			q.Send(first)
++			q.Send(second)
++			if !reflect.DeepEqual(*first, before1) || !reflect.DeepEqual(*second, before2) {
++				t.Fatal("refusal changed a sample or partially added the safe axis")
++			}
++			coalescingTake(t, &q, first, second)
++		})
++	}
++}
++func TestVellumCoalescingScrollCancellationAndRecovery(t *testing.T) {
++	var q Deque
++	a := NewScroll(image.Point{}, math32.Vec2(math.MaxFloat32, 2), 0)
++	b := NewScroll(image.Point{}, math32.Vec2(math.MaxFloat32, 3), 0)
++	c := NewScroll(image.Pt(5, 6), math32.Vec2(-math.MaxFloat32, 4), 0)
++	for _, e := range []*MouseScroll{a, b, c} {
++		e.Init()
++		q.Send(e)
++	}
++	if a.Delta != math32.Vec2(math.MaxFloat32, 2) || b.Delta != math32.Vec2(math.MaxFloat32, 3) || c.Delta != math32.Vec2(0, 7) {
++		t.Fatal("unsafe barrier prevented later valid adjacent sum or mutated old samples", a, b, c)
++	}
++	coalescingTake(t, &q, a, c)
++}
++func TestVellumCoalescingScrollNonfiniteSamplesRemainBarriers(t *testing.T) {
++	for _, v := range []float32{float32(math.NaN()), float32(math.Inf(1)), float32(math.Inf(-1))} {
++		for _, firstInvalid := range []bool{false, true} {
++			var q Deque
++			a := NewScroll(image.Point{}, math32.Vec2(v, 1), 0)
++			b := NewScroll(image.Point{}, math32.Vec2(2, 3), 0)
++			if !firstInvalid {
++				a, b = b, a
++			}
++			ax, ay, bx, by := math.Float32bits(a.Delta.X), math.Float32bits(a.Delta.Y), math.Float32bits(b.Delta.X), math.Float32bits(b.Delta.Y)
++			q.Send(a)
++			q.Send(b)
++			if math.Float32bits(a.Delta.X) != ax || math.Float32bits(a.Delta.Y) != ay || math.Float32bits(b.Delta.X) != bx || math.Float32bits(b.Delta.Y) != by {
++				t.Fatal("nonfinite input was transformed")
++			}
++			coalescingTake(t, &q, a, b)
++		}
++	}
++}
++func TestVellumCoalescingSourceOriginOverflowPreservesBoth(t *testing.T) {
++	max := int(^uint(0) >> 1)
++	min := -max - 1
++	for _, triple := range [][4]int{{min, -1, 1, max}, {max, 0, -2, -max}} {
++		for _, drag := range []bool{false, true} {
++			for _, yaxis := range []bool{false, true} {
++				var s Source
++				point := func(x int) image.Point {
++					if yaxis {
++						return image.Pt(0, x)
++					}
++					return image.Pt(x, 0)
++				}
++				now := time.Unix(1700000000, 0)
++				s.Now = func() time.Time { return now }
++				s.Last.MousePos = point(triple[0])
++				if drag {
++					s.Last.MouseButtonType = MouseDown
++					s.Last.MouseDownPos = point(triple[1])
++					s.Last.MouseButton = Left
++				}
++				s.MouseMove(point(triple[1]))
++				first := s.Deque.Back[0].(*Mouse)
++				saved := first.Base
++				now = now.Add(time.Millisecond)
++				s.MouseMove(point(triple[2]))
++				second := s.Deque.Back[len(s.Deque.Back)-1].(*Mouse)
++				if len(s.Deque.Back) != 2 || !reflect.DeepEqual(first.Base, saved) || second.Prev != point(triple[1]) || second.PrevDelta() != point(triple[2]-triple[1]) {
++					t.Fatal("origin overflow compressed or modified sample", triple, drag, yaxis, first, second)
++				}
++				if first.PrevDelta() != point(triple[3]) {
++					t.Fatal("original representable step changed", first.PrevDelta())
++				}
++				coalescingTake(t, &s.Deque, first, second)
++			}
++		}
++	}
++}
++func TestVellumCoalescingRawLocalOriginsAndTimesAgree(t *testing.T) {
++	for _, typ := range []Types{MouseMove, MouseDrag} {
++		var q Deque
++		first := coalescingMove(typ, image.Pt(12, 24), image.Pt(10, 20), image.Pt(8, 16), image.Pt(1, 2))
++		second := coalescingMove(typ, image.Pt(15, 29), image.Pt(12, 24), image.Pt(8, 16), image.Pt(4, 5))
++		anchor := time.Unix(1700000000, 0)
++		first.PrvTime.SetTime(anchor)
++		first.GenTime.SetTime(anchor.Add(time.Millisecond))
++		first.StTime.SetTime(anchor.Add(-time.Millisecond))
++		second.PrvTime = first.GenTime
++		second.GenTime.SetTime(anchor.Add(2 * time.Millisecond))
++		second.StTime = first.StTime
++		newerTime, newerStartTime, old := second.GenTime, second.StTime, first.Base
++		newerStart := second.Start
++		q.Send(first)
++		q.Send(second)
++		if second.Prev != image.Pt(10, 20) || second.PrevLocal != image.Pt(6, 15) || second.PrevDelta() != image.Pt(5, 9) || second.Where.Sub(second.Prev) != second.PrevDelta() || second.PrvTime != first.PrvTime || second.GenTime != newerTime || second.StTime != newerStartTime || second.Start != newerStart || second.LocalOffset != image.Pt(4, 5) || second.SincePrev() != 2*time.Millisecond || second.SinceStart() != 3*time.Millisecond {
++			t.Fatal("local/raw or virtual timing origins diverged", typ, second.Base)
++		}
++		if !reflect.DeepEqual(first.Base, old) {
++			t.Fatal("queued older event mutated")
++		}
++		coalescingTake(t, &q, second)
++	}
++}
++func TestVellumCoalescingOffsetOverflowRefusesAtomically(t *testing.T) {
++	min := -int(^uint(0)>>1) - 1
++	var q Deque
++	a := coalescingMove(MouseMove, image.Pt(-100, 3), image.Pt(min, 1), image.Point{}, image.Point{})
++	b := coalescingMove(MouseMove, image.Pt(-50, 5), image.Pt(-100, 3), image.Point{}, image.Pt(100, 2))
++	old1, old2 := a.Base, b.Base
++	q.Send(a)
++	q.Send(b)
++	if !reflect.DeepEqual(a.Base, old1) || !reflect.DeepEqual(b.Base, old2) {
++		t.Fatal("offset overflow partially mutated pointer metadata")
++	}
++	coalescingTake(t, &q, a, b)
++}
++func TestVellumCoalescingDifferenceMatchesBigIntegerOracle(t *testing.T) {
++	max := int(^uint(0) >> 1)
++	min := -max - 1
++	edge := []int{min, min + 1, -100, -1, 0, 1, 100, max - 1, max}
++	lo, hi := big.NewInt(int64(min)), big.NewInt(int64(max))
++	check := func(a, b int) {
++		t.Helper()
++		exact := new(big.Int).Sub(big.NewInt(int64(a)), big.NewInt(int64(b)))
++		wantOK := exact.Cmp(lo) >= 0 && exact.Cmp(hi) <= 0
++		got, ok := coalescedSubtract(a, b)
++		if ok != wantOK || ok && int64(got) != exact.Int64() {
++			t.Fatalf("%v-%v: %v,%v want %s,%v", a, b, got, ok, exact, wantOK)
++		}
++	}
++	for _, a := range edge {
++		for _, b := range edge {
++			check(a, b)
++		}
++	}
++	r := rand.New(rand.NewSource(1701))
++	for range 1000 {
++		check(int(r.Uint64()), int(r.Uint64()))
++	}
++}
++func TestVellumCoalescingUniqueBarriersBackAndFront(t *testing.T) {
++	for _, front := range []bool{false, true} {
++		for _, oldUnique := range []bool{false, true} {
++			var q Deque
++			a, b := NewWindowPaint(), NewWindowPaint()
++			if oldUnique {
++				a.SetUnique()
++			} else {
++				b.SetUnique()
++			}
++			send := q.Send
++			if front {
++				send = q.SendFirst
++			}
++			send(a)
++			send(b)
++			if front {
++				coalescingTake(t, &q, b, a)
++			} else {
++				coalescingTake(t, &q, a, b)
++			}
++		}
++	}
++}
++
++type coalescingDeferred struct {
++	CustomEvent
++	readyCalls int
++}
++
++func (e *coalescingDeferred) Ready() bool              { e.readyCalls++; return true }
++func (e *coalescingDeferred) Merge(DeferredEvent) bool { return false }
++func TestVellumCoalescingDeferredBarriersBothSidesAndQueues(t *testing.T) {
++	for _, front := range []bool{false, true} {
++		for _, oldDeferred := range []bool{false, true} {
++			var q Deque
++			d := &coalescingDeferred{}
++			d.Typ = Custom
++			o := &CustomEvent{}
++			o.Typ = Custom
++			var a, b Event = d, o
++			if !oldDeferred {
++				a, b = b, a
++			}
++			send := q.Send
++			if front {
++				send = q.SendFirst
++			}
++			send(a)
++			send(b)
++			if d.readyCalls != 0 {
++				t.Fatal("admission invoked deferred readiness")
++			}
++			if front {
++				coalescingTake(t, &q, b, a)
++			} else {
++				coalescingTake(t, &q, a, b)
++			}
++		}
++	}
++}
++func TestVellumCoalescingFrontKeepsLatestWithoutPointerAggregation(t *testing.T) {
++	var q Deque
++	a, b := NewScroll(image.Point{}, math32.Vec2(math.MaxFloat32, 1), 0), NewScroll(image.Point{}, math32.Vec2(math.MaxFloat32, 2), 0)
++	q.SendFirst(a)
++	q.SendFirst(b)
++	if b.Delta != math32.Vec2(math.MaxFloat32, 2) {
++		t.Fatal("Front unexpectedly aggregates")
++	}
++	coalescingTake(t, &q, b)
++	aMove := coalescingMove(MouseMove, image.Pt(2, 3), image.Pt(1, 2), image.Point{}, image.Point{})
++	bMove := coalescingMove(MouseMove, image.Pt(3, 4), image.Pt(2, 3), image.Point{}, image.Point{})
++	q.SendFirst(aMove)
++	q.SendFirst(bMove)
++	if bMove.Prev != image.Pt(2, 3) || bMove.PrevDelta() != image.Pt(1, 1) {
++		t.Fatal("Front changed latest sample")
++	}
++	coalescingTake(t, &q, bMove)
++}
++func TestVellumCoalescingWindowNotificationsAndPriorityUnchanged(t *testing.T) {
++	var q Deque
++	back1, back2 := NewWindowPaint(), NewWindowPaint()
++	front1, front2 := NewWindowResize(), NewWindowResize()
++	q.Send(back1)
++	q.Send(back2)
++	q.SendFirst(front1)
++	q.SendFirst(front2)
++	coalescingTake(t, &q, front2, back2)
++}
++func TestVellumCoalescingCustomPointerPayloadFallback(t *testing.T) {
++	for _, typ := range []Types{MouseMove, MouseDrag, Scroll} {
++		for _, oldCustom := range []bool{false, true} {
++			var q Deque
++			custom := &CustomEvent{}
++			custom.Typ = typ
++			var typed Event
++			if typ == Scroll {
++				typed = NewScroll(image.Point{}, math32.Vec2(1, 2), 0)
++			} else {
++				typed = coalescingMove(typ, image.Pt(2, 3), image.Pt(1, 2), image.Point{}, image.Point{})
++			}
++			var a, b Event = custom, typed
++			if !oldCustom {
++				a, b = b, a
++			}
++			q.Send(a)
++			q.Send(b)
++			coalescingTake(t, &q, a, b)
++		}
++	}
++}
++func TestVellumCoalescingNormalBurstRetainsOneAccurateSample(t *testing.T) {
++	var s Source
++	for i := 1; i <= 10000; i++ {
++		s.MouseMove(image.Pt(i, 2*i))
++	}
++	if len(s.Deque.Back) != 1 {
++		t.Fatal("normal movement no longer compresses")
++	}
++	ev, ok := s.Deque.PollEvent()
++	if !ok {
++		t.Fatal("missing burst")
++	}
++	m := ev.(*Mouse)
++	if m.Where != image.Pt(10000, 20000) || m.Prev != (image.Point{}) || m.PrevDelta() != image.Pt(10000, 20000) {
++		t.Fatal("burst displacement lost", m.Base)
++	}
++	for range 1000 {
++		s.Scroll(image.Point{}, math32.Vec2(1, -2))
++	}
++	ev, ok = s.Deque.PollEvent()
++	if !ok || ev.(*MouseScroll).Delta != math32.Vec2(1000, -2000) {
++		t.Fatal("normal scroll burst changed", ev)
++	}
++	if _, ok := s.Deque.PollEvent(); ok {
++		t.Fatal("extra burst")
++	}
++}
++func TestVellumCoalescingConcurrentTransferPreservesDisplacement(t *testing.T) {
++	var q Deque
++	done := make(chan struct{})
++	const count = 1000
++	go func() {
++		defer close(done)
++		for i := 1; i <= count; i++ {
++			m := coalescingMove(MouseMove, image.Pt(i, -i), image.Pt(i-1, 1-i), image.Point{}, image.Point{})
++			q.Send(m)
++		}
++		end := NewWindow(WinClose)
++		q.Send(end)
++	}()
++	t.Cleanup(func() { <-done })
++	prev, total := image.Point{}, image.Point{}
++	for {
++		ev := q.NextEvent()
++		if ev.Type() == Window {
++			break
++		}
++		m := ev.(*Mouse)
++		if m.Prev != prev {
++			t.Fatalf("discontinuous ownership transfer %v after %v", m.Prev, prev)
++		}
++		total = total.Add(m.PrevDelta())
++		prev = m.Where
++		m.SetLocalOff(image.Pt(1, 2))
++	}
++	<-done
++	if prev != image.Pt(count, -count) || total != prev {
++		t.Fatal("concurrent burst lost displacement", prev, total)
++	}
++}

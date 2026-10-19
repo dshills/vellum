@@ -1,0 +1,44 @@
+{
+  "result": "PASS_CHANGED_SCOPE_WITH_INHERITED_CORE_VET_FAILURE",
+  "counts": {
+    "queue-focused-v3": 14,
+    "events-full-race-v3": 24,
+    "desktop-base-race-v3": 72,
+    "core-routing-offscreen-v3": 5
+  },
+  "expected_original_code_failures": [
+    "TestVellumOldQueueFiniteScrollMustRemainSeparate",
+    "TestVellumOldQueueLocalDeltaMustMatchRaw",
+    "TestVellumOldQueueUniqueMustSurvive"
+  ],
+  "strict_changed_package_vet_passed": true,
+  "full_core_default_vet_passed": false,
+  "inherited_core_vet_diagnostics": [
+    "core/html.go:169:22: encoding/xml.EndElement struct literal uses unkeyed fields",
+    "core/mainstage.go:295:13: cogentcore.org/core/math32.Geom2DInt struct literal uses unkeyed fields",
+    "core/mainstage.go:385:13: cogentcore.org/core/math32.Geom2DInt struct literal uses unkeyed fields",
+    "core/textfield.go:1280:32: cogentcore.org/core/text/textpos.Range struct literal uses unkeyed fields",
+    "core/textfield.go:1293:36: cogentcore.org/core/text/textpos.Range struct literal uses unkeyed fields",
+    "core/layout_test.go:196:3: cogentcore.org/core/math32.Vector2 struct literal uses unkeyed fields",
+    "core/layout_test.go:197:3: cogentcore.org/core/math32.Vector2 struct literal uses unkeyed fields",
+    "core/layout_test.go:198:3: cogentcore.org/core/math32.Vector2 struct literal uses unkeyed fields",
+    "core/layout_test.go:199:3: cogentcore.org/core/math32.Vector2 struct literal uses unkeyed fields",
+    "core/layout_test.go:200:3: cogentcore.org/core/math32.Vector2 struct literal uses unkeyed fields",
+    "core/renderbench_test.go:41:2: unreachable code",
+    "core/renderbench_test.go:72:2: unreachable code"
+  ],
+  "native_executed": false,
+  "mac_complete": false,
+  "schema": 1,
+  "baseline": "5ffc0a45099f0ffddc2da230e80f14702e1274a6",
+  "scope": "source and offscreen event queue coalescing; no live qualification",
+  "prepared_modules": {
+    "upstream": 6005,
+    "typesetting": 297
+  },
+  "stage_patch_sha256": "d85ef952d37e4a3fb60a64e7d733309406ee3a207938e7d129557156fe27b0f8",
+  "checks_artifact": {
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-event-coalescing/checks-artifact-result.json",
+    "sha256": "bad95926b7b4d0721ebd31b2fe7600ea3c927651d7bb8bc90d8bedffee10cd69"
+  }
+}
