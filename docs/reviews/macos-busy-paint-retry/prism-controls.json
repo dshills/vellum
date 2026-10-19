@@ -1,0 +1,20 @@
+{
+  "controls": [
+    {
+      "case": "directory",
+      "result": "REFUSED",
+      "reason": "SDK source must be a regular file: a/NOTICE"
+    },
+    {
+      "case": "fifo",
+      "result": "REFUSED",
+      "reason": "SDK source must be a regular file: a/NOTICE"
+    },
+    {
+      "case": "aggregate",
+      "result": "REFUSED",
+      "reason": "owned asset notice search exceeds file-count bound"
+    }
+  ],
+  "production_changed": false
+}

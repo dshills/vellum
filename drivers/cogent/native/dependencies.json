@@ -1315,6 +1315,17 @@
               "sha256": "a42e8c1f7df4db77d166e24e49457d49abb883978105a012095e35080f43fbc1"
             }
           ]
+        },
+        {
+          "origin": "Vellum busy paint retry scheduling",
+          "inputs": "native/patches/paintretry/original-hashes.json",
+          "outputs": "native/patches/paintretry/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/paintretry/0100-busy-paint-retry.patch",
+              "sha256": "637250be319149ab60f4dcd3bcfff94aef3f52e641d68c0cff98544b40e5d246"
+            }
+          ]
         }
       ]
     },

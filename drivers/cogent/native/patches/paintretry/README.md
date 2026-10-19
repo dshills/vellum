@@ -1,0 +1,3 @@
+# Stage 0100: coalesced busy paint retry
+
+Busy composition retains its retry timer but no longer forces an identical frame solely because another paint request arrived during the active batch. The next pass checks pending scene/sprite/rebuild invalidations normally. Resize/cache fallback retains its separate forced frame. Actual manual/software composer regressions check unchanged retry, queued dirty pixels and native-branch resize fallback; original-source and resize-removal negative controls distinguish both guarantees. This removes a concrete redundant scheduling path, not proof of native causality or 60Hz qualification. A fresh optimized native comparison remains required.

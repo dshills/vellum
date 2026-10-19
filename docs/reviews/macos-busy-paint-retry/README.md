@@ -1,0 +1,11 @@
+# Busy paint retry checkpoint
+
+A paint request during active composition scheduled a retry and set a flag that could later force another unchanged composition. Stage0100 removes only that busy-path force flag. The retry timer, render counter reservation/retirement, render-context/window ownership, normal scene/sprite/rebuild invalidation scan and resize/cache fallback force remain intact.
+
+Three actual manual/software-composer tests hold a real composition, then verify unchanged retry adds no batch or pixel difference, queued dirty input produces exactly one subsequent batch with current pixels, and the native resize branch still forces its required fallback. Four existing ownership/resize/fault regressions and strict Core vet pass. The original busy-flag source fails the unchanged-retry control with two compositions; separately removing the preserved resize force fails with zero required compositions. Root reproduced stages1–100 and matched the entire6021-file candidate Core tree; all29 preparation methods pass.
+
+Independent source review found no actionable issue. Root integration checks and the shared bounded Prism checkpoint cover this phase separately from the owned-asset declaration collector; each has its own commit and scope record. The two phases touch independent implementation paths.
+
+The preceding actual native journal showed approximately30Hz and an untagged companion acquisition near each traced acquisition. That evidence motivates this focused scheduling change but does not prove that this branch caused the native result. The old failed record remains unchanged. No cursor cache, rendering backend rewrite, latency/cadence threshold change, fresh native success or M3 completion is claimed. A fresh optimized source-bound comparison is required.
+
+Prism reviewed the complete shared two-phase staged packet with Anthropic Claude Sonnet 5.5 (one call, 19 files, 70,440 bytes, no truncation). Its one medium collector finding is retained verbatim. Root controls confirmed the specified aggregate bound and refusal of directory/FIFO notice paths; the disposition records intentional policy with no unresolved actionable finding. The busy-paint phase received no finding. This shared review does not substitute for the pending fresh native comparison.

@@ -1,0 +1,175 @@
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -749,7 +749,9 @@
+ // updates through (such as in offscreen testing).
+ func (w *renderWindow) renderWindow() {
+ 	if atomic.LoadInt32(&w.winRenderCounter) > 0 { // still working
+-		w.flags.SetFlag(true, winRenderSkipped)
++		// Coalesce this request into a dirty-state rescan after the batch.
++		// In-flight work alone does not require another identical composition.
++		// Resize/cache fallback retains its separate forced-frame flag below.
+ 		w.requestPaintAfter(time.Second / 60)
+ 		if DebugSettings.WindowRenderTrace {
+ 			log.Printf("RenderWindow: still rendering, skipped: %v\n", w.name)
+--- a/core/paint_retry_vellum_test.go
++++ b/core/paint_retry_vellum_test.go
+@@ -0,0 +1,159 @@
++// Copyright (c) 2026 Davin Hills. SPDX-License-Identifier: MIT.
++//go:build offscreen
++
++package core
++
++import (
++	"bytes"
++	"context"
++	"image"
++	"image/color"
++	"sync"
++	"sync/atomic"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/system"
++	"cogentcore.org/core/system/composer"
++)
++
++// Keep the real software drawer and source composition; only hold the next
++// actual Start at a deterministic rendezvous and count completed compositions.
++type busyRetryDrawer struct {
++	composer.Drawer
++	image            getImager
++	entered, release chan struct{}
++	once             sync.Once
++	ends             atomic.Int64
++}
++
++func (d *busyRetryDrawer) Start() {
++	d.once.Do(func() { close(d.entered); <-d.release })
++	d.Drawer.Start()
++}
++func (d *busyRetryDrawer) End()                  { d.Drawer.End(); d.ends.Add(1) }
++func (d *busyRetryDrawer) GetImage() *image.RGBA { return d.image.GetImage() }
++func (d *busyRetryDrawer) CanRedraw() bool       { return false }
++
++func busyRetryFixture(t *testing.T) (*ManualWindow, *Body, *fixtureClock, *busyRetryDrawer) {
++	t.Helper()
++	m, b, c := manualFixture(t, func(b *Body) {
++		b.Styler(func(s *styles.Style) { s.Background = image.NewUniform(color.RGBA{R: 31, G: 47, B: 79, A: 255}) })
++	})
++	drainManual(t, m)
++	cp := m.window.SystemWindow.Composer().(*composer.ComposerDrawer)
++	d := &busyRetryDrawer{Drawer: cp.Drawer, image: cp.Drawer.(getImager), entered: make(chan struct{}), release: make(chan struct{})}
++	cp.Drawer = d
++	return m, b, c, d
++}
++
++// This is an actual composition holding the normal render-context and native
++// window locks. Reserve its counter just as renderWindow does before dispatch.
++func holdBusyRetryComposition(t *testing.T, m *ManualWindow, d *busyRetryDrawer) func() {
++	t.Helper()
++	w := m.window
++	atomic.AddInt32(&w.winRenderCounter, 1)
++	done := make(chan struct{})
++	go func() { defer close(done); w.renderAsync(w.SystemWindow.Composer()) }()
++	var once sync.Once
++	finish := func() {
++		once.Do(func() { close(d.release) })
++		select {
++		case <-done:
++		case <-time.After(2 * time.Second):
++			t.Fatal("controlled composition did not retire")
++		}
++	}
++	t.Cleanup(finish)
++	select {
++	case <-d.entered:
++	case <-time.After(2 * time.Second):
++		t.Fatal("actual composer was not entered")
++	}
++	return finish
++}
++
++func TestVellumBusyRetryUnchangedDoesNotComposeAgain(t *testing.T) {
++	m, _, clock, d := busyRetryFixture(t)
++	before, err := m.Image(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	finish := holdBusyRetryComposition(t, m, d)
++	m.window.renderWindow() // Actual busy admission, while the first batch owns rc.
++	finish()
++	if d.ends.Load() != 1 {
++		t.Fatal("controlled batch not completed")
++	}
++	clock.Advance(time.Second / 60)
++	drainManual(t, m)
++	if d.ends.Load() != 1 {
++		t.Fatalf("unchanged busy retry composed %d batches, want1", d.ends.Load())
++	}
++	after, err := m.Image(context.Background())
++	if err != nil || !bytes.Equal(before.Pix, after.Pix) {
++		t.Fatal("unchanged retry altered real pixels", err)
++	}
++}
++
++func TestVellumBusyRetryRetainsQueuedDirtyPixels(t *testing.T) {
++	m, b, clock, d := busyRetryFixture(t)
++	before, err := m.Image(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	handled := 0
++	b.Scene.On(events.Custom, func(e events.Event) {
++		handled++
++		b.Styles.Background = image.NewUniform(color.RGBA{R: 23, G: 211, B: 43, A: 255})
++		b.NeedsRender()
++		e.SetHandled()
++	})
++	finish := holdBusyRetryComposition(t, m, d)
++	// Accepted during the batch; normal FIFO dispatch waits for rc and performs
++	// the mutation. No caller mutates styles/painter state across that ownership.
++	m.window.SystemWindow.Events().Custom("dirty-during-composition")
++	m.window.renderWindow()
++	finish()
++	drainManual(t, m)
++	if handled != 1 || d.ends.Load() != 2 {
++		t.Fatalf("queued dirty input/real subsequent compose lost or duplicated: %d/%d", handled, d.ends.Load())
++	}
++	after, err := m.Image(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	if bytes.Equal(before.Pix, after.Pix) {
++		t.Fatal("dirty retry did not publish changed pixels")
++	}
++	p := after.RGBAAt(after.Bounds().Dx()/2, after.Bounds().Dy()/2)
++	if p.G < 180 || p.R > 60 || p.B > 80 {
++		t.Fatalf("subsequent frame is stale: %v", p)
++	}
++	clock.Advance(time.Second / 60)
++	drainManual(t, m)
++	if d.ends.Load() != 2 {
++		t.Fatal("busy timer added an unchanged composition after dirty work")
++	}
++}
++
++type busyRetryPlatformApp struct{ system.App }
++
++func (*busyRetryPlatformApp) Platform() system.Platforms { return system.MacOS }
++
++func TestVellumBusyRetryPreservesResizeFallbackComposition(t *testing.T) {
++	m, _, _, d := busyRetryFixture(t)
++	// The already constructed window/drawer remain entirely software. Override
++	// only the platform predicate to enter the real native resize-cache branch.
++	close(d.release)
++	original := TheApp.App
++	TheApp.App = &busyRetryPlatformApp{App: original}
++	defer func() { TheApp.App = original }()
++	m.window.lastResize = m.config.Now()
++	m.window.renderWindow()
++	if d.ends.Load() != 1 {
++		t.Fatalf("resize fallback failed to force fresh composition: %d", d.ends.Load())
++	}
++}

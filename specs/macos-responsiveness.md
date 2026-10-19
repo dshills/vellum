@@ -82,3 +82,8 @@ safety requirements. This is not approval to ship unbounded growth or stale work
 
 See [delivery plan](macos-delivery.md), [measurement contract](prototype-plan.md#measurement-contract)
 and [Mac completion scope](macos-completion.md).
+
+
+## Coalescing busy paint requests
+
+A paint request received while composition owns the render context must schedule a later dirty-state rescan. Busy work alone must not force another unchanged composition. Queued input/scene/sprite/rebuild invalidations must remain visible to that scan, and resize/cache fallback must retain its separate required composition. Test unchanged retry, actual queued dirty pixels and resize fallback independently. Stage0100 implements this scheduler correction; native timing comparison is required before attributing a performance improvement. No latency/cadence threshold changes.

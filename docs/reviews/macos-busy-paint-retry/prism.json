@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "5bb8dac6518cfa52633a50bc4d383662",
+  "repo": {
+    "root": "/private/tmp/vellum-macos-native-results-97aee13",
+    "head": "0dafb660d6c7e0fdb2ebf5e3af68461159180a4e",
+    "branch": "codex/macos-native-results"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a1ed86547af8c574",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Global entry bound across all ancestor directories may reject legitimate modules",
+      "message": "The entry loop calls release.declared_notice on every directory entry, including subdirectories, and later file_identity is relied on to refuse non-regular files. A subdirectory or FIFO whose name matches a notice pattern raises an error and aborts the whole collection. Also `visited` is a single global counter across all ancestor directories, so a large module (for example one with many selected assets in separate directories) may hit the MAX_FILES limit spuriously.",
+      "suggestion": "Reset or scope the visited counter per directory, or document why a global bound is intended, and skip directories explicitly via entry.is_dir(follow_symlinks=False) before treating the name as a notice.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "scripts/distribution-inventory.py",
+          "lines": {
+            "start": 205,
+            "end": 205
+          }
+        }
+      ],
+      "tags": [
+        "bounds",
+        "robustness",
+        "location-corrected"
+      ],
+      "evidence": "                if not release.declared_notice(Path(name)) or (module, name) in found:",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4372,
+    "totalMs": 4438
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 19,
+    "bytes": 70440,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 33861,
+        "output": 371,
+        "costUSD": 0.071432
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
