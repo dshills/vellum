@@ -32,6 +32,7 @@ import (
 	"github.com/dshills/vellum/canvas"
 	cogent "github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/drivers/cogent/internal/acceptance"
+	"github.com/dshills/vellum/drivers/cogent/internal/nativefixture"
 	"github.com/dshills/vellum/ui"
 )
 
@@ -115,7 +116,11 @@ func run() error {
 	}
 	// Disposable unique titles must not write 1,000 geometry records into the
 	// user's application preferences. This is local fixture configuration.
-	core.DebugSettings.DisableWindowGeometrySaver = true
+	restoreGeometry, err := nativefixture.IsolateGeometry()
+	if err != nil {
+		return err
+	}
+	defer restoreGeometry()
 	a, err := app.New(app.Config{})
 	if err != nil {
 		return err

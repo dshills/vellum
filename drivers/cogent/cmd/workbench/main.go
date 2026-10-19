@@ -48,7 +48,9 @@ func main() {
 	}
 	must(validateAutomationCheck(*automationCheck, *automationEnabled, *exit, *smoke || *documentSmoke || *enduranceDuration > 0))
 	if *enduranceDuration > 0 || *automationCheck {
-		disableEnduranceGeometrySaver()
+		restoreGeometry, err := disableEnduranceGeometrySaver()
+		must(err)
+		defer restoreGeometry()
 	}
 	if *documentSmoke && (*smoke || *exit > 0) {
 		must(errors.New("document-smoke requires its own native process without smoke/exit-after"))

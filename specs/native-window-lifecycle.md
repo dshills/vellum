@@ -160,3 +160,9 @@ window/view weak references expired by the fixed observations. All windows remai
 counted. Runtime class/image metadata supports a text-service lifetime candidate;
 it does not identify the historical KVO wrapper or establish Vellum deallocation.
 This observation adds no class whitelist, leak qualification or M4 acceptance.
+
+## Fixture geometry settings initialization
+
+Disposable native helper modes load Core settings before installing their process-local geometry-persistence override. Require positive finite initialized zoom so the first lazy body cannot reload settings over that override. A load error or invalid zoom refuses the fixture before overriding policy. Capture and restore the loaded policy; defer restoration before registering application close so teardown runs first. Existing process-exit/watchdog paths still skip defers; the override is process-local and this guard never saves settings. It does not promise rollback of defaults already applied by a failed settings load.
+
+One internal nativefixture helper is shared by sizing, cycle, breadcrumb, tab-close and accessibility fixtures, plus the existing dedicated gallery/workbench test modes. Keep their exact activation predicates and native assertions; ordinary interactive gallery/workbench paths retain their normal behavior. Three in-memory settings regressions exercise actual lazy body loading, errors/invalid values and loaded-policy restoration. These software tests do not establish native geometry, resource retirement or Mac acceptance.

@@ -3,13 +3,13 @@
 package main
 
 import (
-	"cogentcore.org/core/core"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/drivers/cogent/internal/nativefixture"
 	"os"
 	"slices"
 	"sync"
@@ -25,7 +25,11 @@ func main() {
 	}
 }
 func run() error {
-	core.DebugSettings.DisableWindowGeometrySaver = true
+	restoreGeometry, err := nativefixture.IsolateGeometry()
+	if err != nil {
+		return err
+	}
+	defer restoreGeometry()
 	a, err := app.New(app.Config{})
 	if err != nil {
 		return err

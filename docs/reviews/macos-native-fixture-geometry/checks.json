@@ -1,0 +1,105 @@
+{
+  "settings-race": {
+    "exit_code": 0,
+    "seconds": 27.91408054099884,
+    "owned": {
+      "created": true,
+      "pid": 14034,
+      "group": 14034,
+      "terminal": true,
+      "group_absent": true,
+      "exit_code": 0,
+      "errors": [],
+      "observation": {
+        "group": 14034,
+        "members": [],
+        "observation_sha256": "fd67afcdd9d51d144e134f88ea6526d63911a0f5dccfdc1b32b576fe6bf68ca6"
+      }
+    },
+    "pins_stable": true,
+    "logs": {
+      "stdout": {
+        "bytes": 981,
+        "sha256": "cf3a0da1451031f24292fc61f3dfe15e74fd79ab01fe8b9bd280153d5a3d4707"
+      },
+      "stderr": {
+        "bytes": 1055,
+        "sha256": "fd3c1ae5c43b1d71d7d3c265dc63a37fb13e1e1e860a0ad3074c997742b846b4"
+      }
+    },
+    "native_executed": false,
+    "full_receipt_sha256": "1563b7b063a6ffb13e3b2352fb32c09fcf6d783dc0fd11da515903fdcf3d669e"
+  },
+  "native-vet": {
+    "exit_code": 0,
+    "seconds": 21.630941375042312,
+    "owned": {
+      "created": true,
+      "pid": 13985,
+      "group": 13985,
+      "terminal": true,
+      "group_absent": true,
+      "exit_code": 0,
+      "errors": [],
+      "observation": {
+        "group": 13985,
+        "members": [],
+        "observation_sha256": "1c5987fb809f5838f2c1b6c3b166097e65ccd80e38cfacf568737fc8e0d59f53"
+      }
+    },
+    "pins_stable": true,
+    "logs": {
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 941,
+        "sha256": "a1485cd5e7bde4981203922f4e6e46b1e76da276b5da440887a20026134c9e23"
+      }
+    },
+    "native_executed": false,
+    "full_receipt_sha256": "ceb762eb1df05b975bda1ef9be027fa14203b1ecab791d50dd70402bc1f1978c"
+  },
+  "native-build": {
+    "exit_code": 0,
+    "seconds": 79.03507720900234,
+    "owned": {
+      "created": true,
+      "pid": 14010,
+      "group": 14010,
+      "terminal": true,
+      "group_absent": true,
+      "exit_code": 0,
+      "errors": [],
+      "observation": {
+        "group": 14010,
+        "members": [],
+        "observation_sha256": "eed18a42dd04715a75106f983d1e8b18fc021a62278d7b0e2fa13af3061cfe78"
+      }
+    },
+    "pins_stable": true,
+    "logs": {
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 3246,
+        "sha256": "058076fa250a7e50efb6f30984e1740b9f2d728275c62a9f8cd9ab4dba9e245d"
+      }
+    },
+    "native_executed": false,
+    "full_receipt_sha256": "6a8630007df95a1a7c1e82501a9f3cecdba5b65594738e7d5eb8e39bb16eafbf"
+  },
+  "root_race_methods": [
+    "TestIsolateGeometrySurvivesLazyBodySettings",
+    "TestIsolateGeometrySettingsFailureRefusesOverride",
+    "TestIsolateGeometryAlreadyInitializedAndInvalidZoom",
+    "TestEnduranceConfigurationAndTraceBounds",
+    "TestEnduranceOwnerWaitsForExecution",
+    "TestEnduranceJoinsRunningOwnerCallback",
+    "TestEndurancePreservesNativeFailureBeforeCancellation"
+  ],
+  "native_command_build_scope": "go build -tags=vellum_native_checks ./cmd/...; no native applications launched and no retained per-command binary association claim."
+}

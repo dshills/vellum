@@ -21,6 +21,7 @@ import (
 	"cogentcore.org/core/system/driver/desktop"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/drivers/cogent/internal/nativefixture"
 	"github.com/dshills/vellum/ui"
 )
 
@@ -48,7 +49,11 @@ func main() {
 	}
 	watchdog := time.AfterFunc(25*time.Second, func() { fmt.Fprintln(os.Stderr, "window sizing watchdog"); os.Exit(1) })
 	defer watchdog.Stop()
-	core.DebugSettings.DisableWindowGeometrySaver = true
+	restoreGeometry, err := nativefixture.IsolateGeometry()
+	if err != nil {
+		panic(err)
+	}
+	defer restoreGeometry()
 	a, err := app.New(app.Config{})
 	if err != nil {
 		panic(err)

@@ -1,0 +1,32 @@
+{
+  "base": "04ce5192833b71b04cc2e964e011917e85620b81",
+  "source_files": {
+    "drivers/cogent/cmd/window-size-smoke/main.go": "da705b9453e7f6987b94049cfc64411fecd3ec8f793f5d959865e3ed0c499b6e",
+    "drivers/cogent/cmd/window-cycle-smoke/main.go": "b5e3e207a277fe25c4152c0c7b5eb41c1c45dc7b8f0dc3145daa9a7d80050350",
+    "drivers/cogent/cmd/breadcrumb-smoke/main_native.go": "d6d18252b538d39be511df6949f0a96058a66a15e0dccddd3f1ce8243d21d43f",
+    "drivers/cogent/cmd/tab-close-smoke/main_native.go": "bd0a9f4719cfda4c35ad0da961e79a54359be1b3a6d71021ce78f8b05f8f5b1c",
+    "drivers/cogent/cmd/accessibility-smoke/main.go": "b3453dcf23badfae9aa28082e9b95af054c8edab8fd07802471d3a2272e1ccc6",
+    "drivers/cogent/cmd/gallery/main.go": "bc007585ec2162deffe6c7171525a4ad478795018e99f4e4e601c0f8936ff4f1",
+    "drivers/cogent/cmd/workbench/main.go": "c3828628da16fae1617b3f91fb0893ae7b72332f2b76af17f1933e8297c585d1",
+    "drivers/cogent/cmd/workbench/endurance.go": "0525418d698699f7d340d8ccb6e791f631c8e8b6bcdb3c0763ff26eda897f719",
+    "drivers/cogent/internal/nativefixture/geometry.go": "88207c4e0233ab401b3ed6269fb140d96a349a7889009f3ceabf51cf10d36c3f",
+    "drivers/cogent/internal/nativefixture/geometry_test.go": "2cde01fd00915aa701b62f3ca22d58b3629bda0983faae47aee2d6672641586f",
+    "specs/native-window-lifecycle.md": "7e4aaece94202944e13b85310bc8078785fc42f5cd6f8b42af309c233797a4fc"
+  },
+  "author_result_sha256": "6bb5dd4091ccfa1c6ebb048b8d9581cfc598642ed5830672670eaa37ddaaa861",
+  "independent_review_sha256": "392cd50df723a13a07f81393edb71bdcd6fe26007634ec037ce178e9d7f375d2",
+  "author_patch_sha256": "2ff343416734af3fbe4447bd92b1690cc7b127822de8aa86304f45af03681baf",
+  "normalization": "Pinned gofmt only reorders two contiguous import blocks after exact author source copies. Original proposal/evidence preserved; no semantic delta.",
+  "gofmt_only_normalization": {
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-native-fixture-geometry/repo/drivers/cogent/cmd/window-cycle-smoke/main.go": {
+      "author": "b4d3fb1d928540286a440cb5318958537587fd4e8e11566c3e0da48faed5be5a",
+      "integrated": "b5e3e207a277fe25c4152c0c7b5eb41c1c45dc7b8f0dc3145daa9a7d80050350"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-native-fixture-geometry/repo/drivers/cogent/cmd/workbench/endurance.go": {
+      "author": "ef3cf981f5ef9cc99157275e5119c85a55844d79db3e0f9a8a033a88d25ef4ac",
+      "integrated": "0525418d698699f7d340d8ccb6e791f631c8e8b6bcdb3c0763ff26eda897f719"
+    }
+  },
+  "native_executed": false,
+  "narrow_window_size_preparation": "Earlier source-only prototype and missing-import correction preserved externally; no runtime/test PASS transferred."
+}

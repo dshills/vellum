@@ -13,6 +13,7 @@ import (
 	"cogentcore.org/core/events/key"
 	"github.com/dshills/vellum/app"
 	cogent "github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/drivers/cogent/internal/nativefixture"
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/virtual"
 )
@@ -425,9 +426,11 @@ func check(ctx context.Context, a *app.Application, m *model) (result error) {
 }
 func main() {
 	// Disposable acceptance windows must not restore or persist user geometry.
-	previousGeometrySaver := core.DebugSettings.DisableWindowGeometrySaver
-	core.DebugSettings.DisableWindowGeometrySaver = true
-	defer func() { core.DebugSettings.DisableWindowGeometrySaver = previousGeometrySaver }()
+	restoreGeometry, err := nativefixture.IsolateGeometry()
+	if err != nil {
+		panic(err)
+	}
+	defer restoreGeometry()
 	if os.Getenv("VELLUM_AX_EVENT_TRACE") == "1" {
 		core.DebugSettings.EventTrace = true
 		core.DebugSettings.FocusTrace = true

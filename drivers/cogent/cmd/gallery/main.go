@@ -17,6 +17,7 @@ import (
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/drivers/cogent/internal/nativefixture"
 	"github.com/dshills/vellum/editor"
 	"github.com/dshills/vellum/ui"
 )
@@ -241,7 +242,9 @@ func main() {
 		must(errors.New("disclosure-smoke requires its own bounded process"))
 	}
 	if *textModal || *media || *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *catalogue || *choices || *navigation || *structure {
-		core.DebugSettings.DisableWindowGeometrySaver = true
+		restoreGeometry, err := nativefixture.IsolateGeometry()
+		must(err)
+		defer restoreGeometry()
 	}
 	a, err := app.New(app.Config{})
 	must(err)

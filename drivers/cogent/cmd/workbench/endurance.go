@@ -15,12 +15,12 @@ import (
 	"sync"
 	"time"
 
-	"cogentcore.org/core/core"
 	"cogentcore.org/core/system"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/command"
 	"github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/drivers/cogent/internal/nativefixture"
 	"github.com/dshills/vellum/tasks"
 	"github.com/dshills/vellum/virtual"
 )
@@ -39,7 +39,9 @@ func (c enduranceConfig) validate() error {
 	}
 	return nil
 }
-func disableEnduranceGeometrySaver() { core.DebugSettings.DisableWindowGeometrySaver = true }
+
+// Keep the fixture-specific entry point while sharing settings admission.
+func disableEnduranceGeometrySaver() (func(), error) { return nativefixture.IsolateGeometry() }
 
 // PostWait admits work; the reply proves owner execution actually finished.
 func enduranceOwner(ctx context.Context, a *app.Application, fn func() error) error {
