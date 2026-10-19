@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "result": "PRISM_FINDING_DISMISSED_AFTER_SOURCE_REVIEW",
+  "native_or_test_execution": false,
+  "source_edits": false,
+  "prism": {
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-style-compat-fixed/prism.json",
+    "sha256": "477c6dd79304dcab04f3077ec79d34b7dc6cd3d1aed0be8f2d65738bbb1c9d87",
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 11,
+      "bytes": 15833,
+      "chunks": 1,
+      "llmCalls": 1,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 10666,
+          "output": 326,
+          "costUSD": 0.024592
+        }
+      ],
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    }
+  },
+  "dispositions": [
+    {
+      "id": "d916a912dcc6dbd8",
+      "verdict": "NOT_REACHABLE_UNDER_EXISTING_RECORD_INVARIANT",
+      "correctness": "No production path was found that makes a record with Kind=Label retain a non-*core.Text widget. mountShallowScoped switches directly on Label and assigns core.NewText, before attaching the styler. Every production retained sync enters through reconcileScoped, which only reuses records when compatible(old,next) verifies equal ID and Kind. Kind changes remount and retire the old widget; neither reparenting nor theme updates reassign widget. Extension custom mounting is restricted to Kind=Extension and is incompatible with Label. The private record/widget fields have no application setter. Other widget assignments are control/editor/grid construction paths with their own non-Label kinds. Existing Label syncRecordVisible also asserts *core.Text under the same invariant. Direct same-shape syncRecord calls outside reconciliation are package-local test helpers. A checked assertion silently skipping allocation state would conceal invariant corruption rather than fix a reachable input failure.",
+      "source_evidence": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": "552-605",
+          "fact": "Label mount creates core.NewText and attaches styler to that fixed record/widget."
+        },
+        {
+          "path": "drivers/cogent/reconcile.go",
+          "lines": "88-101,234-246",
+          "fact": "Mismatched kind allocates a fresh record; sync uses prepared compatible tree."
+        },
+        {
+          "path": "drivers/cogent/reconcile.go",
+          "lines": "155-196",
+          "fact": "Retained theme/reparent operations do not replace record.widget."
+        },
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": "613-641,681",
+          "fact": "Owned sync updates descriptor only for compatible record; existing Label sync relies on identical concrete type."
+        },
+        {
+          "path": "drivers/cogent/controls.go",
+          "lines": "440-442,613-617,675-679",
+          "fact": "Control sync/preparation return when no control; finish guards its control-specific cases. Label does not enter widget-replacement control construction."
+        }
+      ],
+      "redundant_resolve_style": {
+        "verdict": "NONMATERIAL_REFACTOR_OPPORTUNITY",
+        "assessment": "The second ResolveStyle for Label repeats bounded theme overlay/validation; it has no I/O, native mutation, unbounded traversal or application callback. Reusing the resolved Style could remove duplicate work, but no measured responsiveness regression or scalability defect is established by this finding. It does not justify a broad applyStyle signature refactor during compatibility repair. Existing measured responsiveness gates remain authoritative.",
+        "required_change": false
+      },
+      "required_change": false
+    }
+  ],
+  "remaining_material_findings": [],
+  "source_hashes": {
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/driver.go": "95cb8ed58127e6d86b9145b7364a38dec518f4c763dc9d14e9807e3573251def",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/reconcile.go": "069f85ebae43a327517571b1a1f8754b5747e01e30178f46c70ba49021026a02",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/controls.go": "ff5418b8721ce8c1b65a130395eaed5d21bb0ee1d1f978642b6e9eb47fd30844",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/editor.go": "56aa72f3b61db048cfcfd78277898ac7dfc0b55dc5f629d7b3f574e398090c27",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/grid_editing.go": "c57f7a66d523f7a92326a566f590da7272f3b6152504d961181fa3ad22769b6e",
+    "/private/tmp/vellum-macos-native-results-97aee13/ui/style.go": "2f9a4d9a5753d44ce3bed1c2bfa93c8a617e3b3ae93a62ce74869627dc79e68d",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/style.go": "d0b9776e600ed51e979b50e10200ee6c7941941ee47d4e32365a8acf4b1f8c22"
+  }
+}

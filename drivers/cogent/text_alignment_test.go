@@ -68,6 +68,9 @@ func TestManagedTextAlignmentPixelsKeyedUpdatesAndRemoval(t *testing.T) {
 				return ink
 			}
 			baseline := capture()
+			if kind == ui.Label && widget.(*core.Text).AllocationLayout {
+				t.Fatal("omitted allocation style enabled new layout")
+			}
 			positions := map[ui.Alignment]image.Rectangle{}
 			for _, value := range []ui.Alignment{ui.AlignStart, ui.AlignEnd, ui.AlignCenter} {
 				if err := a.Post(func() { alignment = ui.Some(value); _ = a.Invalidate("one") }); err != nil {
@@ -75,6 +78,9 @@ func TestManagedTextAlignmentPixelsKeyedUpdatesAndRemoval(t *testing.T) {
 				}
 				unitSettle(t, m)
 				positions[value] = capture()
+				if kind == ui.Label && !widget.(*core.Text).AllocationLayout {
+					t.Fatal("explicit alignment did not enable allocation layout")
+				}
 				if findRecord(m.implementation.find("one").state.root, "aligned").widget != widget {
 					t.Fatal("alignment update replaced keyed widget")
 				}
@@ -87,6 +93,9 @@ func TestManagedTextAlignmentPixelsKeyedUpdatesAndRemoval(t *testing.T) {
 				t.Fatal(err)
 			}
 			unitSettle(t, m)
+			if kind == ui.Label && widget.(*core.Text).AllocationLayout {
+				t.Fatal("removing alignment retained allocation layout")
+			}
 			if got := capture(); got != baseline {
 				t.Fatalf("removing alignment did not restore native geometry: %v want %v", got, baseline)
 			}

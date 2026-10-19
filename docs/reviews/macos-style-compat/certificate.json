@@ -1,0 +1,126 @@
+{
+  "base_commit": "dc3fc63159ad679e614dcf44da6de65e59d37f3f",
+  "reviewed_implementation": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "diff_bytes": 15833,
+    "diff_sha256": "42f41985c3d12c84853d316d53270b805cbb72ec5b6e58a4c1fb3968c650a040",
+    "files": {
+      "drivers/cogent/driver.go": "95cb8ed58127e6d86b9145b7364a38dec518f4c763dc9d14e9807e3573251def",
+      "drivers/cogent/native/dependencies.json": "2b5a8cb180ef0febed10cc19761bd488bdb69ddc0896738e97904bc0a6057a12",
+      "drivers/cogent/native/patches/textcompat/0097-text-allocation-opt-in.patch": "963dcfddcf29ad27a0f07f49cb76de8013e69fc7dae2ebe6bf0f98ded2466e6d",
+      "drivers/cogent/native/patches/textcompat/README.md": "99ce13ce8829b24a6c85d66ae4ab631c19d7839b0b6da3a70f1ff4cc38d01856",
+      "drivers/cogent/native/patches/textcompat/original-hashes.json": "dd0f5fc1bd7de059c9bbd039ca566089ae27ad5ceb055d347ff16b53d2c7776b",
+      "drivers/cogent/native/patches/textcompat/output-hashes.json": "73627501992cdecfce037cbe260cf3670048d59259c27d60f1708a1c3edd6f9e",
+      "drivers/cogent/prepare_test.py": "ff9d0ea493d5cfa24a1dd057265306b13f41c33e12a4bcd6ddbcd9c390d97625",
+      "drivers/cogent/text_alignment_test.go": "ac1ce98744fdd6720813cbc32f6332b79fc4920bfb288c4ab444865681e585e7",
+      "specs/layout-theme.md": "4f5d2122bf8ab6a35911516958e714d03c2508c11b7307f70195f55aaf26f8e1",
+      "ui/style.go": "2f9a4d9a5753d44ce3bed1c2bfa93c8a617e3b3ae93a62ce74869627dc79e68d",
+      "ui/style_json_test.go": "cf2ab2a938690b2cbade929b1a3d187212930df76523118d363c94dd77441c87"
+    },
+    "rules_sha256": "e62db12fca39f926ede9dac27f82a000cbbff51f791ab114656e1ddb2c3a227b"
+  },
+  "checks": {
+    "root-race": {
+      "receipt_sha256": "acd7f85402b6f520cebdc3d7542c85c90f3fdca752dff42f5cf3becf677d2a1f",
+      "seconds": 16.402995500015095,
+      "stdout": {
+        "bytes": 678,
+        "sha256": "7510f19bcfaadf17729e1dace1d596f1d563127c2d0cc5e1ac727720e08d0917"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "terminal_group_absent": true
+    },
+    "root-vet": {
+      "receipt_sha256": "e51ba911a71a8bcd25661b00d9381bdb0e692a9acf102d969f7a4a795a677c96",
+      "seconds": 1.6863743329886347,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "terminal_group_absent": true
+    },
+    "layout-race": {
+      "receipt_sha256": "b3897bd42d6ba14cd84e2ec1505e7b1ca456ebfda612a9550a9fdade5b1c9f62",
+      "seconds": 23.413754625013098,
+      "stdout": {
+        "bytes": 53,
+        "sha256": "3aa452d5bda1d4d14066b7818eb33bafeafb8a20acd069097d8447d678001dca"
+      },
+      "stderr": {
+        "bytes": 1089,
+        "sha256": "ed3f02a0a0904f943f79adb77fc8f60ecb9df736d0119f855c1d58a320569e95"
+      },
+      "terminal_group_absent": true
+    },
+    "core-race": {
+      "receipt_sha256": "d9f2253220235a077a98f5b6e274afe88f8f73004161f1df03a315bfb0a27fea",
+      "seconds": 12.774675916996785,
+      "stdout": {
+        "bytes": 37,
+        "sha256": "c92e86588babb47e6f346404a9a2e336ef443e1449cdaff423da46930882f49f"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "terminal_group_absent": true
+    },
+    "driver-vet": {
+      "receipt_sha256": "4cbd1794a6b6a02efc0bb585db14a44114a50f2c611c9b3aa64f39933c9d2c8d",
+      "seconds": 11.681543292012066,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 989,
+        "sha256": "130830518c67afc14acec1dc25e44a924aa3b4f5a759b399dc0cd986bea939f0"
+      },
+      "terminal_group_absent": true
+    },
+    "replay-race": {
+      "receipt_sha256": "486b9b87de6c67712220af29713e3347a9847ac1a1b018478ed6ce6f5879dbc0",
+      "seconds": 196.35160708299372,
+      "stdout": {
+        "bytes": 11251,
+        "sha256": "ce0fb3de871b0a4c9cf6df407e85cc5544507da10bd2c5ccebcad382cb972217"
+      },
+      "stderr": {
+        "bytes": 1153,
+        "sha256": "81e141059a338cb46f9fb7d8324a88cdd5d16974e4cefe18c858437f4135586c"
+      },
+      "terminal_group_absent": true
+    }
+  },
+  "preparation": {
+    "stage97_reproduced": true,
+    "failure_ordering_tests": 29,
+    "prepare_stdout_sha256": "9c6da758a8e8ffc024630196de0a366ab4a52ea86e5ab3420339672c02ec4a82",
+    "prepare_tests_stderr_sha256": "92f9207eb3246bd42fcee9d4aea8e09d032ecd82c95069ee0217b09ef76eaa41"
+  },
+  "frozen_workspace": {
+    "rows": [
+      10000,
+      1000000
+    ],
+    "batches": [
+      1,
+      7,
+      64
+    ],
+    "operations": 1296,
+    "captures": 162,
+    "records_and_goldens_changed": false
+  },
+  "review_record_scope": "These review records are factual checkpoint evidence; Prism reviewed the11 implementation/spec/recipe files in reviewed_implementation. No native performance or full Mac acceptance inferred.",
+  "root_check_transfer": "Root module implementation/tests are unchanged from the earlier passing root-race/root-vet receipts; nested driver/Core changes were tested by focused race/vet and full frozen replay.",
+  "native_executed_for_corrected_checkpoint": false
+}

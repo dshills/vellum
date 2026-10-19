@@ -1,0 +1,107 @@
+--- a/core/text.go
++++ b/core/text.go
+@@ -39,6 +39,10 @@
+ 	// Text is the text to display.
+ 	Text string
+ 
++	// AllocationLayout opts into block alignment and final growth inside the
++	// allocated content box. False preserves legacy native text placement.
++	AllocationLayout bool
++
+ 	// Type is the styling type of text to use.
+ 	// It defaults to [TextBodyLarge].
+ 	Type TextTypes
+@@ -433,7 +437,7 @@
+ // Rendering and all pointer/selection/link coordinates must share this origin.
+ func (tx *Text) paintTextOrigin() math32.Vector2 {
+ 	origin := tx.Geom.Pos.Content
+-	if tx.paintText != nil {
++	if tx.AllocationLayout && tx.paintText != nil {
+ 		spare := tx.Geom.Size.Actual.Content.X - tx.paintText.Bounds.Size().X
+ 		if spare > 0 {
+ 			origin.X += spare * tx.Styles.Text.Align.Factor()
+@@ -598,7 +602,7 @@
+ // twice within an already expanded allocation.
+ func (tx *Text) SizeFinal() {
+ 	wrap := tx.Styles.GrowWrap
+-	if tx.Styles.Grow.X > 0 || tx.Styles.Grow.Y > 0 {
++	if tx.AllocationLayout && (tx.Styles.Grow.X > 0 || tx.Styles.Grow.Y > 0) {
+ 		tx.Styles.GrowWrap = false
+ 	}
+ 	defer func() { tx.Styles.GrowWrap = wrap }()
+--- a/core/text_alignment_vellum_test.go
++++ b/core/text_alignment_vellum_test.go
+@@ -19,6 +19,7 @@
+ 			var tx *Text
+ 			m, body, _ := manualFixture(t, func(b *Body) {
+ 				tx = NewText(b).SetText(`<a href="https://example.com">12345</a>`)
++				tx.AllocationLayout = true
+ 				tx.Styler(func(s *styles.Style) {
+ 					s.Min.Set(units.Dp(240), units.Dp(40))
+ 					s.Max.Set(units.Dp(240), units.Dp(40))
+@@ -55,6 +56,7 @@
+ 	var tx *Text
+ 	m, body, _ := manualFixture(t, func(b *Body) {
+ 		tx = NewText(b).SetText("123456789<br>12")
++		tx.AllocationLayout = true
+ 		tx.Styler(func(s *styles.Style) {
+ 			s.Min.Set(units.Dp(240), units.Dp(80))
+ 			s.Max.Set(units.Dp(240), units.Dp(80))
+@@ -88,6 +90,7 @@
+ 	var tx *Text
+ 	m, body, _ := manualFixture(t, func(b *Body) {
+ 		tx = NewText(b).SetText(`<a href="https://example.com">one two</a>`)
++		tx.AllocationLayout = true
+ 		tx.Styler(func(s *styles.Style) {
+ 			s.Min.Set(units.Dp(300), units.Dp(60))
+ 			s.Max.Set(units.Dp(300), units.Dp(60))
+@@ -130,6 +133,7 @@
+ 			s.Align.Content = styles.Center
+ 		})
+ 		tx = NewText(column).SetText("one two three four five six seven eight nine ten")
++		tx.AllocationLayout = true
+ 		tx.Styler(func(s *styles.Style) { s.Grow.Set(1, 0); s.Font.Size.Dp(24); s.Text.Align = text.Center })
+ 	})
+ 	drainManual(t, m)
+@@ -148,3 +152,41 @@
+ 		}
+ 	}
+ }
++
++// Native labels inherit center/end paragraph alignment for many existing
++// controls. That must not opt them into a second block-to-allocation offset.
++func TestVellumDefaultTextKeepsLegacyOrigin(t *testing.T) {
++	for _, alignment := range []text.Aligns{text.Center, text.End} {
++		t.Run(alignment.String(), func(t *testing.T) {
++			var tx *Text
++			m, body, _ := manualFixture(t, func(b *Body) {
++				tx = NewText(b).SetText(`<a href="https://example.com">12345</a>`)
++				tx.Styler(func(s *styles.Style) {
++					s.Min.Set(units.Dp(240), units.Dp(40))
++					s.Max.Set(units.Dp(240), units.Dp(40))
++					s.Grow.Set(0, 0)
++					s.Text.Align = alignment
++				})
++			})
++			drainManual(t, m)
++			rc := body.Scene.renderContext()
++			rc.Lock()
++			defer rc.Unlock()
++			if spare := tx.Geom.Size.Actual.Content.X - tx.paintText.Bounds.Size().X; spare < 100 {
++				t.Fatal("missing oversized allocation", spare)
++			}
++			if got := tx.paintTextOrigin(); got != tx.Geom.Pos.Content {
++				t.Fatal("default text shifted", got, tx.Geom.Pos.Content)
++			}
++			for ri := 0; ri < 5; ri++ {
++				point := tx.paintText.RuneBounds(ri).Translate(tx.Geom.Pos.Content).Center().ToPoint()
++				if got := tx.pixelToRune(point); got != ri {
++					t.Fatal("legacy selection shifted", ri, got)
++				}
++				if link, hit := tx.findLink(point); link == nil || !point.In(hit) {
++					t.Fatal("legacy link shifted", ri, hit)
++				}
++			}
++		})
++	}
++}

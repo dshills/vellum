@@ -88,3 +88,17 @@ zero resets an outline/radius. Omission restores normal theme/native defaults on
 retained updates. Borders do not promise shadow or platform material controls.
 Native keyboard-focus indicators retain precedence over the resting border,
 including when its explicit width is zero.
+
+Unset app-surface properties (`GrowX`, `GrowY`, `TextAlign`, `CornerRadius`,
+`Border`) are omitted from JSON, preserving existing theme and replay identities.
+Explicitly set zero values remain serialized and restore the corresponding
+property on round trip. Existing properties retain their original JSON shape.
+Optional omission follows `Set`, independently of an ignored `Value`.
+
+Text allocation layout is opt-in through the new resolved `TextAlign`, `GrowX`,
+or `GrowY` properties on a label. Removing all three restores legacy native
+placement on the retained widget. Native control internals and scalar `Grow`
+alone retain their existing paragraph origin and wrapping allocation behavior.
+This avoids shifting inherited center/end paragraph alignment in existing apps.
+Explicit allocation layout keeps drawing, selection and hyperlink geometry on
+one origin. Button/MenuButton alignment uses container justification.

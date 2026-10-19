@@ -596,7 +596,13 @@ func mountShallowScoped(parent tree.Node, n ui.Node, a *app.Application, scope a
 	r.widget.AsWidget().SetName(n.ID)
 	syncSemantics(r)
 	bindFileDrop(r, a, scope.ID())
-	r.widget.AsWidget().Styler(func(s *styles.Style) { applyStyle(s, r.node, r.theme) })
+	r.widget.AsWidget().Styler(func(s *styles.Style) {
+		applyStyle(s, r.node, r.theme)
+		if r.node.Kind == ui.Label {
+			value, err := ui.ResolveStyle(r.node, r.theme)
+			r.widget.(*core.Text).AllocationLayout = err == nil && (value.TextAlign.Set || value.GrowX.Set || value.GrowY.Set)
+		}
+	})
 	return r, nil
 }
 func syncRecord(r *record, n ui.Node) error {

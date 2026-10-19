@@ -15,6 +15,10 @@ type Optional[T comparable] struct {
 
 func Some[T comparable](value T) Optional[T] { return Optional[T]{Set: true, Value: value} }
 
+// IsZero lets JSON omitzero preserve omitted properties independently of Value.
+// An explicitly set zero remains present in the serialized style.
+func (o Optional[T]) IsZero() bool { return !o.Set }
+
 // Insets and Size use device-independent pixels. Max size zero is unbounded.
 type Insets struct{ Top, Right, Bottom, Left float32 }
 
@@ -57,10 +61,10 @@ type Style struct {
 	MinSize, MaxSize Optional[Size]
 	Grow             Optional[float32]
 	// GrowX/GrowY override Grow on one axis, useful for sidebars and rows.
-	GrowX, GrowY           Optional[float32]
-	TextAlign              Optional[Alignment]
-	CornerRadius           Optional[float32]
-	Border                 Optional[Border]
+	GrowX, GrowY           Optional[float32]   `json:",omitzero"`
+	TextAlign              Optional[Alignment] `json:",omitzero"`
+	CornerRadius           Optional[float32]   `json:",omitzero"`
+	Border                 Optional[Border]    `json:",omitzero"`
 	Foreground, Background Optional[color.NRGBA]
 	Typography             Optional[Typography]
 }

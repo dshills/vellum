@@ -1190,6 +1190,17 @@
               "sha256": "73acf57cbb620aa763ef47ea7ffe750b3313598bb7447100c2e1b64093b29041"
             }
           ]
+        },
+        {
+          "origin": "Vellum opt-in text allocation compatibility",
+          "inputs": "native/patches/textcompat/original-hashes.json",
+          "outputs": "native/patches/textcompat/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/textcompat/0097-text-allocation-opt-in.patch",
+              "sha256": "963dcfddcf29ad27a0f07f49cb76de8013e69fc7dae2ebe6bf0f98ded2466e6d"
+            }
+          ]
         }
       ]
     },

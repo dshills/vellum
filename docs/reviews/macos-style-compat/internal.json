@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "result": "APPROVED_SOURCE_REVIEW",
+  "reviewer": "independent mac_reminders_demo agent",
+  "source_edits": false,
+  "tests_or_native_fixtures_launched_by_reviewer": false,
+  "prism_performed": false,
+  "findings": [],
+  "serialization": {
+    "verdict": "APPROVED",
+    "reason": "Optional.IsZero returns !Set, matching public omission semantics even when an ignored Value is nonzero. Go1.25.6 encoding/json supports omitzero and calls value IsZero methods. Tags are restricted to five newly introduced fields; legacy Style fields keep their exact existing wire shape. Set=true explicit numeric/border zero and TextAlign=start remain serialized and decode as explicit options. IsZero alone does not omit untagged old fields.",
+    "regression_coverage": "Exact original empty Style wire bytes are asserted for both zero and ignored-nonzero unset new options; original wire decodes to Style{}; all five explicit-set options survive round trip. Full unchanged frozen replay is the independent nonempty-theme and original-manifest compatibility gate."
+  },
+  "allocation": {
+    "verdict": "APPROVED",
+    "reason": "Stage97 makes stage95 block-to-allocation paint offset and final positive-growth expansion opt-in through Text.AllocationLayout. Default false is behaviorally equivalent to the original text origin/base SizeFinal for existing native internals and scalar Grow. Driver enables the flag only on managed Label after resolving new TextAlign/GrowX/GrowY; the same styler resets it when all new properties are omitted, while honoring theme overrides. Label widget mapping guarantees *core.Text. Render, pointer-to-rune and hyperlink bounds use the same helper, avoiding visual/selection divergence. Button/MenuButton keep container justification and native intrinsic labels.",
+    "regression_coverage": "Core tests explicitly opt in for allocation alignment, linked whitespace and multiline/growing-label geometry; new default center/end test checks original origin, rune selection and links. Driver pixel assertions cover explicit align start/center/end, retained keyed identity, removal restoring original pixels and flag=false, and growing Weather heading centered under centered parent.",
+    "evidence_interpretation": "Parent-run diagnostic isolated origin-only as legacy pixel divergence; pre95 and growth-only match unchanged initial golden. This source review finds the explicit opt-in correction appropriate. Full unchanged frozen replay must still pass before acceptance; no golden migration or changed inputs authorized."
+  },
+  "recipe": {
+    "patch_hash_matches_dependency": true,
+    "prepared_outputs_match_final_stage97_manifest": true,
+    "existing_stage95_and96_unchanged_by_review": true
+  },
+  "required_completion": [
+    "Root must retain complete current full frozen replay result and pixel/model comparisons on unchanged records/goldens.",
+    "Root must bind final source/prepared hashes after compatibility fix before new native renewal; the old dc3fc63 builds/receipts are historical and must not be launched as final corrected binaries."
+  ],
+  "source_hashes": {
+    "/private/tmp/vellum-macos-native-results-97aee13/ui/style.go": "2f9a4d9a5753d44ce3bed1c2bfa93c8a617e3b3ae93a62ce74869627dc79e68d",
+    "/private/tmp/vellum-macos-native-results-97aee13/ui/style_json_test.go": "cf2ab2a938690b2cbade929b1a3d187212930df76523118d363c94dd77441c87",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/driver.go": "95cb8ed58127e6d86b9145b7364a38dec518f4c763dc9d14e9807e3573251def",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/style.go": "d0b9776e600ed51e979b50e10200ee6c7941941ee47d4e32365a8acf4b1f8c22",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/text_alignment_test.go": "ac1ce98744fdd6720813cbc32f6332b79fc4920bfb288c4ab444865681e585e7",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/prepare_test.py": "ff9d0ea493d5cfa24a1dd057265306b13f41c33e12a4bcd6ddbcd9c390d97625",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/native/dependencies.json": "2b5a8cb180ef0febed10cc19761bd488bdb69ddc0896738e97904bc0a6057a12",
+    "/private/tmp/vellum-macos-native-results-97aee13/specs/layout-theme.md": "4f5d2122bf8ab6a35911516958e714d03c2508c11b7307f70195f55aaf26f8e1",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/native/patches/textcompat/0097-text-allocation-opt-in.patch": "963dcfddcf29ad27a0f07f49cb76de8013e69fc7dae2ebe6bf0f98ded2466e6d",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/native/patches/textcompat/original-hashes.json": "dd0f5fc1bd7de059c9bbd039ca566089ae27ad5ceb055d347ff16b53d2c7776b",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/native/patches/textcompat/output-hashes.json": "73627501992cdecfce037cbe260cf3670048d59259c27d60f1708a1c3edd6f9e",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/core/text.go": "0415e5fb2f052a29f6fd645355c0b585afa343386bc4371ce6854e3ff1bb8fbc",
+    "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/core/text_alignment_vellum_test.go": "789197e12a5132cd616e7ebccb70dd7ca357e95e11d21e50b846b8052d5d9150"
+  },
+  "local_toolchain_support": {
+    "path": "/Users/dshills/Development/Go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.6.darwin-arm64/src/encoding/json/encode.go",
+    "lines": "136-144 describe omitzero/IsZero; encoder implementation1099,1205,1217-1244 selects IsZero",
+    "sha256": "533ae250cf46961fc4aded16b130981c25aef37063d00f5c5bf65d28e98f6e1e"
+  }
+}

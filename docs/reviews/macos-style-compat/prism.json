@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "fd7a385d66193ef90c4835154e4295ae",
+  "repo": {
+    "root": "/private/tmp/vellum-macos-native-results-97aee13",
+    "head": "dc3fc63159ad679e614dcf44da6de65e59d37f3f",
+    "branch": "codex/macos-native-results"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "d916a912dcc6dbd8",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unchecked type assertion in Styler",
+      "message": "The Styler runs on every style application and does an unchecked type assertion on r.widget. If any Label node is mounted with a widget that is not *core.Text, this panics. It also re-resolves the style a second time on every style pass, which is redundant work.",
+      "suggestion": "Use a checked assertion (`if tx, ok := r.widget.(*core.Text); ok {...}`) and reuse the already resolved style rather than calling ui.ResolveStyle again.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 603,
+            "end": 605
+          }
+        }
+      ],
+      "tags": [
+        "panic",
+        "type-assertion"
+      ],
+      "evidence": "r.widget.(*core.Text).AllocationLayout = err == nil \u0026\u0026 (value.TextAlign.Set || value.GrowX.Set || value.GrowY.Set)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4932,
+    "totalMs": 4947
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 11,
+    "bytes": 15833,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 10666,
+        "output": 326,
+        "costUSD": 0.024592
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
