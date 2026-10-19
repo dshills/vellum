@@ -12,6 +12,9 @@ import subprocess
 import sys
 import tempfile
 
+if __name__ == "__main__":
+    sys.dont_write_bytecode = True
+
 from build_output import BuildOutput, json_bytes
 from child_process import run_child
 from sdk_environment import child_environment

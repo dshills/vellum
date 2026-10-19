@@ -22,6 +22,26 @@ application and changes no clipboard, input-source or OS preferences. Collection
 requires Darwin with cgo enabled and uses the same controlled child environment,
 graph download/verification and command deadlines as the SDK producer.
 
+Collection accepts either the exact Git checkout root or an extracted SDK with
+`SDK_MANIFEST.json`. A present malformed manifest refuses collection rather than
+falling back to Git. The SDK path verifies exact regular-file membership and all
+manifest checksums, including the manifest's own observed hash. Its source record
+uses `kind: sdk-payload`, separately records `declared_source` from that manifest,
+and explicitly marks authentication as not independently verified. An ancestor
+Git repository cannot supply an extracted SDK's provenance. SDK collection refuses
+`--include-untracked`; the Git producer's existing source APIs are unchanged.
+
+The SDK manifest is bounded to 8 MiB, payload members to 64 MiB each, and their
+aggregate to 1 GiB; at most 20,000 files include the manifest. Canonical relative
+paths, module identity and any native capsule are validated before Go work. Body
+hashing reads only each admitted file size plus a one-byte growth probe and checks
+descriptor/path identity. A fresh source snapshot after package resampling must
+match. These are sampled integrity checks, not atomic isolation or upstream
+authentication. The six SDK/build/generator/package CLI entrypoints disable local
+import bytecode writes before loading helpers, so ordinary Python invocation does
+not add undeclared `__pycache__` files to an SDK. Library imports retain the caller's
+bytecode policy. See the [extracted SDK build check](../docs/reports/macos-sdk-build/README.md).
+
 Every SDK source file is size/SHA256 recorded, including prepared dependencies.
 Resolved `EmbedFiles` are recorded separately with package/module identity and
 font classification. Listed cgo source files, linker flags and framework
@@ -62,7 +82,8 @@ updates release gates. Module notice records preserve existing pinned version/
 checksum provenance. The pin manifest and every shipped source-file hash bind
 the observed prepared bytes; collection does not regenerate private replacements.
 
-Hashes stream with a 1 GiB per-file bound. SDK and build-asset/cgo source lists
+General input hashes stream with a 1 GiB per-file bound; SDK payload admission
+has the stricter bounds above. SDK and build-asset/cgo source lists
 each have a 20,000-entry admission bound, checked before surplus file hashing.
 Notice collection uses bounded streaming metadata mode and retains no notice
 contents; the SDK producer's existing notice-copy mode is separate.
@@ -75,8 +96,9 @@ These sampled checks are not filesystem isolation or an atomic source snapshot.
 Output must be new and outside the source checkout. Publication uses the existing
 exclusive hardlink/copy mechanism and its completion/checksum semantics.
 `--include-untracked` explicitly records whitelisted private precommit files;
-otherwise source names come from tracked Git entries. Source revision and
-cleanliness describe capture, not a later commit. Equivalent input bytes,
+otherwise Git source names come from tracked entries. Git revision and
+cleanliness describe capture, not a later commit. SDK source metadata remains
+self-described as specified above. Equivalent input bytes,
 configuration and source state produce equivalent reports across relocated
 module/cache paths for the recorded conventional linker paths. Unknown absolute
 linker flags remain literal evidence rather than being guessed or resolved.

@@ -147,6 +147,15 @@ profile, while direct source/historical SDK graphs and their original findings
 remain unchanged. Native/font/asset applicability, distribution approval and full
 M6/Mac acceptance remain open. No application is launched in this checkpoint.
 
+The [extracted SDK owned-build check](../docs/reports/macos-sdk-build/README.md)
+now passes from a Git-free private candidate: normal Python app generation,
+actual optimized ARM64 compilation with a linker map, and notice-bearing unsigned
+app packaging. Manifest-backed source integrity replaces the Git-only collector
+assumption for extracted SDKs; declared provenance remains unauthenticated.
+The candidate is a disclosed precommit snapshot, and the app was not launched.
+This closes the SDK build-tool blocker, while final native app acceptance,
+component/asset applicability, owner distribution approval and full M6 stay open.
+
 ## Finish line
 
 Finish the Go-native framework on the local Mac: an independently consumable SDK

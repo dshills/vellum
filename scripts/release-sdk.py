@@ -15,6 +15,9 @@ import tarfile
 import tempfile
 import sys
 
+if __name__ == "__main__":
+    sys.dont_write_bytecode = True
+
 from child_process import run_child, check_child_output
 
 from artifact_io import publish_exclusive

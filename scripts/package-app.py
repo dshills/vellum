@@ -16,6 +16,11 @@ import tarfile
 import tempfile
 import zipfile
 
+import sys
+
+if __name__ == "__main__":
+    sys.dont_write_bytecode = True
+
 import app_notices
 
 from native_archive import regular_stream, unchanged

@@ -9,8 +9,14 @@ from pathlib import Path, PurePosixPath
 import re
 import tempfile
 import struct
+import sys
 
-from native_archive import archive_members, linker_objects, selected_archive_members
+if __name__ == "__main__":
+    sys.dont_write_bytecode = True
+
+import native_gpu
+
+from native_archive import archive_members, linker_objects, selected_archive_members, regular_stream, unchanged
 
 from artifact_io import publish_exclusive
 from child_process import check_child_output
@@ -25,6 +31,115 @@ MAX_FILE_BYTES = 1024 * 1024 * 1024
 COMMAND_TIMEOUT_SECONDS = 600
 FONT_SUFFIXES = {".ttf", ".otf", ".ttc", ".woff", ".woff2"}
 NATIVE_SUFFIXES = {".a", ".dylib", ".so", ".dll", ".lib", ".o"}
+
+
+SDK_MANIFEST = "SDK_MANIFEST.json"
+MAX_SDK_MANIFEST_BYTES = 8 << 20
+MAX_SDK_MEMBER_BYTES = 64 << 20
+MAX_SDK_TOTAL_BYTES = 1 << 30
+
+
+def sdk_source_snapshot(root, include_untracked=False):
+    """Observe a complete immutable SDK payload; its provenance is self-described."""
+    manifest_path = root / SDK_MANIFEST
+    if not manifest_path.exists() and not manifest_path.is_symlink():
+        return None
+    if include_untracked:
+        raise ValueError("SDK payload inventory does not accept include_untracked")
+    raw = native_gpu.read_regular(manifest_path, MAX_SDK_MANIFEST_BYTES)
+    manifest = native_gpu.strict_json(raw)
+    if (type(manifest) is not dict or type(manifest.get("schema")) is not int
+            or manifest["schema"] != 1 or type(manifest.get("release")) is not dict):
+        raise ValueError("invalid SDK source manifest")
+    module = manifest["release"].get("module")
+    version = manifest["release"].get("version")
+    if (type(module) is not str or len(module) > 512
+            or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._~-]*(?:/[A-Za-z0-9][A-Za-z0-9._~-]*)+", module)
+            or type(version) is not str
+            or not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.-]+)?", version)):
+        raise ValueError("invalid SDK source module/version")
+    declared = manifest.get("source")
+    if (type(declared) is not dict or set(declared) != {"commit", "clean"}
+            or type(declared.get("commit")) is not str
+            or not re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", declared["commit"])
+            or type(declared.get("clean")) is not bool):
+        raise ValueError("invalid declared SDK source provenance")
+    files = manifest.get("files")
+    if type(files) is not dict or not 0 < len(files) < MAX_FILES:
+        raise ValueError("SDK source file-count bound exceeded or invalid records")
+    if SDK_MANIFEST in files or "go.mod" not in files:
+        raise ValueError("invalid SDK source manifest membership")
+    for name, checksum in files.items():
+        if (type(name) is not str or not name or len(name) > 4096 or "\\" in name
+                or any(ord(c) < 32 or ord(c) == 127 for c in name)
+                or len(name.split("/")) > 32 or any(part in {"", ".", ".."} for part in name.split("/"))
+                or PurePosixPath(name).is_absolute() or not native_gpu.sha_value(checksum)):
+            raise ValueError("invalid SDK source path/checksum")
+    native_gpu.validate_record(manifest.get("native_gpu"), files, manifest.get("private_build"))
+    expected = {**files, SDK_MANIFEST: hashlib.sha256(raw).hexdigest()}
+    # Enumerate only declared directories, refusing extras before traversing them.
+    directories = {str(parent) for name in expected for parent in PurePosixPath(name).parents
+                   if str(parent) != "."}
+    pending, observed = [(root, "")], set()
+    while pending:
+        directory, prefix = pending.pop()
+        with os.scandir(directory) as entries:
+            for entry in entries:
+                name = prefix + entry.name
+                if entry.is_symlink():
+                    raise ValueError("SDK source cannot contain symlinks")
+                if name in expected and entry.is_file(follow_symlinks=False):
+                    observed.add(name)
+                elif name in directories and entry.is_dir(follow_symlinks=False):
+                    pending.append((Path(entry.path), name + "/"))
+                else:
+                    raise ValueError("SDK source member coverage mismatch: " + name)
+    if observed != set(expected):
+        raise ValueError("SDK source member coverage mismatch")
+    root_module = native_gpu.read_regular(root / "go.mod", 1 << 20).decode("utf-8")
+    directives = re.findall(r"^module\s+(\S+)", root_module, re.MULTILINE)
+    if len(directives) != 1 or directives[0].strip('"') != module:
+        raise ValueError("SDK source module differs from root go.mod")
+    total = 0
+    for name, checksum in sorted(expected.items()):
+        bound = MAX_SDK_MANIFEST_BYTES if name == SDK_MANIFEST else MAX_SDK_MEMBER_BYTES
+        path = root / name
+        release.require_regular_source(root, path)
+        stream, before = regular_stream(path, bound)
+        with stream:
+            total += before.st_size
+            if total > MAX_SDK_TOTAL_BYTES:
+                raise ValueError("SDK source aggregate byte bound exceeded")
+            digest, size = hashlib.sha256(), 0
+            remaining = before.st_size
+            while remaining:
+                chunk = stream.read(min(65536, remaining))
+                if not chunk:
+                    raise ValueError("SDK source shortened during observation")
+                digest.update(chunk); size += len(chunk); remaining -= len(chunk)
+            if stream.read(1):
+                raise ValueError("SDK source grew beyond admitted byte bound")
+            unchanged(stream, before)
+            current = os.stat(path, follow_symlinks=False)
+            if (current.st_dev, current.st_ino) != (before.st_dev, before.st_ino):
+                raise ValueError("SDK source path changed during observation")
+        if size != before.st_size or digest.hexdigest() != checksum:
+            raise ValueError("SDK source checksum mismatch: " + name)
+    state = {"kind": "sdk-payload", "declared_source": declared,
+             "sdk_manifest_sha256": expected[SDK_MANIFEST],
+             "integrity": "observed payload matches manifest checksums",
+             "authentication": "not independently verified"}
+    return state, [(name, root / name) for name in sorted(expected)]
+
+
+def source_snapshot(root, include_untracked=False):
+    sdk = sdk_source_snapshot(root, include_untracked)
+    if sdk is not None:
+        return sdk
+    top = Path(release.git_output(root, ["rev-parse", "--show-toplevel"], text=True).strip()).resolve()
+    if top != root:
+        raise ValueError("inventory root must be a Git checkout root or a complete SDK payload")
+    return release.source_state(root), list(release.source_files(root, include_untracked=include_untracked))
 
 
 def file_identity(base, name):
@@ -344,10 +459,10 @@ def collect(root, include_untracked=False, binary=None, link_map=None):
         raise ValueError("binary and linker map must be supplied together")
     root = root.resolve()
     env = child_environment()
+    source_state, selected_sources = source_snapshot(root, include_untracked)
     configuration = json.loads(check_child_output(["go", "env", "-json", "GOOS", "GOARCH", "GOVERSION", "CGO_ENABLED", "GOROOT"], cwd=root, env=env, text=True, timeout=COMMAND_TIMEOUT_SECONDS))
     if configuration["GOOS"] != "darwin" or configuration["CGO_ENABLED"] != "1":
         raise ValueError("inventory requires the native macOS cgo build configuration")
-    source_state = release.source_state(root)
     graph = release.verified_module_graph(root)
     notices, _ = release.license_inventory(root, modules=graph, copy_notices=False, max_notice_bytes=MAX_FILE_BYTES)
     notice_by_module = {record["module"]: record for record in notices["modules"]}
@@ -369,7 +484,7 @@ def collect(root, include_untracked=False, binary=None, link_map=None):
     if link_observation is not None and link_observation["architecture"] != {"arm64": "arm64", "amd64": "x86_64"}.get(configuration["GOARCH"]):
         raise ValueError("link artifacts differ from selected Go build architecture")
     sources = []
-    for name, path in release.source_files(root, include_untracked=include_untracked):
+    for name, path in selected_sources:
         if len(sources) == MAX_FILES:
             raise ValueError("SDK inventory exceeds file-count bound")
         record = file_identity(root, name)
@@ -401,16 +516,17 @@ def collect(root, include_untracked=False, binary=None, link_map=None):
         current = file_identity(base, record["file"])
         if current["bytes"] != record["bytes"] or current["sha256"] != record["sha256"]:
             raise ValueError("inventory input changed during collection: " + record["file"])
-    if [name for name, _ in release.source_files(root, include_untracked=include_untracked)] != [record["file"] for record in sources]:
-        raise ValueError("SDK source set changed during inventory collection")
     latest = check_child_output(["go", "list", "-deps", "-json", "./cmd/workbench"], cwd=root / "drivers/cogent", env=env, text=True, timeout=COMMAND_TIMEOUT_SECONDS)
     latest_packages = release.decode_objects(latest)
     if build_metadata(latest_packages) != build_metadata(packages):
         raise ValueError("Go build metadata changed during inventory collection")
     if standard_library_inventory(latest_packages, toolchain_root) != standard:
         raise ValueError("standard-library inputs or declarations changed during collection")
-    if release.source_state(root) != source_state:
-        raise ValueError("Git state changed during inventory collection")
+    latest_state, latest_sources = source_snapshot(root, include_untracked)
+    if [name for name, _ in latest_sources] != [record["file"] for record in sources]:
+        raise ValueError("SDK source set changed during inventory collection")
+    if latest_state != source_state:
+        raise ValueError("Git or SDK source state changed during inventory collection")
     if link_observation is not None:
         if native_link_observation(binary, link_map, roots, builds) != link_observation:
             raise ValueError("native link observation changed during collection")

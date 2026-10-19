@@ -36,16 +36,17 @@ class InventoryChecks(unittest.TestCase):
         configuration = {"GOOS": "darwin", "GOARCH": "arm64", "CGO_ENABLED": "1", "GOVERSION": "go-fixture", "GOROOT": str(toolchain)}
         return root, driver, native, graph, packages, notices, sources, configuration
 
-    def collect_fixture(self, fixture, package_change=None, source_change=None, **observation):
+    def collect_fixture(self, fixture, package_change=None, source_change=None, source_hook=None, **observation):
         root, driver, native, graph, packages, notices, sources, configuration = fixture
         calls = []
         def output(argv, **kwargs):
             calls.append((argv, kwargs))
             if argv[:2] == ["go", "env"]: return json.dumps(configuration)
+            if source_hook and len(calls) == 3: source_hook()
             if package_change and len(calls) == 3: return "\n".join(json.dumps(p) for p in package_change)
             return "\n".join(json.dumps(p) for p in packages)
         source_results = [iter(sources), iter(source_change if source_change is not None else sources)]
-        with mock.patch.object(inventory, "check_child_output", side_effect=output), mock.patch.object(inventory.release, "source_state", return_value={"commit": "fixture", "clean": True}), mock.patch.object(inventory.release, "verified_module_graph", return_value=graph), mock.patch.object(inventory.release, "license_inventory", return_value=(notices, {})), mock.patch.object(inventory.release, "source_files", side_effect=source_results):
+        with mock.patch.object(inventory.release, "git_output", return_value=str(root)), mock.patch.object(inventory, "check_child_output", side_effect=output), mock.patch.object(inventory.release, "source_state", return_value={"commit": "fixture", "clean": True}), mock.patch.object(inventory.release, "verified_module_graph", return_value=graph), mock.patch.object(inventory.release, "license_inventory", return_value=(notices, {})), mock.patch.object(inventory.release, "source_files", side_effect=source_results):
             result = inventory.collect(root, **observation)
         self.assertEqual([call[0][:2] for call in calls], [["go", "env"], ["go", "list"], ["go", "list"]])
         return result
@@ -334,6 +335,194 @@ class InventoryChecks(unittest.TestCase):
             mapping.write_text(link_map(archive,['used.o']))
             archive.write_bytes(b'!<arch>\n'+member('used.o',b'changed'))
             with self.assertRaisesRegex(ValueError,'differs from collected candidate'):inventory.native_link_observation(binary,mapping,roots,builds)
+
+
+
+
+class SDKSourceChecks(unittest.TestCase):
+    def fixture(self, base):
+        root = base / 'SDK payload with spaces'; root.mkdir()
+        self.write_manifest(root, {'go.mod': b'module example.com/framework\ngo 1.25.6\n', 'api.go': b'package framework\n'})
+        return root
+
+    def write_manifest(self, root, bodies):
+        for name, body in bodies.items():
+            p = root / name;p.parent.mkdir(parents=True, exist_ok=True);p.write_bytes(body)
+        manifest = {'schema': 1, 'release': {'module': 'example.com/framework', 'version': 'v0.1.0-alpha.2'},
+                    'source': {'commit': 'a' * 40, 'clean': False}, 'private_build': True,
+                    'files': {name: hashlib.sha256(body).hexdigest() for name, body in bodies.items()}}
+        (root / 'SDK_MANIFEST.json').write_text(json.dumps(manifest))
+        return manifest
+
+    def test_exact_relocated_payload_and_manifest_identity_without_git(self):
+        results = []
+        for _ in range(2):
+            with tempfile.TemporaryDirectory() as temporary:
+                root = self.fixture(Path(temporary))
+                with mock.patch.object(inventory.release, 'git_output', side_effect=AssertionError('SDK must not query Git')):
+                    state, files = inventory.source_snapshot(root)
+                self.assertEqual(state['kind'], 'sdk-payload')
+                self.assertEqual(state['declared_source'], {'commit': 'a' * 40, 'clean': False})
+                self.assertEqual(state['authentication'], 'not independently verified')
+                self.assertEqual(state['sdk_manifest_sha256'], hashlib.sha256((root / 'SDK_MANIFEST.json').read_bytes()).hexdigest())
+                self.assertEqual([n for n, _ in files], ['SDK_MANIFEST.json', 'api.go', 'go.mod'])
+                self.assertNotIn(str(root), json.dumps(state));results.append(state)
+        self.assertEqual(results[0], results[1])
+
+    def test_git_checkout_fallback_keeps_existing_source_identity_and_rejects_ancestor(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            with mock.patch.object(inventory.release, 'git_output', return_value=str(root)), mock.patch.object(inventory.release, 'source_state', return_value={'commit': 'fixture', 'clean': True}), mock.patch.object(inventory.release, 'source_files', return_value=[('api.go', root / 'api.go')]):
+                self.assertEqual(inventory.source_snapshot(root), ({'commit': 'fixture', 'clean': True}, [('api.go', root / 'api.go')]))
+            with mock.patch.object(inventory.release, 'git_output', return_value=str(root.parent)), mock.patch.object(inventory.release, 'source_state') as state:
+                with self.assertRaisesRegex(ValueError, 'Git checkout root'):
+                    inventory.source_snapshot(root)
+                state.assert_not_called()
+
+    def test_malformed_sdk_metadata_never_falls_back_to_git(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = self.fixture(Path(temporary)); path = root / 'SDK_MANIFEST.json'; original = json.loads(path.read_text())
+            variants = [b'{"schema":1,"schema":1}', b'{"schema":NaN}', b'[]']
+            for key, value in [('schema', True), ('release', []), ('source', {'commit': 'a' * 40, 'clean': 1}), ('files', []), ('source', {'commit': 'pretend', 'clean': True})]:
+                data = dict(original);data[key] = value;variants.append(json.dumps(data).encode())
+            for raw in variants:
+                with self.subTest(raw=raw), mock.patch.object(inventory.release, 'git_output', side_effect=AssertionError('no fallback')):
+                    path.write_bytes(raw)
+                    with self.assertRaises(ValueError):inventory.source_snapshot(root)
+
+    def test_invalid_paths_checksums_module_and_manifest_membership_refuse(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = self.fixture(Path(temporary));path = root / 'SDK_MANIFEST.json';original = json.loads(path.read_text())
+            for name in ['../escape', '/absolute', 'a//b', 'a/./b', 'a/../b', 'a\\b', 'bad\x00name']:
+                data = json.loads(json.dumps(original));data['files'][name] = 'a' * 64;path.write_text(json.dumps(data))
+                with self.subTest(name=name), self.assertRaisesRegex(ValueError, 'path/checksum'):inventory.source_snapshot(root)
+            for mutate in [lambda d:d['files'].update({'api.go': 'z' * 64}), lambda d:d['files'].update({'SDK_MANIFEST.json': 'a' * 64}), lambda d:d['files'].pop('go.mod'), lambda d:d['release'].update(module='example.com/another')]:
+                data = json.loads(json.dumps(original));mutate(data);path.write_text(json.dumps(data))
+                with self.assertRaises(ValueError):inventory.source_snapshot(root)
+
+    def test_changed_missing_unknown_and_symlink_members_refuse(self):
+        import os
+        with tempfile.TemporaryDirectory() as temporary:
+            root = self.fixture(Path(temporary));source = root / 'api.go';original = source.read_bytes()
+            source.write_bytes(b'other source')
+            with self.assertRaisesRegex(ValueError, 'checksum mismatch'):inventory.source_snapshot(root)
+            source.unlink()
+            with self.assertRaisesRegex(ValueError, 'coverage mismatch'):inventory.source_snapshot(root)
+            source.write_bytes(original)
+            for name, is_dir in [('extra.go', False), ('__pycache__', True)]:
+                p = root / name;p.mkdir() if is_dir else p.write_bytes(b'extra')
+                with self.assertRaisesRegex(ValueError, 'coverage mismatch'):inventory.source_snapshot(root)
+                p.rmdir() if is_dir else p.unlink()
+            source.unlink();source.symlink_to(root / 'go.mod')
+            with self.assertRaisesRegex(ValueError, 'symlinks'):inventory.source_snapshot(root)
+            source.unlink();os.mkfifo(source)
+            with self.assertRaisesRegex(ValueError, 'coverage mismatch'):inventory.source_snapshot(root)
+
+    def test_manifest_special_symlink_and_oversized_inputs_refuse(self):
+        import os
+        with tempfile.TemporaryDirectory() as temporary:
+            root = self.fixture(Path(temporary));path = root / 'SDK_MANIFEST.json';path.unlink()
+            path.symlink_to(root / 'missing')
+            with self.assertRaises(ValueError):inventory.source_snapshot(root)
+            path.unlink();os.mkfifo(path)
+            with self.assertRaises(ValueError):inventory.source_snapshot(root)
+            path.unlink();path.mkdir()
+            with self.assertRaises((ValueError, IsADirectoryError)):inventory.source_snapshot(root)
+            path.rmdir()
+            with path.open('wb') as stream:stream.truncate(inventory.MAX_SDK_MANIFEST_BYTES + 1)
+            with self.assertRaisesRegex(ValueError, 'bound'):inventory.source_snapshot(root)
+
+    def test_count_and_member_bounds_precede_surplus_hashing(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = self.fixture(Path(temporary))
+            with mock.patch.object(inventory, 'MAX_FILES', 2), mock.patch.object(inventory, 'regular_stream') as reader:
+                with self.assertRaisesRegex(ValueError, 'file-count bound'):inventory.source_snapshot(root)
+                reader.assert_not_called()
+            with (root / 'api.go').open('wb') as stream:stream.truncate(inventory.MAX_SDK_MEMBER_BYTES + 1)
+            with self.assertRaisesRegex(ValueError, 'bound'):inventory.source_snapshot(root)
+
+    def test_aggregate_bound_refuses_before_surplus_payload_read(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = self.fixture(Path(temporary));seen = [];original = inventory.regular_stream
+            class Reader:
+                def __init__(self, stream, name):self.stream=stream;self.name=name
+                def __enter__(self):return self
+                def __exit__(self, *args):self.stream.close()
+                def read(self, size):seen.append(self.name);return self.stream.read(size)
+                def fileno(self):return self.stream.fileno()
+            def observed(path, bound):
+                stream, before = original(path, bound)
+                return Reader(stream, path.name), before
+            total = sum(p.stat().st_size for p in root.iterdir())
+            with mock.patch.object(inventory, 'MAX_SDK_TOTAL_BYTES', total-1), mock.patch.object(inventory, 'regular_stream', side_effect=observed):
+                with self.assertRaisesRegex(ValueError, 'aggregate byte bound'):inventory.source_snapshot(root)
+            self.assertIn('api.go', seen);self.assertNotIn('go.mod', seen)
+
+    def test_growing_or_shortened_stream_refuses_with_admitted_read_bound(self):
+        for mode in ['grow', 'short']:
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as temporary:
+                root=self.fixture(Path(temporary));original=inventory.regular_stream;requests=[]
+                class Reader:
+                    def __init__(self, stream):self.stream=stream
+                    def __enter__(self):return self
+                    def __exit__(self, *args):self.stream.close()
+                    def fileno(self):return self.stream.fileno()
+                    def read(self, size):
+                        requests.append(size)
+                        if len(requests)>2:raise AssertionError('reader did not stop at admitted size')
+                        if mode=='short':return b''
+                        return self.stream.read(size) or b'x'*size
+                def changed(path, bound):
+                    stream,before=original(path,bound)
+                    return (Reader(stream) if path.name=='api.go' else stream),before
+                with mock.patch.object(inventory,'regular_stream',side_effect=changed):
+                    with self.assertRaisesRegex(ValueError,'admitted byte bound|shortened'):
+                        inventory.source_snapshot(root)
+                self.assertLessEqual(sum(requests),(root/'api.go').stat().st_size+1)
+
+    def test_include_untracked_refused_for_sdk_payload(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = self.fixture(Path(temporary))
+            with self.assertRaisesRegex(ValueError, 'include_untracked'):inventory.source_snapshot(root, include_untracked=True)
+
+    def test_valid_redeclaration_changes_observed_manifest_identity_not_original_provenance(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = self.fixture(Path(temporary));before, _ = inventory.source_snapshot(root)
+            manifest = json.loads((root / 'SDK_MANIFEST.json').read_text());body=b'package framework\n// new\n';(root / 'api.go').write_bytes(body);manifest['files']['api.go']=hashlib.sha256(body).hexdigest();(root / 'SDK_MANIFEST.json').write_text(json.dumps(manifest));after, _ = inventory.source_snapshot(root)
+            self.assertEqual(before['declared_source'], after['declared_source'])
+            self.assertNotEqual(before['sdk_manifest_sha256'], after['sdk_manifest_sha256'])
+            self.assertEqual(after['authentication'], 'not independently verified')
+
+    def test_full_collector_consumes_sdk_without_git_and_binds_manifest(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            helper = InventoryChecks();fixture = helper.fixture(Path(temporary));root = fixture[0]
+            bodies = {p.relative_to(root).as_posix():p.read_bytes() for p in root.rglob('*') if p.is_file()};bodies['go.mod']=b'module example.com/framework\ngo 1.25.6\n';self.write_manifest(root, bodies)
+            result = helper.collect_fixture(fixture)
+            self.assertEqual(result['source']['kind'], 'sdk-payload')
+            self.assertIn('SDK_MANIFEST.json', {r['file'] for r in result['sdk_files']})
+            self.assertEqual(result['distribution_audit'], 'pending');self.assertFalse(result['runtime_executed'])
+
+    def test_full_collector_refuses_consistent_sdk_rewrite_after_package_listing(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            helper = InventoryChecks();fixture = helper.fixture(Path(temporary));root = fixture[0]
+            bodies = {p.relative_to(root).as_posix():p.read_bytes() for p in root.rglob('*') if p.is_file()};bodies['go.mod']=b'module example.com/framework\ngo 1.25.6\n';self.write_manifest(root, bodies)
+            def mutate():
+                body=b'package bridge\n// late\n';(root / 'drivers/cogent/bridge.go').write_bytes(body);p=root/'SDK_MANIFEST.json';data=json.loads(p.read_text());data['files']['drivers/cogent/bridge.go']=hashlib.sha256(body).hexdigest();p.write_text(json.dumps(data))
+            with self.assertRaisesRegex(ValueError, 'source state changed'):
+                helper.collect_fixture(fixture, source_hook=mutate)
+
+    def test_normal_cli_help_keeps_distributed_source_free_of_bytecode(self):
+        import shutil, sys
+        from child_process import run_child
+        with tempfile.TemporaryDirectory(prefix='Vellum SDK ordinary Python ') as temporary:
+            root=Path(temporary);scripts=root/'scripts';scripts.mkdir()
+            for source in Path(__file__).parent.glob('*.py'):shutil.copyfile(source, scripts/source.name)
+            env=inventory.child_environment();env.pop('PYTHONDONTWRITEBYTECODE', None)
+            for script in ['new-app.py', 'build-macos.py', 'distribution-inventory.py', 'package-app.py', 'check-sdk.py', 'release-sdk.py']:
+                with self.subTest(script=script):
+                    result=run_child([sys.executable,str(scripts/script),'--help'],cwd=root,env=env,capture_output=True,text=True,timeout=30)
+                    self.assertEqual(result.returncode,0,result.stderr)
+                    self.assertEqual(list(root.rglob('__pycache__')),[])
 
 
 if __name__ == "__main__":

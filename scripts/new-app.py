@@ -6,6 +6,11 @@ import shutil
 import shlex
 import subprocess
 import tempfile
+import sys
+
+if __name__ == "__main__":
+    sys.dont_write_bytecode = True
+
 import native_gpu
 import native_linkers
 

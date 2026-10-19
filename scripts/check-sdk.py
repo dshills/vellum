@@ -13,6 +13,9 @@ import shutil
 import subprocess
 import sys
 
+if __name__ == "__main__":
+    sys.dont_write_bytecode = True
+
 from child_process import run_child, check_child_output
 import tarfile
 import tempfile

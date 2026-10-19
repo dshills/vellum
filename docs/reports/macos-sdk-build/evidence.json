@@ -1,0 +1,281 @@
+{
+  "schema": 1,
+  "base": "0372adc461e40818d6ea89b677015a30839e8d57",
+  "result": "PASS_SDK_NATIVE_BUILD_AND_PRIVATE_APP_PACKAGE",
+  "units": {
+    "methods": 151,
+    "suites": 8,
+    "seconds": 2.437,
+    "original_v1_methods": 150,
+    "original_defect": "unbounded growing-file EOF loop; fixed with admitted-size read and growth probe"
+  },
+  "archive": {
+    "archive": "/private/tmp/vellum-sdk-build-snapshot-0372adc/sdk.tar.gz",
+    "sha256": "57de731f1808dd6d7934fd333dccd3217a139f41319fa85aa06f6e71153f0454",
+    "version": "v0.1.0-alpha.2",
+    "modules": 89,
+    "private_build": true
+  },
+  "source": {
+    "authentication": "not independently verified",
+    "declared_source": {
+      "clean": false,
+      "commit": "0372adc461e40818d6ea89b677015a30839e8d57"
+    },
+    "integrity": "observed payload matches manifest checksums",
+    "kind": "sdk-payload",
+    "sdk_manifest_sha256": "df4a28bd38344c3e9484fbf8261cfff5b996c6919f5f2968733667aa64a77d5f"
+  },
+  "payload_changed": [
+    "scripts/build-macos.py",
+    "scripts/check-sdk.py",
+    "scripts/distribution-inventory.py",
+    "scripts/distribution-inventory_test.py",
+    "scripts/new-app.py",
+    "scripts/package-app.py",
+    "scripts/release-sdk.py"
+  ],
+  "sdk_files": 8049,
+  "owned_commands": {
+    "package": {
+      "exit_code": 0,
+      "group_absent": true,
+      "terminal": true
+    },
+    "new-app": {
+      "exit_code": 0,
+      "group_absent": true,
+      "terminal": true
+    },
+    "build": {
+      "exit_code": 0,
+      "group_absent": true,
+      "terminal": true
+    },
+    "metadata": {
+      "exit_code": 0,
+      "group_absent": true,
+      "terminal": true
+    },
+    "app-package": {
+      "exit_code": 0,
+      "group_absent": true,
+      "terminal": true
+    }
+  },
+  "build": {
+    "event": "vellum.macos.build_complete",
+    "output": "/private/tmp/vellum-sdk-build-snapshot-0372adc/owned native build",
+    "receipt_sha256": "92caa28be2fe40f20f08af64a8ed78199cd5b274b5889d3f1a4d3b46c6ce2fee",
+    "binary_sha256": "62947e0efa27da73e0f93d7973c8d45f953b449251a31d33d5b6ca49464e3b6c",
+    "artifact_pair_binding": "producer-observed-same-build",
+    "runtime_executed": false,
+    "distribution_audit": "pending"
+  },
+  "notices": {
+    "directory": "THIRD_PARTY_NOTICES",
+    "inventory_sha256": "52483c2c593ab7476aedf84183729350bc938d1ac29e2df457607e16a2fa0778",
+    "artifact_sha256": "62947e0efa27da73e0f93d7973c8d45f953b449251a31d33d5b6ca49464e3b6c",
+    "files": 393,
+    "components": 176,
+    "bytes": 2569170,
+    "applicability": "review-required",
+    "distribution_audit": "pending",
+    "trust": "caller-selected-not-attested"
+  },
+  "app": {
+    "output": "/private/tmp/vellum-sdk-build-snapshot-0372adc/VellumSDK.app",
+    "private_build": true,
+    "target": "darwin",
+    "signed": false,
+    "notarized": false,
+    "native_distribution_audit": "pending",
+    "packaged_binary_sha256": "62947e0efa27da73e0f93d7973c8d45f953b449251a31d33d5b6ca49464e3b6c"
+  },
+  "native_executed": false,
+  "limits": [
+    "Precommit candidate; documentation added after packaging",
+    "Integrity and self-described provenance only",
+    "Build/packaging only; no native runtime, presentation, physical/human or endurance qualification",
+    "Compiled native notice superset; applicability and distribution audit pending",
+    "No full Mac gate closes"
+  ],
+  "artifacts": {
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/unit-v1.stdout": {
+      "bytes": 264,
+      "sha256": "1c09dd14c1fe9f9f6713ee6ebb24d57bf887d919020f9d23f32e15a4a53a9482"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/unit-v1.stderr": {
+      "bytes": 23895,
+      "sha256": "db1a013e44ebd6cf81eda43a093e8fefa941d7b96b19e35b0f3632e0765d75c4"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/unit-v2.stdout": {
+      "bytes": 264,
+      "sha256": "39132f13a54617451a35940696c678f1359b84beb46b4c936e2d4ddc71a3aed4"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/unit-v2.stderr": {
+      "bytes": 24080,
+      "sha256": "e15a888aff80063c3dd7ba828621af90907ace0e059e0dac1cf81a2440d6e1b4"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/internal-source-review.json": {
+      "bytes": 8394,
+      "sha256": "c0df0ca61526f97439481e964fe1ea3813450c66bc32b416fbf7f6a642ac55c1"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/internal-source-review-interim-after-install.json": {
+      "bytes": 4941,
+      "sha256": "eb2a21f7ef194eff430083cfb50c71445599017ac7df2fac3ab1cd872ed59fe0"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration.py": {
+      "bytes": 10407,
+      "sha256": "31bdfbc68b1622d35dec087b198f64d2aac5d6841ba89f3660d253a71bcf8adb"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/grouped.py": {
+      "bytes": 1616,
+      "sha256": "5686321b15c53f7e5fe861479dd6499d03b878755c7ae3fbef0ec8b83b222421"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration-inputs.json": {
+      "bytes": 6228564,
+      "sha256": "b8c2c169068ef85da42bb2c92102712812bc8aab6d008d36b9595b4fbe1c559c"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration-result.json": {
+      "bytes": 100891,
+      "sha256": "36c1c25f8f597bb2dbbf76cacd3ef3f4508aa08e2bb55c136b6af1bc56d78258"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/notice-origins.json": {
+      "bytes": 228410,
+      "sha256": "c9d1954ed4484d0b27ea44d54512ebdd8dddf951ccdc420f91a97a033c920c6a"
+    },
+    "/private/tmp/vellum-sdk-build-snapshot-0372adc/sdk.tar.gz": {
+      "bytes": 30093509,
+      "sha256": "57de731f1808dd6d7934fd333dccd3217a139f41319fa85aa06f6e71153f0454"
+    },
+    "/private/tmp/vellum-sdk-build-snapshot-0372adc/owned native build/build-receipt.json": {
+      "bytes": 3539,
+      "sha256": "92caa28be2fe40f20f08af64a8ed78199cd5b274b5889d3f1a4d3b46c6ce2fee"
+    },
+    "/private/tmp/vellum-sdk-build-snapshot-0372adc/owned native build/inputs-before.json": {
+      "bytes": 4267584,
+      "sha256": "ba3d7f7f99c48cd70c7cc4ab86f7e49e43a704e3a7e0cebffe4d83251953146f"
+    },
+    "/private/tmp/vellum-sdk-build-snapshot-0372adc/owned native build/inventory.json": {
+      "bytes": 4311035,
+      "sha256": "ff8b9d885bed578aad7a0959f7e85fc0ffb46e69bbc7d333e29dab886ea7ca47"
+    },
+    "/private/tmp/vellum-sdk-build-snapshot-0372adc/owned native build/vellum-workbench": {
+      "bytes": 61338722,
+      "sha256": "62947e0efa27da73e0f93d7973c8d45f953b449251a31d33d5b6ca49464e3b6c"
+    },
+    "/private/tmp/vellum-sdk-build-snapshot-0372adc/owned native build/vellum-workbench.map": {
+      "bytes": 13341321,
+      "sha256": "fe3473bb9128d1cdf738cd799422473cda9fb7b5b5ecd2962f61a899407d425c"
+    },
+    "/private/tmp/vellum-sdk-build-snapshot-0372adc/owned native build/build.stderr": {
+      "bytes": 1132,
+      "sha256": "a9d8d2bb0f25961c0d68ca1084602b63c54fe7fde8000f20ef321128913f79eb"
+    },
+    "/private/tmp/vellum-sdk-build-snapshot-0372adc/app notices/INVENTORY.json": {
+      "bytes": 143224,
+      "sha256": "52483c2c593ab7476aedf84183729350bc938d1ac29e2df457607e16a2fa0778"
+    },
+    "/private/tmp/vellum-sdk-build-snapshot-0372adc/VellumSDK.app/Contents/Resources/APP_MANIFEST.json": {
+      "bytes": 873,
+      "sha256": "619d4535a9b9157b0100d5c3eaab2a6435a55a2355c45cd20b895e672f5d099d"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/pre-growth-fix/package-app.py": {
+      "bytes": 12710,
+      "sha256": "2a82f66b08377fdf1f9ef1282b60f0a6618cadf016a19178c0788a2321eb9fc0"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/pre-growth-fix/release-sdk.py": {
+      "bytes": 23406,
+      "sha256": "b606a191777eac7680df9db416632a7beffea361f5b92b34713fb6e43d7cd3e7"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/pre-growth-fix/distribution-inventory_test.py": {
+      "bytes": 37999,
+      "sha256": "ea1be160dd58b46844114dfccf374fccc0724bbdaa7ee84bf5df7b8811cb597f"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/pre-growth-fix/new-app.py": {
+      "bytes": 2289,
+      "sha256": "c001556afc1cf63c9d560fdf241626065e4a250c04de41f22e60b3b41be0e925"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/pre-growth-fix/check-sdk.py": {
+      "bytes": 16242,
+      "sha256": "482cd470d79655440f0e8ef07fa1097ee4e96d9c16c851e9c37c43cc4c07c1e3"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/pre-growth-fix/build-macos.py": {
+      "bytes": 9987,
+      "sha256": "c62a7ef12468f88a79f4b11debe9cabf8a8776818cb141dbb466be4618a84639"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/pre-growth-fix/distribution-inventory.py": {
+      "bytes": 34607,
+      "sha256": "45543de6aef9e40618375c0e2756be79066bdee71290d10bab615f33c078620e"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration/new-app/stdout": {
+      "bytes": 230,
+      "sha256": "c6c76a67799adb54b5186c699ec373f72b787d0d1dce20b0b0739ee1941ce74e"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration/new-app/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration/new-app/owned.json": {
+      "bytes": 2069,
+      "sha256": "b7b93578af72b82186623dc3befcc6c399283e5f11dcfb9a337c26daf4a76124"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration/build/stdout": {
+      "bytes": 424,
+      "sha256": "f1b6aa0c768168ae85a576e340268d96672b091c0d6dc0dcb5665764d8c0c251"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration/build/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration/build/owned.json": {
+      "bytes": 2033,
+      "sha256": "cd66ab246728d389c4899c36cd17e3bd307ffd131d1ab1b05475ed0703305cf2"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration/app-package/stdout": {
+      "bytes": 305,
+      "sha256": "097cfdbfc1e23f35745b887e96b90d745a78bffadf8a417ad53d5447c0b3d47d"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration/app-package/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration/app-package/owned.json": {
+      "bytes": 2372,
+      "sha256": "79ddb6e405e07245e458f7b9f70ebb9d7f2a5ff6e5e767beebf21dc1be9b4480"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration/metadata/stdout": {
+      "bytes": 5754,
+      "sha256": "e4b18aea1a69b46197b7b155e2f9318c43bf53bbd6a949429ac1343e0dc90741"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration/metadata/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration/metadata/owned.json": {
+      "bytes": 1858,
+      "sha256": "beac91e374236f26e950818f1516c2ad2453620bfe4608e0085024557e91da1f"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration/package/stdout": {
+      "bytes": 230,
+      "sha256": "b832f1fd394e8c6aa9a14b4666e8a3541aff5460c44af60584e4f4df45142b50"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration/package/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-build-snapshot/integration/package/owned.json": {
+      "bytes": 2338,
+      "sha256": "735fcce8f786beb4e862757c874519abe6bd6f14916fcf5ea52712612a20ddf8"
+    },
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-clean-0372adc/result.json": {
+      "bytes": 7827,
+      "sha256": "20f33d38753737d3a1ca736236fc1f4ef18e13ceb2ffca9ae5b1ade497eca26a"
+    },
+    "/private/tmp/vellum-sdk-clean-0372adc/sdk-native-build/build-failed.json": {
+      "bytes": 234,
+      "sha256": "ee5eab720c938d3c1178bb730764d8bce836e78ae47cf4eab8d89d3cdc2c832d"
+    }
+  }
+}
