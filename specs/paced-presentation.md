@@ -31,7 +31,8 @@ The requested GPU flag still does not prove actual GPU routing.
 Ordinary and serial modes retain their branches and defaults. The new mode emits
 explicit `paced_workload:true`, `scheduled_hz:60`, presentation diagnostic and
 nonqualification labels. It emits its completion summary after the timed cohort.
-Version 1 serial journals retain their existing schema and validator behavior.
+Version 1 serial journals retain their format. Both modes add explicit prefix
+observation counts as described in the shared capture contract.
 
 ## Scheduling, overload and observation
 
@@ -67,6 +68,11 @@ no changing frame. After the cohort, freeze the current acquisition prefix and
 require exact receipts/final armed identities before draining its existing
 callbacks. No later acquisition repairs a missing final identity. Worker/runtime
 acknowledgements and post-close evidence follow the serial capture contract.
+The shared [startup observation rule](presentation-capture.md#explicit-pre-input-startup-observations)
+retains precisely proven pre-input unarmed skipped callbacks as non-timing
+observations. The complete prefix stays frozen and visible; all other prefix loss
+and every missing final armed presentation still fail. Startup records never
+change the N final-state population, N-1 intervals, latency or cadence thresholds.
 
 ## Native timing and denominator
 

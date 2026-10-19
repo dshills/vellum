@@ -73,6 +73,25 @@ source revisions and logs remain in development checkpoint
 `macos-presentation-capture-7cbbb73`; this summary does not reconstruct those files.
 Existing AX deprecation and duplicate-objc linker warnings remain unchanged.
 
+## Prospective startup observation correction
+
+The shared capture and strict validator now distinguish terminal skipped native
+callbacks acquired before the first input as startup observations only when they
+are in the same scope with no armed/tag/generation identity and zero presentation
+time. Apple's drawable contract permits zero time for unpresented/skipped frames;
+such callbacks do not prove display. Full frozen prefixes and all raw states stay
+retained. New captures explicitly count prefix records, genuine presentations and
+startup skips separately. Existing failed journals remain failed and refused.
+
+This source correction changes diagnostic population accounting, not rendering,
+latency or pacing behavior. Positive synthetic serial/paced grid/tree controls
+compare complete measured populations against the original fixture; negative
+controls cover the exact receipt boundary, wrong identities, other lost states,
+missing final acquisitions, corrupted counts and immutable failed files. Capture
+helper controls preserve the skipped record and the frozen CPU/receipt cohort.
+These controls are headless evidence only. Actual callback/cadence qualification
+and a fresh externally bound native run remain separate.
+
 ## Remaining work
 
 Qualify actual Metal callback/clock/loss identity and native teardown first. Then

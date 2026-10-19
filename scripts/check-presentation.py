@@ -165,7 +165,7 @@ def validate_pacing(value,config,cpu,receipts,armed,ordered,measured):
 
 def validate(journal,source,binary_sha256,go_version='go1.25.6'):
  paced=type(journal)is dict and journal.get('Schema')=='vellum-presentation-capture-v2'
- obj(journal,['Schema','Result','Window','RunError','CutoffMethod','BinarySHA256','Config','Build','ContinuousWork','WorkerRetired','RuntimeReturned','AcquisitionCutoff','ReceiptCutoff','BeforeClose','AfterClose']+(['Pacing']if paced else[]))
+ obj(journal,['Schema','Result','Window','RunError','CutoffMethod','BinarySHA256','Config','Build','ContinuousWork','WorkerRetired','RuntimeReturned','AcquisitionCutoff','ReceiptCutoff','BeforeClose','AfterClose']+(['Pacing']if paced else[]),['PrefixObservations'])
  need(journal['Schema']in['vellum-presentation-capture-v1','vellum-presentation-capture-v2']and journal['Result']=='CAPTURED_DIAGNOSTIC'and journal['RunError']=='','failed or unsupported capture')
  need(journal['Window']=='perf'and boolean(journal['ContinuousWork'])is paced and boolean(journal['WorkerRetired'])is True and boolean(journal['RuntimeReturned'])is True,'method/worker scope differs')
  need(journal['CutoffMethod']=='acquisition-sequence prefix at completed CPU cohort','cutoff method differs')
@@ -198,7 +198,15 @@ def validate(journal,source,binary_sha256,go_version='go1.25.6'):
   identity=[key for key in SAMPLE_KEYS if key not in['State','DrawableID','Presented']]
   need(all(old[key]==new[key]for key in identity),'acquisition metadata changed after seal')
   if old['State']!='pending':need(old==new,'terminal feedback changed after seal')
- prefix=before[:cutoff];need(all(s['State']=='presented'for s in prefix),'lost/missing prefix feedback')
+ prefix=before[:cutoff]
+ first_receipt=next(iter(receipts.values()))['Received']
+ startup=[s for s in prefix if s['State']=='skipped'and not s['Armed']and s['Tag']==s['Generation']==0 and s['Scope']==1 and s['Presented']==0 and s['Acquired']<first_receipt]
+ presented_prefix=[s for s in prefix if s['State']=='presented']
+ need(len(startup)+len(presented_prefix)==len(prefix),'lost/missing prefix feedback')
+ if 'PrefixObservations'in journal:
+  accounting=obj(journal['PrefixObservations'],['Records','Presented','StartupSkipped'])
+  need(integer(accounting['Records'],hi=65536)==len(prefix)and integer(accounting['Presented'],hi=65536)==len(presented_prefix)and integer(accounting['StartupSkipped'],hi=65536)==len(startup),'prefix observation counts differ')
+ else:need(not startup,'startup skips require explicit prefix accounting')
  need(all(sample['Tag']==0 for sample in after[cutoff:]),'tagged input escaped declared cohort')
  need(prefix==after[:cutoff],'sealed prefix changed after close')
  armed={}
@@ -212,9 +220,9 @@ def validate(journal,source,binary_sha256,go_version='go1.25.6'):
   sample=armed[tag];latency=(sample['Presented']-receipts[tag]['Received'])*1000
   need(math.isfinite(latency)and latency>=0,'invalid latency')
   latencies.append({'tag':tag,'generation':cpu[tag]['Generation'],'sequence':sample['Sequence'],'role':'measured'if tag in measured else'setup'if tag in setup else'warmup','milliseconds':latency})
- times=sorted(sample['Presented']for sample in prefix)
+ times=sorted(sample['Presented']for sample in presented_prefix)
  intervals=[(right-left)*1000 for left,right in zip(times,times[1:])]
- result={'result':'VALID_SERIAL_NATIVE_FEEDBACK_JOURNAL','source':source,'source_binding':'matching clean VCS stamp plus external build/launch binding'if vcs_present else'external build/launch binding required; VCS stamp absent','binary_sha256':binary_sha256,'method':config['Method'],'config':config,'latencies':latencies,'measured_input_latency_ms':stats([s['milliseconds']for s in latencies if s['role']=='measured']),'prefix_presentations':len(prefix),'prefix_intervals_ms':intervals,'equal_presentation_times':sum(v==0 for v in intervals),'tail_records':len(after)-cutoff,'before_state_counts':before_counts,'after_state_counts':after_counts,'cadence_qualified':False,'physical_latency_qualified':False,'actual_gpu_route':'not established by this journal','provenance':'JSON validation requires external binary/native-library/workload execution binding; synthetic data is not native evidence'}
+ result={'result':'VALID_SERIAL_NATIVE_FEEDBACK_JOURNAL','source':source,'source_binding':'matching clean VCS stamp plus external build/launch binding'if vcs_present else'external build/launch binding required; VCS stamp absent','binary_sha256':binary_sha256,'method':config['Method'],'config':config,'latencies':latencies,'measured_input_latency_ms':stats([s['milliseconds']for s in latencies if s['role']=='measured']),'prefix_records':len(prefix),'prefix_presentations':len(presented_prefix),'startup_skipped':len(startup),'prefix_intervals_ms':intervals,'equal_presentation_times':sum(v==0 for v in intervals),'tail_records':len(after)-cutoff,'before_state_counts':before_counts,'after_state_counts':after_counts,'cadence_qualified':False,'physical_latency_qualified':False,'actual_gpu_route':'not established by this journal','provenance':'JSON validation requires external binary/native-library/workload execution binding; synthetic data is not native evidence'}
 
  if paced:
   result.update(validate_pacing(journal['Pacing'],config,cpu,receipts,armed,ordered,measured))

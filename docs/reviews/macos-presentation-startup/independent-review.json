@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "result": "PASS_INDEPENDENT_READONLY_STARTUP_CAPTURE_CORRECTION_REVIEW",
+  "approved": true,
+  "scope": "Prospective nine-file capture/validator accounting correction. No producer rerun, native test, performance pass or failed-journal repair approved. Root integration checks and Prism remain separate.",
+  "candidate_files": {
+    "examples/loadedgrid/perf_presentation.go": "446a335e5e0b8dc15c7db4e6fdf0c66aa3baa85377163031d6abc462c329ee84",
+    "examples/loadedgrid/perf_presentation_test.go": "f0253d2cbc9b7e0c9bde33c2af56bd24ca8083d9c1f7a17a952ad1e8c7a23829",
+    "examples/loadedtree/perf_presentation.go": "446a335e5e0b8dc15c7db4e6fdf0c66aa3baa85377163031d6abc462c329ee84",
+    "examples/loadedtree/perf_presentation_test.go": "f0253d2cbc9b7e0c9bde33c2af56bd24ca8083d9c1f7a17a952ad1e8c7a23829",
+    "scripts/check-presentation.py": "9d314b6d13e24b5e13231fbec24b8a19d333f81acb7eba2c495fe2c7e1ae8662",
+    "scripts/check_presentation_test.py": "97fee3ff3e0ed37c9a8374113fa9d295d470d631d925133177f04dd3703d78a1",
+    "specs/presentation-capture.md": "c35fe18768e15522038dd689404536dac45ff1f7730359fd4580e505142f9e44",
+    "specs/paced-presentation.md": "01171e885ed37e063f692bc01a1f3325dd6aa4b3eefdcc3102a79f0294b6420b",
+    "docs/reports/macos-presentation-capture/README.md": "7f7c954b27eda5d6c41d2a845351c3ebe67818e421b7014b632f5282c544a3d9"
+  },
+  "base_commit": "bd0e1de166ff7a942d55040b23292db12c30e86e",
+  "candidate_patch_sha256": "a4dba8728746e5f01856cd39bd9ede15a2d482e743659e6c309e7af54d779914",
+  "input_files": {
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-current/startup-correction/result.json": "8bb9eb5fb158af31bbfff2f1e19c6274a1e69224e9b2ea5c88c9c63b217526fb",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-startup-integrated/integration.json": "d831f3b3c7bc813a6432e6663374df578e528ad624750b1d0642185f5e404019",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-startup-integrated/internal-review.json": "017eafb5da3fd2cc00d8c1c9b9b4c3697015f195df707e880151808c8b8e119f",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-current/native-result-review.json": "a2ec981566ce73d694248f74949933dd919cc63c2e567c4c660ebddb202ee391",
+    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLDrawable.h": "6ded45a7ca00e7ff0e8cfbe9799aedc0d84bcb65c35c679da2eadf0c5e777eaa"
+  },
+  "verification": {
+    "exact_9_T_and_external_candidate_hashes_match": true,
+    "C_9_files_match_baseline99": true,
+    "grid_tree_capture_and_tests_byte_identical": true,
+    "author_retained_focused_evidence_hashes_match": true,
+    "unchanged_validator_AST": [
+      "load",
+      "point",
+      "number",
+      "validate_pacing",
+      "pace_view",
+      "pace_observation",
+      "percentile",
+      "stats"
+    ],
+    "original_failed_journal_sha256": "4eacbc94b5c77eb290d48fa7fcb72997bbec4f8673472f8e83edc838e6b61116",
+    "original_failed_journal_still_failed_unmodified_without_new_accounting": true
+  },
+  "reasoning": [
+    "Existing point validation first enforces one perf scope, ordered positive finite receipts and acquisitions, immutable terminal states, exact counters and before/after identity. Startup classification then accepts only skipped, unarmed, same-scope, zero tag/generation/presentation-time records acquired strictly before the first receipt. Go boundary validates the receipt fence, and comparisons against it exclude nonpositive/nonfinite acquisition times.",
+    "All prefix records and the frozen cutoff remain retained. Exact Records/Presented/StartupSkipped fields are required for the new startup exemption; missing, boolean, extra or incorrect counts refuse. Raw skipped records remain skipped and contribute no display timestamp. Every armed setup/warmup/measured tag/generation must still have exactly one actual presentation.",
+    "Older successful v1/v2 captures containing no startup skips remain accepted without the additive object. FAILED_DIAGNOSTIC is rejected before classification, and the original failed native journal hash is unchanged. No historical result is relabeled.",
+    "Paced final-state population, N-1 interval denominator, 60Hz/99%-within-period calculation and33.3ms p95 latency threshold are unchanged. Prefix interval arithmetic now uses actual presented samples only, which is the stated correction for non-timing startup skips. The separately observed approximately30Hz workload backlog remains unresolved.",
+    "Tests use serial/paced grid/tree positive population parity, exact+1 raw sequence shift, unchanged metrics, and negative receipt/scope/identity/loss/clock/count/postclose/cohort/failure cases. Go tests verify preserved raw evidence, explicit counts and missing-final refusal. Existing focused author receipts show21Python methods and both10-method Go capture race suites; reviewer checked evidence hashes without rerunning."
+  ],
+  "findings": [],
+  "unresolved_findings": [],
+  "prospective_actual_native_behavior_verified": false,
+  "performance_gate_passed": false,
+  "release_qualified": false,
+  "tests_rerun": false,
+  "native_executed": false,
+  "source_mutated": false,
+  "provider_calls": 0,
+  "git_mutations": false,
+  "limitations": [
+    "Review supports precise prospective diagnostic classification only. Fresh source/binary-bound native evidence is still needed.",
+    "Parent affected integration checks were running separately; their completion is not claimed here.",
+    "Scope closure/pending retirement is not complete Cocoa/Metal resource deallocation proof."
+  ]
+}

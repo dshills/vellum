@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"math"
 	"os"
 	"runtime/debug"
 	"strings"
@@ -91,6 +92,48 @@ func (c *perfPresentationCapture) Metrics() *cogent.PresentationMetrics {
 func (c *perfPresentationCapture) point() presentationCapturePoint {
 	return presentationCapturePoint{Frames: c.frames.Snapshot(), Presentation: c.metrics.Snapshot()}
 }
+
+// The receipt fence is fixed by the complete same-window input cohort. Only
+// actual terminal skipped callbacks acquired before any input can be startup
+// observations. They remain skipped; they never contribute a display timestamp.
+func presentationStartupBoundary(s cogent.PresentationSnapshot) (uint64, float64) {
+	if len(s.Scopes) != 1 || s.Scopes[0].ID != 1 || s.Scopes[0].Window != "perf" || len(s.Inputs) == 0 {
+		return 0, 0
+	}
+	previous := float64(0)
+	for _, input := range s.Inputs {
+		if input.Scope != 1 || input.Tag == 0 || input.Received <= previous || math.IsNaN(input.Received) || math.IsInf(input.Received, 0) {
+			return 0, 0
+		}
+		previous = input.Received
+	}
+	return 1, s.Inputs[0].Received
+}
+
+func presentationStartupSkipped(sample cogent.PresentationSample, scope uint64, firstReceipt float64) bool {
+	return scope != 0 && sample.Scope == scope && sample.State == "skipped" && !sample.Armed && sample.Tag == 0 && sample.Generation == 0 && sample.Presented == 0 && sample.Acquired > 0 && sample.Acquired < firstReceipt
+}
+
+type presentationPrefixAccounting struct {
+	Records, Presented, StartupSkipped int
+}
+
+func presentationPrefixCounts(p presentationCapturePoint, cutoff uint64) presentationPrefixAccounting {
+	counts := presentationPrefixAccounting{Records: int(cutoff)}
+	if cutoff > uint64(len(p.Presentation.Samples)) {
+		return counts
+	}
+	scope, firstReceipt := presentationStartupBoundary(p.Presentation)
+	for _, sample := range p.Presentation.Samples[:cutoff] {
+		if sample.State == "presented" {
+			counts.Presented++
+		} else if presentationStartupSkipped(sample, scope, firstReceipt) {
+			counts.StartupSkipped++
+		}
+	}
+	return counts
+}
+
 func presentationPointError(p presentationCapturePoint, cutoff uint64) error {
 	s := p.Presentation
 	f := p.Frames
@@ -106,11 +149,12 @@ func presentationPointError(p presentationCapturePoint, cutoff uint64) error {
 	if cutoff == 0 || cutoff > uint64(len(s.Samples)) || len(s.Inputs) == 0 || len(f.Samples) == 0 {
 		return errors.New("presentation capture: no native feedback or traced input")
 	}
+	scope, firstReceipt := presentationStartupBoundary(s)
 	for _, sample := range s.Samples[:cutoff] {
 		if sample.State == "pending" {
 			return errors.New("presentation capture: pending prefix feedback")
 		}
-		if sample.State != "presented" {
+		if sample.State != "presented" && !presentationStartupSkipped(sample, scope, firstReceipt) {
 			return errors.New("presentation capture: lost prefix feedback")
 		}
 	}
@@ -278,6 +322,10 @@ func (c *perfPresentationCapture) Finish(runError error, workerRetired, runtimeR
 			message = message[:4096]
 		}
 	}
+	prefix := presentationPrefixAccounting{Records: int(c.cutoff)}
+	if c.before != nil {
+		prefix = presentationPrefixCounts(*c.before, c.cutoff)
+	}
 	value := struct {
 		Schema, Result, Window, RunError, CutoffMethod, BinarySHA256 string
 		Config                                                       presentationCaptureConfig
@@ -285,9 +333,10 @@ func (c *perfPresentationCapture) Finish(runError error, workerRetired, runtimeR
 		ContinuousWork, WorkerRetired, RuntimeReturned               bool
 		AcquisitionCutoff                                            uint64
 		ReceiptCutoff                                                int
+		PrefixObservations                                           presentationPrefixAccounting
 		BeforeClose, AfterClose                                      *presentationCapturePoint
 		Pacing                                                       *perfPacingJournal `json:",omitempty"`
-	}{Schema: "vellum-presentation-capture-v1", Result: result, Window: "perf", RunError: message, CutoffMethod: "acquisition-sequence prefix at completed CPU cohort", BinarySHA256: c.binarySHA256, Config: c.config, Build: c.build, ContinuousWork: c.config.Paced, WorkerRetired: workerRetired, RuntimeReturned: runtimeReturned, AcquisitionCutoff: c.cutoff, ReceiptCutoff: c.receiptCutoff, BeforeClose: c.before, AfterClose: after, Pacing: c.pacing}
+	}{Schema: "vellum-presentation-capture-v1", Result: result, Window: "perf", RunError: message, CutoffMethod: "acquisition-sequence prefix at completed CPU cohort", BinarySHA256: c.binarySHA256, Config: c.config, Build: c.build, ContinuousWork: c.config.Paced, WorkerRetired: workerRetired, RuntimeReturned: runtimeReturned, AcquisitionCutoff: c.cutoff, ReceiptCutoff: c.receiptCutoff, PrefixObservations: prefix, BeforeClose: c.before, AfterClose: after, Pacing: c.pacing}
 	if c.config.Paced {
 		value.Schema = "vellum-presentation-capture-v2"
 	}

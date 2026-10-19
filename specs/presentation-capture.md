@@ -39,15 +39,46 @@ CPU frame within that prefix. Missing identities fail capture immediately; later
 acquisitions cannot repair the frozen cohort. It allows up
 to two seconds for that fixed prefix's callbacks to drain. It retains the full
 snapshot, including newly acquired tail records. It does not move the cutoff,
-filter losses or treat retirement/Present calls as actual presentation.
+discard losses or treat retirement/Present calls as actual presentation.
 
 `Finish` writes both pre-close and post-close snapshots after native Run returns
 and the measurement worker acknowledges terminal cleanup. A setup failure before Run returns has `RuntimeReturned:false` and no post-close
 claim, even if no worker started. An unjoined worker produces a failed journal with no post-close claim. Failed/canceled runs retain
 evidence. The fixed prefix must remain immutable after close; untagged tail
 records remain explicit, outside the serial input cohort. Pending, retired,
-skipped, unavailable or invalid records in the prefix refuse validation.
+skipped, unavailable or invalid records in the prefix refuse validation, except
+for the precisely defined pre-input startup observations below.
 Post-close pending feedback, recorder overflow or a failed recorder also refuses.
+
+### Explicit pre-input startup observations
+
+Apple's `MTLDrawable.presentedTime` is zero when a drawable has not been presented
+or was skipped. A terminal native callback with zero time does not prove display
+and is retained as `State:"skipped"`. A skipped acquisition is a startup
+non-timing observation only when it belongs to the same window scope, has
+`Armed:false`, `Tag:0`, `Generation:0`, `Presented:0`, and its positive finite
+`Acquired` time is strictly before that scope's first native input receipt.
+The complete receipt cohort must have valid, increasing clocks in that scope.
+No receipt, a foreign receipt, or a skipped acquisition at/after the first receipt
+provides no exemption. Pending, unavailable, invalid and retired prefix records
+remain failures, including before the first input. Every setup/warmup/measured
+final armed acquisition still requires genuine actual presentation.
+
+New captures always emit `PrefixObservations` with exact `Records`, `Presented`
+and `StartupSkipped` counts for the original frozen prefix. The raw samples,
+sequence, cutoff and terminal states remain unchanged. Startup skips never become
+presentations or contribute a timestamp. The strict validator reports
+`prefix_records`, `prefix_presentations` and `startup_skipped` separately, and
+calculates raw presentation intervals only from genuine presented records.
+Successful older v1/v2 captures without this additive object remain supported
+when they contain no startup skips. A startup exemption requires the explicit
+matching counts. An existing `FAILED_DIAGNOSTIC` journal remains refused and must
+never be rewritten or relabeled to apply this prospective correction.
+
+This classification corrects diagnostic population accounting; it proves neither
+first-paint reliability nor a rendering fix. It changes no measured input, latency,
+schedule, timing threshold or cadence denominator. It cannot cure actual workload
+backlog or a display cadence failure.
 
 The presentation recorder's shared receipt/drawable capacity is 65536. Each journal
 has a 64 MiB write/read limit. The executable is hashed once before measured work,

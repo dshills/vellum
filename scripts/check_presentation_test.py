@@ -244,4 +244,73 @@ class PacedJournalTests(unittest.TestCase):
   out=m.validate(j,SOURCE,BINARY)['paced_metrics'];self.assertFalse(out['cadence_threshold_met']);self.assertGreater(out['final_work_overrun_ns'],0);self.assertGreater(out['worst_schedule_debt_ns'],0);self.assertTrue(out['iteration_deadline_misses'])
 
 
+def startup_fixture(tree=False,paced=False):
+ j=paced_fixture(tree)if paced else fixture(tree)
+ native=j['BeforeClose']['Presentation']['Samples']
+ for sample in native:sample['Composition']+=1
+ j['AfterClose']['Presentation']['Samples'][-1]['Composition']+=1
+ first=j['BeforeClose']['Presentation']['Inputs'][0]['Received']
+ native.insert(0,{'Sequence':1,'Scope':1,'Tag':0,'Generation':0,'Composition':1,'Armed':False,'DrawableID':0,'Acquired':first-.01,'Presented':0,'State':'skipped'})
+ j['BeforeClose']['Presentation']['Skipped']=j['AfterClose']['Presentation']['Skipped']=1
+ replace_after_prefix(j)
+ j['PrefixObservations']={'Records':len(native),'Presented':len(native)-1,'StartupSkipped':1}
+ return j
+
+class StartupObservationTests(unittest.TestCase):
+ def test_both_consumers_serial_and_paced_preserve_populations(self):
+  for tree in [False,True]:
+   for paced in [False,True]:
+    baseline=m.validate(paced_fixture(tree)if paced else fixture(tree),SOURCE,BINARY)
+    j=startup_fixture(tree,paced);before=copy.deepcopy(j);out=m.validate(j,SOURCE,BINARY)
+    self.assertEqual(j,before)
+    self.assertEqual(out['startup_skipped'],1);self.assertEqual(out['prefix_records'],out['prefix_presentations']+1)
+    self.assertEqual(out['before_state_counts']['skipped'],1)
+    # The inserted raw startup record advances sequence identities by exactly
+    # one; measured tags/generations/roles/times and populations stay identical.
+    expected_latencies=[{**row,'sequence':row['sequence']+1}for row in baseline['latencies']]
+    self.assertEqual(out['latencies'],expected_latencies)
+    for key in ['measured_input_latency_ms','prefix_intervals_ms','prefix_presentations','equal_presentation_times']:self.assertEqual(out[key],baseline[key])
+    if paced:
+     self.assertEqual(out['paced_metrics'],baseline['paced_metrics']);self.assertEqual(out['paced_metrics']['interval_count'],599)
+    self.assertFalse(out['cadence_qualified']);self.assertFalse(out['physical_latency_qualified'])
+ def test_precise_startup_boundary_and_all_other_loss_states(self):
+  for kind in ['at-first-receipt','after-first-receipt','armed','tagged','generation','foreign-scope','nonzero-presented','missing-receipt','foreign-receipt','zero-acquired','nan-acquired','infinite-acquired','pending','unavailable','invalid','retired','missing-final','changed-postclose','truncated-prefix','missing-accounting','wrong-records','wrong-presented','wrong-skipped','extra-accounting','bool-accounting','failed-capture']:
+   with self.subTest(kind=kind):
+    j=startup_fixture();s=j['BeforeClose']['Presentation']['Samples'][0];first=j['BeforeClose']['Presentation']['Inputs'][0]['Received']
+    if kind=='at-first-receipt':s['Acquired']=first
+    if kind=='after-first-receipt':s['Acquired']=first+.00001
+    if kind=='armed':s.update(Armed=True,Tag=j['BeforeClose']['Presentation']['Inputs'][0]['Tag'],Generation=9)
+    if kind=='tagged':s['Tag']=j['BeforeClose']['Presentation']['Inputs'][0]['Tag']
+    if kind=='generation':s['Generation']=9
+    if kind=='foreign-scope':s['Scope']=2
+    if kind=='nonzero-presented':s['Presented']=first-.005
+    if kind=='missing-receipt':j['BeforeClose']['Presentation']['Inputs']=[]
+    if kind=='foreign-receipt':j['BeforeClose']['Presentation']['Inputs'][0]['Scope']=2
+    if kind=='zero-acquired':s['Acquired']=0
+    if kind=='nan-acquired':s['Acquired']=float('nan')
+    if kind=='infinite-acquired':s['Acquired']=float('inf')
+    if kind in ['pending','unavailable','invalid','retired']:
+     s['State']=kind;j['BeforeClose']['Presentation']['Skipped']=0;j['BeforeClose']['Presentation'][kind.title()]=1
+    if kind=='missing-final':j['BeforeClose']['Presentation']['Samples'][-1]['Armed']=False
+    if kind=='missing-accounting':j.pop('PrefixObservations')
+    if kind=='wrong-records':j['PrefixObservations']['Records']-=1
+    if kind=='wrong-presented':j['PrefixObservations']['Presented']+=1
+    if kind=='wrong-skipped':j['PrefixObservations']['StartupSkipped']=0
+    if kind=='extra-accounting':j['PrefixObservations']['hidden']=True
+    if kind=='bool-accounting':j['PrefixObservations']['StartupSkipped']=True
+    if kind=='failed-capture':j['Result']='FAILED_DIAGNOSTIC';j['RunError']='presentation capture: lost prefix feedback'
+    replace_after_prefix(j)
+    if kind in ['pending','unavailable','invalid','retired']:
+     j['AfterClose']['Presentation']['Skipped']=0;j['AfterClose']['Presentation'][kind.title()]=1
+    if kind=='changed-postclose':j['AfterClose']['Presentation']['Samples'][0]['Acquired']-=.001
+    if kind=='truncated-prefix':j['AcquisitionCutoff']-=1
+    with self.assertRaises(ValueError):m.validate(j,SOURCE,BINARY)
+ def test_failed_capture_is_not_retroactively_repaired(self):
+  j=startup_fixture(paced=True);j['Result']='FAILED_DIAGNOSTIC';j['RunError']='presentation capture: lost prefix feedback'
+  raw=json.dumps(j).encode()
+  with tempfile.TemporaryDirectory()as directory:
+   path=Path(directory)/'failed.json';path.write_bytes(raw)
+   with self.assertRaisesRegex(ValueError,'failed or unsupported capture'):m.validate(m.load(path,hashlib.sha256(raw).hexdigest()),SOURCE,BINARY)
+   self.assertEqual(path.read_bytes(),raw)
+
 if __name__=='__main__':unittest.main()

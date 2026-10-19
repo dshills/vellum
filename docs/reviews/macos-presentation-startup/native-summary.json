@@ -1,0 +1,99 @@
+{
+  "source_commit": "bd0e1de166ff7a942d55040b23292db12c30e86e",
+  "result": "FAILED_OR_CANCELED",
+  "native_executed": true,
+  "release_qualified": false,
+  "fourth_case": "NOT_EXECUTED_AFTER_FAILURE",
+  "host": {
+    "os": "macOS26.6.2 build25G83",
+    "gpu": "Apple M4 Pro20cores",
+    "display": "LG HDR DQHD5120x1440@60Hz",
+    "power": "AC"
+  },
+  "cases": {
+    "serial-grid-cpu": {
+      "result": "PASS_SCOPED_NATIVE_FEEDBACK",
+      "exit_code": 0,
+      "native_seconds": 9.530179374967702,
+      "error": null,
+      "receipt_sha256": "fcb1b3f1da25d29da10d10b7e4c9ebefd55450f553c67c1e1d2d7f28e930f493",
+      "all_owned_groups_terminal_absent": true,
+      "serial_diagnostic_input_latency_ms": {
+        "count": 120,
+        "p50": 59.031750075519085,
+        "p95": 59.562583337537944,
+        "p99": 59.86358330119401,
+        "max": 62.38516664598137
+      },
+      "configuration_raw_bytes_unchanged": {
+        "display": true,
+        "power": true,
+        "power-settings": true,
+        "os": true
+      }
+    },
+    "serial-tree-gpu": {
+      "result": "PASS_SCOPED_NATIVE_FEEDBACK",
+      "exit_code": 0,
+      "native_seconds": 10.167922957916744,
+      "error": null,
+      "receipt_sha256": "7b896ad41cc8cf7adf46345542b68d5e2d9516a8982a871966d9b6e36254301f",
+      "all_owned_groups_terminal_absent": true,
+      "serial_diagnostic_input_latency_ms": {
+        "count": 120,
+        "p50": 64.9121250025928,
+        "p95": 65.15899999067187,
+        "p99": 65.29491662513465,
+        "max": 65.4042917303741
+      },
+      "configuration_raw_bytes_unchanged": {
+        "display": true,
+        "power": true,
+        "power-settings": true,
+        "os": true
+      }
+    },
+    "paced-grid-gpu": {
+      "result": "FAILED_OR_CANCELED",
+      "exit_code": 1,
+      "native_seconds": 24.88012520899065,
+      "error": {
+        "type": "ValueError",
+        "message": "owned native case failed or canceled"
+      },
+      "receipt_sha256": "1fd14e9e342baf047f4f9da49f9281e67b269750c6f7da739be2426f27342041",
+      "all_owned_groups_terminal_absent": true,
+      "descriptive_failed_journal_only": {
+        "scope": "Raw record observations from refused FAILED_DIAGNOSTIC, not a passing current/prospective validator result or native release qualification",
+        "measured_latency_ms": {
+          "count": 600,
+          "p50": 59.903166722506285,
+          "p95": 60.625000041909516,
+          "p99": 60.87287503760308,
+          "max": 76.23791671358049
+        },
+        "final_state_interval_ms": {
+          "count": 599,
+          "p50": 33.3332916488871,
+          "p95": 33.333375002257526,
+          "p99": 33.333375002257526,
+          "max": 49.9999166931957
+        },
+        "intervals_within18_333ms": 0,
+        "interval_denominator": 599,
+        "CPU_planned_ns": 10000000000,
+        "CPU_end_ns": 20019294416,
+        "acquisitions": 1452,
+        "inputs": 728,
+        "prefix_cutoff": 1451,
+        "recorder_overflow": false,
+        "preinput_unarmed_skipped": 2,
+        "all_skips_before_firstreceipt": true,
+        "all728armed_presented": true
+      }
+    }
+  },
+  "independent_review_sha256": "a2ec981566ce73d694248f74949933dd919cc63c2e567c4c660ebddb202ee391",
+  "campaign_result_sha256": "4d8328375364a1496c3e650a6caf3d448b553358f6025a343efc7e7ccd53f24c",
+  "new_semantics_will_not_reclassify_this_failed_capture": true
+}

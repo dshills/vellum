@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "1e86d24b29053640add0b137aff40118",
+  "repo": {
+    "root": "/private/tmp/vellum-macos-native-results-97aee13",
+    "head": "bd0e1de166ff7a942d55040b23292db12c30e86e",
+    "branch": "codex/macos-native-results"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "272a9bac15ef9e05",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "First receipt derived by dict order; Acquired positivity unchecked",
+      "message": "The first receipt is taken from dict insertion order, not the minimum Received. The Go side requires increasing clocks and uses Inputs[0], but the Python receipts may be keyed by tag in unspecified order, so the 'strictly before first receipt' boundary may be wrong. Also, the startup filter does not check that Acquired is positive or finite; NaN comparisons are false, but an Acquired of 0 or negative passes the Python startup predicate while the Go side rejects it.",
+      "suggestion": "Use min(r['Received'] for r in receipts.values()) and add 0\u003cs['Acquired'] and math.isfinite(s['Acquired']) to the startup predicate.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "scripts/check-presentation.py",
+          "lines": {
+            "start": 202,
+            "end": 202
+          }
+        }
+      ],
+      "tags": [
+        "validator",
+        "boundary",
+        "location-corrected"
+      ],
+      "evidence": "first_receipt=next(iter(receipts.values()))['Received']",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4227,
+    "totalMs": 4267
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 14,
+    "bytes": 55092,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 27058,
+        "output": 370,
+        "costUSD": 0.057816
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

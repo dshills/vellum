@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/dshills/vellum/drivers/cogent"
 	"io"
+	"math"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -43,6 +44,9 @@ func TestPresentationCaptureExclusiveFileAndFailurePreservation(t *testing.T) {
 	var record map[string]any
 	if err := json.Unmarshal(before, &record); err != nil || record["Schema"] != "vellum-presentation-capture-v1" || record["Result"] != "FAILED_DIAGNOSTIC" || record["ContinuousWork"] != false || record["AfterClose"] == nil {
 		t.Fatal(err, record)
+	}
+	if counts, ok := record["PrefixObservations"].(map[string]any); !ok || counts["Records"] != float64(0) || counts["Presented"] != float64(0) || counts["StartupSkipped"] != float64(0) {
+		t.Fatal("failed capture omitted explicit prefix accounting", record)
 	}
 	if c.Seal(context.Background()) == nil {
 		t.Fatal("seal after finish")
@@ -233,6 +237,86 @@ func TestPresentationFrozenPrefixRequiresEntireCompletedCohort(t *testing.T) {
 			}
 			if presentationCohortError(p, uint64(len(p.Presentation.Samples))) == nil {
 				t.Fatal("incomplete final acquisition cohort accepted")
+			}
+		})
+	}
+}
+
+func TestPresentationStartupSkipsRemainExplicitAndOutsideTiming(t *testing.T) {
+	makePoint := func() presentationCapturePoint {
+		return presentationCapturePoint{
+			Frames: cogent.FrameMetricsSnapshot{Samples: []cogent.FrameSample{{Tag: 1, Window: "perf", Generation: 9, Completed: true}}},
+			Presentation: cogent.PresentationSnapshot{
+				Scopes: []cogent.PresentationScope{{ID: 1, Window: "perf"}},
+				Inputs: []cogent.PresentationInput{{Scope: 1, Tag: 1, Received: 10}},
+				Samples: []cogent.PresentationSample{
+					{Sequence: 1, Scope: 1, Frame: cogent.PresentationFrame{Composition: 1}, Acquired: 9, State: "skipped"},
+					{Sequence: 2, Scope: 1, Frame: cogent.PresentationFrame{Tag: 1, Generation: 9, Composition: 2, Armed: true}, Acquired: 11, Presented: 12, State: "presented"},
+				},
+			},
+		}
+	}
+	p := makePoint()
+	before, _ := json.Marshal(p)
+	if err := presentationPointError(p, 2); err != nil {
+		t.Fatal("actual pre-input terminal skipped observation refused", err)
+	}
+	if err := presentationCohortError(p, 2); err != nil {
+		t.Fatal("startup observation changed final acquisition cohort", err)
+	}
+	if counts := presentationPrefixCounts(p, 2); counts != (presentationPrefixAccounting{Records: 2, Presented: 1, StartupSkipped: 1}) {
+		t.Fatal("skipped startup counted as presented or omitted", counts)
+	}
+	after, _ := json.Marshal(p)
+	if !reflect.DeepEqual(before, after) || p.Presentation.Samples[0].Presented != 0 || p.Presentation.Samples[0].State != "skipped" {
+		t.Fatal("startup classification rewrote evidence")
+	}
+	for _, kind := range []string{"at-first-receipt", "after-first-receipt", "armed", "tagged", "generation", "foreign-scope", "nonzero-presented", "missing-receipt", "foreign-receipt", "zero-receipt", "nonfinite-receipt", "regressed-receipt", "zero-acquired", "nan-acquired", "infinite-acquired", "pending", "unavailable", "invalid", "retired", "missing-final"} {
+		t.Run(kind, func(t *testing.T) {
+			p := makePoint()
+			sample := &p.Presentation.Samples[0]
+			switch kind {
+			case "at-first-receipt":
+				sample.Acquired = 10
+			case "after-first-receipt":
+				sample.Acquired = 10.5
+			case "armed":
+				sample.Armed = true
+			case "tagged":
+				sample.Tag = 1
+			case "generation":
+				sample.Generation = 8
+			case "foreign-scope":
+				sample.Scope = 2
+			case "nonzero-presented":
+				sample.Presented = 9.5
+			case "missing-receipt":
+				p.Presentation.Inputs = nil
+			case "foreign-receipt":
+				p.Presentation.Inputs[0].Scope = 2
+			case "zero-receipt":
+				p.Presentation.Inputs[0].Received = 0
+			case "nonfinite-receipt":
+				p.Presentation.Inputs[0].Received = math.Inf(1)
+			case "regressed-receipt":
+				p.Presentation.Inputs = append(p.Presentation.Inputs, cogent.PresentationInput{Scope: 1, Tag: 2, Received: 9.5})
+			case "zero-acquired":
+				sample.Acquired = 0
+			case "nan-acquired":
+				sample.Acquired = math.NaN()
+			case "infinite-acquired":
+				sample.Acquired = math.Inf(1)
+			case "pending", "unavailable", "invalid", "retired":
+				sample.State = kind
+			case "missing-final":
+				p.Presentation.Samples[1].Armed = false
+			}
+			if kind == "missing-final" {
+				if presentationCohortError(p, 2) == nil {
+					t.Fatal("startup exemption repaired missing final acquisition")
+				}
+			} else if presentationPointError(p, 2) == nil {
+				t.Fatal("invalid prefix loss received startup exemption")
 			}
 		})
 	}

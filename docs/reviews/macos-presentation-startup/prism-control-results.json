@@ -1,0 +1,47 @@
+{
+  "result": "PASS_TARGETED_PRISM_CLAIM_NEGATIVES",
+  "cases": [
+    {
+      "case": "zero-acquired",
+      "result": "REFUSED",
+      "reason": "invalid native clock"
+    },
+    {
+      "case": "negative-acquired",
+      "result": "REFUSED",
+      "reason": "invalid native clock"
+    },
+    {
+      "case": "nan-acquired",
+      "result": "REFUSED",
+      "reason": "invalid native clock"
+    },
+    {
+      "case": "inf-acquired",
+      "result": "REFUSED",
+      "reason": "invalid native clock"
+    },
+    {
+      "case": "regressed-receipts",
+      "result": "REFUSED",
+      "reason": "receipt clock/order regressed"
+    },
+    {
+      "case": "duplicate-receipt-time",
+      "result": "REFUSED",
+      "reason": "receipt clock/order regressed"
+    },
+    {
+      "case": "late-skip",
+      "result": "REFUSED",
+      "reason": "acquisition clock regressed"
+    },
+    {
+      "case": "at-receipt",
+      "result": "REFUSED",
+      "reason": "lost/missing prefix feedback"
+    }
+  ],
+  "validator_sha256": "9d314b6d13e24b5e13231fbec24b8a19d333f81acb7eba2c495fe2c7e1ae8662",
+  "native_executed": false
+}

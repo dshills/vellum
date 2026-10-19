@@ -1,0 +1,13 @@
+{
+  "result": "APPROVED_AFTER_REFUTING_SINGLE_PRISM_FINDING",
+  "id": "272a9bac15ef9e05",
+  "provider": "Anthropic claude-sonnet-5-5",
+  "disposition": "False positive: existing point() runs before startup classification and strictly validates every acquisition as finite positive and each receipt as finite positive, unique and strictly increasing. validate() then requires canonical exact receipt tag order before next(iter(receipts.values())). Python dict preserves insertion order; the first value is exactly the minimum of the already strictly increasing receipt sequence. No unchecked zero/negative/nonfinite/unsorted path reaches predicate.",
+  "evidence": [
+    "scripts/check-presentation.py point(): number(sample[Acquired],True), receipt clock/order check",
+    "scripts/check-presentation.py validate(): point before prefix logic; exact list(receipts)==ordered check"
+  ],
+  "targeted_controls": "Eight actual integrated-source negative cases all refused; owned group terminal/absent, source/SDK stable. Controls supplement existing21-method strict test suite; no source change or provider rerun needed.",
+  "unresolved_findings": [],
+  "native_run_executed_for_this_fix": false
+}

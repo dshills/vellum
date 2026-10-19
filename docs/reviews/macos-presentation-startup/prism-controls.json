@@ -1,0 +1,47 @@
+{
+  "argv": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny network* (remote ip) (local ip))(deny file-write* (subpath \"/Users/dshills/Development/projects/Vellum\"))(deny file-write* (subpath \"/private/tmp/vellum-macos-native-results-97aee13\"))(deny file-write* (subpath \"/private/tmp/vellum-current-sdk-bd0e1de/retained SDK/vellum-v0.1.0-alpha.2\"))(deny file-write* (subpath \"/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m2-final-cocoa/consumer\"))(deny file-write* (subpath \"/Users/dshills/Library/Cogent Core\"))",
+    "/usr/bin/python3",
+    "-B",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-startup-integrated/prism-controls.py"
+  ],
+  "cwd": "/private/tmp/vellum-macos-native-results-97aee13",
+  "started_utc": "2026-10-19T22:18:34.552329+00:00",
+  "watchdog_seconds": 30,
+  "error": null,
+  "exit_code": 0,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 45776,
+  "group": 45776,
+  "owned": {
+    "created": true,
+    "pid": 45776,
+    "group": 45776,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 0,
+    "errors": [],
+    "observation": {
+      "group": 45776,
+      "members": [],
+      "observation_sha256": "577924b5d6f2b280a4549f2fbfd9d5f0d8a06fb94a1a40f77eae701bdea7666c"
+    }
+  },
+  "seconds": 4.046401250059716,
+  "logs": {
+    "stdout": {
+      "bytes": 1111,
+      "sha256": "6bd73e3da7c19dc5357e6e9e0aca6da8e16a759badfc812784e1e2fe54c28cc2"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}
