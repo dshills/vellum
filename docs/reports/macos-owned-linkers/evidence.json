@@ -1,0 +1,63 @@
+{
+  "scope": "Five owned linker sources in the private DarwinARM64SDK profile; no other native/platform/rights gate closure",
+  "working_candidate_base": "7c941a992d30cbcc45f7338bfbce3dce6b093a59",
+  "sdk_is_precommit_working_snapshot": true,
+  "unit_test_methods": 137,
+  "unit_suites": [
+    "native_linkers_test",
+    "native_gpu_test",
+    "release-sdk_test",
+    "check-sdk_test",
+    "distribution-inventory_test",
+    "build-macos_test",
+    "app_notices_test",
+    "package-app_test"
+  ],
+  "unit_outcome": "PASS",
+  "integration_result": "PASS_PRIVATE_OWNED_LINKER_SDK",
+  "archive": {
+    "archive": "/private/tmp/vellum-sdk-owned-linkers-7c941a9-v2/sdk.tar.gz",
+    "sha256": "4a0f886b5afb4aa161b57da1f80675937d6693ef822349ff90241cf4e2b36aa9",
+    "version": "v0.1.0-alpha.2",
+    "modules": 89,
+    "private_build": true
+  },
+  "sdk_files": 8049,
+  "default_mains": 26,
+  "tagged_helpers": 1,
+  "owned_commands": 68,
+  "owned_commands_terminal_absent": true,
+  "module_inventory_count": 89,
+  "owned_linker_modules": [
+    "github.com/oliverbestmann/webgpu/libs-android",
+    "github.com/oliverbestmann/webgpu/libs-darwin",
+    "github.com/oliverbestmann/webgpu/libs-ios",
+    "github.com/oliverbestmann/webgpu/libs-linux",
+    "github.com/oliverbestmann/webgpu/libs-windows"
+  ],
+  "unrelated_manual_review_modules": [],
+  "distribution_audit": "pending",
+  "source_prepared_prior_sdks_unchanged": true,
+  "actual_native_executed": false,
+  "public_distribution": false,
+  "failed_attempts_preserved": [
+    "Unitv1: six compiler-environment mismatches and missing emptyfixturego.sum; no production failure",
+    "Integrationv1: missing logparent before subprocess creation; fresh v2scope used"
+  ],
+  "retained_local_artifact_dir": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-owned-linkers",
+  "records": {
+    "unit-v1.stdout": "670b8d0a5ec01ab9e952a9d67c2c6f6dc9a2fef4f413af7e6f84de36998aff84",
+    "unit-v1.stderr": "e97ebd4a61d16dcd8b03aa5bb7abda452939da2e00a14804ac3bbcdbce04e47f",
+    "unit-v2.stdout": "982ed938b3caf741dd35b3e495bbfb40cbd6baf4826a4f92db32774dfa960fab",
+    "unit-v2.stderr": "8d9c774f7fc491a3cd7167ad6bf622d703e9e360ecc441864f18d311175fd940",
+    "unit-v3.stdout": "4885a971989cd9012a9ed84a490e35439ff61ecb2b6b74f4a9a0565b9dc826ff",
+    "unit-v3.stderr": "75db10e5f4e3ee5eca596ad9f809285dba53bb31618f5e1c2f858483283f57fa",
+    "integration.py": "fa34d8f5ae23058c49b84f0c1812447af60aadf2f1ee4a096bed71b279f550f6",
+    "integration-result.json": "f7db6f70ee14b78d665813b3ed5574a3f0878d478f268775bfc67aba9d0f4842",
+    "integration-inputs.json": "0a21fcbf2d13a5ce1e3f277423aaf9e3f0865a7367674db6cf2c491bb8914703",
+    "integration-v2.py": "e3f221e249c46591b2d493fd95da470b7b5b6ee4fed54c761a6f9f62ae6babf8",
+    "integration-v2-result.json": "8171cf1dfbc83aec4c11ede4233e55d02d5670e3a1f42dfff77419f6fc0ee965",
+    "integration-v2-inputs.json": "fdbff09f0f1b4e92b54374bc6e851d142b37a9710f3471b8bbbff4ddc1ad294c",
+    "internal-source-review.json": "43e8e2b11d8ef6c4d66522b8c6fdc2dabc04b4b41a75022a3b997c20eee1a106"
+  }
+}

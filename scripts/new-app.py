@@ -7,6 +7,7 @@ import shlex
 import subprocess
 import tempfile
 import native_gpu
+import native_linkers
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -35,7 +36,7 @@ def main():
                         f"-replace=cogentcore.org/core={ROOT / 'drivers/cogent/build/upstream'}",
                         f"-replace=github.com/go-text/typesetting={ROOT / 'drivers/cogent/build/typesetting'}"]
         if gpu is not None:
-            command.append(f"-replace={native_gpu.MODULE}={ROOT / native_gpu.DIRECTORY}")
+            command.extend(f"-replace={module}={ROOT / relative}" for module, relative in native_linkers.replacements(gpu).items())
         subprocess.run(command, cwd=stage, check=True)
         stage.rename(destination)
     print(f"Created {destination}; source {shlex.quote(str(ROOT / 'drivers/cogent/env.sh'))} then run go test ./... and go run .")

@@ -134,26 +134,52 @@ Provenance requires integer `schema: 1`, `target: "darwin-arm64"` and
 as caller-supplied declarations. The builder never interprets them as commands,
 source attestation, executed-build evidence, component closure or rights approval.
 
-The generated `drivers/cogent/build/libs-darwin` capsule contains exactly
-`go.mod`, owned `libs.go`, `arm64/libwgpu_native.a` and `PROVENANCE.json`.
-`SDK_MANIFEST.native_gpu` records their hashes, observed object count, target,
-explicit unverified trust label and pending distribution audit. Its module
-rewrite records contain both source and archived hashes. `source.commit` names
-the framework baseline and `source.clean` describes the checkout; the candidate
-and derived module files are disclosed overlays. Go graph notices remain
-separate from native/Rust/standard-library component and rights closure.
+A new private candidate supplies five Vellum-authored compatibility modules at
+`drivers/cogent/build/libs-{android,darwin,ios,linux,windows}`. They retain the
+upstream module/import identities because the WebGPU binding blank-imports all
+five, but select freshly authored source with its own MIT declaration. The
+original upstream linker-module distributions are not selected. This does not
+change the separately selected WebGPU binding, headers or native archive.
 
-Driver and native example main-module manifests receive relative local overrides.
-Dependency replacements are not transitive: generated applications receive an
-absolute override to the SDK capsule. The generator rechecks the capsule and
-recorded module-overlay bytes, refuses symlinks and extra files such as a competing
-dylib, and retains the existing destination and starter-license behavior.
-The archive verifier couples the optional manifest record to its exact files;
-an orphan capsule or mismatched record refuses. Relocation checks require the
-actual Go module origin to equal the capsule directory and run candidate builds
-only on an ARM64 Mac, explicitly targeting `GOOS=darwin GOARCH=arm64`.
-Direct tests/builds from the prepared upstream dependency module are outside
-these selected main-module overrides and need their own explicit replacement.
+Every compatibility module has `go.mod`, `package.go`, `unsupported.go` and
+`LICENSE`. Darwin additionally has `link.go`, `arm64/libwgpu_native.a` and
+`PROVENANCE.json`. Only Darwin ARM64 with CGO selects `link.go`, whose flags name
+the exact archive path rather than searching for an alternative WGPU library.
+Unsupported Darwin architectures/no-CGO and the four other native targets fail
+compilation with `VellumSDKRequiresDarwinARM64WithCGO`. Non-target packages are
+inert so the five unconditional imports remain consumable on the supported Mac.
+The private candidate does not qualify another platform.
+
+`SDK_MANIFEST.native_gpu.owned_linkers` binds all five module directories,
+authored source/license hashes, role and target policy. The Darwin `files` record
+also binds the exact archive/provenance; object count, unverified trust label and
+pending distribution audit remain explicit. Module rewrite records retain both
+source and archived hashes. `source.commit` names the framework baseline and
+`source.clean` describes the checkout; generated sources and derived module files
+are disclosed overlays. Earlier one-Darwin-capsule records remain readable as
+legacy records and acquire no new ownership or licensing claim.
+
+The notice collector inventories the same effective replacement graph used by
+consumers. Each owned entry has `status: owned-source-declaration`, null effective
+`version`/`sum`, original resolution metadata in `selected_requirement`, and an
+`effective_source` with the SDK-relative directory and authored file hashes.
+The owned license points to that module's SDK file. It is not copied into the
+upstream notice collection or presented as an upstream declaration. An unrelated
+missing declaration remains unresolved. Go source declarations remain separate
+from native/Rust/standard-library/font/asset applicability and distribution audit.
+
+Driver and native example main-module manifests receive all five relative local
+overrides, with conflicting replacements refused. Generated standalone apps
+receive all five absolute overrides because dependency replacements are not
+transitive. The generator rechecks all capsules and module-overlay bytes,
+refusing symlinks, partial/changed source or notices, and extra files such as a
+competing dylib. It retains destination and starter-license behavior. The archive
+verifier couples the optional record to exact membership; orphan capsules and
+mismatched records refuse. Relocation requires every actual replacement origin
+to equal its SDK-local directory and runs candidate builds only on an ARM64 Mac,
+explicitly targeting `GOOS=darwin GOARCH=arm64`. Direct source-checkout builds and
+tests from the prepared upstream module remain on their existing graph unless
+the caller explicitly supplies the candidate replacements.
 
 Digest and origin validation do not prove static linkage or runtime behavior.
 A candidate qualification must separately inspect the compiled artifact/linkmap

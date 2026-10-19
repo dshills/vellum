@@ -16,6 +16,7 @@ import unittest
 from unittest import mock
 
 import native_gpu as gpu
+import native_linkers as linkers
 
 
 def load(name, path):
@@ -61,7 +62,8 @@ def source(base):
 
     write("release/version.json", json.dumps(dict(version="v0.1.0-alpha.1", module="github.com/dshills/vellum")))
     write("go.mod", "module github.com/dshills/vellum\ngo 1.25.6\n")
-    write("drivers/cogent/go.mod", "module github.com/dshills/vellum/drivers/cogent\ngo 1.25.6\nrequire " + gpu.MODULE + " v0.0.0\n")
+    write("drivers/cogent/go.mod", "module github.com/dshills/vellum/drivers/cogent\ngo 1.25.6\n" + "".join("require " + module + " v0.0.0\n" for module in linkers.DIRECTORIES))
+    write("drivers/cogent/go.sum", "")
     for module, name in [("cogentcore.org/core", "upstream"), ("github.com/go-text/typesetting", "typesetting")]:
         write("drivers/cogent/build/" + name + "/go.mod", "module " + module + "\ngo 1.25.6\n")
     write("examples/hello/go.mod", '''module example.com/hello
@@ -73,10 +75,12 @@ require (
  github.com/go-text/typesetting v0.0.0
 )
 ''')
+    example_module = files["examples/hello/go.mod"]
+    example_module.write_text(example_module.read_text() + "".join("require " + module + " v0.0.0\n" for module in linkers.DIRECTORIES))
     for name, text in [("main.go", "package main\nfunc main() {}\n"), ("model.go", "package main\n"),
                        ("model_test.go", "package main\n"), ("go.sum", ""), ("LICENSE", "starter notice\n")]:
         write("examples/hello/" + name, text)
-    for name in ["new-app.py", "native_gpu.py", "native_archive.py"]:
+    for name in ["new-app.py", "native_gpu.py", "native_archive.py", "native_linkers.py"]:
         write("scripts/" + name, (SCRIPTS / name).read_text())
     return root, files
 

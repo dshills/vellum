@@ -135,6 +135,18 @@ baseline before preparing their exact launch plan. No old scope is replayed.
 After M2, resume the materially different measured M3 rendering/publication work;
 M4–M7, physical/human qualification and final SDK acceptance remain open.
 
+
+The [owned linker checkpoint](../docs/reports/macos-owned-linkers/README.md)
+replaces five undeclared upstream linker-module distributions in the private Mac
+SDK profile with explicitly licensed, freshly authored compatibility source.
+137 affected tests, independent relocation/race/vet/build and all 26 default mains
+plus one tagged helper pass. Original resolution metadata stays separate from
+the effective owned source; the exact native archive and prepared dependencies
+are unchanged. This closes that effective-source declaration gap for this SDK
+profile, while direct source/historical SDK graphs and their original findings
+remain unchanged. Native/font/asset applicability, distribution approval and full
+M6/Mac acceptance remain open. No application is launched in this checkpoint.
+
 ## Finish line
 
 Finish the Go-native framework on the local Mac: an independently consumable SDK

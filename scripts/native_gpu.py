@@ -7,6 +7,8 @@ import posixpath
 import re
 import struct
 
+import native_linkers
+
 from native_archive import archive_members, regular_stream, unchanged
 
 MODULE = "github.com/oliverbestmann/webgpu/libs-darwin"
@@ -102,12 +104,16 @@ def candidate(library, expected_sha256, provenance):
     declared = strict_json(declaration)
     if type(declared) is not dict or type(declared.get("schema")) is not int or declared["schema"] != 1 or declared.get("target") != "darwin-arm64" or declared.get("artifact_sha256") != expected_sha256:
         raise ValueError("native GPU provenance must identify schema, target and exact artifact")
-    generated = {"go.mod": GO_MOD, "libs.go": LIBS_GO, LIBRARY: data, PROVENANCE: declaration}
+    generated = {native_linkers.DIRECTORIES[module] + "/" + name: body
+                 for module, files in native_linkers.sources().items() for name, body in files.items()}
+    generated.update({DIRECTORY + "/" + LIBRARY: data, DIRECTORY + "/" + PROVENANCE: declaration})
     record = {"schema": 1, "target": "darwin-arm64", "module": MODULE, "directory": DIRECTORY,
               "trust": TRUST, "distribution_audit": "pending", "arm64_object_members": objects,
-              "files": {name: digest(body) for name, body in sorted(generated.items())},
-              "go_mod_overlays": {}}
-    return record, {DIRECTORY + "/" + name: body for name, body in generated.items()}
+              "files": {name[len(DIRECTORY) + 1:]: digest(body) for name, body in sorted(generated.items())
+                        if name.startswith(DIRECTORY + "/")},
+              "owned_linkers": native_linkers.declaration(), "go_mod_overlays": {}}
+    return record, generated
+
 
 
 
@@ -194,18 +200,21 @@ def overlay_modfile(name, data):
     if name != "drivers/cogent/go.mod" and not (name.startswith("examples/") and name.endswith("/go.mod") and
             re.search(rb"^\s*(?:require\s+)?github\.com/dshills/vellum/drivers/cogent\s+v\S+", data, re.MULTILINE)):
         return None
-    if re.search(rb"^\s*(?:replace\s+)?github\.com/oliverbestmann/webgpu/libs-darwin(?:\s+\S+)?\s+=>", data, re.MULTILINE):
-        raise ValueError("native GPU module already has a replacement: " + name)
-    relative = posixpath.relpath(DIRECTORY, str(PurePosixPath(name).parent))
-    if not relative.startswith("."):
-        relative = "./" + relative
-    return data + ("\nreplace " + MODULE + " => " + relative + "\n").encode()
+    additions = []
+    for module, directory in native_linkers.DIRECTORIES.items():
+        if re.search(rb"^\s*(?:replace\s+)?" + re.escape(module.encode()) + rb"(?:\s+\S+)?\s+=>", data, re.MULTILINE):
+            raise ValueError("native GPU module already has a replacement: " + name)
+        relative = posixpath.relpath(directory, str(PurePosixPath(name).parent))
+        if not relative.startswith("."):
+            relative = "./" + relative
+        additions.append("replace " + module + " => " + relative)
+    return data + ("\n" + "\n".join(additions) + "\n").encode()
 
 
 def validate_record(record, files, private_build):
     if type(files) is not dict:
         raise ValueError("invalid native GPU SDK file map")
-    capsule = {name for name in files if name.startswith(DIRECTORY + "/")}
+    capsule = {name for name in files if any(name.startswith(directory + "/") for directory in native_linkers.DIRECTORIES.values())}
     if record is None:
         if capsule:
             raise ValueError("native GPU capsule has no SDK manifest record")
@@ -213,9 +222,17 @@ def validate_record(record, files, private_build):
     if type(record) is not dict or type(record.get("schema")) is not int or record["schema"] != 1 or private_build is not True or record.get("target") != "darwin-arm64" or record.get("module") != MODULE or record.get("directory") != DIRECTORY or record.get("trust") != TRUST or record.get("distribution_audit") != "pending":
         raise ValueError("invalid private native GPU manifest record")
     hashes = record.get("files")
-    if type(hashes) is not dict or set(hashes) != FILES or capsule != {DIRECTORY + "/" + name for name in FILES} or any(not sha_value(value) or files.get(DIRECTORY + "/" + name) != value for name, value in hashes.items()):
+    owned = "owned_linkers" in record
+    expected_sources = native_linkers.sources() if owned else {}
+    expected_darwin = set(expected_sources.get(MODULE, {})) | {LIBRARY, PROVENANCE} if owned else FILES
+    expected_capsule = {DIRECTORY + "/" + name for name in expected_darwin}
+    for module, bodies in expected_sources.items():
+        expected_capsule.update(native_linkers.DIRECTORIES[module] + "/" + name for name in bodies)
+    if type(hashes) is not dict or set(hashes) != expected_darwin or capsule != expected_capsule or any(not sha_value(value) or files.get(DIRECTORY + "/" + name) != value for name, value in hashes.items()):
         raise ValueError("native GPU manifest/member coverage mismatch")
-    if hashes["go.mod"] != digest(GO_MOD) or hashes["libs.go"] != digest(LIBS_GO):
+    if owned:
+        native_linkers.validate(record, files)
+    elif hashes["go.mod"] != digest(GO_MOD) or hashes["libs.go"] != digest(LIBS_GO):
         raise ValueError("native GPU linkage differs from owned module")
     if "component_notices" in record:
         component_notice_record(record["component_notices"], files)
@@ -239,10 +256,13 @@ def sdk_candidate(root):
     if type(manifest) is not dict:
         raise ValueError("invalid native GPU SDK manifest")
     record = validate_record(manifest.get("native_gpu"), manifest.get("files", {}), manifest.get("private_build"))
-    if record is None and ((root / DIRECTORY).exists() or (root / DIRECTORY).is_symlink()):
+    if record is None and any((root / directory).exists() or (root / directory).is_symlink() for directory in native_linkers.DIRECTORIES.values()):
         raise ValueError("native GPU SDK capsule has no manifest record")
     if record is not None:
         expected = {DIRECTORY + "/" + name: value for name, value in record["files"].items()}
+        for module, relative in native_linkers.replacements(record).items():
+            if "owned_linkers" in record:
+                expected.update({relative + "/" + name: checksum for name, checksum in record["owned_linkers"]["modules"][module]["files"].items()})
         expected.update({name: value["archived_sha256"] for name, value in record["go_mod_overlays"].items()})
         for name, checksum in expected.items():
             path = root
@@ -257,16 +277,30 @@ def sdk_candidate(root):
             observed = component_notices(root, record["files"][LIBRARY])
             if observed != record["component_notices"]:
                 raise ValueError("native component inventory does not match selected archive or record")
-        # Refuse on the first unexpected entry; never traverse a tampered tree.
-        for directory, allowed in [(root / DIRECTORY, {"go.mod", "libs.go", PROVENANCE, "arm64"}),
-                                   (root / DIRECTORY / "arm64", {"libwgpu_native.a"})]:
-            seen = set()
-            for path in directory.iterdir():
-                if path.name not in allowed or path.is_symlink():
+        # Refuse unknown paths before descending; the authored tree is fixed and small.
+        for relative in native_linkers.DIRECTORIES.values():
+            capsule_files = {name[len(relative) + 1:] for name in expected if name.startswith(relative + "/")}
+            base = root / relative
+            if not capsule_files:
+                if base.exists() or base.is_symlink():
                     raise ValueError("native GPU capsule contains extra or missing files")
-                if not (path.is_dir() if path.name == "arm64" else path.is_file()):
-                    raise ValueError("native GPU capsule requires regular files and directories")
-                seen.add(path.name)
-            if seen != allowed:
+                continue
+            allowed_files = {PurePosixPath(name) for name in capsule_files}
+            allowed_dirs = {parent for name in allowed_files for parent in name.parents}
+            pending = [(base, PurePosixPath("."))]
+            seen = set()
+            while pending:
+                directory, prefix = pending.pop()
+                for path in directory.iterdir():
+                    name = prefix / path.name
+                    if path.is_symlink():
+                        raise ValueError("native GPU capsule contains extra or missing files")
+                    if name in allowed_files and path.is_file():
+                        seen.add(name)
+                    elif name in allowed_dirs and path.is_dir():
+                        pending.append((path, name))
+                    else:
+                        raise ValueError("native GPU capsule contains extra or missing files")
+            if seen != allowed_files:
                 raise ValueError("native GPU capsule contains extra or missing files")
     return record

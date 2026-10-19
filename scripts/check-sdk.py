@@ -18,6 +18,7 @@ import tarfile
 import tempfile
 import zlib
 import native_gpu
+import native_linkers
 
 from sdk_environment import CHILD_ENVIRONMENT, GO_CONFIGURATION, child_environment
 
@@ -225,7 +226,7 @@ def check_origin(modules, sdk, module_path="github.com/dshills/vellum", gpu=None
                 "cogentcore.org/core": "drivers/cogent/build/upstream",
                 "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"}
     if gpu is not None:
-        expected[native_gpu.MODULE] = native_gpu.DIRECTORY
+        expected.update(native_linkers.replacements(gpu))
     for name, relative in expected.items():
         if name not in origins:
             raise ValueError(f"consumer is missing explicit SDK replacement: {name}")

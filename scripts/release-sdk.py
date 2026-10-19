@@ -20,6 +20,7 @@ from child_process import run_child, check_child_output
 from artifact_io import publish_exclusive
 from sdk_environment import child_environment
 import native_gpu
+import native_linkers
 
 ROOT = Path(__file__).resolve().parents[1]
 COMMAND_TIMEOUT_SECONDS = 600
@@ -174,8 +175,11 @@ def module_license(path):
     return declared_notice(path) and re.match(r"^(?:licen[cs]e|copying)(?:[._-]|$)", path.name.lower()) is not None and (len(path.parts) == 1 or len(path.parts) == 2 and path.parts[0].lower() in {"license", "licenses", "licence", "licences"})
 
 
-def verified_module_graph(root, dependencies=None):
+def verified_module_graph(root, dependencies=None, *, linkers=None):
     env = child_environment()
+    linker_directories = (linkers["directories"] if linkers is not None else
+                          {module: root / relative for module, relative in
+                           native_linkers.replacements(native_gpu.sdk_candidate(root)).items()})
     # Listing the module graph alone leaves Dir absent for cold-cache modules.
     # Materialize and verify every external source before collecting declarations.
     # Work on copied graph files: Go downloads may add sums even in readonly mode.
@@ -186,6 +190,7 @@ def verified_module_graph(root, dependencies=None):
         module_path = json.loads((root / "release/version.json").read_text())["module"]
         owned = dependencies if dependencies is not None else {name: root / "drivers/cogent/build" / name for name in ("upstream", "typesetting")}
         replacements = {module_path: root.resolve(), "cogentcore.org/core": owned["upstream"].resolve(), "github.com/go-text/typesetting": owned["typesetting"].resolve()}
+        replacements.update(linker_directories)
         run_child(["go", "mod", "edit", *["-replace=" + name + "=" + str(path) for name, path in replacements.items()]], cwd=graph, env=env, check=True, timeout=COMMAND_TIMEOUT_SECONDS)
         run_child(["go", "mod", "download", "all"], cwd=graph, env=env, check=True, timeout=COMMAND_TIMEOUT_SECONDS)
         run_child(["go", "mod", "verify"], cwd=graph, env=env, check=True, stdout=subprocess.PIPE, timeout=COMMAND_TIMEOUT_SECONDS)
@@ -193,14 +198,22 @@ def verified_module_graph(root, dependencies=None):
     return decode_objects(raw)
 
 
-def license_inventory(root, dependencies=None, modules=None, *, copy_notices=True, max_notice_bytes=None):
-    modules = verified_module_graph(root, dependencies) if modules is None else modules
+def license_inventory(root, dependencies=None, modules=None, *, copy_notices=True, max_notice_bytes=None, linkers=None):
+    if linkers is None:
+        linkers = native_linkers.sdk_inventory(root, native_gpu.sdk_candidate(root))
+    if modules is None:
+        modules = (verified_module_graph(root, dependencies, linkers=linkers) if linkers is not None
+                   else verified_module_graph(root, dependencies))
     pinned_file = root / "drivers/cogent/native/dependencies.json"
     pinned = {item["module"]: item for item in json.loads(pinned_file.read_text())["dependencies"]} if pinned_file.is_file() else {}
     inventory = []
     notices = {}
     for module in sorted(modules, key=lambda item: item["Path"]):
         if module.get("Main") or module["Path"] == json.loads((root / "release/version.json").read_text())["module"]:
+            continue
+        owned = native_linkers.inventory_item(root, module, linkers, copy_notices=copy_notices, max_notice_bytes=max_notice_bytes)
+        if owned is not None:
+            inventory.append(owned)
             continue
         effective = module.get("Replace", module)
         directory = Path(effective["Dir"]) if "Dir" in effective else None
@@ -233,6 +246,8 @@ def license_inventory(root, dependencies=None, modules=None, *, copy_notices=Tru
         version = source_pin["version"] if source_pin else effective.get("Version", module.get("Version"))
         source_sum = source_pin["sum"] if source_pin else effective.get("Sum", module.get("Sum"))
         inventory.append({"module": module["Path"], "version": version, "sum": source_sum, "license_files": copies, "module_license_files": own_licenses, "status": ("declared-files-copied" if copy_notices else "declared-file-identities") if own_licenses else "manual-review-required"})
+    if linkers is not None and {item["module"] for item in inventory if item["status"] == "owned-source-declaration"} != set(linkers["directories"]):
+        raise ValueError("inventory graph is missing an owned linker module")
     result = {"schema": 1, "scope": "Go module graph and declared license/notice files; not a legal approval or complete embedded native/Rust/font audit", "distribution_audit": "pending", "modules": inventory}
     if not copy_notices:
         result["notice_contents_included"] = False
@@ -285,7 +300,8 @@ def package(root, output, public=False, include_untracked=False, *, macos_gpu_li
     pending = None
     try:
         with public_dependencies(root) if public else nullcontext(None) as dependencies:
-            inventory, notices = license_inventory(root, dependencies)
+            with native_linkers.inventory_tree(gpu_record, gpu_files) as linkers:
+                inventory, notices = license_inventory(root, dependencies, linkers=linkers)
             if gpu_record is not None:
                 inventory["native_gpu_candidate"] = {"artifact_sha256": gpu_record["files"][native_gpu.LIBRARY],
                     "provenance_sha256": gpu_record["files"][native_gpu.PROVENANCE],
