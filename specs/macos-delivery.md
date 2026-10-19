@@ -90,6 +90,18 @@ and original-window closure pass. Callback totals are 8 list, 2 menu, 3 check/re
 and 1 outside action. This is controlled Go2/SDK786a CPU-scene routing. Remaining
 catalogue, full M2/M5, physical/human input and M3–M7 stay open; no SDK refresh.
 
+The [current catalogue and contract audit](../docs/reports/macos-current-catalogue/README.md)
+qualifies all five current native records: 255 routed inputs and 169 observations.
+The assertion audit covers 36 catalogue rows, 29 requirement groups and 205 exact
+executed test functions. M2 remains open for three explicit dedicated Cocoa
+methods: the eight-stage tab-close, twelve-stage Breadcrumb and eight-step
+ColorPicker selector records. Their fixtures pass current builds/software checks
+and internal source review, but have not run natively on this candidate. The
+owner is online, so foreground testing is deferred. Reconcile the current source
+baseline before preparing their exact launch plan. No old scope is replayed.
+After M2, resume the materially different measured M3 rendering/publication work;
+M4–M7, physical/human qualification and final SDK acceptance remain open.
+
 ## Finish line
 
 Finish the Go-native framework on the local Mac: an independently consumable SDK
@@ -501,7 +513,7 @@ be budgeted in addition to implementation time.
 | Milestone | Current status | Next action / evidence needed |
 | --- | --- | --- |
 | M1 | Complete in source; incorporated in current private SDK | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); exact helper bytes are included in the [current SDK](../docs/reports/macos-sdk-stage0079/README.md). Full final artifact acceptance remains in M6. |
-| M2 | Partial; headless and native workspace records pass, native catalogue open | [Six frozen software records and catalogue map](../docs/reports/macos-workspace-acceptance/README.md), plus [both full native 10k/1M records](../docs/reports/macos-native-workspace/README.md), pass. [Structural50/42 passes](../docs/reports/macos-editor-publication/README.md), and [body/gutter typography restores all six original software workspace records](../docs/reports/macos-editor-gutter-font/README.md). Native text/modal68/33 remains open after the sealed21/3 occlusion failure; finish it, then audit M2 against the current candidate. |
+| M2 | Partial; current workspace, text and five catalogue records pass; three Cocoa methods open | [Current workflow](../docs/reports/macos-current-workflows/README.md) qualifies native workspace 432/54 and text 68/33. [Current catalogue/audit](../docs/reports/macos-current-catalogue/README.md) qualifies five records 255/169 and maps actual assertions for 205 executed tests. Dedicated tab-close, Breadcrumb and ColorPicker Cocoa-selector methods remain unqualified; renew and review those before M2 closure. Physical/human workflows remain M5. |
 | M3 | Failing / incomplete; current table matrix measured | [Current Go table matrix](../docs/reports/macos-grid-current/README.md): 7/40 run-p95s meet 4 ms, 33 fail; all 40 p99s meet 6 ms. Only fixed-height million-row GPU meets both targets in all five runs (median run-p95 3.840415 ms). Eight separate final-scene diagnostics and exact 10k/1M geometry pass, with the original validator failure/recovery preserved. The [render-local style experiment](../docs/reports/macos-grid-paint/README.md) reduces allocation but fails the frozen latency bar (CPU/GPU median p95 gains 0.058/0.150 ms; CPU 3/5 improved pairs and worse median p99). It stays private and is rejected; no further style/cache tuning or conditional matrix is run. Next close the remaining native M2 catalogue coverage, then select a materially different measured M3 implementation. The [earlier table matrix](../docs/reports/macos-grid-matrix/README.md) and rejected culling/row-fragment/resolved-shape experiments remain historical. The [tree/local-layout prototype](../docs/reports/macos-tree-local-layout/README.md) remains rejected (0/5 improved pairs each CPU/GPU); no further local-tree/cache tuning is adopted. Full tree/general UI, remaining performance and M4–M7 gates stay open. |
 | M4 | Partial; current SDK preflight and sampled idle CPU pass | [Two composed cycles/66 native checks and four eligible 60-second CPU intervals](../docs/reports/macos-sdk-lifecycle-stage0079/README.md) pass with owned process-group absence and framework-tracked retirement. Extra admissions remain unattributed; one hidden Cocoa window remains unclassified, so native deallocation/leak closure stays open. Original sandbox harness failure is preserved. OS wakeups/presentation, full memory/resource accounting, ten-minute activity, 1,000-cycle and overnight gates remain open. |
 | M5 | Partial; live checks authorized while owner is away | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |

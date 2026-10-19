@@ -63,6 +63,21 @@ The portable root package tests retain the detailed validation contracts in
 
 ## Remaining Mac acceptance
 
+The [current catalogue and assertion audit](../docs/reports/macos-current-catalogue/README.md)
+renews all five native Go FIFO records on `1338b11`/stage87: 255 inputs and
+169 observations, independently reviewed. The audit covers 36 rows, 29 requirement
+groups and 205 exact executed test functions, with source assertion predicates
+and raw PASS locations retained. Three explicit M2 methods remain open: attached
+Cocoa-selector tab closing (eight stages), Breadcrumb (twelve stages) and
+ColorPicker (eight steps, seven edits and one invalid proposal). The current
+Go FIFO records do not replace those dedicated methods. Their existing fixtures
+are built and source-reviewed, with no new native launch while the owner is
+online. M2 remains partial; physical/human and M3–M7 requirements remain open.
+
+The older entries below retain their original source/configuration and failure
+identities. They are historical checkpoints, not outstanding copies of already
+qualified current records.
+
 The map supplies a named automated scenario for every catalogue entry. The
 [full native workspace checkpoint](../docs/reports/macos-native-workspace/README.md)
 now passes all 216 operations and 27 captures at both 10k/1M rows. It covers the
