@@ -176,6 +176,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 				m.status = fmt.Sprintf("Selected: %s • zoom %.0f%%", e.SelectedID, e.Number*100)
 				update()
 			}},
+			m.layersPanel(ref, update, invoke),
 			{ID: "canvas-edit-events", Kind: ui.Extension, Custom: m.canvasEditor},
 		}},
 		{ID: "status", Kind: ui.StatusBar, Children: []ui.Node{{ID: "message", Kind: ui.Label, Text: fmt.Sprintf("%s • %d objects • %d selected • Undo %d / Redo %d", m.status, len(m.scene.Objects), len(selection), m.journal.Snapshot().UndoCount, m.journal.Snapshot().RedoCount)}}},

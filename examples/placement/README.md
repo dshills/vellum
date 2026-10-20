@@ -4,6 +4,19 @@ An independent public Go SDK consumer demonstrating a reusable typed tool palett
 and a managed `ui.Canvas2D`. Block, Connector and Note use the same validation,
 command registry and bounded history path for pointer and keyboard placement.
 
+The right-hand **Layers** panel lists components front first. Group selectors
+appear before each group's frontmost member; component rows retain the exact
+paint order even when flat group members are interleaved. Click a component or
+group selector to select its whole group. **Add selection** makes clicks toggle
+components/groups in the current selection; **Clear** deselects everything.
+Checkmarks/highlights follow canvas selection and Undo/Redo. Selection is transient
+and does not add history or dirty the drawing. **Forward / Backward** in the panel
+use the same one-layer commands as the toolbar; absolute Front/Back actions remain
+in the toolbar. Reorders are one Undo/Redo entry and persist through Save/Open.
+The list scrolls independently of the canvas and supports keyboard button focus.
+There is no row dragging or nested layer tree; group selectors are membership
+markers, not synthetic paint layers.
+
 Use **Bring to front** or **Send to back** to place selected components and
 whole selected groups above or below every unselected component. Each action
 preserves relative paint order within the selection and within the remaining

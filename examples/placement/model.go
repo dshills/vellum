@@ -42,6 +42,7 @@ type model struct {
 	clipboardJob              *clipboardOperation
 	pasteText                 string
 	pasteCount                uint64
+	layerAdd                  bool
 }
 
 func componentByKind(kind string) (component, bool) {
