@@ -4,7 +4,9 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"errors"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/ui"
 	"testing"
@@ -22,17 +24,27 @@ func TestFailureContextSeparatesDomainRetirementAndUnknownWindow(t *testing.T) {
 			t.Fatal(e)
 		}
 	}
+	activeRef, e := a.WindowRef("active")
+	if e != nil || activeRef.Context().Err() != nil {
+		t.Fatal("capture live opening", e)
+	}
 	before := observeNativeActionFailure(a, "active")
 	if before.ApplicationCanceled || !before.DomainWindowPresent || before.WindowCanceled || before.WindowContextError != "" {
 		t.Fatal(before)
 	}
 	var policyError error
-	if e = a.Do(func() { policyError = a.RequestCloseWindow(currentFixtureRef(a, "active")) }); e != nil || policyError != nil {
+	if e = a.Do(func() { policyError = a.RequestCloseWindow(activeRef) }); e != nil || policyError != nil {
 		t.Fatal(e, policyError)
 	}
 	after := observeNativeActionFailure(a, "active")
-	if after.ApplicationCanceled || after.DomainWindowPresent || !after.WindowCanceled || after.WindowContextError != "" {
+	if after.ApplicationCanceled || after.DomainWindowPresent || after.WindowCanceled || after.WindowContextError == "" {
 		t.Fatal(after)
+	}
+	if !errors.Is(activeRef.Context().Err(), context.Canceled) {
+		t.Fatal("captured opening did not cancel", activeRef.Context().Err())
+	}
+	if _, err := a.WindowContext("active"); !errors.Is(err, app.ErrWindowClosed) {
+		t.Fatal("retired name lookup must refuse", err)
 	}
 	var event map[string]any
 	if e = json.Unmarshal(log.Bytes(), &event); e != nil || event["window"] != "active" || event["policy_accepts"] != true || event["trigger_actor_known"] != false {

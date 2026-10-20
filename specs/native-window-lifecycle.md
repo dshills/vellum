@@ -44,6 +44,13 @@ component mix, 1,000-control baseline, continuous workload latency, overnight
 soak, native heap or physical GPU memory. Caller-held objects remain separate
 retention costs.
 
+The diagnostic must capture the live `WindowRef` before requesting closure.
+After retirement its captured context is canceled, while a fresh name-based
+`WindowContext` lookup returns `app.ErrWindowClosed`. A failed lookup has no
+context whose cancellation can be asserted. Test these independently, including
+the diagnostic's absent-domain and lookup-error fields; do not retain retired
+names solely to satisfy a fixture. See the [fixture contract correction](../docs/reports/macos-window-retirement-fixture/README.md).
+
 ## Sampled Cocoa window metadata
 
 Opt-in `vellum_native_checks` snapshots include `IdentityAvailable`,

@@ -1,0 +1,5 @@
+# Window retirement fixture contract
+
+The window-cycle diagnostic now tests the current bounded window registry contract. It captures a live WindowRef before closing that exact opening, verifies its context is canceled, and verifies a later name-based WindowContext lookup returns app.ErrWindowClosed. The diagnostic correctly records the retired domain as absent with a lookup error, without inventing a canceled context for a lookup that failed. Runtime behavior and public APIs are unchanged.
+
+The stale assertion was found during the source103 short resource-preflight prerequisites. That first full fixture run remains failed. A test-only external overlay then passed all 49 tagged fixture race tests, alongside settings tests, vet and the unchanged native build. The short native resource campaign was held unexecuted; its eventual run requires a fresh source-bound SDK and prerequisites after this correction and the driver checkpoint are committed. This test correction does not qualify native window deallocation, physical input, resources, or Mac completion.
