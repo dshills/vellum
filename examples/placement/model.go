@@ -30,6 +30,7 @@ type model struct {
 	pending                   *placement.Request[component]
 	next                      uint64
 	snap, locked, rejectNotes bool
+	resizeMode                bool
 	status                    string
 	files                     *document.Session[drawingFile]
 	prompt                    string
@@ -105,6 +106,18 @@ func newModel() (*model, error) {
 			}
 			return m.nudge(edit.dx, edit.dy)
 		}}); err != nil {
+			return nil, err
+		}
+	}
+
+	for _, resize := range []struct {
+		id, label string
+		dw, dh    float64
+	}{
+		{"width-less", "Width −", -1, 0}, {"width-more", "Width +", 1, 0},
+		{"height-less", "Height −", 0, -1}, {"height-more", "Height +", 0, 1},
+	} {
+		if err := m.commands.Register(command.Command{ID: resize.id, Label: resize.label, Available: m.editAvailable, Execute: func(context.Context) error { return m.resizeSelected(resize.dw, resize.dh) }}); err != nil {
 			return nil, err
 		}
 	}

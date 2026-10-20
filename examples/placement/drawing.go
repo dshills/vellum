@@ -16,7 +16,8 @@ import (
 
 const drawingByteLimit = 256 << 10
 
-// Version 1 stores the example's fixed component types, not toolkit internals.
+// Version 2 adds bounded component dimensions. Version 1 remains readable
+// with its original type dimensions; saved drawings always use version 2.
 // Viewport dimensions belong to the receiving window and are never restored.
 type drawingFile struct {
 	Format   string          `json:"format"`
@@ -29,15 +30,17 @@ type drawingFile struct {
 	NextID   uint64          `json:"next_id"`
 }
 type drawingObject struct {
-	ID   string  `json:"id"`
-	Kind string  `json:"kind"`
-	X    float64 `json:"x"`
-	Y    float64 `json:"y"`
+	ID     string  `json:"id"`
+	Kind   string  `json:"kind"`
+	X      float64 `json:"x"`
+	Y      float64 `json:"y"`
+	Width  float64 `json:"width,omitempty"`
+	Height float64 `json:"height,omitempty"`
 }
 
 func (f drawingFile) scene() (*canvas.Scene, error) {
 	finite := func(v float64) bool { return !math.IsNaN(v) && !math.IsInf(v, 0) }
-	if f.Format != "vellum-placement" || f.Version != 1 || len(f.Objects) > 512 || !finite(f.Zoom) || f.Zoom < .01 || f.Zoom > 100 || !finite(f.Center.X) || !finite(f.Center.Y) || math.Abs(f.Center.X) > 1e12 || math.Abs(f.Center.Y) > 1e12 {
+	if f.Format != "vellum-placement" || (f.Version != 1 && f.Version != 2) || len(f.Objects) > 512 || !finite(f.Zoom) || f.Zoom < .01 || f.Zoom > 100 || !finite(f.Center.X) || !finite(f.Center.Y) || math.Abs(f.Center.X) > 1e12 || math.Abs(f.Center.Y) > 1e12 {
 		return nil, errors.New("invalid or unsupported Vellum drawing")
 	}
 	objects := make([]canvas.Rect, 0, len(f.Objects))
@@ -48,7 +51,17 @@ func (f drawingFile) scene() (*canvas.Scene, error) {
 		if !ok || !split || kind != o.Kind || err != nil || n == 0 || n > f.NextID || strconv.FormatUint(n, 10) != suffix || !finite(o.X) || !finite(o.Y) || math.Abs(o.X) > 10000 || math.Abs(o.Y) > 10000 {
 			return nil, fmt.Errorf("invalid drawing component %q", o.ID)
 		}
-		objects = append(objects, canvas.Rect{ID: o.ID, X: o.X, Y: o.Y, Width: c.Width, Height: c.Height, Color: c.Color})
+		width, height := o.Width, o.Height
+		if f.Version == 1 {
+			if width != 0 || height != 0 {
+				return nil, errors.New("version 1 drawing cannot contain dimensions")
+			}
+			width, height = c.Width, c.Height
+		}
+		if !validSize(width, height) {
+			return nil, fmt.Errorf("invalid dimensions for %q", o.ID)
+		}
+		objects = append(objects, canvas.Rect{ID: o.ID, X: o.X, Y: o.Y, Width: width, Height: height, Color: c.Color})
 	}
 	scene, err := canvas.New(objects)
 	if err != nil {
@@ -67,10 +80,10 @@ func drawingCodec(m *model) document.Codec[drawingFile] {
 			if m.palette.State().Active || m.pending != nil || m.move != nil {
 				return drawingFile{}, errors.New("finish or cancel the drag before saving")
 			}
-			f := drawingFile{Format: "vellum-placement", Version: 1, Objects: make([]drawingObject, 0, len(m.scene.Objects)), Center: m.scene.View.Center, Zoom: m.scene.View.Zoom, Selected: m.scene.Selected, Snap: m.snap, NextID: m.next}
+			f := drawingFile{Format: "vellum-placement", Version: 2, Objects: make([]drawingObject, 0, len(m.scene.Objects)), Center: m.scene.View.Center, Zoom: m.scene.View.Zoom, Selected: m.scene.Selected, Snap: m.snap, NextID: m.next}
 			for _, o := range m.scene.Objects {
 				kind, _, _ := strings.Cut(o.ID, "-")
-				f.Objects = append(f.Objects, drawingObject{ID: o.ID, Kind: kind, X: o.X, Y: o.Y})
+				f.Objects = append(f.Objects, drawingObject{ID: o.ID, Kind: kind, X: o.X, Y: o.Y, Width: o.Width, Height: o.Height})
 			}
 			_, err := f.scene()
 			return f, err

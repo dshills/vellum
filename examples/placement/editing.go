@@ -20,6 +20,7 @@ type objectMove struct {
 	start, grab     canvas.Point
 	geometry        placement.Geometry
 	dragging, valid bool
+	resize          bool
 }
 
 func (m *model) editAvailable() error {
@@ -117,7 +118,7 @@ func (m *model) beginMove(g placement.Geometry, p canvas.Point) *objectMove {
 	}
 	m.scene.Selected = id
 	m.scene.View = g.View
-	s := &objectMove{id: id, before: slices.Clone(m.scene.Objects), start: p, grab: world, geometry: g, valid: true}
+	s := &objectMove{id: id, before: slices.Clone(m.scene.Objects), start: p, grab: world, geometry: g, valid: true, resize: m.resizeMode}
 	m.move = s
 	return s
 }
@@ -142,6 +143,12 @@ func (m *model) previewMove(s *objectMove, p canvas.Point) {
 		if after[i].ID != s.id {
 			continue
 		}
+		if s.resize {
+			after[i].Width, after[i].Height = resizedDimensions(after[i], dx, dy, m.snap)
+			m.scene.Objects = after
+			m.status = fmt.Sprintf("Resizing %s to %.0f × %.0f • Escape cancels", s.id, after[i].Width, after[i].Height)
+			return
+		}
 		x, y := after[i].X+dx, after[i].Y+dy
 		if m.snap {
 			x = math.Round(x/20) * 20
@@ -164,7 +171,7 @@ func (m *model) cancelMove(s *objectMove) {
 	m.scene.Objects = slices.Clone(s.before)
 	m.scene.Selected = s.id
 	m.move = nil
-	m.status = "Move canceled"
+	m.status = s.operation() + " canceled"
 }
 func (m *model) finishMove(s *objectMove, p canvas.Point) error {
 	if m.move != s {
@@ -181,10 +188,10 @@ func (m *model) finishMove(s *objectMove, p canvas.Point) error {
 	if !s.dragging || slices.Equal(after, s.before) {
 		return nil
 	}
-	if err := m.applyObjects("Move "+s.id, after, s.id); err != nil {
+	if err := m.applyObjects(s.operation()+" "+s.id, after, s.id); err != nil {
 		return err
 	}
-	m.status = "Moved " + s.id
+	m.status = s.operation() + " completed: " + s.id
 	return nil
 }
 
@@ -203,4 +210,54 @@ func (m *model) updateMoveGeometry(s *objectMove, g placement.Geometry) bool {
 	s.geometry = g
 	m.scene.View = g.View
 	return true
+}
+
+func (s *objectMove) operation() string {
+	if s.resize {
+		return "Resize"
+	}
+	return "Move"
+}
+
+const minComponentSize, maxComponentSize = 8.0, 2000.0
+
+func validSize(width, height float64) bool {
+	return !math.IsNaN(width) && !math.IsNaN(height) && width >= minComponentSize && height >= minComponentSize && width <= maxComponentSize && height <= maxComponentSize
+}
+
+// Only changed axes snap; resizing width must not change a component's height.
+// Clamp to positive bounded sizes so crossing the anchor never flips an object.
+func resizedDimensions(before canvas.Rect, dx, dy float64, snap bool) (float64, float64) {
+	axis := func(size, delta float64) float64 {
+		if delta == 0 {
+			return size
+		}
+		size += delta
+		if snap {
+			size = math.Round(size/20) * 20
+		}
+		return math.Max(minComponentSize, math.Min(maxComponentSize, size))
+	}
+	return axis(before.Width, dx), axis(before.Height, dy)
+}
+
+func (m *model) resizeSelected(dw, dh float64) error {
+	if err := m.editAvailable(); err != nil {
+		return err
+	}
+	if math.IsNaN(dw) || math.IsNaN(dh) || math.IsInf(dw, 0) || math.IsInf(dh, 0) {
+		return errors.New("invalid resize delta")
+	}
+	step := 1.0
+	if m.snap {
+		step = 20
+	}
+	i := m.selectedIndex()
+	after := slices.Clone(m.scene.Objects)
+	after[i].Width, after[i].Height = resizedDimensions(after[i], dw*step, dh*step, m.snap)
+	if err := m.applyObjects("Resize "+after[i].ID, after, after[i].ID); err != nil {
+		return err
+	}
+	m.status = fmt.Sprintf("Resized %s to %.0f × %.0f", after[i].ID, after[i].Width, after[i].Height)
+	return nil
 }

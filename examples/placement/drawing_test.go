@@ -179,7 +179,7 @@ func TestInvalidDrawingRefusesWithoutChangingModel(t *testing.T) {
 			bad.Objects = append([]drawingObject(nil), original.Objects...)
 			switch name {
 			case "version":
-				bad.Version = 2
+				bad.Version = 3
 			case "kind":
 				bad.Objects[0].Kind = "foreign"
 			case "duplicate":
@@ -204,7 +204,7 @@ func TestInvalidDrawingRefusesWithoutChangingModel(t *testing.T) {
 			}
 		})
 	}
-	for _, data := range [][]byte{[]byte("not JSON"), append(append([]byte{}, encoded...), []byte("{}")...), bytes.Replace(encoded, []byte(`"version": 1`), []byte(`"unexpected": 1, "version": 1`), 1), []byte(strings.Repeat(" ", drawingByteLimit+1))} {
+	for _, data := range [][]byte{[]byte("not JSON"), append(append([]byte{}, encoded...), []byte("{}")...), bytes.Replace(encoded, []byte(`"version": 2`), []byte(`"unexpected": 1, "version": 2`), 1), []byte(strings.Repeat(" ", drawingByteLimit+1))} {
 		if _, err := drawingCodec(f.m).Decode(data); err == nil {
 			t.Fatal("malformed/oversize file accepted")
 		}
@@ -267,7 +267,7 @@ func TestCaptureIsDetachedAndFormatIsVersioned(t *testing.T) {
 		t.Fatal(err)
 	}
 	var raw map[string]any
-	if err = json.Unmarshal(data, &raw); err != nil || raw["format"] != "vellum-placement" || raw["version"] != float64(1) {
+	if err = json.Unmarshal(data, &raw); err != nil || raw["format"] != "vellum-placement" || raw["version"] != float64(2) {
 		t.Fatal(err, raw)
 	}
 	decoded, err := drawingCodec(f.m).Decode(data)

@@ -87,7 +87,16 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 	for _, object := range m.scene.Objects {
 		kind, _, _ := strings.Cut(object.ID, "-")
 		label := map[string]string{"block": "Block", "connector": "Connector", "note": "Note"}[kind]
-		objects = append(objects, ui.CanvasObject{ID: object.ID, Name: label + " " + object.ID, Help: "Select this component."})
+		objects = append(objects, ui.CanvasObject{ID: object.ID, Name: label + " " + object.ID, Help: fmt.Sprintf("Select this component; size %.0f by %.0f.", object.Width, object.Height)})
+	}
+	dimensions := "Select a component"
+	if i := m.selectedIndex(); i >= 0 {
+		o := m.scene.Objects[i]
+		dimensions = fmt.Sprintf("%s: %.0f × %.0f", o.ID, o.Width, o.Height)
+	}
+	help := "Drag tools to place • drag objects to move • empty canvas pans • wheel zooms • Delete removes • Undo/Redo"
+	if m.resizeMode {
+		help = "Resize mode: drag a component to resize • top-left stays fixed • Escape cancels • Undo/Redo"
 	}
 	root := ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{
 		{ID: "file-tools", Kind: ui.Toolbar, Children: []ui.Node{
@@ -113,7 +122,15 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 			{ID: "move-down", Kind: ui.Button, Text: "Down", Disabled: m.commands.Enabled("move-down") != nil, Activate: invoke("move-down")},
 			{ID: "delete", Kind: ui.Button, Text: "Delete selected", Disabled: m.commands.Enabled("delete") != nil, Activate: invoke("delete")},
 		}},
-		{ID: "help", Kind: ui.Label, Text: "Drag tools to place • drag objects to move • empty canvas pans • wheel zooms • Delete removes • Undo/Redo"},
+		{ID: "resize-tools", Kind: ui.Toolbar, Children: []ui.Node{
+			{ID: "resize-mode", Kind: ui.Checkbox, Text: "Resize mode", Disabled: navigatingDisabled, Checked: m.resizeMode, Change: func(e ui.ChangeEvent) { m.resizeMode = e.Checked; update() }, Accessibility: ui.Accessibility{Help: "When enabled, dragging a component changes its width and height, keeping its top-left corner fixed."}},
+			{ID: "width-less", Kind: ui.Button, Text: "Width −", Disabled: m.commands.Enabled("width-less") != nil, Activate: invoke("width-less")},
+			{ID: "width-more", Kind: ui.Button, Text: "Width +", Disabled: m.commands.Enabled("width-more") != nil, Activate: invoke("width-more")},
+			{ID: "height-less", Kind: ui.Button, Text: "Height −", Disabled: m.commands.Enabled("height-less") != nil, Activate: invoke("height-less")},
+			{ID: "height-more", Kind: ui.Button, Text: "Height +", Disabled: m.commands.Enabled("height-more") != nil, Activate: invoke("height-more")},
+			{ID: "dimensions", Kind: ui.Label, Text: dimensions},
+		}},
+		{ID: "help", Kind: ui.Label, Text: help},
 		{ID: "workspace", Kind: ui.Row, Grow: true, Children: []ui.Node{
 			{ID: "palette", Kind: ui.Column, MinWidth: 145, Children: tools},
 			{ID: "drawing", Kind: ui.Canvas2D, Disabled: busy, Canvas: m.scene, CanvasObjects: objects, CanvasGrid: grid, PlacementTarget: m.target, Grow: true, Accessibility: ui.Accessibility{Name: "Component canvas", Help: "Select a component, or use Option+Left/Right/Home/End on the canvas; drag an object to move; drag empty canvas or use plain arrow keys to pan; scroll to zoom."}, Change: func(e ui.ChangeEvent) {

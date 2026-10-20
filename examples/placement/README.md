@@ -39,9 +39,29 @@ Delete selected, Backspace, and forward Delete remove the selected object.
 Undo restores its exact ID and original paint order; Redo repeats the deletion.
 Move/Delete participate in the same saved/unsaved drawing history as placement.
 
+Enable **Resize mode**, then drag a component to change its width/height with
+its top-left corner fixed. The initial grab offset is retained through pan,
+zoom, display scale and canvas layout changes. Disable Resize mode to move
+components again. Empty-space drags always pan. A resize crosses the same
+six-logical-pixel threshold and uses the same cancellation/release-consumption
+path as moving: Escape, focus/capture loss, outside release, camera/display-scale
+change or Close restores the original dimensions without a history entry.
+Each valid completed resize makes one Undo entry, preserving ID, position,
+selection and paint order. Width/Height −/+ buttons use the same command/history
+path and are keyboard accessible through Tab/Return. With snapping enabled,
+changed dimensions round to the 20-unit grid; with it off, buttons change one
+unit. Unchanged axes retain their original size. Sizes clamp to 8–2000 units;
+objects never flip when the pointer crosses the fixed corner. The selected size
+is displayed beside the buttons. This app uses a mode rather than corner handles.
+
+Saved drawings now use version 2, which preserves component dimensions. Existing
+version-1 drawings open at their original type dimensions and are upgraded on
+Save. Older builds cannot open version-2 drawings. Invalid/missing dimensions
+in version 2 are rejected before replacing the drawing.
+
 Use **Save** (Cmd+S), **Save As…** (Cmd+Shift+S) and **Open…** (Cmd+O) to
 persist drawings through native file choosers. `.vellum` files contain bounded,
-versioned JSON for component types, stable IDs and positions, selection,
+versioned JSON for component types, stable IDs, positions and dimensions, selection,
 pan/zoom, snapping and the next object ID. Window dimensions and Undo history
 are not saved. Opening validates the entire file before replacing the drawing,
 clears the previous document's history, and preserves the current canvas size.
