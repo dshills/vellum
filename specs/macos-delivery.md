@@ -9,19 +9,75 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
-## Current status — source 70bf391 (20 October 2026 UTC)
+## Current startup quit checkpoint — source 344447c and reviewed overlay
+
+The [startup quit checkpoint](../docs/reports/macos-pre-show-quit-checkpoint/README.md)
+separates the verified source-104 SDK from the later tested quit correction. The
+verified SDK uses clean source `344447c639d3b92fbd8100c391aa76606a0d4ce4`, Go 1.25.6,
+and archive SHA256
+`fdb4e141a11f6a745d4a2cee7e8c26ff9236d4538b8c84b08b2552f7bf11ca15`.
+Its 8,312 retained files include the manifest. Genuine packaging, relocation and
+complete source/prepared/SDK association checks pass; this does not qualify native
+startup, performance or final delivery.
+
+The first source-104 serial-grid performance case fails its 330.044-second
+watchdog. It emits setup output and an empty journal, with no accepted latency or
+cadence result; the other three cases are unrun. This does not establish whether
+any startup rendering occurred. The failed scope and raw evidence remain sealed.
+
+The quit correction retains terminal failure/cancellation before Show and waits
+for safe construction completion before asynchronous shutdown. A genuine native
+same-consumer comparison uses the retained SDK with separate Go overlays. With
+the correction, a real first-Prepare CPU batch before Show exceeds its 100 ms
+deadline through one 250 ms application operation; `Driver.Run` returns the typed
+deadline failure; the consumer joins its worker and observes normal close. The actual old-driver
+counterfactual reaches the same active pre-Show credit but exits through its
+ten-second hard watchdog, without normal cleanup proof. This verifies the narrow
+quit correction; it does not identify the original performance hang's trigger or
+simulate a missing native presentation callback.
+
+The ordinary-close and requested after-Show deadline cases both remain failed:
+Core104 refuses them with `drawable was not presented` before the deliberate
+after-Show work runs. Their Run/worker/close cleanup observations do not turn them
+into passing cases. The callback branch combines zero and nonfinite values; the
+exact value was not recorded. Acknowledged-skip policy remains separate work.
+Complete cleanup censuses retain hidden unclassified Cocoa windows; tracked
+retirement and process-group absence do not prove native deallocation.
+
+The actual recursive race suite passes 782 methods: 649 in the driver root package
+(the accepted 639 plus ten new quit regressions) and 133 in commands/internal
+packages, with no failed or skipped methods. The original controller remains
+failed because it compared the entire recursive stream with the root-only 649
+expectation. A separately reviewed continuation completes only the seven unrun
+vet/graph/build/metadata phases; the race suite is not rerun. These are tested
+source overlays, not a packaged final SDK containing the quit correction. No
+future commit identity or refreshed-SDK result is claimed here.
+
+The last accepted measured comparison remains source 70 below, whose serial
+input-to-presentation p95 values miss 33.3 ms. The 60 Hz responsiveness and 33.3 ms
+latency gates are unchanged; 4 ms remains an optimization target. M3–M7 remain
+open, including the full measured matrix/workflows, resource/endurance,
+physical/human checks and final SDK/application acceptance.
+
+The next deliverable is a frozen private Mac alpha with a source-bound SDK,
+runnable examples and explicit remaining limits. Finish the demonstrated startup
+and presentation correctness issues, renew the required candidate checks and
+complete final delivery evidence before claiming the Mac framework complete.
+Feature expansion and a promised completion date are outside this finish scope.
+
+## Last measured comparison — source 70bf391 (20 October 2026 UTC)
 
 See the [current native
 checkpoint](../docs/reports/macos-current-native-status/README.md) for exact source/SDK
 binding, raw evidence and limits.
 
-The latest source-bound native checks use clean
+These source-70-bound native checks use clean
 `70bf39175903f0bc8408e358d58781efdfa5032c`, Go 1.25.6, and the private SDK whose archive
 SHA256 is `fa6e9134404f445bf7334391c18eb755d08d89c0a374ec031caa828cf0d2bb4f`. Its 8,293
 retained files include the manifest; complete source/prepared/SDK association and
-relocation checks pass. The native archive remains `786aaad8…`. These results supersede
-the previous source 103 summary for current status; earlier records retain their
-original outcomes.
+relocation checks pass. The native archive remains `786aaad8…`. This comparison follows
+the earlier source 103 comparison within its stated source/configuration scope;
+earlier records retain their original outcomes.
 
 The performance campaign **fails**. Serial grid CPU and tree GPU captures are valid,
 with input-to-presentation p95 of 48.030 and 48.204 ms, respectively, above the
@@ -39,7 +95,7 @@ finds overlapping acquired/unpresented drawables and CPU submission completion b
 display completion; a pacing correction requires implementation, review and new native
 evidence.
 
-Two short composed lifecycle scopes **pass** on the same SDK. Same-name replacement
+Two source-70 short composed lifecycle scopes **pass** on that SDK. Same-name replacement
 completes two cycles and 66 acknowledged native selector actions, with one sampled
 replacement. A separate 40-second visible/occluded/minimized/background scope records
 eight paired samples. Both owned native groups retire, with empty stderr and unchanged
@@ -298,8 +354,8 @@ full resource/endurance qualification and M7 closure.
 | Application/API | Public Go APIs, controls/themes, commands/tasks, documents/history, docking and independent windows | Complete composed workflow and lifecycle acceptance on a release candidate |
 | Data and canvas | Managed tables/trees, typed placement, retained drawing/images, compute/HDR and custom 3D | Frame targets, representative interaction, full resource accounting |
 | Mac integration | Cocoa input/accessibility, menus, clipboard, choosers, drops, tray and optional notifications | Human/native workflow coverage, scale/display changes, declared service support |
-| SDK | Source 103 private SDK: 8,292 verified files, clean-source/archive association, genuine relocated consumption and scoped native grid/tree captures | Final source-bound SDK/application native acceptance, component/font/asset/rights closure and distribution acceptance |
-| Performance/endurance | Actual native callbacks/clocks; source 103 paced grid/tree each retain 599/599 intervals within 18.333 ms; historical idle/cycle evidence remains scoped | Input latency remains42–44 ms against 33.3 ms; full representative matrix and current-source memory/idle/endurance acceptance remain |
+| SDK | Source 104 private SDK: 8,312 retained files including the manifest; genuine clean-source/archive association and relocation pass | Package the later reviewed quit correction; final SDK/application native acceptance, component/font/asset/rights closure and distribution acceptance remain |
+| Performance/endurance | Last accepted source-70 serial captures have input-to-presentation p95 48.030/48.204 ms; source-104 startup watchdog supplies no accepted timings; earlier cadence/idle/cycle results retain their scope | The unchanged 60 Hz/33.3 ms gates, full measured matrix/workflows and final-source resource/idle/endurance acceptance remain |
 
 The first automated desktop placement attempt expired without input. The second
 attempt also sent no pointer/key input: the private operator refused an unusable
@@ -637,11 +693,13 @@ implementation checkpoint; it is not rerun after each documentation edit.
 
 ## Forecast and closure ledger
 
-Source 103 now supplies actual native callback/clock/lifecycle evidence for four
-fixed grid/tree cases. Both paced cohorts meet the numeric cadence predicate;
-input-to-presentation latency still fails 33.3 ms. This does not replace the full
-repeated matrix or representative M3 workflows. Historical CPU-work misses remain
-optimization evidence under the owner-selected 60 Hz policy.
+The latest source-104 startup performance attempt fails without accepted timings.
+The reviewed quit overlay passes its controlled pre-Show failure/cleanup case,
+while ordinary and requested after-Show cases remain failed. The last accepted
+measured source-70 serial captures still miss 33.3 ms; earlier source-103 cadence
+passes retain their historical scope. None replaces the full repeated matrix or
+representative M3 workflows. Historical CPU-work misses remain optimization
+evidence under the owner-selected 60 Hz policy.
 
 M1 is complete in source and incorporated in the private SDK. M2's eleven-method
 controlled functional renewal on `93b4730` remains qualified for its stated scope;
@@ -651,12 +709,12 @@ Candidate evidence must retain exact source/configuration scope or justified reu
 
 | Milestone | Current status | Next action / evidence needed |
 | --- | --- | --- |
-| M1 | Complete in source; incorporated in the private SDK | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); current `70bf391` SDK association and relocation pass in the [Current checkpoint](../docs/reports/macos-current-native-status/README.md). Final artifact acceptance remains M6. |
+| M1 | Complete in source; incorporated in the private SDK | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); verified source-104 SDK association and relocation pass in the [Startup quit checkpoint](../docs/reports/macos-pre-show-quit-checkpoint/README.md). Final artifact acceptance remains M6. |
 | M2 | Complete for the previously qualified controlled functional scope | The [eleven-method renewal](../docs/reports/macos-m2-renewal/README.md) passed on source `93b4730`: three dedicated Cocoa records, six catalogue/text records 323/202 and two full workspace records 432/54. Full software replay 1296/162 and the 205-test contract audit supply the scenario map. This does not certify physical/human input, all native pixels/deallocation, presentation performance or the full Mac release. Affected candidate evidence requires exact scope or justified reuse. |
-| M3 | Open; latest native campaign fails | [Current checkpoint](../docs/reports/macos-current-native-status/README.md): valid serial grid/tree input-to-presentation p95 48.030/48.204 ms misses 33.3 ms. Paced grid fails strict post-receipt prefix accounting; fourth case unrun. No cache performance gain established. Source 103 cadence passes retain their earlier scope. Full repeated matrix and representative workflows remain required; 60 Hz/33.3 ms gates and 4 ms optimization target are unchanged. |
-| M4 | Partial; two current short scopes pass, full resource/endurance remains | [Current checkpoint](../docs/reports/macos-current-native-status/README.md): two same-name composed cycles/66 acknowledged native selector actions and a separate 40-second visibility soak/eight paired samples pass. Two groups retire. Each complete final census retains one hidden unclassified Cocoa window; no deallocation proof or eligible 60-second CPU interval. OS wakeups/presentation, native/GPU resources, ten-minute activity, 1,000 cycles and overnight remain open. |
+| M3 | Open; latest startup performance attempt fails without accepted timings | [Startup quit checkpoint](../docs/reports/macos-pre-show-quit-checkpoint/README.md): source-104 first-case watchdog fails; later three cases unrun. Last accepted [source-70 comparison](../docs/reports/macos-current-native-status/README.md) serial p95 48.030/48.204 ms misses 33.3 ms, with paced-grid prefix failure and fourth case unrun. No display-backpressure performance gain established. Full repeated matrix/workflows remain required; 60 Hz/33.3 ms gates and 4 ms optimization target are unchanged. |
+| M4 | Partial; two source-70 short scopes pass, full resource/endurance remains | [Current checkpoint](../docs/reports/macos-current-native-status/README.md): two same-name composed cycles/66 acknowledged native selector actions and a separate 40-second visibility soak/eight paired samples pass. Two groups retire. Each complete final census retains one hidden unclassified Cocoa window; no deallocation proof or eligible 60-second CPU interval. OS wakeups/presentation, native/GPU resources, ten-minute activity, 1,000 cycles and overnight remain open. |
 | M5 | Partial; physical and human acceptance remains | Native fixtures and automated routing evidence exist. Direct pointer/preview, cross-display, native text/IME and human accessibility workflows remain separately qualified requirements. |
-| M6 | Partial; current private SDK relocation/association pass | [Current checkpoint](../docs/reports/macos-current-native-status/README.md): clean `70bf391` SDK has 8,293 retained files including its manifest, with complete archive/source/prepared/extraction binding and relocated public-contract checks. Final SDK/app must include later accepted changes, complete component/native/font/asset and notice/rights closure, relocated native application acceptance and distribution prerequisites. No public publication/signing approval follows. |
+| M6 | Partial; verified source-104 private SDK relocation/association pass | [Startup quit checkpoint](../docs/reports/macos-pre-show-quit-checkpoint/README.md): clean `344447c` SDK has 8,312 retained files including its manifest, with complete archive/source/prepared/extraction binding and relocated public-contract checks. The tested quit overlay is not yet in that SDK. Final SDK/app must include accepted changes, complete component/native/font/asset and notice/rights closure, relocated native application acceptance and distribution prerequisites. No public publication/signing approval follows. |
 | M7 | Open | Requirement-by-requirement final audit after all preceding gates close. |
 
 The ledger changes only when the corresponding requirement is demonstrated.

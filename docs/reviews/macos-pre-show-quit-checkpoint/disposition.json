@@ -1,0 +1,152 @@
+{
+  "approved": true,
+  "commit_ready": true,
+  "packet_sha256": "c7081c2700056f188e5085e6c11c26a6499d41066e546cc9a6bbdc47be0c23ef",
+  "prism_sha256": "b446c17cbd086159bcc5a272dfb5560f71534b9cca95ed4e58c95e9b4acbc366",
+  "inputs": {
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-checkpoint/packet.json": "c7081c2700056f188e5085e6c11c26a6499d41066e546cc9a6bbdc47be0c23ef",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-checkpoint/prism.json": "b446c17cbd086159bcc5a272dfb5560f71534b9cca95ed4e58c95e9b4acbc366",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-checkpoint/internal-review.json": "780525857ecc81590c5c18c376a4769c854dd87b8956b14e951856b4a3b07dc6",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-checkpoint/independent-findings-disposition.json": "73cd371453d731bd0a515b6fca5c78d45c86b48e74510c677e0d43b6f0884697",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-checkpoint/prism-rules.json": "32ac8759509f10c979618eeeed036030e47774e67369db1709c2ccc07cca91e2"
+  },
+  "unresolved_findings": [],
+  "finding_dispositions": {
+    "retained:f5dda822e4ffb697": {
+      "status": "refuted",
+      "reason": "In supported Application.Run, quit follows committed failure/closing or a.ctx cancellation; App.Close serializes OpenWindow, cancels/clears registrations and rejects future ones. An opening concurrent with committed failure is covered by concurrent-close cancellation. Existing ctx check already prevents new construction during canceled direct-driver lifetime. No still-live supported opening is lost. Refusal is also specified and protocol-tested."
+    },
+    "retained:b90f97a619d4b405": {
+      "status": "refuted",
+      "reason": "Both paths acquire topology before request mutex. endBatch releases topology while holding request mutex; it does not acquire topology in reverse order. This publishes completion before another request can dispatch. Releasing request first would admit dispatch while topology remains held. Both owners are released before calling the selected callback. No blocking acquisition cycle exists."
+    }
+  },
+  "independent_review": {
+    "approved": true,
+    "review_kind": "INDEPENDENT_SOURCE_ADJUDICATION_OF_PRISM_FINDINGS",
+    "prism_sha256": "b446c17cbd086159bcc5a272dfb5560f71534b9cca95ed4e58c95e9b4acbc366",
+    "candidate_proposal_sha256": "86a75d129327f069bf8a102481d9335bb32e733523de1f7b2dfba36d9911ac0e",
+    "unresolved_findings": [],
+    "inputs": {
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-checkpoint/prism.json": "b446c17cbd086159bcc5a272dfb5560f71534b9cca95ed4e58c95e9b4acbc366",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-correction/proposal.json": "86a75d129327f069bf8a102481d9335bb32e733523de1f7b2dfba36d9911ac0e",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-correction/candidate/drivers/cogent/driver.go": "460d05daa2c43c2304435a4c6fe613036967f59e91453f3ea1412e864f4e0155",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-correction/candidate/drivers/cogent/native_quit.go": "b948f8b7343e5bfe1de486c92d07d45756dc2f048730d64f858bc3394bb27c1f",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-correction/candidate/drivers/cogent/native_quit_test.go": "f331dfd050433d634a5233c76e986cab75a66a89ff55614452310b42bc1c6de0",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-correction/candidate/specs/native-window-lifecycle.md": "e78d45f8caffffa1f807b31d64b9718aa7984a5522e151334c5af4294e206173",
+      "/Users/dshills/Development/projects/Vellum/app/app.go": "fd11228334b20bb25023bf48b20d63196e4a826bf7968c4523f9bd1c291122ec",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-checks-continuation/combined-actual-result-review.json": "13c5a1a80cfa474679baed6af056ce9992ace7b9a0ba17aa68a0875c1e4d82cc",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-native-continuation/actual-result-review.json": "d3bfced2e66a25d2582c2749539682f97b8af60277b7b674bd5b82e72de0ff8b"
+    },
+    "findings": [
+      {
+        "id": "f5dda822e4ffb697",
+        "disposition": "REFUTED_FOR_SUPPORTED_APPLICATION_LIFECYCLE",
+        "reason": "Refusing a new construction batch after terminal quit dispatch is intentional, specified and tested. There is no reachable supported still-live registration that requires new construction after dispatch. This is not a user-requested nonterminal window-close gate.",
+        "source_refs": [
+          {
+            "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-correction/candidate/drivers/cogent/driver.go",
+            "lines": "150-163",
+            "fact": "The only dispatch closure is asynchronous services.shutdown then Core QuitReq. First fail commits failure and calls Application.Close before its explicit quit request."
+          },
+          {
+            "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-correction/candidate/drivers/cogent/driver.go",
+            "lines": "350-360,414-416,529",
+            "fact": "Other requests are OnShow with ctx.Err/failure or context.AfterFunc on the Driver context; readiness does not itself request quit."
+          },
+          {
+            "path": "/Users/dshills/Development/projects/Vellum/app/app.go",
+            "lines": "427-445",
+            "fact": "Standard Application.Run installs external-context Close and passes a.ctx to Driver.Run, so external cancellation becomes application closure before Driver-context cancellation."
+          },
+          {
+            "path": "/Users/dshills/Development/projects/Vellum/app/app.go",
+            "lines": "107-140,394-425",
+            "fact": "OpenWindow and Close serialize on a.mu. Close marks closed, cancels application/window contexts, clears registrations and queued work; later OpenWindow returns ErrClosed. A previously accepted opening may be concurrently canceled, explicitly documented at109-110."
+          },
+          {
+            "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-correction/candidate/drivers/cogent/driver.go",
+            "lines": "284-303,426-473",
+            "fact": "Old topology already skips canceled context/lifetimes. Native close callback still performs its own cleanup; reconciliation after terminal quit is not the sole teardown path."
+          },
+          {
+            "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-correction/candidate/drivers/cogent/native_quit_test.go",
+            "lines": "145-173,175-208",
+            "fact": "Existing actual passing controls cover refusal after dispatch and admitting a subsequent construction before terminal dispatch."
+          },
+          {
+            "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-correction/candidate/specs/native-window-lifecycle.md",
+            "lines": "178-203",
+            "fact": "Spec explicitly states new construction is refused after quit dispatch."
+          }
+        ],
+        "concurrency_limit": "OnShow can observe the committed failure while fail is still closing a; a concurrent opening can succeed before Close obtains a.mu but is then canceled by that same terminal Close. No assertion that every observed request occurs only after Close returns is needed. Arbitrary direct Driver.Run lifecycle misuse is not a newly introduced guarantee."
+      },
+      {
+        "id": "b90f97a619d4b405",
+        "disposition": "REFUTED_NO_REVERSE_LOCK_ACQUISITION",
+        "reason": "beginBatch acquires topology then q.mu; endBatch is entered already owning topology and acquires q.mu in the same order. It releases topology while holding q.mu; Mutex.Unlock does not acquire topology or wait for its next owner, so this is not a reverse acquisition or lock cycle.",
+        "source_refs": [
+          {
+            "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-correction/candidate/drivers/cogent/native_quit.go",
+            "lines": "22-42,44-68",
+            "fact": "request/markReady acquire only q.mu and release it before invoking dispatch. beginBatch and endBatch acquire topology\u2192q. There is no q\u2192topology acquisition."
+          },
+          {
+            "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-correction/candidate/drivers/cogent/native_quit.go",
+            "lines": "57-68",
+            "fact": "Under both owners, endBatch publishes batch=false and sets dispatched when eligible, releases topology, then q.mu, then invokes dispatch outside both. A new batch can acquire topology but cannot inspect state until the q owner releases."
+          },
+          {
+            "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-pre-show-quit-correction/candidate/drivers/cogent/native_quit_test.go",
+            "lines": "175-230",
+            "fact": "Existing actual passing controls exercise batch handoff and dispatch outside both owners; reentry and racing exactly-once controls are also present."
+          }
+        ],
+        "suggested_fix_risk": "Releasing q.mu before topology.Unlock permits a concurrent request/markReady to see ready && !batch and invoke dispatch while topology remains owned. That violates the explicit outside-both-owners contract. Current release order closes that window without blocking while holding the q owner."
+      }
+    ],
+    "actual_evidence_scope": "Prior actual headless 782 results/ten new quit methods and native pre-show positive/old baseline watchdog are preserved and not rerun here. Ordinary and after-show native failures remain failures. No causal claim about original P104 refusal trigger, performance acceptance or callback-loss proof.",
+    "actions": "No source change or repeated provider review required for these two findings. Root disposition and commit remain separate.",
+    "executed_by_reviewer": {
+      "source_reads": true,
+      "hashes_and_artifact_write": true,
+      "tests": false,
+      "builds": false,
+      "native": false,
+      "provider": false,
+      "source_or_Git_mutation": false
+    }
+  },
+  "root_concurrence": "Root independently traced all production quit call sites, Application.Run/Close/OpenWindow and lock state transitions. Neither finding demonstrates a concrete defect; no code changes or test reruns warranted.",
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 71905,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 35553,
+        "output": 1039,
+        "costUSD": 0.081496
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "report_capture_boundary": "The report PENDING paragraph records packet-freeze status before this provider review/disposition and the subsequent source commits; this record supplies the completed review state. Final SDK/new command packaging and release gates remain pending.",
+  "reviewed_utc": "2026-10-20T11:32:45.360676+00:00"
+}

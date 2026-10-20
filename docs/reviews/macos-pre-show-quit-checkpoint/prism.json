@@ -1,0 +1,119 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "c54f2663c959438e8976f1892c6128e2",
+  "repo": {
+    "root": "/private/tmp/vellum-pre-show-quit-checkpoint-review",
+    "head": "740bf3aa0c594fc3f2e4fb0bdf0bd3e6049cc228",
+    "branch": "codex/pre-show-quit-review"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "f5dda822e4ffb697",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Refused construction after quit is silently dropped",
+      "message": "After quit has been dispatched, beginBatch returns false and syncTopology silently returns. Any topology change (a new window request, or a close) is dropped without error. Callers receive no signal that construction was refused, so windows posted around quit can be silently lost.",
+      "suggestion": "Surface the refusal, for example by closing or failing the pending window requests, or document and test that dropping them is intended.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 241,
+            "end": 61
+          }
+        }
+      ],
+      "tags": [
+        "error-handling"
+      ],
+      "evidence": "if !quitRequest.beginBatch(\u0026topologyMu) {\n\t\t\treturn\n\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "b90f97a619d4b405",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Inconsistent lock ordering between topology and request mutex",
+      "message": "beginBatch acquires topology then q.mu, while endBatch holds q.mu and then unlocks topology. The lock order is inconsistent, and the topology mutex is released while q.mu is held. It currently works only because Unlock does not block. The pattern is fragile, and the stated ordering (unlock topology before any new batch begins) is not the actual semantic.",
+      "suggestion": "Release q.mu before topology.Unlock, and dispatch after both. Ensure no state transition is needed between the two releases, or document the lock order explicitly.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/native_quit.go",
+          "lines": {
+            "start": 57,
+            "end": 65
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "locking",
+        "location-corrected"
+      ],
+      "evidence": "func (q *nativeQuitRequest) endBatch(topology *sync.Mutex, nativeReady bool) {\n\tq.mu.Lock()\n\tq.ready = q.ready || nativeReady\n\tq.batch = false\n\trun := q.takeLocked()\n\t// Publish completion and unlock topology before another request can dispatch\n\t// or another construction batch can begin. Neither action loses a wake.\n\ttopology.Unlock()\n\tq.mu.Unlock()",
+      "fix": {
+        "before": "func (q *nativeQuitRequest) endBatch(topology *sync.Mutex, nativeReady bool) {\n\tq.mu.Lock()\n\tq.ready = q.ready || nativeReady\n\tq.batch = false\n\trun := q.takeLocked()\n\t// Publish completion and unlock topology before another request can dispatch\n\t// or another construction batch can begin. Neither action loses a wake.\n\ttopology.Unlock()\n\tq.mu.Unlock()",
+        "after": "func (q *nativeQuitRequest) endBatch(topology *sync.Mutex, nativeReady bool) {\n\tq.mu.Lock()\n\tq.ready = q.ready || nativeReady\n\tq.batch = false\n\trun := q.takeLocked()\n\tq.mu.Unlock()\n\ttopology.Unlock()"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 9876,
+    "totalMs": 9939
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 71905,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 35553,
+        "output": 1039,
+        "costUSD": 0.081496
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
