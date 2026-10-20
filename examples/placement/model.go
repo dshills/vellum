@@ -43,6 +43,8 @@ type model struct {
 	pasteText                 string
 	pasteCount                uint64
 	layerAdd                  bool
+	layerDrag                 *layerDrag
+	layerEditor               *layerEditor
 }
 
 func componentByKind(kind string) (component, bool) {

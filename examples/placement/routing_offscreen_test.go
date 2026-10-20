@@ -288,7 +288,7 @@ func TestPublicPaletteCanvasConsumer(t *testing.T) {
 func managedTestView(n ui.Node) ui.Node {
 	children := n.Children[:0]
 	for _, child := range n.Children {
-		if child.ID != "canvas-edit-events" {
+		if child.ID != "canvas-edit-events" && child.ID != "layers-drag-events" {
 			children = append(children, managedTestView(child))
 		}
 	}

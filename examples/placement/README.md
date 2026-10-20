@@ -14,8 +14,23 @@ and does not add history or dirty the drawing. **Forward / Backward** in the pan
 use the same one-layer commands as the toolbar; absolute Front/Back actions remain
 in the toolbar. Reorders are one Undo/Redo entry and persist through Save/Open.
 The list scrolls independently of the canvas and supports keyboard button focus.
-There is no row dragging or nested layer tree; group selectors are membership
-markers, not synthetic paint layers.
+Group selectors are membership markers, not synthetic paint layers; there is no
+nested layer tree.
+
+Drag a component row or group selector past the 6-point movement threshold to
+reorder. Dragging a selected row moves the complete current selection; an unselected
+row moves its component/whole group. The upper/lower half of a visible target row
+means above/below it in this front-first list. A blue insertion line
+identifies the proposed position; release commits exactly one history entry. A group
+selector targets its outer group boundary; a member row targets that component.
+Dropping below a group selector requires its last member row to be fully visible;
+for longer groups, scroll before starting and drop on the visible last member.
+A no-op adds no history. Short clicks keep normal selection/Add behavior. Escape,
+outside/invalid/self release, focus/capture loss, changed panel geometry or display
+scale, removed rows and window closure cancel without reordering or changing
+selection. The final release is consumed. Scrolling/autoscroll during a drag and
+cross-window dragging are not supported; scroll before starting. Existing reorder
+buttons remain the keyboard path to the same bounded document history.
 
 Use **Bring to front** or **Send to back** to place selected components and
 whole selected groups above or below every unselected component. Each action

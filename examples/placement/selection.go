@@ -37,6 +37,7 @@ func (m *model) selectedIDs() []string {
 // Managed callbacks represent explicit single-selection actions. Navigation is
 // routed separately by the app adapter so reselecting the primary also collapses.
 func (m *model) managedSelection(id string) {
+	m.cancelLayerDrag(m.layerDrag)
 	if m.move != nil {
 		m.cancelMove(m.move)
 	}

@@ -85,7 +85,7 @@ func (m *model) selectLayer(id string) error {
 }
 
 func (m *model) layersPanel(ref app.WindowRef, update func(), invoke func(string) func()) ui.Node {
-	disabled := m.clipboardAvailable() != nil
+	disabled := m.clipboardAvailable() != nil && m.layerDrag == nil
 	finish := func(action func() error) {
 		if ref.Context().Err() != nil {
 			return
@@ -105,7 +105,7 @@ func (m *model) layersPanel(ref app.WindowRef, update func(), invoke func(string
 		if row.selected {
 			style.Background = ui.Some(color.NRGBA{R: 218, G: 232, B: 252, A: 255})
 		}
-		rows = append(rows, ui.Node{ID: "layer-select-" + row.id, Kind: ui.Button, Text: text, Appearance: ui.ButtonQuiet, Disabled: disabled, Style: style, Accessibility: ui.Accessibility{Name: "Layer " + text, Help: "Select a component or whole group. Add selection toggles membership."}, Activate: func() { finish(func() error { return m.selectLayer(row.id) }) }})
+		rows = append(rows, ui.Node{ID: "layer-select-" + row.id, Kind: ui.Button, Text: text, Appearance: ui.ButtonQuiet, Disabled: disabled, Style: style, Accessibility: ui.Accessibility{Name: "Layer " + text, Help: "Click to select; drag above or below another row to reorder. Escape cancels. Add selection toggles membership."}, Activate: func() { finish(func() error { return m.selectLayer(row.id) }) }})
 	}
 	if len(rows) == 0 {
 		rows = append(rows, ui.Node{ID: "layers-empty", Kind: ui.Label, Text: "No components"})
@@ -126,8 +126,8 @@ func (m *model) layersPanel(ref app.WindowRef, update func(), invoke func(string
 			{ID: "layers-clear", Kind: ui.Button, Text: "Clear", Style: compact, Disabled: disabled || len(m.selectedIDs()) == 0, Activate: func() { finish(func() error { return m.selectLayer("") }) }},
 		}},
 		{ID: "layers-order", Kind: ui.Row, Children: []ui.Node{
-			{ID: "layers-forward", Kind: ui.Button, Text: "Forward", Style: compact, Disabled: m.commands.Enabled("bring-forward") != nil, Activate: invoke("bring-forward")},
-			{ID: "layers-backward", Kind: ui.Button, Text: "Backward", Style: compact, Disabled: m.commands.Enabled("send-backward") != nil, Activate: invoke("send-backward")},
+			{ID: "layers-forward", Kind: ui.Button, Text: "Forward", Style: compact, Disabled: m.commandDisabled("bring-forward"), Activate: invoke("bring-forward")},
+			{ID: "layers-backward", Kind: ui.Button, Text: "Backward", Style: compact, Disabled: m.commandDisabled("send-backward"), Activate: invoke("send-backward")},
 		}},
 		{ID: "layers-scroll", Kind: ui.Scroll, Grow: true, Children: []ui.Node{{ID: "layers-rows", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1)), Gap: ui.Some(float32(1))}, Children: rows}}},
 	}}
