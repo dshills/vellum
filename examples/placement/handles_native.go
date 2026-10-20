@@ -90,6 +90,10 @@ func (e *canvasEditor) publishHandles(target *core.WidgetBase, mount *editorMoun
 			for _, object := range objects {
 				drawSelectionOutline(pc, object, g)
 			}
+			if bounds, ok := selectionBounds(objects, ids); ok {
+				drawSelectionOutline(pc, bounds, g)
+				drawCornerHandles(pc, bounds, g)
+			}
 		}
 	})
 	sprite.Active = true

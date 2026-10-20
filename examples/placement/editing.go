@@ -130,8 +130,8 @@ func (m *model) beginMove(g placement.Geometry, p canvas.Point) *objectMove {
 	corner := noCorner
 	id := ""
 	ids := m.selectedIDs()
-	if i := m.selectedIndex(); i >= 0 && len(ids) == 1 {
-		corner = handleAt(m.scene.Objects[i], g, p)
+	if bounds, ok := selectionBounds(m.scene.Objects, ids); ok {
+		corner = handleAt(bounds, g, p)
 		if corner != noCorner {
 			id = m.scene.Selected
 		}
@@ -167,6 +167,16 @@ func (m *model) previewMove(s *objectMove, p canvas.Point) {
 	// Keep the initial world grab point while mapping the current pointer with
 	// the latest layout, preserving the offset inside the object.
 	dx, dy := world.X-s.grab.X, world.Y-s.grab.Y
+	if s.resize && len(s.selection) > 1 {
+		after, err := resizedSelection(s.before, s.selection, s.corner, dx, dy, m.snap)
+		if err != nil {
+			s.valid = false
+			return
+		}
+		m.scene.Objects = after
+		m.status = fmt.Sprintf("Resizing %d selected components • Escape cancels", len(s.selection))
+		return
+	}
 	after := slices.Clone(s.before)
 	for i := range after {
 		if after[i].ID != s.id {
@@ -222,7 +232,9 @@ func (m *model) finishMove(s *objectMove, p canvas.Point) error {
 		return nil
 	}
 	if !s.dragging {
-		m.setSelection([]string{s.id}, s.id)
+		if !s.resize {
+			m.setSelection([]string{s.id}, s.id)
+		}
 		return nil
 	}
 	if slices.Equal(after, s.before) {

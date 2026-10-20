@@ -40,14 +40,23 @@ and the selection set; Redo repeats the operation. New placement selects its new
 object; Undo restores the previous set. Cmd+Z / Cmd+Shift+Z replay history. The
 example limits the document to 512 objects and history to 64 changes.
 
-Corner handles and Width/Height buttons resize exactly one selected component;
-group resizing remains outside this internal app. Use Shift-click to reduce a
-set to one, or plain-click a component. Managed keyboard/semantic object selection
-still replaces the set with a single primary object. Additional group members
-are described in accessible names; standard canvas selected semantics expose the
-primary only. The set is transient: Save retains the primary in the existing
-version-2 format, and Open clears the group and selects that primary. All group
-object edits and dimensions are saved normally.
+Corner handles surround the selected set's bounding box. Drag any corner to
+scale all selected positions, dimensions and spacing, keeping the opposite
+bounding corner fixed. Horizontal and vertical scales are independent. With
+snapping enabled, changed group bounds round to the 20-unit grid; members are
+not individually snapped. Each member stays within 8–2000 units: a shared scale
+clamps at the strictest member limit, without flipping or distorting the group's
+relative proportions along either axis. Origins must remain within ±10000;
+invalid movement cancels the entire edit. One group resize is one Undo entry,
+restoring exact geometry, IDs, paint order and selection. A corner click without
+a drag keeps the group and adds no history. Escape, outside release and existing
+capture/camera/lifecycle cancellation restore every member.
+
+Width/Height buttons still resize exactly one component. Managed keyboard and
+semantic object selection replace the set with a single primary. Additional
+members are described in accessible names; standard selected semantics expose
+the primary only. The set is transient: Save retains that primary in the existing
+version-2 format, and Open selects only it. All resized object geometry is saved.
 
 The press offset is preserved under pan, zoom, scrolling and display scale.
 Canvas origin, visible size and clipping may settle during capture; movement
