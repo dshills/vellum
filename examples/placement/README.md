@@ -4,6 +4,19 @@ An independent public Go SDK consumer demonstrating a reusable typed tool palett
 and a managed `ui.Canvas2D`. Block, Connector and Note use the same validation,
 command registry and bounded history path for pointer and keyboard placement.
 
+Use the **Arrange** toolbar with at least two selected components to align left,
+horizontal center, right, top, vertical center or bottom to the selection bounds.
+**H gaps / V gaps** require at least three components and distribute them with
+equal horizontal/vertical edge gaps inside the same bounds. Components are
+ordered by their current axis position; ties keep paint order. Distribution
+requires enough room for non-overlapping gaps; a crowded set is left unchanged
+with an explanation. Move components apart first if needed.
+
+Arrangement changes only the chosen axis positions, preserving IDs, dimensions,
+paint order, selected set and primary. It ignores grid snapping to keep alignment and gap relationships to floating-point precision, regardless of pan/zoom. Each action is one Undo
+entry; an unchanged result adds none. Invalid origins reject the whole action.
+Existing busy/file/gesture guards apply. Undo/Redo restore exact geometry.
+
 Copy selected components with **Copy / Cmd+C**, paste with **Paste / Cmd+V**,
 and duplicate with **Duplicate / Cmd+D**. Copy writes versioned Vellum component
 JSON as plain text to the native macOS clipboard. Paste accepts that format;

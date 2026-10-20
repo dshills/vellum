@@ -109,6 +109,10 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		dimensions = fmt.Sprintf("%d selected • drag group corners to resize", len(selection))
 	}
 	help := "Shift-click toggles • Shift-drag empty canvas adds a marquee • plain empty drag pans • corners resize selection"
+	arrangementTools := []ui.Node{{ID: "arrange-label", Kind: ui.Label, Text: "Arrange:"}}
+	for _, action := range arrangementActions {
+		arrangementTools = append(arrangementTools, ui.Node{ID: action.id, Kind: ui.Button, Text: action.label, Disabled: m.commands.Enabled(action.id) != nil, Activate: invoke(action.id)})
+	}
 	root := ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{
 		{ID: "file-tools", Kind: ui.Toolbar, Children: []ui.Node{
 			{ID: "open", Kind: ui.Button, Text: "Open…", Disabled: m.files == nil || m.commands.Enabled("open") != nil, Activate: invoke("open")},
@@ -143,6 +147,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 			{ID: "height-more", Kind: ui.Button, Text: "Height +", Disabled: m.commands.Enabled("height-more") != nil, Activate: invoke("height-more")},
 			{ID: "dimensions", Kind: ui.Label, Text: dimensions},
 		}},
+		{ID: "arrange-tools", Kind: ui.Toolbar, Children: arrangementTools},
 		{ID: "help", Kind: ui.Label, Text: help},
 		{ID: "workspace", Kind: ui.Row, Grow: true, Children: []ui.Node{
 			{ID: "palette", Kind: ui.Column, MinWidth: 145, Children: tools},

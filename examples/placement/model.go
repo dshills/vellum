@@ -154,6 +154,10 @@ func newModel() (*model, error) {
 		m.palette.Close()
 		return nil, err
 	}
+	if err := m.bindArrangement(); err != nil {
+		m.palette.Close()
+		return nil, err
+	}
 	return m, nil
 }
 func (m *model) commit(ctx context.Context) error {
