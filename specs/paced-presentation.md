@@ -28,6 +28,16 @@ routes; tree supports wide/deep 10k/100k nodes and both requested routes. Novel
 one-way grid scrolling and other source/profile/input diagnostics are excluded.
 The requested GPU flag still does not prove actual GPU routing.
 
+The initial coordinates remain part of the declared workload. Grid and wide-tree
+cohorts start at `(0,0)`. The deep-tree cohort starts at
+`(0,(Nodes*3/4+64)*9)`, matching the existing stored-tree consumer: y=68,076 for
+10,000 nodes and y=675,576 for 100,000 nodes. Its first/reverse and complete warm
+trajectory return to that exact nonzero initial viewport. Validation binds this
+origin to the method, Deep flag and stored node count; it does not normalize an
+arbitrary starting position to zero or allow all positive origins. Subsequent
+per-slot deltas, generations, clocks, prefix accounting, deadlines, interval
+population and numeric thresholds remain unchanged.
+
 Ordinary and serial modes retain their branches and defaults. The new mode emits
 explicit `paced_workload:true`, `scheduled_hz:60`, presentation diagnostic and
 nonqualification labels. It emits its completion summary after the timed cohort.

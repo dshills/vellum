@@ -313,4 +313,58 @@ class StartupObservationTests(unittest.TestCase):
    with self.assertRaisesRegex(ValueError,'failed or unsupported capture'):m.validate(m.load(path,hashlib.sha256(raw).hexdigest()),SOURCE,BINARY)
    self.assertEqual(path.read_bytes(),raw)
 
+
+# Literal source-protocol checkpoints, independent of the validator expression.
+DEEP_INITIAL_Y={10000:68076,100000:675576}
+def shift_paced_origin(j,y):
+ delta=y-j['Pacing']['Initial']['View']['ScrollY']
+ j['Pacing']['Initial']['View']['ScrollY']+=delta
+ for slot in j['Pacing']['Slots']:slot['Observation']['View']['ScrollY']+=delta
+ return j
+
+def deep_paced_fixture(size,gpu=False):
+ j=paced_fixture(True);j['Config'].update(DataSize=size,Deep=True,GPURequested=gpu)
+ return shift_paced_origin(j,DEEP_INITIAL_Y[size])
+
+class PacedInitialOriginTests(unittest.TestCase):
+ def test_deep_source_origins_are_accepted(self):
+  for size in [10000,100000]:
+   for gpu in [False,True]:
+    with self.subTest(size=size,gpu=gpu):
+     j=deep_paced_fixture(size,gpu);out=m.validate(j,SOURCE,BINARY)
+     self.assertEqual(j['Pacing']['Initial']['View']['ScrollY'],DEEP_INITIAL_Y[size])
+     self.assertEqual(out['result'],'VALID_PACED_NATIVE_FEEDBACK_JOURNAL')
+     self.assertEqual(out['measured_input_latency_ms']['count'],600)
+     self.assertEqual(out['paced_metrics']['interval_count'],599)
+     self.assertTrue(out['paced_metrics']['cadence_threshold_met'])
+     self.assertFalse(out['paced_metrics']['release_qualified'])
+ def test_deep_arbitrary_or_wrong_size_origins_are_refused(self):
+  for size,other in [(10000,100000),(100000,10000)]:
+   expected=DEEP_INITIAL_Y[size]
+   for y in [0,expected-1,expected+1,DEEP_INITIAL_Y[other]]:
+    with self.subTest(size=size,y=y):
+     j=shift_paced_origin(deep_paced_fixture(size),y)
+     with self.assertRaisesRegex(ValueError,'paced initial/warmup baseline differs'):m.validate(j,SOURCE,BINARY)
+ def test_wide_tree_and_all_grid_modes_keep_zero_origin(self):
+  for tree,sizes in [(False,[10000,1000000]),(True,[10000,100000])]:
+   for size in sizes:
+    for variable in ([False]if tree else[False,True]):
+     for gpu in [False,True]:
+      with self.subTest(tree=tree,size=size,variable=variable,gpu=gpu):
+       j=paced_fixture(tree);j['Config'].update(DataSize=size,Variable=variable,GPURequested=gpu)
+       self.assertEqual(m.validate(j,SOURCE,BINARY)['paced_metrics']['interval_count'],599)
+       shift_paced_origin(j,1)
+       with self.assertRaisesRegex(ValueError,'paced initial/warmup baseline differs'):m.validate(j,SOURCE,BINARY)
+ def test_deep_origin_cannot_be_transferred_to_other_configuration(self):
+  for kind in ['wide','wrong-size','invalid-size','tree-variable','grid-method','grid-deep']:
+   with self.subTest(kind=kind):
+    j=deep_paced_fixture(10000)
+    if kind=='wide':j['Config']['Deep']=False
+    if kind=='wrong-size':j['Config']['DataSize']=100000
+    if kind=='invalid-size':j['Config']['DataSize']=1000000
+    if kind=='tree-variable':j['Config']['Variable']=True
+    if kind=='grid-method':j['Config']['Method']='routed-grid-scroll'
+    if kind=='grid-deep':j=paced_fixture();j['Config']['Deep']=True
+    with self.assertRaises(ValueError):m.validate(j,SOURCE,BINARY)
+
 if __name__=='__main__':unittest.main()

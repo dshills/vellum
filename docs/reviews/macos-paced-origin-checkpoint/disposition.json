@@ -1,0 +1,24 @@
+{
+  "approved": true,
+  "source_implementation_changed_after_review": false,
+  "packet_diff_sha256": "066698888cc55f9720ec2671b19c02013b54e241933874782805048c1223d59b",
+  "prism_sha256": "5a2b28c0ef8621cad307dd616012d14591f6f5ab9a0b395fbac47bf918e14b50",
+  "status_independent_review_sha256": "87d93fd9e91a2a2b21b565e2482de81f6506b530875d6c676fdaca31ca79e847",
+  "finding_review_sha256": "8aa0613555c5851508bc1826cb4651bb6355357da96cfe4d1bd44434d5675a04",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "reviewed_text_files": 8,
+  "binary_evidence_archive_references": 2,
+  "raw_binary_content_reviewed_by_provider": false,
+  "finding_dispositions": [
+    {
+      "id": "fa3049ba1f41bcaa",
+      "disposition": "refuted for accepted public journal path",
+      "reason": "validate requires strict integer DataSize and tree supported sizes10000/100000 before its sole validate_pacing call. CLI only calls validate. Already executed invalid-size crossover control refuses unsupported1000000. Formula matches bounded existing Go source; duplicate domain lookup is optional defense."
+    }
+  ],
+  "unresolved_actionable_findings": [],
+  "cost_usd": 0.07566,
+  "llm_calls": 1,
+  "limits": "Correctness of offline validator and truthful scoped documentation only; current failed performance/remaining Mac gates unchanged."
+}

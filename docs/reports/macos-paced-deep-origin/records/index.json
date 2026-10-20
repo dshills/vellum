@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "archive": {
+    "file": "evidence.tar.xz",
+    "bytes": 8784,
+    "sha256": "85eeb80b402735f6053add2dc9340e073acde50426291b44a7e43d7d86276c04"
+  },
+  "files": {
+    "actual-checks-review.json": {
+      "bytes": 10391,
+      "sha256": "02167f0729bff893ee2e32264595ca43533e610038249eb5777551c00cad37bf"
+    },
+    "candidate-command.json": {
+      "bytes": 2400,
+      "sha256": "303b048a3a992031c9a68cc0d3b843f03e08b7b5d88cfc3b28ea69fe1f278e08"
+    },
+    "checks-plan.json": {
+      "bytes": 7809,
+      "sha256": "5521ce10ee85052fe77247beeea63cd82ac03cd68210572a8138ab7c08c0db3e"
+    },
+    "checks-result.json": {
+      "bytes": 13274,
+      "sha256": "8ca895fc8d0c7dff0db1c3626294bcae385605f01a66cd08cf29f0618c85af88"
+    },
+    "checks/candidate/owned.json": {
+      "bytes": 1538,
+      "sha256": "8dcc70bf5ba43b54b4aaac475ff73b19765580a54463642872b497917a2221a4"
+    },
+    "checks/candidate/stderr": {
+      "bytes": 4034,
+      "sha256": "54d3d6fd0e107ae99cf26acb38e78652329162e3edcdb8616dac8eecc3364b70"
+    },
+    "checks/candidate/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "checks/original-counterfactual/owned.json": {
+      "bytes": 1566,
+      "sha256": "258990a359b8eeb1c463108d09d5af152353eaede50c4f596812ed9ad4b72f97"
+    },
+    "checks/original-counterfactual/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "checks/original-counterfactual/stdout": {
+      "bytes": 7607,
+      "sha256": "ae9d9501a904fbeadc55259dd7486ba0f88526c277d3a82650493ac8fe92be79"
+    },
+    "counterfactual.py": {
+      "bytes": 1411,
+      "sha256": "f682e636b2083b80e28ebc2e85a6d32a98bc4d60d3c0a4caa2bb4eac3a4704b8"
+    },
+    "original-counterfactual-command.json": {
+      "bytes": 2429,
+      "sha256": "f5fa2bea84fb48a102b58deba8666c96c5bd58767f4054cbc5baf28503725c9e"
+    },
+    "proposal.json": {
+      "bytes": 4473,
+      "sha256": "a559dc7b741418c43b7e79f64b3df5d84ac28a6d7e1a6e3ff071a475367bd6cd"
+    },
+    "run-checks.py": {
+      "bytes": 5032,
+      "sha256": "9550d284f709cc8ec77d4e46c497789e7cac2bcf864435b01439c59ef54ab3dd"
+    }
+  },
+  "source_head": "70bf39175903f0bc8408e358d58781efdfa5032c",
+  "native_or_Go_executed": false
+}

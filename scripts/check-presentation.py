@@ -125,7 +125,8 @@ def validate_pacing(value,config,cpu,receipts,armed,ordered,measured):
  tags=[tag for tag in ordered if tag in measured]
  initial=pace_observation(value['Initial'],tree)
  initial_tag=config['Warmup']+2 if tree else(1<<32)+config['Warmup']
- need(initial['Tag']==initial_tag and initial['Generation']==cpu[initial_tag]['Generation']and initial['View']['ScrollX']==initial['View']['ScrollY']==0,'paced initial/warmup baseline differs')
+ expected_initial_y=(config['DataSize']*3//4+64)*9 if tree and config['Deep']else 0
+ need(initial['Tag']==initial_tag and initial['Generation']==cpu[initial_tag]['Generation']and initial['View']['ScrollX']==0 and initial['View']['ScrollY']==expected_initial_y,'paced initial/warmup baseline differs')
  previous=initial;previous_end=0;lower_origin=None;upper_origin=None;last_precision=0
  for index,slot in enumerate(slots):
   obj(slot,['Index','Tag','ScheduledNS','State','StartNS','DispatchNS','EnqueuedNS','AcknowledgedNS','InspectedNS','EndNS','Observation'])

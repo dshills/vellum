@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "finding_id": "fa3049ba1f41bcaa",
+  "disposition": "NOT_A_MATERIAL_DEFECT_EXISTING_CALLER_DOMAIN_ENFORCEMENT",
+  "approved": true,
+  "source_change_required": false,
+  "unresolved_findings": [],
+  "reason": "The formula is an internal helper in the full journal validation pipeline. validate first type-checks DataSize as an integer and rejects unsupported tree sizes before its sole call to validate_pacing. Thus only 10000 or 100000 reaches the deep-tree formula through the CLI/validated journal entry point. An explicit duplicate lookup in the helper is optional defensive duplication, not a correction to an actually admitted unsupported journal.",
+  "source_order": {
+    "strict_DataSize_integer_line": 174,
+    "supported_tree_size_check_line": 180,
+    "only_validate_pacing_call_line": 229,
+    "CLI_entry": "main invokes validate(load(...),source,binary_sha256,go_version), never validate_pacing directly"
+  },
+  "existing_regression_evidence": "Existing 25-test candidate run passes. The added configuration-crossover method calls m.validate and rejects invalid DataSize 1000000, changed supported size with wrong origin, tree-variable and wrong method/deep combinations. No tests rerun for this disposition.",
+  "status_archive_review": "Independent current-status/archive audit remains approved at SHA 87d93fd9e91a2a2b21b565e2482de81f6506b530875d6c676fdaca31ca79e847. Binary archives were audited locally, not presented as model-readable provider inputs.",
+  "packet_files_verified_against_review_repo_and_originals": 10,
+  "inputs": {
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-deep-origin-status-checkpoint/packet.json": "44c331b181a9f575d166d0eca17cb975c11caaac7b3e1a0dbf1257c9b4b2d3c3",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-deep-origin-status-checkpoint/staged.diff": "066698888cc55f9720ec2671b19c02013b54e241933874782805048c1223d59b",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-deep-origin-status-checkpoint/prism.json": "5a2b28c0ef8621cad307dd616012d14591f6f5ab9a0b395fbac47bf918e14b50",
+    "/private/tmp/vellum-deep-origin-status-review/scripts/check-presentation.py": "16cd049180c0a86ecc8de03feb37d1eb51b7fc61d647b8108c308c2fe9e37eed",
+    "/private/tmp/vellum-deep-origin-status-review/scripts/check_presentation_test.py": "0212072da38e22f55cb971a6d162684267aa3edb4e0376a57781d6134c241a33",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m3-deep-origin-correction/candidate-command.json": "303b048a3a992031c9a68cc0d3b843f03e08b7b5d88cfc3b28ea69fe1f278e08",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m3-deep-origin-correction/checks/candidate/stderr": "54d3d6fd0e107ae99cf26acb38e78652329162e3edcdb8616dac8eecc3364b70",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-m3-deep-origin-correction/actual-checks-review.json": "02167f0729bff893ee2e32264595ca43533e610038249eb5777551c00cad37bf",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-current-native-status/independent-review.json": "87d93fd9e91a2a2b21b565e2482de81f6506b530875d6c676fdaca31ca79e847"
+  },
+  "tests_native_provider_or_source_mutations": false,
+  "reviewed_utc": "2026-10-20T01:38:37.896170+00:00"
+}

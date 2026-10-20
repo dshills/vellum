@@ -9,34 +9,55 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
-## Current status — source 103 (19 October 2026)
+## Current status — source 70bf391 (20 October 2026 UTC)
 
-Mac completion remains open. The public Go API/native implementation exists and
-M2's controlled functional scope previously passed on `93b4730`; that result is
-separate from physical/human, performance, resource and final delivery acceptance.
-The [source 103 checkpoint](../docs/reports/macos-presentation-post103/README.md)
-records four valid native captures on clean `33183c7` and its independently
-verified private SDK (8,292 files). Both paced cohorts retain 599/599 intervals
-within 18.333 ms, with interval p95 about 16.667 ms. All four input-to-presentation
-p95 values remain 42–44 ms, above the unchanged 33.3 ms gate. All 36 created
-native/probe groups retired and were observed absent; full source/SDK/geometry
-checks pass. These are four single-run diagnostics, not the full M3 matrix or Mac
-release qualification. The stage 0102 policy remains experimental; stage 0103's
-native timing effects are not causally established by this comparison.
+See the [current native
+checkpoint](../docs/reports/macos-current-native-status/README.md) for exact source/SDK
+binding, raw evidence and limits.
 
-Remaining required work is the M3 latency gate, full repeated matrix and text/
-layout/canvas/input/resize workflows; M4 native/resource attribution, activity,
-1,000 composed cycles, full idle and eight-hour soak; M5 physical/human, IME,
-VoiceOver and display workflows; M6 final source-bound SDK/application native
-and component/notice/rights acceptance; then M7's frozen-candidate audit. Two
-separate sizing/visibility helpers now pass their existing scoped native assertions;
-one hidden unclassified Cocoa window remains in the complete final census.
-Blocked-acquisition overlap and native deallocation remain unverified. A separate
-observer trace/profile points to native-main text-input publication as a source
-lead; it is diagnostic, unqualified and does not establish per-input causality.
-The short M4 native plan remains held pending the next genuine source/SDK binding
-and fresh prerequisites.
-No completion percentage or new acceptance threshold is introduced.
+The latest source-bound native checks use clean
+`70bf39175903f0bc8408e358d58781efdfa5032c`, Go 1.25.6, and the private SDK whose archive
+SHA256 is `fa6e9134404f445bf7334391c18eb755d08d89c0a374ec031caa828cf0d2bb4f`. Its 8,293
+retained files include the manifest; complete source/prepared/SDK association and
+relocation checks pass. The native archive remains `786aaad8…`. These results supersede
+the previous source 103 summary for current status; earlier records retain their
+original outcomes.
+
+The performance campaign **fails**. Serial grid CPU and tree GPU captures are valid,
+with input-to-presentation p95 of 48.030 and 48.204 ms, respectively, above the
+unchanged 33.3 ms gate. Paced grid GPU stops on three unarmed startup acquisitions
+skipped after the first warmup receipt. Its 728 armed acquisitions are presented, but
+this does not qualify the lost-prefix capture. The fourth case is unrun. Descriptive
+timing from that failed journal is not accepted performance evidence. No latency
+improvement or causality is established for the empty inactive text-publication cache.
+
+All 23 actual performance/native-probe groups terminate and are independently observed
+absent. Final full source, prepared dependency, SDK and persisted geometry boundaries
+match. The failed raw journals, strict startup classification, thresholds, cutoff,
+warmup and fixed sample populations remain unchanged. A separate source investigation
+finds overlapping acquired/unpresented drawables and CPU submission completion before
+display completion; a pacing correction requires implementation, review and new native
+evidence.
+
+Two short composed lifecycle scopes **pass** on the same SDK. Same-name replacement
+completes two cycles and 66 acknowledged native selector actions, with one sampled
+replacement. A separate 40-second visible/occluded/minimized/background scope records
+eight paired samples. Both owned native groups retire, with empty stderr and unchanged
+source/SDK/geometry boundaries. Each final complete Cocoa census still contains one
+hidden unclassified `NSKVONotifying_TUINSWindow`. It is counted; these checks do not
+prove its identity or deallocation.
+
+The 40-second run has zero eligible 60-second CPU intervals. It does not qualify idle
+CPU, OS wakeups, presentation counts, native/GPU resource bounds, ten-minute activity,
+1,000 cycles or the eight-hour soak. Those M4 gates remain open. The native diagnostic
+policy uses direct RSS-compatible observation, with process-local geometry-saving
+prevention and sampled full boundaries; it does not claim enforced OS settings/network
+denial.
+
+M3–M7 remain open. The full repeated performance matrix, representative
+text/layout/canvas/input/resize workflows, complete resources/endurance, physical/human
+Mac checks and final SDK/application/component acceptance precede the frozen-candidate
+audit. No completion percentage or new threshold is introduced.
 
 ## Historical checkpoint summaries
 
@@ -630,12 +651,12 @@ Candidate evidence must retain exact source/configuration scope or justified reu
 
 | Milestone | Current status | Next action / evidence needed |
 | --- | --- | --- |
-| M1 | Complete in source; incorporated in the private SDK | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); source 103 SDK association is independently verified in the [current checkpoint](../docs/reports/macos-presentation-post103/README.md). Final artifact acceptance remains in M6. |
+| M1 | Complete in source; incorporated in the private SDK | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); current `70bf391` SDK association and relocation pass in the [Current checkpoint](../docs/reports/macos-current-native-status/README.md). Final artifact acceptance remains M6. |
 | M2 | Complete for the previously qualified controlled functional scope | The [eleven-method renewal](../docs/reports/macos-m2-renewal/README.md) passed on source `93b4730`: three dedicated Cocoa records, six catalogue/text records 323/202 and two full workspace records 432/54. Full software replay 1296/162 and the 205-test contract audit supply the scenario map. This does not certify physical/human input, all native pixels/deallocation, presentation performance or the full Mac release. Affected candidate evidence requires exact scope or justified reuse. |
-| M3 | Open; source 103 cadence predicates pass, input latency fails | [Source 103](../docs/reports/macos-presentation-post103/README.md) has four valid native captures; both paced cohorts retain 599/599 intervals within 18.333 ms. Latency p95 is 42.781/43.620 ms serial grid/tree and 43.832/41.812 ms paced grid/tree, all above 33.3 ms. These four single-run cases do not replace the full repeated matrix or text/layout/canvas/input/resize workflows. Source 102 remains failed/unqualified; stage 0102 remains experimental. Unchanged 60 Hz/33.3 ms gates and 4 ms optimization target remain. |
-| M4 | Partial; native resource/endurance acceptance remains | Earlier sampled idle/cleanup checks remain scoped. The [AppKit reference](../docs/reports/macos-appkit-window-reference/README.md) reproduces one persistent hidden text-service window after its own weak clients expire, but does not identify the historical KVO window or prove Vellum deallocation. All windows remain counted. OS wakeups/presentation, full native memory/resource accounting, ten-minute activity, 1,000-cycle and overnight gates remain open. |
+| M3 | Open; latest native campaign fails | [Current checkpoint](../docs/reports/macos-current-native-status/README.md): valid serial grid/tree input-to-presentation p95 48.030/48.204 ms misses 33.3 ms. Paced grid fails strict post-receipt prefix accounting; fourth case unrun. No cache performance gain established. Source 103 cadence passes retain their earlier scope. Full repeated matrix and representative workflows remain required; 60 Hz/33.3 ms gates and 4 ms optimization target are unchanged. |
+| M4 | Partial; two current short scopes pass, full resource/endurance remains | [Current checkpoint](../docs/reports/macos-current-native-status/README.md): two same-name composed cycles/66 acknowledged native selector actions and a separate 40-second visibility soak/eight paired samples pass. Two groups retire. Each complete final census retains one hidden unclassified Cocoa window; no deallocation proof or eligible 60-second CPU interval. OS wakeups/presentation, native/GPU resources, ten-minute activity, 1,000 cycles and overnight remain open. |
 | M5 | Partial; physical and human acceptance remains | Native fixtures and automated routing evidence exist. Direct pointer/preview, cross-display, native text/IME and human accessibility workflows remain separately qualified requirements. |
-| M6 | Partial; source 103 private SDK relocation/consumption and archive association pass | Clean `33183c7` private SDK contains 8,292 files including its manifest; actual archive/extraction/relocation/public-contract receipts and complete source/prepared/SDK vectors are independently verified. Four scoped native grid/tree captures are separate from final packaged application acceptance. Final SDK/app must include later accepted changes, component/native/font/asset and notice/rights closure, relocated native app acceptance and distribution prerequisites. No public publication/signing approval follows. |
+| M6 | Partial; current private SDK relocation/association pass | [Current checkpoint](../docs/reports/macos-current-native-status/README.md): clean `70bf391` SDK has 8,293 retained files including its manifest, with complete archive/source/prepared/extraction binding and relocated public-contract checks. Final SDK/app must include later accepted changes, complete component/native/font/asset and notice/rights closure, relocated native application acceptance and distribution prerequisites. No public publication/signing approval follows. |
 | M7 | Open | Requirement-by-requirement final audit after all preceding gates close. |
 
 The ledger changes only when the corresponding requirement is demonstrated.
