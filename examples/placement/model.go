@@ -160,6 +160,10 @@ func newModel() (*model, error) {
 		m.palette.Close()
 		return nil, err
 	}
+	if err := m.bindStacking(); err != nil {
+		m.palette.Close()
+		return nil, err
+	}
 	if err := m.bindArrangement(); err != nil {
 		m.palette.Close()
 		return nil, err

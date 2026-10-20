@@ -4,6 +4,14 @@ An independent public Go SDK consumer demonstrating a reusable typed tool palett
 and a managed `ui.Canvas2D`. Block, Connector and Note use the same validation,
 command registry and bounded history path for pointer and keyboard placement.
 
+Use **Bring to front** or **Send to back** to place selected components and
+whole selected groups above or below every unselected component. Each action
+preserves relative paint order within the selection and within the remaining
+objects, along with geometry, group membership and the primary selection.
+A changed order is one Undo/Redo step; an already front/back selection adds no
+history. Save/Open preserves the stacking order. Groups remain flat membership
+sets: this does not create nested layers or change their internal paint order.
+
 Use **Group / Cmd+G** to bind at least two selected components or groups into
 one flat group. **Ungroup / Cmd+Shift+G** removes membership from selected groups,
 leaving geometry, IDs and the selected components unchanged. Each is one Undo

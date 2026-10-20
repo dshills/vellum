@@ -155,6 +155,8 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		{ID: "resize-tools", Kind: ui.Toolbar, Children: []ui.Node{
 			{ID: "group", Kind: ui.Button, Text: "Group", Disabled: m.commands.Enabled("group") != nil, Activate: invoke("group")},
 			{ID: "ungroup", Kind: ui.Button, Text: "Ungroup", Disabled: m.commands.Enabled("ungroup") != nil, Activate: invoke("ungroup")},
+			{ID: "bring-front", Kind: ui.Button, Text: "Bring to front", Disabled: m.commands.Enabled("bring-front") != nil, Activate: invoke("bring-front")},
+			{ID: "send-back", Kind: ui.Button, Text: "Send to back", Disabled: m.commands.Enabled("send-back") != nil, Activate: invoke("send-back")},
 			{ID: "width-less", Kind: ui.Button, Text: "Width −", Disabled: m.commands.Enabled("width-less") != nil, Activate: invoke("width-less")},
 			{ID: "width-more", Kind: ui.Button, Text: "Width +", Disabled: m.commands.Enabled("width-more") != nil, Activate: invoke("width-more")},
 			{ID: "height-less", Kind: ui.Button, Text: "Height −", Disabled: m.commands.Enabled("height-less") != nil, Activate: invoke("height-less")},
