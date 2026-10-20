@@ -30,7 +30,6 @@ type model struct {
 	pending                   *placement.Request[component]
 	next                      uint64
 	snap, locked, rejectNotes bool
-	resizeMode                bool
 	status                    string
 	files                     *document.Session[drawingFile]
 	prompt                    string

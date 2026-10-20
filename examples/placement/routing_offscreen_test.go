@@ -236,10 +236,6 @@ func TestPublicPaletteCanvasConsumer(t *testing.T) {
 
 			index = m.selectedIndex()
 			originalSize := m.scene.Objects[index]
-			click("resize-mode")
-			if !m.resizeMode {
-				t.Fatal("resize mode checkbox")
-			}
 			click("width-more")
 			if m.scene.Objects[index].Width != originalSize.Width+20 || m.scene.Objects[index].Height != originalSize.Height {
 				t.Fatal("routed resize width")
@@ -253,7 +249,6 @@ func TestPublicPaletteCanvasConsumer(t *testing.T) {
 				t.Fatal("routed resize redo")
 			}
 			click("undo")
-			click("resize-mode")
 			before = m.scene.View
 			center = target.Bounds.Min.Add(image.Pt(20, 20)) // Empty space pans; dragging an object now moves it.
 			input(cogent.ManualInput{Type: events.MouseDown, Button: events.Left, Position: center})

@@ -23,7 +23,7 @@ type canvasEditor struct {
 }
 
 func (e *canvasEditor) Mount(parent tree.Node) core.Widget {
-	w := core.NewFrame(parent)
+	w := tree.New[editorMount](parent)
 	w.Styler(func(s *styles.Style) { s.Display = styles.DisplayNone })
 	return w
 }
@@ -37,11 +37,16 @@ func (e *canvasEditor) Sync(w core.Widget) error {
 		return fmt.Errorf("canvas editor requires its managed canvas sibling")
 	}
 	const property = "vellum-placement-app-editor"
-	if target.Property(property) == e {
-		return nil
+	if target.Property(property) != e {
+		target.SetProperty(property, e)
+		target.OnFirst(events.MouseDown, func(event events.Event) { e.press(target, event) })
+		if mount, ok := w.(*editorMount); ok {
+			target.FinalStyler(func(*styles.Style) { mount.deferHandles(target) })
+		}
 	}
-	target.SetProperty(property, e)
-	target.OnFirst(events.MouseDown, func(event events.Event) { e.press(target, event) })
+	if mount, ok := w.(*editorMount); ok {
+		e.publishHandles(target, mount)
+	}
 	return nil
 }
 func editGeometry(w *core.WidgetBase, view canvas.Viewport) (placement.Geometry, error) {

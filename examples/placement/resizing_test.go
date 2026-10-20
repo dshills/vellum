@@ -16,10 +16,10 @@ import (
 
 func TestResizeDragTransformedHistoryAndCancel(t *testing.T) {
 	m := editModel(t)
-	m.resizeMode = true
+	m.scene.Selected = "block-1"
 	m.snap = false
 	g := placement.Geometry{Window: "placement", Origin: canvas.Point{X: 35, Y: -20}, Clip: canvas.Bounds{Min: canvas.Point{X: 40, Y: 0}, Max: canvas.Point{X: 1600, Y: 1200}}, Scale: 2, View: canvas.Viewport{Width: 800, Height: 600, Zoom: 1.5, Center: canvas.Point{X: 30, Y: -20}}}
-	startLocal := g.View.Screen(canvas.Point{X: 10, Y: 10})
+	startLocal := g.View.Screen(canvas.Point{X: 80, Y: 50})
 	start := canvas.Point{X: g.Origin.X + startLocal.X*g.Scale, Y: g.Origin.Y + startLocal.Y*g.Scale}
 	before := slices.Clone(m.scene.Objects)
 	count, next := m.journal.Snapshot().UndoCount, m.next
@@ -85,10 +85,10 @@ func TestResizeDragTransformedHistoryAndCancel(t *testing.T) {
 
 func TestResizeLayoutGrabSnappingAndBounds(t *testing.T) {
 	m := editModel(t)
-	m.resizeMode = true
+	m.scene.Selected = "block-1"
 	m.snap = false
 	g := placement.Geometry{Window: "placement", Clip: canvas.Bounds{Max: canvas.Point{X: 800, Y: 600}}, Scale: 1, View: canvas.Viewport{Width: 800, Height: 600, Zoom: 1}}
-	start := canvas.Point{X: 410, Y: 310}
+	start := canvas.Point{X: 480, Y: 350}
 	s := m.beginMove(g, start)
 	g.Origin.Y = 18
 	g.View.Height = 582
@@ -96,7 +96,7 @@ func TestResizeLayoutGrabSnappingAndBounds(t *testing.T) {
 	if !m.updateMoveGeometry(s, g) {
 		t.Fatal("layout canceled")
 	}
-	if err := m.finishMove(s, canvas.Point{X: 450, Y: 330}); err != nil || m.scene.Objects[0].Width != 120 || m.scene.Objects[0].Height != 61 {
+	if err := m.finishMove(s, canvas.Point{X: 520, Y: 370}); err != nil || m.scene.Objects[0].Width != 120 || m.scene.Objects[0].Height != 61 {
 		t.Fatal("layout broke resize offset", err, m.scene.Objects[0])
 	}
 	m.scene.Selected = "connector-2"

@@ -39,20 +39,33 @@ Delete selected, Backspace, and forward Delete remove the selected object.
 Undo restores its exact ID and original paint order; Redo repeats the deletion.
 Move/Delete participate in the same saved/unsaved drawing history as placement.
 
-Enable **Resize mode**, then drag a component to change its width/height with
-its top-left corner fixed. The initial grab offset is retained through pan,
-zoom, display scale and canvas layout changes. Disable Resize mode to move
-components again. Empty-space drags always pan. A resize crosses the same
-six-logical-pixel threshold and uses the same cancellation/release-consumption
-path as moving: Escape, focus/capture loss, outside release, camera/display-scale
-change or Close restores the original dimensions without a history entry.
-Each valid completed resize makes one Undo entry, preserving ID, position,
-selection and paint order. Width/Height −/+ buttons use the same command/history
-path and are keyboard accessible through Tab/Return. With snapping enabled,
-changed dimensions round to the 20-unit grid; with it off, buttons change one
-unit. Unchanged axes retain their original size. Sizes clamp to 8–2000 units;
-objects never flip when the pointer crosses the fixed corner. The selected size
-is displayed beside the buttons. This app uses a mode rather than corner handles.
+Select a component to show four blue-and-white corner handles. Drag any handle
+to resize directly; no mode switch is needed. The opposite corner stays fixed,
+including when minimum/maximum size clamps apply. Drag inside the component to
+move it. Empty-space drags always pan. Handles stay the same logical pixel size
+under zoom and display scaling, and paint/hit-test using the current canvas
+transform and clip. Only visible corner centers are exposed; use Fit to bring
+an offscreen corner into view. Handles take priority over overlapping object
+fills. Very small projected objects have overlapping hit targets; the nearest
+corner wins, so zoom in to distinguish them.
+
+Each resize crosses the same six-logical-pixel threshold and uses the existing
+capture/cancellation/release-consumption path. Escape, focus/capture loss, outside
+release, camera/display-scale change or Close restores the original rectangle
+without an edit. Each valid completed resize is one Undo entry, preserving ID,
+selection and paint order. Undo/Redo restores position as well as dimensions for
+north/west handle edits. Corner origins must remain within ±10000. An invalid coordinate-limit preview
+keeps the last valid rectangle visible; releasing there cancels the entire edit.
+
+Width/Height −/+ buttons remain available through Tab/Return. They keep the
+top-left corner fixed. With snapping enabled, changed dimensions round to the
+20-unit grid; with it off, buttons change one unit. Unchanged axes keep their
+original size. Sizes clamp to 8–2000 units and do not flip when a handle crosses
+the opposite corner. The selected size is displayed beside the buttons. Handles
+are presentation-only, are never saved or counted as components, and the mount
+removes their single sprite on destruction. A coalesced native post-layout hook
+restores the detached sprite after window resizing or a Core rebuild resets it. Rendering reads detached owner
+snapshots and native geometry, not mutable application state.
 
 Saved drawings now use version 2, which preserves component dimensions. Existing
 version-1 drawings open at their original type dimensions and are upgraded on

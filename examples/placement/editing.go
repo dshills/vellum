@@ -21,6 +21,7 @@ type objectMove struct {
 	geometry        placement.Geometry
 	dragging, valid bool
 	resize          bool
+	corner          resizeCorner
 }
 
 func (m *model) editAvailable() error {
@@ -112,13 +113,23 @@ func (m *model) beginMove(g placement.Geometry, p canvas.Point) *objectMove {
 	if err != nil {
 		return nil
 	}
-	id := m.scene.ObjectAt(m.scene.View.Screen(world))
+	corner := noCorner
+	id := ""
+	if i := m.selectedIndex(); i >= 0 {
+		corner = handleAt(m.scene.Objects[i], g, p)
+		if corner != noCorner {
+			id = m.scene.Selected
+		}
+	}
+	if id == "" {
+		id = m.scene.ObjectAt(m.scene.View.Screen(world))
+	}
 	if id == "" {
 		return nil
 	}
 	m.scene.Selected = id
 	m.scene.View = g.View
-	s := &objectMove{id: id, before: slices.Clone(m.scene.Objects), start: p, grab: world, geometry: g, valid: true, resize: m.resizeMode}
+	s := &objectMove{id: id, before: slices.Clone(m.scene.Objects), start: p, grab: world, geometry: g, valid: true, resize: corner != noCorner, corner: corner}
 	m.move = s
 	return s
 }
@@ -144,7 +155,11 @@ func (m *model) previewMove(s *objectMove, p canvas.Point) {
 			continue
 		}
 		if s.resize {
-			after[i].Width, after[i].Height = resizedDimensions(after[i], dx, dy, m.snap)
+			after[i] = resizedCorner(after[i], s.corner, dx, dy, m.snap)
+			if !validPosition(after[i].X, after[i].Y) {
+				s.valid = false
+				return
+			}
 			m.scene.Objects = after
 			m.status = fmt.Sprintf("Resizing %s to %.0f × %.0f • Escape cancels", s.id, after[i].Width, after[i].Height)
 			return
