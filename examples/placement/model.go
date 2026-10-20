@@ -37,6 +37,9 @@ type model struct {
 	canvasEditor              *canvasEditor
 	selectionIDs              []string
 	selectionPrimary          string
+	clipboardJob              *clipboardOperation
+	pasteText                 string
+	pasteCount                uint64
 }
 
 func componentByKind(kind string) (component, bool) {

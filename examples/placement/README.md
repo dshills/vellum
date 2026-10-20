@@ -4,6 +4,36 @@ An independent public Go SDK consumer demonstrating a reusable typed tool palett
 and a managed `ui.Canvas2D`. Block, Connector and Note use the same validation,
 command registry and bounded history path for pointer and keyboard placement.
 
+Copy selected components with **Copy / Cmd+C**, paste with **Paste / Cmd+V**,
+and duplicate with **Duplicate / Cmd+D**. Copy writes versioned Vellum component
+JSON as plain text to the native macOS clipboard. Paste accepts that format;
+unrelated text or invalid data leaves the drawing unchanged. Duplicate does not
+read or change the clipboard. Shortcuts defer to focused native controls first.
+
+Each insertion preserves component types, sizes, colors, relative positions and
+paint order, assigns fresh IDs and selects the inserted set. The first Paste
+shifts the copied world positions by (+20,+20); repeated pastes of identical
+clipboard text use (+40,+40), (+60,+60), and so on. Copy resets that sequence. The counter counts successful pastes (up to 1000);
+Undo and Duplicate do not reset it. Origin limits can reject an insertion sooner.
+Duplicate shifts the current selection by (+20,+20). These are shared world-unit
+translations regardless of snapping or camera; members are never individually
+snapped. Use Fit if copies lie outside the visible canvas.
+
+A completed Paste/Duplicate creates exactly one history entry. Undo restores the
+prior selection and geometry; Redo restores the same inserted IDs. New edits
+after Undo allocate fresh IDs rather than reusing discarded ones. Copy creates
+no history and does not mark dirty. Save/Open retain inserted geometry through
+the existing version-2 drawing format; transient paste counters reset on Open.
+
+Clipboard data is bounded to 256 KiB and 512 components. The existing document
+capacity, origin/dimension limits and placement rejection switches apply to all
+members atomically. Clipboard work runs outside the UI owner, with one operation
+at a time, a five-second deadline and window-scoped result delivery. Existing
+edit/file/navigation actions are gated while it is pending. Close cancels and
+retires pending delivery so a late Paste cannot mutate the drawing. As with the
+existing native clipboard service, cancellation can race an OS write already
+in progress. There is no Cut or interoperability with other shape formats.
+
 From the repository root, prepare the pinned native dependencies:
 
 ```sh

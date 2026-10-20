@@ -77,8 +77,8 @@ func (f drawingFile) scene() (*canvas.Scene, error) {
 func drawingCodec(m *model) document.Codec[drawingFile] {
 	return document.Codec[drawingFile]{
 		Capture: func() (drawingFile, error) {
-			if m.palette.State().Active || m.pending != nil || m.move != nil {
-				return drawingFile{}, errors.New("finish or cancel the drag before saving")
+			if m.palette.State().Active || m.pending != nil || m.move != nil || m.clipboardJob != nil {
+				return drawingFile{}, errors.New("finish or cancel the current operation before saving")
 			}
 			f := drawingFile{Format: "vellum-placement", Version: 2, Objects: make([]drawingObject, 0, len(m.scene.Objects)), Center: m.scene.View.Center, Zoom: m.scene.View.Zoom, Selected: m.scene.Selected, Snap: m.snap, NextID: m.next}
 			for _, o := range m.scene.Objects {
@@ -118,7 +118,7 @@ func drawingCodec(m *model) document.Codec[drawingFile] {
 			return f, err
 		},
 		Install: func(f drawingFile) error {
-			if m.move != nil {
+			if m.move != nil || m.clipboardJob != nil {
 				return document.ErrBusy
 			}
 			scene, err := f.scene()
@@ -130,6 +130,7 @@ func drawingCodec(m *model) document.Codec[drawingFile] {
 			m.scene.View.Center, m.scene.View.Zoom = scene.View.Center, scene.View.Zoom
 			m.setSelection([]string{scene.Selected}, scene.Selected)
 			m.next, m.snap = f.NextID, f.Snap
+			m.pasteText, m.pasteCount = "", 0
 			return nil
 		},
 	}

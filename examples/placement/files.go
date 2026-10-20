@@ -11,7 +11,9 @@ import (
 	"github.com/dshills/vellum/ui"
 )
 
-func (m *model) fileBusy() bool { return m.files != nil && m.files.State().Busy }
+func (m *model) fileBusy() bool {
+	return m.clipboardJob != nil || (m.files != nil && m.files.State().Busy)
+}
 
 func (m *model) bindFiles(a *app.Application, ref app.WindowRef, choose func(context.Context, app.FileOptions) (string, error)) error {
 	var err error
@@ -70,6 +72,11 @@ func (m *model) fileAction(a *app.Application, ref app.WindowRef, action string,
 
 func (m *model) requestClose(a *app.Application) bool {
 	m.cancelMove(m.move)
+	if job := m.clipboardJob; job != nil {
+		m.clipboardJob = nil
+		job.cancel()
+		job.ticket.Abort()
+	}
 	if m.fileBusy() {
 		m.files.Cancel()
 		m.status = "Canceling file operation; close again when it finishes"

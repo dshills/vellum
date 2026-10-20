@@ -32,6 +32,9 @@ func run() {
 	if err := m.bindFiles(a, windowRef, nil); err != nil {
 		fail(err)
 	}
+	if err := m.bindClipboard(a, windowRef); err != nil {
+		fail(err)
+	}
 	if err := a.Run(context.Background(), cogent.Driver{Commands: m.commands}); err != nil {
 		fail(err)
 	}
@@ -123,6 +126,9 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 			{ID: "reject-notes", Kind: ui.Checkbox, Text: "Reject notes", Checked: m.rejectNotes, Change: func(e ui.ChangeEvent) { m.rejectNotes = e.Checked; update() }},
 		}},
 		{ID: "edit-tools", Kind: ui.Toolbar, Children: []ui.Node{
+			{ID: "copy", Kind: ui.Button, Text: "Copy", Disabled: m.commands.Enabled("copy") != nil, Activate: invoke("copy")},
+			{ID: "paste", Kind: ui.Button, Text: "Paste", Disabled: m.commands.Enabled("paste") != nil, Activate: invoke("paste")},
+			{ID: "duplicate", Kind: ui.Button, Text: "Duplicate", Disabled: m.commands.Enabled("duplicate") != nil, Activate: invoke("duplicate")},
 			{ID: "move-label", Kind: ui.Label, Text: "Move selected:"},
 			{ID: "move-left", Kind: ui.Button, Text: "Left", Disabled: m.commands.Enabled("move-left") != nil, Activate: invoke("move-left")},
 			{ID: "move-right", Kind: ui.Button, Text: "Right", Disabled: m.commands.Enabled("move-right") != nil, Activate: invoke("move-right")},
