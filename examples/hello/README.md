@@ -23,9 +23,11 @@ qualification remains open.
 
 `-benchmark` launches the same application, verifies the rendered rectangle through
 GPU readback, emits a JSON measurement, waits quietly, and closes. The normal app
-performs no measurement readbacks. Benchmark mode disables native window-geometry
-loading and saving before app construction, keeps the process-local switch set
-through teardown, and restores its prior value on normal return. Its JSON report
+performs no measurement readbacks. Benchmark mode first initializes Core settings
+and requires positive finite zoom, then disables native window-geometry loading
+and saving before app construction. The process-local switch remains set through
+teardown and restores the loaded policy on normal return. Settings-load errors
+are terminal before app construction; partial defaults are not rolled back. Its JSON report
 includes the actual `geometry_persistence_disabled_in_fixture` flag. Generated
 applications inherit this benchmark behavior; ordinary interactive mode retains
 normal geometry persistence. See [SDK contract](../../specs/sdk.md).

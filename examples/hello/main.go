@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"image/color"
+	"math"
 	"os"
 	"runtime"
 	"time"
@@ -28,14 +29,16 @@ func main() {
 	if *idle <= 0 || *samples < 1 || *samples > 1000 {
 		fail(errors.New("positive idle and 1..1000 samples required"))
 	}
-	if *benchmark {
-		// Measurement windows must neither restore nor persist application
-		// geometry. Keep this process-local setting through app teardown.
-		previousGeometrySaver := core.DebugSettings.DisableWindowGeometrySaver
-		core.DebugSettings.DisableWindowGeometrySaver = true
-		defer func() { core.DebugSettings.DisableWindowGeometrySaver = previousGeometrySaver }()
-	}
+	// Include settings initialization in startup, as the former lazy Body path did.
 	started := time.Now()
+	if *benchmark {
+		restoreGeometry, err := isolateBenchmarkGeometry()
+		if err != nil {
+			fail(err)
+		}
+		// Registered before app.Close, so the loaded policy is restored after teardown.
+		defer restoreGeometry()
+	}
 	a, err := app.New(app.Config{})
 	if err != nil {
 		fail(err)
@@ -142,3 +145,22 @@ func main() {
 	}
 }
 func fail(err error) { fmt.Fprintln(os.Stderr, err); os.Exit(1) }
+
+// isolateBenchmarkGeometry is local because generated applications cannot import
+// the driver's internal nativefixture package. Call once before app construction.
+// Load failures are terminal: Core may apply defaults before returning an error;
+// this fixture does not roll them back and must not be retried or ignored.
+func isolateBenchmarkGeometry() (restore func(), err error) {
+	if core.AppearanceSettings.Zoom == 0 {
+		if err := core.LoadAllSettings(); err != nil {
+			return nil, err
+		}
+	}
+	zoom := float64(core.AppearanceSettings.Zoom)
+	if zoom <= 0 || math.IsNaN(zoom) || math.IsInf(zoom, 0) {
+		return nil, errors.New("hello benchmark: positive initialized Core zoom required")
+	}
+	previous := core.DebugSettings.DisableWindowGeometrySaver
+	core.DebugSettings.DisableWindowGeometrySaver = true
+	return func() { core.DebugSettings.DisableWindowGeometrySaver = previous }, nil
+}
