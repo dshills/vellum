@@ -12,6 +12,15 @@ A changed order is one Undo/Redo step; an already front/back selection adds no
 history. Save/Open preserves the stacking order. Groups remain flat membership
 sets: this does not create nested layers or change their internal paint order.
 
+Use **Bring forward** / **Send backward** for one component layer per action.
+Every member of a selected group participates. Each consecutive selected run
+crosses one adjacent unselected component, preserving relative order within both
+sets. Disjoint selections step independently; runs already at an edge stay there.
+Groups are flat membership sets, so members can remain interleaved with other
+components; unselected groups are not synthetic layers. The commands never
+compact unrelated groups. A changed order is one Undo/Redo entry; an edge or
+all-selected no-op adds no history. Save/Open preserves the resulting order.
+
 Use **Group / Cmd+G** to bind at least two selected components or groups into
 one flat group. **Ungroup / Cmd+Shift+G** removes membership from selected groups,
 leaving geometry, IDs and the selected components unchanged. Each is one Undo
