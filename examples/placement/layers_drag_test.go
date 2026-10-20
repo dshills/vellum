@@ -1,10 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"maps"
+	"math"
 	"slices"
 	"testing"
+	"time"
 
+	"cogentcore.org/core/core"
+	"cogentcore.org/core/math32"
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/canvas"
 )
@@ -243,10 +248,217 @@ func TestLayerGroupMarkerPreviewUsesBackmostMember(t *testing.T) {
 			if !s.valid || s.line != 170 {
 				t.Fatal("group preview must mark last member boundary", s.line)
 			}
-		} else if s.valid {
-			t.Fatal("offscreen group boundary accepted")
+		} else if !s.valid || s.line != g.clip.Max.Y {
+			t.Fatal("offscreen group boundary must mark the viewport edge")
 		}
 		m.cancelLayerDrag(s)
+	}
+}
+
+func shiftedLayerLayout(g layerLayout, delta float64) layerLayout {
+	g.rows = slices.Clone(g.rows)
+	for i := range g.rows {
+		g.rows[i].bounds.Min.Y -= delta
+		g.rows[i].bounds.Max.Y -= delta
+	}
+	return g
+}
+
+func TestLayerDragScrollRetargetsStationaryPointerAndHistory(t *testing.T) {
+	for _, scale := range []float64{1, 2} {
+		m := groupedModel(t)
+		g := testLayerLayout(m, scale)
+		s := m.beginLayerDrag("connector-2", layerPoint(g, "connector-2", true), g)
+		p := layerPoint(g, "block-1", false)
+		if !m.updateLayerDrag(s, p, g) || !s.valid || s.target != "block-1" {
+			t.Fatal("initial target")
+		}
+		count, before, view := m.journal.Snapshot().UndoCount, slices.Clone(m.scene.Objects), m.scene.View
+		// The list moves under the held pointer. The source may leave the
+		// viewport; identity and original document snapshots stay intact.
+		next := shiftedLayerLayout(g, 40*scale)
+		if !m.scrollLayerDrag(s, g, next, 40*scale) || s.pointer != p || s.target != "" || m.journal.Snapshot().UndoCount != count {
+			t.Fatal("scroll committed or stale target", s.target)
+		}
+		if !m.scrollLayerDrag(s, next, g, -40*scale) || s.target != "block-1" || !s.valid {
+			t.Fatal("reverse scroll")
+		}
+		if err := m.finishLayerDrag(s, p, g); err != nil {
+			t.Fatal(err)
+		}
+		after := slices.Clone(m.scene.Objects)
+		if m.journal.Snapshot().UndoCount != count+1 || m.scene.View != view || slices.Equal(before, after) {
+			t.Fatal("one drop after scrolling")
+		}
+		if err := m.journal.Undo(); err != nil || !slices.Equal(m.scene.Objects, before) {
+			t.Fatal("undo", err)
+		}
+		if err := m.journal.Redo(); err != nil || !slices.Equal(m.scene.Objects, after) {
+			t.Fatal("redo", err)
+		}
+	}
+}
+
+func TestLayerDragScrollRejectsStructuralChangesAndCancels(t *testing.T) {
+	for _, mutate := range []func(*layerLayout){
+		func(g *layerLayout) { g.clip.Max.Y-- },
+		func(g *layerLayout) { g.scale *= 2 },
+		func(g *layerLayout) { g.rows[0].id = "removed" },
+		func(g *layerLayout) { g.rows[0].bounds.Max.Y++ },
+		func(g *layerLayout) { g.rows[0].bounds.Min.X++ },
+		func(g *layerLayout) { g.rows = g.rows[1:] },
+	} {
+		m := groupedModel(t)
+		g := testLayerLayout(m, 1)
+		s := m.beginLayerDrag("connector-2", layerPoint(g, "connector-2", true), g)
+		m.updateLayerDrag(s, layerPoint(g, "block-1", true), g)
+		after := shiftedLayerLayout(g, 20)
+		mutate(&after)
+		before, count := slices.Clone(m.scene.Objects), m.journal.Snapshot().UndoCount
+		if m.scrollLayerDrag(s, g, after, 20) || m.layerDrag != nil {
+			t.Fatal("invalid scroll retained")
+		}
+		_ = m.finishLayerDrag(s, layerPoint(g, "block-1", true), g)
+		if !slices.Equal(before, m.scene.Objects) || m.journal.Snapshot().UndoCount != count {
+			t.Fatal("canceled scroll edited")
+		}
+	}
+}
+
+func TestLayerClippedRowHitUsesFullMidpoint(t *testing.T) {
+	m := groupedModel(t)
+	g := testLayerLayout(m, 1)
+	// Only the bottom of the first row is visible. It is still its lower
+	// half; clipping must not create a new midpoint or change identity.
+	g.clip.Min.Y = g.rows[0].bounds.Max.Y - 8
+	p := canvas.Point{X: 200, Y: g.clip.Min.Y + 1}
+	id, front, _ := g.rowAt(p)
+	if id != g.rows[0].id || front {
+		t.Fatal("clipped target midpoint")
+	}
+	if m.beginLayerDrag(id, p, g) == nil {
+		t.Fatal("clipped source rejected")
+	}
+}
+
+func TestLayerFractionalScrollAtMaximumRowsAndHighScale(t *testing.T) {
+	m, err := newModel()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(m.palette.Close)
+	m.groups = make(map[string]string)
+	for i := 0; i < 512; i++ {
+		id := fmt.Sprintf("block-%d", i+1)
+		m.scene.Objects = append(m.scene.Objects, canvas.Rect{ID: id, Width: 80, Height: 50})
+		m.groups[id] = fmt.Sprintf("group-%d", i/2+1)
+	}
+	g := testLayerLayout(m, 4)
+	g.clip.Max.Y = 800
+	s := m.beginLayerDrag("group-256", layerPoint(g, "group-256", true), g)
+	if s == nil {
+		t.Fatal("begin")
+	}
+	m.updateLayerDrag(s, canvas.Point{X: 600, Y: 600}, g)
+	for _, delta := range []float64{0.33333334, 0.7, -0.1875} {
+		next := g
+		next.rows = slices.Clone(g.rows)
+		for i := range next.rows {
+			next.rows[i].bounds.Min.Y = float64(float32(float32(g.rows[i].bounds.Min.Y) - float32(delta)))
+			next.rows[i].bounds.Max.Y = float64(float32(float32(g.rows[i].bounds.Max.Y) - float32(delta)))
+		}
+		if !m.scrollLayerDrag(s, g, next, delta) || m.layerDrag != s {
+			t.Fatal("valid fractional native scroll canceled", delta)
+		}
+		g = next
+	}
+	m.cancelLayerDrag(s)
+}
+
+func TestLayerEdgeBandAndScrollLimits(t *testing.T) {
+	g := layerLayout{clip: canvas.Bounds{Min: canvas.Point{X: 100, Y: 10}, Max: canvas.Point{X: 400, Y: 110}}, scale: 2}
+	s := &layerDrag{layout: g, dragging: true}
+	for _, tc := range []struct {
+		p    canvas.Point
+		want float64
+	}{
+		{canvas.Point{X: 200, Y: 11}, -24}, {canvas.Point{X: 200, Y: 109}, 24},
+		{canvas.Point{X: 200, Y: 60}, 0}, {canvas.Point{X: 99, Y: 109}, 0}, {canvas.Point{X: 200, Y: 111}, 0},
+	} {
+		s.pointer = tc.p
+		if got := layerEdgeDelta(s); got != tc.want {
+			t.Fatal(tc, got)
+		}
+	}
+	s.dragging = false
+	if layerEdgeDelta(s) != 0 {
+		t.Fatal("pre-threshold auto scroll")
+	}
+	fr := tree.New[core.Frame]()
+	fr.HasScroll[math32.Y] = true
+	fr.Geom.Size.Internal.Y = 1000
+	fr.Geom.Size.Alloc.Content.Y = 100
+	sb := tree.New[core.Slider]()
+	fr.Scrolls[math32.Y] = sb
+	for _, tc := range []struct {
+		current float32
+		delta   float64
+		want    float32
+		changed bool
+	}{
+		{0, -10, 0, false}, {0, 10, 10, true}, {895, 20, 900, true}, {900, 20, 900, false}, {100, 1e9, 200, true}, {100, math.NaN(), 0, false},
+	} {
+		sb.Value = tc.current
+		got, changed := layerScrollDestination(fr, tc.delta)
+		if got != tc.want || changed != tc.changed {
+			t.Fatal(tc, got, changed)
+		}
+	}
+}
+
+func TestLayerPulseRetiresQueuedWorkOnCancelAndDestroy(t *testing.T) {
+	for _, destroy := range []bool{false, true} {
+		f := fileModel(t, false)
+		f.place(t, "block", canvas.Point{})
+		f.place(t, "note", canvas.Point{X: 200})
+		f.owner(t, func() {
+			g := testLayerLayout(f.m, 1)
+			s := f.m.beginLayerDrag("block-1", layerPoint(g, "block-1", true), g)
+			w := tree.New[layerMount]()
+			w.editor = &layerEditor{a: f.a, ref: f.ref, model: f.m}
+			w.active = s
+			var err error
+			w.ticket, err = f.a.ReserveWindowCompletion(f.ref, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			pulse, err := f.a.ReserveWindowCompletion(f.ref, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			w.pulse = &layerPulse{ticket: pulse}
+			if err = pulse.Publish(func() { t.Error("retired autoscroll ran") }); err != nil {
+				t.Fatal(err)
+			}
+			w.pulse.timer = time.AfterFunc(time.Hour, func() { t.Error("retired timer fired") })
+			if destroy {
+				w.Destroy()
+			} else {
+				f.m.cancelLayerDrag(s)
+				w.endCapture()
+			}
+			if w.pulse != nil || w.active != nil {
+				t.Fatal("pulse references retained")
+			}
+		})
+		if err := f.a.Drain(); err != nil {
+			t.Fatal(err)
+		}
+		f.owner(t, func() {
+			if f.m.layerDrag != nil {
+				t.Fatal("domain capture retained")
+			}
+		})
 	}
 }
 func TestLayerMountDestroyTransfersCancellationWithoutOwnerReentry(t *testing.T) {

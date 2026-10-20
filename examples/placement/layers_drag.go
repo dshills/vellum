@@ -107,8 +107,8 @@ func (m *model) updateLayerDrag(s *layerDrag, p canvas.Point, g layerLayout) boo
 	if s.dragging && s.target != "" {
 		_, err := reorderedLayers(s.before, s.groups, s.ids, s.target, s.front)
 		s.valid = err == nil
-		// A group marker's lower half targets its backmost member, not the
-		// marker's own bottom. Require that actual boundary to be visible.
+		// A group marker targets the outer group boundary, including members
+		// below the viewport. Clamp its indicator to the visible list edge.
 		if s.valid && !s.front {
 			for _, o := range s.before {
 				if s.groups[o.ID] != s.target {
@@ -116,8 +116,8 @@ func (m *model) updateLayerDrag(s *layerDrag, p canvas.Point, g layerLayout) boo
 				}
 				s.valid = false
 				for _, row := range g.rows {
-					if row.id == o.ID && row.bounds.Min.Y >= g.clip.Min.Y && row.bounds.Max.Y <= g.clip.Max.Y {
-						s.line, s.valid = row.bounds.Max.Y, true
+					if row.id == o.ID {
+						s.line, s.valid = math.Max(g.clip.Min.Y, math.Min(g.clip.Max.Y, row.bounds.Max.Y)), true
 						break
 					}
 				}
@@ -136,6 +136,65 @@ func (m *model) updateLayerDrag(s *layerDrag, p canvas.Point, g layerLayout) boo
 		}
 	}
 	return true
+}
+
+// Adopt only a translation produced by our native list scroll operation. All
+// other geometry changes keep the ordinary cancellation path. The stationary
+// pointer is re-hit-tested against the new full (unclipped) row positions.
+func (m *model) scrollLayerDrag(s *layerDrag, before, after layerLayout, delta float64) bool {
+	if s == nil {
+		return false
+	}
+	if !m.updateLayerDrag(s, s.pointer, before) {
+		return false
+	}
+	valid := !math.IsNaN(delta) && !math.IsInf(delta, 0) && before.clip == after.clip && before.scale == after.scale && len(before.rows) == len(after.rows)
+	if valid {
+		for i, a := range before.rows {
+			b := after.rows[i]
+			if a.id != b.id || a.bounds.Min.X != b.bounds.Min.X || a.bounds.Max.X != b.bounds.Max.X || !layerTranslatedY(a.bounds.Min.Y, b.bounds.Min.Y, delta) || !layerTranslatedY(a.bounds.Max.Y, b.bounds.Max.Y, delta) {
+				valid = false
+				break
+			}
+		}
+	}
+	if !valid {
+		m.cancelLayerDrag(s)
+		return false
+	}
+	s.layout.rows = slices.Clone(after.rows)
+	return m.updateLayerDrag(s, s.pointer, after)
+}
+
+func layerTranslatedY(before, after, delta float64) bool {
+	// Native row/scroll geometry is float32. Distant offscreen rows can have
+	// larger ULPs than a fixed epsilon, especially at high display scaling.
+	ulp := func(v float64) float64 {
+		f := float32(v)
+		return math.Abs(float64(math.Nextafter32(f, float32(math.Inf(1)))) - float64(f))
+	}
+	tolerance := math.Max(0.001, 2*(ulp(before)+ulp(after)+ulp(delta)))
+	return math.Abs(before-delta-after) <= tolerance
+}
+
+// A bounded, vertical edge band. Outside release is still invalid; no scrolling
+// continues while the pointer is over canvas/chrome or before the threshold.
+func layerEdgeDelta(s *layerDrag) float64 {
+	if s == nil || !s.dragging {
+		return 0
+	}
+	g, p := s.layout, s.pointer
+	if p.X < g.clip.Min.X || p.X >= g.clip.Max.X || p.Y < g.clip.Min.Y || p.Y >= g.clip.Max.Y {
+		return 0
+	}
+	band := math.Min(24*g.scale, (g.clip.Max.Y-g.clip.Min.Y)/3)
+	if p.Y < g.clip.Min.Y+band {
+		return -12 * g.scale
+	}
+	if p.Y > g.clip.Max.Y-band {
+		return 12 * g.scale
+	}
+	return 0
 }
 func (m *model) finishLayerDrag(s *layerDrag, p canvas.Point, g layerLayout) error {
 	if !m.updateLayerDrag(s, p, g) {

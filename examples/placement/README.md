@@ -23,14 +23,27 @@ row moves its component/whole group. The upper/lower half of a visible target ro
 means above/below it in this front-first list. A blue insertion line
 identifies the proposed position; release commits exactly one history entry. A group
 selector targets its outer group boundary; a member row targets that component.
-Dropping below a group selector requires its last member row to be fully visible;
-for longer groups, scroll before starting and drop on the visible last member.
+The group boundary indicator clamps to the visible list edge when its last
+member is offscreen; the drop still targets the entire group boundary.
 A no-op adds no history. Short clicks keep normal selection/Add behavior. Escape,
-outside/invalid/self release, focus/capture loss, changed panel geometry or display
+outside/invalid/self release, focus/capture loss, resized panel geometry or display
 scale, removed rows and window closure cancel without reordering or changing
-selection. The final release is consumed. Scrolling/autoscroll during a drag and
-cross-window dragging are not supported; scroll before starting. Existing reorder
-buttons remain the keyboard path to the same bounded document history.
+selection. The final release is consumed.
+
+While holding a threshold-crossed row drag, use the wheel/trackpad to scroll the
+layers list (including with Shift held). Hold near the top or bottom inside edge
+to autoscroll; moving back to the middle or outside the list stops autoscroll.
+Only the list scrolls; canvas pan/zoom and the drawing stay unchanged until the
+drop. Partially clipped source/target rows use their full row midpoint, so the
+visible portion does not change above/below semantics. Sources can scroll out of
+view without losing their stable identities. Held drags suppress row tooltips.
+Scrolling itself adds no history; the eventual valid release adds one entry.
+
+The native adapter owns one bounded 50ms autoscroll pulse at a time and retires
+its timer and reserved delivery on finish, cancellation or destruction. Native
+scrolling rebases only verified vertical translations of every row; a structural
+layout change still cancels. Cross-window dragging remains unsupported. Existing
+reorder buttons remain the keyboard path to the same bounded document history.
 
 Use **Bring to front** or **Send to back** to place selected components and
 whole selected groups above or below every unselected component. Each action

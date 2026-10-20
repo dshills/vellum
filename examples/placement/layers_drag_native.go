@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"image/color"
 	"math"
+	"sync/atomic"
+	"time"
 
 	"cogentcore.org/core/colors"
 	"cogentcore.org/core/core"
@@ -32,6 +34,15 @@ type layerMount struct {
 	stage         *core.Stage
 	sprite        *core.Sprite
 	restoreQueued bool
+	pulse         *layerPulse
+}
+
+// Completion callbacks own detached atomic state, never native mount fields.
+// The native Sync consumes readiness under render ownership.
+type layerPulse struct {
+	ready, canceled atomic.Bool
+	ticket          *app.Completion
+	timer           *time.Timer
 }
 
 const layerDragSprite = "vellum.placement-app.layer-insertion"
@@ -50,6 +61,7 @@ func (w *layerMount) clearPreview() {
 	w.sprite = nil
 }
 func (w *layerMount) endCapture() {
+	w.stopPulse()
 	if w.owner != nil && w.owner.Scene != nil {
 		w.owner.Scene.Events.ReleasePointer(w.token)
 	}
@@ -108,8 +120,11 @@ func layerGeometry(scroll, rows *core.WidgetBase, entries []layerRow) (layerLayo
 		if row == nil {
 			return layerLayout{}, fmt.Errorf("layer row removed")
 		}
-		b := row.Geom.TotalBBox
-		g.rows = append(g.rows, layerBox{entry.id, bounds(b.Min.X, b.Min.Y, b.Max.X, b.Max.Y)})
+		// TotalBBox is clipped, even empty for offscreen rows. Capture their
+		// full layout rectangles so scrolling and clipped hits retain identity
+		// and the real midpoint, independent of the visible portion.
+		p, size := row.Geom.Pos.Total, row.Geom.Size.Actual.Total
+		g.rows = append(g.rows, layerBox{entry.id, canvas.Bounds{Min: canvas.Point{X: float64(p.X) + float64(offset.X), Y: float64(p.Y) + float64(offset.Y)}, Max: canvas.Point{X: float64(p.X+size.X) + float64(offset.X), Y: float64(p.Y+size.Y) + float64(offset.Y)}}})
 	}
 	return g, nil
 }
@@ -128,16 +143,30 @@ func (e *layerEditor) Sync(widget core.Widget) error {
 		if row.Property(prop) != e {
 			row.SetProperty(prop, e)
 			row.OnFirst(events.MouseDown, func(event events.Event) { w.press(scroll, rows, row, entry.id, event) })
+			// A tooltip popup would retire scoped capture during a held drag.
+			// Keep normal help available when no drag is active.
+			for _, typ := range []events.Types{events.LongHoverStart, events.LongPressStart} {
+				row.OnFirst(typ, func(event events.Event) {
+					if w.active != nil {
+						event.SetHandled()
+					}
+				})
+			}
 		}
 	}
 	if w.active != nil && e.model.layerDrag != w.active {
 		w.endCapture()
+	}
+	if pulse := w.pulse; pulse != nil && pulse.ready.Load() {
+		w.stopPulse()
+		w.scrollBy(scroll, rows, layerEdgeDelta(w.active))
 	}
 	if e.model.layerDrag != nil {
 		w.publishPreview(scroll)
 	} else {
 		w.clearPreview()
 	}
+	w.armPulse(scroll)
 	const prop = "vellum-placement-layer-preview"
 	if scroll.Property(prop) != w {
 		scroll.SetProperty(prop, w)
@@ -184,6 +213,7 @@ func (w *layerMount) press(scroll, rows, row *core.WidgetBase, id string, event 
 	}
 	event.SetHandled()
 	lost := func() {
+		w.stopPulse()
 		w.active = nil
 		w.owner = nil
 		w.ticket = nil
@@ -193,10 +223,12 @@ func (w *layerMount) press(scroll, rows, row *core.WidgetBase, id string, event 
 	}
 	handle := func(input events.Event) {
 		terminal := input.Type() == events.MouseUp && input.MouseButton() == events.Left
-		if input.Type() != events.MouseMove && input.Type() != events.MouseDrag && !terminal {
+		wheel, scrolling := input.(*events.MouseScroll)
+		if input.Type() != events.MouseMove && input.Type() != events.MouseDrag && !terminal && !scrolling {
 			return
 		}
 		if terminal {
+			w.stopPulse()
 			ticket.Abort()
 			w.active = nil
 			w.owner = nil
@@ -217,6 +249,11 @@ func (w *layerMount) press(scroll, rows, row *core.WidgetBase, id string, event 
 				}
 			} else {
 				e.model.updateLayerDrag(s, eventPoint(input), g)
+				if scrolling && s.dragging && e.model.layerDrag == s {
+					// The captured wheel always scrolls this vertical layer list,
+					// including with Shift held. Never route it to canvas zoom.
+					w.scrollBy(scroll, rows, float64(wheel.Delta.Y))
+				}
 			}
 			if terminal || e.model.layerDrag != s {
 				if !terminal {
@@ -229,6 +266,7 @@ func (w *layerMount) press(scroll, rows, row *core.WidgetBase, id string, event 
 				// Preview painting uses detached values and native render wake.
 				w.publishPreview(scroll)
 				scroll.Scene.NeedsRender()
+				w.armPulse(scroll)
 			}
 		})
 	}
@@ -244,6 +282,103 @@ func (w *layerMount) press(scroll, rows, row *core.WidgetBase, id string, event 
 	w.owner = scroll
 	w.token = token
 	row.SetFocusQuiet()
+}
+
+func (w *layerMount) stopPulse() {
+	if p := w.pulse; p != nil {
+		p.canceled.Store(true)
+		if p.timer != nil {
+			p.timer.Stop()
+		}
+		p.ticket.Abort()
+	}
+	w.pulse = nil
+}
+
+func layerScrollFrame(scroll *core.WidgetBase) *core.Frame {
+	if scroll == nil || scroll.This == nil {
+		return nil
+	}
+	if layout, ok := scroll.This.(core.Layouter); ok {
+		return layout.AsFrame()
+	}
+	return nil
+}
+
+func layerScrollDestination(fr *core.Frame, delta float64) (float32, bool) {
+	if fr == nil || !fr.HasScroll[math32.Y] || fr.Scrolls[math32.Y] == nil || math.IsNaN(delta) || math.IsInf(delta, 0) {
+		return 0, false
+	}
+	sb := fr.Scrolls[math32.Y]
+	maximum, visible, _ := fr.ScrollValues(math32.Y)
+	limit := math.Max(0, float64(maximum-visible))
+	// Bound even synthetic wheel records to one visible page per event.
+	delta = math.Max(-float64(visible), math.Min(float64(visible), delta))
+	next := float32(math.Max(0, math.Min(limit, float64(sb.Value)+delta)))
+	return next, next != sb.Value
+}
+
+// Native mutations run only from event/Sync ownership, never a timer goroutine.
+func (w *layerMount) scrollBy(scroll, rows *core.WidgetBase, delta float64) {
+	e, s := w.editor, w.active
+	if s == nil || e.model.layerDrag != s || !s.dragging {
+		return
+	}
+	before, err := layerGeometry(scroll, rows, e.model.layerRows())
+	if err != nil || !e.model.updateLayerDrag(s, s.pointer, before) {
+		e.model.cancelLayerDrag(s)
+		w.endCapture()
+		_ = e.a.Invalidate("placement")
+		return
+	}
+	fr := layerScrollFrame(scroll)
+	next, changed := layerScrollDestination(fr, delta)
+	if !changed {
+		return
+	}
+	sb := fr.Scrolls[math32.Y]
+	prior := sb.Value
+	sb.SetValue(next)
+	fr.ScrollChanged(math32.Y, sb)
+	after, err := layerGeometry(scroll, rows, e.model.layerRows())
+	if err != nil || !e.model.scrollLayerDrag(s, before, after, float64(sb.Value-prior)) {
+		e.model.cancelLayerDrag(s)
+		w.endCapture()
+		_ = e.a.Invalidate("placement")
+	}
+}
+
+// At most one timer and one reserved completion belong to this capture. The
+// timer publishes a flag only; the next native Sync performs the actual scroll.
+// Aborting cancels both unpublished and ready work on every terminal path.
+func (w *layerMount) armPulse(scroll *core.WidgetBase) {
+	s, e := w.active, w.editor
+	if s == nil || e.model.layerDrag != s || e.ref.Context().Err() != nil {
+		w.stopPulse()
+		return
+	}
+	if _, can := layerScrollDestination(layerScrollFrame(scroll), layerEdgeDelta(s)); !can {
+		w.stopPulse()
+		return
+	}
+	if w.pulse != nil {
+		return
+	}
+	ticket, err := e.a.ReserveWindowCompletion(e.ref, nil)
+	if err != nil {
+		return
+	}
+	p := &layerPulse{ticket: ticket}
+	w.pulse = p
+	a := e.a
+	p.timer = time.AfterFunc(50*time.Millisecond, func() {
+		_ = ticket.Publish(func() {
+			if !p.canceled.Load() {
+				p.ready.Store(true)
+				_ = a.Invalidate("placement")
+			}
+		})
+	})
 }
 func (w *layerMount) publishPreview(scroll *core.WidgetBase) {
 	w.clearPreview()
