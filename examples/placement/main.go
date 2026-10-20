@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/dshills/vellum/app"
@@ -25,7 +26,10 @@ func run() {
 	}
 	defer a.Close()
 	var windowRef app.WindowRef
-	if windowRef, err = a.OpenWindow(app.Window{ID: "placement", Title: "Vellum palette to canvas", Width: 1100, Height: 760, View: func() ui.Node { return view(a, windowRef, m) }}); err != nil {
+	if windowRef, err = a.OpenWindow(app.Window{ID: "placement", Title: "Vellum palette to canvas", Width: 1100, Height: 760, View: func() ui.Node { return view(a, windowRef, m) }, CloseRequest: func() bool { return m.requestClose(a) }}); err != nil {
+		fail(err)
+	}
+	if err := m.bindFiles(a, windowRef, nil); err != nil {
 		fail(err)
 	}
 	if err := a.Run(context.Background(), cogent.Driver{Commands: m.commands}); err != nil {
@@ -35,6 +39,14 @@ func run() {
 func fail(err error) { fmt.Fprintln(os.Stderr, err); os.Exit(1) }
 func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 	update := func() { _ = a.Invalidate("placement") }
+	busy := m.fileBusy()
+	filename := "Untitled.vellum"
+	if m.files != nil && m.files.State().Path != "" {
+		filename = filepath.Base(m.files.State().Path)
+	}
+	if m.journal.Snapshot().Dirty {
+		filename += " • Unsaved placements"
+	}
 	invoke := func(id string) func() {
 		return func() {
 			life := ref.Context()
@@ -51,7 +63,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 	tools := []ui.Node{{ID: "tools-heading", Kind: ui.Label, Text: "Components"}}
 	for _, id := range []string{"block", "connector", "note"} {
 		source := m.palette.Source(id)
-		tools = append(tools, ui.Node{ID: "tool-" + id, Kind: ui.Button, Text: source.Label(), PlacementSource: source, Accessibility: ui.Accessibility{Name: source.Label(), Help: "Drag onto the canvas, or press Return to place at the current canvas center."}, Activate: func() {
+		tools = append(tools, ui.Node{ID: "tool-" + id, Kind: ui.Button, Text: source.Label(), Disabled: busy, PlacementSource: source, Accessibility: ui.Accessibility{Name: source.Label(), Help: "Drag onto the canvas, or press Return to place at the current canvas center."}, Activate: func() {
 			life := ref.Context()
 			if life.Err() != nil {
 				return
@@ -73,24 +85,32 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		label := map[string]string{"block": "Block", "connector": "Connector", "note": "Note"}[kind]
 		objects = append(objects, ui.CanvasObject{ID: object.ID, Name: label + " " + object.ID, Help: "Select this component."})
 	}
-	return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{
+	root := ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{
+		{ID: "file-tools", Kind: ui.Toolbar, Children: []ui.Node{
+			{ID: "open", Kind: ui.Button, Text: "Open…", Disabled: m.files == nil || m.commands.Enabled("open") != nil, Activate: invoke("open")},
+			{ID: "save", Kind: ui.Button, Text: "Save", Disabled: m.files == nil || m.commands.Enabled("save") != nil, Activate: invoke("save")},
+			{ID: "save-as", Kind: ui.Button, Text: "Save As…", Disabled: m.files == nil || m.commands.Enabled("save-as") != nil, Activate: invoke("save-as")},
+			{ID: "filename", Kind: ui.Label, Text: filename},
+		}},
 		{ID: "toolbar", Kind: ui.Toolbar, Children: []ui.Node{
 			{ID: "undo", Kind: ui.Button, Text: "Undo", Disabled: m.commands.Enabled("undo") != nil, Activate: invoke("undo")},
 			{ID: "redo", Kind: ui.Button, Text: "Redo", Disabled: m.commands.Enabled("redo") != nil, Activate: invoke("redo")},
-			{ID: "fit", Kind: ui.Button, Text: "Fit objects", Activate: func() { m.scene.Fit(); update() }},
-			{ID: "reset", Kind: ui.Button, Text: "Reset view", Activate: func() { m.scene.View.Center = canvas.Point{}; m.scene.View.Zoom = 1; update() }},
-			{ID: "snap", Kind: ui.Checkbox, Text: "Snap to grid", Checked: m.snap, Change: func(e ui.ChangeEvent) { m.snap = e.Checked; update() }},
+			{ID: "fit", Kind: ui.Button, Text: "Fit objects", Disabled: busy, Activate: func() { m.scene.Fit(); update() }},
+			{ID: "reset", Kind: ui.Button, Text: "Reset view", Disabled: busy, Activate: func() { m.scene.View.Center = canvas.Point{}; m.scene.View.Zoom = 1; update() }},
+			{ID: "snap", Kind: ui.Checkbox, Text: "Snap to grid", Disabled: busy, Checked: m.snap, Change: func(e ui.ChangeEvent) { m.snap = e.Checked; update() }},
 			{ID: "lock", Kind: ui.Checkbox, Text: "Reject all drops", Checked: m.locked, Change: func(e ui.ChangeEvent) { m.locked = e.Checked; update() }},
 			{ID: "reject-notes", Kind: ui.Checkbox, Text: "Reject notes", Checked: m.rejectNotes, Change: func(e ui.ChangeEvent) { m.rejectNotes = e.Checked; update() }},
 		}},
 		{ID: "help", Kind: ui.Label, Text: "Drag to place • drag the canvas or use arrow keys to pan • wheel to zoom • Escape cancels • Return on a tool places at center • Option+arrows select objects"},
 		{ID: "workspace", Kind: ui.Row, Grow: true, Children: []ui.Node{
 			{ID: "palette", Kind: ui.Column, MinWidth: 145, Children: tools},
-			{ID: "drawing", Kind: ui.Canvas2D, Canvas: m.scene, CanvasObjects: objects, CanvasGrid: grid, PlacementTarget: m.target, Grow: true, Accessibility: ui.Accessibility{Name: "Component canvas", Help: "Select a component, or use Option+Left/Right/Home/End on the canvas; drag or use plain arrow keys to pan; scroll to zoom."}, Change: func(e ui.ChangeEvent) {
+			{ID: "drawing", Kind: ui.Canvas2D, Disabled: busy, Canvas: m.scene, CanvasObjects: objects, CanvasGrid: grid, PlacementTarget: m.target, Grow: true, Accessibility: ui.Accessibility{Name: "Component canvas", Help: "Select a component, or use Option+Left/Right/Home/End on the canvas; drag or use plain arrow keys to pan; scroll to zoom."}, Change: func(e ui.ChangeEvent) {
 				m.status = fmt.Sprintf("Selected: %s • zoom %.0f%%", e.SelectedID, e.Number*100)
 				update()
 			}},
 		}},
 		{ID: "status", Kind: ui.StatusBar, Children: []ui.Node{{ID: "message", Kind: ui.Label, Text: fmt.Sprintf("%s • %d objects • Undo %d / Redo %d", m.status, len(m.scene.Objects), m.journal.Snapshot().UndoCount, m.journal.Snapshot().RedoCount)}}},
 	}}
+	root.Children = append(root.Children, m.filePrompt(a, ref))
+	return root
 }

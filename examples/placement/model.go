@@ -10,6 +10,7 @@ import (
 
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/command"
+	"github.com/dshills/vellum/document"
 	"github.com/dshills/vellum/history"
 	"github.com/dshills/vellum/placement"
 )
@@ -30,6 +31,20 @@ type model struct {
 	next                      uint64
 	snap, locked, rejectNotes bool
 	status                    string
+	files                     *document.Session[drawingFile]
+	prompt                    string
+}
+
+func componentByKind(kind string) (component, bool) {
+	for _, c := range components() {
+		if c.Kind == kind {
+			return c, true
+		}
+	}
+	return component{}, false
+}
+func components() []component {
+	return []component{{"block", 80, 50, color.RGBA{48, 117, 209, 255}}, {"connector", 120, 16, color.RGBA{35, 150, 110, 255}}, {"note", 90, 65, color.RGBA{235, 180, 50, 255}}}
 }
 
 func newModel() (*model, error) {
@@ -45,12 +60,18 @@ func newModel() (*model, error) {
 	for _, c := range []command.Command{
 		{ID: "place", Label: "Place component", Execute: func(ctx context.Context) error { return m.commit(ctx) }},
 		{ID: "undo", Label: "Undo", Shortcut: "Meta+Z", Available: func() error {
+			if m.fileBusy() {
+				return document.ErrBusy
+			}
 			if m.journal.Snapshot().UndoCount == 0 {
 				return history.ErrEmpty
 			}
 			return nil
 		}, Execute: func(context.Context) error { return m.journal.Undo() }},
 		{ID: "redo", Label: "Redo", Shortcut: "Meta+Shift+Z", Available: func() error {
+			if m.fileBusy() {
+				return document.ErrBusy
+			}
 			if m.journal.Snapshot().RedoCount == 0 {
 				return history.ErrEmpty
 			}
@@ -62,7 +83,7 @@ func newModel() (*model, error) {
 		}
 	}
 	items := []placement.Item[component]{}
-	for _, c := range []component{{"block", 80, 50, color.RGBA{48, 117, 209, 255}}, {"connector", 120, 16, color.RGBA{35, 150, 110, 255}}, {"note", 90, 65, color.RGBA{235, 180, 50, 255}}} {
+	for _, c := range components() {
 		items = append(items, placement.Item[component]{ID: c.Kind, Label: map[string]string{"block": "Block", "connector": "Connector", "note": "Note"}[c.Kind], Payload: c, Preview: canvas.Rect{Width: c.Width, Height: c.Height, Color: c.Color}})
 	}
 	m.palette, err = placement.New(placement.Config[component]{Items: items, Command: func(ctx context.Context, r placement.Request[component]) error {
@@ -81,7 +102,7 @@ func newModel() (*model, error) {
 		}
 		return p, nil
 	}, Accept: func(r placement.Request[component]) error {
-		if m.locked || (m.rejectNotes && r.Payload.Kind == "note") || len(m.scene.Objects) >= 512 || math.Abs(r.Position.X) > 10000 || math.Abs(r.Position.Y) > 10000 {
+		if m.fileBusy() || m.locked || (m.rejectNotes && r.Payload.Kind == "note") || len(m.scene.Objects) >= 512 || math.Abs(r.Position.X) > 10000 || math.Abs(r.Position.Y) > 10000 {
 			return placement.ErrRejected
 		}
 		return nil

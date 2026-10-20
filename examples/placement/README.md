@@ -25,6 +25,20 @@ reject all drops, or reject notes to inspect target policy. Undo/Redo buttons an
 Cmd+Z / Cmd+Shift+Z replay exactly one placement with the original object ID.
 The example limits the document to 512 objects and history to 64 changes.
 
+Use **Save** (Cmd+S), **Save As…** (Cmd+Shift+S) and **Open…** (Cmd+O) to
+persist drawings through native file choosers. `.vellum` files contain bounded,
+versioned JSON for component types, stable IDs and positions, selection,
+pan/zoom, snapping and the next object ID. Window dimensions and Undo history
+are not saved. Opening validates the entire file before replacing the drawing,
+clears the previous document's history, and preserves the current canvas size.
+New placements after opening still support Undo/Redo.
+
+Open and Close ask before discarding unsaved placements. Cancel Close to save
+first. Navigation, selection and snapping do not mark placements dirty, but their
+current values are included whenever Save is used. Save writes a complete file
+atomically; failed/canceled Open keeps the current drawing. Only this example
+uses the existing `document.Session` API; framework behavior is unchanged.
+
 Run the model checks or deterministic software routing checks separately:
 
 ```sh
