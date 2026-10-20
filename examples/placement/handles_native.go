@@ -61,7 +61,12 @@ func (e *canvasEditor) publishHandles(target *core.WidgetBase, mount *editorMoun
 	stage := target.Scene.Stage.Main
 
 	ids := e.model.selectedIDs()
-	if len(ids) == 0 || e.model.fileBusy() || e.model.prompt != "" || e.model.palette.State().Active {
+	var marquee canvas.Rect
+	showMarquee := false
+	if s := e.model.move; s != nil && s.marquee && s.dragging && s.valid {
+		marquee, showMarquee = s.marqueeBounds, true
+	}
+	if (len(ids) == 0 && !showMarquee) || e.model.fileBusy() || e.model.prompt != "" || e.model.palette.State().Active {
 		return
 	}
 	wanted := make(map[string]bool, len(ids))
@@ -84,6 +89,10 @@ func (e *canvasEditor) publishHandles(target *core.WidgetBase, mount *editorMoun
 		if err != nil {
 			return
 		}
+		if showMarquee {
+			drawMarquee(pc, marquee, g)
+			return
+		}
 		if len(objects) == 1 {
 			drawCornerHandles(pc, objects[0], g)
 		} else {
@@ -99,6 +108,18 @@ func (e *canvasEditor) publishHandles(target *core.WidgetBase, mount *editorMoun
 	sprite.Active = true
 	mount.handleStage, mount.handleSprite = stage, sprite
 	stage.Sprites.Add(sprite)
+}
+
+func drawMarquee(pc *paint.Painter, bounds canvas.Rect, g placement.Geometry) {
+	p := g.View.Screen(canvas.Point{X: bounds.X, Y: bounds.Y})
+	left, top := g.Origin.X+p.X*g.Scale, g.Origin.Y+p.Y*g.Scale
+	right, bottom := left+bounds.Width*g.View.Zoom*g.Scale, top+bounds.Height*g.View.Zoom*g.Scale
+	left, top = math.Max(left, g.Clip.Min.X), math.Max(top, g.Clip.Min.Y)
+	right, bottom = math.Min(right, g.Clip.Max.X), math.Min(bottom, g.Clip.Max.Y)
+	if right > left && bottom > top {
+		pc.FillBox(math32.Vec2(float32(left), float32(top)), math32.Vec2(float32(right-left), float32(bottom-top)), colors.Uniform(color.NRGBA{R: 25, G: 90, B: 180, A: 28}))
+	}
+	drawSelectionOutline(pc, bounds, g)
 }
 
 func drawCornerHandles(pc *paint.Painter, object canvas.Rect, g placement.Geometry) {

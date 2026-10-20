@@ -24,6 +24,8 @@ type objectMove struct {
 	corner          resizeCorner
 	selection       []string
 	selectionOnly   bool
+	marquee         bool
+	marqueeBounds   canvas.Rect
 }
 
 func (m *model) editAvailable() error {
@@ -164,6 +166,11 @@ func (m *model) previewMove(s *objectMove, p canvas.Point) {
 		return
 	}
 	s.dragging = true
+	if s.marquee {
+		s.marqueeBounds = marqueeRect(s.grab, world)
+		m.status = fmt.Sprintf("Marquee: %d components • release to select • Escape cancels", len(marqueeIDs(s.before, s.selection, s.marqueeBounds)))
+		return
+	}
 	// Keep the initial world grab point while mapping the current pointer with
 	// the latest layout, preserving the offset inside the object.
 	dx, dy := world.X-s.grab.X, world.Y-s.grab.Y
@@ -224,6 +231,14 @@ func (m *model) finishMove(s *objectMove, p canvas.Point) error {
 		m.cancelMove(s)
 		return nil
 	}
+	if s.marquee {
+		m.move = nil
+		if s.dragging {
+			m.setSelection(marqueeIDs(s.before, s.selection, s.marqueeBounds), s.id)
+			m.status = fmt.Sprintf("Marquee selected %d components", len(m.selectedIDs()))
+		}
+		return nil
+	}
 	after := slices.Clone(m.scene.Objects)
 	m.scene.Objects = slices.Clone(s.before)
 	m.move = nil
@@ -265,6 +280,9 @@ func (m *model) updateMoveGeometry(s *objectMove, g placement.Geometry) bool {
 }
 
 func (s *objectMove) operation() string {
+	if s.marquee {
+		return "Marquee selection"
+	}
 	if s.resize {
 		return "Resize"
 	}

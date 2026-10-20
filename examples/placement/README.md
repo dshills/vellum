@@ -24,6 +24,23 @@ paint-ordered selection set; Shift-click empty space keeps the set. Blue outline
 mark every selected component and the toolbar/status show the selected count.
 Selection changes alone do not make Undo entries or mark the drawing dirty.
 
+Shift-drag from **empty canvas** to draw a marquee. After the six-logical-pixel
+threshold, a blue rectangle previews the selection area. Release inside the
+canvas to add every component whose footprint intersects the rectangle with
+positive area, including partially covered or overlapping components. Either
+drag direction works. Existing members and the existing primary are kept;
+otherwise the last selected object in paint order becomes primary. Shift-drag
+starting on a component keeps Shift-click toggle behavior; start in empty space.
+Click empty space first for a fresh selection. A zero-area rectangle or empty
+Shift-click keeps the previous set. Snapping does not affect the selection area.
+
+Selection commits only on valid release and creates no object edit or Undo entry.
+Escape, outside release, focus/capture loss, Close, or camera/display-scale change
+cancels and keeps the original selection. The captured release cannot also pan,
+click a component or activate a palette tool. Plain empty-space drag still pans,
+plain arrows pan and wheel zooms. During a marquee, navigation/file/edit commands
+are gated by the existing capture lifecycle. There is no edge autoscroll.
+
 Drag any selected component to move the whole set, preserving relative offsets.
 With snapping, the dragged component determines one snapped translation shared by
 all members. A group drag or Move button/shortcut is one Undo entry; if any member

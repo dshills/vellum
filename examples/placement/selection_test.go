@@ -20,7 +20,7 @@ func toggleSelection(t *testing.T, m *model, g placement.Geometry, p canvas.Poin
 	t.Helper()
 	p = selectionPoint(g, p)
 	s := m.selectionToggle(g, p)
-	if s == nil || !s.selectionOnly {
+	if s == nil || (!s.selectionOnly && !s.marquee) {
 		t.Fatal("toggle capture")
 	}
 	if err := m.finishMove(s, p); err != nil {

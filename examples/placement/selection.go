@@ -82,6 +82,12 @@ func (m *model) selectionToggle(g placement.Geometry, p canvas.Point) *objectMov
 	ids := m.selectedIDs()
 	id := m.scene.ObjectAt(m.scene.View.Screen(world))
 	primary := m.scene.Selected
+	if id == "" {
+		m.scene.View = g.View
+		s := &objectMove{id: primary, before: slices.Clone(m.scene.Objects), selection: ids, start: p, grab: world, geometry: g, valid: true, marquee: true}
+		m.move = s
+		return s
+	}
 	if id != "" {
 		if i := slices.Index(ids, id); i >= 0 {
 			ids = slices.Delete(ids, i, i+1)
