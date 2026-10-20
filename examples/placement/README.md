@@ -4,9 +4,34 @@ An independent public Go SDK consumer demonstrating a reusable typed tool palett
 and a managed `ui.Canvas2D`. Block, Connector and Note use the same validation,
 command registry and bounded history path for pointer and keyboard placement.
 
-Use the **Arrange** toolbar with at least two selected components to align left,
+Use **Group / Cmd+G** to bind at least two selected components or groups into
+one flat group. **Ungroup / Cmd+Shift+G** removes membership from selected groups,
+leaving geometry, IDs and the selected components unchanged. Each is one Undo
+entry and marks the drawing dirty; Undo/Redo restore the exact memberships and
+selection. Grouping existing groups merges them; nesting is not supported.
+
+Click or keyboard-select a member to select its whole group. Shift-click toggles
+the whole group; marquee contact with any member selects the whole group. Empty
+space still pans/clears selection normally. Group members move, resize and delete
+together. Copy/Paste/Duplicate preserve groups but allocate independent group IDs
+for the new components. Undoing deletion restores both geometry and membership.
+Ungroup first to edit a single member. Named accessibility objects include their
+group ID; the managed canvas still exposes one primary member.
+
+Alignment/distribution counts groups as units and translates members rigidly.
+One selected group alone has nothing else to align with; select another component
+or group. Handles resize the complete selected set as before. Groups are metadata,
+not extra canvas objects, so object counts and paint order stay unchanged.
+
+Drawings that have allocated groups save as app format **version 3**, including
+membership and the group-ID counter even after all groups are removed. Version-1/2
+drawings still open; never-grouped drawings still save as version 2. Older internal builds cannot read grouped version-3 files. On Open,
+a saved primary belonging to a group selects that whole group, and history resets.
+Up to 256 disjoint groups of at least two members fit within the 512-object limit.
+
+Use the **Arrange** toolbar with at least two selected components or groups to align left,
 horizontal center, right, top, vertical center or bottom to the selection bounds.
-**H gaps / V gaps** require at least three components and distribute them with
+**H gaps / V gaps** require at least three components or groups and distribute them with
 equal horizontal/vertical edge gaps inside the same bounds. Components are
 ordered by their current axis position; ties keep paint order. Distribution
 requires enough room for non-overlapping gaps; a crowded set is left unchanged
@@ -36,7 +61,7 @@ A completed Paste/Duplicate creates exactly one history entry. Undo restores the
 prior selection and geometry; Redo restores the same inserted IDs. New edits
 after Undo allocate fresh IDs rather than reusing discarded ones. Copy creates
 no history and does not mark dirty. Save/Open retain inserted geometry through
-the existing version-2 drawing format; transient paste counters reset on Open.
+the version-2/3 drawing format; transient paste counters reset on Open.
 
 Clipboard data is bounded to 256 KiB and 512 components. The existing document
 capacity, origin/dimension limits and placement rejection switches apply to all
@@ -62,7 +87,7 @@ Escape, release outside, focus loss or removing a source/target cancels without
 creating an object. A palette click only focuses its button. Tab to a tool and
 press Return to place it at the current canvas center through the same path.
 
-Click an object to select it. Shift-click toggles a component in a bounded,
+Click an object to select it. Shift-click toggles a component or its group in a bounded,
 paint-ordered selection set; Shift-click empty space keeps the set. Blue outlines
 mark every selected component and the toolbar/status show the selected count.
 Selection changes alone do not make Undo entries or mark the drawing dirty.
@@ -90,7 +115,7 @@ all members. A group drag or Move button/shortcut is one Undo entry; if any memb
 would leave ±10000, no member is committed. Escape, focus/capture loss, outside
 release and camera/display-scale changes cancel the entire preview. The captured
 release cannot also trigger a selection click or canvas pan. A plain click with
-no drag replaces the set with the clicked component. Clicking an unselected
+no drag replaces the set with the clicked component or its group. Clicking an unselected
 component replaces the set immediately; clicking empty space clears it and keeps
 ordinary pan navigation. Drag empty space or use arrows to pan; wheel zooms.
 
@@ -113,10 +138,10 @@ a drag keeps the group and adds no history. Escape, outside release and existing
 capture/camera/lifecycle cancellation restore every member.
 
 Width/Height buttons still resize exactly one component. Managed keyboard and
-semantic object selection replace the set with a single primary. Additional
+semantic object selection replace the set with a primary and its group. Additional
 members are described in accessible names; standard selected semantics expose
-the primary only. The set is transient: Save retains that primary in the existing
-version-2 format, and Open selects only it. All resized object geometry is saved.
+the primary only. The set is transient: Save retains that primary in the version-2/3
+drawing format, and Open selects it and its group. All resized object geometry is saved.
 
 The press offset is preserved under pan, zoom, scrolling and display scale.
 Canvas origin, visible size and clipping may settle during capture; movement
@@ -153,10 +178,11 @@ removes their single sprite on destruction. A coalesced native post-layout hook
 restores the detached sprite after window resizing or a Core rebuild resets it. Rendering reads detached owner
 snapshots and native geometry, not mutable application state.
 
-Saved drawings now use version 2, which preserves component dimensions. Existing
+Never-grouped saved drawings use version 2, which preserves component dimensions.
+Grouped drawings use version 3 as described above. Existing
 version-1 drawings open at their original type dimensions and are upgraded on
 Save. Older builds cannot open version-2 drawings. Invalid/missing dimensions
-in version 2 are rejected before replacing the drawing.
+in versions 2/3 are rejected before replacing the drawing.
 
 Use **Save** (Cmd+S), **Save As…** (Cmd+Shift+S) and **Open…** (Cmd+O) to
 persist drawings through native file choosers. `.vellum` files contain bounded,

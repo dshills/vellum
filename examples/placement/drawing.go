@@ -16,18 +16,20 @@ import (
 
 const drawingByteLimit = 256 << 10
 
-// Version 2 adds bounded component dimensions. Version 1 remains readable
-// with its original type dimensions; saved drawings always use version 2.
+// Version 2 adds bounded dimensions; version 3 adds flat group membership.
+// Legacy versions remain readable; never-grouped drawings save as version 2.
 // Viewport dimensions belong to the receiving window and are never restored.
 type drawingFile struct {
-	Format   string          `json:"format"`
-	Version  int             `json:"version"`
-	Objects  []drawingObject `json:"objects"`
-	Center   canvas.Point    `json:"center"`
-	Zoom     float64         `json:"zoom"`
-	Selected string          `json:"selected,omitempty"`
-	Snap     bool            `json:"snap"`
-	NextID   uint64          `json:"next_id"`
+	Format    string          `json:"format"`
+	Version   int             `json:"version"`
+	Objects   []drawingObject `json:"objects"`
+	Center    canvas.Point    `json:"center"`
+	Zoom      float64         `json:"zoom"`
+	Selected  string          `json:"selected,omitempty"`
+	Snap      bool            `json:"snap"`
+	NextID    uint64          `json:"next_id"`
+	Groups    []drawingGroup  `json:"groups,omitempty"`
+	NextGroup uint64          `json:"next_group,omitempty"`
 }
 type drawingObject struct {
 	ID     string  `json:"id"`
@@ -40,7 +42,7 @@ type drawingObject struct {
 
 func (f drawingFile) scene() (*canvas.Scene, error) {
 	finite := func(v float64) bool { return !math.IsNaN(v) && !math.IsInf(v, 0) }
-	if f.Format != "vellum-placement" || (f.Version != 1 && f.Version != 2) || len(f.Objects) > 512 || !finite(f.Zoom) || f.Zoom < .01 || f.Zoom > 100 || !finite(f.Center.X) || !finite(f.Center.Y) || math.Abs(f.Center.X) > 1e12 || math.Abs(f.Center.Y) > 1e12 {
+	if f.Format != "vellum-placement" || (f.Version != 1 && f.Version != 2 && f.Version != 3) || len(f.Objects) > 512 || !finite(f.Zoom) || f.Zoom < .01 || f.Zoom > 100 || !finite(f.Center.X) || !finite(f.Center.Y) || math.Abs(f.Center.X) > 1e12 || math.Abs(f.Center.Y) > 1e12 {
 		return nil, errors.New("invalid or unsupported Vellum drawing")
 	}
 	objects := make([]canvas.Rect, 0, len(f.Objects))
@@ -67,6 +69,9 @@ func (f drawingFile) scene() (*canvas.Scene, error) {
 	if err != nil {
 		return nil, err
 	}
+	if _, err := f.groupMap(objects); err != nil {
+		return nil, err
+	}
 	if err := scene.Select(f.Selected); err != nil {
 		return nil, err
 	}
@@ -84,6 +89,11 @@ func drawingCodec(m *model) document.Codec[drawingFile] {
 			for _, o := range m.scene.Objects {
 				kind, _, _ := strings.Cut(o.ID, "-")
 				f.Objects = append(f.Objects, drawingObject{ID: o.ID, Kind: kind, X: o.X, Y: o.Y, Width: o.Width, Height: o.Height})
+			}
+			if len(m.groups) > 0 || m.nextGroup != 0 {
+				f.Version = 3
+				f.Groups = m.savedGroups()
+				f.NextGroup = m.nextGroup
 			}
 			_, err := f.scene()
 			return f, err
@@ -125,9 +135,14 @@ func drawingCodec(m *model) document.Codec[drawingFile] {
 			if err != nil {
 				return err
 			}
+			groups, err := f.groupMap(scene.Objects)
+			if err != nil {
+				return err
+			}
 			// Preserve the bound Scene identity and current window dimensions.
 			m.scene.Objects, m.scene.Selected = scene.Objects, scene.Selected
 			m.scene.View.Center, m.scene.View.Zoom = scene.View.Center, scene.View.Zoom
+			m.groups, m.nextGroup = groups, f.NextGroup
 			m.setSelection([]string{scene.Selected}, scene.Selected)
 			m.next, m.snap = f.NextID, f.Snap
 			m.pasteText, m.pasteCount = "", 0

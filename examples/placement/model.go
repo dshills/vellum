@@ -37,6 +37,8 @@ type model struct {
 	canvasEditor              *canvasEditor
 	selectionIDs              []string
 	selectionPrimary          string
+	groups                    map[string]string
+	nextGroup                 uint64
 	clipboardJob              *clipboardOperation
 	pasteText                 string
 	pasteCount                uint64
@@ -154,6 +156,10 @@ func newModel() (*model, error) {
 		m.palette.Close()
 		return nil, err
 	}
+	if err := m.bindGrouping(); err != nil {
+		m.palette.Close()
+		return nil, err
+	}
 	if err := m.bindArrangement(); err != nil {
 		m.palette.Close()
 		return nil, err
@@ -169,25 +175,9 @@ func (m *model) commit(ctx context.Context) error {
 	}
 	r := *m.pending
 	before := slices.Clone(m.scene.Objects)
-	selection := m.selectedIDs()
-	selected := m.scene.Selected
 	object := canvas.Rect{ID: fmt.Sprintf("%s-%d", r.Payload.Kind, m.next+1), X: r.Position.X, Y: r.Position.Y, Width: r.Payload.Width, Height: r.Payload.Height, Color: r.Payload.Color}
 	after := append(slices.Clone(before), object)
-	err := m.journal.Apply(history.Change{Label: "Place " + r.Payload.Kind, Apply: func() error {
-		if !slices.Equal(m.scene.Objects, before) {
-			return history.ErrStale
-		}
-		m.scene.Objects = slices.Clone(after)
-		m.setSelection([]string{object.ID}, object.ID)
-		return nil
-	}, Revert: func() error {
-		if !slices.Equal(m.scene.Objects, after) {
-			return history.ErrStale
-		}
-		m.scene.Objects = slices.Clone(before)
-		m.setSelection(selection, selected)
-		return nil
-	}})
+	err := m.applyDocument("Place "+r.Payload.Kind, after, m.groups, []string{object.ID}, object.ID)
 	if err == nil {
 		m.next++
 		m.status = fmt.Sprintf("Placed %s at (%.0f, %.0f)", object.ID, object.X, object.Y)

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"math"
 	"slices"
 	"strings"
@@ -16,7 +17,6 @@ import (
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/command"
 	"github.com/dshills/vellum/document"
-	"github.com/dshills/vellum/history"
 )
 
 type copiedComponent struct {
@@ -25,6 +25,7 @@ type copiedComponent struct {
 	Y      float64 `json:"y"`
 	Width  float64 `json:"width"`
 	Height float64 `json:"height"`
+	Group  int     `json:"group,omitempty"`
 }
 type selectionClipboard struct {
 	Format  string            `json:"format"`
@@ -52,10 +53,18 @@ func (m *model) copiedSelection() ([]copiedComponent, error) {
 		wanted[id] = true
 	}
 	objects := make([]copiedComponent, 0, len(ids))
+	tags := make(map[string]int)
 	for _, o := range m.scene.Objects {
 		if wanted[o.ID] {
 			kind, _, _ := strings.Cut(o.ID, "-")
-			objects = append(objects, copiedComponent{kind, o.X, o.Y, o.Width, o.Height})
+			tag := 0
+			if group := m.groups[o.ID]; group != "" {
+				if tags[group] == 0 {
+					tags[group] = len(tags) + 1
+				}
+				tag = tags[group]
+			}
+			objects = append(objects, copiedComponent{Kind: kind, X: o.X, Y: o.Y, Width: o.Width, Height: o.Height, Group: tag})
 		}
 	}
 	return objects, nil
@@ -81,7 +90,28 @@ func decodeSelection(text string) ([]copiedComponent, error) {
 			return nil, errors.New("invalid clipboard component")
 		}
 	}
+	if _, err := copiedGroupCounts(f.Objects); err != nil {
+		return nil, err
+	}
 	return f.Objects, nil
+}
+
+func copiedGroupCounts(objects []copiedComponent) (map[int]int, error) {
+	counts := make(map[int]int)
+	for _, o := range objects {
+		if o.Group < 0 || o.Group > 512 {
+			return nil, errors.New("invalid clipboard group tag")
+		}
+		if o.Group > 0 {
+			counts[o.Group]++
+		}
+	}
+	for _, count := range counts {
+		if count < 2 {
+			return nil, errors.New("incomplete clipboard group")
+		}
+	}
+	return counts, nil
 }
 
 func (m *model) insertCopies(objects []copiedComponent, offset float64, label string) error {
@@ -91,7 +121,19 @@ func (m *model) insertCopies(objects []copiedComponent, offset float64, label st
 	if len(objects) == 0 || len(objects) > 512-len(m.scene.Objects) || uint64(len(objects)) > math.MaxUint64-m.next || m.locked {
 		return errors.New("cannot insert components: capacity, IDs or placement rejection")
 	}
-	before, priorIDs, primary := slices.Clone(m.scene.Objects), m.selectedIDs(), m.scene.Selected
+	counts, err := copiedGroupCounts(objects)
+	if err != nil {
+		return err
+	}
+	if uint64(len(counts)) > math.MaxUint64-m.nextGroup {
+		return errors.New("group IDs exhausted")
+	}
+	before := slices.Clone(m.scene.Objects)
+	groups := maps.Clone(m.groups)
+	if groups == nil {
+		groups = make(map[string]string)
+	}
+	groupIDs := make(map[int]string, len(counts))
 	after, ids := slices.Clone(before), make([]string, 0, len(objects))
 	for i, o := range objects {
 		c, ok := componentByKind(o.Kind)
@@ -101,24 +143,19 @@ func (m *model) insertCopies(objects []copiedComponent, offset float64, label st
 		id := fmt.Sprintf("%s-%d", o.Kind, m.next+uint64(i)+1)
 		after = append(after, canvas.Rect{ID: id, X: o.X + offset, Y: o.Y + offset, Width: o.Width, Height: o.Height, Color: c.Color})
 		ids = append(ids, id)
+		if o.Group > 0 {
+			g := groupIDs[o.Group]
+			if g == "" {
+				g = fmt.Sprintf("group-%d", m.nextGroup+uint64(len(groupIDs))+1)
+				groupIDs[o.Group] = g
+			}
+			groups[id] = g
+		}
 	}
-	err := m.journal.Apply(history.Change{Label: label, Apply: func() error {
-		if !slices.Equal(m.scene.Objects, before) {
-			return history.ErrStale
-		}
-		m.scene.Objects = slices.Clone(after)
-		m.setSelection(ids, ids[len(ids)-1])
-		return nil
-	}, Revert: func() error {
-		if !slices.Equal(m.scene.Objects, after) {
-			return history.ErrStale
-		}
-		m.scene.Objects = slices.Clone(before)
-		m.setSelection(priorIDs, primary)
-		return nil
-	}})
+	err = m.applyDocument(label, after, groups, ids, ids[len(ids)-1])
 	if err == nil {
 		m.next += uint64(len(objects))
+		m.nextGroup += uint64(len(groupIDs))
 		m.status = fmt.Sprintf("%s: %d components", label, len(objects))
 	}
 	return err

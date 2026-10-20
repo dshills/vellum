@@ -198,7 +198,7 @@ func TestDrawingRejectsInvalidDimensions(t *testing.T) {
 			}
 		}
 	}
-	for _, version := range []int{0, 1, 3} {
+	for _, version := range []int{0, 1, 4} {
 		bad := good
 		bad.Version = version
 		if _, err := bad.scene(); err == nil {

@@ -7,7 +7,6 @@ import (
 	"slices"
 
 	"github.com/dshills/vellum/canvas"
-	"github.com/dshills/vellum/history"
 	"github.com/dshills/vellum/placement"
 )
 
@@ -47,33 +46,14 @@ func (m *model) selectedIndex() int {
 }
 
 func (m *model) applyObjects(label string, after []canvas.Rect, selected string) error {
-	before, priorIDs := slices.Clone(m.scene.Objects), m.selectedIDs()
-	priorSelection := m.scene.Selected
+	priorIDs := m.selectedIDs()
 	nextIDs := []string{selected}
 	if selected == "" {
 		nextIDs = nil
-	} else if selected == priorSelection {
-		nextIDs = slices.Clone(priorIDs)
+	} else if selected == m.scene.Selected {
+		nextIDs = priorIDs
 	}
-	if slices.Equal(before, after) {
-		return nil
-	}
-	after = slices.Clone(after)
-	return m.journal.Apply(history.Change{Label: label, Apply: func() error {
-		if !slices.Equal(m.scene.Objects, before) {
-			return history.ErrStale
-		}
-		m.scene.Objects = slices.Clone(after)
-		m.setSelection(nextIDs, selected)
-		return nil
-	}, Revert: func() error {
-		if !slices.Equal(m.scene.Objects, after) {
-			return history.ErrStale
-		}
-		m.scene.Objects = slices.Clone(before)
-		m.setSelection(priorIDs, priorSelection)
-		return nil
-	}})
+	return m.applyDocument(label, after, prunedGroups(m.groups, after), nextIDs, selected)
 }
 
 func (m *model) deleteSelected() error {
@@ -168,7 +148,7 @@ func (m *model) previewMove(s *objectMove, p canvas.Point) {
 	s.dragging = true
 	if s.marquee {
 		s.marqueeBounds = marqueeRect(s.grab, world)
-		m.status = fmt.Sprintf("Marquee: %d components • release to select • Escape cancels", len(marqueeIDs(s.before, s.selection, s.marqueeBounds)))
+		m.status = fmt.Sprintf("Marquee: %d components • release to select • Escape cancels", len(m.expandedSelection(marqueeIDs(s.before, s.selection, s.marqueeBounds))))
 		return
 	}
 	// Keep the initial world grab point while mapping the current pointer with

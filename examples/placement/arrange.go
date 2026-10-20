@@ -24,8 +24,9 @@ func (m *model) arrangementAvailable(minimum int) error {
 	if err := m.editAvailable(); err != nil {
 		return err
 	}
-	if len(m.selectedIDs()) < minimum {
-		return fmt.Errorf("select at least %d components", minimum)
+	units, _ := m.selectionUnits()
+	if len(units) < minimum {
+		return fmt.Errorf("select at least %d components or groups", minimum)
 	}
 	return nil
 }
@@ -43,7 +44,7 @@ func (m *model) arrangeSelected(action string) error {
 			if err := m.arrangementAvailable(a.minimum); err != nil {
 				return err
 			}
-			after, err := arrangedObjects(m.scene.Objects, m.selectedIDs(), action)
+			after, err := m.arrangedSelection(action)
 			if err != nil {
 				return err
 			}
@@ -55,6 +56,38 @@ func (m *model) arrangeSelected(action string) error {
 		}
 	}
 	return errors.New("unknown arrangement")
+}
+
+func (m *model) arrangedSelection(action string) ([]canvas.Rect, error) {
+	units, keys := m.selectionUnits()
+	ids := make([]string, 0, len(units))
+	for _, u := range units {
+		ids = append(ids, u.ID)
+	}
+	arranged, err := arrangedObjects(units, ids, action)
+	if err != nil {
+		return nil, err
+	}
+	deltas := make(map[string]canvas.Point, len(units))
+	for i, u := range units {
+		deltas[u.ID] = canvas.Point{X: arranged[i].X - u.X, Y: arranged[i].Y - u.Y}
+	}
+	after := slices.Clone(m.scene.Objects)
+	for i, o := range after {
+		if unit := keys[o.ID]; unit != "" {
+			d := deltas[unit]
+			if d.X != 0 {
+				after[i].X += d.X
+			}
+			if d.Y != 0 {
+				after[i].Y += d.Y
+			}
+			if !validPosition(after[i].X, after[i].Y) {
+				return nil, errors.New("arrangement would exceed member origin limits")
+			}
+		}
+	}
+	return after, nil
 }
 
 // Work in world coordinates without snapping: alignment/gap equalities must

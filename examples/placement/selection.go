@@ -12,16 +12,7 @@ import (
 // The managed canvas keeps one primary selection. The app adds a bounded set,
 // ordered by paint order, and reconciles managed keyboard/accessibility changes.
 func (m *model) setSelection(ids []string, primary string) {
-	wanted := make(map[string]bool, len(ids))
-	for _, id := range ids {
-		wanted[id] = true
-	}
-	selected := make([]string, 0, len(ids))
-	for _, o := range m.scene.Objects {
-		if wanted[o.ID] {
-			selected = append(selected, o.ID)
-		}
-	}
+	selected := m.expandedSelection(ids)
 	if !slices.Contains(selected, primary) {
 		primary = ""
 		if len(selected) > 0 {
@@ -40,17 +31,7 @@ func (m *model) selectedIDs() []string {
 	if m.scene.Selected != m.selectionPrimary {
 		ids = []string{m.scene.Selected}
 	}
-	wanted := make(map[string]bool, len(ids))
-	for _, id := range ids {
-		wanted[id] = true
-	}
-	result := make([]string, 0, len(ids))
-	for _, o := range m.scene.Objects {
-		if wanted[o.ID] {
-			result = append(result, o.ID)
-		}
-	}
-	return result
+	return m.expandedSelection(ids)
 }
 
 // Managed callbacks represent explicit single-selection actions. Navigation is
@@ -88,13 +69,12 @@ func (m *model) selectionToggle(g placement.Geometry, p canvas.Point) *objectMov
 		m.move = s
 		return s
 	}
-	if id != "" {
-		if i := slices.Index(ids, id); i >= 0 {
-			ids = slices.Delete(ids, i, i+1)
-		} else {
-			ids = append(ids, id)
-			primary = id
-		}
+	unit := m.expandedSelection([]string{id})
+	if slices.Contains(ids, id) {
+		ids = slices.DeleteFunc(ids, func(member string) bool { return slices.Contains(unit, member) })
+	} else {
+		ids = append(ids, unit...)
+		primary = id
 	}
 	m.setSelection(ids, primary)
 	m.scene.View = g.View

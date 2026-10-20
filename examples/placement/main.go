@@ -98,6 +98,9 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		if selectedSet[object.ID] && len(selection) > 1 {
 			label = "Selected " + label
 		}
+		if group := m.groups[object.ID]; group != "" {
+			label = group + " · " + label
+		}
 		objects = append(objects, ui.CanvasObject{ID: object.ID, Name: label + " " + object.ID, Help: fmt.Sprintf("Select this component; size %.0f by %.0f.", object.Width, object.Height)})
 	}
 	dimensions := "Select a component"
@@ -108,7 +111,16 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 	if len(selection) > 1 {
 		dimensions = fmt.Sprintf("%d selected • drag group corners to resize", len(selection))
 	}
-	help := "Shift-click toggles • Shift-drag empty canvas adds a marquee • plain empty drag pans • corners resize selection"
+	selectedGroups := make(map[string]bool)
+	for _, id := range selection {
+		if group := m.groups[id]; group != "" {
+			selectedGroups[group] = true
+		}
+	}
+	if len(selectedGroups) > 0 {
+		dimensions = fmt.Sprintf("%d selected • %d groups • corners resize", len(selection), len(selectedGroups))
+	}
+	help := "Group: Cmd+G • Ungroup: Cmd+Shift+G • Shift-drag selects • plain empty drag pans • corners resize selection"
 	arrangementTools := []ui.Node{{ID: "arrange-label", Kind: ui.Label, Text: "Arrange:"}}
 	for _, action := range arrangementActions {
 		arrangementTools = append(arrangementTools, ui.Node{ID: action.id, Kind: ui.Button, Text: action.label, Disabled: m.commands.Enabled(action.id) != nil, Activate: invoke(action.id)})
@@ -141,6 +153,8 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 			{ID: "delete", Kind: ui.Button, Text: "Delete selected", Disabled: m.commands.Enabled("delete") != nil, Activate: invoke("delete")},
 		}},
 		{ID: "resize-tools", Kind: ui.Toolbar, Children: []ui.Node{
+			{ID: "group", Kind: ui.Button, Text: "Group", Disabled: m.commands.Enabled("group") != nil, Activate: invoke("group")},
+			{ID: "ungroup", Kind: ui.Button, Text: "Ungroup", Disabled: m.commands.Enabled("ungroup") != nil, Activate: invoke("ungroup")},
 			{ID: "width-less", Kind: ui.Button, Text: "Width −", Disabled: m.commands.Enabled("width-less") != nil, Activate: invoke("width-less")},
 			{ID: "width-more", Kind: ui.Button, Text: "Width +", Disabled: m.commands.Enabled("width-more") != nil, Activate: invoke("width-more")},
 			{ID: "height-less", Kind: ui.Button, Text: "Height −", Disabled: m.commands.Enabled("height-less") != nil, Activate: invoke("height-less")},
