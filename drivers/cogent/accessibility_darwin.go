@@ -48,8 +48,13 @@ type accessibilityAttachment struct {
 
 func (n *accessibilityAttachment) Focus(bool) {}
 func (n *accessibilityAttachment) Close() {
-	if n.text != nil && n.text.native != nil {
-		n.text.native.Close()
+	if n.text != nil {
+		// Native attachment retirement precedes the owner's WinClose cleanup.
+		// Revoke publication readiness before closing its main-owned backend.
+		n.text.nativeReady.Store(false)
+		if n.text.native != nil {
+			n.text.native.Close()
+		}
 	}
 	n.bridge.closeFrom("native-attachment-close")
 	C.vellumAXDetach(C.uint64_t(n.bridge.token))

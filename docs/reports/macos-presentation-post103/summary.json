@@ -1,0 +1,238 @@
+{
+  "schema": 1,
+  "head": "33183c7706d0791188474aff45db8ff2804573c1",
+  "result": "FOUR_VALID_CAPTURES_CADENCE_PREDICATES_PASS_INPUT_LATENCY_FAIL",
+  "release_qualified": false,
+  "full_M3_qualified": false,
+  "M4_qualified": false,
+  "SDK_files": 8292,
+  "actual_owned_groups": 36,
+  "all_groups_terminal_and_absent_at_audit": true,
+  "cases": {
+    "serial-grid-cpu": {
+      "latency_p95_ms": 42.78062505181879,
+      "interval_p95_ms": 16.666749957948923,
+      "interval_max_ms": 16.666791634634137,
+      "interval_within18_333ms": 119,
+      "interval_denominator": 119,
+      "cadence_eligible": false,
+      "numeric_predicates": {
+        "cadence_evaluation": "not eligible: serial diagnostic",
+        "input_latency_threshold_met": false,
+        "release_qualified": false
+      },
+      "prefix_acquisitions": {
+        "prefix_records": 251,
+        "before_total": 251,
+        "prefix_presented": 251,
+        "prefix_tag0": 3,
+        "before_total_tag0": 3,
+        "prefix_armed": 248,
+        "prefix_tagged_intermediate": 0,
+        "prefix_skipped": 0
+      },
+      "CPU_elapsed_p95_ms": {
+        "InputNS": 0.014458,
+        "AcquireNS": 0.030292,
+        "TotalUIWorkNS": 3.994334
+      },
+      "native_host_phase_p95_ms": {
+        "ReceiptToFinalAcquire": 16.395749989897013,
+        "FinalAcquireToPresented": 26.557416655123234
+      }
+    },
+    "serial-tree-gpu": {
+      "latency_p95_ms": 43.6199166579172,
+      "interval_p95_ms": 16.666750074364245,
+      "interval_max_ms": 16.66679175104946,
+      "interval_within18_333ms": 119,
+      "interval_denominator": 119,
+      "cadence_eligible": false,
+      "numeric_predicates": {
+        "cadence_evaluation": "not eligible: serial diagnostic",
+        "input_latency_threshold_met": false,
+        "release_qualified": false
+      },
+      "prefix_acquisitions": {
+        "prefix_records": 256,
+        "before_total": 256,
+        "prefix_presented": 256,
+        "prefix_tag0": 6,
+        "before_total_tag0": 6,
+        "prefix_armed": 250,
+        "prefix_tagged_intermediate": 0,
+        "prefix_skipped": 0
+      },
+      "CPU_elapsed_p95_ms": {
+        "InputNS": 0.008416,
+        "AcquireNS": 0.026792,
+        "TotalUIWorkNS": 4.83746
+      },
+      "native_host_phase_p95_ms": {
+        "ReceiptToFinalAcquire": 16.626333235763013,
+        "FinalAcquireToPresented": 27.20366674475372
+      }
+    },
+    "paced-grid-gpu": {
+      "latency_p95_ms": 43.831541668623686,
+      "interval_p95_ms": 16.666749957948923,
+      "interval_max_ms": 16.66679175104946,
+      "interval_within18_333ms": 599,
+      "interval_denominator": 599,
+      "cadence_eligible": true,
+      "numeric_predicates": {
+        "cadence_threshold_met": true,
+        "input_latency_threshold_met": false,
+        "within_fraction": 1.0,
+        "cadence_acceptance_eligible": true,
+        "release_qualified": false
+      },
+      "prefix_acquisitions": {
+        "prefix_records": 734,
+        "before_total": 734,
+        "prefix_presented": 732,
+        "prefix_tag0": 6,
+        "before_total_tag0": 6,
+        "prefix_armed": 728,
+        "prefix_tagged_intermediate": 0,
+        "prefix_skipped": 2
+      },
+      "CPU_elapsed_p95_ms": {
+        "InputNS": 0.010583,
+        "AcquireNS": 0.024126,
+        "TotalUIWorkNS": 3.629586
+      },
+      "native_host_phase_p95_ms": {
+        "ReceiptToFinalAcquire": 16.68666664045304,
+        "FinalAcquireToPresented": 27.43620832916349
+      }
+    },
+    "paced-tree-cpu": {
+      "latency_p95_ms": 41.81220824830234,
+      "interval_p95_ms": 16.666749957948923,
+      "interval_max_ms": 16.66679175104946,
+      "interval_within18_333ms": 599,
+      "interval_denominator": 599,
+      "cadence_eligible": true,
+      "numeric_predicates": {
+        "cadence_threshold_met": true,
+        "input_latency_threshold_met": false,
+        "within_fraction": 1.0,
+        "cadence_acceptance_eligible": true,
+        "release_qualified": false
+      },
+      "prefix_acquisitions": {
+        "prefix_records": 733,
+        "before_total": 733,
+        "prefix_presented": 733,
+        "prefix_tag0": 3,
+        "before_total_tag0": 3,
+        "prefix_armed": 730,
+        "prefix_tagged_intermediate": 0,
+        "prefix_skipped": 0
+      },
+      "CPU_elapsed_p95_ms": {
+        "InputNS": 0.014791,
+        "AcquireNS": 0.037334,
+        "TotalUIWorkNS": 5.999542
+      },
+      "native_host_phase_p95_ms": {
+        "ReceiptToFinalAcquire": 15.662041609175503,
+        "FinalAcquireToPresented": 26.900374912656844
+      }
+    }
+  },
+  "separate_lifecycle_helpers": {
+    "result": "PASS_TWO_EXISTING_NATIVE_LIFECYCLE_HELPERS_INDEPENDENTLY_REVIEWED",
+    "helpers": {
+      "native-client-shrink": {
+        "records": 3,
+        "status": "VALID_SCOPED_EXISTING_HELPER",
+        "validation_result": "PASS_EXISTING_NATIVE_CLIENT_SHRINK"
+      },
+      "actual-occluded-acquisition-and-closure": {
+        "records": 30,
+        "status": "VALID_SCOPED_EXISTING_HELPER",
+        "validation_result": "PASS_NATIVE_VISIBILITY_RECORD"
+      }
+    },
+    "actual_created_groups": 18,
+    "all_terminal_absent_at_audit": true,
+    "unclassified_Cocoa_windows_retained": [
+      {
+        "Title": "",
+        "Visible": false,
+        "Miniaturized": false,
+        "Key": false,
+        "OcclusionVisible": false,
+        "Frame": [
+          0,
+          0,
+          500,
+          500
+        ],
+        "OrderedIndex": -1,
+        "Opaque": false,
+        "Alpha": 1,
+        "Level": 0,
+        "IdentityAvailable": true,
+        "WindowClass": "NSKVONotifying_TUINSWindow",
+        "ContentViewClass": "NSView",
+        "WindowNumber": 158118
+      }
+    ],
+    "blocked_acquisition_overlap_verified": false,
+    "native_deallocation_qualified": false,
+    "full_M4_qualified": false
+  },
+  "observer_trace": {
+    "result": "CAPTURED_UNQUALIFIED_TRACE_AND_SIX_HEADLESS_PROFILES_INDEPENDENTLY_REVIEWED",
+    "native_cases": 1,
+    "headless_profile_commands": 6,
+    "trace_bytes": 5635001,
+    "capture_bytes": 1082981,
+    "diagnostic": {
+      "observer_instrumented_unqualified": true,
+      "samples": 600,
+      "native_receipt_to_present_ms": {
+        "count": 600,
+        "p50": 47.03512508422136,
+        "p95": 47.64000000432134,
+        "p99": 47.748708399012685,
+        "max": 49.39062497578561
+      },
+      "native_receipt_to_final_acquire_ms": {
+        "count": 600,
+        "p50": 15.921041602268815,
+        "p95": 16.624291660264134,
+        "p99": 17.470583319664,
+        "max": 18.210749956779182
+      },
+      "native_final_acquire_to_present_ms": {
+        "count": 600,
+        "p50": 31.120416591875255,
+        "p95": 31.31554159335792,
+        "p99": 31.40516672283411,
+        "max": 32.179499976336956
+      },
+      "CPU_elapsed_UI_ms": {
+        "count": 600,
+        "p50": 2.800874,
+        "p95": 3.619081,
+        "p99": 3.908543,
+        "max": 4.511209
+      },
+      "prefix_records": 734,
+      "prefix_presented": 734,
+      "prefix_armed": 728,
+      "prefix_tag0": 6,
+      "prefix_startup_skipped": 0,
+      "no_numeric_gate_acceptance_asserted": true
+    },
+    "latency_or_cadence_gate_qualified": false,
+    "later_chronology_result": "FAILED_UNQUALIFIED_CHRONOLOGY",
+    "trace_and_native_clocks_directly_subtracted": false,
+    "no_cache_experiment_performance_claim": true
+  },
+  "M4_short_preflight": "Headless prerequisites only, explicit test overlay; held native plan. Renew all checks after actual final SDK binding."
+}

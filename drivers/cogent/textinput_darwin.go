@@ -86,6 +86,13 @@ func nativeTextScale(w *nativeWindow) float64 {
 	}
 	return 1
 }
+
+// Native readiness alone can outlive the terminal main queue. Querying this
+// portable main state does not publish a queue or touch AppKit off main.
+func nativeTextMainAlive() bool {
+	return desktop.TheApp != nil && !desktop.TheApp.MainStopped()
+}
+
 func publishTextOnMain(t *textWindow, client uint64, s core.TextFieldEditingState, start, end int, active bool, ack uint64, rect [4]float64, g textinput.Geometry, maximum int) (bool, error) {
 	if !t.nativeReady.Load() {
 		return false, nil

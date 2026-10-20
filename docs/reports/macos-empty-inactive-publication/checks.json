@@ -1,0 +1,426 @@
+{
+  "schema": 1,
+  "result": "PASS_HEADLESS_FOCUSED_COUNTERFACTUAL_AND_FULL632_RACE_NATIVE_COMPARISON_PENDING",
+  "baseline_head": "33183c7706d0791188474aff45db8ff2804573c1",
+  "candidate_proposal_sha256": "4c47a69211b6763bc9c1f964c4e26f3eec016af1aa83947cbfad3c113c399498",
+  "source_review": {
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/independent-review-v2.json",
+    "sha256": "0c71b617a62ddc6cb79ac80d192803a125d7d951b19284646f49d670c2f6ea03",
+    "approved": true
+  },
+  "commands": {
+    "positive": {
+      "outcome": "PASS",
+      "receipt": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/positive.json",
+      "receipt_sha256": "b5788e893340c5897c075cdf77a740ee7926cbaa480fd3883c0c09ee25d2cf6a",
+      "exit_code": 0,
+      "seconds": 42.60867704101838,
+      "go_arguments": [
+        "test",
+        "-v",
+        "-race",
+        "-count=1",
+        "-p=1",
+        "-tags=offscreen",
+        "-timeout=180s",
+        "-overlay",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/overlay.json",
+        "-run",
+        "^TestEmptyInactivePublication",
+        "."
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent",
+      "watchdog_seconds": 240,
+      "boundary_stable": true,
+      "pins_stable": true,
+      "source_pin_count": 652,
+      "logs": {
+        "stdout": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/positive/stdout",
+          "bytes": 2056,
+          "sha256": "6fc7736a0c7492fc9a63e12ec3da8553bb1cabbe4c20994a8b6791c5602ddeec"
+        },
+        "stderr": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/positive/stderr",
+          "bytes": 1089,
+          "sha256": "ed3f02a0a0904f943f79adb77fc8f60ecb9df736d0119f855c1d58a320569e95"
+        }
+      },
+      "failure_evidence": [],
+      "expected_outcome_passed": true,
+      "owned": {
+        "pid": 52161,
+        "group": 52161,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": []
+      },
+      "native_fixture_executed": false
+    },
+    "negative-original": {
+      "outcome": "EXPECTED_BEHAVIORAL_FAILURE",
+      "receipt": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/negative-original.json",
+      "receipt_sha256": "6c7f43d5a276d2459a6804cba8db103a127fffbbb7e1618e140168395ed78fb8",
+      "exit_code": 1,
+      "seconds": 13.425249708001502,
+      "go_arguments": [
+        "test",
+        "-v",
+        "-race",
+        "-count=1",
+        "-p=1",
+        "-tags=offscreen",
+        "-timeout=180s",
+        "-overlay",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/negative-overlay.json",
+        "-run",
+        "^TestEmptyInactivePublicationReusesActualAcceptedMainDispatch$",
+        "."
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent",
+      "watchdog_seconds": 240,
+      "boundary_stable": true,
+      "pins_stable": true,
+      "source_pin_count": 652,
+      "logs": {
+        "stdout": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/negative-original/stdout",
+          "bytes": 343,
+          "sha256": "633eeffde0a66d3e8ddd048b6fabb9788a1548ebb70dc2fe0e2c43028dd1616b"
+        },
+        "stderr": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/negative-original/stderr",
+          "bytes": 1089,
+          "sha256": "ed3f02a0a0904f943f79adb77fc8f60ecb9df736d0119f855c1d58a320569e95"
+        }
+      },
+      "failure_evidence": [
+        "    editor_inactive_publication_darwin_test.go:95: repeated empty publication reentered main or lost accepted activation 256 true",
+        "--- FAIL: TestEmptyInactivePublicationReusesActualAcceptedMainDispatch (0.01s)"
+      ],
+      "expected_outcome_passed": true,
+      "owned": {
+        "pid": 53267,
+        "group": 53267,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 1,
+        "errors": []
+      },
+      "native_fixture_executed": false
+    },
+    "baseline-terminal": {
+      "outcome": "PASS",
+      "receipt": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/baseline-terminal.json",
+      "receipt_sha256": "fa24ac3191e22bd1d4fe07e52c7fa3ae18c54f8d0c43873ae0b52c4b537c0521",
+      "exit_code": 0,
+      "seconds": 13.965718124993145,
+      "go_arguments": [
+        "test",
+        "-v",
+        "-race",
+        "-count=1",
+        "-p=1",
+        "-tags=offscreen",
+        "-timeout=180s",
+        "-overlay",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/negative-overlay.json",
+        "-run",
+        "^TestEmptyInactivePublication(StoppedMainDoesNotPublishGoRules|NativeAttachmentRetiresBeforeOwnerCleanup)$",
+        "."
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent",
+      "watchdog_seconds": 240,
+      "boundary_stable": true,
+      "pins_stable": true,
+      "source_pin_count": 652,
+      "logs": {
+        "stdout": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/baseline-terminal/stdout",
+          "bytes": 376,
+          "sha256": "a7181aa6229b1b725d18eb25be3f030b0347bde5fe2eefa4a004fea91bf905b7"
+        },
+        "stderr": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/baseline-terminal/stderr",
+          "bytes": 1089,
+          "sha256": "ed3f02a0a0904f943f79adb77fc8f60ecb9df736d0119f855c1d58a320569e95"
+        }
+      },
+      "failure_evidence": [],
+      "expected_outcome_passed": true,
+      "owned": {
+        "pid": 53268,
+        "group": 53268,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": []
+      },
+      "native_fixture_executed": false
+    },
+    "negative-terminal-v1": {
+      "outcome": "EXPECTED_BEHAVIORAL_FAILURE",
+      "receipt": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/negative-terminal-v1.json",
+      "receipt_sha256": "d5da78ed32b36fd0cd409e232413b4fa4f9bb107ff2bb82c6ecfb842777f63c1",
+      "exit_code": 1,
+      "seconds": 13.901138459099457,
+      "go_arguments": [
+        "test",
+        "-v",
+        "-race",
+        "-count=1",
+        "-p=1",
+        "-tags=offscreen",
+        "-timeout=180s",
+        "-overlay",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/terminal-v1-negative-overlay.json",
+        "-run",
+        "^TestEmptyInactivePublication(StoppedMainDoesNotPublishGoRules|NativeAttachmentRetiresBeforeOwnerCleanup)$",
+        "."
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent",
+      "watchdog_seconds": 240,
+      "boundary_stable": true,
+      "pins_stable": true,
+      "source_pin_count": 652,
+      "logs": {
+        "stdout": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/negative-terminal-v1/stdout",
+          "bytes": 595,
+          "sha256": "8ad5ee3d4d23bdfdb4d8a6d24eaed278715c0cd76c9543a2d04c2583bdd74ffc"
+        },
+        "stderr": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/negative-terminal-v1/stderr",
+          "bytes": 1089,
+          "sha256": "ed3f02a0a0904f943f79adb77fc8f60ecb9df736d0119f855c1d58a320569e95"
+        }
+      },
+      "failure_evidence": [
+        "    editor_inactive_publication_darwin_test.go:362: stopped native main accepted a cached Go publication",
+        "--- FAIL: TestEmptyInactivePublicationStoppedMainDoesNotPublishGoRules (0.01s)",
+        "    editor_inactive_publication_darwin_test.go:397: retired native attachment accepted cached Go publication",
+        "--- FAIL: TestEmptyInactivePublicationNativeAttachmentRetiresBeforeOwnerCleanup (0.00s)"
+      ],
+      "expected_outcome_passed": true,
+      "owned": {
+        "pid": 53266,
+        "group": 53266,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 1,
+        "errors": []
+      },
+      "native_fixture_executed": false
+    },
+    "regressions": {
+      "outcome": "TIMEOUT_NOT_A_PASS",
+      "receipt": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/regressions.json",
+      "receipt_sha256": "918a8b235343b41a1b0567cb0eecc0074ca1918ea8b482d75ae321426fb8469f",
+      "exit_code": 1,
+      "seconds": 182.98162325005978,
+      "go_arguments": [
+        "test",
+        "-v",
+        "-race",
+        "-count=1",
+        "-p=1",
+        "-tags=offscreen",
+        "-timeout=180s",
+        "-overlay",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/overlay.json",
+        "."
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent",
+      "watchdog_seconds": 240,
+      "boundary_stable": true,
+      "pins_stable": true,
+      "source_pin_count": 652,
+      "logs": {
+        "stdout": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/regressions/stdout",
+          "bytes": 192912,
+          "sha256": "7e2624ee7308f26f4b2118dc2286e1c333d07406d2d94765aa95a2c2d05e9f17"
+        },
+        "stderr": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/regressions/stderr",
+          "bytes": 1089,
+          "sha256": "ed3f02a0a0904f943f79adb77fc8f60ecb9df736d0119f855c1d58a320569e95"
+        }
+      },
+      "failure_evidence": [
+        "panic: test timed out after 3m0s"
+      ],
+      "expected_outcome_passed": false,
+      "owned": {
+        "pid": 54252,
+        "group": 54252,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 1,
+        "errors": []
+      },
+      "native_fixture_executed": false
+    },
+    "vet": {
+      "outcome": "PASS",
+      "receipt": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/vet.json",
+      "receipt_sha256": "ed5a5330da322fa3db93363d25e69f4e0621031e0b5e15311a44023dc73351ba",
+      "exit_code": 0,
+      "seconds": 21.941008707974106,
+      "go_arguments": [
+        "vet",
+        "-p=1",
+        "-tags=offscreen",
+        "-overlay",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/overlay.json",
+        "."
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent",
+      "watchdog_seconds": 240,
+      "boundary_stable": true,
+      "pins_stable": true,
+      "source_pin_count": 652,
+      "logs": {
+        "stdout": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/vet/stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/vet/stderr",
+          "bytes": 989,
+          "sha256": "130830518c67afc14acec1dc25e44a924aa3b4f5a759b399dc0cd986bea939f0"
+        }
+      },
+      "failure_evidence": [],
+      "expected_outcome_passed": true,
+      "owned": {
+        "pid": 54442,
+        "group": 54442,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": []
+      },
+      "native_fixture_executed": false
+    },
+    "native-build": {
+      "outcome": "PASS",
+      "receipt": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/native-build.json",
+      "receipt_sha256": "b7e20aec2eeeca4aa8237cebb2c24e462276741f32be728e3f29aa73d384a8d0",
+      "exit_code": 0,
+      "seconds": 28.545745832961984,
+      "go_arguments": [
+        "build",
+        "-p=1",
+        "-overlay",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/overlay.json",
+        "."
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent",
+      "watchdog_seconds": 240,
+      "boundary_stable": true,
+      "pins_stable": true,
+      "source_pin_count": 652,
+      "logs": {
+        "stdout": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/native-build/stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks/native-build/stderr",
+          "bytes": 941,
+          "sha256": "a1485cd5e7bde4981203922f4e6e46b1e76da276b5da440887a20026134c9e23"
+        }
+      },
+      "failure_evidence": [],
+      "expected_outcome_passed": true,
+      "owned": {
+        "pid": 54257,
+        "group": 54257,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": []
+      },
+      "native_fixture_executed": false
+    },
+    "regressions-extended": {
+      "outcome": "PASS_FULL_632_TOP_LEVEL_OFFSCREEN_RACE",
+      "receipt": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks-extended/regressions.json",
+      "receipt_sha256": "6b6b60c9b5e5f7a0244b977cbdbba1c4c113a47b141fca12108a531dfd32e99c",
+      "exit_code": 0,
+      "seconds": 294.3549674169626,
+      "go_arguments": [
+        "test",
+        "-v",
+        "-race",
+        "-count=1",
+        "-p=1",
+        "-tags=offscreen",
+        "-timeout=900s",
+        "-overlay",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/overlay.json",
+        "."
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent",
+      "watchdog_seconds": 960,
+      "boundary_stable": true,
+      "pins_stable": true,
+      "source_pin_count": 652,
+      "logs": {
+        "stdout": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks-extended/regressions/stdout",
+          "bytes": 269849,
+          "sha256": "24656611e18d4302c73d915fd78821da274125f531425a580c5b7e6bd930aad5"
+        },
+        "stderr": {
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/checks-extended/regressions/stderr",
+          "bytes": 1089,
+          "sha256": "ed3f02a0a0904f943f79adb77fc8f60ecb9df736d0119f855c1d58a320569e95"
+        }
+      },
+      "failure_evidence": [],
+      "expected_outcome_passed": true,
+      "owned": {
+        "pid": 57502,
+        "group": 57502,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": []
+      },
+      "native_fixture_executed": false,
+      "top_level_started": 632,
+      "top_level_passed": 632,
+      "skipped": 0,
+      "assertion_failures": 0,
+      "race_diagnostic_observed": false,
+      "independent_actual_review": {
+        "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/extended-regressions-actual-review.json",
+        "sha256": "ef9bc1ace369ee826bacac183a788824b77a75b0a393a593aa0527bcdd25d90b",
+        "approved": true
+      }
+    }
+  },
+  "full_suite_pass": true,
+  "fresh_sdk_built": false,
+  "native_comparison_executed": false,
+  "release_qualified": false,
+  "extended_run_plan": {
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/extended-regressions-plan.json",
+    "sha256": "78dca4720b9bf561c91879de7caf19f45e00beba02d21d8cdc15cd137c6f8ec3",
+    "test_timeout_seconds": 900,
+    "watchdog_seconds": 960,
+    "result": "ACTUAL_PASS_IN_REGRESSIONS_EXTENDED_WITH_INDEPENDENT_REVIEW",
+    "receipt_sha256": "6b6b60c9b5e5f7a0244b977cbdbba1c4c113a47b141fca12108a531dfd32e99c"
+  },
+  "evidence_type": "Source-bound headless software/fake-backend checks. Darwin native-driver go build . compiled the library package; no executable artifact was produced and no application ran.",
+  "independent_actual_checks_review": {
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-empty-inactive-publication-correction/actual-checks-review.json",
+    "sha256": "14b4d18663db8d20a6854ab891d71390b6ab263c4c56bf56e68776d507d82b27",
+    "result": "SIX_EXPECTED_OUTCOMES_VERIFIED_FULL_SUITE_REMAINS_INCOMPLETE"
+  }
+}

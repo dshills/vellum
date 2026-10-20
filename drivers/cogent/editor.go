@@ -77,28 +77,40 @@ type nativeTextBackend interface {
 	Settle(uint64) bool
 	Close()
 }
+
+// inactiveTextPublication holds only one successful empty client-zero key.
+// It never retains document strings, cell arrays, geometry or application callbacks.
+// All fields are confined to the application owner.
+type inactiveTextPublication struct {
+	backend  nativeTextBackend
+	lifetime *textLifetime
+	ack      uint64
+	valid    bool
+}
+
 type textLifetime struct{ ctx context.Context }
 type textWindow struct {
-	admission          sync.Mutex // accepted Cocoa preflight through commit; never owner/widget callbacks
-	pendingInput       *transport.OrderedTicket[textMessage]
-	lifetime           atomic.Pointer[textLifetime]
-	owner              *app.Application
-	window             *nativeWindow
-	pump               *transport.OrderedPump[textMessage]
-	manual             bool // explicit offscreen routing; settlement never invokes Cocoa/ambient workers
-	rules              atomic.Pointer[gridTextRules]
-	native             nativeTextBackend
-	clients            map[uint64]*record    // owner only, exact mount incarnations
-	shadows            map[uint64]textShadow // owner only; publications become authoritative only on native acceptance
-	ack                uint64
-	activeClient       uint64
-	closed             atomic.Bool
-	nativeReady        atomic.Bool // set only by a callback executed on the actual platform main loop
-	nativeReadyStarted atomic.Bool
-	requests           map[uint64]*textSettlement // owner only
-	nextRequest        uint64
-	settleDispatch     func(context.Context, *textWindow, uint64, uint64) error
-	boundaries         map[*core.Scene]func(events.Event) // originating loop, restored on teardown
+	admission           sync.Mutex // accepted Cocoa preflight through commit; never owner/widget callbacks
+	pendingInput        *transport.OrderedTicket[textMessage]
+	lifetime            atomic.Pointer[textLifetime]
+	owner               *app.Application
+	window              *nativeWindow
+	pump                *transport.OrderedPump[textMessage]
+	manual              bool // explicit offscreen routing; settlement never invokes Cocoa/ambient workers
+	rules               atomic.Pointer[gridTextRules]
+	native              nativeTextBackend
+	clients             map[uint64]*record    // owner only, exact mount incarnations
+	shadows             map[uint64]textShadow // owner only; publications become authoritative only on native acceptance
+	ack                 uint64
+	activeClient        uint64
+	inactivePublication inactiveTextPublication
+	closed              atomic.Bool
+	nativeReady         atomic.Bool // set only by a callback executed on the actual platform main loop
+	nativeReadyStarted  atomic.Bool
+	requests            map[uint64]*textSettlement // owner only
+	nextRequest         uint64
+	settleDispatch      func(context.Context, *textWindow, uint64, uint64) error
+	boundaries          map[*core.Scene]func(events.Event) // originating loop, restored on teardown
 }
 type textSettlement struct {
 	binding   *record

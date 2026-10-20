@@ -8,6 +8,7 @@ import (
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/workbench"
 	"image"
+	"reflect"
 	"unicode/utf8"
 )
 
@@ -50,6 +51,7 @@ func (t *textWindow) focusedClient() *record {
 }
 func (t *textWindow) publish() {
 	if t.native == nil || !t.acceptsNativeInput() || !t.nativeReady.Load() {
+		t.inactivePublication = inactiveTextPublication{}
 		return
 	}
 	// A refresh may move Go focus ahead of already admitted Cocoa edits. Do
@@ -66,13 +68,44 @@ func (t *textWindow) publish() {
 	if r == nil {
 		// Retired clients still relinquish native preedit through the handoff FIFO;
 		// resulting old-incarnation messages are explicitly refused by apply.
-		accepted, _ := publishTextOnMain(t, 0, core.TextFieldEditingState{}, -1, -1, false, t.ack, [4]float64{}, textinput.Geometry{}, textinput.MaxDocumentBytes)
+		accepted, _ := t.publishEmptyInactive()
 		if accepted {
 			t.setActiveClient(0, false)
 		}
 		return
 	}
 	_, _ = t.publishClient(r, active)
+}
+
+// emptyPublicationKey refuses caching while ordered input is reserved, queued or
+// in flight. Latest publication triggers do not consume ordered mailbox credit.
+// Snapshotting Stats uses its existing transport locks; pendingInput itself is
+// main-owned and must never be read unsafely from the application owner.
+func (t *textWindow) emptyPublicationKey() (inactiveTextPublication, bool) {
+	if t.native == nil || !t.acceptsNativeInput() || !t.nativeReady.Load() || t.pump == nil || !reflect.ValueOf(t.native).Comparable() {
+		return inactiveTextPublication{}, false
+	}
+	stats := t.pump.Stats()
+	if stats.Closed || stats.Queue.Closed || stats.Queue.Outstanding != 0 || !nativeTextMainAlive() {
+		return inactiveTextPublication{}, false
+	}
+	return inactiveTextPublication{backend: t.native, lifetime: t.lifetime.Load(), ack: t.ack, valid: true}, true
+}
+
+func (t *textWindow) publishEmptyInactive() (bool, error) {
+	before, eligible := t.emptyPublicationKey()
+	if eligible && t.activeClient == 0 && t.inactivePublication.valid && t.inactivePublication == before {
+		return true, nil
+	}
+	t.inactivePublication = inactiveTextPublication{}
+	accepted, err := publishTextOnMain(t, 0, core.TextFieldEditingState{}, -1, -1, false, t.ack, [4]float64{}, textinput.Geometry{}, textinput.MaxDocumentBytes)
+	// Native acceptance is authoritative. Revalidate after the synchronous main
+	// callback, including logical closure, readiness, backend and pending input.
+	after, unchanged := t.emptyPublicationKey()
+	if accepted && err == nil && eligible && unchanged && before == after {
+		t.inactivePublication = after
+	}
+	return accepted, err
 }
 
 // setActiveClient publishes only the acceptance result, never an attempted
@@ -92,6 +125,7 @@ func (t *textWindow) setActiveClient(id uint64, active bool) {
 // copying outgoing Go text/geometry. Ack rejection still preserves the old
 // native state; only accepted client-zero publication retires its activation.
 func (t *textWindow) deactivateNativeClient() (bool, error) {
+	t.inactivePublication = inactiveTextPublication{}
 	accepted, err := publishTextOnMain(t, 0, core.TextFieldEditingState{}, -1, -1, false, t.ack, [4]float64{}, textinput.Geometry{}, textinput.MaxDocumentBytes)
 	if accepted {
 		t.setActiveClient(0, false)
@@ -149,6 +183,8 @@ func (t *textWindow) finishFieldFocusLosses(deactivate func(*record) (bool, erro
 }
 
 func (t *textWindow) publishClient(r *record, active bool) (bool, error) {
+	// Even a refused active/client attempt breaks the empty publication chain.
+	t.inactivePublication = inactiveTextPublication{}
 	client, ok := r.widget.(nativeTextClient)
 	if !ok {
 		return false, nil

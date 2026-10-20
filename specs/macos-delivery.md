@@ -9,6 +9,43 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
+## Current status — source 103 (19 October 2026)
+
+Mac completion remains open. The public Go API/native implementation exists and
+M2's controlled functional scope previously passed on `93b4730`; that result is
+separate from physical/human, performance, resource and final delivery acceptance.
+The [source 103 checkpoint](../docs/reports/macos-presentation-post103/README.md)
+records four valid native captures on clean `33183c7` and its independently
+verified private SDK (8,292 files). Both paced cohorts retain 599/599 intervals
+within 18.333 ms, with interval p95 about 16.667 ms. All four input-to-presentation
+p95 values remain 42–44 ms, above the unchanged 33.3 ms gate. All 36 created
+native/probe groups retired and were observed absent; full source/SDK/geometry
+checks pass. These are four single-run diagnostics, not the full M3 matrix or Mac
+release qualification. The stage 0102 policy remains experimental; stage 0103's
+native timing effects are not causally established by this comparison.
+
+Remaining required work is the M3 latency gate, full repeated matrix and text/
+layout/canvas/input/resize workflows; M4 native/resource attribution, activity,
+1,000 composed cycles, full idle and eight-hour soak; M5 physical/human, IME,
+VoiceOver and display workflows; M6 final source-bound SDK/application native
+and component/notice/rights acceptance; then M7's frozen-candidate audit. Two
+separate sizing/visibility helpers now pass their existing scoped native assertions;
+one hidden unclassified Cocoa window remains in the complete final census.
+Blocked-acquisition overlap and native deallocation remain unverified. A separate
+observer trace/profile points to native-main text-input publication as a source
+lead; it is diagnostic, unqualified and does not establish per-input causality.
+The short M4 native plan remains held pending the next genuine source/SDK binding
+and fresh prerequisites.
+No completion percentage or new acceptance threshold is introduced.
+
+## Historical checkpoint summaries
+
+The paragraphs below retain their original checkpoint status, sources and
+limitations. Their present-tense availability, missing-native-feedback and old
+SDK statements describe those earlier checkpoints; use the current summary and
+closure ledger for today's status. They neither revoke later evidence nor
+change the original failed/pass labels or current desktop-admission rules.
+
 The [paced presentation checkpoint](../docs/reports/macos-paced-presentation/README.md)
 implements an opt-in fixed-deadline 60 Hz grid/tree workload and strict version 2
 journal analysis, preserving late/unstarted work and collapsed-display anomalies.
@@ -240,8 +277,8 @@ full resource/endurance qualification and M7 closure.
 | Application/API | Public Go APIs, controls/themes, commands/tasks, documents/history, docking and independent windows | Complete composed workflow and lifecycle acceptance on a release candidate |
 | Data and canvas | Managed tables/trees, typed placement, retained drawing/images, compute/HDR and custom 3D | Frame targets, representative interaction, full resource accounting |
 | Mac integration | Cocoa input/accessibility, menus, clipboard, choosers, drops, tray and optional notifications | Human/native workflow coverage, scale/display changes, declared service support |
-| SDK | Current relocated minimum-Go SDK, all default main builds, font-byte mapping and four native source-assertion/readback cases | Final clean candidate including the M1 cancellation fix, component/rights closure and distribution acceptance |
-| Performance/endurance | Existing profilers, ordinary benchmarks, scoped idle samples and historical 1,000-cycle campaigns | Ordinary targets still fail; complete current-source memory/pacing/idle/overnight qualification |
+| SDK | Source 103 private SDK: 8,292 verified files, clean-source/archive association, genuine relocated consumption and scoped native grid/tree captures | Final source-bound SDK/application native acceptance, component/font/asset/rights closure and distribution acceptance |
+| Performance/endurance | Actual native callbacks/clocks; source 103 paced grid/tree each retain 599/599 intervals within 18.333 ms; historical idle/cycle evidence remains scoped | Input latency remains42–44 ms against 33.3 ms; full representative matrix and current-source memory/idle/endurance acceptance remain |
 
 The first automated desktop placement attempt expired without input. The second
 attempt also sent no pointer/key input: the private operator refused an unusable
@@ -325,6 +362,10 @@ For current M3 work, the [release policy's immediate tasks](macos-responsiveness
 supersede architecture-first directions in the historical experiment notes below.
 Measure 60 Hz presentation/input behavior before proposing another renderer change.
 
+
+The numbered checkpoint notes below preserve earlier execution decisions and
+status snapshots. Their "current" and "next" statements apply to those records;
+the current summary and closure ledger govern remaining milestone work.
 
 1. **M1 source checkpoint complete.** The production SDK cancellation fix and
    its 107-method headless acceptance are [recorded here](../docs/reviews/macos-sdk-cancellation/README.md).
@@ -575,27 +616,26 @@ implementation checkpoint; it is not rerun after each documentation edit.
 
 ## Forecast and closure ledger
 
-M3 requires actual presentation/input evidence for the owner-selected 60 Hz
-release gate. Historical CPU-work misses remain optimization evidence and do
-not establish a failed 60 Hz user experience. Measure the existing candidate
-before selecting another rendering experiment; keep the previous rejected
-experiments and their original results intact.
+Source 103 now supplies actual native callback/clock/lifecycle evidence for four
+fixed grid/tree cases. Both paced cohorts meet the numeric cadence predicate;
+input-to-presentation latency still fails 33.3 ms. This does not replace the full
+repeated matrix or representative M3 workflows. Historical CPU-work misses remain
+optimization evidence under the owner-selected 60 Hz policy.
 
-M1 is complete in source. M2's current workspace/text and five catalogue records
-pass, with three dedicated Cocoa methods still open. The private SDK passes its
-scoped minimum-Go/relocation/native checks; final candidate and rights closure
-remain M6 work. The ten-minute activity, 1,000-cycle and eight-hour final soak,
-human accessibility/input verification and supported display checks remain
-required. Estimate remaining time from those actual results.
+M1 is complete in source and incorporated in the private SDK. M2's eleven-method
+controlled functional renewal on `93b4730` remains qualified for its stated scope;
+the three dedicated Cocoa methods are no longer listed as unexecuted. Physical/
+human, native resource/endurance and final artifact gates remain open below.
+Candidate evidence must retain exact source/configuration scope or justified reuse.
 
 | Milestone | Current status | Next action / evidence needed |
 | --- | --- | --- |
-| M1 | Complete in source; incorporated in current private SDK | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); exact helper bytes are included in the [current SDK](../docs/reports/macos-sdk-stage0079/README.md). Full final artifact acceptance remains in M6. |
-| M2 | Complete for the controlled functional workflow/catalogue scope on 19 October 2026 | [Current renewal](../docs/reports/macos-m2-renewal/README.md) passes all 11 methods on source `93b4730`: three dedicated Cocoa records, six catalogue/text records 323/202 and two full workspace records 432/54. Full software replay 1296/162 passes unchanged across both row counts and all three batches. The existing 205-test dedicated-contract audit supplies the named scenario map. Physical/human/pixel qualification, native deallocation and actual presentation performance remain M3–M5; M6/M7 and full Mac completion remain open. |
-| M3 | Open; source102 capture failed and latency remains above the gate | Source101 passed cadence in two paced cohorts, with latency still failing. The [source102 experiment](../docs/reports/macos-presentation-post102/README.md) completes two valid serial diagnostics, then fails strict paced-grid startup-prefix capture; paced tree is unrun. Its raw timing improvement is unqualified. Stage0102 remains experimental while stage0103 tests completion-triggered dirty rescans; native effects are unproven. Full matrix and representative workflows remain open, with unchanged 33.3 ms/60 Hz gates and 4 ms optimization target. |
+| M1 | Complete in source; incorporated in the private SDK | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); source 103 SDK association is independently verified in the [current checkpoint](../docs/reports/macos-presentation-post103/README.md). Final artifact acceptance remains in M6. |
+| M2 | Complete for the previously qualified controlled functional scope | The [eleven-method renewal](../docs/reports/macos-m2-renewal/README.md) passed on source `93b4730`: three dedicated Cocoa records, six catalogue/text records 323/202 and two full workspace records 432/54. Full software replay 1296/162 and the 205-test contract audit supply the scenario map. This does not certify physical/human input, all native pixels/deallocation, presentation performance or the full Mac release. Affected candidate evidence requires exact scope or justified reuse. |
+| M3 | Open; source 103 cadence predicates pass, input latency fails | [Source 103](../docs/reports/macos-presentation-post103/README.md) has four valid native captures; both paced cohorts retain 599/599 intervals within 18.333 ms. Latency p95 is 42.781/43.620 ms serial grid/tree and 43.832/41.812 ms paced grid/tree, all above 33.3 ms. These four single-run cases do not replace the full repeated matrix or text/layout/canvas/input/resize workflows. Source 102 remains failed/unqualified; stage 0102 remains experimental. Unchanged 60 Hz/33.3 ms gates and 4 ms optimization target remain. |
 | M4 | Partial; native resource/endurance acceptance remains | Earlier sampled idle/cleanup checks remain scoped. The [AppKit reference](../docs/reports/macos-appkit-window-reference/README.md) reproduces one persistent hidden text-service window after its own weak clients expire, but does not identify the historical KVO window or prove Vellum deallocation. All windows remain counted. OS wakeups/presentation, full native memory/resource accounting, ten-minute activity, 1,000-cycle and overnight gates remain open. |
 | M5 | Partial; physical and human acceptance remains | Native fixtures and automated routing evidence exist. Direct pointer/preview, cross-display, native text/IME and human accessibility workflows remain separately qualified requirements. |
-| M6 | Partial; private source102 SDK relocation/consumption passes | Source `04ce519` private SDK contains 8,285 files including its manifest, with genuine relocated public-contract checks and an independent full archive/source association audit. Native timing fails separately in M3. Public owned-asset collection passed on source100; source99 application packaging is historical. A final SDK/application must include later changes and remaining native/human acceptance; no public distribution/signing approval follows. |
+| M6 | Partial; source 103 private SDK relocation/consumption and archive association pass | Clean `33183c7` private SDK contains 8,292 files including its manifest; actual archive/extraction/relocation/public-contract receipts and complete source/prepared/SDK vectors are independently verified. Four scoped native grid/tree captures are separate from final packaged application acceptance. Final SDK/app must include later accepted changes, component/native/font/asset and notice/rights closure, relocated native app acceptance and distribution prerequisites. No public publication/signing approval follows. |
 | M7 | Open | Requirement-by-requirement final audit after all preceding gates close. |
 
 The ledger changes only when the corresponding requirement is demonstrated.
