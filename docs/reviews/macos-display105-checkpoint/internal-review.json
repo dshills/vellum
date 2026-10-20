@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "approved": true,
+  "unresolved_findings": [],
+  "review_kind": "Internal source, declared tests, actual native outcomes, normal code commits and four later documentation files",
+  "source_commits": {
+    "rendering": "19cab39c1b3b38ee3fc355d18e37dc042184a795",
+    "benchmark": "77f1ae8d000b5912b0019758949e7390c838d8f6"
+  },
+  "reviews": {
+    "Core_source_review": {
+      "local_artifact": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-acknowledged-skip-correction/independent-source-review.json",
+      "sha256": "0e8b98d14089be1c4d56fc843ca98ecc9148ae219c5faebd028fb63da77372e8"
+    },
+    "Hello_source_review": {
+      "local_artifact": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-hello-benchmark-geometry-correction/independent-source-review.json",
+      "sha256": "5277a84166e72d890a49fdf8ff8d136b533d96e161a4e1cc9d1b05c0b14c32eb"
+    },
+    "headless_actual_review": {
+      "local_artifact": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-checks/actual-result-review.json",
+      "sha256": "5ef74da1c3553e2475364ca700221c551eb725e1c04cb6e67733c502193b9df7"
+    },
+    "native_actual_review": {
+      "local_artifact": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-checks/native/actual-native-review.json",
+      "sha256": "2302572d0cf7a7df08be6fd0ccc9d98e4d22c71f319384d7e565e032c72f1863"
+    },
+    "source_commits_actual_review": {
+      "local_artifact": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-checkpoint/commit-result-review.json",
+      "sha256": "0fecdf47b2ef66b5724793b322c6a0204c507b32cd3d8d7d99c3c22903ad9d59"
+    },
+    "documentation_review": {
+      "local_artifact": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-documentation/independent-review.json",
+      "sha256": "32053d454a336134bde518fbdbfa9aba95fbfa73b255a649ffbca8c4fbbdaf56"
+    },
+    "provider_finding_disposition": {
+      "local_artifact": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-checkpoint/independent-findings-disposition.json",
+      "sha256": "b7b4bdff99ec842b8cee04d89f626eed3b7b6a10e61d3e9b2cfebec0d2a2d40b"
+    }
+  },
+  "provider_scope": "One Anthropic Claude Sonnet5.5 source call covers14files (10 publicsource+4 preparedreviewmirrors); later report metadata is internally reviewed, not claimed part of that provider call.",
+  "limits": "Targeted nativefunctionalchecks, not60Hz/p95qualification, hiddenCocoadeallocation, physical/humanverification, refreshedSDKorMaccompletion."
+}

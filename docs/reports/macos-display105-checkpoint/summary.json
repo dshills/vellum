@@ -1,0 +1,158 @@
+{
+  "schema": 1,
+  "checkpoint": "Core105 acknowledged skips and Hello benchmark geometry",
+  "tested_base_commit": "3d64eacb8c97d9f4bcabf046b755b11099acfb08",
+  "actual_checkpoint_commit_ids": {
+    "Core105": "19cab39c1b3b38ee3fc355d18e37dc042184a795",
+    "hello_geometry": "77f1ae8d000b5912b0019758949e7390c838d8f6"
+  },
+  "commit_identity_status": "Actual two source commits independently audited against exact tested blobs and parents. Documentation commit identity and fresh SDK remain pending.",
+  "candidate_identity": {
+    "Core105_proposal_sha256": "bff8df95becc7c033bf586809b52820dab651be64a7d8f82c902face1d7002a9",
+    "stage0105_patch_sha256": "f03b7af13f29d992add76f857f26da55bfd1604a40eee6cc7ab38c1e5b03b46a",
+    "prepared_outputs": {
+      "system/driver/desktop/display_backpressure.go": "b7f57f586c84f4b01466cc66db84565bb60f12d53995f48b86c3c7e49adae3ca",
+      "system/driver/desktop/display_backpressure_darwin.go": "bf25a4849361296e47b470e7f9424155dbd0c70a2efb7280ae4054c034d3b3c7",
+      "system/driver/desktop/display_backpressure_vellum_test.go": "3ff890bfcb29b480660b8c40df22c7a006132be29058cdc303aad185eb6abec5",
+      "core/display_backpressure_vellum_test.go": "0bec380e07dfd8f30393775f607082d5b20594fbf41a92a8919f0eb6296079cb"
+    },
+    "hello_proposal_sha256": "0a495b763f8202a441df4d5b980362dba352cc52ae87fc624b9e32bd47bb4446",
+    "hello_public_files": {
+      "examples/hello/main.go": "25e605f3b36438fa99186ef8fddf4d69219fc6be28a19aaca1f458d354602a80",
+      "examples/hello/model_test.go": "9893ee01cc232bd51646fa896d3143248cd8df1a0e13de9ace067e215146b045",
+      "examples/hello/README.md": "12d54279e3c58a0afe8b2a9fece886ae0e4d80232d4449d4d4a2eeaaaf61322c"
+    }
+  },
+  "headless": {
+    "result": "PASS_DECLARED_OUTCOMES_ALL_17_PHASES",
+    "desktop_race": {
+      "PASS": 23,
+      "FAIL": 0,
+      "SKIP": 0
+    },
+    "selected_Core_race": {
+      "PASS": 48,
+      "FAIL": 0,
+      "SKIP": 0
+    },
+    "generated_consumer_race": {
+      "PASS": 4,
+      "FAIL": 0,
+      "SKIP": 0
+    },
+    "Python_prepare_PASS": 30,
+    "Python_strict_presentation_PASS": 27,
+    "expected_counterfactual_failures": {
+      "old_gate": 2,
+      "old_hello_guard": 3
+    },
+    "full_Core_recipe_replay_files": 6029,
+    "actual_groups_retired": 17,
+    "optimized_native_binaries": {
+      "diagnostic": "76a9fe7aff144221f8520b18276b71e633c4905382064ed0e2d73ba566ff0c8e",
+      "generated_consumer": "e0ac1c6416f3cff7a80081f33441a1ac661253d94e8298ec6de3c276bbdec50e"
+    }
+  },
+  "native": {
+    "result": "PASS_FOUR_SCOPED_FUNCTIONAL_CASES",
+    "cases": {
+      "ordinary": {
+        "RunReturned": true,
+        "WorkerJoined": true,
+        "Closed": true,
+        "RunError": ""
+      },
+      "after_show": {
+        "RunError": "presentation deadline exceeded",
+        "CPU_deadline_ns": 100000000,
+        "actual_deliberate_CPU_work_ns": 251022125,
+        "RunReturned": true,
+        "WorkerJoined": true,
+        "Shown": true,
+        "Closed": true
+      },
+      "pre_show": {
+        "RunError": "presentation deadline exceeded",
+        "CPU_deadline_ns": 100000000,
+        "actual_deliberate_CPU_work_ns": 250037333,
+        "ShownAtEntry": false,
+        "RunReturned": true,
+        "WorkerJoined": true,
+        "Closed": true
+      },
+      "generated_consumer": {
+        "geometry_persistence_disabled_in_fixture": true,
+        "pixel_verification": true,
+        "timed_GPU_readback_samples": 3,
+        "exit_code": 0
+      }
+    },
+    "actual_groups": [
+      86792,
+      86820,
+      86865,
+      86893
+    ],
+    "all_groups_absent_at_audit": true,
+    "shared_lease_free_at_audit": true,
+    "tracked_cleanup_censuses": 3,
+    "hidden_unclassified_TUINS_records_per_census": 1,
+    "native_deallocation_proven": false,
+    "exact_native_callback_numeric_value_recorded": false,
+    "performance_gain_established": false,
+    "geometry_preserved_against_current_scope_baseline": true
+  },
+  "SDK": {
+    "verified_immutable_source_commit": "3d64eacb8c97d9f4bcabf046b755b11099acfb08",
+    "retained_files_including_manifest": 8316,
+    "archive_sha256": "fbf6fbf12773bc0c496fee4e04089a726b30298173a0abe0a8ec40e5954f5a36",
+    "package_and_headless_relocation": "PASS",
+    "current_native_candidate_copy": "Modified copy; not manifest-valid release SDK",
+    "fresh_SDK_including_Core105_and_Hello_guard": "PENDING"
+  },
+  "Prism_source_review": {
+    "provider": "Anthropic",
+    "model": "claude-sonnet-5-5",
+    "files": 14,
+    "calls": 1,
+    "input_tokens": 25229,
+    "output_tokens": 368,
+    "cost_USD": 0.054138,
+    "finding_count": 1,
+    "disposition": "Refuted: fatal-only partial-settings-load contract already documented and sole caller exits before app construction.",
+    "unresolved_findings": [],
+    "scope": "The source packet was reviewed; this later documentation is not claimed to be part of that source call."
+  },
+  "release_policy": {
+    "measured_refresh_Hz": 60,
+    "input_to_presentation_p95_limit_ms": 33.3,
+    "CPU_work_optimization_target_ms": 4,
+    "M3_to_M7_closed": false
+  },
+  "remaining": [
+    "Build and verify a fresh private SDK from the final accepted source, preserving actual source-commit identities.",
+    "Run required unprofiled presentation matrix and representative workflows; latest accepted source70 serial p95 remains48.030/48.204ms and fails33.3ms.",
+    "Complete resource/endurance, physical/human Mac checks, final SDK/application/component acceptance and frozen-candidate audit."
+  ],
+  "source_evidence": {
+    "artifacts/macos-display105-acknowledged-skip-correction/proposal.json": "bff8df95becc7c033bf586809b52820dab651be64a7d8f82c902face1d7002a9",
+    "artifacts/macos-hello-benchmark-geometry-correction/proposal.json": "0a495b763f8202a441df4d5b980362dba352cc52ae87fc624b9e32bd47bb4446",
+    "artifacts/macos-display105-checks/actual-result-review.json": "5ef74da1c3553e2475364ca700221c551eb725e1c04cb6e67733c502193b9df7",
+    "artifacts/macos-display105-checks/native/actual-native-review.json": "2302572d0cf7a7df08be6fd0ccc9d98e4d22c71f319384d7e565e032c72f1863",
+    "artifacts/macos-sdk-pre-show-quit/binding.json": "ea9775483d976f64e1447f76ef9b54ecf9933e8f826bc9a981c68f4b09c7e871",
+    "artifacts/macos-sdk-pre-show-quit/result.json": "d2039b24467532aa09928b8ed1876e06eb91c1964a5a6bf8ad7f7efe1799b78a",
+    "artifacts/macos-sdk-pre-show-quit/retention.json": "6ecbcb5943abddcdbd86def26267f38cb21ba9f10d41d303550a126a6964ed79",
+    "artifacts/macos-display105-checkpoint/prism.json": "2c092272b3a806f6e0233b10e62179779d87eb34985679f308b8b39c1ba95c59",
+    "artifacts/macos-display105-checkpoint/prism-disposition.json": "93a39a353c0fee0e5a6aa08e6394e229fbd625c0b73473d154bad18524e5f4a6",
+    "artifacts/macos-display105-checkpoint/independent-findings-disposition.json": "b7b4bdff99ec842b8cee04d89f626eed3b7b6a10e61d3e9b2cfebec0d2a2d40b",
+    "artifacts/macos-display105-checkpoint/commit-result-review.json": "0fecdf47b2ef66b5724793b322c6a0204c507b32cd3d8d7d99c3c22903ad9d59"
+  },
+  "evidence_scope": "Compact hash-bound summary; complete raw receipts/logs remain in the local artifact paths, not in a new evidence archive.",
+  "source_checkpoint_counts_before_this_documentation": {
+    "C_T_clean_tracked_each": 5944,
+    "prepared_each": 6328,
+    "Core": 6029,
+    "typesetting": 299,
+    "stage": "0105"
+  }
+}

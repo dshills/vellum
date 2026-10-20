@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "approved": true,
+  "commit_ready": true,
+  "packet_sha256": "03064613e02fb8bb4ca7b5b6ca9d8bd98005e656b1173014abd8d8817e0b6f59",
+  "prism_sha256": "2c092272b3a806f6e0233b10e62179779d87eb34985679f308b8b39c1ba95c59",
+  "independent_disposition_sha256": "b7b4bdff99ec842b8cee04d89f626eed3b7b6a10e61d3e9b2cfebec0d2a2d40b",
+  "finding_dispositions": {
+    "2e311b6f3ba33220": {
+      "status": "refuted",
+      "reason": "The local unexported benchmark helper already documents fatal-only load errors, partial settings application without rollback, and no retry/ignore. Its sole production caller calls fail/os.Exit before app construction. README states normal-return restoration and terminal load errors. A transactional preferences API is outside this local fixture contract; restoring one flag would not roll back all partially applied settings."
+    }
+  },
+  "unresolved_findings": [],
+  "source_changed_after_Prism": false,
+  "repeat_provider_call": false,
+  "actual_provider_coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 14,
+    "bytes": 49412,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 25229,
+        "output": 368,
+        "costUSD": 0.054138
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "inputs": {
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-checkpoint/packet.json": "03064613e02fb8bb4ca7b5b6ca9d8bd98005e656b1173014abd8d8817e0b6f59",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-checkpoint/manifest.json": "6e54d0a16dc7dbcc170ae2a46a6587c1c0459367f3bc133245de29da8d55d04b",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-checkpoint/prism.json": "2c092272b3a806f6e0233b10e62179779d87eb34985679f308b8b39c1ba95c59",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-checkpoint/independent-findings-disposition.json": "b7b4bdff99ec842b8cee04d89f626eed3b7b6a10e61d3e9b2cfebec0d2a2d40b",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-checks/actual-result-review.json": "5ef74da1c3553e2475364ca700221c551eb725e1c04cb6e67733c502193b9df7",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-checks/native/actual-native-review.json": "2302572d0cf7a7df08be6fd0ccc9d98e4d22c71f319384d7e565e032c72f1863"
+  }
+}

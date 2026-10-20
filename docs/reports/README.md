@@ -3,6 +3,8 @@
 These reports preserve investigation outcomes and their original validation scope.
 The [implementation status](../implementation.md) describes the current framework.
 
+- [Acknowledged skips and benchmark geometry](macos-display105-checkpoint/README.md): Core105/Hello checks and four native functional cases pass; fresh SDK and Mac release gates remain open.
+
 - [Isolated native drawing and 3D fixtures](macos-advanced-native/README.md)
 
 - [Current private SDK native GPU demos](macos-gpu-sdk-stage0077/README.md)

@@ -9,7 +9,54 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
-## Current startup quit checkpoint — source 344447c and reviewed overlay
+## Current checkpoint — acknowledged skips and benchmark geometry
+
+The [Core105 checkpoint](../docs/reports/macos-display105-checkpoint/README.md)
+was tested on base `3d64eacb8c97d9f4bcabf046b755b11099acfb08` plus exact reviewed
+candidate bytes, then committed as Core105
+`19cab39c1b3b38ee3fc355d18e37dc042184a795` and Hello
+`77f1ae8d000b5912b0019758949e7390c838d8f6`. Their parent/blob continuity is
+independently audited. Matching finite-zero display acknowledgments retire ownership
+without claiming presentation success; malformed values, CPU/native ownership,
+stale identities and deadline latches stay guarded. No automatic unchanged-scene
+replay, measurement-clock, strict-classifier or release-threshold change is made.
+Hello's benchmark now loads settings before its process-local geometry override,
+with terminal load errors and restoration after normal teardown. Its actual
+generated consumer carries the helper and tests without a new public API.
+
+All 17 headless phases meet declared outcomes: desktop 23, selected Core 48 and
+generated-consumer four race methods pass; Python preparation 30 and strict
+presentation 27 pass; full 6,029-file Core recipe replay, vet and native build
+metadata pass. Old gate/Hello controls retain two/three expected behavioral
+failures. Four native functional cases pass: ordinary close, genuine after-Show
+and pre-Show CPU deadlines with worker join/normal close, and generated-consumer
+geometry isolation/pixel verification/three timed GPU readbacks. All groups retire;
+the native shared lease is free and current boundaries match.
+
+Each of the three lifecycle cleanup censuses retains one hidden unclassified
+TUINS window. No exact native callback numeric value, performance gain, native
+heap deallocation or physical/human verification is claimed. The earlier Core104
+watchdog and ordinary/after-Show failures below remain failed historical records.
+
+The immutable source-3d64 private SDK remains valid for its completed packaging
+and headless relocation checks, with 8,316 retained files including the manifest.
+The modified candidate copy used for these checks is not a manifest-valid SDK.
+The two source commits are recorded above; a fresh SDK containing Core105 and the
+Hello guard remains pending. No future documentation-commit identity or SDK
+success is claimed.
+
+The next deliverable remains a frozen private Mac alpha. Renew actual-source SDK
+and native application delivery, then qualify the unchanged measured matrix,
+workflows, resource/endurance and physical/human checks before final audit. M3–M7
+remain open: 60 Hz responsiveness and 33.3 ms latency are release gates; 4 ms is an
+optimization target. No feature expansion or completion date is introduced.
+
+## Earlier startup quit checkpoint — source 344447c and reviewed overlay
+
+This section records the earlier Core104/quit-overlay boundary. Its failed scopes
+and then-pending work retain their original status; the Core105 result above does
+not relabel their evidence.
+
 
 The [startup quit checkpoint](../docs/reports/macos-pre-show-quit-checkpoint/README.md)
 separates the verified source-104 SDK from the later tested quit correction. The
@@ -354,8 +401,8 @@ full resource/endurance qualification and M7 closure.
 | Application/API | Public Go APIs, controls/themes, commands/tasks, documents/history, docking and independent windows | Complete composed workflow and lifecycle acceptance on a release candidate |
 | Data and canvas | Managed tables/trees, typed placement, retained drawing/images, compute/HDR and custom 3D | Frame targets, representative interaction, full resource accounting |
 | Mac integration | Cocoa input/accessibility, menus, clipboard, choosers, drops, tray and optional notifications | Human/native workflow coverage, scale/display changes, declared service support |
-| SDK | Source 104 private SDK: 8,312 retained files including the manifest; genuine clean-source/archive association and relocation pass | Package the later reviewed quit correction; final SDK/application native acceptance, component/font/asset/rights closure and distribution acceptance remain |
-| Performance/endurance | Last accepted source-70 serial captures have input-to-presentation p95 48.030/48.204 ms; source-104 startup watchdog supplies no accepted timings; earlier cadence/idle/cycle results retain their scope | The unchanged 60 Hz/33.3 ms gates, full measured matrix/workflows and final-source resource/idle/endurance acceptance remain |
+| SDK | Verified source-3d64 SDK: 8,316 retained files including the manifest; candidate Core105/Hello copy passes scoped native functionality | Fresh final-source SDK including Core105/Hello, relocated native application acceptance, component/font/asset/rights and distribution closure remain |
+| Performance/endurance | Last accepted source-70 serial p95 remains 48.030/48.204 ms; Core105 adds functional checks without accepted presentation timings | Unchanged 60 Hz/33.3 ms gates, full measured matrix/workflows and final-source resource/idle/endurance acceptance remain |
 
 The first automated desktop placement attempt expired without input. The second
 attempt also sent no pointer/key input: the private operator refused an unusable
@@ -693,9 +740,9 @@ implementation checkpoint; it is not rerun after each documentation edit.
 
 ## Forecast and closure ledger
 
-The latest source-104 startup performance attempt fails without accepted timings.
-The reviewed quit overlay passes its controlled pre-Show failure/cleanup case,
-while ordinary and requested after-Show cases remain failed. The last accepted
+Core105 and the Hello guard pass four scoped native functional cases on a modified
+SDK copy, without accepted presentation timings. The earlier source-104 startup
+watchdog and ordinary/after-Show failures remain historical failures. The last accepted
 measured source-70 serial captures still miss 33.3 ms; earlier source-103 cadence
 passes retain their historical scope. None replaces the full repeated matrix or
 representative M3 workflows. Historical CPU-work misses remain optimization
@@ -709,12 +756,12 @@ Candidate evidence must retain exact source/configuration scope or justified reu
 
 | Milestone | Current status | Next action / evidence needed |
 | --- | --- | --- |
-| M1 | Complete in source; incorporated in the private SDK | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); verified source-104 SDK association and relocation pass in the [Startup quit checkpoint](../docs/reports/macos-pre-show-quit-checkpoint/README.md). Final artifact acceptance remains M6. |
+| M1 | Complete in source; incorporated in the private SDK | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); verified source-3d64 SDK association and relocation pass are retained in the [Core105 checkpoint](../docs/reports/macos-display105-checkpoint/README.md). Final artifact acceptance remains M6. |
 | M2 | Complete for the previously qualified controlled functional scope | The [eleven-method renewal](../docs/reports/macos-m2-renewal/README.md) passed on source `93b4730`: three dedicated Cocoa records, six catalogue/text records 323/202 and two full workspace records 432/54. Full software replay 1296/162 and the 205-test contract audit supply the scenario map. This does not certify physical/human input, all native pixels/deallocation, presentation performance or the full Mac release. Affected candidate evidence requires exact scope or justified reuse. |
-| M3 | Open; latest startup performance attempt fails without accepted timings | [Startup quit checkpoint](../docs/reports/macos-pre-show-quit-checkpoint/README.md): source-104 first-case watchdog fails; later three cases unrun. Last accepted [source-70 comparison](../docs/reports/macos-current-native-status/README.md) serial p95 48.030/48.204 ms misses 33.3 ms, with paced-grid prefix failure and fourth case unrun. No display-backpressure performance gain established. Full repeated matrix/workflows remain required; 60 Hz/33.3 ms gates and 4 ms optimization target are unchanged. |
-| M4 | Partial; two source-70 short scopes pass, full resource/endurance remains | [Current checkpoint](../docs/reports/macos-current-native-status/README.md): two same-name composed cycles/66 acknowledged native selector actions and a separate 40-second visibility soak/eight paired samples pass. Two groups retire. Each complete final census retains one hidden unclassified Cocoa window; no deallocation proof or eligible 60-second CPU interval. OS wakeups/presentation, native/GPU resources, ten-minute activity, 1,000 cycles and overnight remain open. |
+| M3 | Open; no accepted Core105 presentation timings | [Startup quit checkpoint](../docs/reports/macos-pre-show-quit-checkpoint/README.md): source-104 first-case watchdog fails; later three cases unrun. Last accepted [source-70 comparison](../docs/reports/macos-current-native-status/README.md) serial p95 48.030/48.204 ms misses 33.3 ms, with paced-grid prefix failure and fourth case unrun. The Core105 functional pass does not establish a performance gain. Full repeated matrix/workflows remain required; 60 Hz/33.3 ms gates and 4 ms optimization target are unchanged. |
+| M4 | Partial; historical short scopes and current functional cleanup only | [Current checkpoint](../docs/reports/macos-current-native-status/README.md): two same-name composed cycles/66 acknowledged native selector actions and a separate 40-second visibility soak/eight paired samples pass. Two groups retire. Each complete final census retains one hidden unclassified Cocoa window; no deallocation proof or eligible 60-second CPU interval. Three Core105 lifecycle censuses also retain one hidden unclassified TUINS each. OS wakeups/presentation, native/GPU resources, ten-minute activity, 1,000 cycles and overnight remain open. |
 | M5 | Partial; physical and human acceptance remains | Native fixtures and automated routing evidence exist. Direct pointer/preview, cross-display, native text/IME and human accessibility workflows remain separately qualified requirements. |
-| M6 | Partial; verified source-104 private SDK relocation/association pass | [Startup quit checkpoint](../docs/reports/macos-pre-show-quit-checkpoint/README.md): clean `344447c` SDK has 8,312 retained files including its manifest, with complete archive/source/prepared/extraction binding and relocated public-contract checks. The tested quit overlay is not yet in that SDK. Final SDK/app must include accepted changes, complete component/native/font/asset and notice/rights closure, relocated native application acceptance and distribution prerequisites. No public publication/signing approval follows. |
+| M6 | Partial; source-3d64 packaging passes, fresh Core105/Hello SDK pending | [Core105 checkpoint](../docs/reports/macos-display105-checkpoint/README.md): immutable `3d64eac` SDK has 8,316 retained files including its manifest and passes packaging/headless relocation. The modified candidate passes four functional native cases but is not a manifest-valid SDK. Final SDK/app must include accepted changes, complete component/native/font/asset and notice/rights closure, relocated native application acceptance and distribution prerequisites. No public publication/signing approval follows. |
 | M7 | Open | Requirement-by-requirement final audit after all preceding gates close. |
 
 The ledger changes only when the corresponding requirement is demonstrated.
