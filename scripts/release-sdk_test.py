@@ -24,6 +24,222 @@ release = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(release)
 
 class ReleaseChecks(unittest.TestCase):
+    def documentation_fixture(self, root):
+        files = {"README.md": "Qualification remains open.\nSee [guide](docs/guide.md#use) and [evidence](docs/reports/check/README.md#scope).\n",
+                 "docs/guide.md": "# Guide\n", "docs/reports/check/README.md": "# Repository evidence\n"}
+        for name, text in files.items():
+            path = root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text)
+        return files
+
+    def test_sdk_documentation_preserves_local_links_labels_and_evidence_fragments(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            files = self.documentation_fixture(root)
+            data = (root / "README.md").read_bytes()
+            derived, record = release.sdk_documentation(root, "README.md", data,
+                {"README.md", "docs/guide.md"}, set(files))
+            self.assertIn(b"[guide](docs/guide.md#use)", derived)
+            self.assertIn(b"evidence (full-repository reference: `docs/reports/check/README.md#scope`)", derived)
+            self.assertIn(b"[documentation scope](SDK_DOCUMENTATION.md)", derived)
+            self.assertEqual(record["source_sha256"], hashlib.sha256(data).hexdigest())
+            self.assertEqual(record["archived_sha256"], hashlib.sha256(derived).hexdigest())
+            self.assertEqual(record["references"], [{"original_target": "docs/reports/check/README.md#scope",
+                "repository_reference": "docs/reports/check/README.md#scope"}])
+            self.assertEqual((root / "README.md").read_bytes(), data)
+
+    def test_sdk_documentation_multiline_label_directory_and_qualification(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            files = self.documentation_fixture(root)
+            data = b"Qualification remains open. See [recorded\nevidence](../docs/reports/check/#scope).\n"
+            derived, record = release.sdk_documentation(root, "specs/sdk.md", data,
+                {"specs/sdk.md"}, set(files))
+            self.assertTrue(derived.startswith(b"Qualification remains open. See recorded\nevidence"))
+            self.assertIn(b"`docs/reports/check#scope`", derived)
+            self.assertIn(b"(../SDK_DOCUMENTATION.md)", derived)
+            self.assertEqual(len(record["references"]), 1)
+
+    def test_sdk_documentation_indented_paragraph_continuations_are_links(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            files = self.documentation_fixture(root)
+            data = (b"Qualification remains open; the paragraph continues\n"
+                    b"    [evidence](docs/reports/check/README.md#scope)\n"
+                    b"\t[another](docs/reports/check/README.md).\n")
+            derived, record = release.sdk_documentation(root, "README.md", data, {"README.md"}, set(files))
+            self.assertIn(b"    evidence (full-repository reference:", derived)
+            self.assertIn(b"\tanother (full-repository reference:", derived)
+            self.assertEqual(len(record["references"]), 2)
+            with self.assertRaisesRegex(ValueError, "unknown missing"):
+                release.sdk_documentation(root, "README.md", b"A paragraph\n    [missing](absent.md)\n",
+                    {"README.md"}, set(files))
+
+    def test_sdk_documentation_nested_list_and_multiline_list_links_are_links(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            files = self.documentation_fixture(root)
+            data = (b"- Outer item\n  - Inner item\n"
+                    b"    [nested](docs/reports/check/README.md)\n"
+                    b"    [multiline\n    evidence](docs/reports/check/README.md#scope)\n\n"
+                    b"    New item paragraph [record](docs/reports/check/README.md).\n")
+            derived, record = release.sdk_documentation(root, "README.md", data, {"README.md"}, set(files))
+            self.assertIn(b"    nested (full-repository reference:", derived)
+            self.assertIn(b"    multiline\n    evidence (full-repository reference:", derived)
+            self.assertIn(b"New item paragraph record (full-repository reference:", derived)
+            self.assertEqual(len(record["references"]), 3)
+
+    def test_sdk_documentation_thematic_breaks_and_setext_end_paragraph_before_code(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            files = self.documentation_fixture(root)
+            boundaries = [(heading, b"    ") for heading in [b"---\n", b"- - -\n", b"* * *\n",
+                b"_ _ _\n", b"___\n", b"A heading\n--\n", b"A heading\n===\n",
+                b"A heading\n-\n", b"A heading\n=\n"]]
+            boundaries += [(b"- Item\n\n  " + marker, b"      ")
+                for marker in [b"- - -\n", b"* * *\n", b"_ _ _\n"]]
+            for heading, indentation in boundaries:
+                with self.subTest(heading=heading):
+                    code = heading + indentation + b"[code](absent.md)\n\n"
+                    data = code + b"A paragraph continues\n    [evidence](docs/reports/check/README.md)\n"
+                    derived, record = release.sdk_documentation(root, "README.md", data,
+                        {"README.md"}, set(files))
+                    self.assertTrue(derived.startswith(code))
+                    self.assertIn(b"    evidence (full-repository reference:", derived)
+                    self.assertEqual(len(record["references"]), 1)
+
+    def test_sdk_documentation_real_indented_and_list_contained_code_remains_exact(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            files = self.documentation_fixture(root)
+            code = (b"    [top-code](absent.md)\n\n    - [code-marker](absent.md)\n\n"
+                    b"- List item\n\n      [list-code](absent.md)\n\n"
+                    b"  - Nested item\n\n        [nested-code](absent.md)\n\n"
+                    b"    ```md\n    [nested-fence](absent.md)\n    ```\n\n"
+                    b"- ```md\n  [marker-fence](absent.md)\n  ```\n\n")
+            data = code + b"[evidence](docs/reports/check/README.md)\n"
+            derived, record = release.sdk_documentation(root, "README.md", data, {"README.md"}, set(files))
+            self.assertTrue(derived.startswith(code))
+            self.assertEqual(len(record["references"]), 1)
+
+    def test_sdk_documentation_code_external_and_packaged_links_remain_exact(self):
+        data = (b"```md\n[missing](absent.md)\n```\n~~~\n[missing](absent.md)\n~~~\n"
+                b"    [missing](absent.md)\n\t[missing](absent.md)\n"
+                b"`[missing](absent.md)` [remote](https://example.com/absent.md) "
+                b"[anchor](#scope) [directory](docs/) [root](./)\n")
+        tracked = mock.Mock(side_effect=AssertionError("unneeded tracked-name enumeration"))
+        derived, record = release.sdk_documentation(Path("/unused"), "README.md", data,
+            {"README.md", "docs/guide.md"}, tracked)
+        self.assertEqual(derived, data)
+        self.assertIsNone(record)
+        tracked.assert_not_called()
+        third_party = b"[not an SDK link](unknown.md)\n"
+        self.assertEqual(release.sdk_documentation(Path("/unused"),
+            "drivers/cogent/build/upstream/README.md", third_party, set(), set()), (third_party, None))
+
+    def test_sdk_documentation_equal_length_backticks_preserve_embedded_shorter_runs(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            files = self.documentation_fixture(root)
+            code = b"`` a`[missing](absent.md)`b `` and ``` a``[missing](absent.md)``b ```\n"
+            data = code + b"[evidence](docs/reports/check/README.md)\n"
+            derived, record = release.sdk_documentation(root, "README.md", data,
+                {"README.md"}, set(files))
+            self.assertTrue(derived.startswith(code))
+            self.assertEqual(len(record["references"]), 1)
+            self.assertEqual(release.sdk_documentation(root, "README.md", code,
+                {"README.md"}, set(files)), (code, None))
+
+    def test_sdk_documentation_preserves_third_party_component_notices_only(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            files = self.documentation_fixture(root)
+            notice = b"Third-party notice. [API](../unshipped-api.md) [unknown](missing.md).\nNonlinked attribution stays exact.\n"
+            name = "release/native-components/webgpu/NOTICES/component/API.md"
+            self.assertEqual(release.sdk_documentation(root, name, notice, {name}, set(files)),
+                (notice, None))
+            # The component's first-party README is not part of the notice tree.
+            name = "release/native-components/webgpu/README.md"
+            derived, record = release.sdk_documentation(root, name,
+                b"[evidence](../../../docs/reports/check/README.md)\n", {name}, set(files))
+            self.assertIn(b"full-repository reference: `docs/reports/check/README.md`", derived)
+            self.assertEqual(len(record["references"]), 1)
+            with self.assertRaisesRegex(ValueError, "unknown missing"):
+                release.sdk_documentation(root, name, b"[unknown](missing.md)", {name}, set(files))
+
+    def test_sdk_documentation_escaped_literal_bracket_is_not_a_link(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            files = self.documentation_fixture(root)
+            literal = b"\\[missing](absent.md) and \\`literal\\`\n"
+            data = literal + b"\\\\[evidence](docs/reports/check/README.md)\n"
+            derived, record = release.sdk_documentation(root, "README.md", data,
+                {"README.md"}, set(files))
+            self.assertTrue(derived.startswith(literal + b"\\\\evidence (full-repository reference:"))
+            self.assertEqual(len(record["references"]), 1)
+            with self.assertRaisesRegex(ValueError, "unknown missing"):
+                release.sdk_documentation(root, "README.md", b"[missing](absent.md)",
+                    {"README.md"}, set(files))
+
+    def test_sdk_documentation_unknown_missing_and_escape_targets_refuse(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            files = self.documentation_fixture(root)
+            for target, tracked in [("docs/typo.md", set(files)),
+                    ("docs/reports/check/README.md", set()),
+                    ("docs/reports/missing.md", {*files, "docs/reports/missing.md"}),
+                    ("../outside.md", set()), ("%2e%2e/outside.md", set())]:
+                with self.subTest(target=target, tracked=tracked):
+                    with self.assertRaises(ValueError):
+                        release.sdk_documentation(root, "README.md", ("[evidence](" + target + ")").encode(),
+                            {"README.md"}, tracked)
+
+    def test_sdk_documentation_excluded_symlink_target_refuses(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "docs/reports").mkdir(parents=True)
+            (root / "real.md").write_text("real")
+            (root / "docs/reports/link.md").symlink_to(root / "real.md")
+            with self.assertRaisesRegex(ValueError, "symlink"):
+                release.sdk_documentation(root, "README.md", b"[record](docs/reports/link.md)",
+                    {"README.md"}, {"docs/reports/link.md"})
+
+    def test_sdk_archive_records_derived_document_hashes_and_scope_without_evidence(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary)
+            root = base / "source"
+            root.mkdir()
+            files = self.documentation_fixture(root)
+            (root / "release").mkdir()
+            (root / "release/version.json").write_text('{"version":"v0.1.0-alpha.2"}')
+            sources = [(name, root / name) for name in ["README.md", "docs/guide.md"]]
+            kwargs = {"source_files": mock.DEFAULT, "license_inventory": mock.DEFAULT,
+                      "source_state": mock.DEFAULT, "git_output": mock.DEFAULT}
+            with mock.patch.multiple(release, **kwargs) as mocks:
+                mocks["source_files"].return_value = sources
+                mocks["license_inventory"].return_value = ({"modules": []}, {})
+                mocks["source_state"].return_value = {"clean": True, "commit": "a" * 40}
+                mocks["git_output"].return_value = ("\0".join(files) + "\0").encode()
+                output = base / "sdk.tar.gz"
+                release.package(root, output)
+                repeat = base / "repeat.tar.gz"
+                release.package(root, repeat)
+            self.assertEqual(output.read_bytes(), repeat.read_bytes())
+            with tarfile.open(output) as archive:
+                payload = {m.name.split("/", 1)[1]: archive.extractfile(m).read() for m in archive}
+            manifest = json.loads(payload["SDK_MANIFEST.json"])
+            self.assertIn("SDK_DOCUMENTATION.md", payload)
+            self.assertNotIn("docs/reports/check/README.md", payload)
+            self.assertNotIn(b"# Repository evidence", b"".join(payload.values()))
+            self.assertIn(b"Qualification remains open.", payload["README.md"])
+            record = manifest["documentation_overlays"]["documents"]["README.md"]
+            self.assertEqual(record["source_sha256"], hashlib.sha256(files["README.md"].encode()).hexdigest())
+            self.assertEqual(record["archived_sha256"], hashlib.sha256(payload["README.md"]).hexdigest())
+            for name, digest in manifest["files"].items():
+                self.assertEqual(digest, hashlib.sha256(payload[name]).hexdigest())
+            self.assertEqual(manifest["documentation_overlays"]["scope_note"], "SDK_DOCUMENTATION.md")
+
     def test_public_release_fails_closed_without_owner_choices(self):
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaisesRegex(ValueError,"namespace.*license.*audit"):

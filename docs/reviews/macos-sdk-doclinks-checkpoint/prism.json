@@ -1,0 +1,116 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b37a63215f3cb56a8341811da9f0462d",
+  "repo": {
+    "root": "/private/tmp/vellum-sdk-doclinks-checkpoint-review",
+    "head": "714935bfed647e054a4b49d8786d3701211a5e29",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "f85d7983ddcfd580",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Reference-style link definitions are not handled",
+      "message": "The link regex only matches inline links. Reference-style definitions such as `[x]: docs/reports/a.md` and autolinks are never inspected. Links to omitted targets via reference definitions therefore stay unconverted and dangle in the SDK. The policy requires only inline links, but it silently passes the others.",
+      "suggestion": "Detect reference definitions pointing at omitted targets and either convert them or raise an error.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "scripts/release-sdk.py",
+          "lines": {
+            "start": 172,
+            "end": 172
+          }
+        }
+      ],
+      "tags": [
+        "markdown",
+        "location-corrected"
+      ],
+      "evidence": "            match = DOCUMENTATION_LINK.match(text, position) if text[position] in \"[!\" else None",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "da9c2c07567bdb9e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Indented-code detection skips list continuations and paragraph continuations",
+      "message": "Any line starting with four spaces or a tab is treated as an indented code block, even when it is a continuation of a paragraph or a nested list item. Links in those lines are never rewritten, so a link into an omitted directory (docs/reports) is left as a dangling link in the SDK archive. The documentation-export goal is silently defeated. A link split across a paragraph line and an indented continuation also breaks the block boundary.",
+      "suggestion": "Only treat indented lines as code when they follow a blank line and are not list continuations. Alternatively, validate after conversion that no link to an omitted target remains.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "scripts/release-sdk.py",
+          "lines": {
+            "start": 194,
+            "end": 197
+          }
+        }
+      ],
+      "tags": [
+        "markdown",
+        "correctness",
+        "location-corrected"
+      ],
+      "evidence": "        elif line.startswith((\"    \", \"\\t\")):\n            pieces.append(inline(\"\".join(block)))\n            block = []\n            pieces.append(line)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6438,
+    "totalMs": 6499
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 8,
+    "bytes": 60122,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 25852,
+        "output": 653,
+        "costUSD": 0.058234
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

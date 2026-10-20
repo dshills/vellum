@@ -7,6 +7,7 @@ import hashlib
 import io
 import json
 import os
+import posixpath
 import re
 import shutil
 from pathlib import Path
@@ -14,6 +15,7 @@ import subprocess
 import tarfile
 import tempfile
 import sys
+from urllib.parse import unquote, urlsplit
 
 if __name__ == "__main__":
     sys.dont_write_bytecode = True
@@ -94,6 +96,148 @@ def require_regular_source(root, source):
         raise ValueError(f"SDK source must be a regular file: {relative}")
 
 
+REPOSITORY_DOCUMENTATION = ("docs/reviews/", "docs/reports/", "docs/research/", "docs/assets/", "prototypes/")
+DOCUMENTATION_NOTE = "SDK_DOCUMENTATION.md"
+DOCUMENTATION_LINK = re.compile(
+    r"!?\[(?P<label>[^\]]*)\]\(\s*"
+    r"(?P<target><[^>\n]+>|[^\s)]+)(?:\s+(?:\"[^\"]*\"|'[^']*'))?\s*\)")
+
+
+def repository_documentation(name):
+    return any(name == prefix[:-1] or name.startswith(prefix) for prefix in REPOSITORY_DOCUMENTATION)
+
+
+def sdk_documentation(root, name, data, exported, tracked):
+    """Derive first-party inline Markdown only; keep shipped links and all code."""
+    if (not name.endswith(".md") or name.startswith("drivers/cogent/build/")
+            or re.match(r"release/native-components/[^/]+/NOTICES/", name)):
+        return data, None
+    references = []
+
+    def replace(match):
+        target = match.group("target").strip("<>")
+        parsed = urlsplit(target)
+        if parsed.scheme or parsed.netloc or not parsed.path:
+            return match.group(0)
+        path = unquote(parsed.path)
+        resolved = posixpath.normpath(posixpath.join(posixpath.dirname(name), path))
+        if path.startswith("/") or "\\" in path or resolved == ".." or resolved.startswith("../"):
+            raise ValueError(f"SDK documentation target escapes source: {name}: {target}")
+        prefix = resolved.rstrip("/") + "/"
+        if resolved == "." or resolved in exported or any(item.startswith(prefix) for item in exported):
+            return match.group(0)
+        source = root / resolved
+        if not repository_documentation(resolved) or not source.exists():
+            raise ValueError(f"unknown missing SDK documentation target: {name}: {target}")
+        names = tracked() if callable(tracked) else tracked
+        if resolved not in names and not any(item.startswith(prefix) for item in names):
+            raise ValueError(f"unknown missing SDK documentation target: {name}: {target}")
+        current = root
+        for part in Path(resolved).parts:
+            current = current / part
+            if current.is_symlink():
+                raise ValueError(f"SDK documentation target cannot be a symlink: {resolved}")
+        if not source.is_file() and not source.is_dir():
+            raise ValueError(f"SDK documentation target must be regular: {resolved}")
+        reference = resolved + ("?" + parsed.query if parsed.query else "") + ("#" + parsed.fragment if parsed.fragment else "")
+        references.append({"original_target": target, "repository_reference": reference})
+        return match.group("label") + " (full-repository reference: `" + reference + "`)"
+
+    def inline(text):
+        output, position = [], 0
+        while position < len(text):
+            if text[position] == "\\":
+                output.append(text[position:position + 2])
+                position += 2
+                continue
+            if text[position] == "`":
+                end = position
+                while end < len(text) and text[end] == "`":
+                    end += 1
+                search, close = end, None
+                while search < len(text):
+                    start = text.find("`", search)
+                    if start < 0:
+                        break
+                    search = start
+                    while search < len(text) and text[search] == "`":
+                        search += 1
+                    if search - start == end - position:
+                        close = search
+                        break
+                # Only an equal-length delimiter closes an inline code span.
+                output.append(text[position:close if close is not None else end])
+                position = close if close is not None else end
+                continue
+            match = DOCUMENTATION_LINK.match(text, position) if text[position] in "[!" else None
+            if match is not None:
+                output.append(replace(match))
+                position = match.end()
+            else:
+                output.append(text[position])
+                position += 1
+        return "".join(output)
+
+    # Indented code cannot interrupt a paragraph. List content indentation is
+    # relative to its marker, so four document columns need not be code.
+    pieces, block, fence, lists, paragraph = [], [], None, [], False
+    for line in data.decode("utf-8").splitlines(keepends=True):
+        expanded = line.expandtabs(4)
+        indent = len(expanded) - len(expanded.lstrip(" "))
+        if fence is not None:
+            pieces.append(line)
+            marker, base = fence
+            closing = expanded[base:] if indent >= base else expanded
+            if re.fullmatch(r" {0,3}" + re.escape(marker[0]) + "{" + str(len(marker)) + r",}[ \t]*(?:\r?\n)?", closing):
+                fence = None
+            continue
+        if not line.strip():
+            block.append(line)
+            paragraph = False
+            continue
+        item = re.match(r"([-+*]|[0-9]{1,9}[.)])( +|$)", expanded[indent:].rstrip("\r\n"))
+        # An unindented non-marker can be a lazy list paragraph continuation.
+        while lists and indent < lists[-1] and (item or not paragraph):
+            lists.pop()
+        base = lists[-1] if lists else 0
+        if not paragraph and indent >= base + 4:
+            pieces.append(inline("".join(block)))
+            block = []
+            pieces.append(line)
+            continue
+        content = expanded[base:] if indent >= base else expanded
+        thematic = re.fullmatch(r" {0,3}(?:(?:\* *){3,}|(?:- *){3,}|(?:_ *){3,})[ \t]*(?:\r?\n)?", content)
+        setext = paragraph and re.fullmatch(r" {0,3}(?:=+|-+)[ \t]*(?:\r?\n)?", content)
+        if thematic or setext:
+            block.append(line)
+            paragraph = False
+            continue
+        if item and indent <= base + 3:
+            padding = len(item.group(2))
+            base = indent + len(item.group(1)) + (padding if 0 < padding <= 4 else 1)
+            lists.append(base)
+            content = expanded[base:]
+            paragraph = False
+        marker = re.match(r"^ {0,3}(`{3,}|~{3,})", content)
+        if marker:
+            pieces.append(inline("".join(block)))
+            block = []
+            fence = (marker.group(1), base)
+            pieces.append(line)
+            paragraph = False
+            continue
+        block.append(line)
+        paragraph = bool(content.strip()) and not re.match(r"^ {0,3}#{1,6}(?: |$)", content)
+    pieces.append(inline("".join(block)))
+    if not references:
+        return data, None
+    note = posixpath.relpath(DOCUMENTATION_NOTE, posixpath.dirname(name) or ".")
+    derived = ("".join(pieces) + "\n\nSDK archive scope: omitted evidence references require the matching full checkout; "
+               "see [documentation scope](" + note + ").\n").encode("utf-8")
+    return derived, {"source_sha256": hashlib.sha256(data).hexdigest(),
+                     "archived_sha256": hashlib.sha256(derived).hexdigest(), "references": references}
+
+
 def source_files(root, include_untracked=False, dependencies=None):
     arguments = ["git", "ls-files", "-z", "--cached"]
     if include_untracked:
@@ -105,7 +249,7 @@ def source_files(root, include_untracked=False, dependencies=None):
         if name.startswith("drivers/cogent/build/") or "__pycache__" in path.parts:
             continue
         if path.parts[0] not in allowed and name not in {"go.mod", "go.sum", "README.md", "LICENSE"} and not (len(path.parts) == 1 and path.suffix == ".go"):
-            if not (name.startswith("specs/") or name.startswith("docs/") and not name.startswith(("docs/reviews/", "docs/reports/", "docs/research/", "docs/assets/"))):
+            if not (name.startswith("specs/") or name.startswith("docs/") and not repository_documentation(name)):
                 continue
         source = root / path
         require_regular_source(root, source)
@@ -298,6 +442,7 @@ def package(root, output, public=False, include_untracked=False, *, macos_gpu_li
     prefix = "vellum-" + version
     output.parent.mkdir(parents=True, exist_ok=True)
     checksums = {}
+    documentation = {}
     untracked_candidates = set(filter(None, git_output(root, ["ls-files", "-z", "--others", "--exclude-standard"]).decode().split("\0"))) if include_untracked else set()
     included_untracked = []
     pending = None
@@ -314,12 +459,25 @@ def package(root, output, public=False, include_untracked=False, *, macos_gpu_li
                 inventory["native_gpu_candidate"]["component_notices"] = gpu_record["component_notices"]
             if public and any(not item.get("module_license_files") for item in inventory["modules"]):
                 raise ValueError("a dependency has no recorded module license declaration")
+            sources = list(source_files(root, include_untracked=include_untracked, dependencies=dependencies))
+            exported = {name for name, _ in sources}
+            tracked = None
+
+            def tracked_names():
+                nonlocal tracked
+                if tracked is None:
+                    tracked = set(filter(None, git_output(root, ["ls-files", "-z", "--cached"]).decode().split("\0")))
+                return tracked
+
             with tempfile.NamedTemporaryFile(prefix=".vellum-sdk-", dir=output.parent, delete=False) as temporary:
                 pending = Path(temporary.name)
                 with gzip.GzipFile(fileobj=temporary, mode="wb", filename="", mtime=0) as zipped:
                     with tarfile.open(fileobj=zipped, mode="w|", format=tarfile.PAX_FORMAT) as archive:
-                        for name, source in source_files(root, include_untracked=include_untracked, dependencies=dependencies):
+                        for name, source in sources:
                             data = source.read_bytes()
+                            data, derived = sdk_documentation(root, name, data, exported, tracked_names)
+                            if derived is not None:
+                                documentation[name] = derived
                             if gpu_record is not None:
                                 overlaid = native_gpu.overlay_modfile(name, data)
                                 if overlaid is not None:
@@ -332,6 +490,17 @@ def package(root, output, public=False, include_untracked=False, *, macos_gpu_li
                             checksums[name] = hashlib.sha256(data).hexdigest()
                         generated = dict(notices)
                         generated.update(gpu_files)
+                        if documentation:
+                            generated[DOCUMENTATION_NOTE] = (
+                                "# SDK documentation scope\n\n"
+                                "This SDK includes application guides, API contracts and planning documents. "
+                                "Reports, reviews, research, artwork and prototypes remain in the full repository. "
+                                "References explicitly marked full-repository reference are not SDK links; "
+                                "obtain the matching full checkout to inspect that evidence. "
+                                "No remote publication or additional qualification is implied.\n\n"
+                                "Recorded source commit: `" + state["commit"] + "`. "
+                                "Manifest documentation_overlays records source/derived hashes and reference mappings.\n"
+                            ).encode("utf-8")
                         generated["THIRD_PARTY_INVENTORY.json"] = (json.dumps(inventory, indent=2, sort_keys=True) + "\n").encode()
                         if not public:
                             generated["PRIVATE_BUILD.txt"] = b"Private SDK validation build. Public release, licensing and platform qualification gates have not passed.\n"
@@ -341,6 +510,9 @@ def package(root, output, public=False, include_untracked=False, *, macos_gpu_li
                             add_member(archive, prefix + "/" + name, data)
                             checksums[name] = hashlib.sha256(data).hexdigest()
                         manifest = {"schema": 1, "release": metadata, "source": state, "private_build": not public, "untracked_files": sorted(included_untracked), "files": checksums}
+                        if documentation:
+                            manifest["documentation_overlays"] = {"schema": 1, "scope_note": DOCUMENTATION_NOTE,
+                                                                  "documents": documentation}
                         if gpu_record is not None:
                             native_gpu.validate_record(gpu_record, checksums, True)
                             manifest["native_gpu"] = gpu_record

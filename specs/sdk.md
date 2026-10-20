@@ -6,6 +6,26 @@ directory. The framework namespace is `github.com/dshills/vellum` and its own co
 is MIT-licensed. Public distribution remains gated on the dependency/native audit
 and target qualification.
 
+## Documentation in the SDK archive
+
+Consumer guides and contracts retain their links to other packaged files.
+Repository-only reports, reviews, research, artwork and prototypes remain excluded.
+For first-party inline Markdown links into those known existing source trees,
+the exporter retains the label and exact repository path/fragment as an explicit
+nonlinked full-repository reference. It adds a link to `SDK_DOCUMENTATION.md`,
+which explains that inspecting this evidence requires the matching full checkout.
+No remote publication or additional qualification is implied. Unknown missing or
+escaping inline targets refuse packaging rather than becoming evidence references.
+Code examples, third-party prepared documentation and native-component
+`NOTICES/` trees remain unchanged. First-party component READMEs still follow the
+normal documentation policy.
+
+`SDK_MANIFEST.json` hashes the actual archived document bytes and generated scope
+note. Its additive `documentation_overlays` record contains each original source
+hash, derived archived hash and exact rewritten target/reference mappings.
+These derived document bytes must be associated through this record when comparing
+an SDK against its producing source; they are not claimed to be unchanged source.
+
 ## Public document editing
 
 The SDK includes the standard-library-only `editor` package and its managed

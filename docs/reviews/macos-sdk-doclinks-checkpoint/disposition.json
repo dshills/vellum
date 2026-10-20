@@ -1,0 +1,37 @@
+{
+  "prism_sha256": "59e69ef8c81bbb9ffb86383667678a88bded2d07e3394b604232504e82fde1b3",
+  "provider_packet_sha256": "09556974f30a3e63187ecc743dbbbdd3bf30a7e1c379f7375aa4c21fe9abfab8",
+  "provider_calls": 1,
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "costUSD": 0.058234,
+  "scope": "provider covered eight original v3 text/source paths; final v5 narrow provider correction independently reviewed/tested; rawarchive/index internallyverified only",
+  "findings": [
+    {
+      "id": "f85d7983ddcfd580",
+      "disposition": "refuted_scoped_limitation",
+      "reason": "Explicit first-party inline Markdown contract; no first-party reference definitions/HTML href/src/URI-email autolinks in current185 firstparty files; no affectedcurrentmissingtarget. No fullCommonMark/reference/HTML/anchorvalidation claimed.",
+      "independent_assessment_sha256": "79d054445a8c3f95b23dae24c681d7cf920285c94d3af5c30dad2b8e793e7a4b"
+    },
+    {
+      "id": "da9c2c07567bdb9e",
+      "disposition": "accepted_fixed",
+      "reason": "Container-relative list indentation and paragraph boundaries preserve real code/fences while converting genuine paragraph/list continuations; thematic/setext code regression also corrected.",
+      "final_source_review_sha256": "aee199e5451de3e0def42bb52fabbeef82cf36d1f9d2108c31165988f6d819b7",
+      "provider_fix_diff_sha256": "893ec0022ea81902fd8deae977c2557a1295aadc10c54ba6624294c4d0da99e8"
+    }
+  ],
+  "unresolved_findings": [],
+  "repeat_provider_call": false,
+  "final_checks": {
+    "suite_methods_PASS": 42,
+    "suite_receipt_sha256": "9c163574034d86a8ff5a904c9a1c12f0b061191646f4f341a68df374b0dfd278",
+    "current_derivation_sha256": "a350776df30ad00e31ada7a2aadcaa5931ce6184b41f1cf0b3a5469eab235f28",
+    "tracked_exported_Markdown": 198,
+    "derived_documents": 62,
+    "rewritten_evidence_references": 386,
+    "native_notice_Markdown_unchanged": 13,
+    "current_doc_output_unchanged_after_provider_fix": true
+  },
+  "limits": "Current8cc SDK remainsimmutable; candidateproduced no freshreleasearchiveyet. MacM3-M7 andphysical/human/rights/endurance remainopen."
+}
