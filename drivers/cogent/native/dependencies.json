@@ -1370,6 +1370,17 @@
               "sha256": "4450e315199380c6e5d3190625b7dcccda72f79af9b36d282970c9e2bb9b04fc"
             }
           ]
+        },
+        {
+          "origin": "Vellum finite-zero drawable acknowledgement",
+          "inputs": "native/patches/acknowledgedskip/original-hashes.json",
+          "outputs": "native/patches/acknowledgedskip/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/acknowledgedskip/0105-acknowledged-skipped-drawable.patch",
+              "sha256": "f03b7af13f29d992add76f857f26da55bfd1604a40eee6cc7ab38c1e5b03b46a"
+            }
+          ]
         }
       ]
     },

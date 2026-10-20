@@ -1,0 +1,269 @@
+--- a/system/driver/desktop/display_backpressure.go
++++ b/system/driver/desktop/display_backpressure.go
+@@ -169,9 +169,10 @@
+ 		g.mu.Unlock()
+ 		return
+ 	}
+-	// Zero presentedTime is a terminal skipped record, never display success.
+-	// It frees native ownership but permanently refuses this experimental gate.
+-	if !unavailable && (at <= 0 || math.IsNaN(at) || math.IsInf(at, 0)) {
++	// An actual callback with finite zero presentedTime acknowledges a skipped
++	// drawable. It releases native ownership, not evidence of displayed pixels.
++	// Malformed times remain terminal; an earlier failure is never cleared.
++	if !unavailable && (at < 0 || math.IsNaN(at) || math.IsInf(at, 0)) {
+ 		g.failLocked("drawable was not presented")
+ 	}
+ 	g.nativePending = 0
+--- a/system/driver/desktop/display_backpressure_darwin.go
++++ b/system/driver/desktop/display_backpressure_darwin.go
+@@ -13,8 +13,9 @@
+ 
+ // EnableDisplayBackpressure is a private opt-in Mac experiment, not a default
+ // scheduling policy. It must run before the layer's first drawable acquisition.
+-// A missing/zero display callback latches typed refusal; it never guesses that a
+-// live frame retired. Callers must observe refusal and close the diagnostic.
++// A missing callback reaches the deadline without retiring live ownership. An
++// actual finite-zero callback acknowledges a skip, never successful display.
++// Malformed times and deadlines latch refusal; callers must close on refusal.
+ func (w *Window) EnableDisplayBackpressure(timeout time.Duration) error {
+ 	if C.vellumPresentationAvailable() == 0 {
+ 		return displayFailure("native presentation callback unavailable")
+--- a/system/driver/desktop/display_backpressure_vellum_test.go
++++ b/system/driver/desktop/display_backpressure_vellum_test.go
+@@ -128,8 +128,8 @@
+ 	next := displayAdmit(t, g)
+ 	g.finish(next)
+ }
+-func TestVellumDisplayBackpressureSkippedCallbackRefusesRatherThanSucceeds(t *testing.T) {
+-	for _, at := range []float64{0, math.NaN(), math.Inf(1)} {
++func TestVellumDisplayBackpressureMalformedCallbackRefusesRatherThanSucceeds(t *testing.T) {
++	for _, at := range []float64{-1, -math.SmallestNonzeroFloat64, math.NaN(), math.Inf(1), math.Inf(-1)} {
+ 		t.Run("invalid-display-time", func(t *testing.T) {
+ 			g, _ := displayGateFixture(t)
+ 			credit := displayAdmit(t, g)
+@@ -137,10 +137,10 @@
+ 			g.finish(credit)
+ 			g.complete(seq, at, false)
+ 			if s := g.status(); s.NativePending != 0 || s.Active != 0 || s.Failure == "" {
+-				t.Fatalf("skipped frame misclassified: %+v", s)
++				t.Fatalf("malformed callback misclassified: %+v", s)
+ 			}
+ 			if c, err := g.admit(); c != 0 || err == nil {
+-				t.Fatal("skipped callback allowed another batch")
++				t.Fatal("malformed callback allowed another batch")
+ 			}
+ 		})
+ 	}
+@@ -310,3 +310,170 @@
+ 	g.finish(next)
+ 	g.complete(second, 1, false)
+ }
++
++func TestVellumDisplayBackpressureAcknowledgedSkipAfterCPUEnd(t *testing.T) {
++	for _, at := range []float64{0, math.Copysign(0, -1)} {
++		g, wake := displayGateFixture(t)
++		credit := displayAdmit(t, g)
++		seq := g.acquire(credit)
++		g.finish(credit)
++		g.complete(seq, at, false)
++		if s := g.status(); s.Active != 0 || s.NativePending != 0 || s.Retired != credit || s.Failure != "" || wake.Load() != 0 {
++			t.Fatalf("acknowledged skip failed ownership retirement or caused replay: %+v wakes%d", s, wake.Load())
++		}
++		select {
++		case err := <-g.refusals:
++			t.Fatal("finite-zero acknowledgement invented terminal failure", err)
++		default:
++		}
++		next := displayAdmit(t, g)
++		g.finish(next)
++		if wake.Load() != 0 {
++			t.Fatal("unused subsequent batch requested replay")
++		}
++	}
++}
++
++func TestVellumDisplayBackpressureAcknowledgedSkipBeforeCPUEnd(t *testing.T) {
++	g, wake := displayGateFixture(t)
++	credit := displayAdmit(t, g)
++	seq := g.acquire(credit)
++	g.complete(seq, 0, false)
++	if s := g.status(); s.Active != credit || s.NativePending != 0 || s.CPUFinished || s.Retired != 0 || s.Failure != "" || wake.Load() != 0 {
++		t.Fatalf("zero acknowledgement released unfinished CPU work: %+v", s)
++	}
++	g.finish(credit)
++	if s := g.status(); s.Active != 0 || s.Retired != credit || s.Failure != "" || wake.Load() != 0 {
++		t.Fatalf("CPU end lost earlier zero acknowledgement: %+v", s)
++	}
++}
++
++func TestVellumDisplayBackpressureAcknowledgedSkipCoalescesOnlyExistingDirty(t *testing.T) {
++	g, wake := displayGateFixture(t)
++	credit := displayAdmit(t, g)
++	seq := g.acquire(credit)
++	for range 64 {
++		displayPending(t, g)
++	}
++	g.finish(credit)
++	g.complete(seq, 0, false)
++	if s := g.status(); s.Active != 0 || s.NativePending != 0 || s.Failure != "" || wake.Load() != 1 {
++		t.Fatalf("dirty skip lost or duplicated wake: %+v wakes%d", s, wake.Load())
++	}
++	g.complete(seq, 0, false)
++	g.finish(credit)
++	if wake.Load() != 1 {
++		t.Fatal("duplicate skip or CPU completion requested another replay")
++	}
++	next := displayAdmit(t, g)
++	g.finish(next)
++	if wake.Load() != 1 {
++		t.Fatal("fresh unchanged work inherited old dirty intent")
++	}
++}
++
++func TestVellumDisplayBackpressureStaleZeroCannotRetireRetryOrNewBatch(t *testing.T) {
++	g, _ := displayGateFixture(t)
++	credit := displayAdmit(t, g)
++	first := g.acquire(credit)
++	g.unavailable(first)
++	second := g.acquire(credit)
++	if first == 0 || second <= first {
++		t.Fatal("unavailable retry lost its independent sequence")
++	}
++	g.complete(first, 0, false)
++	g.finish(credit)
++	if s := g.status(); s.Active != credit || s.NativePending != second || s.Failure != "" {
++		t.Fatalf("stale zero retired current retry: %+v", s)
++	}
++	g.complete(second, 0, false)
++	next := displayAdmit(t, g)
++	third := g.acquire(next)
++	before := g.status()
++	g.complete(second, 0, false)
++	g.complete(0, 0, false)
++	if after := g.status(); after != before {
++		t.Fatalf("old zero changed new native ownership: %+v -> %+v", before, after)
++	}
++	g.finish(next)
++	g.complete(third, 0, false)
++}
++
++func TestVellumDisplayBackpressureLateZeroRetiresButCannotClearDeadline(t *testing.T) {
++	g, _ := displayGateFixture(t)
++	credit := displayAdmit(t, g)
++	seq := g.acquire(credit)
++	g.finish(credit)
++	g.expire(credit)
++	before := g.status()
++	if before.Active != credit || before.NativePending != seq || before.Failure != "presentation deadline exceeded" {
++		t.Fatalf("timeout fabricated a native acknowledgement: %+v", before)
++	}
++	g.complete(seq, 0, false)
++	if after := g.status(); after.Active != 0 || after.NativePending != 0 || after.Retired != credit || after.Failure != before.Failure {
++		t.Fatalf("late zero lost ownership or reset refusal: %+v", after)
++	}
++	if credit, err := g.admit(); credit != 0 || err == nil {
++		t.Fatal("late zero reopened a failed gate")
++	}
++}
++
++func TestVellumDisplayBackpressureClosedAndReplacedWindowIgnoreZero(t *testing.T) {
++	var registry nativePresentationRegistry
++	first, _ := displayGateFixture(t)
++	old, err := registry.register(first)
++	if err != nil {
++		t.Fatal(err)
++	}
++	credit := displayAdmit(t, first)
++	seq := first.acquire(credit)
++	registry.close(old)
++	closed := first.status()
++	first.complete(seq, 0, false)
++	first.finish(credit)
++	if first.status() != closed {
++		t.Fatal("late zero changed closed ownership")
++	}
++	next, _ := displayGateFixture(t)
++	token, err := registry.register(next)
++	if err != nil || token <= old {
++		t.Fatal(token, err)
++	}
++	defer registry.close(token)
++	newCredit := displayAdmit(t, next)
++	newSequence := next.acquire(newCredit)
++	next.finish(newCredit)
++	before := next.status()
++	registry.presented(old, newSequence, 0, 0)
++	if next.status() != before {
++		t.Fatal("old window zero callback retired replacement credit")
++	}
++	registry.presented(token, newSequence, 0, 0)
++	if s := next.status(); s.Active != 0 || s.NativePending != 0 || s.Failure != "" {
++		t.Fatalf("current incarnation zero did not acknowledge: %+v", s)
++	}
++}
++
++func TestVellumDisplayBackpressureConcurrentDirtyAndSkippedCompletion(t *testing.T) {
++	g, wake := displayGateFixture(t)
++	credit := displayAdmit(t, g)
++	seq := g.acquire(credit)
++	var wg sync.WaitGroup
++	for range 64 {
++		wg.Add(1)
++		go func() {
++			defer wg.Done()
++			if credit, err := g.admit(); credit != 0 || !errors.Is(err, errDisplayPending) {
++				t.Error("busy gate admitted or refused with wrong error", credit, err)
++			}
++		}()
++	}
++	wg.Wait()
++	wg.Add(2)
++	go func() { defer wg.Done(); g.finish(credit) }()
++	go func() { defer wg.Done(); g.complete(seq, 0, false) }()
++	wg.Wait()
++	if s := g.status(); s.Active != 0 || s.NativePending != 0 || s.Retired != credit || s.Failure != "" || wake.Load() != 1 {
++		t.Fatalf("zero/CPU race lost existing dirty work: %+v wakes%d", s, wake.Load())
++	}
++}
+--- a/core/display_backpressure_vellum_test.go
++++ b/core/display_backpressure_vellum_test.go
+@@ -136,3 +136,39 @@
+ 	}
+ 	w.present()
+ }
++
++// This fake models ownership acknowledgement only, not timestamp classification.
++// The desktop gate tests exercise actual finite-zero classification separately.
++func TestVellumDisplayAdmissionAcknowledgedSkipDoesNotReplayUnchangedScene(t *testing.T) {
++	m, body, _, drawer, w := displayManualFixture(t)
++	displayDirty(body, color.RGBA{R: 211, G: 23, B: 43, A: 255})
++	m.window.renderWindow()
++	for range 32 {
++		m.window.renderWindow()
++	}
++	if drawer.ends.Load() != 1 || !w.dirty || !w.nativePending {
++		t.Fatal("busy unchanged requests bypassed pending native ownership")
++	}
++	w.present() // Controlled acknowledgement, including the acknowledged-skip case.
++	m.window.renderWindow()
++	for range 32 {
++		m.window.renderWindow()
++	}
++	if drawer.ends.Load() != 1 || w.active != 0 || w.begun != 1 {
++		t.Fatal("acknowledged skip manufactured an unchanged composition")
++	}
++	displayDirty(body, color.RGBA{R: 23, G: 211, B: 43, A: 255})
++	m.window.renderWindow()
++	if drawer.ends.Load() != 2 || !w.nativePending {
++		t.Fatal("genuinely changed work did not resume after acknowledgement")
++	}
++	img, err := m.Image(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	p := img.RGBAAt(img.Bounds().Dx()/2, img.Bounds().Dy()/2)
++	if p.G < 180 || p.R > 60 || p.B > 80 {
++		t.Fatalf("resumed changed frame is stale: %v", p)
++	}
++	w.present()
++}

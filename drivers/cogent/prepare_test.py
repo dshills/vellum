@@ -280,7 +280,20 @@ class PreparationChecks(unittest.TestCase):
         core, font = manifest["dependencies"]
         self.assertEqual(core["module"], "cogentcore.org/core")
         numbers = [int(Path(patch["file"]).name[:4]) for stage in core["stages"] for patch in stage["patches"]]
-        self.assertEqual(numbers, list(range(1, 104)))
+        self.assertEqual(numbers, list(range(1, 106)))
+        stage105 = core["stages"][-1]
+        self.assertEqual(Path(stage105["patches"][0]["file"]).name, "0105-acknowledged-skipped-drawable.patch")
+        original = json.loads((ROOT / stage105["inputs"]).read_text())
+        result = json.loads((ROOT / stage105["outputs"]).read_text())
+        previous = json.loads((ROOT / core["stages"][-2]["outputs"]).read_text())
+        expected = {"core/display_backpressure_vellum_test.go", "system/driver/desktop/display_backpressure.go",
+                    "system/driver/desktop/display_backpressure_darwin.go", "system/driver/desktop/display_backpressure_vellum_test.go"}
+        self.assertEqual(set(original), expected)
+        self.assertEqual(set(result), expected)
+        self.assertEqual(original, {name: previous[name] for name in expected})
+        for name, digest in result.items():
+            self.assertRegex(digest, r"^[0-9a-f]{64}$")
+            self.assertNotEqual(digest, original[name])
         font_numbers = [int(Path(patch["file"]).name[:4]) for stage in font["stages"] for patch in stage["patches"]]
         self.assertEqual(font_numbers, list(range(1, 7)))
         import hashlib
@@ -291,6 +304,66 @@ class PreparationChecks(unittest.TestCase):
                     self.assertEqual(hashlib.sha256((ROOT / asset["source"]).read_bytes()).hexdigest(), asset["sha256"])
                 for patch in stage["patches"]:
                     self.assertEqual(hashlib.sha256((ROOT / patch["file"]).read_bytes()).hexdigest(), patch["sha256"])
+
+
+    def test_acknowledged_skip_recipe_replays_pinned_stage104_files(self):
+        import hashlib
+        import re
+        import shutil
+        from unittest import mock
+        core = json.loads((ROOT / "native/dependencies.json").read_text())["dependencies"][0]
+        prior, stage = core["stages"][-2:]
+        original = json.loads((ROOT / stage["inputs"]).read_text())
+        outputs = json.loads((ROOT / stage["outputs"]).read_text())
+        lines = (ROOT / prior["patches"][0]["file"]).read_text().splitlines(keepends=True)
+        bodies = {}
+        # These exact four files were added in104; recover only their complete
+        # addition hunks, then independently require every original SHA pin.
+        for name, digest in original.items():
+            start = lines.index("+++ b/" + name + "\n")
+            self.assertEqual(lines[start - 1], "--- /dev/null\n")
+            match = re.fullmatch(r"@@ -0,0 \+1,([0-9]+) @@\n", lines[start + 1])
+            self.assertIsNotNone(match)
+            count = int(match.group(1))
+            payload = lines[start + 2:start + 2 + count]
+            self.assertEqual(len(payload), count)
+            self.assertTrue(all(line.startswith("+") for line in payload))
+            body = "".join(line[1:] for line in payload).encode()
+            self.assertEqual(hashlib.sha256(body).hexdigest(), digest)
+            bodies[name] = body
+        for case in ("valid", "changed-input", "wrong-output-pin"):
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as tmp:
+                fixture, owned = Path(tmp) / "recipe", Path(tmp) / "owned"
+                for name, body in bodies.items():
+                    path = owned / name
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_bytes(body)
+                for name in [stage["inputs"], stage["outputs"], stage["patches"][0]["file"]]:
+                    path = fixture / name
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copyfile(ROOT / name, path)
+                if case == "changed-input":
+                    path = owned / sorted(bodies)[0]
+                    path.write_bytes(path.read_bytes() + b"\n")
+                elif case == "wrong-output-pin":
+                    wrong = dict(outputs)
+                    wrong[sorted(wrong)[0]] = "0" * 64
+                    (fixture / stage["outputs"]).write_text(json.dumps(wrong))
+                before = {name: (owned / name).read_bytes() for name in bodies}
+                with mock.patch.object(prepare, "ROOT", fixture):
+                    if case == "valid":
+                        prepare.apply_stage(stage, owned)
+                        self.assertEqual({name: hashlib.sha256((owned / name).read_bytes()).hexdigest()
+                                          for name in outputs}, outputs)
+                    elif case == "changed-input":
+                        with self.assertRaisesRegex(RuntimeError, "Patch input mismatch"):
+                            prepare.apply_stage(stage, owned)
+                        self.assertEqual({name: (owned / name).read_bytes() for name in bodies}, before)
+                    else:
+                        with self.assertRaisesRegex(RuntimeError, "Patch input mismatch"):
+                            prepare.apply_stage(stage, owned)
+                        self.assertEqual({name: hashlib.sha256((owned / name).read_bytes()).hexdigest()
+                                          for name in outputs}, outputs)
 
 
 class AssetOverlayChecks(unittest.TestCase):
