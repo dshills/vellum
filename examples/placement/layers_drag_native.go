@@ -34,11 +34,12 @@ type layerMount struct {
 	stage         *core.Stage
 	sprite        *core.Sprite
 	restoreQueued bool
+	pulseScene    *core.Scene
 	pulse         *layerPulse
 }
 
 // Completion callbacks own detached atomic state, never native mount fields.
-// The native Sync consumes readiness under render ownership.
+// A native Custom event consumes readiness under render ownership.
 type layerPulse struct {
 	ready, canceled atomic.Bool
 	ticket          *app.Completion
@@ -75,6 +76,10 @@ func (w *layerMount) endCapture() {
 	w.clearPreview()
 }
 func (w *layerMount) Destroy() {
+	if scene := w.pulseScene; scene != nil && scene.Property(layerPulseOwner) == w {
+		scene.SetProperty(layerPulseOwner, nil)
+	}
+	w.pulseScene = nil
 	// Reconciliation may already hold the non-reentrant app owner. Publish the
 	// domain cleanup through its reserved completion instead of entering Do.
 	if s, ticket := w.active, w.ticket; s != nil && ticket != nil {
@@ -157,10 +162,8 @@ func (e *layerEditor) Sync(widget core.Widget) error {
 	if w.active != nil && e.model.layerDrag != w.active {
 		w.endCapture()
 	}
-	if pulse := w.pulse; pulse != nil && pulse.ready.Load() {
-		w.stopPulse()
-		w.scrollBy(scroll, rows, layerEdgeDelta(w.active))
-	}
+	w.bindPulse(scroll.Scene)
+
 	if e.model.layerDrag != nil {
 		w.publishPreview(scroll)
 	} else {
@@ -284,6 +287,55 @@ func (w *layerMount) press(scroll, rows, row *core.WidgetBase, id string, event 
 	row.SetFocusQuiet()
 }
 
+const layerPulseOwner = "vellum-placement-layer-pulse-owner"
+const layerPulseInstalled = "vellum-placement-layer-pulse-installed"
+
+func (w *layerMount) bindPulse(scene *core.Scene) {
+	w.pulseScene = scene
+	scene.SetProperty(layerPulseOwner, w)
+	if scene.Property(layerPulseInstalled) == true {
+		return
+	}
+	scene.SetProperty(layerPulseInstalled, true)
+	// The scene owns one handler. It looks up the current mount and widgets;
+	// no retired mount/editor/row closures accumulate across reconciliation.
+	scene.OnFirst(events.Custom, func(input events.Event) {
+		current, _ := scene.Property(layerPulseOwner).(*layerMount)
+		if current != nil && current.This != nil {
+			current.handlePulse(input)
+		}
+	})
+}
+func (w *layerMount) handlePulse(input events.Event) {
+	ce, ok := input.(*events.CustomEvent)
+	if !ok {
+		return
+	}
+	p, ok := ce.Data.(*layerPulse)
+	if !ok || p != w.pulse || !p.ready.Load() {
+		return
+	}
+	input.SetHandled()
+	e := w.editor
+	_ = e.a.Do(func() {
+		w.stopPulse()
+		scroll, rows := layerWidgets(w.AsTree().Parent)
+		if w.active == nil || e.model.layerDrag != w.active {
+			return
+		}
+		if scroll == nil || rows == nil || scroll.Scene == nil || !scroll.Scene.Events.PointerCaptured(w.token) {
+			e.model.cancelLayerDrag(w.active)
+			w.endCapture()
+			_ = e.a.Invalidate("placement")
+			return
+		}
+		w.scrollBy(scroll, rows, layerEdgeDelta(w.active))
+		w.publishPreview(scroll)
+		scroll.Scene.NeedsRender()
+		w.armPulse(scroll)
+	})
+}
+
 func (w *layerMount) stopPulse() {
 	if p := w.pulse; p != nil {
 		p.canceled.Store(true)
@@ -349,7 +401,8 @@ func (w *layerMount) scrollBy(scroll, rows *core.WidgetBase, delta float64) {
 }
 
 // At most one timer and one reserved completion belong to this capture. The
-// timer publishes a flag only; the next native Sync performs the actual scroll.
+// timer publishes detached readiness and queues one native wake. That wake
+// performs the scroll without restyling/reconciling the captured list.
 // Aborting cancels both unpublished and ready work on every terminal path.
 func (w *layerMount) armPulse(scroll *core.WidgetBase) {
 	s, e := w.active, w.editor
@@ -370,12 +423,16 @@ func (w *layerMount) armPulse(scroll *core.WidgetBase) {
 	}
 	p := &layerPulse{ticket: ticket}
 	w.pulse = p
-	a := e.a
+	source := scroll.SystemEvents()
 	p.timer = time.AfterFunc(50*time.Millisecond, func() {
 		_ = ticket.Publish(func() {
 			if !p.canceled.Load() {
 				p.ready.Store(true)
-				_ = a.Invalidate("placement")
+				input := &events.CustomEvent{}
+				input.Typ, input.Data = events.Custom, p
+				input.SetUnique()
+				input.Init()
+				source.Deque.Send(input)
 			}
 		})
 	})

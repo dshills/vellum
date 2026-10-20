@@ -149,6 +149,14 @@ func (m *model) scrollLayerDrag(s *layerDrag, before, after layerLayout, delta f
 		return false
 	}
 	valid := !math.IsNaN(delta) && !math.IsInf(delta, 0) && before.clip == after.clip && before.scale == after.scale && len(before.rows) == len(after.rows)
+	// ApplyScenePos can remove an initial subpixel layout alignment on the
+	// first scroll. Accept at most one dot of uniform translation rounding,
+	// then verify every row against the measured displacement.
+	if valid && len(before.rows) > 0 {
+		actual := before.rows[0].bounds.Min.Y - after.rows[0].bounds.Min.Y
+		valid = math.Abs(actual-delta) <= 1
+		delta = actual
+	}
 	if valid {
 		for i, a := range before.rows {
 			b := after.rows[i]

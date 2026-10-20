@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"cogentcore.org/core/core"
+	"cogentcore.org/core/events"
 	"cogentcore.org/core/math32"
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/canvas"
@@ -341,6 +342,19 @@ func TestLayerClippedRowHitUsesFullMidpoint(t *testing.T) {
 	}
 }
 
+func TestLayerFirstNativeScrollAllowsUniformSubpixelAlignment(t *testing.T) {
+	for _, rounding := range []float64{-.5, .5, 1.5} {
+		m := groupedModel(t)
+		g := testLayerLayout(m, 1)
+		s := m.beginLayerDrag("connector-2", layerPoint(g, "connector-2", true), g)
+		m.updateLayerDrag(s, layerPoint(g, "block-1", false), g)
+		next := shiftedLayerLayout(g, 12.15+rounding)
+		if got := m.scrollLayerDrag(s, g, next, 12.15); got != (math.Abs(rounding) <= 1) {
+			t.Fatal("initial layout rounding", rounding, got)
+		}
+	}
+}
+
 func TestLayerFractionalScrollAtMaximumRowsAndHighScale(t *testing.T) {
 	m, err := newModel()
 	if err != nil {
@@ -459,6 +473,26 @@ func TestLayerPulseRetiresQueuedWorkOnCancelAndDestroy(t *testing.T) {
 				t.Fatal("domain capture retained")
 			}
 		})
+	}
+}
+
+func TestLayerPulseSceneHandlerDoesNotAccumulateOrRetainMounts(t *testing.T) {
+	scene := tree.New[core.Scene]()
+	before := len(scene.Listeners.First[events.Custom])
+	old := tree.New[layerMount]()
+	old.bindPulse(scene)
+	current := tree.New[layerMount]()
+	current.bindPulse(scene)
+	if got := len(scene.Listeners.First[events.Custom]); got != before+1 {
+		t.Fatal("handlers accumulated", got, before)
+	}
+	old.Destroy()
+	if scene.Property(layerPulseOwner) != current {
+		t.Fatal("old destroy detached current mount")
+	}
+	current.Destroy()
+	if scene.Property(layerPulseOwner) != nil || current.pulseScene != nil {
+		t.Fatal("destroy retained mount")
 	}
 }
 func TestLayerMountDestroyTransfersCancellationWithoutOwnerReentry(t *testing.T) {
