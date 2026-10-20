@@ -22,13 +22,15 @@ type objectMove struct {
 	dragging, valid bool
 	resize          bool
 	corner          resizeCorner
+	selection       []string
+	selectionOnly   bool
 }
 
 func (m *model) editAvailable() error {
 	if m.fileBusy() || m.prompt != "" || m.move != nil || m.palette.State().Active {
 		return errors.New("finish the current operation first")
 	}
-	if m.selectedIndex() < 0 {
+	if len(m.selectedIDs()) == 0 {
 		return errNoSelection
 	}
 	return nil
@@ -43,7 +45,14 @@ func (m *model) selectedIndex() int {
 }
 
 func (m *model) applyObjects(label string, after []canvas.Rect, selected string) error {
-	before, priorSelection := slices.Clone(m.scene.Objects), m.scene.Selected
+	before, priorIDs := slices.Clone(m.scene.Objects), m.selectedIDs()
+	priorSelection := m.scene.Selected
+	nextIDs := []string{selected}
+	if selected == "" {
+		nextIDs = nil
+	} else if selected == priorSelection {
+		nextIDs = slices.Clone(priorIDs)
+	}
 	if slices.Equal(before, after) {
 		return nil
 	}
@@ -53,14 +62,14 @@ func (m *model) applyObjects(label string, after []canvas.Rect, selected string)
 			return history.ErrStale
 		}
 		m.scene.Objects = slices.Clone(after)
-		m.scene.Selected = selected
+		m.setSelection(nextIDs, selected)
 		return nil
 	}, Revert: func() error {
 		if !slices.Equal(m.scene.Objects, after) {
 			return history.ErrStale
 		}
 		m.scene.Objects = slices.Clone(before)
-		m.scene.Selected = priorSelection
+		m.setSelection(priorIDs, priorSelection)
 		return nil
 	}})
 }
@@ -69,14 +78,21 @@ func (m *model) deleteSelected() error {
 	if err := m.editAvailable(); err != nil {
 		return err
 	}
-	i := m.selectedIndex()
-	id := m.scene.Objects[i].ID
-	after := slices.Clone(m.scene.Objects)
-	after = append(after[:i], after[i+1:]...)
-	if err := m.applyObjects("Delete "+id, after, ""); err != nil {
+	ids := m.selectedIDs()
+	selected := make(map[string]bool, len(ids))
+	for _, id := range ids {
+		selected[id] = true
+	}
+	after := make([]canvas.Rect, 0, len(m.scene.Objects)-len(ids))
+	for _, o := range m.scene.Objects {
+		if !selected[o.ID] {
+			after = append(after, o)
+		}
+	}
+	if err := m.applyObjects("Delete selection", after, ""); err != nil {
 		return err
 	}
-	m.status = "Deleted " + id
+	m.status = fmt.Sprintf("Deleted %d selected components", len(ids))
 	return nil
 }
 
@@ -88,17 +104,15 @@ func (m *model) nudge(dx, dy float64) error {
 	if m.snap {
 		step = 20
 	}
-	i := m.selectedIndex()
-	after := slices.Clone(m.scene.Objects)
-	x, y := after[i].X+dx*step, after[i].Y+dy*step
-	if !validPosition(x, y) {
-		return errors.New("component position must be within ±10000")
-	}
-	after[i].X, after[i].Y = x, y
-	if err := m.applyObjects("Move "+after[i].ID, after, after[i].ID); err != nil {
+	ids := m.selectedIDs()
+	after, err := movedSelection(m.scene.Objects, ids, dx*step, dy*step)
+	if err != nil {
 		return err
 	}
-	m.status = fmt.Sprintf("Moved %s to (%.0f, %.0f)", after[i].ID, x, y)
+	if err = m.applyObjects("Move selection", after, m.scene.Selected); err != nil {
+		return err
+	}
+	m.status = fmt.Sprintf("Moved %d selected components", len(ids))
 	return nil
 }
 func validPosition(x, y float64) bool {
@@ -115,7 +129,8 @@ func (m *model) beginMove(g placement.Geometry, p canvas.Point) *objectMove {
 	}
 	corner := noCorner
 	id := ""
-	if i := m.selectedIndex(); i >= 0 {
+	ids := m.selectedIDs()
+	if i := m.selectedIndex(); i >= 0 && len(ids) == 1 {
 		corner = handleAt(m.scene.Objects[i], g, p)
 		if corner != noCorner {
 			id = m.scene.Selected
@@ -127,14 +142,17 @@ func (m *model) beginMove(g placement.Geometry, p canvas.Point) *objectMove {
 	if id == "" {
 		return nil
 	}
-	m.scene.Selected = id
+	if !slices.Contains(ids, id) {
+		ids = []string{id}
+	}
+	m.setSelection(ids, id)
 	m.scene.View = g.View
-	s := &objectMove{id: id, before: slices.Clone(m.scene.Objects), start: p, grab: world, geometry: g, valid: true, resize: corner != noCorner, corner: corner}
+	s := &objectMove{id: id, before: slices.Clone(m.scene.Objects), start: p, grab: world, geometry: g, valid: true, resize: corner != noCorner, corner: corner, selection: m.selectedIDs()}
 	m.move = s
 	return s
 }
 func (m *model) previewMove(s *objectMove, p canvas.Point) {
-	if m.move != s {
+	if m.move != s || s.selectionOnly {
 		return
 	}
 	world, err := s.geometry.World(p)
@@ -164,18 +182,17 @@ func (m *model) previewMove(s *objectMove, p canvas.Point) {
 			m.status = fmt.Sprintf("Resizing %s to %.0f × %.0f • Escape cancels", s.id, after[i].Width, after[i].Height)
 			return
 		}
-		x, y := after[i].X+dx, after[i].Y+dy
 		if m.snap {
-			x = math.Round(x/20) * 20
-			y = math.Round(y/20) * 20
+			dx = math.Round((after[i].X+dx)/20)*20 - after[i].X
+			dy = math.Round((after[i].Y+dy)/20)*20 - after[i].Y
 		}
-		if !validPosition(x, y) {
+		moved, err := movedSelection(s.before, s.selection, dx, dy)
+		if err != nil {
 			s.valid = false
 			return
 		}
-		after[i].X, after[i].Y = x, y
-		m.scene.Objects = after
-		m.status = fmt.Sprintf("Moving %s to (%.0f, %.0f) • Escape cancels", s.id, x, y)
+		m.scene.Objects = moved
+		m.status = fmt.Sprintf("Moving %d selected components • Escape cancels", len(s.selection))
 		return
 	}
 }
@@ -184,7 +201,7 @@ func (m *model) cancelMove(s *objectMove) {
 		return
 	}
 	m.scene.Objects = slices.Clone(s.before)
-	m.scene.Selected = s.id
+	m.setSelection(s.selection, s.id)
 	m.move = nil
 	m.status = s.operation() + " canceled"
 }
@@ -200,7 +217,15 @@ func (m *model) finishMove(s *objectMove, p canvas.Point) error {
 	after := slices.Clone(m.scene.Objects)
 	m.scene.Objects = slices.Clone(s.before)
 	m.move = nil
-	if !s.dragging || slices.Equal(after, s.before) {
+	m.setSelection(s.selection, s.id)
+	if s.selectionOnly {
+		return nil
+	}
+	if !s.dragging {
+		m.setSelection([]string{s.id}, s.id)
+		return nil
+	}
+	if slices.Equal(after, s.before) {
 		return nil
 	}
 	if err := m.applyObjects(s.operation()+" "+s.id, after, s.id); err != nil {
@@ -257,7 +282,7 @@ func resizedDimensions(before canvas.Rect, dx, dy float64, snap bool) (float64, 
 }
 
 func (m *model) resizeSelected(dw, dh float64) error {
-	if err := m.editAvailable(); err != nil {
+	if err := m.resizeAvailable(); err != nil {
 		return err
 	}
 	if math.IsNaN(dw) || math.IsNaN(dh) || math.IsInf(dw, 0) || math.IsInf(dh, 0) {

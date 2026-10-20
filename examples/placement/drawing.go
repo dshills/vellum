@@ -118,6 +118,9 @@ func drawingCodec(m *model) document.Codec[drawingFile] {
 			return f, err
 		},
 		Install: func(f drawingFile) error {
+			if m.move != nil {
+				return document.ErrBusy
+			}
 			scene, err := f.scene()
 			if err != nil {
 				return err
@@ -125,6 +128,7 @@ func drawingCodec(m *model) document.Codec[drawingFile] {
 			// Preserve the bound Scene identity and current window dimensions.
 			m.scene.Objects, m.scene.Selected = scene.Objects, scene.Selected
 			m.scene.View.Center, m.scene.View.Zoom = scene.View.Center, scene.View.Zoom
+			m.setSelection([]string{scene.Selected}, scene.Selected)
 			m.next, m.snap = f.NextID, f.Snap
 			return nil
 		},

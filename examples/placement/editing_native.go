@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"math"
 
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
+	"cogentcore.org/core/events/key"
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/tree"
@@ -40,6 +42,9 @@ func (e *canvasEditor) Sync(w core.Widget) error {
 	if target.Property(property) != e {
 		target.SetProperty(property, e)
 		target.OnFirst(events.MouseDown, func(event events.Event) { e.press(target, event) })
+		for _, typ := range []events.Types{events.Scroll, events.SlideMove, events.KeyChord} {
+			target.OnFirst(typ, func(event events.Event) { e.navigate(target, event) })
+		}
 		if mount, ok := w.(*editorMount); ok {
 			target.FinalStyler(func(*styles.Style) { mount.deferHandles(target) })
 		}
@@ -81,7 +86,11 @@ func (e *canvasEditor) press(w *core.WidgetBase, event events.Event) {
 		if err != nil {
 			return
 		}
-		move = e.model.beginMove(g, eventPoint(event))
+		if event.HasAnyModifier(key.Shift) {
+			move = e.model.selectionToggle(g, eventPoint(event))
+		} else {
+			move = e.model.beginMove(g, eventPoint(event))
+		}
 		if move == nil {
 			return
 		}
@@ -136,4 +145,90 @@ func (e *canvasEditor) press(w *core.WidgetBase, event events.Event) {
 	// which changes its mapping while this gesture is in progress.
 	w.SetFocusQuiet()
 	_ = e.a.Invalidate("placement")
+}
+
+// Keep navigation separate from managed single-selection callbacks. This makes
+// an Option+Home or AX press on the current primary explicitly select only it.
+func (e *canvasEditor) navigate(w *core.WidgetBase, event events.Event) {
+	dx, dy := 0.0, 0.0
+	switch event.Type() {
+	case events.KeyChord:
+		handled, x, y := canvasNavigationKey(event.KeyCode(), event.Modifiers())
+		if !handled {
+			return
+		}
+		dx, dy = x, y
+		if dx == 0 && dy == 0 {
+			event.SetHandled()
+			return
+		}
+	case events.Scroll, events.SlideMove:
+	default:
+		return
+	}
+	if w.IsDisabled() || e.ref.Context().Err() != nil {
+		return
+	}
+	event.SetHandled()
+	_ = e.a.Do(func() {
+		m := e.model
+		if e.ref.Context().Err() != nil || m.fileBusy() || m.prompt != "" || m.move != nil || m.palette.State().Active {
+			return
+		}
+		g, err := editGeometry(w, m.scene.View)
+		if err != nil {
+			return
+		}
+		m.scene.View = g.View
+		switch event.Type() {
+		case events.Scroll:
+			scroll, ok := event.(*events.MouseScroll)
+			if !ok {
+				return
+			}
+			p := eventPoint(event)
+			if !inCanvas(g, p) {
+				return
+			}
+			err = m.scene.View.ZoomAt(canvas.Point{X: (p.X - g.Origin.X) / g.Scale, Y: (p.Y - g.Origin.Y) / g.Scale}, math.Exp(-float64(scroll.Delta.Y)*.003))
+		case events.SlideMove:
+			d := event.PrevDelta()
+			err = m.scene.View.Pan(float64(d.X)/g.Scale, float64(d.Y)/g.Scale)
+		case events.KeyChord:
+			err = m.scene.View.Pan(dx, dy)
+		}
+		if err != nil {
+			m.status = err.Error()
+		}
+		_ = e.a.Invalidate("placement")
+	})
+}
+
+// Only exact Option object-selection chords fall through to managed selection.
+// Command arrows are handled by WindowShortcuts first; consume a refused one
+// rather than accidentally panning after a bounds/availability refusal.
+func canvasNavigationKey(code key.Codes, mods key.Modifiers) (bool, float64, float64) {
+	if key.HasAnyModifier(mods, key.Alt) && !key.HasAnyModifier(mods, key.Meta, key.Control, key.Shift) {
+		switch code {
+		case key.CodeLeftArrow, key.CodeRightArrow, key.CodeHome, key.CodeEnd:
+			return false, 0, 0
+		}
+	}
+	dx, dy := 0.0, 0.0
+	switch code {
+	case key.CodeLeftArrow:
+		dx = 30
+	case key.CodeRightArrow:
+		dx = -30
+	case key.CodeUpArrow:
+		dy = 30
+	case key.CodeDownArrow:
+		dy = -30
+	default:
+		return false, 0, 0
+	}
+	if key.HasAnyModifier(mods, key.Meta, key.Control) {
+		return true, 0, 0
+	}
+	return true, dx, dy
 }

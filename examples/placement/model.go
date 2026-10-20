@@ -35,6 +35,8 @@ type model struct {
 	prompt                    string
 	move                      *objectMove
 	canvasEditor              *canvasEditor
+	selectionIDs              []string
+	selectionPrimary          string
 }
 
 func componentByKind(kind string) (component, bool) {
@@ -116,7 +118,7 @@ func newModel() (*model, error) {
 		{"width-less", "Width −", -1, 0}, {"width-more", "Width +", 1, 0},
 		{"height-less", "Height −", 0, -1}, {"height-more", "Height +", 0, 1},
 	} {
-		if err := m.commands.Register(command.Command{ID: resize.id, Label: resize.label, Available: m.editAvailable, Execute: func(context.Context) error { return m.resizeSelected(resize.dw, resize.dh) }}); err != nil {
+		if err := m.commands.Register(command.Command{ID: resize.id, Label: resize.label, Available: m.resizeAvailable, Execute: func(context.Context) error { return m.resizeSelected(resize.dw, resize.dh) }}); err != nil {
 			return nil, err
 		}
 	}
@@ -160,6 +162,7 @@ func (m *model) commit(ctx context.Context) error {
 	}
 	r := *m.pending
 	before := slices.Clone(m.scene.Objects)
+	selection := m.selectedIDs()
 	selected := m.scene.Selected
 	object := canvas.Rect{ID: fmt.Sprintf("%s-%d", r.Payload.Kind, m.next+1), X: r.Position.X, Y: r.Position.Y, Width: r.Payload.Width, Height: r.Payload.Height, Color: r.Payload.Color}
 	after := append(slices.Clone(before), object)
@@ -168,14 +171,14 @@ func (m *model) commit(ctx context.Context) error {
 			return history.ErrStale
 		}
 		m.scene.Objects = slices.Clone(after)
-		m.scene.Selected = object.ID
+		m.setSelection([]string{object.ID}, object.ID)
 		return nil
 	}, Revert: func() error {
 		if !slices.Equal(m.scene.Objects, after) {
 			return history.ErrStale
 		}
 		m.scene.Objects = slices.Clone(before)
-		m.scene.Selected = selected
+		m.setSelection(selection, selected)
 		return nil
 	}})
 	if err == nil {

@@ -19,24 +19,41 @@ Escape, release outside, focus loss or removing a source/target cancels without
 creating an object. A palette click only focuses its button. Tab to a tool and
 press Return to place it at the current canvas center through the same path.
 
-Click canvas objects to select. Drag empty canvas space or use arrow keys to pan; scroll
-to zoom about the pointer. Fit and Reset change the view. Toggle grid snapping,
-reject all drops, or reject notes to inspect target policy. Undo/Redo buttons and
-Cmd+Z / Cmd+Shift+Z replay exactly one placement with the original object ID.
-The example limits the document to 512 objects and history to 64 changes.
+Click an object to select it. Shift-click toggles a component in a bounded,
+paint-ordered selection set; Shift-click empty space keeps the set. Blue outlines
+mark every selected component and the toolbar/status show the selected count.
+Selection changes alone do not make Undo entries or mark the drawing dirty.
 
-Drag a placed component to move it. The press offset is preserved under pan,
-zoom, scrolling and display scale; snapping rounds the proposed origin to the
-20-unit grid. A completed drag is one Undo entry. Escape, focus/capture loss,
-release outside the canvas, or a changed camera/display scale cancels the preview.
-Canvas origin, visible size and clipping may settle during capture; placement
+Drag any selected component to move the whole set, preserving relative offsets.
+With snapping, the dragged component determines one snapped translation shared by
+all members. A group drag or Move button/shortcut is one Undo entry; if any member
+would leave ±10000, no member is committed. Escape, focus/capture loss, outside
+release and camera/display-scale changes cancel the entire preview. The captured
+release cannot also trigger a selection click or canvas pan. A plain click with
+no drag replaces the set with the clicked component. Clicking an unselected
+component replaces the set immediately; clicking empty space clears it and keeps
+ordinary pan navigation. Drag empty space or use arrows to pan; wheel zooms.
+
+Delete selected, Backspace or forward Delete removes the complete set in one
+history operation. Undo restores exact IDs, positions, dimensions, paint order
+and the selection set; Redo repeats the operation. New placement selects its new
+object; Undo restores the previous set. Cmd+Z / Cmd+Shift+Z replay history. The
+example limits the document to 512 objects and history to 64 changes.
+
+Corner handles and Width/Height buttons resize exactly one selected component;
+group resizing remains outside this internal app. Use Shift-click to reduce a
+set to one, or plain-click a component. Managed keyboard/semantic object selection
+still replaces the set with a single primary object. Additional group members
+are described in accessible names; standard canvas selected semantics expose the
+primary only. The set is transient: Save retains the primary in the existing
+version-2 format, and Open clears the group and selects that primary. All group
+object edits and dimensions are saved normally.
+
+The press offset is preserved under pan, zoom, scrolling and display scale.
+Canvas origin, visible size and clipping may settle during capture; movement
 keeps the initial world grab point and validates release against the latest clip.
-Clicking without moving creates no history entry. Empty-space drags still pan.
-
-The Move selected Left/Right/Up/Down buttons (or Cmd+Option+arrow keys) nudge by
-20 world units with snapping enabled and by one unit with snapping off.
-Delete selected, Backspace, and forward Delete remove the selected object.
-Undo restores its exact ID and original paint order; Redo repeats the deletion.
+The Move selected Left/Right/Up/Down buttons (or Cmd+Option+arrow keys) nudge the
+whole selection by 20 world units with snapping enabled and one unit with it off.
 Move/Delete participate in the same saved/unsaved drawing history as placement.
 
 Select a component to show four blue-and-white corner handles. Drag any handle

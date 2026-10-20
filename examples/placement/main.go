@@ -83,10 +83,18 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 	if m.snap {
 		grid = 20
 	}
+	selection := m.selectedIDs()
+	selectedSet := make(map[string]bool, len(selection))
+	for _, id := range selection {
+		selectedSet[id] = true
+	}
 	objects := make([]ui.CanvasObject, 0, len(m.scene.Objects))
 	for _, object := range m.scene.Objects {
 		kind, _, _ := strings.Cut(object.ID, "-")
 		label := map[string]string{"block": "Block", "connector": "Connector", "note": "Note"}[kind]
+		if selectedSet[object.ID] && len(selection) > 1 {
+			label = "Selected " + label
+		}
 		objects = append(objects, ui.CanvasObject{ID: object.ID, Name: label + " " + object.ID, Help: fmt.Sprintf("Select this component; size %.0f by %.0f.", object.Width, object.Height)})
 	}
 	dimensions := "Select a component"
@@ -94,7 +102,10 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		o := m.scene.Objects[i]
 		dimensions = fmt.Sprintf("%s: %.0f × %.0f", o.ID, o.Width, o.Height)
 	}
-	help := "Drag corners to resize • drag inside objects to move • empty canvas pans • wheel zooms • Escape cancels"
+	if len(selection) > 1 {
+		dimensions = fmt.Sprintf("%d selected • resize requires one", len(selection))
+	}
+	help := "Shift-click toggles selection • drag selection to move together • corners resize one • Delete removes selection"
 	root := ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{
 		{ID: "file-tools", Kind: ui.Toolbar, Children: []ui.Node{
 			{ID: "open", Kind: ui.Button, Text: "Open…", Disabled: m.files == nil || m.commands.Enabled("open") != nil, Activate: invoke("open")},
@@ -129,13 +140,14 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		{ID: "help", Kind: ui.Label, Text: help},
 		{ID: "workspace", Kind: ui.Row, Grow: true, Children: []ui.Node{
 			{ID: "palette", Kind: ui.Column, MinWidth: 145, Children: tools},
-			{ID: "drawing", Kind: ui.Canvas2D, Disabled: busy, Canvas: m.scene, CanvasObjects: objects, CanvasGrid: grid, PlacementTarget: m.target, Grow: true, Accessibility: ui.Accessibility{Name: "Component canvas", Help: "Select a component, or use Option+Left/Right/Home/End on the canvas; drag selected corner handles to resize; drag an object to move; drag empty canvas or use plain arrow keys to pan; scroll to zoom."}, Change: func(e ui.ChangeEvent) {
+			{ID: "drawing", Kind: ui.Canvas2D, Disabled: busy, Canvas: m.scene, CanvasObjects: objects, CanvasGrid: grid, PlacementTarget: m.target, Grow: true, Accessibility: ui.Accessibility{Name: "Component canvas", Help: "Shift-click to toggle multiple components; drag a selected component to move the selection; Option+Left/Right/Home/End selects one; drag selected corner handles to resize; drag an object to move; drag empty canvas or use plain arrow keys to pan; scroll to zoom."}, Change: func(e ui.ChangeEvent) {
+				m.managedSelection(e.SelectedID)
 				m.status = fmt.Sprintf("Selected: %s • zoom %.0f%%", e.SelectedID, e.Number*100)
 				update()
 			}},
 			{ID: "canvas-edit-events", Kind: ui.Extension, Custom: m.canvasEditor},
 		}},
-		{ID: "status", Kind: ui.StatusBar, Children: []ui.Node{{ID: "message", Kind: ui.Label, Text: fmt.Sprintf("%s • %d objects • Undo %d / Redo %d", m.status, len(m.scene.Objects), m.journal.Snapshot().UndoCount, m.journal.Snapshot().RedoCount)}}},
+		{ID: "status", Kind: ui.StatusBar, Children: []ui.Node{{ID: "message", Kind: ui.Label, Text: fmt.Sprintf("%s • %d objects • %d selected • Undo %d / Redo %d", m.status, len(m.scene.Objects), len(selection), m.journal.Snapshot().UndoCount, m.journal.Snapshot().RedoCount)}}},
 	}}
 	root.Children = append(root.Children, m.filePrompt(a, ref))
 	return root

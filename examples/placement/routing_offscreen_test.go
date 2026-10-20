@@ -201,6 +201,19 @@ func TestPublicPaletteCanvasConsumer(t *testing.T) {
 			if m.scene.Selected != m.scene.Objects[0].ID {
 				t.Fatal("public keyboard object selection failed")
 			}
+
+			// The same managed callback must collapse even when Home reselects the primary.
+			if err := a.Do(func() {
+				m.setSelection([]string{m.scene.Objects[0].ID, m.scene.Objects[1].ID}, m.scene.Objects[0].ID)
+				_ = a.Invalidate("placement")
+			}); err != nil {
+				t.Fatal(err)
+			}
+			settle()
+			input(cogent.ManualInput{Type: events.KeyChord, Code: key.CodeHome, Modifiers: key.Modifiers(1 << key.Alt)})
+			if len(m.selectedIDs()) != 1 {
+				t.Fatal("same-primary OptionHome did not collapse group")
+			}
 			before := m.scene.View
 			input(cogent.ManualInput{Type: events.KeyChord, Code: key.CodeRightArrow})
 			if m.scene.View.Center == before.Center {

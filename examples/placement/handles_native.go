@@ -60,13 +60,22 @@ func (e *canvasEditor) publishHandles(target *core.WidgetBase, mount *editorMoun
 	}
 	stage := target.Scene.Stage.Main
 
-	i := e.model.selectedIndex()
-	if i < 0 || e.model.fileBusy() || e.model.prompt != "" || e.model.palette.State().Active {
+	ids := e.model.selectedIDs()
+	if len(ids) == 0 || e.model.fileBusy() || e.model.prompt != "" || e.model.palette.State().Active {
 		return
 	}
-	// Sync is under the UI owner. Draw reads detached values plus native layout
-	// under the render lock, never mutable application model state.
-	object, view, life := e.model.scene.Objects[i], e.model.scene.View, e.ref.Context()
+	wanted := make(map[string]bool, len(ids))
+	for _, id := range ids {
+		wanted[id] = true
+	}
+	objects := make([]canvas.Rect, 0, len(ids))
+	for _, o := range e.model.scene.Objects {
+		if wanted[o.ID] {
+			objects = append(objects, o)
+		}
+	}
+	// Owner-detached values: native Draw reads no mutable application model.
+	view, life := e.model.scene.View, e.ref.Context()
 	sprite := core.NewSprite(handleSpriteName, func(pc *paint.Painter) {
 		if life.Err() != nil || target.This == nil || !target.IsVisible() || target.IsDisabled() {
 			return
@@ -75,7 +84,13 @@ func (e *canvasEditor) publishHandles(target *core.WidgetBase, mount *editorMoun
 		if err != nil {
 			return
 		}
-		drawCornerHandles(pc, object, g)
+		if len(objects) == 1 {
+			drawCornerHandles(pc, objects[0], g)
+		} else {
+			for _, object := range objects {
+				drawSelectionOutline(pc, object, g)
+			}
+		}
 	})
 	sprite.Active = true
 	mount.handleStage, mount.handleSprite = stage, sprite
@@ -98,4 +113,22 @@ func drawCornerHandles(pc *paint.Painter, object canvas.Rect, g placement.Geomet
 		fill(handle.center, 5, color.NRGBA{R: 25, G: 90, B: 180, A: 255})
 		fill(handle.center, 3, color.NRGBA{R: 255, G: 255, B: 255, A: 255})
 	}
+}
+
+func drawSelectionOutline(pc *paint.Painter, o canvas.Rect, g placement.Geometry) {
+	p := g.View.Screen(canvas.Point{X: o.X, Y: o.Y})
+	x, y := g.Origin.X+p.X*g.Scale, g.Origin.Y+p.Y*g.Scale
+	right, bottom := x+o.Width*g.View.Zoom*g.Scale, y+o.Height*g.View.Zoom*g.Scale
+	width := 2 * g.Scale
+	fill := func(left, top, r, b float64) {
+		left, top = math.Max(left, g.Clip.Min.X), math.Max(top, g.Clip.Min.Y)
+		r, b = math.Min(r, g.Clip.Max.X), math.Min(b, g.Clip.Max.Y)
+		if r > left && b > top {
+			pc.FillBox(math32.Vec2(float32(left), float32(top)), math32.Vec2(float32(r-left), float32(b-top)), colors.Uniform(color.NRGBA{R: 25, G: 90, B: 180, A: 255}))
+		}
+	}
+	fill(x-width, y-width, right+width, y)
+	fill(x-width, bottom, right+width, bottom+width)
+	fill(x-width, y, x, bottom)
+	fill(right, y, right+width, bottom)
 }
