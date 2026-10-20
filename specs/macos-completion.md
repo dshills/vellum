@@ -9,6 +9,16 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
+The latest [source-105 SDK/native checkpoint](../docs/reports/macos-source105-native/README.md)
+passes actual private packaging/relocation, one generated native consumer and
+four strict capture-validity cases. Performance acceptance fails: p95 latency is
+61–63 ms and both paced cohorts have 0/599 intervals within 18.333 ms. Late work
+is retained. Resource/endurance, physical/human, final application/component/rights
+and M7 documentation/final audit checks remain open; no Mac completion or
+default backpressure adoption is claimed. See the current
+[delivery status](macos-delivery.md) and the archived exact evidence.
+
+
 The [paced presentation checkpoint](../docs/reports/macos-paced-presentation/README.md)
 implements an opt-in fixed-deadline 60 Hz grid/tree workload and strict version 2
 journal analysis, preserving late/unstarted work and collapsed-display anomalies.

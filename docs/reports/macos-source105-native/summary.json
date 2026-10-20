@@ -1,0 +1,270 @@
+{
+  "P105": {
+    "all36groups_absent_at_audit": true,
+    "capture_validity": "PASS_ALL_FOUR",
+    "full_M3_qualified": false,
+    "geometry_source_SDK_boundaries_unchanged_at_audit": true,
+    "latency_p95_ms": {
+      "paced-grid-gpu": 62.49570834916085,
+      "paced-tree-cpu": 61.26504170242697,
+      "serial-grid-cpu": 61.399041675031185,
+      "serial-tree-gpu": 62.90145835373551
+    },
+    "native_commands": 4,
+    "one_pre_receipt_unarmed_startup_skip_retained": true,
+    "outcome": "CAPTURE_VALIDITY_PASS_PERFORMANCE_FAIL",
+    "paced": {
+      "paced-grid-gpu": {
+        "ack_to_inspection_ns": {
+          "count": 600,
+          "max": 804917,
+          "p50": 6750,
+          "p95": 13792,
+          "p99": 22000
+        },
+        "actual_hold_end_ns": 20082021208,
+        "cadence_threshold_met": false,
+        "collapsed_or_reordered_states": 0,
+        "dispatch_to_enqueue_return_ns": {
+          "count": 600,
+          "max": 25500,
+          "p50": 5333,
+          "p95": 8875,
+          "p99": 14042
+        },
+        "distinct_final_presentation_times": 600,
+        "enqueue_return_to_ack_observation_ns": {
+          "count": 600,
+          "max": 51224542,
+          "p50": 33206625,
+          "p95": 34224375,
+          "p99": 35217125
+        },
+        "final_presentation_after_planned_end_ms_bounds": [
+          10109.123785,
+          10109.126714
+        ],
+        "final_work_overrun_ns": 10082020791,
+        "first_scheduled_to_presented_ms_bounds": [
+          59.168077,
+          59.171006
+        ],
+        "interval_count": 599,
+        "interval_stats_ms": {
+          "count": 599,
+          "max": 49.9999166931957,
+          "p50": 33.333250088617206,
+          "p95": 33.33333332557231,
+          "p99": 33.33341667894274
+        },
+        "interval_threshold_ms": 18.333333333333332,
+        "iteration_deadline_misses": 600,
+        "iteration_ns": {
+          "count": 600,
+          "max": 51433708,
+          "p50": 33392042,
+          "p95": 34430875,
+          "p99": 35443542
+        },
+        "ordered_distinct_final_times": true,
+        "over_threshold_intervals": 599,
+        "over_two_periods": 18,
+        "planned_duration_ns": 10000000000,
+        "planned_states": 600,
+        "start_lateness_ns": {
+          "count": 600,
+          "max": 10064271167,
+          "p50": 5014528875,
+          "p95": 9564120042,
+          "p99": 9963758417
+        },
+        "within_1_1_period": 0,
+        "within_fraction": 0.0,
+        "worst_consecutive_deadline_misses": 600,
+        "worst_schedule_debt_ns": 10082020791
+      },
+      "paced-tree-cpu": {
+        "ack_to_inspection_ns": {
+          "count": 600,
+          "max": 49750,
+          "p50": 14959,
+          "p95": 25375,
+          "p99": 33625
+        },
+        "actual_hold_end_ns": 20078750625,
+        "cadence_threshold_met": false,
+        "collapsed_or_reordered_states": 0,
+        "dispatch_to_enqueue_return_ns": {
+          "count": 600,
+          "max": 109042,
+          "p50": 17500,
+          "p95": 26709,
+          "p99": 32708
+        },
+        "distinct_final_presentation_times": 600,
+        "enqueue_return_to_ack_observation_ns": {
+          "count": 600,
+          "max": 50214500,
+          "p50": 33211125,
+          "p95": 34217083,
+          "p99": 36216208
+        },
+        "final_presentation_after_planned_end_ms_bounds": [
+          10105.957493,
+          10105.963047
+        ],
+        "final_work_overrun_ns": 10078750166,
+        "first_scheduled_to_presented_ms_bounds": [
+          56.003327,
+          56.008881
+        ],
+        "interval_count": 599,
+        "interval_stats_ms": {
+          "count": 599,
+          "max": 49.999958369880915,
+          "p50": 33.333249972201884,
+          "p95": 33.33333332557231,
+          "p99": 33.33341667894274
+        },
+        "interval_threshold_ms": 18.333333333333332,
+        "iteration_deadline_misses": 600,
+        "iteration_ns": {
+          "count": 600,
+          "max": 50306375,
+          "p50": 33286250,
+          "p95": 34307583,
+          "p99": 36290084
+        },
+        "ordered_distinct_final_times": true,
+        "over_threshold_intervals": 599,
+        "over_two_periods": 15,
+        "planned_duration_ns": 10000000000,
+        "planned_states": 600,
+        "start_lateness_ns": {
+          "count": 600,
+          "max": 10062151708,
+          "p50": 5029376458,
+          "p95": 9562485208,
+          "p99": 9962429500
+        },
+        "within_1_1_period": 0,
+        "within_fraction": 0.0,
+        "worst_consecutive_deadline_misses": 600,
+        "worst_schedule_debt_ns": 10078750166
+      }
+    },
+    "performance_acceptance": false,
+    "probe_commands": 32,
+    "strict_validator_sha256": "b94c5aa49820959088a13d2907aa7658e6fa92bca7d5e543bc92784d40fbf9ff"
+  },
+  "SDK": {
+    "archive": {
+      "bytes": 31025344,
+      "path": "/private/tmp/vellum-display105-sdk-8cc374a/sdk.tar.gz",
+      "sha256": "a5014e1ac1e405d1aa3963167bf926da040b9a1429623b3419b02dc92ecdf79d"
+    },
+    "binding_sha256": "d01b1315386d6133a0d3f16202edfe42592560cf0621f8f5cb0ce606c38de1ca",
+    "headless_relocation": {
+      "archive_sha256": "a5014e1ac1e405d1aa3963167bf926da040b9a1429623b3419b02dc92ecdf79d",
+      "checks": [
+        "manifest all-file integrity",
+        "external Go module cache verification",
+        "standalone consumer race/vet/build",
+        "public API scenarios race/vet"
+      ],
+      "digest_verified_against_expected": true,
+      "event": "vellum.sdk.relocated",
+      "independent_authenticity_verified": false,
+      "native_runtime": "not executed",
+      "path_contains_spaces": true,
+      "public_distribution_audit": "not certified",
+      "replacements_within_sdk": {
+        "cogentcore.org/core": "drivers/cogent/build/upstream",
+        "github.com/dshills/vellum": ".",
+        "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+        "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+        "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+        "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+        "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+        "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+        "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+      },
+      "source": {
+        "clean": true,
+        "commit": "8cc374a070ad782dcc3e61a981c6501f5b82749c"
+      },
+      "trust_basis": "caller-supplied expected digest",
+      "verified_files": 8319,
+      "version": "v0.1.0-alpha.2"
+    },
+    "manifest_sha256": "70d0a359df4a7099e98732d545323b9635d1a1b3de58a3adb45531622b69ef3e",
+    "public_distribution_certified": false,
+    "result": "PASS_PRIVATE_SDK_PACKAGE_RELOCATION"
+  },
+  "actual_source_commits": {
+    "Core105": "19cab39c1b3b38ee3fc355d18e37dc042184a795",
+    "Hello": "77f1ae8d000b5912b0019758949e7390c838d8f6",
+    "documentation": "8cc374a070ad782dcc3e61a981c6501f5b82749c"
+  },
+  "counts_at_frozen_source": {
+    "Core": 6029,
+    "SDK_including_manifest": 8320,
+    "prepared": 6328,
+    "tracked": 5949,
+    "typesetting": 299
+  },
+  "evidence": {
+    "archive": "evidence.tar.xz",
+    "archive_bytes": 1151416,
+    "archive_sha256": "856bd24fbbb2c93967b8d1b4162343d03774780b58e66e9a0072791f4171b074",
+    "index": "evidence-index.json",
+    "index_sha256": "1fb255025e9d349ef42668556691e58a542e7d81438f84f3919d46a04802552d",
+    "regular_members_including_index": 284
+  },
+  "limits": [
+    "One four-case opt-in1sbackpressure preflight, not the full repeated matrix or default-policy adoption",
+    "Functional GPU readback is not input-to-presentation or physical latency",
+    "No exact callback numeric cause, deallocation/human acceptance or prior-failure repair claimed",
+    "Original70/104 failed scopes remain sealed; separate M7 correction and timing diagnostic are outside this report",
+    "Earlier source Prism review does not cover this later report; root review remains pending"
+  ],
+  "pacing_analysis": {
+    "measured_conclusions": [
+      "The first three measured cohorts have approximately33.333ms final-state presentation intervals and zero intervals within18.333333ms; p95 receipt-to-presentation is61.399/62.901/62.496ms. This fails existing gates.",
+      "Measured input/queue costs are microseconds; total charged UI work medians are4.704/6.254/3.671ms. Acquire calls and Present calls are also short. A rendering rewrite is not supported by these measurements.",
+      "After a preceding actual presentedTime, the next measured acquisition follows in medians5.176/5.575/4.165ms, not another full refresh interval. Acquire-to-present medians28.158/27.761/29.171ms dominate each one-credit cycle."
+    ],
+    "scope": "READ_ONLY_MEASURED_WAIT_ANALYSIS_FIRST_THREE_COMPLETED_CASES",
+    "source": "macos-display105-pacing-analysis/analysis.json",
+    "source_inference_is_not_native_compositor_cause_proof": true
+  },
+  "public_consumer": {
+    "presentation_latency_qualified": false,
+    "report": {
+      "event": "vellum.native.ready",
+      "geometry_persistence_disabled_in_fixture": true,
+      "go_version": "go1.25.6",
+      "heap_alloc_bytes": 62558128,
+      "height": 344,
+      "render_readback_ns": [
+        1761417,
+        1919000,
+        1711125
+      ],
+      "startup_to_verified_gpu_ns": 201150042,
+      "width": 630
+    },
+    "result": "PASS_ONE_FRESH_SDK105_PUBLIC_CONSUMER_ACTUAL_AUDIT",
+    "wall_seconds": 2.018155957921408,
+    "whole_native_cleanup_census": false
+  },
+  "remaining": [
+    "Unchanged 60Hz/33.3ms performance matrix and representative M3 workflows",
+    "M4 resource/endurance, M5 physical/human checks and full native deallocation evidence",
+    "Final SDK/application/component/rights acceptance and M7 final audit",
+    "Observed exported-plan documentation-link gap: 55 occurrences in the scoped source8cc audit; separate correction outside this frozen SDK/report"
+  ],
+  "schema": 1,
+  "source8cc_freeze": "Artifact-only report; C/T/SDK untouched. No future documentation commit or package identity inferred.",
+  "source_commit": "8cc374a070ad782dcc3e61a981c6501f5b82749c"
+}

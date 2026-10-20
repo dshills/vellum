@@ -3,7 +3,9 @@
 These reports preserve investigation outcomes and their original validation scope.
 The [implementation status](../implementation.md) describes the current framework.
 
-- [Acknowledged skips and benchmark geometry](macos-display105-checkpoint/README.md): Core105/Hello checks and four native functional cases pass; fresh SDK and Mac release gates remain open.
+- [Source-105 private SDK and native captures](macos-source105-native/README.md): actual SDK/consumer and all four capture-validity checks pass; unchanged latency/cadence gates fail, with portable raw evidence.
+
+- [Acknowledged skips and benchmark geometry](macos-display105-checkpoint/README.md): Core105/Hello source and candidate-copy functional checks pass; later SDK/capture outcomes are recorded in the source-105 report above.
 
 - [Isolated native drawing and 3D fixtures](macos-advanced-native/README.md)
 

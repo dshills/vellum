@@ -1,0 +1,1443 @@
+{
+  "excluded": [
+    "Executable/native-library/SDK payload bytes and the separate 31,025,344-byte SDK archive",
+    "Historical raw campaigns and recursive report archives; their sealed hash references remain in current provenance",
+    "Separate timing diagnostic, prospective M7 correction and any future commit or fresh-package claim"
+  ],
+  "external_SDK_artifact": {
+    "bytes": 31025344,
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/vellum-mac-private-alpha-8cc374a.tar.gz",
+    "same_bytes_as_owned_package_output": true,
+    "scope": "durable local private SDK artifact; no publication/signing/notarization/Macreleasequalification",
+    "sha256": "a5014e1ac1e405d1aa3963167bf926da040b9a1429623b3419b02dc92ecdf79d",
+    "source_commit": "8cc374a070ad782dcc3e61a981c6501f5b82749c"
+  },
+  "index_member": "EVIDENCE_INDEX.json",
+  "index_self_hash": "Not recursive; this exact index file is included as EVIDENCE_INDEX.json and pinned by the outside proposal/summary.",
+  "members": {
+    "macos-display105-checkpoint/commit-result-review.json": {
+      "bytes": 4800,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-checkpoint/commit-result-review.json",
+      "sha256": "0fecdf47b2ef66b5724793b322c6a0204c507b32cd3d8d7d99c3c22903ad9d59"
+    },
+    "macos-display105-checkpoint/commit-result.json": {
+      "bytes": 1525511,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-checkpoint/commit-result.json",
+      "sha256": "601a32844d9ecb6313b964c88bedeb7b423f573e72c2b372575db46133ecf933"
+    },
+    "macos-display105-checkpoint/documentation-commit-result.json": {
+      "bytes": 1527160,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-checkpoint/documentation-commit-result.json",
+      "sha256": "8d8b26df6be6d1b1e2f59e249aafb02d9918d02ad85d1d9dbe655cce7c99c29a"
+    },
+    "macos-display105-pacing-analysis/analysis.json": {
+      "bytes": 20116,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display105-pacing-analysis/analysis.json",
+      "sha256": "cd3743e152393f6303bfcea4112fb5500e1f2e2723d22cda7aa4e80e756f3dc7"
+    },
+    "macos-presentation-display105/binding.json": {
+      "bytes": 2631036,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/binding.json",
+      "sha256": "d01b1315386d6133a0d3f16202edfe42592560cf0621f8f5cb0ce606c38de1ca"
+    },
+    "macos-presentation-display105/builds/clean-native-builds.json": {
+      "bytes": 2759,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/clean-native-builds.json",
+      "sha256": "7641c5a7acb8896177079bb0094c59a4fca39b4d11fe5d5ce7e03d6369c16c45"
+    },
+    "macos-presentation-display105/builds/compile-grid-build-info.txt": {
+      "bytes": 3787,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-grid-build-info.txt",
+      "sha256": "23820ce746043c99c7afb43239045159c2c87b7cc97949f2a527676d8bd7687a"
+    },
+    "macos-presentation-display105/builds/compile-grid-metadata/owned.json": {
+      "bytes": 1909,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-grid-metadata/owned.json",
+      "sha256": "1ac9bcbbe5a4f9c78d44b36616bbb15b225d3b121ba86a78f9a4ebf148795c5f"
+    },
+    "macos-presentation-display105/builds/compile-grid-metadata/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-grid-metadata/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/builds/compile-grid-metadata/stdout": {
+      "bytes": 3787,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-grid-metadata/stdout",
+      "sha256": "23820ce746043c99c7afb43239045159c2c87b7cc97949f2a527676d8bd7687a"
+    },
+    "macos-presentation-display105/builds/compile-grid.json": {
+      "bytes": 1761688,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-grid.json",
+      "sha256": "5a5c6fae6fa298bc8c956e026371933f2b4b5568dcdeb9b454b3a4a9f99ab773"
+    },
+    "macos-presentation-display105/builds/compile-grid/owned.json": {
+      "bytes": 1932,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-grid/owned.json",
+      "sha256": "203396836aae595f5d17b5683e102485cf6fa2c5576d22326d16d7e060c2c64c"
+    },
+    "macos-presentation-display105/builds/compile-grid/stderr": {
+      "bytes": 1041,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-grid/stderr",
+      "sha256": "2fbd87253e70c30a824bc5e8cb5c78592162f72c6aa351e61dff5539866d22ae"
+    },
+    "macos-presentation-display105/builds/compile-grid/stdout": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-grid/stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/builds/compile-tree-build-info.txt": {
+      "bytes": 3787,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-tree-build-info.txt",
+      "sha256": "9b9f8b8d80bcc37685e77d76188cabbc3a59aa4feb3f63990f682d3b4eab422d"
+    },
+    "macos-presentation-display105/builds/compile-tree-metadata/owned.json": {
+      "bytes": 1909,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-tree-metadata/owned.json",
+      "sha256": "70123362e0c7be5849f8d89681d4895b2a7012da23609ff5a0819f63655cb21c"
+    },
+    "macos-presentation-display105/builds/compile-tree-metadata/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-tree-metadata/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/builds/compile-tree-metadata/stdout": {
+      "bytes": 3787,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-tree-metadata/stdout",
+      "sha256": "9b9f8b8d80bcc37685e77d76188cabbc3a59aa4feb3f63990f682d3b4eab422d"
+    },
+    "macos-presentation-display105/builds/compile-tree.json": {
+      "bytes": 1761686,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-tree.json",
+      "sha256": "c465068a4dcde3d4ebbc0ad5ec5a5ea42ff216307ba9b0109055abf68d15312d"
+    },
+    "macos-presentation-display105/builds/compile-tree/owned.json": {
+      "bytes": 1932,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-tree/owned.json",
+      "sha256": "a847a6970bf85ebff9f09333fde667bf58f16b26f72d7dda861127d96f580b0f"
+    },
+    "macos-presentation-display105/builds/compile-tree/stderr": {
+      "bytes": 1041,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-tree/stderr",
+      "sha256": "c75834f74dc62b4ba5d45a94a7f614467cf5225aa470eb46a91870574cd33e8a"
+    },
+    "macos-presentation-display105/builds/compile-tree/stdout": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/compile-tree/stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/builds/grid.json": {
+      "bytes": 1758521,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/grid.json",
+      "sha256": "227d83c85afcbbaac100e6eb5f0e237210f5a480d78a56c1f8280bc0fb13fe55"
+    },
+    "macos-presentation-display105/builds/grid/owned.json": {
+      "bytes": 1894,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/grid/owned.json",
+      "sha256": "1587306eb45e330dc2e5b1ca39d2b4f1dd31d62d2b566cf0d7a608620e227475"
+    },
+    "macos-presentation-display105/builds/grid/stderr": {
+      "bytes": 1046,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/grid/stderr",
+      "sha256": "cb8a9ee4f52844d9acbdb98b34a395d2d36cc006d1ecca8097f5e2d6066dffc8"
+    },
+    "macos-presentation-display105/builds/grid/stdout": {
+      "bytes": 16111,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/grid/stdout",
+      "sha256": "eb6df1296a94c0af4670a6910c04a50351d95fab572cdcd603751e309aa6729d"
+    },
+    "macos-presentation-display105/builds/tree.json": {
+      "bytes": 1758523,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/tree.json",
+      "sha256": "b25bae83709c090d44400bee97b32c3e6cdd26923072e698b6040a04005eabd8"
+    },
+    "macos-presentation-display105/builds/tree/owned.json": {
+      "bytes": 1894,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/tree/owned.json",
+      "sha256": "f2ab40ba1f468f444a47857d967466d5ef11d29113fb342d20f473038fc3c27f"
+    },
+    "macos-presentation-display105/builds/tree/stderr": {
+      "bytes": 1046,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/tree/stderr",
+      "sha256": "4c36e26aac3bb6692bc54bf3f9390dbc67365a1796bd9a6d04c0e38a37e967e9"
+    },
+    "macos-presentation-display105/builds/tree/stdout": {
+      "bytes": 13756,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/tree/stdout",
+      "sha256": "ea5b70353e86e4e7ef2ca6c4a0d9137d97a7248ce16ad5331bb4772210a583b0"
+    },
+    "macos-presentation-display105/builds/validator-tests.json": {
+      "bytes": 1758439,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/validator-tests.json",
+      "sha256": "c1ae33cc8a1a4091233e776c0913f50f63651648cbfa60fc0f48d66057a9953c"
+    },
+    "macos-presentation-display105/builds/validator-tests/owned.json": {
+      "bytes": 1814,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/validator-tests/owned.json",
+      "sha256": "08067d699151b5e570acb9554c45b95b7a22de5cd5bbccc812afdbc5793a55ad"
+    },
+    "macos-presentation-display105/builds/validator-tests/stderr": {
+      "bytes": 2633,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/validator-tests/stderr",
+      "sha256": "8c04001c3a8ac0dd99201e1f6e86e367c24c8ac28be2c6cf6c70189d9600d450"
+    },
+    "macos-presentation-display105/builds/validator-tests/stdout": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/validator-tests/stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/builds/vet-grid.json": {
+      "bytes": 1758459,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/vet-grid.json",
+      "sha256": "3075e8e221c6888d2518c5356ea620f6fc86e9dde7ee1f0a1cfc234d8b1ed1f6"
+    },
+    "macos-presentation-display105/builds/vet-grid/owned.json": {
+      "bytes": 1835,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/vet-grid/owned.json",
+      "sha256": "7ffb1b96fa5d77aac724347af2fe720b1c022e6e3a880fc7de063efa29be33e4"
+    },
+    "macos-presentation-display105/builds/vet-grid/stderr": {
+      "bytes": 941,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/vet-grid/stderr",
+      "sha256": "a1485cd5e7bde4981203922f4e6e46b1e76da276b5da440887a20026134c9e23"
+    },
+    "macos-presentation-display105/builds/vet-grid/stdout": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/vet-grid/stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/builds/vet-tree.json": {
+      "bytes": 1758460,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/vet-tree.json",
+      "sha256": "588b08b2317cc7af75174c60408f3d321cb97e6ecb4f4f57912c84bc59b9158a"
+    },
+    "macos-presentation-display105/builds/vet-tree/owned.json": {
+      "bytes": 1835,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/vet-tree/owned.json",
+      "sha256": "018487dd26280f414de8ce47450d86e50db8a1a6f6d04110e135434fa9db368a"
+    },
+    "macos-presentation-display105/builds/vet-tree/stderr": {
+      "bytes": 941,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/vet-tree/stderr",
+      "sha256": "a1485cd5e7bde4981203922f4e6e46b1e76da276b5da440887a20026134c9e23"
+    },
+    "macos-presentation-display105/builds/vet-tree/stdout": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/builds/vet-tree/stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/check.py": {
+      "bytes": 9109,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/check.py",
+      "sha256": "1016ce26a5988f75c3f5db1bf1a71b1c2490d3f457a4594206fb66c06fe4251f"
+    },
+    "macos-presentation-display105/comparison-baseline.json": {
+      "bytes": 31571,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/comparison-baseline.json",
+      "sha256": "703794ad840d740eb0d836ead3c9f24b8c30dd7b52b8c405ed3aa3e54bfabc37"
+    },
+    "macos-presentation-display105/controller-review.json": {
+      "bytes": 58067,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/controller-review.json",
+      "sha256": "875b46bb55edc63c3fe938158dee9141bb0a7a921dedf0b38908896d087b2a34"
+    },
+    "macos-presentation-display105/controller.py": {
+      "bytes": 29734,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/controller.py",
+      "sha256": "d990675f85bb70002048df4adf3bb97b7d9bea554893fb706980dc7b49399844"
+    },
+    "macos-presentation-display105/controls.json": {
+      "bytes": 36419,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/controls.json",
+      "sha256": "7277592fb8922aa9dc734843f1db4a819d94a07de5ad356c68435f1ba02fc33a"
+    },
+    "macos-presentation-display105/controls/owned.json": {
+      "bytes": 1749,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/controls/owned.json",
+      "sha256": "0057a961c1aa3110ee8a230315e3f59aca6a5a33b93be5db9857cd226f19dcfa"
+    },
+    "macos-presentation-display105/controls/stderr": {
+      "bytes": 2262,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/controls/stderr",
+      "sha256": "91323b2f322a15d01a9c5588738986c0c410ae27610270c257ba76f26e4e1890"
+    },
+    "macos-presentation-display105/controls/stdout": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/controls/stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/finalize_metadata_test.py": {
+      "bytes": 1751,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/finalize_metadata_test.py",
+      "sha256": "830392b3d61f1f73bce9700f4b1299a4ddec81642f59e9b8b3f9d69fd91d2623"
+    },
+    "macos-presentation-display105/headless-admission.json": {
+      "bytes": 618,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/headless-admission.json",
+      "sha256": "8cc6986f8b5a29ba9364a989d3c9a0bb568c3539be28ae212df265f9e45da339"
+    },
+    "macos-presentation-display105/headless-review-process-observation.txt": {
+      "bytes": 14773,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/headless-review-process-observation.txt",
+      "sha256": "207848a95be46887fbbda7b0b467c4451ecaf5ef128b1872eb2abb967db34df3"
+    },
+    "macos-presentation-display105/headless-tool-calls.json": {
+      "bytes": 6643,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/headless-tool-calls.json",
+      "sha256": "c2b45389d02310547142cb4b650fde68d44390d3e6eff7b7ff86771f853f0944"
+    },
+    "macos-presentation-display105/independent-source-template-review.json": {
+      "bytes": 6153,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/independent-source-template-review.json",
+      "sha256": "3a843136708186c9e0e082283950c33ef802f7d4571506ac9843b94921178bcb"
+    },
+    "macos-presentation-display105/native-admission.json": {
+      "bytes": 625,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/native-admission.json",
+      "sha256": "33b2f4219644ba0f1bd7ec4feb20be6e3dbdcb2f136aa9f02da96fce166e082f"
+    },
+    "macos-presentation-display105/native-result-review.json": {
+      "bytes": 68198,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/native-result-review.json",
+      "sha256": "24b7fb8e5c55baa68d7c51556c9ecddf1896ed54d2c89a382240da1904ebab68"
+    },
+    "macos-presentation-display105/native-review-process-observation.txt": {
+      "bytes": 14790,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/native-review-process-observation.txt",
+      "sha256": "e6eed572f74daaf14a4e5cdd82b062cc39b020e02d2613d415d0df584545968c"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/display-command.json": {
+      "bytes": 2847,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/display-command.json",
+      "sha256": "7e60b54085c4f144937fac27c0b10593b248fb87520347185f62faef1136a9b4"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/display/owned.json": {
+      "bytes": 1957,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/display/owned.json",
+      "sha256": "d1d44ed529895028e811abbc4a65d00c6cb0ed35c27b03eb195eebd83d38a64b"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/display/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/display/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/display/stdout": {
+      "bytes": 1162,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/display/stdout",
+      "sha256": "df98fd1930d8885dbf3a6b932b8bde06a4a7feacaec6de3110eee5b831b8e43e"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/os-command.json": {
+      "bytes": 2797,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/os-command.json",
+      "sha256": "27a4af57379f0178420aa8e28f144e344b148073d064364b4e74bfd43d0df5a4"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/os/owned.json": {
+      "bytes": 1909,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/os/owned.json",
+      "sha256": "4bac77de434f156feed66eb6342e488489fc10bcce64d7cd37b75480662ad119"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/os/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/os/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/os/stdout": {
+      "bytes": 65,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/os/stdout",
+      "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/power-command.json": {
+      "bytes": 2816,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/power-command.json",
+      "sha256": "f40e434f47445bd11fca398e67045b0e4098357598b98928e2e69004323c3b72"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/power-settings-command.json": {
+      "bytes": 2820,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/power-settings-command.json",
+      "sha256": "47cfd2b83ecdd07e300e047827158c5c9c2de3cbaa3d260c813f847f925dea20"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/power-settings/owned.json": {
+      "bytes": 1931,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/power-settings/owned.json",
+      "sha256": "5fa10ecac4eb8800401b45fad0cd1a271a4c87b8bb5426a15012486f4e232102"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/power-settings/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/power-settings/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/power-settings/stdout": {
+      "bytes": 325,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/power-settings/stdout",
+      "sha256": "b4e363b7b2de39b590149004429a55a255a9e0a8e393a939e5736d54da4499bf"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/power/owned.json": {
+      "bytes": 1929,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/power/owned.json",
+      "sha256": "3d0c79404ce9e39f80493e6974c13edd3815e4dada724f5447458ebf6c6d9217"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/power/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/power/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-grid-gpu/after/power/stdout": {
+      "bytes": 28,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/after/power/stdout",
+      "sha256": "14726fc52ddf54b166819a66551cc819147724eae55b3e45b20676b0545c7234"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/display-command.json": {
+      "bytes": 2847,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/display-command.json",
+      "sha256": "2828ee3803a56e7be895eca2a0e2741c7c27c3a3a4f3b379ffb42a0a61f348c3"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/display/owned.json": {
+      "bytes": 1958,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/display/owned.json",
+      "sha256": "f13dea4bf22217569866c6a25de52545f28ccd0428caa1f8f952a0d27c971baa"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/display/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/display/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/display/stdout": {
+      "bytes": 1162,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/display/stdout",
+      "sha256": "df98fd1930d8885dbf3a6b932b8bde06a4a7feacaec6de3110eee5b831b8e43e"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/os-command.json": {
+      "bytes": 2798,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/os-command.json",
+      "sha256": "e1915f3d5169b68f9e65639d7e7000d11320af50fc83d911fa43391854296e15"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/os/owned.json": {
+      "bytes": 1910,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/os/owned.json",
+      "sha256": "dd7d140df63fa78b7d52a47e7bbe1947e989400a7398c88becf411963354eaab"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/os/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/os/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/os/stdout": {
+      "bytes": 65,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/os/stdout",
+      "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/power-command.json": {
+      "bytes": 2818,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/power-command.json",
+      "sha256": "8705974bd87e76790a8f51aabc29f14180e98725b8d50cd1dfd7ff8e7b02f41b"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/power-settings-command.json": {
+      "bytes": 2821,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/power-settings-command.json",
+      "sha256": "c6f9067a3cf6d7057d002b9de4e5c3a295fe2059e59548812f33afd192fd6329"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/power-settings/owned.json": {
+      "bytes": 1932,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/power-settings/owned.json",
+      "sha256": "ddcddb4fccc6ca81939dd32d060cb7da327e34c760a293f5dcdbd853077c25db"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/power-settings/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/power-settings/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/power-settings/stdout": {
+      "bytes": 325,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/power-settings/stdout",
+      "sha256": "b4e363b7b2de39b590149004429a55a255a9e0a8e393a939e5736d54da4499bf"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/power/owned.json": {
+      "bytes": 1930,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/power/owned.json",
+      "sha256": "9f9b43a4f33e2929519a66ed0c9613b3f1781ec018a722245fc2518c62bead2f"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/power/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/power/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-grid-gpu/before/power/stdout": {
+      "bytes": 28,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/before/power/stdout",
+      "sha256": "14726fc52ddf54b166819a66551cc819147724eae55b3e45b20676b0545c7234"
+    },
+    "macos-presentation-display105/paced-grid-gpu/native-command.json": {
+      "bytes": 3235,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/native-command.json",
+      "sha256": "2fc3b987e7f9d125735f899628bf26d2ce334e9b7cc9055cbaa1ae3b4c3b851f"
+    },
+    "macos-presentation-display105/paced-grid-gpu/native/owned.json": {
+      "bytes": 2347,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/native/owned.json",
+      "sha256": "ca06a5e6ce3fb9b63627b0962926b9ca6dadc4a0195ebc6f7b66aceee2e27db2"
+    },
+    "macos-presentation-display105/paced-grid-gpu/native/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/native/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-grid-gpu/native/stdout": {
+      "bytes": 3480,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/native/stdout",
+      "sha256": "324931bd4af621be67c8a3687fe2c7a6d6452e2575b4e632fda4286acf036193"
+    },
+    "macos-presentation-display105/paced-grid-gpu/presentation.json": {
+      "bytes": 1088521,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/presentation.json",
+      "sha256": "df4fb5390c2f00f6c547134120cd5a3064b8ddd03cefddf3e8062ddbb7560fbc"
+    },
+    "macos-presentation-display105/paced-grid-gpu/result.json": {
+      "bytes": 305911,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/result.json",
+      "sha256": "aa7072d2585f97575984bb4713f359ebd988620831284560fa05d1a7c317d13f"
+    },
+    "macos-presentation-display105/paced-grid-gpu/sealed": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-grid-gpu/sealed",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/display-command.json": {
+      "bytes": 2846,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/display-command.json",
+      "sha256": "c263c0fa196a7dcd07b6bfe31a3b0e84808056ff68828ecc1013c9e754dfe096"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/display/owned.json": {
+      "bytes": 1957,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/display/owned.json",
+      "sha256": "6de12da3735be4ea25befe345261031c1d696cd9a8f520e72abc727c0d5e2cdc"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/display/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/display/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/display/stdout": {
+      "bytes": 1162,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/display/stdout",
+      "sha256": "df98fd1930d8885dbf3a6b932b8bde06a4a7feacaec6de3110eee5b831b8e43e"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/os-command.json": {
+      "bytes": 2796,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/os-command.json",
+      "sha256": "26e56e0a06c136a5035d5edc8a855314f63d8e429c5d558610927697747f5f2d"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/os/owned.json": {
+      "bytes": 1909,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/os/owned.json",
+      "sha256": "a0bb9824013b128c0c4dc40228e921b47458d0902335dafa8a3dcb6175f6fdde"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/os/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/os/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/os/stdout": {
+      "bytes": 65,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/os/stdout",
+      "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/power-command.json": {
+      "bytes": 2817,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/power-command.json",
+      "sha256": "1ee367d30900211646749bd9633f4657cf353aa587b07537a774067f1bd1f236"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/power-settings-command.json": {
+      "bytes": 2818,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/power-settings-command.json",
+      "sha256": "79e55e1bee7bf141876dc60338a20232fabfa0958b584a166054804b1ad95657"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/power-settings/owned.json": {
+      "bytes": 1931,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/power-settings/owned.json",
+      "sha256": "6b3ae6ad27137934c1addd5a01a949e53dd4c57db56b9a0e094dddfe26ace220"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/power-settings/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/power-settings/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/power-settings/stdout": {
+      "bytes": 325,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/power-settings/stdout",
+      "sha256": "b4e363b7b2de39b590149004429a55a255a9e0a8e393a939e5736d54da4499bf"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/power/owned.json": {
+      "bytes": 1929,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/power/owned.json",
+      "sha256": "56da9fe51d911746a88315b4e48211a137866d0479ec670ff0e8c756dbd7b05a"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/power/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/power/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-tree-cpu/after/power/stdout": {
+      "bytes": 28,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/after/power/stdout",
+      "sha256": "14726fc52ddf54b166819a66551cc819147724eae55b3e45b20676b0545c7234"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/display-command.json": {
+      "bytes": 2847,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/display-command.json",
+      "sha256": "d3bf7204809c286c861f31fff808541ed20b3572dbe86a8dc6e9357e027ed51e"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/display/owned.json": {
+      "bytes": 1958,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/display/owned.json",
+      "sha256": "ad96d6e933abe688f25699297019fe909163bfa11f855437c945f32f754c5271"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/display/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/display/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/display/stdout": {
+      "bytes": 1162,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/display/stdout",
+      "sha256": "df98fd1930d8885dbf3a6b932b8bde06a4a7feacaec6de3110eee5b831b8e43e"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/os-command.json": {
+      "bytes": 2798,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/os-command.json",
+      "sha256": "a03a4985191e92c7d6663a4c7464591a35fb7f43de06986e11bf2e41586b380a"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/os/owned.json": {
+      "bytes": 1910,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/os/owned.json",
+      "sha256": "08cf7a90e23b2ad32156f141b1a6c801d1a2af727ff164c945b12ce8138a4db4"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/os/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/os/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/os/stdout": {
+      "bytes": 65,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/os/stdout",
+      "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/power-command.json": {
+      "bytes": 2818,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/power-command.json",
+      "sha256": "8f8a15abec58cbb326567e50bb7c0ae1b5ee0070ee0b08ea8ae080ca83469f9f"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/power-settings-command.json": {
+      "bytes": 2821,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/power-settings-command.json",
+      "sha256": "319d7170d56331b9567e57e3fb6c3e107c4e967f351c1ae7228ba3922bd29c25"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/power-settings/owned.json": {
+      "bytes": 1932,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/power-settings/owned.json",
+      "sha256": "da571ae85586f949a81fb917cbece53b47e59c798c2cb3644b4dab8e60f14943"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/power-settings/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/power-settings/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/power-settings/stdout": {
+      "bytes": 325,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/power-settings/stdout",
+      "sha256": "b4e363b7b2de39b590149004429a55a255a9e0a8e393a939e5736d54da4499bf"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/power/owned.json": {
+      "bytes": 1930,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/power/owned.json",
+      "sha256": "2787376cdf0270e651160ba84fc18d7b0b9ec7ae570407d38165b7d41c39145c"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/power/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/power/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-tree-cpu/before/power/stdout": {
+      "bytes": 28,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/before/power/stdout",
+      "sha256": "14726fc52ddf54b166819a66551cc819147724eae55b3e45b20676b0545c7234"
+    },
+    "macos-presentation-display105/paced-tree-cpu/native-command.json": {
+      "bytes": 3221,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/native-command.json",
+      "sha256": "dde77bbe98e12d25564b5eb9c9d32f242ca991e1434abf022d3488321aea1475"
+    },
+    "macos-presentation-display105/paced-tree-cpu/native/owned.json": {
+      "bytes": 2330,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/native/owned.json",
+      "sha256": "2ddc4fee156dd687d91d3ba1732b6ea1c901427fe7f42bb9508c091455ee46f6"
+    },
+    "macos-presentation-display105/paced-tree-cpu/native/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/native/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/paced-tree-cpu/native/stdout": {
+      "bytes": 65830,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/native/stdout",
+      "sha256": "a1037f5bffb7e4f3444260bb12c4474ae3359a6443060c20e9afba07b84543ad"
+    },
+    "macos-presentation-display105/paced-tree-cpu/presentation.json": {
+      "bytes": 1085072,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/presentation.json",
+      "sha256": "bda1c753eb82d1e972b41d34e637c888bfcf502563b76fdce913193f0601c9ac"
+    },
+    "macos-presentation-display105/paced-tree-cpu/result.json": {
+      "bytes": 305283,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/result.json",
+      "sha256": "1ff1bc26a92b58803d534ed4638452c557aa5dbea99b8a479426e21278cc74b6"
+    },
+    "macos-presentation-display105/paced-tree-cpu/sealed": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/paced-tree-cpu/sealed",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/plan.json": {
+      "bytes": 2672607,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/plan.json",
+      "sha256": "af57f3609e7135fb0636395890e978b24ca8bc71ff2633cf4c0f99daf381c524"
+    },
+    "macos-presentation-display105/prior-display104-failure.json": {
+      "bytes": 6209,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/prior-display104-failure.json",
+      "sha256": "b7b939ea8910935aa6043231a05ac97df4f04a66d476b18750bdf670915a3c10"
+    },
+    "macos-presentation-display105/provenance-status.json": {
+      "bytes": 1710,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/provenance-status.json",
+      "sha256": "fc17425513af0ba72d5fd214d7602217613cca94989829559d8c0d5708027bbf"
+    },
+    "macos-presentation-display105/refresh-baseline.json": {
+      "bytes": 21895,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/refresh-baseline.json",
+      "sha256": "0d0d58fbeccc109ca653813e6dc7db6579e899cb7c22905ec67e827be935a57b"
+    },
+    "macos-presentation-display105/result.json": {
+      "bytes": 886065,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/result.json",
+      "sha256": "3629242ca5258b6bdcb22c2bf8cc12b10eea82d83fb20a56600dc20cf0587fad"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/display-command.json": {
+      "bytes": 2848,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/display-command.json",
+      "sha256": "c94345b83836ce0bec0e46be5892385dbcfc4b9c9f9d6de3e7580b1b6306cd89"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/display/owned.json": {
+      "bytes": 1958,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/display/owned.json",
+      "sha256": "539aeaaab136bb44844cada1d0788eaef9c26af4265cd4c3317843f6846346b1"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/display/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/display/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/display/stdout": {
+      "bytes": 1162,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/display/stdout",
+      "sha256": "df98fd1930d8885dbf3a6b932b8bde06a4a7feacaec6de3110eee5b831b8e43e"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/os-command.json": {
+      "bytes": 2797,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/os-command.json",
+      "sha256": "745abc59ed8ce6355fe0c2e9c765dd1a137adcbce71e90a1666030efc204421f"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/os/owned.json": {
+      "bytes": 1910,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/os/owned.json",
+      "sha256": "d03e6495778a3779f84999798f6fc049aa058c81d61affd6cc079fd88fd4685f"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/os/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/os/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/os/stdout": {
+      "bytes": 65,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/os/stdout",
+      "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/power-command.json": {
+      "bytes": 2817,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/power-command.json",
+      "sha256": "c8decfff652471392a07fd734f88ffe423d1540d3cbdd60803c25995ae17a925"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/power-settings-command.json": {
+      "bytes": 2821,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/power-settings-command.json",
+      "sha256": "2afa0a5874339980b41a67924b53f69518030f523b750851422b2a5f760777ef"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/power-settings/owned.json": {
+      "bytes": 1932,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/power-settings/owned.json",
+      "sha256": "dc6a98e99c0c20db998a3418ae139cf6b48a8ca895a3f651c3af00378bdc1e66"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/power-settings/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/power-settings/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/power-settings/stdout": {
+      "bytes": 325,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/power-settings/stdout",
+      "sha256": "b4e363b7b2de39b590149004429a55a255a9e0a8e393a939e5736d54da4499bf"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/power/owned.json": {
+      "bytes": 1930,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/power/owned.json",
+      "sha256": "0f1e3a2b34f09d0f68290f1fb7149b1b02ca4f7f415efb244e5427776bf14740"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/power/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/power/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-grid-cpu/after/power/stdout": {
+      "bytes": 28,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/after/power/stdout",
+      "sha256": "14726fc52ddf54b166819a66551cc819147724eae55b3e45b20676b0545c7234"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/display-command.json": {
+      "bytes": 2848,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/display-command.json",
+      "sha256": "6bdfb11051a7cb32fedf31c5b45a6f8d38694fd723039d0b6e9f4bce145b602d"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/display/owned.json": {
+      "bytes": 1959,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/display/owned.json",
+      "sha256": "5c96e4c92412a8d22d522a85492e1723b26e9388c4bf44693e5cd4f3340f297c"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/display/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/display/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/display/stdout": {
+      "bytes": 1162,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/display/stdout",
+      "sha256": "df98fd1930d8885dbf3a6b932b8bde06a4a7feacaec6de3110eee5b831b8e43e"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/os-command.json": {
+      "bytes": 2797,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/os-command.json",
+      "sha256": "13b68fd8c8a489f4bcfa81bac979d73a1504a305c65c55e18b98109ad50f119d"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/os/owned.json": {
+      "bytes": 1911,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/os/owned.json",
+      "sha256": "3168aae1a3b3c0f8274c7db4943ef2d048c570f1066aaa4e61341bd1537a09f6"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/os/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/os/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/os/stdout": {
+      "bytes": 65,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/os/stdout",
+      "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/power-command.json": {
+      "bytes": 2819,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/power-command.json",
+      "sha256": "149ef1ff7d50a657e38c0d09072fdad97a62eb70bb97fd8d0bbd68f91009ce19"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/power-settings-command.json": {
+      "bytes": 2822,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/power-settings-command.json",
+      "sha256": "b82955671ea542b49ed19aa21d00b9d24fd5563917375296a29a4b2e836bf4df"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/power-settings/owned.json": {
+      "bytes": 1933,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/power-settings/owned.json",
+      "sha256": "5e082632c8996c0c12b27e4731269422c4f3907f312aba292d93a4442bebf59f"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/power-settings/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/power-settings/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/power-settings/stdout": {
+      "bytes": 325,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/power-settings/stdout",
+      "sha256": "b4e363b7b2de39b590149004429a55a255a9e0a8e393a939e5736d54da4499bf"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/power/owned.json": {
+      "bytes": 1931,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/power/owned.json",
+      "sha256": "32f40ab1a89d3840a35f3c8ba623727f9ec314cd846de1b027141fd347b4ab7b"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/power/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/power/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-grid-cpu/before/power/stdout": {
+      "bytes": 28,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/before/power/stdout",
+      "sha256": "14726fc52ddf54b166819a66551cc819147724eae55b3e45b20676b0545c7234"
+    },
+    "macos-presentation-display105/serial-grid-cpu/native-command.json": {
+      "bytes": 3204,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/native-command.json",
+      "sha256": "7c55236aa05b129a46e75cdac33e67e0a0c9c6ee631e414ebad4bf7a0d4cd8a7"
+    },
+    "macos-presentation-display105/serial-grid-cpu/native/owned.json": {
+      "bytes": 2313,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/native/owned.json",
+      "sha256": "2efd1f915040e64a928d31bee7b7142547e5998c2b5c0897859c8a4df8a991f1"
+    },
+    "macos-presentation-display105/serial-grid-cpu/native/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/native/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-grid-cpu/native/stdout": {
+      "bytes": 157447,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/native/stdout",
+      "sha256": "7bc8393469134e985ce8a14d63a0073716ff41cf2ae048d6618b4310b731726c"
+    },
+    "macos-presentation-display105/serial-grid-cpu/presentation.json": {
+      "bytes": 267880,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/presentation.json",
+      "sha256": "f66a83853cbbd80f025534235f8e6531d6fe196d326892a4befa7ce6a73c7730"
+    },
+    "macos-presentation-display105/serial-grid-cpu/result.json": {
+      "bytes": 76841,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/result.json",
+      "sha256": "d7b8fd4638e9bb39f06e5f85d0c8e95a1e8627378cd670c7f0bfa9c806aee2c3"
+    },
+    "macos-presentation-display105/serial-grid-cpu/sealed": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-grid-cpu/sealed",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/display-command.json": {
+      "bytes": 2848,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/display-command.json",
+      "sha256": "97fd6d43623bc9130f4e06f1d4e6cf3a55ea65bb29418c3397af8003a3b2edf4"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/display/owned.json": {
+      "bytes": 1958,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/display/owned.json",
+      "sha256": "edfe445df5fb2ce42f608dc8f3711c719eb8e79e0f6977792b75fd2855b5d279"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/display/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/display/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/display/stdout": {
+      "bytes": 1162,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/display/stdout",
+      "sha256": "df98fd1930d8885dbf3a6b932b8bde06a4a7feacaec6de3110eee5b831b8e43e"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/os-command.json": {
+      "bytes": 2796,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/os-command.json",
+      "sha256": "e88ec102e35d8b6ac4fcead4e9c54993f9ccb98bb6517867c7d50a717394845d"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/os/owned.json": {
+      "bytes": 1910,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/os/owned.json",
+      "sha256": "6a155aad8438707ac936c08e47289cb46a77555ed504997eb460f72efef12e4d"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/os/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/os/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/os/stdout": {
+      "bytes": 65,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/os/stdout",
+      "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/power-command.json": {
+      "bytes": 2818,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/power-command.json",
+      "sha256": "0b9f71794e165aba6151beac1d51f9c143825559457eaa3c816ef49fdfc85f01"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/power-settings-command.json": {
+      "bytes": 2821,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/power-settings-command.json",
+      "sha256": "b5e26141aafb42fcf9076260bf46a767d7bea1df100dff4f91ebf8dffa2db4bd"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/power-settings/owned.json": {
+      "bytes": 1932,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/power-settings/owned.json",
+      "sha256": "260f4394b04db2b15cd1d29a8e6602997af396067141c830bbbdcb957c3b6471"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/power-settings/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/power-settings/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/power-settings/stdout": {
+      "bytes": 325,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/power-settings/stdout",
+      "sha256": "b4e363b7b2de39b590149004429a55a255a9e0a8e393a939e5736d54da4499bf"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/power/owned.json": {
+      "bytes": 1930,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/power/owned.json",
+      "sha256": "db94526120816e300d4020a241bc275a6f03e2353ab09642a05ef2457487c406"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/power/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/power/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-tree-gpu/after/power/stdout": {
+      "bytes": 28,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/after/power/stdout",
+      "sha256": "14726fc52ddf54b166819a66551cc819147724eae55b3e45b20676b0545c7234"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/display-command.json": {
+      "bytes": 2849,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/display-command.json",
+      "sha256": "8232112bce15dcacaabcebbf4e5b99727969ae59ee1479506158886156aeda94"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/display/owned.json": {
+      "bytes": 1959,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/display/owned.json",
+      "sha256": "820dd21ce9ae2443ddcd4c93cd64dbc4acb9909c5d13b613c549391f1e8c5993"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/display/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/display/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/display/stdout": {
+      "bytes": 1162,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/display/stdout",
+      "sha256": "df98fd1930d8885dbf3a6b932b8bde06a4a7feacaec6de3110eee5b831b8e43e"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/os-command.json": {
+      "bytes": 2799,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/os-command.json",
+      "sha256": "f2b10300bfdeaaf9e33a34315a9b1fec9ed497e3393097733abb4258c5dcd801"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/os/owned.json": {
+      "bytes": 1911,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/os/owned.json",
+      "sha256": "031b727c9b554eb290d0ceb5be78611bb59645da1d7c1576dbc1d1ac5095b7a3"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/os/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/os/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/os/stdout": {
+      "bytes": 65,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/os/stdout",
+      "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/power-command.json": {
+      "bytes": 2818,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/power-command.json",
+      "sha256": "e88c7fbe7ecf2c7d497c0adf490d52bed6556703c21f3e9e84dfefad2b2bed30"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/power-settings-command.json": {
+      "bytes": 2822,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/power-settings-command.json",
+      "sha256": "54962a04b942345a83db9f4f097bcdeb2b1f4d95913d62a5e41aa2122c448e69"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/power-settings/owned.json": {
+      "bytes": 1933,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/power-settings/owned.json",
+      "sha256": "71ccc889555dbe5c4d022a535c0c0b5694f78171fc340bab946f0bdcfa5aad87"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/power-settings/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/power-settings/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/power-settings/stdout": {
+      "bytes": 325,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/power-settings/stdout",
+      "sha256": "b4e363b7b2de39b590149004429a55a255a9e0a8e393a939e5736d54da4499bf"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/power/owned.json": {
+      "bytes": 1931,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/power/owned.json",
+      "sha256": "62ac4aedf39c9b3da2e2d7bde691a5397e01a71f482162fad3c96a352b109ab1"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/power/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/power/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-tree-gpu/before/power/stdout": {
+      "bytes": 28,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/before/power/stdout",
+      "sha256": "14726fc52ddf54b166819a66551cc819147724eae55b3e45b20676b0545c7234"
+    },
+    "macos-presentation-display105/serial-tree-gpu/native-command.json": {
+      "bytes": 3228,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/native-command.json",
+      "sha256": "41502580de3752ad1fc42a5e4c6534055295355e7531cf638e3ea64a04d574a7"
+    },
+    "macos-presentation-display105/serial-tree-gpu/native/owned.json": {
+      "bytes": 2337,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/native/owned.json",
+      "sha256": "5e765b5b29674068e550f94c44c7820b0493389579b53206d03f39f75384e825"
+    },
+    "macos-presentation-display105/serial-tree-gpu/native/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/native/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/serial-tree-gpu/native/stdout": {
+      "bytes": 171922,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/native/stdout",
+      "sha256": "ae08092ed848a037621aaf82b451a665a1a0ef2c8762a720fb45a7dd2eab98ba"
+    },
+    "macos-presentation-display105/serial-tree-gpu/presentation.json": {
+      "bytes": 265083,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/presentation.json",
+      "sha256": "6c488b73cad70d093ae3fa82815223912a546f537763b71d0eb37f13eec13135"
+    },
+    "macos-presentation-display105/serial-tree-gpu/result.json": {
+      "bytes": 76298,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/result.json",
+      "sha256": "71a9f1a83983ca9b4c0f68b793b0e5c53133a446f499a3d23a9a7ff9b475c95e"
+    },
+    "macos-presentation-display105/serial-tree-gpu/sealed": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/serial-tree-gpu/sealed",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/started.json": {
+      "bytes": 287,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/started.json",
+      "sha256": "a7892290fdf90ec3494ad22f7297a3dfa1a7f92de45c5705fb77e794f3a82552"
+    },
+    "macos-presentation-display105/stop-live": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/stop-live",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-presentation-display105/tests.py": {
+      "bytes": 19895,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-display105/tests.py",
+      "sha256": "8af1d33d79787ee8492f100b411d50a0cd7801a89e71ece18c7b24eba5042f8b"
+    },
+    "macos-sdk-display105-native-consumer/actual-result-review.json": {
+      "bytes": 21008,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/actual-result-review.json",
+      "sha256": "e8f0425dbbf2ca9311284a71558d32dc880a8e4699e1199a269ad742d93f9ce3"
+    },
+    "macos-sdk-display105-native-consumer/build-receipt.json": {
+      "bytes": 6138,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/build-receipt.json",
+      "sha256": "419da855c59062286f76dd345d6bb53adac07dc926d9f6c8bc50d12b0a587aec"
+    },
+    "macos-sdk-display105-native-consumer/build/owned.json": {
+      "bytes": 5278,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/build/owned.json",
+      "sha256": "7b3a90d0758e106b59a0c5693fc7c5784e2a5a6a573a5ee8a7586947e81ad31e"
+    },
+    "macos-sdk-display105-native-consumer/build/stderr": {
+      "bytes": 1120,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/build/stderr",
+      "sha256": "67760fd99da8a59b539bf22bfb6580331346effc4a09ee392342350b809aea56"
+    },
+    "macos-sdk-display105-native-consumer/build/stdout": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/build/stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-sdk-display105-native-consumer/generate-receipt.json": {
+      "bytes": 5412,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/generate-receipt.json",
+      "sha256": "792638c69c2f3120a223d4da171668f9523aa6548a4337d19aa718a7d182cc28"
+    },
+    "macos-sdk-display105-native-consumer/generate/owned.json": {
+      "bytes": 4552,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/generate/owned.json",
+      "sha256": "bcbb994ba921fc5c8b523c0b4d1f4b77c0935b9cfb26c22d84864b240b71384f"
+    },
+    "macos-sdk-display105-native-consumer/generate/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/generate/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-sdk-display105-native-consumer/generate/stdout": {
+      "bytes": 234,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/generate/stdout",
+      "sha256": "b771197ddf23b31eaaf6bcb940f0dc8f4237a09671472dd45fba7a4dd1d80dfb"
+    },
+    "macos-sdk-display105-native-consumer/graph-receipt.json": {
+      "bytes": 6062,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/graph-receipt.json",
+      "sha256": "38c5064ee00b6f833893015af41e57420aa2f1687910a2c622324bfcba3b44a7"
+    },
+    "macos-sdk-display105-native-consumer/graph/owned.json": {
+      "bytes": 5198,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/graph/owned.json",
+      "sha256": "9a60c201e153c63010d99d53b6f980cd56c008dba67ef83b0b54be7694d7b767"
+    },
+    "macos-sdk-display105-native-consumer/graph/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/graph/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-sdk-display105-native-consumer/graph/stdout": {
+      "bytes": 32440,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/graph/stdout",
+      "sha256": "42c9b3c5f091afd8e0f7ab2ffc3772a08d2e2d84def9b51b3b23c8314b5fb6bf"
+    },
+    "macos-sdk-display105-native-consumer/headless-admission.json": {
+      "bytes": 373,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/headless-admission.json",
+      "sha256": "0ed94a653ec211d8c6b671e4e4d61a8a65f8a3c10a3bee10b014c7d34f12d1d1"
+    },
+    "macos-sdk-display105-native-consumer/headless-result.json": {
+      "bytes": 28943,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/headless-result.json",
+      "sha256": "f1b918258eb8ebdf30e68344a1dac61b410eee10ca2684b5897fa049d4fa5015"
+    },
+    "macos-sdk-display105-native-consumer/independent-source-review.json": {
+      "bytes": 4138,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/independent-source-review.json",
+      "sha256": "2b6890440cb34b9e80ed8a02513d0342a49c1044ac387b344cb783bf66c9b376"
+    },
+    "macos-sdk-display105-native-consumer/metadata-controls.stderr": {
+      "bytes": 1147,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/metadata-controls.stderr",
+      "sha256": "a76e2668449d505f75fcca363927befb7cd2d2088bcd484c62e6a9839e9cffde"
+    },
+    "macos-sdk-display105-native-consumer/metadata-controls.stdout": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/metadata-controls.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-sdk-display105-native-consumer/metadata-receipt.json": {
+      "bytes": 6134,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/metadata-receipt.json",
+      "sha256": "c0513d07ec0de6c1f3657c5e6e81dc7a0d912ffae011a0b30812c305595e5f30"
+    },
+    "macos-sdk-display105-native-consumer/metadata/owned.json": {
+      "bytes": 5272,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/metadata/owned.json",
+      "sha256": "8f8a00d09d5433d3c66464f4a8523894874d89688c653ff43b98436d7e68f099"
+    },
+    "macos-sdk-display105-native-consumer/metadata/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/metadata/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-sdk-display105-native-consumer/metadata/stdout": {
+      "bytes": 6548,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/metadata/stdout",
+      "sha256": "c7c426b75c801032ae1570f402e826b785fa458a3f8eea79baabc178261e004a"
+    },
+    "macos-sdk-display105-native-consumer/metadata_test.py": {
+      "bytes": 4022,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/metadata_test.py",
+      "sha256": "5b6336ee71dc8087a48580492633161245524ac730ba1524e3e364499b5f557d"
+    },
+    "macos-sdk-display105-native-consumer/native/admission.json": {
+      "bytes": 555,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/native/admission.json",
+      "sha256": "b2800bb033c6f73b560232ebd06e334621182f666c06129de7bddc7f5feff1a8"
+    },
+    "macos-sdk-display105-native-consumer/native/plan.json": {
+      "bytes": 8673,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/native/plan.json",
+      "sha256": "fb9e1ae387e62e5b7b5248acdaef635726c9b72d62b34292931a876bc1ec719d"
+    },
+    "macos-sdk-display105-native-consumer/native/result.json": {
+      "bytes": 9355,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/native/result.json",
+      "sha256": "4133f2e417460b780cff34e461cf9e7776afb75fe20b8cfccb09531ffc93331e"
+    },
+    "macos-sdk-display105-native-consumer/native/run/owned.json": {
+      "bytes": 7136,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/native/run/owned.json",
+      "sha256": "71cd7e8747ed0b69441ebb8725a79f60968f10da46243b63d2200ce9d31d870c"
+    },
+    "macos-sdk-display105-native-consumer/native/run/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/native/run/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-sdk-display105-native-consumer/native/run/stdout": {
+      "bytes": 243,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/native/run/stdout",
+      "sha256": "46c60171cbb261635952b537f533663dde8ee4f73f45dec8552f1b441ef48a59"
+    },
+    "macos-sdk-display105-native-consumer/native/stop-live": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/native/stop-live",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-sdk-display105-native-consumer/plan.json": {
+      "bytes": 6596,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/plan.json",
+      "sha256": "838d38333681c3e6cdcc4d660cf766b032714675c0d6cacb4bfa2ea4a4bba60e"
+    },
+    "macos-sdk-display105-native-consumer/run.py": {
+      "bytes": 13777,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/run.py",
+      "sha256": "4d0317d7d5de77a0c140938a8f44b8462d0f3b78310f337830393b68623fb35b"
+    },
+    "macos-sdk-display105-native-consumer/source-freeze.json": {
+      "bytes": 3596,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105-native-consumer/source-freeze.json",
+      "sha256": "30c77558a615ba781d3ebc7b05d63694e08ba0bcb4ab1af87b714ca8d2cc1e4a"
+    },
+    "macos-sdk-display105/actual-package-review.json": {
+      "bytes": 9874,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/actual-package-review.json",
+      "sha256": "a47b95902b454297876e17f6eef84d7cecec71d30e939eef3dada54b7df7ae3a"
+    },
+    "macos-sdk-display105/admission.json": {
+      "bytes": 403,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/admission.json",
+      "sha256": "87c2512e00cb5a81f20396ed50c7c858269925c3bf721f16d8ed5aea608e3672"
+    },
+    "macos-sdk-display105/association-review.json": {
+      "bytes": 2354,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/association-review.json",
+      "sha256": "5d8f08d6ca2689bd20f793fd9d65a136c76d1f5851320a975a326ed42ffac224"
+    },
+    "macos-sdk-display105/binding.json": {
+      "bytes": 2631036,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/binding.json",
+      "sha256": "d01b1315386d6133a0d3f16202edfe42592560cf0621f8f5cb0ce606c38de1ca"
+    },
+    "macos-sdk-display105/build.py": {
+      "bytes": 2169,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/build.py",
+      "sha256": "b4f456f9df1ac3a0a0466a9de266ffe3d24a69c47d1da41cbf33f33fc7d5e396"
+    },
+    "macos-sdk-display105/contract-controls.json": {
+      "bytes": 1013,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/contract-controls.json",
+      "sha256": "56f65bc61ead3db5e5b358ba03dbc72733c81b6b6d8275090e7c4dd81fdc849b"
+    },
+    "macos-sdk-display105/durable-artifact.json": {
+      "bytes": 453,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/durable-artifact.json",
+      "sha256": "f143b3c39c430a09aa6eb94b253aea852ae11640042d2d9b5db3321d5606e07b"
+    },
+    "macos-sdk-display105/final-source.json": {
+      "bytes": 521,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/final-source.json",
+      "sha256": "b807b4f49ffd757e7b705176b3001d16d5a12065d84fb7de84b7564a530160bb"
+    },
+    "macos-sdk-display105/final_source.py": {
+      "bytes": 3260,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/final_source.py",
+      "sha256": "82d666b9588204c5d3348e5ca10a9f7331b73e762ddedfb6b22f9daa0e51b95f"
+    },
+    "macos-sdk-display105/independent-plan-review.json": {
+      "bytes": 13339,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/independent-plan-review.json",
+      "sha256": "84578692f30e4da3e6c7f2b30d4da075a924de7244afb101715446f2d9a928e1"
+    },
+    "macos-sdk-display105/package-command.json": {
+      "bytes": 2546,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/package-command.json",
+      "sha256": "3cbec2396da747c728929ee3ed7d055bad088a81f6ebc499dfad4e889aa781cf"
+    },
+    "macos-sdk-display105/package/owned.json": {
+      "bytes": 1685,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/package/owned.json",
+      "sha256": "3c0eb6ae31b9706bec2e383c3b82c6b15c5e3d09d508fdb38f33b324d9cf7b70"
+    },
+    "macos-sdk-display105/package/stderr": {
+      "bytes": 0,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/package/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "macos-sdk-display105/package/stdout": {
+      "bytes": 226,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/package/stdout",
+      "sha256": "b6475be0ceb6036dd3551b99b2c4da11e24fbe51b645659a75a0b71af365fb66"
+    },
+    "macos-sdk-display105/plan.json": {
+      "bytes": 1563040,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/plan.json",
+      "sha256": "23a562c005b60b48e30329a45f1f94a1dcf29a84b8758fd752ab97ae04ae2ac5"
+    },
+    "macos-sdk-display105/relocation-command.json": {
+      "bytes": 2257,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/relocation-command.json",
+      "sha256": "d9c77ea48b1ebdd419bc8c25f848b5edabfed382e0e934abfaa65be54522d4b7"
+    },
+    "macos-sdk-display105/relocation/owned.json": {
+      "bytes": 1391,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/relocation/owned.json",
+      "sha256": "b38b406e76ecf3fb8910e05d7d3a1811b8bc280b23eb27e86e2dac0c9eb4da44"
+    },
+    "macos-sdk-display105/relocation/stderr": {
+      "bytes": 3701,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/relocation/stderr",
+      "sha256": "cf981ed578f0d719df1e3774e140f64a0e81a1f7a3c47f898a966781c734d205"
+    },
+    "macos-sdk-display105/relocation/stdout": {
+      "bytes": 1422,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/relocation/stdout",
+      "sha256": "2f4fe9c1f15ceba95afcedff1a229ce88412fe5674c48de290c8587724bf9194"
+    },
+    "macos-sdk-display105/result.json": {
+      "bytes": 7464,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/result.json",
+      "sha256": "6384bb41940961b392d5071167b17432113d28c95f8f7257979a163dab1b5b97"
+    },
+    "macos-sdk-display105/retain.py": {
+      "bytes": 2600,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/retain.py",
+      "sha256": "6e548b9aabbad519d2ba80e16ae2803c6c55fe28239956b89f03fcfa7ed56a76"
+    },
+    "macos-sdk-display105/retained-SDK_MANIFEST.json": {
+      "bytes": 1177672,
+      "original_path": "/private/tmp/vellum-display105-sdk-8cc374a/retained SDK/vellum-v0.1.0-alpha.2/SDK_MANIFEST.json",
+      "sha256": "70d0a359df4a7099e98732d545323b9635d1a1b3de58a3adb45531622b69ef3e"
+    },
+    "macos-sdk-display105/retention.json": {
+      "bytes": 1103014,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/retention.json",
+      "sha256": "8703a3c4de6c40b6229168c0060d499df4f22492d250b6a2007550a2ed32af1c"
+    },
+    "macos-sdk-display105/verify-association.py": {
+      "bytes": 7144,
+      "original_path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-display105/verify-association.py",
+      "sha256": "90c5cec79cde66160397842d157847fb12a7e9ec9b2e226491570114ef95cb91"
+    },
+    "producing-source/scripts/check-presentation.py": {
+      "bytes": 22536,
+      "original_path": "/Users/dshills/Development/projects/Vellum/scripts/check-presentation.py",
+      "sha256": "b94c5aa49820959088a13d2907aa7658e6fa92bca7d5e543bc92784d40fbf9ff"
+    },
+    "producing-source/scripts/native_archive.py": {
+      "bytes": 7086,
+      "original_path": "/Users/dshills/Development/projects/Vellum/scripts/native_archive.py",
+      "sha256": "b186e30cf34577b0c1ccc4d25f5c090981afac25a0840942de0e83087ca4b541"
+    },
+    "producing-source/specs/macos-display-backpressure-experiment.md": {
+      "bytes": 6082,
+      "original_path": "/Users/dshills/Development/projects/Vellum/specs/macos-display-backpressure-experiment.md",
+      "sha256": "6adbedcb9db1c3e0d5ce0e6cb74154b6dbb113270f29f6a4f7f13a649b063282"
+    },
+    "producing-source/specs/macos-responsiveness.md": {
+      "bytes": 10760,
+      "original_path": "/Users/dshills/Development/projects/Vellum/specs/macos-responsiveness.md",
+      "sha256": "14a88c83808796a8c53d7448cd6b6812a481fdbb8e857a31b1cb1b5d304b6a01"
+    }
+  },
+  "schema": 1,
+  "scope": "Current SDK105, one fresh generated public consumer, all four strict P105 captures and first-three-only pacing analysis. Exact selected bytes; no execution by assembler.",
+  "selection_complete_within": [
+    "SDK package/relocation raw owned receipts and logs plus actual association/binding/manifest records",
+    "Fresh consumer generate/graph/build/metadata and native raw receipts/logs/reviews",
+    "All 156 four-case P105 raw files: journals, case records, 36 owned native/probe receipts and logs",
+    "Current P105 headless receipts/logs, controls, optimized metadata and complete final plan"
+  ],
+  "source_commit": "8cc374a070ad782dcc3e61a981c6501f5b82749c"
+}

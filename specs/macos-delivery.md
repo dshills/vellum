@@ -9,47 +9,38 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
-## Current checkpoint — acknowledged skips and benchmark geometry
+## Current checkpoint — source-105 SDK and native capture results
 
-The [Core105 checkpoint](../docs/reports/macos-display105-checkpoint/README.md)
-was tested on base `3d64eacb8c97d9f4bcabf046b755b11099acfb08` plus exact reviewed
-candidate bytes, then committed as Core105
-`19cab39c1b3b38ee3fc355d18e37dc042184a795` and Hello
-`77f1ae8d000b5912b0019758949e7390c838d8f6`. Their parent/blob continuity is
-independently audited. Matching finite-zero display acknowledgments retire ownership
-without claiming presentation success; malformed values, CPU/native ownership,
-stale identities and deadline latches stay guarded. No automatic unchanged-scene
-replay, measurement-clock, strict-classifier or release-threshold change is made.
-Hello's benchmark now loads settings before its process-local geometry override,
-with terminal load errors and restoration after normal teardown. Its actual
-generated consumer carries the helper and tests without a new public API.
+The [source-105 native report](../docs/reports/macos-source105-native/README.md)
+records actual clean source `8cc374a070ad782dcc3e61a981c6501f5b82749c`, after the
+separately reviewed Core105 and Hello commits. Its private SDK packages and
+relocates with 8,320 retained files including the manifest. One freshly generated
+public consumer returns normally with verified GPU pixels and geometry isolation.
+This renews those scoped source/SDK/functional checks; it does not complete M6
+or certify public distribution.
 
-All 17 headless phases meet declared outcomes: desktop 23, selected Core 48 and
-generated-consumer four race methods pass; Python preparation 30 and strict
-presentation 27 pass; full 6,029-file Core recipe replay, vet and native build
-metadata pass. Old gate/Hello controls retain two/three expected behavioral
-failures. Four native functional cases pass: ordinary close, genuine after-Show
-and pre-Show CPU deadlines with worker join/normal close, and generated-consumer
-geometry isolation/pixel verification/three timed GPU readbacks. All groups retire;
-the native shared lease is free and current boundaries match.
+All four strict single-attempt captures are valid, but performance acceptance
+fails. Serial grid/tree p95 is 61.399/62.901 ms; paced grid/tree p95 is
+62.496/61.265 ms. Both paced cohorts have 0/599 intervals within 18.333 ms,
+33.333333 ms interval p95 and 600 deadline misses. Grid/tree final work debt is
+10.082021/10.078750 seconds. Late work and the valid pre-receipt startup skip
+remain in the unchanged strict journal population. The explicit one-second
+backpressure experiment remains default-off; no production adoption follows.
 
-Each of the three lifecycle cleanup censuses retains one hidden unclassified
-TUINS window. No exact native callback numeric value, performance gain, native
-heap deallocation or physical/human verification is claimed. The earlier Core104
-watchdog and ordinary/after-Show failures below remain failed historical records.
+All 36 native/probe groups retire; source/prepared/SDK and current geometry
+boundaries match. Functional readback is not presentation latency, and no
+physical/human, deallocation or full resource/endurance acceptance is claimed.
+The first-three-case pacing analysis is a measured-wait/source-inference record,
+not proof of an exact native compositor or callback cause.
 
-The immutable source-3d64 private SDK remains valid for its completed packaging
-and headless relocation checks, with 8,316 retained files including the manifest.
-The modified candidate copy used for these checks is not a manifest-valid SDK.
-The two source commits are recorded above; a fresh SDK containing Core105 and the
-Hello guard remains pending. No future documentation-commit identity or SDK
-success is claimed.
-
-The next deliverable remains a frozen private Mac alpha. Renew actual-source SDK
-and native application delivery, then qualify the unchanged measured matrix,
-workflows, resource/endurance and physical/human checks before final audit. M3–M7
-remain open: 60 Hz responsiveness and 33.3 ms latency are release gates; 4 ms is an
-optimization target. No feature expansion or completion date is introduced.
+M3–M7 remain open under unchanged 60 Hz/33.3 ms gates and the 4 ms optimization
+target. Complete the remaining matrix/workflows, resource and physical/human
+checks, final application/component/rights acceptance and frozen audit. The
+source8cc package audit observes 55 missing evidence-link occurrences in the
+exported delivery plan; no separate M7 correction is included in this frozen SDK. No new feature,
+future commit/package or completion date is introduced. This current status
+supersedes then-pending SDK statements in earlier checkpoint records below;
+their failed scopes and original validation limits remain unchanged.
 
 ## Earlier startup quit checkpoint — source 344447c and reviewed overlay
 
