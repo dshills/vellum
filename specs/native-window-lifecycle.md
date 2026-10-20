@@ -173,3 +173,36 @@ This observation adds no class whitelist, leak qualification or M4 acceptance.
 Disposable native helper modes load Core settings before installing their process-local geometry-persistence override. Require positive finite initialized zoom so the first lazy body cannot reload settings over that override. A load error or invalid zoom refuses the fixture before overriding policy. Capture and restore the loaded policy; defer restoration before registering application close so teardown runs first. Existing process-exit/watchdog paths still skip defers; the override is process-local and this guard never saves settings. It does not promise rollback of defaults already applied by a failed settings load.
 
 One internal nativefixture helper is shared by sizing, cycle, breadcrumb, tab-close and accessibility fixtures, plus the existing dedicated gallery/workbench test modes. Keep their exact activation predicates and native assertions; ordinary interactive gallery/workbench paths retain their normal behavior. Three in-memory settings regressions exercise actual lazy body loading, errors/invalid values and loaded-policy restoration. These software tests do not establish native geometry, resource retirement or Mac acceptance.
+
+
+## Terminal requests during native construction
+
+The Mac driver retains a terminal failure or cancellation even when no scene has
+emitted Show. Display refusal can prevent Show indefinitely, so Show must not be
+the sole authorization for shutting down an already constructed native window.
+
+A bounded request latch dispatches quit at most once. Construction owns the existing
+topology mutex across the whole window batch, including cleanup of unlaunched
+bodies. A request made during construction remains pending until that batch has
+unwound. For the ordinary synchronous Mac Stage.Run path, return establishes
+construction completion; readiness does not assert that a window is still alive.
+Do not inspect mutable scene/stage pointers to establish readiness after starting
+the window event loop. Existing Show readiness remains a fallback for asynchronous
+and other platform paths. This does not change crash recovery or qualify those
+platforms.
+
+Publish batch completion and release topology ownership before invoking the
+existing asynchronous service-shutdown/Core quit path. Dispatch runs outside both
+request and topology locks, allowing attachment monitors and native cleanup to
+finish without joining their own caller. New construction is refused after quit
+has been dispatched. A failed construction with no started native window keeps
+its direct error return and does not enter Core quit.
+
+Regression coverage includes a request before readiness without Show, cancellation,
+whole-batch readiness, later construction, racing/reentrant requests and exactly-once
+dispatch. A separate tagged native diagnostic must observe a real active display
+credit during the first Prepare before Show, exceed its CPU-batch deadline with
+bounded application work, and return the typed failure with normal native cleanup.
+The old-driver counterfactual and corrected-driver observation use the same
+consumer. This exercises CPU work exceeding the deadline; it does not simulate or
+qualify a lost native presentation callback, physical input, latency or endurance.

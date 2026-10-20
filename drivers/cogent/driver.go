@@ -15,6 +15,7 @@ import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/system"
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/command"
@@ -112,7 +113,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 	if !processRun.CompareAndSwap(false, true) {
 		return fmt.Errorf("cogent: native main loop runs once per process")
 	}
-	var started, shown atomic.Bool
+	var started atomic.Bool
 	defer func() {
 		if !started.Load() {
 			processRun.Store(false)
@@ -146,15 +147,10 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 		return err
 	}
 	defer removeServiceCleanup()
-	var quitting atomic.Bool
-	quit := func() {
-		if !shown.Load() {
-			return
-		}
-		if quitting.CompareAndSwap(false, true) {
-			go func() { services.shutdown(); core.TheApp.QuitReq() }()
-		}
-	}
+	quitRequest := &nativeQuitRequest{dispatch: func() {
+		go func() { services.shutdown(); core.TheApp.QuitReq() }()
+	}}
+	quit := quitRequest.request
 	defer func() {
 		if started.Load() {
 			services.shutdown()
@@ -242,8 +238,15 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 	syncTopology = func() {
 		// No other window's native render lock is acquired while holding the owner.
 		// Native CloseReq runs asynchronously so Close events can finish independently.
-		topologyMu.Lock()
-		defer topologyMu.Unlock()
+		if !quitRequest.beginBatch(&topologyMu) {
+			return
+		}
+		nativeReady := false
+		defer func() {
+			// Unlaunched cleanup runs first. Publish readiness and release the
+			// topology owner together before forwarding terminal quit intent.
+			quitRequest.endBatch(&topologyMu, nativeReady)
+		}()
 		var launch []*nativeWindow
 		// If construction or refresh fails, discard every tree that never entered
 		// a native loop. Close callbacks cannot clean up unlaunched bodies.
@@ -352,7 +355,9 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					}
 					return
 				}
-				shown.Store(true)
+				// Fallback for asynchronous/non-Mac Stage creation. The Mac native
+				// quit path also publishes readiness after synchronous construction.
+				quitRequest.markReady()
 				if w.closing.Load() {
 					go rw.SystemWindow.CloseReq()
 					return
@@ -475,7 +480,15 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			w := launch[0]
 			launch = launch[1:]
 			started.Store(true)
+			// Without the Core rendezvous, normal Mac WindowStage.Run returns
+			// after construction, publication and event-loop registration. This
+			// is safe-to-quit readiness, not proof the window remains alive. Do
+			// not traverse Scene/Stage fields that an early close can delete.
+			synchronousMac := core.TheApp.Platform() == system.MacOS && system.OnSystemWindowCreated == nil
 			initialWindowStage(w.body, w.window).Run()
+			if synchronousMac {
+				nativeReady = true
+			}
 		}
 	}
 	custom = func(w *nativeWindow, e events.Event) {
