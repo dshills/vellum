@@ -1,0 +1,31 @@
+{
+  "approved": true,
+  "utc": "2026-10-20T09:57:03.565680+00:00",
+  "prism_sha256": "60c957b0fcce2de0d341ed80a39152dfe0c9dc632726ac4d643f1e100a492537",
+  "packet_sha256": "14fe38af5d14ccfbf89ac9f9c756ec6af5f6416867ff3e4582efb87aee83b1db",
+  "reviewed_diff_sha256": "1c3d9ca34c57095a66ada628bf8a35e4ce266355dca64930bb25d1dec7bb549d",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "provider_calls": 1,
+  "coverage": "31textfiles and2binary archive references;199016complete diff bytes, complete indexes, no omissions/truncation. Binary raw contents locally audited rather than model-readable.",
+  "findings": [
+    {
+      "id": "a1d8c818f04ec6d9",
+      "disposition": "REFUTED_BY_ACTUAL_CALLER_OWNERSHIP",
+      "reason": "The actual sole native-creation transaction does not discard the attachment on error. It assigns both results to w.Native and err, invokes releaseNativeResources before returning the error, and closes/clears any returned NativeAttachment. Pre-closing here would duplicate cleanup already owned by the caller."
+    },
+    {
+      "id": "d576106b0c984f94",
+      "disposition": "NO_REACHABLE_COUNTEREXAMPLE_UNDER_DRIVER_RUN_CONTRACT",
+      "reason": "Configuration occurs after the exclusive processRun guard and accessibility-hook ownership check, before syncTopology can start any native window. After started=true, every normal Run return passes core.Wait. That runs the native main loop; ordinary quit stops it only after closing/removing every native window. Desktop window close synchronously runs Native.Close (joining its monitor) before base Close can remove the window. Native creation and hook reads occur only within the admitted native-main transaction; after MainLoop returns its terminal queue and joined ingress refuse further callbacks. Consequently restoration cannot overlap supported native creation or leave a normal live-window monitor from this Run."
+    }
+  ],
+  "finding_review_sha256": "a1319a65ed4bcb3d2e5e97ff44d7052b6e4972071a0ffbe6b8760b8d841fa626",
+  "root_concurrence": "Root independently traced actual NativeAttach error cleanup, processRun and normal native creation/quit/main-loop contracts. No implementation correction required.",
+  "unresolved_actionable_findings": [],
+  "native_qualification": false,
+  "remaining": [
+    "Actual native watchdog refusal/close/join, performance/cadence/startup and occlusion remain unverified.",
+    "Ordinary default policy unchanged; experiment is opt-in."
+  ]
+}

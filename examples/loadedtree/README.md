@@ -135,3 +135,18 @@ Performance fixtures initialize Core settings before disabling window geometry
 persistence, and restore the loaded process-local policy after teardown. Saved
 settings are read, never saved by this guard. Settings errors or invalid zoom
 refuse the fixture before native setup. The ordinary interactive demo is unchanged.
+
+### Opt-in display backpressure experiment
+
+The Mac-only `-experimental-display-backpressure=1s` option requires `-perf`
+and a new `-perf-presentation` journal. Its timeout must be 100 ms through
+5 s. It enables one display credit per native window before its first native
+acquisition; a missing or skipped display callback refuses the run. The journal
+records `Config.DisplayBackpressureNS` only when enabled. Zero keeps the existing
+rendering and journal behavior.
+
+This is a prospective experiment, with no native performance qualification yet.
+The same input workload, acquisition prefix, final presentation requirements and
+latency/cadence thresholds still apply. It does not drain startup paint work or
+permit late unarmed skipped acquisitions. Run it in a separately reviewed native
+scope; existing captures retain their original results.

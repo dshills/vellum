@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
@@ -39,6 +40,9 @@ type Driver struct {
 	Theme          ui.Theme
 	// ContinuousRendering opts into refresh-rate paint ticks; default uses invalidation.
 	ContinuousRendering bool
+	// ExperimentalDisplayBackpressure is a Mac-only display credit trial. Zero
+	// keeps default rendering. Missing/zero callbacks refuse and close the run.
+	ExperimentalDisplayBackpressure time.Duration
 	// ExperimentalGridScrollReuse enables checked CPU pixel reuse in main-window
 	// grid scenes. Default replay is retained: current table workloads are slower
 	// with this experiment. It does not reduce GPU uploads. Copied at Run startup.
@@ -162,6 +166,11 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			quit()
 		}
 	}
+	stopDisplayExperiment, err := configureDisplayBackpressure(d.ExperimentalDisplayBackpressure, fail)
+	if err != nil {
+		return err
+	}
+	defer stopDisplayExperiment()
 	failWindow := func(w *nativeWindow, err error) {
 		if w.window.Ref().Context().Err() != nil && (errors.Is(err, app.ErrWindowClosed) || errors.Is(err, app.ErrClosed)) {
 			return

@@ -1,0 +1,1124 @@
+--- /dev/null
++++ b/core/display_backpressure.go
+@@ -0,0 +1,58 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package core
++
++import (
++	"cogentcore.org/core/system"
++	"cogentcore.org/core/system/composer"
++)
++
++type displayFrameAdmission interface {
++	AdmitDisplayFrame() (uint64, error)
++	FinishDisplayFrame(uint64)
++}
++
++func admitDisplayFrame(window system.Window) (uint64, error) {
++	if gate, ok := window.(displayFrameAdmission); ok {
++		return gate.AdmitDisplayFrame()
++	}
++	return 0, nil
++}
++func finishDisplayFrame(window system.Window, credit uint64) {
++	if credit != 0 {
++		if gate, ok := window.(displayFrameAdmission); ok {
++			gate.FinishDisplayFrame(credit)
++		}
++	}
++}
++func displayFramePending(err error) bool {
++	pending, ok := err.(interface{ DisplayPending() bool })
++	return ok && pending.DisplayPending()
++}
++func beginDisplayFrame(window system.Window) func() {
++	if gate, ok := window.(interface {
++		DisplayBackpressureEnabled() bool
++		BeginDisplayFrame()
++		EndDisplayFrame()
++	}); ok && gate.DisplayBackpressureEnabled() {
++		gate.BeginDisplayFrame()
++		return gate.EndDisplayFrame
++	}
++	return nil
++}
++
++// The existing renderContext/window owners and CPU-batch retirement are kept.
++// The display credit ends only after this CPU batch and its native callback.
++func (w *renderWindow) renderDisplayAsync(cp composer.Composer, trace *FrameTrace, tag, credit uint64) {
++	rc := w.renderContext()
++	rc.Lock()
++	defer rc.Unlock()
++	w.renderDisplayAsyncOwned(cp, trace, tag, credit)
++}
++func (w *renderWindow) renderDisplayAsyncOwned(cp composer.Composer, trace *FrameTrace, tag, credit uint64) {
++	defer finishDisplayFrame(w.SystemWindow, credit)
++	if tag != 0 {
++		w.renderAsyncMeasuredOwned(cp, trace, tag)
++	} else {
++		w.renderAsyncOwned(cp)
++	}
++}
+--- /dev/null
++++ b/core/display_backpressure_vellum_test.go
+@@ -0,0 +1,138 @@
++//go:build offscreen
++
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package core
++
++import (
++	"context"
++	"image"
++	"image/color"
++	"sync"
++	"testing"
++)
++
++// The real manual owner, layout, software compositor and pixels remain in use.
++// Only asynchronous native presentation is replaced by an explicit callback.
++type fakeDisplayPending struct{}
++
++func (fakeDisplayPending) Error() string        { return "controlled display pending" }
++func (fakeDisplayPending) DisplayPending() bool { return true }
++
++type displayAdmissionWindow struct {
++	*completionPaintWindow
++	mu                            sync.Mutex
++	next, active                  uint64
++	admitted, finished, begun     int
++	cpuDone, nativePending, dirty bool
++}
++
++func (w *displayAdmissionWindow) AdmitDisplayFrame() (uint64, error) {
++	w.mu.Lock()
++	defer w.mu.Unlock()
++	if w.active != 0 {
++		w.dirty = true
++		return 0, fakeDisplayPending{}
++	}
++	w.next++
++	w.active = w.next
++	w.cpuDone = false
++	w.admitted++
++	return w.active, nil
++}
++func (w *displayAdmissionWindow) FinishDisplayFrame(credit uint64) {
++	w.mu.Lock()
++	defer w.mu.Unlock()
++	if credit == 0 || credit != w.active {
++		return
++	}
++	w.finished++
++	w.cpuDone = true
++	if !w.nativePending {
++		w.active = 0
++	}
++}
++func (w *displayAdmissionWindow) DisplayBackpressureEnabled() bool { return true }
++func (w *displayAdmissionWindow) BeginDisplayFrame() {
++	w.mu.Lock()
++	defer w.mu.Unlock()
++	w.begun++
++	w.nativePending = true
++}
++func (w *displayAdmissionWindow) EndDisplayFrame() {}
++func (w *displayAdmissionWindow) present() {
++	w.mu.Lock()
++	w.nativePending = false
++	if w.cpuDone {
++		w.active = 0
++	}
++	dirty := w.dirty
++	w.dirty = false
++	w.mu.Unlock()
++	if dirty {
++		w.RequestPaintAfter(0)
++	}
++}
++func displayManualFixture(t *testing.T) (*ManualWindow, *Body, *fixtureClock, *busyRetryDrawer, *displayAdmissionWindow) {
++	t.Helper()
++	m, b, clock, drawer := busyRetryFixture(t)
++	close(drawer.release)
++	w := &displayAdmissionWindow{completionPaintWindow: observeCompletionPaint(m)}
++	m.window.SystemWindow = w
++	return m, b, clock, drawer, w
++}
++func displayDirty(body *Body, c color.RGBA) {
++	body.Styles.Background = image.NewUniform(c)
++	body.NeedsRender()
++}
++func TestVellumDisplayAdmissionDefersRealPixelsUntilNativeAcknowledgement(t *testing.T) {
++	m, body, _, drawer, w := displayManualFixture(t)
++	displayDirty(body, color.RGBA{R: 211, G: 23, B: 43, A: 255})
++	m.window.renderWindow()
++	if drawer.ends.Load() != 1 || w.finished != 1 || !w.cpuDone || !w.nativePending || w.active == 0 {
++		t.Fatalf("CPU completion lost native reservation: compositions%d state%+v", drawer.ends.Load(), w)
++	}
++	displayDirty(body, color.RGBA{R: 23, G: 211, B: 43, A: 255})
++	for range 32 {
++		m.window.renderWindow()
++	}
++	if drawer.ends.Load() != 1 || w.admitted != 1 {
++		t.Fatal("another real composition bypassed asynchronous display credit")
++	}
++	w.present()
++	m.window.renderWindow()
++	if drawer.ends.Load() != 2 || w.admitted != 2 || w.finished != 2 {
++		t.Fatal("acknowledgement lost or duplicated dirty composition")
++	}
++	img, err := m.Image(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	p := img.RGBAAt(img.Bounds().Dx()/2, img.Bounds().Dy()/2)
++	if p.G < 180 || p.R > 60 || p.B > 80 {
++		t.Fatalf("resumed real software frame is stale: %v", p)
++	}
++	w.present()
++}
++func TestVellumDisplayAdmissionRetiresUnchangedReservation(t *testing.T) {
++	m, _, _, drawer, w := displayManualFixture(t)
++	m.window.renderWindow()
++	if drawer.ends.Load() != 0 || w.admitted != 1 || w.finished != 1 || w.active != 0 || w.begun != 0 {
++		t.Fatalf("unchanged pass leaked display reservation: compositions%d state%+v", drawer.ends.Load(), w)
++	}
++}
++func TestVellumDisplayAdmissionCoversEarlyResizeReplay(t *testing.T) {
++	m, _, _, drawer, w := displayManualFixture(t)
++	original := TheApp.App
++	TheApp.App = &busyRetryPlatformApp{App: original}
++	defer func() { TheApp.App = original }()
++	m.window.lastResize = m.config.Now()
++	before := m.window.flags.HasFlag(winRenderSkipped)
++	w.active = 99
++	w.nativePending = true
++	w.cpuDone = true
++	m.window.renderWindow()
++	if w.admitted != 0 || !w.dirty || drawer.ends.Load() != 0 || m.window.flags.HasFlag(winRenderSkipped) != before {
++		t.Fatal("early resize/cache path bypassed pending display admission")
++	}
++	w.present()
++}
+--- a/core/presentation.go
++++ b/core/presentation.go
+@@ -18,17 +18,23 @@
+ 	return 0, 0, false
+ }
+ func beginPresentationFrame(window system.Window, trace *FrameTrace, tag uint64) func() {
++	endDisplay := beginDisplayFrame(window)
+ 	observer, ok := window.(interface {
+ 		PresentationEnabled() bool
+ 		BeginPresentationFrame(uint64, uint64, bool)
+ 		EndPresentationFrame()
+ 	})
+ 	if !ok || !observer.PresentationEnabled() {
+-		return nil
++		return endDisplay
+ 	}
+ 	input, generation, armed := trace.presentationStamp(tag)
+ 	observer.BeginPresentationFrame(input, generation, armed)
+-	return observer.EndPresentationFrame
++	return func() {
++		observer.EndPresentationFrame()
++		if endDisplay != nil {
++			endDisplay()
++		}
++	}
+ }
+ func redrawCachedObserved(window system.Window) bool {
+ 	if end := beginPresentationFrame(window, nil, 0); end != nil {
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -765,6 +765,26 @@
+ 	}
+ 
+ 	w.winRenderRescan.Store(false)
++
++	// Opt-in native display credit is claimed before resize/cache replay too.
++	// A pending credit defers work without holding any render/native lock.
++	displayCredit, displayErr := admitDisplayFrame(w.SystemWindow)
++	if displayErr != nil {
++		if !displayFramePending(displayErr) {
++			trace := w.frameTrace()
++			if tag := trace.startFrame(); tag != 0 {
++				trace.frameFailed(tag, displayErr.Error())
++			}
++		}
++		return
++	}
++	displayDispatched := false
++	defer func() {
++		if !displayDispatched {
++			finishDisplayFrame(w.SystemWindow, displayCredit)
++		}
++	}()
++
+ 	offscreen := TheApp.Platform() == system.Offscreen
+ 
+ 	sinceResize := w.now().Sub(w.lastResize)
+@@ -934,13 +954,10 @@
+ 
+ 	w.SystemWindow.Unlock()
+ 	systemLocked = false
++	displayDispatched = true
+ 	if offscreen || w.flags.HasFlag(winResize) || sinceResize < 500*time.Millisecond {
+ 		atomic.AddInt32(&w.winRenderCounter, 1)
+-		if traceTag != 0 {
+-			w.renderAsyncMeasuredOwned(cp, trace, traceTag)
+-		} else {
+-			w.renderAsyncOwned(cp)
+-		}
++		w.renderDisplayAsyncOwned(cp, trace, traceTag, displayCredit)
+ 		if w.flags.HasFlag(winResize) {
+ 			w.lastResize = w.now()
+ 		}
+@@ -950,11 +967,7 @@
+ 		// because otherwise we can lose an entire pass before the goroutine starts!
+ 		// function will turn flag off when it finishes.
+ 		atomic.AddInt32(&w.winRenderCounter, 1)
+-		if traceTag != 0 {
+-			go w.renderAsyncMeasured(cp, trace, traceTag)
+-		} else {
+-			go w.renderAsync(cp)
+-		}
++		go w.renderDisplayAsync(cp, trace, traceTag, displayCredit)
+ 	}
+ }
+ 
+--- /dev/null
++++ b/system/driver/desktop/display_backpressure.go
+@@ -0,0 +1,267 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package desktop
++
++import (
++	"errors"
++	"math"
++	"sync"
++	"time"
++)
++
++// DisplayBackpressureError is a terminal refusal of the opt-in experiment.
++// It does not claim successful presentation. Close remains available.
++type DisplayBackpressureError struct{ Reason string }
++
++func (e *DisplayBackpressureError) Error() string {
++	return "desktop: display backpressure refused: " + e.Reason
++}
++
++type displayPendingError struct{}
++
++func (displayPendingError) Error() string        { return "desktop: presentation still outstanding" }
++func (displayPendingError) DisplayPending() bool { return true }
++
++var errDisplayPending error = displayPendingError{}
++
++// DisplayBackpressureStatus is detached scalar state, not native qualification.
++// Retired counts admission reservations, including unused/cancelled batches.
++type DisplayBackpressureStatus struct {
++	Enabled                                       bool
++	Issued, Retired, Epoch, Active, NativePending uint64
++	Dirty, CPUFinished, Closed                    bool
++	Failure                                       string
++}
++
++type displayGate struct {
++	refusals                                                  chan error // internally owned buffer1; clients receive only
++	mu                                                        sync.Mutex
++	issued, retired, epoch, active, nextNative, nativePending uint64
++	dirty, cpuFinished, closed                                bool
++	failure                                                   string
++	timeout                                                   time.Duration
++	timer                                                     *time.Timer
++	wake                                                      func() // only a bounded mailbox notification; never a window/main call
++}
++
++func newDisplayGate(timeout time.Duration, wake func()) (*displayGate, error) {
++	if timeout < 100*time.Millisecond || timeout > 5*time.Second || wake == nil {
++		return nil, errors.New("desktop: bounded display timeout and owner mailbox required")
++	}
++	return &displayGate{timeout: timeout, wake: wake, refusals: make(chan error, 1)}, nil
++}
++func (g *displayGate) status() DisplayBackpressureStatus {
++	g.mu.Lock()
++	defer g.mu.Unlock()
++	return DisplayBackpressureStatus{true, g.issued, g.retired, g.epoch, g.active, g.nativePending, g.dirty, g.cpuFinished, g.closed, g.failure}
++}
++func (g *displayGate) failLocked(reason string) {
++	if g.failure == "" {
++		g.failure = reason
++		select {
++		case g.refusals <- &DisplayBackpressureError{reason}:
++		default:
++		}
++	}
++}
++func (g *displayGate) admit() (uint64, error) {
++	g.mu.Lock()
++	defer g.mu.Unlock()
++	if g.closed {
++		return 0, &DisplayBackpressureError{"window retired"}
++	}
++	if g.failure != "" {
++		return 0, &DisplayBackpressureError{g.failure}
++	}
++	if g.epoch == math.MaxUint64 {
++		g.failLocked("admission epoch exhausted")
++		return 0, &DisplayBackpressureError{g.failure}
++	}
++	g.epoch++
++	if g.active != 0 {
++		g.dirty = true
++		return 0, errDisplayPending
++	}
++	if g.issued == math.MaxUint64 {
++		g.failLocked("admission identity exhausted")
++		return 0, &DisplayBackpressureError{g.failure}
++	}
++	g.issued++
++	g.active = g.issued
++	g.cpuFinished = false
++	g.dirty = false
++	credit := g.active
++	g.timer = time.AfterFunc(g.timeout, func() { g.expire(credit) })
++	return credit, nil
++}
++
++// expire never returns a live native credit. It latches failure and wakes the
++// owner so the diagnostic can refuse; only close revokes an unacknowledged one.
++func (g *displayGate) expire(credit uint64) {
++	g.mu.Lock()
++	notify := !g.closed && g.active == credit
++	if notify {
++		g.failLocked("presentation deadline exceeded")
++		if g.timer != nil {
++			g.timer.Stop()
++			g.timer = nil
++		}
++	}
++	g.mu.Unlock()
++	if notify {
++		g.wake()
++	}
++}
++func (g *displayGate) retireLocked() bool {
++	if !g.cpuFinished || g.nativePending != 0 {
++		return false
++	}
++	if g.timer != nil {
++		g.timer.Stop()
++		g.timer = nil
++	}
++	g.retired = g.active
++	g.active = 0
++	return g.dirty || g.failure != ""
++}
++func (g *displayGate) finish(credit uint64) {
++	if credit == 0 {
++		return
++	}
++	g.mu.Lock()
++	if g.closed || credit != g.active {
++		g.mu.Unlock()
++		return
++	}
++	g.cpuFinished = true
++	notify := g.retireLocked()
++	g.mu.Unlock()
++	if notify {
++		g.wake()
++	}
++}
++
++// acquire runs BEFORE nextDrawable. A second live native acquisition is refused
++// before entering Metal, including another acquisition in the same CPU batch.
++func (g *displayGate) acquire(credit uint64) uint64 {
++	g.mu.Lock()
++	defer g.mu.Unlock()
++	if g.closed || g.failure != "" || credit == 0 || credit != g.active || g.cpuFinished {
++		return 0
++	}
++	if g.nativePending != 0 {
++		g.failLocked("overlapping drawable acquisition refused")
++		return 0
++	}
++	if g.nextNative == math.MaxUint64 {
++		g.failLocked("drawable identity exhausted")
++		return 0
++	}
++	g.nextNative++
++	g.nativePending = g.nextNative
++	return g.nativePending
++}
++func (g *displayGate) unavailable(sequence uint64) {
++	g.complete(sequence, 1, true)
++}
++func (g *displayGate) complete(sequence uint64, at float64, unavailable bool) {
++	g.mu.Lock()
++	if g.closed || sequence == 0 || sequence != g.nativePending {
++		g.mu.Unlock()
++		return
++	}
++	// Zero presentedTime is a terminal skipped record, never display success.
++	// It frees native ownership but permanently refuses this experimental gate.
++	if !unavailable && (at <= 0 || math.IsNaN(at) || math.IsInf(at, 0)) {
++		g.failLocked("drawable was not presented")
++	}
++	g.nativePending = 0
++	notify := g.retireLocked()
++	g.mu.Unlock()
++	if notify {
++		g.wake()
++	}
++}
++func (g *displayGate) close() {
++	g.mu.Lock()
++	defer g.mu.Unlock()
++	if g.closed {
++		return
++	}
++	g.closed = true
++	close(g.refusals)
++	g.retired = g.issued
++	g.active = 0
++	g.nativePending = 0
++	g.dirty = false
++	if g.timer != nil {
++		g.timer.Stop()
++		g.timer = nil
++	}
++}
++
++// The registry is reused for bounded scalar token lookup; the diagnostic
++// presentation observer retains its independent subscription and sequence.
++var displayRegistry nativePresentationRegistry
++
++func (*displayGate) Receipt(uint64, float64)                    {}
++func (*displayGate) Acquired(PresentationFrame, float64) uint64 { return 0 }
++func (*displayGate) Unavailable(PresentationFrame, float64)     {}
++func (g *displayGate) Presented(sequence, _ uint64, at float64) { g.complete(sequence, at, false) }
++func (g *displayGate) Closed()                                  { g.close() }
++
++// DisplayBackpressureRefusals delivers at most the first typed terminal failure,
++// even when no FrameTrace is active. The stream closes on window retirement.
++func (w *Window) DisplayBackpressureRefusals() <-chan error {
++	if w != nil {
++		if g := w.displayGate.Load(); g != nil {
++			return g.refusals
++		}
++	}
++	return nil
++}
++
++// RetireDisplayBackpressure cancels the opt-in experiment without waiting for a
++// native callback. It never permits enabling again on the same window.
++func (w *Window) RetireDisplayBackpressure()       { w.retireDisplayBackpressure() }
++func (w *Window) DisplayBackpressureEnabled() bool { return w != nil && w.displayGate.Load() != nil }
++func (w *Window) DisplayBackpressureSnapshot() DisplayBackpressureStatus {
++	if w != nil {
++		if g := w.displayGate.Load(); g != nil {
++			return g.status()
++		}
++	}
++	return DisplayBackpressureStatus{}
++}
++func (w *Window) AdmitDisplayFrame() (uint64, error) {
++	if w == nil {
++		return 0, &DisplayBackpressureError{"nil window"}
++	}
++	if g := w.displayGate.Load(); g != nil {
++		return g.admit()
++	}
++	return 0, nil
++}
++func (w *Window) FinishDisplayFrame(credit uint64) {
++	if w != nil {
++		if g := w.displayGate.Load(); g != nil {
++			g.finish(credit)
++		}
++	}
++}
++func (w *Window) retireDisplayBackpressure() {
++	if w == nil {
++		return
++	}
++	if g := w.displayGate.Load(); g != nil {
++		g.close()
++	}
++	displayRegistry.close(w.displayToken.Swap(0))
++}
++func displayGateForToken(token uint64) *displayGate {
++	if s := displayRegistry.lookup(token); s != nil && !s.closed.Load() {
++		g, _ := s.observer.(*displayGate)
++		return g
++	}
++	return nil
++}
++func displayFailure(reason string) error { return &DisplayBackpressureError{reason} }
+--- /dev/null
++++ b/system/driver/desktop/display_backpressure_darwin.go
+@@ -0,0 +1,83 @@
++//go:build darwin
++
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package desktop
++
++/*
++#cgo CFLAGS: -x objective-c
++#cgo LDFLAGS: -framework QuartzCore -framework Metal
++#include "presentation_darwin.h"
++*/
++import "C"
++import "time"
++
++// EnableDisplayBackpressure is a private opt-in Mac experiment, not a default
++// scheduling policy. It must run before the layer's first drawable acquisition.
++// A missing/zero display callback latches typed refusal; it never guesses that a
++// live frame retired. Callers must observe refusal and close the diagnostic.
++func (w *Window) EnableDisplayBackpressure(timeout time.Duration) error {
++	if C.vellumPresentationAvailable() == 0 {
++		return displayFailure("native presentation callback unavailable")
++	}
++	if !w.Lock() {
++		return displayFailure("window closed")
++	}
++	defer w.Unlock()
++	if w.nativeLayer == nil || w.displayGate.Load() != nil {
++		return displayFailure("native layer unavailable or experiment already enabled")
++	}
++	paint := w.Paint
++	if paint == nil {
++		return displayFailure("owner paint mailbox unavailable")
++	}
++	g, err := newDisplayGate(timeout, paint.Request)
++	if err != nil {
++		return err
++	}
++	token, err := displayRegistry.register(g)
++	if err != nil {
++		return err
++	}
++	if C.vellumDisplayBackpressure(w.nativeLayer, C.uint64_t(token)) == 0 {
++		displayRegistry.close(token)
++		return displayFailure("drawable acquisition already started")
++	}
++	w.displayToken.Store(token)
++	w.displayGate.Store(g)
++	return nil
++}
++
++// Begin/End require existing SystemWindow.Mu, matching native frame stamps.
++func (w *Window) BeginDisplayFrame() {
++	if g := w.displayGate.Load(); g != nil {
++		status := g.status()
++		C.vellumDisplayFrame(w.nativeLayer, C.uint64_t(status.Active))
++	}
++}
++func (w *Window) EndDisplayFrame() {
++	if w.displayGate.Load() != nil {
++		C.vellumDisplayFrame(w.nativeLayer, 0)
++	}
++}
++
++//export vellumGoDisplayAcquire
++func vellumGoDisplayAcquire(token, credit C.uint64_t) C.uint64_t {
++	if g := displayGateForToken(uint64(token)); g != nil {
++		return C.uint64_t(g.acquire(uint64(credit)))
++	}
++	return 0
++}
++
++//export vellumGoDisplayUnavailable
++func vellumGoDisplayUnavailable(token, sequence C.uint64_t) {
++	if g := displayGateForToken(uint64(token)); g != nil {
++		g.unavailable(uint64(sequence))
++	}
++}
++
++//export vellumGoDisplayPresented
++func vellumGoDisplayPresented(token, sequence C.uint64_t, at C.double) {
++	if g := displayGateForToken(uint64(token)); g != nil {
++		g.complete(uint64(sequence), float64(at), false)
++	}
++}
+--- /dev/null
++++ b/system/driver/desktop/display_backpressure_other.go
+@@ -0,0 +1,12 @@
++//go:build !darwin
++
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package desktop
++
++import "time"
++
++func (*Window) EnableDisplayBackpressure(time.Duration) error {
++	return displayFailure("experiment requires macOS")
++}
++func (*Window) BeginDisplayFrame() {}
++func (*Window) EndDisplayFrame()   {}
+--- /dev/null
++++ b/system/driver/desktop/display_backpressure_vellum_test.go
+@@ -0,0 +1,312 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package desktop
++
++import (
++	"errors"
++	"math"
++	"sync"
++	"sync/atomic"
++	"testing"
++	"time"
++)
++
++func displayGateFixture(t *testing.T) (*displayGate, *atomic.Int64) {
++	t.Helper()
++	wake := new(atomic.Int64)
++	g, err := newDisplayGate(5*time.Second, func() { wake.Add(1) })
++	if err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(g.close)
++	return g, wake
++}
++func displayAdmit(t *testing.T, g *displayGate) uint64 {
++	t.Helper()
++	c, err := g.admit()
++	if err != nil || c == 0 {
++		t.Fatal(c, err)
++	}
++	return c
++}
++func displayPending(t *testing.T, g *displayGate) {
++	t.Helper()
++	if c, err := g.admit(); c != 0 || !errors.Is(err, errDisplayPending) {
++		t.Fatal("second batch was admitted", c, err)
++	}
++}
++func TestVellumDisplayBackpressureWaitsForAsynchronousPresentation(t *testing.T) {
++	g, wake := displayGateFixture(t)
++	credit := displayAdmit(t, g)
++	native := g.acquire(credit)
++	if native == 0 {
++		t.Fatal("no native reservation")
++	}
++	g.finish(credit)
++	for range 64 {
++		displayPending(t, g)
++	}
++	if s := g.status(); s.Active != credit || s.NativePending != native || !s.CPUFinished || !s.Dirty || wake.Load() != 0 {
++		t.Fatalf("CPU completion freed display ownership: %+v", s)
++	}
++	release := make(chan struct{})
++	done := make(chan struct{})
++	go func() { defer close(done); <-release; g.complete(native, 1, false) }()
++	close(release)
++	select {
++	case <-done:
++	case <-time.After(time.Second):
++		t.Fatal("asynchronous acknowledgement blocked")
++	}
++	if s := g.status(); s.Active != 0 || s.NativePending != 0 || s.Retired != credit || wake.Load() != 1 {
++		t.Fatalf("lost or duplicate dirty wake: %+v wakes%d", s, wake.Load())
++	}
++	next := displayAdmit(t, g)
++	if next <= credit {
++		t.Fatal("batch identity reused")
++	}
++	g.finish(next)
++}
++func TestVellumDisplayBackpressurePresentationBeforeCPUEnd(t *testing.T) {
++	g, _ := displayGateFixture(t)
++	credit := displayAdmit(t, g)
++	seq := g.acquire(credit)
++	g.complete(seq, 1, false)
++	displayPending(t, g)
++	if g.status().Active != credit {
++		t.Fatal("callback freed live CPU batch")
++	}
++	g.finish(credit)
++	if g.status().Active != 0 {
++		t.Fatal("CPU end lost earlier native acknowledgement")
++	}
++}
++func TestVellumDisplayBackpressureUnavailableRetryAndStaleCompletion(t *testing.T) {
++	g, _ := displayGateFixture(t)
++	credit := displayAdmit(t, g)
++	first := g.acquire(credit)
++	g.unavailable(first)
++	second := g.acquire(credit)
++	if first == 0 || second <= first {
++		t.Fatal("retry identity reused")
++	}
++	g.complete(first, 1, false)
++	g.finish(credit)
++	if g.status().NativePending != second {
++		t.Fatal("stale callback retired newer retry")
++	}
++	g.complete(second, 1, false)
++	if g.status().Active != 0 {
++		t.Fatal("retry did not retire")
++	}
++}
++func TestVellumDisplayBackpressureRefusesOverlappingNativeAcquisition(t *testing.T) {
++	g, _ := displayGateFixture(t)
++	credit := displayAdmit(t, g)
++	seq := g.acquire(credit)
++	if g.acquire(credit) != 0 {
++		t.Fatal("second live drawable entered Metal")
++	}
++	g.finish(credit)
++	if s := g.status(); s.NativePending != seq || s.Failure == "" {
++		t.Fatalf("overlap refusal lost live identity: %+v", s)
++	}
++	g.complete(seq, 1, false)
++	_, err := g.admit()
++	var refused *DisplayBackpressureError
++	if !errors.As(err, &refused) {
++		t.Fatal("overlap failure was reset", err)
++	}
++}
++func TestVellumDisplayBackpressureUnusedBatchRetiresWithoutNativeCallback(t *testing.T) {
++	g, wake := displayGateFixture(t)
++	credit := displayAdmit(t, g)
++	g.finish(credit)
++	g.finish(credit)
++	if s := g.status(); s.Active != 0 || s.Retired != credit || s.NativePending != 0 || wake.Load() != 0 {
++		t.Fatalf("unchanged batch leaked or woke: %+v", s)
++	}
++	next := displayAdmit(t, g)
++	g.finish(next)
++}
++func TestVellumDisplayBackpressureSkippedCallbackRefusesRatherThanSucceeds(t *testing.T) {
++	for _, at := range []float64{0, math.NaN(), math.Inf(1)} {
++		t.Run("invalid-display-time", func(t *testing.T) {
++			g, _ := displayGateFixture(t)
++			credit := displayAdmit(t, g)
++			seq := g.acquire(credit)
++			g.finish(credit)
++			g.complete(seq, at, false)
++			if s := g.status(); s.NativePending != 0 || s.Active != 0 || s.Failure == "" {
++				t.Fatalf("skipped frame misclassified: %+v", s)
++			}
++			if c, err := g.admit(); c != 0 || err == nil {
++				t.Fatal("skipped callback allowed another batch")
++			}
++		})
++	}
++}
++func TestVellumDisplayBackpressureLostCallbackNeverReleasesLiveToken(t *testing.T) {
++	g, wake := displayGateFixture(t)
++	credit := displayAdmit(t, g)
++	seq := g.acquire(credit)
++	g.finish(credit)
++	g.expire(credit)
++	if s := g.status(); s.Active != credit || s.NativePending != seq || s.Failure == "" || wake.Load() != 1 {
++		t.Fatalf("deadline guessed native retirement: %+v", s)
++	}
++	if c, err := g.admit(); c != 0 || err == nil {
++		t.Fatal("timeout readmitted a live frame")
++	}
++	g.complete(seq, 1, false)
++	if g.status().Active != 0 {
++		t.Fatal("late actual callback did not retire ownership")
++	}
++	if c, err := g.admit(); c != 0 || err == nil {
++		t.Fatal("late callback reset failure latch")
++	}
++}
++func TestVellumDisplayBackpressureCloseRevokesLateCallbacks(t *testing.T) {
++	g, wake := displayGateFixture(t)
++	credit := displayAdmit(t, g)
++	seq := g.acquire(credit)
++	displayPending(t, g)
++	g.close()
++	before := g.status()
++	g.finish(credit)
++	g.complete(seq, 1, false)
++	g.unavailable(seq)
++	g.expire(credit)
++	if after := g.status(); after != before || after.Active != 0 || !after.Closed || wake.Load() != 0 {
++		t.Fatalf("late callback changed retired state: %+v -> %+v", before, after)
++	}
++	if c, err := g.admit(); c != 0 || err == nil {
++		t.Fatal("closed window readmitted")
++	}
++}
++func TestVellumDisplayBackpressureRegistryDoesNotCreditReusedWindow(t *testing.T) {
++	var registry nativePresentationRegistry
++	first, _ := displayGateFixture(t)
++	old, err := registry.register(first)
++	if err != nil {
++		t.Fatal(err)
++	}
++	registry.close(old)
++	next, _ := displayGateFixture(t)
++	token, err := registry.register(next)
++	if err != nil || token <= old {
++		t.Fatal(token, err)
++	}
++	defer registry.close(token)
++	credit := displayAdmit(t, next)
++	seq := next.acquire(credit)
++	next.finish(credit)
++	registry.presented(old, seq, 0, 1)
++	if next.status().NativePending != seq {
++		t.Fatal("old subscription released replacement window")
++	}
++	registry.presented(token, seq, 0, 1)
++	if next.status().Active != 0 {
++		t.Fatal("replacement callback lost")
++	}
++}
++func TestVellumDisplayBackpressureConcurrentDirtyAndCompletion(t *testing.T) {
++	g, wake := displayGateFixture(t)
++	credit := displayAdmit(t, g)
++	seq := g.acquire(credit)
++	var wg sync.WaitGroup
++	for range 64 {
++		wg.Add(1)
++		go func() {
++			defer wg.Done()
++			if c, err := g.admit(); c != 0 || err == nil {
++				t.Error("duplicate admitted")
++			}
++		}()
++	}
++	wg.Wait()
++	wg.Add(2)
++	go func() { defer wg.Done(); g.finish(credit) }()
++	go func() { defer wg.Done(); g.complete(seq, 1, false) }()
++	wg.Wait()
++	if s := g.status(); s.Active != 0 || s.Retired != credit || s.NativePending != 0 || wake.Load() != 1 {
++		t.Fatalf("completion race lost/coalesced incorrectly: %+v wakes%d", s, wake.Load())
++	}
++}
++func TestVellumDisplayBackpressureIdentityBoundsRefuseWithoutWrapping(t *testing.T) {
++	g, _ := displayGateFixture(t)
++	g.issued = math.MaxUint64
++	if c, err := g.admit(); c != 0 || err == nil {
++		t.Fatal("batch sequence wrapped")
++	}
++	other, _ := displayGateFixture(t)
++	credit := displayAdmit(t, other)
++	other.nextNative = math.MaxUint64
++	if other.acquire(credit) != 0 || other.status().Failure == "" {
++		t.Fatal("native sequence wrapped")
++	}
++}
++func TestVellumDisplayBackpressureRequiresBoundedTimeoutAndMailbox(t *testing.T) {
++	for _, timeout := range []time.Duration{0, -1, 99 * time.Millisecond, 6 * time.Second} {
++		if _, err := newDisplayGate(timeout, func() {}); err == nil {
++			t.Fatal("unbounded timeout admitted", timeout)
++		}
++	}
++	if _, err := newDisplayGate(time.Second, nil); err == nil {
++		t.Fatal("missing owner wake accepted")
++	}
++}
++
++func TestVellumDisplayBackpressureUntypedFrameAbsenceStillReportsFailure(t *testing.T) {
++	g, _ := displayGateFixture(t)
++	credit := displayAdmit(t, g)
++	seq := g.acquire(credit)
++	g.finish(credit)
++	g.expire(credit)
++	g.expire(credit)
++	select {
++	case err := <-g.refusals:
++		var failure *DisplayBackpressureError
++		if !errors.As(err, &failure) {
++			t.Fatal("missing typed refusal", err)
++		}
++	default:
++		t.Fatal("no refusal without FrameTrace")
++	}
++	select {
++	case err := <-g.refusals:
++		t.Fatal("duplicate terminal refusal", err)
++	default:
++	}
++	if g.status().NativePending != seq {
++		t.Fatal("reporting guessed native retirement")
++	}
++	g.close()
++	select {
++	case _, ok := <-g.refusals:
++		if ok {
++			t.Fatal("refusal stream not retired")
++		}
++	default:
++		t.Fatal("retirement left monitor blocked")
++	}
++}
++
++func TestVellumDisplayBackpressureOldBatchCannotRetireReplacement(t *testing.T) {
++	g, _ := displayGateFixture(t)
++	old := displayAdmit(t, g)
++	first := g.acquire(old)
++	g.finish(old)
++	g.complete(first, 1, false)
++	next := displayAdmit(t, g)
++	second := g.acquire(next)
++	before := g.status()
++	g.finish(old)
++	g.complete(first, 1, false)
++	g.unavailable(first)
++	g.expire(old)
++	if after := g.status(); after != before {
++		t.Fatalf("stale completion changed newer batch: %+v -> %+v", before, after)
++	}
++	g.finish(next)
++	g.complete(second, 1, false)
++}
+--- a/system/driver/desktop/presentation_darwin.h
++++ b/system/driver/desktop/presentation_darwin.h
+@@ -6,6 +6,8 @@
+ void vellumPresentationObserver(void *layer, uint64_t token);
+ void vellumPresentationFrame(void *layer, uint64_t tag, uint64_t generation, uint64_t composition, int armed);
+ void vellumPresentationReceipt(void *layer, uint64_t tag);
++int vellumDisplayBackpressure(void *layer, uint64_t token);
++void vellumDisplayFrame(void *layer, uint64_t credit);
+ double vellumPresentationHostTime(void);
+ int vellumPresentationAvailable(void);
+ #endif
+--- a/system/driver/desktop/presentation_darwin.m
++++ b/system/driver/desktop/presentation_darwin.m
+@@ -10,9 +10,12 @@
+ extern void vellumGoDrawableUnavailable(uint64_t, uint64_t, uint64_t, uint64_t, int, double);
+ extern void vellumGoDrawablePresented(uint64_t, uint64_t, uint64_t, double);
+ extern void vellumGoPresentationReceipt(uint64_t, uint64_t, double);
++extern uint64_t vellumGoDisplayAcquire(uint64_t,uint64_t);
++extern void vellumGoDisplayUnavailable(uint64_t,uint64_t);
++extern void vellumGoDisplayPresented(uint64_t,uint64_t,double);
+ 
+ typedef struct {
+- uint64_t token, tag, generation, composition;
++ uint64_t token, tag, generation, composition, displayToken, displayCredit;
+  int armed;
+ } VellumPresentationStamp;
+ 
+@@ -20,15 +23,19 @@
+ @interface VellumPresentationLayer : CAMetalLayer {
+  os_unfair_lock _stampLock;
+  uint64_t _observerToken;
++ uint64_t _displayToken, _displayCredit;
++ int _acquisitionStarted;
+  VellumPresentationStamp _stamp;
+ }
+ - (void)setObserverToken:(uint64_t)token;
+ - (void)setTag:(uint64_t)tag generation:(uint64_t)generation composition:(uint64_t)composition armed:(int)armed;
+ - (VellumPresentationStamp)captureStamp;
++- (int)setDisplayToken:(uint64_t)token;
++- (void)setDisplayCredit:(uint64_t)credit;
+ @end
+ @implementation VellumPresentationLayer
+ - (id)init {
+- if ((self=[super init])) { _stampLock=(os_unfair_lock)OS_UNFAIR_LOCK_INIT; _observerToken=0; _stamp=(VellumPresentationStamp){0}; }
++ if ((self=[super init])) { _stampLock=(os_unfair_lock)OS_UNFAIR_LOCK_INIT; _observerToken=0; _displayToken=0; _displayCredit=0; _acquisitionStarted=0; _stamp=(VellumPresentationStamp){0}; }
+  return self;
+ }
+ - (void)setObserverToken:(uint64_t)token {
+@@ -44,29 +51,52 @@
+  os_unfair_lock_unlock(&_stampLock);
+ }
+ - (VellumPresentationStamp)captureStamp {
+- if (!__atomic_load_n(&_observerToken,__ATOMIC_ACQUIRE))return (VellumPresentationStamp){0};
++ if (!__atomic_load_n(&_observerToken,__ATOMIC_ACQUIRE) && !__atomic_load_n(&_displayToken,__ATOMIC_ACQUIRE))return (VellumPresentationStamp){0};
+  os_unfair_lock_lock(&_stampLock);
+  VellumPresentationStamp stamp=_stamp;
++ stamp.displayToken=_displayToken;stamp.displayCredit=_displayCredit;
+  os_unfair_lock_unlock(&_stampLock);
+  return stamp;
+ }
++- (int)setDisplayToken:(uint64_t)token {
++ os_unfair_lock_lock(&_stampLock);
++ if (token && __atomic_load_n(&_acquisitionStarted,__ATOMIC_ACQUIRE)) { os_unfair_lock_unlock(&_stampLock);return 0; }
++ _displayCredit=0;__atomic_store_n(&_displayToken,token,__ATOMIC_RELEASE);
++ os_unfair_lock_unlock(&_stampLock);return 1;
++}
++- (void)setDisplayCredit:(uint64_t)credit {
++ os_unfair_lock_lock(&_stampLock);_displayCredit=credit;os_unfair_lock_unlock(&_stampLock);
++}
+ - (id<CAMetalDrawable>)nextDrawable {
+- // Keep super's autoreleased return lifetime. A local pool here could drain it
+- // before the WebGPU caller retains the drawable.
++ __atomic_store_n(&_acquisitionStarted,1,__ATOMIC_RELEASE);
++ VellumPresentationStamp before=[self captureStamp];
++ uint64_t displaySequence=0;
++ if (before.displayToken) {
++  displaySequence=vellumGoDisplayAcquire(before.displayToken,before.displayCredit);
++  if (!displaySequence) {
++   if (before.token)vellumGoDrawableUnavailable(before.token,before.tag,before.generation,before.composition,before.armed,CACurrentMediaTime());
++   return nil;
++  }
++ }
++ // Keep super's autoreleased return lifetime. No pool may drain it here.
+  id<CAMetalDrawable> drawable=[super nextDrawable];
+  VellumPresentationStamp stamp=[self captureStamp];
+- if (!stamp.token)return drawable;
++ if (!stamp.token && !displaySequence)return drawable;
+  double acquired=CACurrentMediaTime();
+  if (!drawable) {
+-  vellumGoDrawableUnavailable(stamp.token,stamp.tag,stamp.generation,stamp.composition,stamp.armed,acquired);
++  if (displaySequence)vellumGoDisplayUnavailable(before.displayToken,displaySequence);
++  if (stamp.token)vellumGoDrawableUnavailable(stamp.token,stamp.tag,stamp.generation,stamp.composition,stamp.armed,acquired);
+   return nil;
+  }
+- uint64_t sequence=vellumGoDrawableAcquired(stamp.token,stamp.tag,stamp.generation,stamp.composition,stamp.armed,acquired);
+- if (sequence) {
+-  // Only immutable integers are closed over: neither self nor drawable/window.
+-  uint64_t token=stamp.token;
++ uint64_t sequence=stamp.token ? vellumGoDrawableAcquired(stamp.token,stamp.tag,stamp.generation,stamp.composition,stamp.armed,acquired) : 0;
++ if (sequence || displaySequence) {
++  // One handler shares immutable scalar identities; no window/layer capture.
++  uint64_t token=stamp.token, displayToken=before.displayToken;
+   [drawable addPresentedHandler:^(id<MTLDrawable> shown) {
+-   @autoreleasepool { vellumGoDrawablePresented(token,sequence,shown.drawableID,shown.presentedTime); }
++   @autoreleasepool {
++    if (sequence)vellumGoDrawablePresented(token,sequence,shown.drawableID,shown.presentedTime);
++    if (displaySequence)vellumGoDisplayPresented(displayToken,displaySequence,shown.presentedTime);
++   }
+   }];
+  }
+  return drawable;
+@@ -84,6 +114,9 @@
+  if(stamp.token)vellumGoPresentationReceipt(stamp.token,tag,CACurrentMediaTime());
+ }
+ 
++int vellumDisplayBackpressure(void *layer,uint64_t token) { return [(VellumPresentationLayer *)layer setDisplayToken:token]; }
++void vellumDisplayFrame(void *layer,uint64_t credit) { [(VellumPresentationLayer *)layer setDisplayCredit:credit]; }
++
+ double vellumPresentationHostTime(void) { return CACurrentMediaTime(); }
+ 
+ int vellumPresentationAvailable(void) { if (@available(macOS 10.15.4,*))return 1;return 0; }
+--- a/system/driver/desktop/window.go
++++ b/system/driver/desktop/window.go
+@@ -35,7 +35,9 @@
+ 	Native                  NativeAttachment
+ 	nativeLayer             unsafe.Pointer // borrowed from content view, under Mu
+ 	presentationToken       atomic.Uint64
+-	presentationComposition uint64 // monotonic under Mu
++	presentationComposition uint64                      // monotonic under Mu
++	displayGate             atomic.Pointer[displayGate] // opt-in; retained closed after teardown
++	displayToken            atomic.Uint64
+ 	closeOnce               sync.Once
+ 	cursorScale             atomic.Uint64 // packed DPI/DPR, published under Mu after creation
+ 	pointerFocus            atomic.Uint64 // focus rebase publication, never cleared by producer
+@@ -526,6 +528,7 @@
+ 		return
+ 	}
+ 	w.closeOnce.Do(func() {
++		w.retireDisplayBackpressure()
+ 		if w.cursor != nil {
+ 			w.cursor.retireStatus()
+ 		}
+@@ -545,6 +548,7 @@
+ 
+ // releaseNativeResources runs on the main thread, including failed creation.
+ func (w *Window) releaseNativeResources() {
++	w.retireDisplayBackpressure()
+ 	w.composerPointer.Store(nil)
+ 	w.App.retireCursor(w.cursor)
+ 	w.closePresentationObserver()

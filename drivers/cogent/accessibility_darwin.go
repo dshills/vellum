@@ -42,12 +42,14 @@ import (
 )
 
 type accessibilityAttachment struct {
-	bridge *accessibilityBridge
-	text   *textWindow
+	display *displayFailureMonitor
+	bridge  *accessibilityBridge
+	text    *textWindow
 }
 
 func (n *accessibilityAttachment) Focus(bool) {}
 func (n *accessibilityAttachment) Close() {
+	n.display.close()
 	if n.text != nil {
 		// Native attachment retirement precedes the owner's WinClose cleanup.
 		// Revoke publication readiness before closing its main-owned backend.

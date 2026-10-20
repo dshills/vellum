@@ -1,0 +1,143 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "51e6b505463ba7c8af4a1b3ce30b8beb",
+  "repo": {
+    "root": "/private/tmp/vellum-display104-checkpoint-review",
+    "head": "7bafe383cd1e6b70b2f8686202d3147ce8de80ce",
+    "branch": "codex/display104-review"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a1d8c818f04ec6d9",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Attachment leaked when display attach fails",
+      "message": "When attachDisplayBackpressure fails, NativeAttach returns both the attachment and an error. The attachment has already been installed, and if the caller discards it on error, its accessibility bridge and text window are never closed. This leaks native resources on the failure path.",
+      "suggestion": "Close the attachment before returning the error: call attachment.Close() when attachDisplayBackpressure fails and return nil, err. Alternatively, document that callers must close the attachment returned alongside an error.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/display_backpressure_darwin.go",
+          "lines": {
+            "start": 34,
+            "end": 38
+          }
+        }
+      ],
+      "tags": [
+        "resource-leak",
+        "lifecycle"
+      ],
+      "evidence": "monitor, err := attachDisplayBackpressure(w, timeout, fail)\n\t\tif err != nil {\n\t\t\treturn attachment, err\n\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "d576106b0c984f94",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Global NativeAttach restore races with live windows and monitors",
+      "message": "The restore closure reinstalls `previous` after Run returns, but monitors for live windows are retired only by attachment Close. If Run returns while a window is still alive, the monitor goroutine keeps running with a `fail` callback bound to a finished Run. Restoring the global NativeAttach hook is also not synchronized with window creation on other goroutines.",
+      "suggestion": "Make sure all attachments are closed and their monitors joined before the restore runs. Guard the NativeAttach swap against concurrent window creation.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/display_backpressure_darwin.go",
+          "lines": {
+            "start": 39,
+            "end": 39
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "global-state",
+        "location-corrected"
+      ],
+      "evidence": "return func() { desktop.TheApp.NativeAttach = previous }, nil",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 11583,
+    "totalMs": 11726
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 31,
+    "bytes": 199016,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 101093,
+        "output": 1066,
+        "costUSD": 0.212846
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "087cdd1bbeec47c8",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Epoch increments on every pending admit and can latch failure",
+        "message": "In admit(), the pending path (g.active != 0) is reached even after the failure latch is set. A live credit that was never acknowledged keeps `active` nonzero, and a refusal arrives by channel only once. Any dirty flag set here is cleared only when retire succeeds. After the failure latch fires the failure check at the top refuses, so this is acceptable. The remaining concern is that g.epoch is incremented on every pending call and can reach MaxUint64 under a long stall. That would turn a pending state into a terminal failure.",
+        "suggestion": "Increment epoch only when a new credit is issued, or drop the epoch-exhaustion failure for the pending path.",
+        "confidence": 0.45,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/displaybackpressure/0104-opt-in-display-backpressure.patch",
+            "lines": {
+              "start": 94,
+              "end": 98
+            }
+          }
+        ],
+        "tags": [
+          "state"
+        ],
+        "evidence": "g.epoch++\n\tif g.active != 0 {\n\t\tg.dirty = true\n\t\treturn 0, errDisplayPending\n\t}",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/displaybackpressure/0104-opt-in-display-backpressure.patch"
+    }
+  ],
+  "suppressed": []
+}

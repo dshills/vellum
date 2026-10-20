@@ -30,7 +30,8 @@ type presentationCaptureConfig struct {
 	Method                              string
 	Samples, Warmup, DataSize           int
 	Variable, Deep, Novel, GPURequested bool
-	Paced                               bool `json:",omitempty"`
+	Paced                               bool  `json:",omitempty"`
+	DisplayBackpressureNS               int64 `json:",omitempty"`
 }
 type perfPresentationCapture struct {
 	metrics                *cogent.PresentationMetrics
@@ -57,6 +58,9 @@ func startPerfPresentation(path string, frames *cogent.FrameMetrics, config pres
 	}
 	if !validPresentationPath(path) || frames == nil || config.Method != "routed-grid-scroll" && config.Method != "routed-tree-scroll" {
 		return nil, errors.New("presentation capture: invalid configuration")
+	}
+	if config.DisplayBackpressureNS != 0 && (config.DisplayBackpressureNS < int64(100*time.Millisecond) || config.DisplayBackpressureNS > int64(5*time.Second)) {
+		return nil, errors.New("presentation capture: invalid display backpressure declaration")
 	}
 	metrics, err := cogent.NewPresentationMetrics(65536)
 	if err != nil {

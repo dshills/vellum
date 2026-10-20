@@ -367,4 +367,29 @@ class PacedInitialOriginTests(unittest.TestCase):
     if kind=='grid-deep':j=paced_fixture();j['Config']['Deep']=True
     with self.assertRaises(ValueError):m.validate(j,SOURCE,BINARY)
 
+
+class DisplayBackpressureDeclarationTests(unittest.TestCase):
+ def test_optional_bounded_declaration_changes_no_existing_result_or_gate(self):
+  for tree in [False,True]:
+   for paced in [False,True]:
+    factory=paced_fixture if paced else fixture
+    baseline=factory(tree);expected=m.validate(baseline,SOURCE,BINARY)
+    self.assertNotIn('DisplayBackpressureNS',expected['config'])
+    for timeout in [100_000_000,1_000_000_000,5_000_000_000]:
+     j=copy.deepcopy(baseline);j['Config']['DisplayBackpressureNS']=timeout
+     actual=m.validate(j,SOURCE,BINARY)
+     unchanged=copy.deepcopy(expected);unchanged['config']['DisplayBackpressureNS']=timeout
+     self.assertEqual(actual,unchanged)
+ def test_malformed_declaration_failed_journal_and_late_prefix_stay_refused(self):
+  for value in [None,True,False,0,-1,99_999_999,5_000_000_001,1e9,'1000000000']:
+   j=fixture();j['Config']['DisplayBackpressureNS']=value
+   with self.subTest(value=value),self.assertRaises(ValueError):m.validate(j,SOURCE,BINARY)
+  j=fixture();j['Config']['DisplayBackpressureNS']=1_000_000_000;j['Result']='FAILED_DIAGNOSTIC'
+  with self.assertRaises(ValueError):m.validate(j,SOURCE,BINARY)
+  j=startup_fixture();j['Config']['DisplayBackpressureNS']=1_000_000_000
+  skipped=j['BeforeClose']['Presentation']['Samples'][0]
+  skipped['Acquired']=j['BeforeClose']['Presentation']['Inputs'][0]['Received']+.00001
+  replace_after_prefix(j)
+  with self.assertRaises(ValueError):m.validate(j,SOURCE,BINARY)
+
 if __name__=='__main__':unittest.main()

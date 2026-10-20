@@ -73,7 +73,12 @@ func main() {
 	perfPresentation := flag.String("perf-presentation", "", "new raw native presentation journal; separate serial diagnostic, not 60Hz cadence qualification")
 	gpuScene := flag.Bool("gpu-scene", false, "opt-in ordered shared-device scene candidate; requires -perf")
 	paced := flag.Bool("perf-60hz", false, "separate fixed-deadline 60Hz workload; requires presentation journal and >=600 samples")
+	displayBackpressure := flag.Duration("experimental-display-backpressure", 0, "opt-in Mac display credit timeout (100ms..5s); requires -perf and -perf-presentation; experimental, no qualification claim")
 	flag.Parse()
+	if err := validatePerfDisplayBackpressure(*perf, *perfPresentation, *displayBackpressure); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 	if *gpuScene && !*perf {
 		fmt.Fprintln(os.Stderr, "loadedgrid: -gpu-scene requires -perf")
 		os.Exit(1)
@@ -98,7 +103,7 @@ func main() {
 		os.Exit(1)
 	}
 	if *perf {
-		if err := runPerf(perfConfig{Rows: *rows, Variable: *variable, Samples: *perfSamples, Warmup: *perfWarmup, Novel: *perfNovel, CPUProfile: *perfProfile, AllocationProfile: *perfAlloc, SourceDetails: *perfSources, InputDetails: *perfInputs, PresentationDetails: *perfPresentation, Paced: *paced, GPUSceneRendering: *gpuScene}); err != nil {
+		if err := runPerf(perfConfig{Rows: *rows, Variable: *variable, Samples: *perfSamples, Warmup: *perfWarmup, Novel: *perfNovel, CPUProfile: *perfProfile, AllocationProfile: *perfAlloc, SourceDetails: *perfSources, InputDetails: *perfInputs, PresentationDetails: *perfPresentation, Paced: *paced, GPUSceneRendering: *gpuScene, DisplayBackpressure: *displayBackpressure}); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}

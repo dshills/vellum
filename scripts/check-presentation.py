@@ -170,7 +170,8 @@ def validate(journal,source,binary_sha256,go_version='go1.25.6'):
  need(journal['Schema']in['vellum-presentation-capture-v1','vellum-presentation-capture-v2']and journal['Result']=='CAPTURED_DIAGNOSTIC'and journal['RunError']=='','failed or unsupported capture')
  need(journal['Window']=='perf'and boolean(journal['ContinuousWork'])is paced and boolean(journal['WorkerRetired'])is True and boolean(journal['RuntimeReturned'])is True,'method/worker scope differs')
  need(journal['CutoffMethod']=='acquisition-sequence prefix at completed CPU cohort','cutoff method differs')
- config=obj(journal['Config'],['Method','Samples','Warmup','DataSize','Variable','Deep','Novel','GPURequested']+(['Paced']if paced else[]))
+ config=obj(journal['Config'],['Method','Samples','Warmup','DataSize','Variable','Deep','Novel','GPURequested']+(['Paced']if paced else[]),['DisplayBackpressureNS'])
+ if 'DisplayBackpressureNS'in config:integer(config['DisplayBackpressureNS'],100_000_000,5_000_000_000)
  samples=integer(config['Samples'],120,2048);warmup=integer(config['Warmup'],32,2048);size=integer(config['DataSize'],1,1_000_000)
  for key in ['Variable','Deep','Novel','GPURequested']:boolean(config[key])
  if config['Method']=='routed-grid-scroll':

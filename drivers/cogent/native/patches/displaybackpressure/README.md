@@ -1,0 +1,3 @@
+# Opt-in display backpressure experiment
+
+Stage104 adds bounded per-window CPU/native display credit admission before native acquisition, including Core resize/cache replay. Ordinary defaults remain unchanged. One real presented handler shares separate recorder and display identities. Missing/skipped callbacks latch typed diagnostic refusal; no timeout resets live ownership. Close revokes the gate before resource teardown. The low-level early-enable seam is consumed by the separately authored public Driver duration option and NativeAttach lifetime monitor. This is prospective reviewed source; no checks or native efficacy are claimed by this recipe.

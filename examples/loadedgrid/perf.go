@@ -9,6 +9,7 @@ import (
 	"image"
 	"runtime"
 	"strconv"
+	"time"
 
 	"github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/virtual"
@@ -29,6 +30,7 @@ type perfConfig struct {
 	PresentationDetails string
 	Paced               bool
 	GPUSceneRendering   bool
+	DisplayBackpressure time.Duration
 }
 
 func validatePerfModes(perf, smoke, sourceDetails bool, profile, allocation string) error {
@@ -48,6 +50,9 @@ func validatePerfModes(perf, smoke, sourceDetails bool, profile, allocation stri
 }
 
 func (c perfConfig) validate() error {
+	if err := validatePerfDisplayBackpressure(true, c.PresentationDetails, c.DisplayBackpressure); err != nil {
+		return err
+	}
 	if c.Paced && (c.PresentationDetails == "" || c.Samples < 600 || c.Novel) {
 		return errors.New("paced workload: requires -perf-presentation and 600..2048 samples")
 	}

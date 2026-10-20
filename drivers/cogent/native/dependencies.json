@@ -1359,6 +1359,17 @@
               "sha256": "8a15eb8e037c1ee34bf74a1beeb7c3bebba6423cb5e49324fcfdd635112671cf"
             }
           ]
+        },
+        {
+          "origin": "Vellum opt-in bounded display backpressure experiment",
+          "inputs": "native/patches/displaybackpressure/original-hashes.json",
+          "outputs": "native/patches/displaybackpressure/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/displaybackpressure/0104-opt-in-display-backpressure.patch",
+              "sha256": "4450e315199380c6e5d3190625b7dcccda72f79af9b36d282970c9e2bb9b04fc"
+            }
+          ]
         }
       ]
     },

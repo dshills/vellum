@@ -1,0 +1,155 @@
+{
+  "approved": true,
+  "scope": "Internal source/test/report/checkpoint reviews; full implementation checks and source reviews are archived with the Core104 report.",
+  "inputs": {
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/independent-review.json": "fc4909b5debd5242e98fe655cfa4f27afbf1087f1de63b3b83eebcd3b6c0115a",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/internal-example-adapter-review.json": "df9b0d8a9c6d3a1dd5c9913db5d51b8621d627d7298b9bc6d41a73614e2dab3a",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/root-source-review.json": "562d3b28f805721b2365604f8f585979e8ede5c00c31bbef9c95ef430f8c30d0",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/headless/actual-result-review.json": "e733e195bc15d6c23617824958fe6e18d38f12b3475938c3b566dc37e42b209d",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display104-checkpoint/integration-coherence-review.json": "a1a5ff59e2ab5869b2e1b110f2d69d327dbe35d5e50cdea4f95fe0d77243929d",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display104-checkpoint/independent-report-review.json": "e5b103899c0d49c9325b088afdb28997faeea5bafe1785e79f1b1d0a63d37a3c",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display104-checkpoint/commit-source-review.json": "fa1c71225d0b6ddfbd12dcd79fdc7474bb410b242ab1eeede615601dc6908aed",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display104-checkpoint/prism-finding-review.json": "a1319a65ed4bcb3d2e5e97ff44d7052b6e4972071a0ffbe6b8760b8d841fa626",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-delivery-renewal-record/independent-review.json": "09b1f3507ec1424709a2f2c3457ef0681b5e16e3a430cc1afa1741bb627e5923",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-delivery-renewal-record/wording-clarification-review.json": "07a1093e4e5bd3c05cb7ea47729af8168a93d6d20f6424b1766caa907ff31540"
+  },
+  "unresolved_actionable_findings": [],
+  "actual_phase_expectations_passed": 20,
+  "driver_race_pass": 639,
+  "source_and_prepared_acceptance": "Full actual integration preimage; exact tested Core104 candidate; no native acceptance claim.",
+  "prism_followup": {
+    "approved": true,
+    "unresolved_findings": [],
+    "at_utc": "2026-10-20T09:56:16.207315+00:00",
+    "scope": "Independent source-contract adjudication of the two exact Prism findings. No source/test/native/provider/Git operation. The reviewer authored the candidate; root also traces these paths independently.",
+    "prism_sha256": "60c957b0fcce2de0d341ed80a39152dfe0c9dc632726ac4d643f1e100a492537",
+    "proposal_sha256": "2c153f8551508bd62951606f05b21aff8adb8b93a9c99d1af1f8a00398de040f",
+    "inputs": {
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display104-checkpoint/prism.json": "60c957b0fcce2de0d341ed80a39152dfe0c9dc632726ac4d643f1e100a492537",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/proposal.json": "2c153f8551508bd62951606f05b21aff8adb8b93a9c99d1af1f8a00398de040f",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/headless/actual-result-review.json": "e733e195bc15d6c23617824958fe6e18d38f12b3475938c3b566dc37e42b209d",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/adapter-candidate/drivers/cogent/driver.go": "20c63ff9c3b3573e1ab081ca7b17644ac3c78b50b3a0657ed31c9d6df6f6d3eb",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/adapter-candidate/drivers/cogent/display_backpressure_darwin.go": "230f9c7980a4569391b803503d217d285366ccff4ae84e5fb9e33451715f645b",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/adapter-candidate/drivers/cogent/display_backpressure.go": "4040c05f1c91030c78e665932619914f3d30f7e42c94de85c272835d4e3f62c4",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/adapter-candidate/drivers/cogent/accessibility_darwin.go": "d01417cb8631feed5d0de02687ce93345eb8a931772efa734c56fffd5d89f921",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/adapter-candidate/drivers/cogent/display_backpressure_test.go": "ba5d6bbc6e91e647e397902839816fd35c8109eb95c80201ee2fff1586a82796",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/candidate-core/core/renderwindow.go": "63e695432a2cecf458d696f019d34e4f7eb3c5ef5c2f105a3b810f2b0ad8f5a6",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/candidate-core/system/driver/desktop/window.go": "57a7cda567c24d42d12c8a334eefbf7403a18bcf53a55bb05f48a1b3166e63ee",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/driver/desktop/app.go": "7f4d5353fa903c206caf9a83d16e9c4130b481e5708fe7ecf06e373e7b878579",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/driver/desktop/cursor.go": "18cfb9b3742945adef39aa410216cbacd97ea1fa99530d1b0a68ded770c13774",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/driver/desktop/native_idle.go": "74944313479981f6dcae212456b5cdfa35cfc6f19b54c9b55e142802d267e31c",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/driver/base/app.go": "f7c39f21a905e044e12a5e24f8bb708b26b04d1aaae4f08dfef26c8f7ff914dd",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/driver/base/app_multi.go": "4511bc21926c8a2a0ca1ee8e3c24a0c4371941c1bd102c16c77ed09f5b513a5b",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/driver/base/window.go": "624a8b6e27990287c8dd03863fb123b1e584ee5cd5fdad8f4593b5f01cf2153e",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/driver/base/helpers.go": "98e64f472e915ffed8878ffbe13d5be52ebce4b82664fa04dd0f76a43c3c559d",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/core/stage.go": "55e090008baeca2fd36113a50ec3fa2ce03c84eceba71a1f35a07b99294403a9",
+      "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/recover.go": "1d12e55a9387537524a4db2ed849e1fc47e2288312da342aa5fb9bdba3cfd505"
+    },
+    "findings": [
+      {
+        "id": "a1d8c818f04ec6d9",
+        "disposition": "REFUTED_BY_ACTUAL_CALLER_OWNERSHIP",
+        "reason": "The actual sole native-creation transaction does not discard the attachment on error. It assigns both results to w.Native and err, invokes releaseNativeResources before returning the error, and closes/clears any returned NativeAttachment. Pre-closing here would duplicate cleanup already owned by the caller.",
+        "source_locations": [
+          {
+            "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/driver/desktop/app.go",
+            "lines": "169\u2013179",
+            "proof": "w.Native,err=NativeAttach(w); if err releaseNativeResources; then returnnil,error."
+          },
+          {
+            "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/candidate-core/system/driver/desktop/window.go",
+            "symbol": "releaseNativeResources",
+            "proof": "If Native nonnil, invoke Native.Close and clear before GLFW/GPU teardown, including failed creation."
+          },
+          {
+            "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/adapter-candidate/drivers/cogent/accessibility_darwin.go",
+            "lines": "49\u201362",
+            "proof": "Attachment close first joins display monitor, then revokes/closes native text backend and AX bridge."
+          }
+        ],
+        "control_evidence": "Actual driver race suite includes monitor-construction failure retirement, refused enable without retry, and monitor close/join controls. These are controlled protocol tests, not a physical native attachment-failure experiment."
+      },
+      {
+        "id": "d576106b0c984f94",
+        "disposition": "NO_REACHABLE_COUNTEREXAMPLE_UNDER_DRIVER_RUN_CONTRACT",
+        "reason": "Configuration occurs after the exclusive processRun guard and accessibility-hook ownership check, before syncTopology can start any native window. After started=true, every normal Run return passes core.Wait. That runs the native main loop; ordinary quit stops it only after closing/removing every native window. Desktop window close synchronously runs Native.Close (joining its monitor) before base Close can remove the window. Native creation and hook reads occur only within the admitted native-main transaction; after MainLoop returns its terminal queue and joined ingress refuse further callbacks. Consequently restoration cannot overlap supported native creation or leave a normal live-window monitor from this Run.",
+        "source_locations": [
+          {
+            "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/adapter-candidate/drivers/cogent/driver.go",
+            "lines": "112\u2013130,149\u2013173,473\u2013519",
+            "proof": "CAS once-per-process; processRun resets only if neverstarted; configureAccessibility before display wrapper; initial launch setsstarted beforeStage.Run; all normal started returns pass core.Wait."
+          },
+          {
+            "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/adapter-candidate/drivers/cogent/display_backpressure_darwin.go",
+            "lines": "19\u201339",
+            "proof": "Requires existing attachment hook; wraps it for the oneRun and restores only bydefer."
+          },
+          {
+            "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/driver/desktop/app.go",
+            "lines": "54\u201357,76\u201396,110\u2013119,169\u2013179",
+            "proof": "Hook documented beforewindows; actual creation nativeOnMain transaction; MainLoop terminaldefer before callerreturns."
+          },
+          {
+            "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/driver/desktop/cursor.go",
+            "lines": "254\u2013260",
+            "proof": "nativeOnMain executesadmitted currentnative-threadcallback or uses queued owner; no unsynchronizedworker hookread."
+          },
+          {
+            "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/candidate-core/core/renderwindow.go",
+            "lines": "26\u201347",
+            "proof": "Wait startswindowwait\u2192Quitworker and runsMainLoop oncaller."
+          },
+          {
+            "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/driver/base/app.go",
+            "lines": "275\u2013299",
+            "proof": "NormalQuit stopsMain only after QuitClean returns true."
+          },
+          {
+            "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/driver/base/app_multi.go",
+            "lines": "118\u2013138",
+            "proof": "QuitClean snapshots/closes current windows and succeeds only NWindows()==0."
+          },
+          {
+            "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-backpressure-correction/candidate-core/system/driver/desktop/window.go",
+            "symbol": "Window.Close",
+            "proof": "Native.Close synchronously viaRunOnMainQueued beforebaseWindow.Close/removal; monitorclose/join precedes window removal."
+          },
+          {
+            "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/driver/base/window.go",
+            "lines": "237\u2013249",
+            "proof": "Only after close event andcleanup does RemoveWindow run."
+          },
+          {
+            "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/driver/desktop/native_idle.go",
+            "lines": "23\u201343",
+            "proof": "MainLoop stop and ingress pumpjoin occur before return; no new admitted maincallback afterterminalstate."
+          },
+          {
+            "path": "/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream/system/driver/base/helpers.go",
+            "lines": "37\u201376",
+            "proof": "ExecuteMain refuses F afterStopMain; accepted callback acknowledges before callerreturns."
+          }
+        ],
+        "qualification": "This disposition covers supported Driver.Run startup/quit/window lifecycle. It does not broaden recovery guarantees for external low-level StopMain, fatal native-thread panic/Goexit, or unsupported direct mutation of the exclusive NativeAttach field. No such new supported-path counterexample was found."
+      }
+    ],
+    "discarded_epoch_concern": {
+      "disposition": "BOUNDED_EXHAUSTION_POLICY_NOT_OPERATIONAL_DEFECT",
+      "reason": "An epoch bound refuses rather than wraps identities; changing it would weaken the stated monotonic ownership policy. Counter exhaustion is explicitly covered by the gate identity-bound control, not evidence of ordinary workload failure."
+    },
+    "actual_controls": {
+      "headless_result_sha256": "e5afdc17f69bc1944179869423104a54ad2838c4c7c0db7d162ab2fff8624c4c",
+      "driver_race_receipt_sha256": "a99c50e84bfdedbb5ed080382be501d869b33517bc7b62824179b6714a83357b",
+      "new_monitor_methods": 7,
+      "all_driver_top_level_pass": 639,
+      "actual_gate_methods": 14,
+      "limits": "Controlled/fake/offscreen tests do not establish actual native watchdog failure\u2192close\u2192monitorjoin behavior."
+    },
+    "remaining_verification": [
+      "Fresh real native untagged watchdog refusal and complete Run cleanup/join remain pending.",
+      "Native performance/occlusion/startup acceptance remain separate."
+    ],
+    "source_changes_required": false,
+    "additional_provider_call_required": false
+  }
+}

@@ -32,9 +32,13 @@ type treePerfConfig struct {
 	GPUSceneRendering, SourceDetails bool
 	PresentationDetails              string
 	Paced                            bool
+	DisplayBackpressure              time.Duration
 }
 
 func (c treePerfConfig) validate() error {
+	if err := validatePerfDisplayBackpressure(true, c.PresentationDetails, c.DisplayBackpressure); err != nil {
+		return err
+	}
 	if c.Paced && (c.PresentationDetails == "" || c.Samples < 600) {
 		return errors.New("paced workload: requires -perf-presentation and 600..2048 samples")
 	}
@@ -411,7 +415,7 @@ func runTreePerf(c treePerfConfig) (terminal error) {
 	if err != nil {
 		return err
 	}
-	capture, err := startPerfPresentation(c.PresentationDetails, metrics, presentationCaptureConfig{Method: "routed-tree-scroll", Samples: c.Samples, Warmup: c.Warmup, DataSize: c.Nodes, Deep: c.Deep, GPURequested: c.GPUSceneRendering, Paced: c.Paced})
+	capture, err := startPerfPresentation(c.PresentationDetails, metrics, presentationCaptureConfig{Method: "routed-tree-scroll", Samples: c.Samples, Warmup: c.Warmup, DataSize: c.Nodes, Deep: c.Deep, GPURequested: c.GPUSceneRendering, Paced: c.Paced, DisplayBackpressureNS: c.DisplayBackpressure.Nanoseconds()})
 	if err != nil {
 		return err
 	}
@@ -420,7 +424,7 @@ func runTreePerf(c treePerfConfig) (terminal error) {
 	defer func() { terminal = errors.Join(terminal, capture.Finish(terminal, workerRetired, runtimeReturned)) }()
 	result := make(chan error, 1)
 	failures := make(chan error, 1)
-	driver := cogent.Driver{GPUSceneRendering: c.GPUSceneRendering, FrameMetrics: metrics, PresentationMetrics: capture.Metrics(), Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 12}), Foreground: ui.Some(color.NRGBA{R: 20, G: 20, B: 20, A: 255}), Background: ui.Some(color.NRGBA{R: 250, G: 250, B: 250, A: 255})}}, OnError: func(e error) {
+	driver := cogent.Driver{ExperimentalDisplayBackpressure: c.DisplayBackpressure, GPUSceneRendering: c.GPUSceneRendering, FrameMetrics: metrics, PresentationMetrics: capture.Metrics(), Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 12}), Foreground: ui.Some(color.NRGBA{R: 20, G: 20, B: 20, A: 255}), Background: ui.Some(color.NRGBA{R: 250, G: 250, B: 250, A: 255})}}, OnError: func(e error) {
 		select {
 		case failures <- e:
 		default:

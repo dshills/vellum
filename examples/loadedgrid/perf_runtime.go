@@ -373,7 +373,7 @@ func runPerf(c perfConfig) (terminal error) {
 	if err != nil {
 		return err
 	}
-	capture, err := startPerfPresentation(c.PresentationDetails, m, presentationCaptureConfig{Method: "routed-grid-scroll", Samples: c.Samples, Warmup: c.Warmup, DataSize: c.Rows, Variable: c.Variable, Novel: c.Novel, GPURequested: c.GPUSceneRendering, Paced: c.Paced})
+	capture, err := startPerfPresentation(c.PresentationDetails, m, presentationCaptureConfig{Method: "routed-grid-scroll", Samples: c.Samples, Warmup: c.Warmup, DataSize: c.Rows, Variable: c.Variable, Novel: c.Novel, GPURequested: c.GPUSceneRendering, Paced: c.Paced, DisplayBackpressureNS: c.DisplayBackpressure.Nanoseconds()})
 	if err != nil {
 		return err
 	}
@@ -389,7 +389,7 @@ func runPerf(c perfConfig) (terminal error) {
 		return err
 	}
 	failure := make(chan error, 1)
-	d := cogent.Driver{FrameMetrics: m, PresentationMetrics: capture.Metrics(), GPUSceneRendering: c.GPUSceneRendering, Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 15}), Foreground: ui.Some(color.NRGBA{R: 20, G: 20, B: 20, A: 255}), Background: ui.Some(color.NRGBA{R: 250, G: 250, B: 250, A: 255})}}, OnError: func(err error) {
+	d := cogent.Driver{ExperimentalDisplayBackpressure: c.DisplayBackpressure, FrameMetrics: m, PresentationMetrics: capture.Metrics(), GPUSceneRendering: c.GPUSceneRendering, Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 15}), Foreground: ui.Some(color.NRGBA{R: 20, G: 20, B: 20, A: 255}), Background: ui.Some(color.NRGBA{R: 250, G: 250, B: 250, A: 255})}}, OnError: func(err error) {
 		select {
 		case failure <- err:
 		default:
