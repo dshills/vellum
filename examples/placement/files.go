@@ -33,7 +33,7 @@ func (m *model) bindFiles(a *app.Application, ref app.WindowRef, choose func(con
 	}
 	for _, c := range []struct{ id, label, shortcut string }{{"open", "Open…", "Meta+O"}, {"save", "Save", "Meta+S"}, {"save-as", "Save As…", "Meta+Shift+S"}} {
 		if err := m.commands.Register(command.Command{ID: c.id, Label: c.label, Shortcut: c.shortcut, Available: func() error {
-			if m.fileBusy() || m.prompt != "" || m.palette.State().Active {
+			if m.fileBusy() || m.move != nil || m.prompt != "" || m.palette.State().Active {
 				return document.ErrBusy
 			}
 			return nil
@@ -69,6 +69,7 @@ func (m *model) fileAction(a *app.Application, ref app.WindowRef, action string,
 }
 
 func (m *model) requestClose(a *app.Application) bool {
+	m.cancelMove(m.move)
 	if m.fileBusy() {
 		m.files.Cancel()
 		m.status = "Canceling file operation; close again when it finishes"
@@ -85,10 +86,10 @@ func (m *model) requestClose(a *app.Application) bool {
 
 func (m *model) filePrompt(a *app.Application, ref app.WindowRef) ui.Node {
 	cancel := func() { m.prompt = ""; _ = a.Invalidate("placement") }
-	text := "Discard unsaved placements and open another drawing?"
+	text := "Discard unsaved changes and open another drawing?"
 	label := "Discard and Open…"
 	if m.prompt == "close" {
-		text, label = "Discard unsaved placements and close? Cancel to save first.", "Discard and Close"
+		text, label = "Discard unsaved changes and close? Cancel to save first.", "Discard and Close"
 	}
 	return ui.Node{ID: "file-decision", Kind: ui.Dialog, Text: "Unsaved drawing", Open: m.prompt != "", Dismiss: cancel, Children: []ui.Node{
 		{ID: "file-decision-text", Kind: ui.Label, Text: text},

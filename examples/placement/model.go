@@ -33,6 +33,8 @@ type model struct {
 	status                    string
 	files                     *document.Session[drawingFile]
 	prompt                    string
+	move                      *objectMove
+	canvasEditor              *canvasEditor
 }
 
 func componentByKind(kind string) (component, bool) {
@@ -60,7 +62,7 @@ func newModel() (*model, error) {
 	for _, c := range []command.Command{
 		{ID: "place", Label: "Place component", Execute: func(ctx context.Context) error { return m.commit(ctx) }},
 		{ID: "undo", Label: "Undo", Shortcut: "Meta+Z", Available: func() error {
-			if m.fileBusy() {
+			if m.fileBusy() || m.move != nil || m.prompt != "" || m.palette.State().Active {
 				return document.ErrBusy
 			}
 			if m.journal.Snapshot().UndoCount == 0 {
@@ -69,7 +71,7 @@ func newModel() (*model, error) {
 			return nil
 		}, Execute: func(context.Context) error { return m.journal.Undo() }},
 		{ID: "redo", Label: "Redo", Shortcut: "Meta+Shift+Z", Available: func() error {
-			if m.fileBusy() {
+			if m.fileBusy() || m.move != nil || m.prompt != "" || m.palette.State().Active {
 				return document.ErrBusy
 			}
 			if m.journal.Snapshot().RedoCount == 0 {
@@ -79,6 +81,30 @@ func newModel() (*model, error) {
 		}, Execute: func(context.Context) error { return m.journal.Redo() }},
 	} {
 		if err := m.commands.Register(c); err != nil {
+			return nil, err
+		}
+	}
+	for _, edit := range []struct {
+		id, label, shortcut string
+		dx, dy              float64
+	}{
+		{"move-left", "Move left", "Meta+Alt+LeftArrow", -1, 0},
+		{"move-right", "Move right", "Meta+Alt+RightArrow", 1, 0},
+		{"move-up", "Move up", "Meta+Alt+UpArrow", 0, -1},
+		{"move-down", "Move down", "Meta+Alt+DownArrow", 0, 1},
+		{"delete", "Delete selected", "Backspace", 0, 0},
+		{"delete-forward", "Delete selected", "Delete", 0, 0},
+	} {
+		scope := command.WindowShortcuts
+		if edit.id == "delete" || edit.id == "delete-forward" {
+			scope = command.AfterFocusShortcuts
+		}
+		if err := m.commands.Register(command.Command{ID: edit.id, Label: edit.label, Shortcut: edit.shortcut, ShortcutScope: scope, Available: m.editAvailable, Execute: func(context.Context) error {
+			if edit.id == "delete" || edit.id == "delete-forward" {
+				return m.deleteSelected()
+			}
+			return m.nudge(edit.dx, edit.dy)
+		}}); err != nil {
 			return nil, err
 		}
 	}
@@ -102,7 +128,7 @@ func newModel() (*model, error) {
 		}
 		return p, nil
 	}, Accept: func(r placement.Request[component]) error {
-		if m.fileBusy() || m.locked || (m.rejectNotes && r.Payload.Kind == "note") || len(m.scene.Objects) >= 512 || math.Abs(r.Position.X) > 10000 || math.Abs(r.Position.Y) > 10000 {
+		if m.fileBusy() || m.move != nil || m.prompt != "" || m.locked || (m.rejectNotes && r.Payload.Kind == "note") || len(m.scene.Objects) >= 512 || math.Abs(r.Position.X) > 10000 || math.Abs(r.Position.Y) > 10000 {
 			return placement.ErrRejected
 		}
 		return nil

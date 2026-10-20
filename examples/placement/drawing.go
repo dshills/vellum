@@ -64,7 +64,7 @@ func (f drawingFile) scene() (*canvas.Scene, error) {
 func drawingCodec(m *model) document.Codec[drawingFile] {
 	return document.Codec[drawingFile]{
 		Capture: func() (drawingFile, error) {
-			if m.palette.State().Active || m.pending != nil {
+			if m.palette.State().Active || m.pending != nil || m.move != nil {
 				return drawingFile{}, errors.New("finish or cancel the drag before saving")
 			}
 			f := drawingFile{Format: "vellum-placement", Version: 1, Objects: make([]drawingObject, 0, len(m.scene.Objects)), Center: m.scene.View.Center, Zoom: m.scene.View.Zoom, Selected: m.scene.Selected, Snap: m.snap, NextID: m.next}

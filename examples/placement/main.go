@@ -40,12 +40,16 @@ func fail(err error) { fmt.Fprintln(os.Stderr, err); os.Exit(1) }
 func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 	update := func() { _ = a.Invalidate("placement") }
 	busy := m.fileBusy()
+	if m.canvasEditor == nil {
+		m.canvasEditor = &canvasEditor{a: a, ref: ref, model: m}
+	}
+	navigatingDisabled := busy || m.move != nil
 	filename := "Untitled.vellum"
 	if m.files != nil && m.files.State().Path != "" {
 		filename = filepath.Base(m.files.State().Path)
 	}
 	if m.journal.Snapshot().Dirty {
-		filename += " • Unsaved placements"
+		filename += " • Unsaved changes"
 	}
 	invoke := func(id string) func() {
 		return func() {
@@ -63,7 +67,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 	tools := []ui.Node{{ID: "tools-heading", Kind: ui.Label, Text: "Components"}}
 	for _, id := range []string{"block", "connector", "note"} {
 		source := m.palette.Source(id)
-		tools = append(tools, ui.Node{ID: "tool-" + id, Kind: ui.Button, Text: source.Label(), Disabled: busy, PlacementSource: source, Accessibility: ui.Accessibility{Name: source.Label(), Help: "Drag onto the canvas, or press Return to place at the current canvas center."}, Activate: func() {
+		tools = append(tools, ui.Node{ID: "tool-" + id, Kind: ui.Button, Text: source.Label(), Disabled: navigatingDisabled, PlacementSource: source, Accessibility: ui.Accessibility{Name: source.Label(), Help: "Drag onto the canvas, or press Return to place at the current canvas center."}, Activate: func() {
 			life := ref.Context()
 			if life.Err() != nil {
 				return
@@ -95,19 +99,28 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		{ID: "toolbar", Kind: ui.Toolbar, Children: []ui.Node{
 			{ID: "undo", Kind: ui.Button, Text: "Undo", Disabled: m.commands.Enabled("undo") != nil, Activate: invoke("undo")},
 			{ID: "redo", Kind: ui.Button, Text: "Redo", Disabled: m.commands.Enabled("redo") != nil, Activate: invoke("redo")},
-			{ID: "fit", Kind: ui.Button, Text: "Fit objects", Disabled: busy, Activate: func() { m.scene.Fit(); update() }},
-			{ID: "reset", Kind: ui.Button, Text: "Reset view", Disabled: busy, Activate: func() { m.scene.View.Center = canvas.Point{}; m.scene.View.Zoom = 1; update() }},
-			{ID: "snap", Kind: ui.Checkbox, Text: "Snap to grid", Disabled: busy, Checked: m.snap, Change: func(e ui.ChangeEvent) { m.snap = e.Checked; update() }},
+			{ID: "fit", Kind: ui.Button, Text: "Fit objects", Disabled: navigatingDisabled, Activate: func() { m.scene.Fit(); update() }},
+			{ID: "reset", Kind: ui.Button, Text: "Reset view", Disabled: navigatingDisabled, Activate: func() { m.scene.View.Center = canvas.Point{}; m.scene.View.Zoom = 1; update() }},
+			{ID: "snap", Kind: ui.Checkbox, Text: "Snap to grid", Disabled: navigatingDisabled, Checked: m.snap, Change: func(e ui.ChangeEvent) { m.snap = e.Checked; update() }},
 			{ID: "lock", Kind: ui.Checkbox, Text: "Reject all drops", Checked: m.locked, Change: func(e ui.ChangeEvent) { m.locked = e.Checked; update() }},
 			{ID: "reject-notes", Kind: ui.Checkbox, Text: "Reject notes", Checked: m.rejectNotes, Change: func(e ui.ChangeEvent) { m.rejectNotes = e.Checked; update() }},
 		}},
-		{ID: "help", Kind: ui.Label, Text: "Drag to place • drag the canvas or use arrow keys to pan • wheel to zoom • Escape cancels • Return on a tool places at center • Option+arrows select objects"},
+		{ID: "edit-tools", Kind: ui.Toolbar, Children: []ui.Node{
+			{ID: "move-label", Kind: ui.Label, Text: "Move selected:"},
+			{ID: "move-left", Kind: ui.Button, Text: "Left", Disabled: m.commands.Enabled("move-left") != nil, Activate: invoke("move-left")},
+			{ID: "move-right", Kind: ui.Button, Text: "Right", Disabled: m.commands.Enabled("move-right") != nil, Activate: invoke("move-right")},
+			{ID: "move-up", Kind: ui.Button, Text: "Up", Disabled: m.commands.Enabled("move-up") != nil, Activate: invoke("move-up")},
+			{ID: "move-down", Kind: ui.Button, Text: "Down", Disabled: m.commands.Enabled("move-down") != nil, Activate: invoke("move-down")},
+			{ID: "delete", Kind: ui.Button, Text: "Delete selected", Disabled: m.commands.Enabled("delete") != nil, Activate: invoke("delete")},
+		}},
+		{ID: "help", Kind: ui.Label, Text: "Drag tools to place • drag objects to move • empty canvas pans • wheel zooms • Delete removes • Undo/Redo"},
 		{ID: "workspace", Kind: ui.Row, Grow: true, Children: []ui.Node{
 			{ID: "palette", Kind: ui.Column, MinWidth: 145, Children: tools},
-			{ID: "drawing", Kind: ui.Canvas2D, Disabled: busy, Canvas: m.scene, CanvasObjects: objects, CanvasGrid: grid, PlacementTarget: m.target, Grow: true, Accessibility: ui.Accessibility{Name: "Component canvas", Help: "Select a component, or use Option+Left/Right/Home/End on the canvas; drag or use plain arrow keys to pan; scroll to zoom."}, Change: func(e ui.ChangeEvent) {
+			{ID: "drawing", Kind: ui.Canvas2D, Disabled: busy, Canvas: m.scene, CanvasObjects: objects, CanvasGrid: grid, PlacementTarget: m.target, Grow: true, Accessibility: ui.Accessibility{Name: "Component canvas", Help: "Select a component, or use Option+Left/Right/Home/End on the canvas; drag an object to move; drag empty canvas or use plain arrow keys to pan; scroll to zoom."}, Change: func(e ui.ChangeEvent) {
 				m.status = fmt.Sprintf("Selected: %s • zoom %.0f%%", e.SelectedID, e.Number*100)
 				update()
 			}},
+			{ID: "canvas-edit-events", Kind: ui.Extension, Custom: m.canvasEditor},
 		}},
 		{ID: "status", Kind: ui.StatusBar, Children: []ui.Node{{ID: "message", Kind: ui.Label, Text: fmt.Sprintf("%s • %d objects • Undo %d / Redo %d", m.status, len(m.scene.Objects), m.journal.Snapshot().UndoCount, m.journal.Snapshot().RedoCount)}}},
 	}}

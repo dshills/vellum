@@ -28,6 +28,8 @@ import (
 
 // This separate module exercises the actual managed widgets through public APIs.
 // It creates software windows only and is not physical pointer certification.
+// The qualified descriptor runner excludes the app-local native drag extension;
+// drag math/history are tested separately and the hook is checked in the Mac app.
 func TestPublicPaletteCanvasConsumer(t *testing.T) {
 	for _, batch := range []int{1, 7, 64} {
 		t.Run(fmt.Sprint(batch), func(t *testing.T) {
@@ -53,7 +55,7 @@ func TestPublicPaletteCanvasConsumer(t *testing.T) {
 			}
 			defer a.Close()
 			var windowRef app.WindowRef
-			if windowRef, err = a.OpenWindow(app.Window{ID: "placement", Title: "Placement", Width: 1100, Height: 760, View: func() ui.Node { return view(a, windowRef, m) }}); err != nil {
+			if windowRef, err = a.OpenWindow(app.Window{ID: "placement", Title: "Placement", Width: 1100, Height: 760, View: func() ui.Node { return managedTestView(view(a, windowRef, m)) }}); err != nil {
 				t.Fatal(err)
 			}
 			config := cogent.ManualConfig{Clock: clock, Executor: executor, Commands: m.commands, LogicalDPI: 160, OwnerBatch: batch, MaxWindows: 2, EventCapacity: 128, Theme: ui.Theme{Default: ui.Style{Foreground: ui.Some(color.NRGBA{R: 24, G: 24, B: 24, A: 255}), Background: ui.Some(color.NRGBA{R: 248, G: 248, B: 248, A: 255}), Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 16})}}}
@@ -209,7 +211,30 @@ func TestPublicPaletteCanvasConsumer(t *testing.T) {
 			if m.scene.View.Zoom <= before.Zoom {
 				t.Fatal("canvas wheel zoom failed")
 			}
+			moved := slices.Clone(m.scene.Objects)
+			dragView := m.scene.View
+			index := m.selectedIndex()
+			x := m.scene.Objects[index].X
+			input(cogent.ManualInput{Type: events.KeyChord, Code: key.CodeRightArrow, Modifiers: key.Modifiers(1<<key.Meta | 1<<key.Alt)})
+			if m.scene.Objects[index].X != x+20 || m.scene.View != dragView {
+				t.Fatal("move shortcut was intercepted by canvas navigation")
+			}
+			click("undo")
+			click("delete")
+			if len(m.scene.Objects) != 3 {
+				t.Fatal("routed delete")
+			}
+			click("undo")
+			if !slices.Equal(m.scene.Objects, moved) {
+				t.Fatal("delete undo order/identity")
+			}
+			input(cogent.ManualInput{Type: events.KeyChord, Code: key.CodeBackspace})
+			if len(m.scene.Objects) != 3 {
+				t.Fatal("Backspace command did not delete")
+			}
+			click("undo")
 			before = m.scene.View
+			center = target.Bounds.Min.Add(image.Pt(20, 20)) // Empty space pans; dragging an object now moves it.
 			input(cogent.ManualInput{Type: events.MouseDown, Button: events.Left, Position: center})
 			if _, err := clock.Advance(core.TimingSettings.SlideStartTime + time.Millisecond); err != nil {
 				t.Fatal(err)
@@ -228,4 +253,16 @@ func TestPublicPaletteCanvasConsumer(t *testing.T) {
 			}
 		})
 	}
+}
+
+// The descriptor manual runner qualifies managed nodes, not arbitrary app code.
+func managedTestView(n ui.Node) ui.Node {
+	children := n.Children[:0]
+	for _, child := range n.Children {
+		if child.ID != "canvas-edit-events" {
+			children = append(children, managedTestView(child))
+		}
+	}
+	n.Children = children
+	return n
 }

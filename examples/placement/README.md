@@ -19,11 +19,25 @@ Escape, release outside, focus loss or removing a source/target cancels without
 creating an object. A palette click only focuses its button. Tab to a tool and
 press Return to place it at the current canvas center through the same path.
 
-Click canvas objects to select. Drag the canvas or use arrow keys to pan; scroll
+Click canvas objects to select. Drag empty canvas space or use arrow keys to pan; scroll
 to zoom about the pointer. Fit and Reset change the view. Toggle grid snapping,
 reject all drops, or reject notes to inspect target policy. Undo/Redo buttons and
 Cmd+Z / Cmd+Shift+Z replay exactly one placement with the original object ID.
 The example limits the document to 512 objects and history to 64 changes.
+
+Drag a placed component to move it. The press offset is preserved under pan,
+zoom, scrolling and display scale; snapping rounds the proposed origin to the
+20-unit grid. A completed drag is one Undo entry. Escape, focus/capture loss,
+release outside the canvas, or a changed camera/display scale cancels the preview.
+Canvas origin, visible size and clipping may settle during capture; placement
+keeps the initial world grab point and validates release against the latest clip.
+Clicking without moving creates no history entry. Empty-space drags still pan.
+
+The Move selected Left/Right/Up/Down buttons (or Cmd+Option+arrow keys) nudge by
+20 world units with snapping enabled and by one unit with snapping off.
+Delete selected, Backspace, and forward Delete remove the selected object.
+Undo restores its exact ID and original paint order; Redo repeats the deletion.
+Move/Delete participate in the same saved/unsaved drawing history as placement.
 
 Use **Save** (Cmd+S), **Save As…** (Cmd+Shift+S) and **Open…** (Cmd+O) to
 persist drawings through native file choosers. `.vellum` files contain bounded,
@@ -33,8 +47,8 @@ are not saved. Opening validates the entire file before replacing the drawing,
 clears the previous document's history, and preserves the current canvas size.
 New placements after opening still support Undo/Redo.
 
-Open and Close ask before discarding unsaved placements. Cancel Close to save
-first. Navigation, selection and snapping do not mark placements dirty, but their
+Open and Close ask before discarding unsaved changes. Cancel Close to save
+first. Navigation, selection and snapping do not mark the drawing dirty, but their
 current values are included whenever Save is used. Save writes a complete file
 atomically; failed/canceled Open keeps the current drawing. Only this example
 uses the existing `document.Session` API; framework behavior is unchanged.
@@ -50,7 +64,9 @@ go build .
 
 The offscreen suite routes real managed-widget events at owner batches 1, 7 and
 64 using bundled, checked fonts. It exercises all component types, keyboard
-activation, validation, selection, pan/zoom and Undo/Redo. It does not prove
+activation, validation, selection, pan/zoom and Undo/Redo. The application-local Core extension that captures placed-object drags is excluded
+from the qualified descriptor runner; its mapping/history have focused model
+regressions, and its input path needs the packaged native check. It does not prove
 physical Mac pointer delivery, display transitions, GPU presentation or external
 screen-reader interaction. These require a separate available desktop session.
 

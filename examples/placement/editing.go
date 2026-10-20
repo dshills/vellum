@@ -1,0 +1,206 @@
+package main
+
+import (
+	"errors"
+	"fmt"
+	"math"
+	"slices"
+
+	"github.com/dshills/vellum/canvas"
+	"github.com/dshills/vellum/history"
+	"github.com/dshills/vellum/placement"
+)
+
+var errNoSelection = errors.New("select a component first")
+
+// A move keeps one detached before image, never a history entry per pointer event.
+type objectMove struct {
+	id              string
+	before          []canvas.Rect
+	start, grab     canvas.Point
+	geometry        placement.Geometry
+	dragging, valid bool
+}
+
+func (m *model) editAvailable() error {
+	if m.fileBusy() || m.prompt != "" || m.move != nil || m.palette.State().Active {
+		return errors.New("finish the current operation first")
+	}
+	if m.selectedIndex() < 0 {
+		return errNoSelection
+	}
+	return nil
+}
+func (m *model) selectedIndex() int {
+	for i, o := range m.scene.Objects {
+		if o.ID == m.scene.Selected {
+			return i
+		}
+	}
+	return -1
+}
+
+func (m *model) applyObjects(label string, after []canvas.Rect, selected string) error {
+	before, priorSelection := slices.Clone(m.scene.Objects), m.scene.Selected
+	if slices.Equal(before, after) {
+		return nil
+	}
+	after = slices.Clone(after)
+	return m.journal.Apply(history.Change{Label: label, Apply: func() error {
+		if !slices.Equal(m.scene.Objects, before) {
+			return history.ErrStale
+		}
+		m.scene.Objects = slices.Clone(after)
+		m.scene.Selected = selected
+		return nil
+	}, Revert: func() error {
+		if !slices.Equal(m.scene.Objects, after) {
+			return history.ErrStale
+		}
+		m.scene.Objects = slices.Clone(before)
+		m.scene.Selected = priorSelection
+		return nil
+	}})
+}
+
+func (m *model) deleteSelected() error {
+	if err := m.editAvailable(); err != nil {
+		return err
+	}
+	i := m.selectedIndex()
+	id := m.scene.Objects[i].ID
+	after := slices.Clone(m.scene.Objects)
+	after = append(after[:i], after[i+1:]...)
+	if err := m.applyObjects("Delete "+id, after, ""); err != nil {
+		return err
+	}
+	m.status = "Deleted " + id
+	return nil
+}
+
+func (m *model) nudge(dx, dy float64) error {
+	if err := m.editAvailable(); err != nil {
+		return err
+	}
+	step := float64(1)
+	if m.snap {
+		step = 20
+	}
+	i := m.selectedIndex()
+	after := slices.Clone(m.scene.Objects)
+	x, y := after[i].X+dx*step, after[i].Y+dy*step
+	if !validPosition(x, y) {
+		return errors.New("component position must be within ±10000")
+	}
+	after[i].X, after[i].Y = x, y
+	if err := m.applyObjects("Move "+after[i].ID, after, after[i].ID); err != nil {
+		return err
+	}
+	m.status = fmt.Sprintf("Moved %s to (%.0f, %.0f)", after[i].ID, x, y)
+	return nil
+}
+func validPosition(x, y float64) bool {
+	return !math.IsNaN(x) && !math.IsNaN(y) && !math.IsInf(x, 0) && !math.IsInf(y, 0) && math.Abs(x) <= 10000 && math.Abs(y) <= 10000
+}
+
+func (m *model) beginMove(g placement.Geometry, p canvas.Point) *objectMove {
+	if m.fileBusy() || m.prompt != "" || m.move != nil || m.palette.State().Active {
+		return nil
+	}
+	world, err := g.World(p)
+	if err != nil {
+		return nil
+	}
+	id := m.scene.ObjectAt(m.scene.View.Screen(world))
+	if id == "" {
+		return nil
+	}
+	m.scene.Selected = id
+	m.scene.View = g.View
+	s := &objectMove{id: id, before: slices.Clone(m.scene.Objects), start: p, grab: world, geometry: g, valid: true}
+	m.move = s
+	return s
+}
+func (m *model) previewMove(s *objectMove, p canvas.Point) {
+	if m.move != s {
+		return
+	}
+	world, err := s.geometry.World(p)
+	s.valid = err == nil
+	if !s.valid {
+		return
+	}
+	if math.Hypot(p.X-s.start.X, p.Y-s.start.Y) < 6*s.geometry.Scale && !s.dragging {
+		return
+	}
+	s.dragging = true
+	// Keep the initial world grab point while mapping the current pointer with
+	// the latest layout, preserving the offset inside the object.
+	dx, dy := world.X-s.grab.X, world.Y-s.grab.Y
+	after := slices.Clone(s.before)
+	for i := range after {
+		if after[i].ID != s.id {
+			continue
+		}
+		x, y := after[i].X+dx, after[i].Y+dy
+		if m.snap {
+			x = math.Round(x/20) * 20
+			y = math.Round(y/20) * 20
+		}
+		if !validPosition(x, y) {
+			s.valid = false
+			return
+		}
+		after[i].X, after[i].Y = x, y
+		m.scene.Objects = after
+		m.status = fmt.Sprintf("Moving %s to (%.0f, %.0f) • Escape cancels", s.id, x, y)
+		return
+	}
+}
+func (m *model) cancelMove(s *objectMove) {
+	if m.move != s || s == nil {
+		return
+	}
+	m.scene.Objects = slices.Clone(s.before)
+	m.scene.Selected = s.id
+	m.move = nil
+	m.status = "Move canceled"
+}
+func (m *model) finishMove(s *objectMove, p canvas.Point) error {
+	if m.move != s {
+		return nil
+	}
+	m.previewMove(s, p)
+	if !s.valid {
+		m.cancelMove(s)
+		return nil
+	}
+	after := slices.Clone(m.scene.Objects)
+	m.scene.Objects = slices.Clone(s.before)
+	m.move = nil
+	if !s.dragging || slices.Equal(after, s.before) {
+		return nil
+	}
+	if err := m.applyObjects("Move "+s.id, after, s.id); err != nil {
+		return err
+	}
+	m.status = "Moved " + s.id
+	return nil
+}
+
+// Layout can settle after focus/disabled styling. Refresh its mapping and clip
+// while retaining the initial world grab point for translation.
+// Camera or display-scale changes invalidate a gesture rather than mixing maps.
+func (m *model) updateMoveGeometry(s *objectMove, g placement.Geometry) bool {
+	if m.move != s || s == nil {
+		return false
+	}
+	before := s.geometry
+	if g.Window != before.Window || g.Scale != before.Scale || g.View.Zoom != before.View.Zoom || g.View.Center != before.View.Center {
+		m.cancelMove(s)
+		return false
+	}
+	s.geometry = g
+	m.scene.View = g.View
+	return true
+}
