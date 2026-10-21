@@ -41,6 +41,7 @@ var helpTopics = []helpTopic{
 	{"files", "Files, settings and export", []string{
 		"Open and New ask before discarding unsaved changes. Cancel to keep the drawing and save first. Recent lists successful Opens, Saves and saved copies. Opening a drawing resets Undo history.",
 		"More → Save a Copy writes a separate drawing without changing the active filename, dirty state or history. Copy destinations cannot refer to the active drawing. Native choosers handle overwrite confirmation.",
+		"More → Export PNG writes visible drawing or selection geometry at 1×, 2× or 4× with transparent, white or dark background. Bounds fit the objects. Camera, grid and handles are omitted; oversize outputs are rejected. PNG is output only.",
 		"More → Export SVG writes visible rectangles in world coordinates and paint order, including locked objects. Hidden objects, grid and selection handles are omitted. SVG is output only; Open uses .vellum drawings.",
 		"More → Export Selected SVG exports only whole selected visible units with a viewBox fitted to their bounds. More → Revert to Saved reloads the active file; dirty drawings require confirmation. Cancel or a failed read preserves the drawing and history. Successful reload clears Undo/Redo.",
 		"Private recovery offers the latest completed interrupted-session copy at startup. It is not a document version log. Explicit Save and Save a Copy remain the durable file workflow.",

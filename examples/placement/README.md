@@ -620,3 +620,9 @@ The frozen native clipboard service returns complete text before app validation;
 ## Saved views (internal 24)
 
 **Zoom → Saved views…** names the current pan/zoom position. Up to 16 unique names travel with each drawing; saving an existing name updates its camera. Save current view and Remove view each create one Undo/Redo entry and mark dirty; Restore view changes only navigation and keeps selection, geometry and history. Window size is never restored. Bookmarks use drawing format6; versions1–5 still open, while older builds cannot read drawings containing bookmarks. Save/Open, Save a Copy and recovery retain them; New clears them. The dialog captures the current camera when opened.
+
+## PNG export (internal 24)
+
+**More → Export PNG…** exports the visible drawing (including locked components) or selected whole units. Choose 1×, 2× or 4× pixels per world unit and a transparent, white or dark background. Dimensions preview before the file chooser. Bounds fit exported geometry; paint order and fills match the drawing. This is CPU geometry export, with rectangle edges rounded outward to pixels, not a GPU screenshot. Camera, grid and editing overlays are omitted.
+
+Each output is bounded to 8192 pixels per side, 16 megapixels and 16 MiB encoded data. Oversize drawings require a smaller selection or scale. Rendering/encoding and atomic file output use the existing detached worker. Cancel/failure preserves the drawing; export cannot overwrite the active drawing and does not change the active filename, dirty state, Undo/Redo or Recent. PNG import remains unavailable.

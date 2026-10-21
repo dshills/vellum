@@ -23,6 +23,7 @@ type component struct {
 	Color         color.RGBA
 }
 type model struct {
+	pngDraft                          *pngDraft
 	savedViews                        []savedView
 	viewsDraft                        *savedViewsDraft
 	batchRename                       *batchRenameDraft

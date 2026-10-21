@@ -18,6 +18,7 @@ type detachedSaveConfig[T any] struct {
 	title, filename, extension, success string
 	codec                               document.Codec[T]
 	store                               document.Store
+	maxBytes                            int
 	recordRecent                        bool
 }
 
@@ -53,12 +54,16 @@ func startDetachedSave[T any](m *model, a *app.Application, ref app.WindowRef, c
 		}
 		return path, nil
 	}
+	maxBytes := c.maxBytes
+	if maxBytes == 0 {
+		maxBytes = drawingByteLimit
+	}
 	journal, err := history.New(1)
 	if err != nil {
 		return err
 	}
 	var session *document.Session[T]
-	session, err = document.New(document.Config[T]{Owner: a, Window: "placement", Journal: journal, Codec: c.codec, Filename: c.filename, Extensions: []string{c.extension}, MaxBytes: drawingByteLimit, Store: c.store, Choose: chooser, OnComplete: func(r document.Result) {
+	session, err = document.New(document.Config[T]{Owner: a, Window: "placement", Journal: journal, Codec: c.codec, Filename: c.filename, Extensions: []string{c.extension}, MaxBytes: int64(maxBytes), Store: c.store, Choose: chooser, OnComplete: func(r document.Result) {
 		if m.output != session {
 			return
 		}

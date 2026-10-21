@@ -63,12 +63,12 @@ func (m *model) bindFiles(a *app.Application, ref app.WindowRef, choose func(con
 	if err != nil {
 		return err
 	}
-	for _, c := range []struct{ id, label, shortcut string }{{"new", "New", "Meta+N"}, {"open", "Open…", "Meta+O"}, {"save", "Save", "Meta+S"}, {"save-as", "Save As…", "Meta+Shift+S"}, {"save-copy", "Save a Copy…", ""}, {"export-svg", "Export SVG…", ""}, {"export-selected-svg", "Export Selected SVG…", ""}} {
+	for _, c := range []struct{ id, label, shortcut string }{{"new", "New", "Meta+N"}, {"open", "Open…", "Meta+O"}, {"save", "Save", "Meta+S"}, {"save-as", "Save As…", "Meta+Shift+S"}, {"save-copy", "Save a Copy…", ""}, {"export-svg", "Export SVG…", ""}, {"export-selected-svg", "Export Selected SVG…", ""}, {"export-png", "Export PNG…", ""}} {
 		if err := m.commands.Register(command.Command{ID: c.id, Label: c.label, Shortcut: c.shortcut, Available: func() error {
 			if c.id == "export-selected-svg" {
 				return m.selectedSVGAvailable()
 			}
-			if c.id == "export-svg" {
+			if c.id == "export-svg" || c.id == "export-png" {
 				return m.svgAvailable()
 			}
 			if m.fileBusy() || m.move != nil || m.prompt != "" || m.palette.State().Active {
@@ -102,6 +102,8 @@ func (m *model) fileAction(a *app.Application, ref app.WindowRef, action string,
 	}
 	var err error
 	switch action {
+	case "export-png":
+		return m.beginPNG()
 	case "export-selected-svg":
 		return m.exportSelectedSVG(a, ref, nil)
 	case "export-svg":
