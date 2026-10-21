@@ -13,17 +13,12 @@ import (
 )
 
 func (m *model) fileBusy() bool {
-	return m.layerDrag != nil || m.clipboardJob != nil || (m.files != nil && m.files.State().Busy)
+	return m.layerDrag != nil || m.clipboardJob != nil || (m.output != nil && m.output.State().Busy) || (m.files != nil && m.files.State().Busy)
 }
 
 func (m *model) bindFiles(a *app.Application, ref app.WindowRef, choose func(context.Context, app.FileOptions) (string, error)) error {
 	var err error
-	// Session invokes this on its worker. Normalize only the suggestion, never
-	// the destination returned by the OS after overwrite confirmation.
-	chooseDrawing := func(ctx context.Context, options app.FileOptions) (string, error) {
-		if options.Mode == app.SaveFile {
-			options.Filename = drawingSuggestion(options.Filename)
-		}
+	nativeChooser := func(ctx context.Context, options app.FileOptions) (string, error) {
 		if choose != nil {
 			return choose(ctx, options)
 		}
@@ -32,6 +27,14 @@ func (m *model) bindFiles(a *app.Application, ref app.WindowRef, choose func(con
 			return "", err
 		}
 		return services.ChooseFile(ctx, options)
+	}
+	m.chooseFile = nativeChooser
+	// Normalize only a suggestion, never the confirmed destination.
+	chooseDrawing := func(ctx context.Context, options app.FileOptions) (string, error) {
+		if options.Mode == app.SaveFile {
+			options.Filename = drawingSuggestion(options.Filename)
+		}
+		return nativeChooser(ctx, options)
 	}
 	m.newFileSession = func() (*document.Session[drawingFile], error) {
 		return document.New(document.Config[drawingFile]{Owner: a, Window: "placement", Journal: m.journal, Codec: drawingCodec(m), Filename: "Drawing.vellum", Extensions: []string{"vellum"}, MaxBytes: drawingByteLimit, Choose: chooseDrawing, OnComplete: func(r document.Result) {
@@ -60,7 +63,7 @@ func (m *model) bindFiles(a *app.Application, ref app.WindowRef, choose func(con
 	if err != nil {
 		return err
 	}
-	for _, c := range []struct{ id, label, shortcut string }{{"new", "New", "Meta+N"}, {"open", "Open…", "Meta+O"}, {"save", "Save", "Meta+S"}, {"save-as", "Save As…", "Meta+Shift+S"}} {
+	for _, c := range []struct{ id, label, shortcut string }{{"new", "New", "Meta+N"}, {"open", "Open…", "Meta+O"}, {"save", "Save", "Meta+S"}, {"save-as", "Save As…", "Meta+Shift+S"}, {"save-copy", "Save a Copy…", ""}} {
 		if err := m.commands.Register(command.Command{ID: c.id, Label: c.label, Shortcut: c.shortcut, Available: func() error {
 			if m.fileBusy() || m.move != nil || m.prompt != "" || m.palette.State().Active {
 				return document.ErrBusy
@@ -93,6 +96,8 @@ func (m *model) fileAction(a *app.Application, ref app.WindowRef, action string,
 	}
 	var err error
 	switch action {
+	case "save-copy":
+		return m.saveCopy(a, ref, nil)
 	case "new":
 		return m.newDrawing(a, ref, discard)
 	case "open":
@@ -156,7 +161,12 @@ func (m *model) requestClose(a *app.Application) bool {
 		job.ticket.Abort()
 	}
 	if m.fileBusy() {
-		m.files.Cancel()
+		if m.output != nil {
+			m.output.Cancel()
+		}
+		if m.files != nil {
+			m.files.Cancel()
+		}
 		m.status = "Canceling file operation; close again when it finishes"
 		_ = a.Invalidate("placement")
 		return false

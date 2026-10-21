@@ -8,6 +8,7 @@ import (
 	"math"
 	"slices"
 
+	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/command"
 	"github.com/dshills/vellum/document"
@@ -33,6 +34,8 @@ type model struct {
 	snap, locked, rejectNotes         bool
 	status                            string
 	files                             *document.Session[drawingFile]
+	output                            detachedFileSession
+	chooseFile                        func(context.Context, app.FileOptions) (string, error)
 	newFileSession                    func() (*document.Session[drawingFile], error)
 	recent                            *recentDrawings
 	geometry                          *geometryDraft

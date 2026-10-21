@@ -497,3 +497,12 @@ current world-space view center, preserving relative positions, group membership
 and names with fresh IDs. It bypasses snapping and creates one Undo entry; Redo
 restores the same IDs. Invalid/out-of-bounds payloads are rejected atomically.
 Existing Paste keeps its offset cascade; centered Paste does not advance it.
+
+## Save a Copy (internal 20)
+
+**More → Save a Copy…** writes a detached drawing snapshot to a separate file.
+The active filename, Save destination, dirty state, selection and Undo history
+are unchanged. The native chooser confirms overwrites; choosing the active file
+or an existing alias of it is refused. Successful copies appear in Recent.
+Cancel or failed storage keeps the drawing. IO uses the existing bounded document
+worker and atomic replacement; closing during output first cancels that operation.
