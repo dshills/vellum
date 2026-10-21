@@ -1,0 +1,179 @@
+{
+  "outcome": "TWO_VALID_NATIVE_REFERENCE_COHORTS_NO_FRAMEWORK_FIX",
+  "started_utc": "2026-10-21T18:19:06.207561+00:00",
+  "finished_utc": "2026-10-21T18:19:18.044859+00:00",
+  "source_and_binary_pins": [
+    {
+      "artifact_path": "macos-native-latency-repair/ready-reference/native",
+      "sha256": "2b81753dd84ffb95711164a05ed8662166be0a2804af873dd75c3850ac9fb45b",
+      "evidence_member": null,
+      "availability": "excluded executable"
+    },
+    {
+      "artifact_path": "macos-native-latency-repair/ready-reference/main.m",
+      "sha256": "4b8e3534785c804178711aa248caf20c7e7c08303a8c21dd885cb289d73c1f13",
+      "evidence_member": "main.m",
+      "availability": "archived"
+    },
+    {
+      "artifact_path": "macos-native-latency-repair/ready-reference/run.py",
+      "sha256": "73a907cb06692cac24f0640656151751f831a1f51875066d35b5b9fe66e94054",
+      "evidence_member": "run.py",
+      "availability": "archived"
+    },
+    {
+      "artifact_path": "macos-native-latency-repair/ready-reference/validate.py",
+      "sha256": "b667f17b99a6f6eebf379e10298a71fcff745ed816f45bc9395bb9f2c60c4fc9",
+      "evidence_member": "validate.py",
+      "availability": "archived"
+    },
+    {
+      "artifact_path": "macos-native-latency-repair/ready-reference/validate_test.py",
+      "sha256": "200d9ab70e8384a34f601ebb1b5802c7c19495c78d0a9c26941204f124a6b723",
+      "evidence_member": "validate_test.py",
+      "availability": "archived"
+    },
+    {
+      "artifact_path": "macos-native-latency-repair/ready-reference/plan.txt",
+      "sha256": "a367c3b562073c82ceeab9069bc2203ffccdcabed98922c492ebcd334e65acab",
+      "evidence_member": "plan.txt",
+      "availability": "archived"
+    },
+    {
+      "artifact_path": "macos-release-default-assessment/assessment.py",
+      "sha256": "a7c5a9d900a615339bef1d5c4c7a20293bf5142b422c9d95945ae1acbfda89c2",
+      "evidence_member": null,
+      "availability": "external reused helper; hash only, not a standalone rebuild bundle"
+    },
+    {
+      "artifact_path": "macos-sdk-native-238b3b6/run.py",
+      "sha256": "e76238012be63f58cbc5923e27f6fc227a3aca8443d85d64f466c0675382c7ac",
+      "evidence_member": null,
+      "availability": "external reused helper; hash only, not a standalone rebuild bundle"
+    },
+    {
+      "artifact_path": "macos-sdk-stage0079-abe67c6-cache-v2/shared/live_lease.py",
+      "sha256": "90137d3675603d3018c62b46b55dbc35242d0869127acc53fdae00d35bd0f1f4",
+      "evidence_member": null,
+      "availability": "external reused helper; hash only, not a standalone rebuild bundle"
+    }
+  ],
+  "modes": {
+    "raw": {
+      "outcome": "VALID_READY_WINDOW_REFERENCE",
+      "exit_code": 0,
+      "seconds": 4.638527166796848,
+      "owned_retired": true,
+      "geometry_unchanged": true,
+      "configuration_bytes_unchanged": true,
+      "metrics": {
+        "outcome": "VALID_READY_WINDOW_NATIVE_REFERENCE",
+        "mode": "raw",
+        "receipt_boundary": "before nextDrawable",
+        "native_OS_floor_proven": false,
+        "framework_release_qualified": false,
+        "setup_count": 7,
+        "setup_zero_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "warmup_count": 128,
+        "measured_count": 120,
+        "measured_receipt_to_shown_ms": {
+          "count": 120,
+          "p50": 48.3329170383513,
+          "p95": 48.84349997155368,
+          "p99": 48.9049581810832,
+          "max": 48.94124995917082
+        },
+        "measured_display_intervals_ms": {
+          "count": 119,
+          "p50": 16.666749957948923,
+          "p95": 16.666792100295424,
+          "p99": 16.666832845658064,
+          "max": 16.666833078488708
+        }
+      }
+    },
+    "link": {
+      "outcome": "VALID_READY_WINDOW_REFERENCE",
+      "exit_code": 0,
+      "seconds": 4.533486666856334,
+      "owned_retired": true,
+      "geometry_unchanged": true,
+      "configuration_bytes_unchanged": true,
+      "metrics": {
+        "outcome": "VALID_READY_WINDOW_NATIVE_REFERENCE",
+        "mode": "provided-link",
+        "receipt_boundary": "provided-drawable callback;acquisition precedes receipt",
+        "native_OS_floor_proven": false,
+        "framework_release_qualified": false,
+        "setup_count": 7,
+        "setup_zero_indices": [
+          0,
+          1,
+          2
+        ],
+        "warmup_count": 128,
+        "measured_count": 120,
+        "measured_receipt_to_shown_ms": {
+          "count": 120,
+          "p50": 49.834791803732514,
+          "p95": 49.90845895372331,
+          "p99": 49.93141698651016,
+          "max": 49.95504207909107
+        },
+        "measured_display_intervals_ms": {
+          "count": 119,
+          "p50": 16.666749957948923,
+          "p95": 16.666792100295424,
+          "p99": 16.666834009811282,
+          "max": 16.666834009811282
+        },
+        "callback_to_target_ms": {
+          "count": 120,
+          "p50": 49.82120799832046,
+          "p95": 49.89124997518957,
+          "p99": 49.919334007427096,
+          "max": 49.9376670923084
+        },
+        "target_to_shown_ms": {
+          "count": 120,
+          "p50": 0.01354212872684002,
+          "p95": 0.017042038962244987,
+          "p99": 0.01733400858938694,
+          "max": 0.01737498678267002
+        }
+      },
+      "derived_metrics": {
+        "callback_to_render_deadline_ms": {
+          "count": 120,
+          "p50": 16.48779190145433,
+          "p95": 16.55783411115408,
+          "p99": 16.58591697923839,
+          "max": 16.604250064119697
+        },
+        "render_deadline_to_presentation_target_ms": {
+          "count": 120,
+          "p50": 33.333417028188705,
+          "p95": 33.333417028188705,
+          "p99": 33.333417028188705,
+          "max": 33.333417028188705
+        }
+      }
+    }
+  },
+  "native_commands": 2,
+  "probe_commands": 16,
+  "all_groups_retired": true,
+  "framework_release_qualified": false,
+  "native_OS_floor_proven": false,
+  "policy_changed": false,
+  "foreground_qualified": false,
+  "receipt_boundaries_differ": true,
+  "reference_allows_next_drawable_timeout": true
+}

@@ -9,7 +9,23 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
-## Current checkpoint — native latency investigation; blocker unresolved
+## Current checkpoint — ready native reference; latency gate still open
+
+The [ready-window native reference](../docs/reports/macos-native-ready-reference/README.md)
+passes two scoped native cohorts after explicit setup readiness, 128 warmups and
+120 measured frames each. Raw render-request p95 is 48.843 ms; direct native callback
+p95 is 49.908 ms with a native presentation target about 50 ms ahead. Boundaries
+differ; this does not establish framework qualification or a universal OS floor.
+Actual foreground/key-window state was not instrumented. Both native and all
+16 probe groups retire; source/geometry/configuration boundaries hold.
+
+No framework policy or latency threshold changes. Verify foreground/scheduling
+state before selecting another repair or proposing a new owner-approved latency
+policy. Any revised policy needs predeclared criteria and fresh representative
+framework measurements. The preceding failed candidates remain rejected; M3–M7
+stay open. Features remain frozen.
+
+## Previous checkpoint — native latency investigation; blocker unresolved
 
 The [native investigation](../docs/reports/macos-native-latency-investigation/README.md)
 confirms two native drawables with vsync. All four private presentation candidates

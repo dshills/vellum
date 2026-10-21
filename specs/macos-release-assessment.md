@@ -83,3 +83,18 @@ drawable ownership through the native surface rather than interception of
 callback/target-presentation timestamps. Preserve receipt-before-queue semantics,
 all states, FIFO/vsync, cancellation and shutdown. Missing target timestamps and
 failed prefixes currently prevent choosing a safe repair; this does not waive M3.
+
+## Ready native reference result
+
+The [ready-window reference](../docs/reports/macos-native-ready-reference/README.md)
+closes the readiness/target-timestamp diagnostic prerequisite with two valid
+128-warmup/120-measured cohorts. Raw render-request p95 is 48.843 ms; direct native
+display-link callback p95 is 49.908 ms and its presentation target is about 50 ms
+ahead, followed within 0.018 ms. Boundaries differ; no causal A/B pooling or OS-floor
+claim follows. Actual foreground/key-window state was not instrumented.
+
+No framework repair or threshold change is adopted. Before another backend
+change or a baseline-derived release-policy proposal, verify foreground/key-window
+state and scheduling configuration. Any policy revision needs owner approval,
+predeclared criteria and fresh representative measurements; the minimal reference
+does not qualify the framework. Existing failed 33.3 ms scopes remain failed.
