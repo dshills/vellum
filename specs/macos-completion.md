@@ -1659,3 +1659,14 @@ diagnostic storage with original-failing/race-passing regressions; it changes no
 ordinary rendering/pacing behavior or public API. Retained SDK and native archive
 remain unchanged. Inspect native allocation/mapping/copy/queue work inside image
 upload before choosing a performance repair; gate/freeze and M3–M7 stay unchanged.
+
+
+### Native CPU upload-stage control (21 October 2026)
+
+The [private off/on upload probe](../docs/reports/macos-upload-probe/README.md)
+finds staging copy p95 2.612 ms, create-buffer0.117 ms and map0.002167 ms. Copy
+may include deferred backing/cache effects; no pool/cache policy is adopted.
+All248 on-mode cohort writes and six startup writes are retained/matched; source,
+SDK, resource ownership and defaults remain unchanged. Next compare first versus
+subsequent native copies and CPU cache modes with GPU byte readback. This remains
+diagnostic-only; features/gate stay frozen and M3–M7 remain open.

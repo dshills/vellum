@@ -1,0 +1,216 @@
+{
+  "outcome": "VALID_PRIVATE_CPU_UPLOAD_PAIR",
+  "source_checkpoint": "0640a2e",
+  "started_utc": "2026-10-21T22:13:55.735788+00:00",
+  "finished_utc": "2026-10-21T22:15:02.371049+00:00",
+  "elapsed_seconds": 66.635261,
+  "maximum_seconds": 90,
+  "native_commands": 2,
+  "probe_commands": 16,
+  "retired_owned_groups": 18,
+  "warmup_states": 256,
+  "measured_states": 240,
+  "observer_on_measured_states": 120,
+  "runs": [
+    {
+      "mode": "off",
+      "metrics": {
+        "outcome": "VALID_CPU_SOURCE_DIAGNOSTIC",
+        "warmup": 128,
+        "measured": 120,
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "source_phase_ms": {
+          "DrawNS": {
+            "count": 120,
+            "p50": 3.013958,
+            "p95": 3.555417,
+            "p99": 4.345625,
+            "max": 4.373166
+          },
+          "RasterNS": {
+            "count": 120,
+            "p50": 0.724125,
+            "p95": 0.756833,
+            "p99": 1.304625,
+            "max": 2.262292
+          },
+          "CopyNS": {
+            "count": 120,
+            "p50": 2.288833,
+            "p95": 2.756125,
+            "p99": 3.402833,
+            "max": 3.530792
+          },
+          "SetFromGoImageNS": {
+            "count": 120,
+            "p50": 2.281333,
+            "p95": 2.746208,
+            "p99": 3.394875,
+            "max": 3.520875
+          }
+        },
+        "totals": {
+          "DrawNS": 350124709,
+          "RasterNS": 80643959,
+          "CopyNS": 269175207,
+          "SetFromGoImageNS": 268224378,
+          "SetFromGoImageAttempts": 120,
+          "ImageCacheHits": 0,
+          "LogicalUploadRGBABytes": 923065920
+        },
+        "nested_shares_of_source_draw": {
+          "RasterNS": 0.23032924248713907,
+          "CopyNS": 0.7687980884548197,
+          "SetFromGoImageNS": 0.7660824017992972
+        },
+        "presentation_feedback_accounting_valid": true,
+        "latency_gate_qualified": false,
+        "diagnostic_only": "Additional source clocks/counters and private compiler overlays; these timings are not ordinary latency qualification or successful GPU transfer evidence.",
+        "observer_mode": "off"
+      }
+    },
+    {
+      "mode": "on",
+      "metrics": {
+        "outcome": "VALID_CPU_SOURCE_DIAGNOSTIC",
+        "warmup": 128,
+        "measured": 120,
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "source_phase_ms": {
+          "DrawNS": {
+            "count": 120,
+            "p50": 3.053125,
+            "p95": 3.651584,
+            "p99": 4.008958,
+            "max": 4.683333
+          },
+          "RasterNS": {
+            "count": 120,
+            "p50": 0.730792,
+            "p95": 0.768416,
+            "p99": 0.821458,
+            "max": 0.824792
+          },
+          "CopyNS": {
+            "count": 120,
+            "p50": 2.319167,
+            "p95": 2.884625,
+            "p99": 3.1805,
+            "max": 3.938792
+          },
+          "SetFromGoImageNS": {
+            "count": 120,
+            "p50": 2.309208,
+            "p95": 2.874208,
+            "p99": 3.171875,
+            "max": 3.917167
+          }
+        },
+        "totals": {
+          "DrawNS": 337728418,
+          "RasterNS": 74823082,
+          "CopyNS": 262606122,
+          "SetFromGoImageNS": 261614460,
+          "SetFromGoImageAttempts": 120,
+          "ImageCacheHits": 0,
+          "LogicalUploadRGBABytes": 923065920
+        },
+        "nested_shares_of_source_draw": {
+          "RasterNS": 0.2215480783142152,
+          "CopyNS": 0.7775659612985247,
+          "SetFromGoImageNS": 0.7746296907712398
+        },
+        "presentation_feedback_accounting_valid": true,
+        "latency_gate_qualified": false,
+        "diagnostic_only": "Additional source clocks/counters and private compiler overlays; these timings are not ordinary latency qualification or successful GPU transfer evidence.",
+        "observer_mode": "on",
+        "native_trace_records": 254,
+        "retained_startup_uploads": 6,
+        "joined_cohort_uploads": 248,
+        "CPU_phase_ms": {
+          "create_ns": {
+            "count": 120,
+            "p50": 0.10187504813075066,
+            "p95": 0.11699995957314968,
+            "p99": 0.13891677372157574,
+            "max": 0.17533334903419018
+          },
+          "map_ns": {
+            "count": 120,
+            "p50": 0.0017085112631320953,
+            "p95": 0.0021667219698429108,
+            "p99": 0.0023334287106990814,
+            "max": 0.00237487256526947
+          },
+          "copy_ns": {
+            "count": 120,
+            "p50": 2.0606250036507845,
+            "p95": 2.6116250082850456,
+            "p99": 2.9237917624413967,
+            "max": 3.114833263680339
+          },
+          "flush_ns": {
+            "count": 120,
+            "p50": 0.0008335337042808533,
+            "p95": 0.0011667143553495407,
+            "p99": 0.0013748649507761002,
+            "max": 0.001500127837061882
+          },
+          "encode_ns": {
+            "count": 120,
+            "p50": 0.06345845758914948,
+            "p95": 0.07041660137474537,
+            "p99": 0.09433319792151451,
+            "max": 0.6515833083540201
+          },
+          "native_total_ns": {
+            "count": 120,
+            "p50": 2.2874583955854177,
+            "p95": 2.8423331677913666,
+            "p99": 3.149874974042177,
+            "max": 3.893875051289797
+          },
+          "other_native_ns": {
+            "count": 120,
+            "p50": 0.051666516810655594,
+            "p95": 0.061957864090800285,
+            "p99": 0.06483308970928192,
+            "max": 0.08895830251276493
+          },
+          "Go_API_outside_native_ns": {
+            "count": 120,
+            "p50": 0.01983379121553898,
+            "p95": 0.026166041753053666,
+            "p99": 0.04416606791949272,
+            "max": 0.04545877859425545
+          }
+        },
+        "uploads_per_measured_frame": {
+          "count": 120,
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1
+        },
+        "interpretation": "CPU function success is not GPU upload success or completion. Signed residuals retain clock rounding. No phase quantile addition, observer-neutrality or shipping-equivalence proof."
+      }
+    }
+  ],
+  "on_minus_off_image_API_run_p95_ms": 0.128,
+  "release_gate_changed": false,
+  "framework_qualified": false,
+  "zero_observer_overhead_proven": false,
+  "allocation_pool_justified": false,
+  "shipping_binary_equivalence_proven": false,
+  "conclusion": "Measured staging CPU copy is the dominant native upload stage (p95 2.611625ms), not buffer creation (0.117ms) or mapping (0.002167ms). No pool or cache policy is adopted.",
+  "limits": [
+    "One private same-binary off/on pair with detailed source clocks; not shipping-path cost equivalence or observer neutrality.",
+    "CPU function success is not GPU upload success, GPU completion, deallocation or physical transfer proof.",
+    "Native stages and Go source phases are nested; quantiles are not additive. Signed residuals are retained.",
+    "Six startup writes retained; all248 on-mode warmup/measured uploads uniquely joined to source API attempts/bytes.",
+    "No renderer/default/resource-lifetime/SDK/app/release-gate change."
+  ],
+  "next_action": "Offscreen native cache-mode/first-versus-subsequent-copy control with exact GPU byte readback, before considering any cache or ownership change."
+}
