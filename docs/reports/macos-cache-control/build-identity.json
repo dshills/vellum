@@ -1,0 +1,57 @@
+{
+  "scope": "Private transient-upload staging CPU cache control, diagnostic only",
+  "source_native_commit": "6aed50955d934ac36049ba8d002034841633ae02",
+  "core_version": "29.0.3",
+  "hal_version": "29.0.3",
+  "archive_sha256": "5c3cf3f8b7139afaf1769e4abd841bdd5849f29c3dd8093c4e6b3f2218024598",
+  "binary_sha256": "d10aeab15f48c0bc79955194db083836dc85ae07f5fb4221c8a609a9451c6bf0",
+  "binary_mode": "0o755",
+  "private_source_pins": {
+    "/private/tmp/vellum-cache-control/source/Cargo.toml": "ae624ecf99374d2e465074c7e7e672cf488c53359c54d305c4e5241c7ccd9614",
+    "/private/tmp/vellum-cache-control/source/Cargo.lock": "88b105b6f5ec2afdaeef2f373596b2de3dc35c9be5fc7db094c5284cc96ed251",
+    "/private/tmp/vellum-cache-control/source/src/lib.rs": "2570feb07c152fe49c8533a733e52030182831e505295ed905098dadb0c7cd71",
+    "/private/tmp/vellum-cache-control/core/src/device/queue.rs": "3974fd73c652ffe6e2fe998da051c0aca4403e6cbcd93d929b7b4fd4f19b4ddc",
+    "/private/tmp/vellum-cache-control/core/src/resource.rs": "92d321ba6c6eeb4042ab3799aac9b1dd3278b2b5ecb978101c339e11a1158c18",
+    "/private/tmp/vellum-cache-control/core/src/lib.rs": "71a6a765e9a4f7db0fdc6e84e8962a0b619e5927c373636ce8ebef0090c7a689",
+    "/private/tmp/vellum-cache-control/core/src/upload_probe.rs": "88b0f4092fcd9930ca5c2ae9b4c6134e8a5d132e751901e28cc115e9aca3f628",
+    "/private/tmp/vellum-cache-control/hal/src/metal/device.rs": "528f1ee064fe77858be67930d441517c7dde07acc85e048fb1dfa61ce2a9bc00",
+    "/private/tmp/vellum-cache-control/hal/src/metal/mod.rs": "c3ae2f048bd128a0cd063a8db3c89465fb01e81f259a42225096bf1ed9957db5",
+    "/private/tmp/vellum-cache-control/hal/src/metal/vellum_cache_control.rs": "9745eda8d1d0392348de8d0f0448143ed5a7283fef29248e3c085e4d1cadecf9"
+  },
+  "fixture_source_pins": {
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/cachecontrol/run.py": "852dd54728309f9fa11661b3bc0d352c361aa22b0a2c19a8cab61c95cb9ffec2",
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/cachecontrol/check.py": "f548a6610ab676745869fcc86bf297990a26a929f1fffc1da96898904da0a7de",
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/cachecontrol/control.rs": "9745eda8d1d0392348de8d0f0448143ed5a7283fef29248e3c085e4d1cadecf9",
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/cachecontrol/check_test.py": "1f3eb023abed328408df102c5cea4754c0fc8e51cd02b5abc287fb9d5c92b050",
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/cachecontrol/PLAN.md": "75f5a5d4639b60ddee015dccfb364613cfd052e0b2881b51a639794e248ed185",
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/cachecontrol/apply.py": "f14411964b29ac5f47ec3e9c3815db07b3a02d902f0ca1d678c9b0cfadb931fc",
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/cachecontrol/framework/go.mod": "2bed622ceae81d0ded2a1ab0d5b367f06da6cc8c6e0a16e580861d1f05160db1",
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/cachecontrol/framework/observe_darwin.m": "c7cefc649f5b4ceaa3ee0423d68ec5c3b32508be24f93d0e8b8100f9eacd9db3",
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/cachecontrol/framework/fixture.go": "4e14d6858041b6172aa53e47ec0bf043f5fc456b7373c29f9b14927ec06b1c08",
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/cachecontrol/framework/fixture_test.go": "4e182a49706f02da18b81e125911a5d77037a7024f7dc8c22162a883d7517526",
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/cachecontrol/framework/go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/cachecontrol/framework/probe_darwin.go": "4fae642a877e89cfa9681daa392330ace49ca9612501425ae3cccf21dffa1590",
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/cachecontrol/framework/main_darwin.go": "89094fae19104ea2a9289bfe1689014b8b58a12f7ee30b8880c439b21a389b4f",
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/cachecontrol/framework/observe_darwin.go": "62479d35a317dd3beac599a7301399c5d35b6fbf4fb906bb7186c320abad7ce8"
+  },
+  "overlay_file_pins": {
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-cache-control/overlay.json": "4330e6293acee53dbdc8e53166210c6e4c76e507cb880464138c11592c036c75",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-cache-control/desktop_session.go": "3e3b8bc6f79edbac67433813103a39eccdf31e1075e62f9aaca0d8bbbeb58cf4",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-cache-control/desktop_measurement.go": "ac8a07ac2175f82a41b8c6d4953a7e5b34f35f69beba572e4efe4db91b65bceb",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-cache-control/frame_trace.go": "3154804322a30dabc9003f552d822e1bea5c791dd53309c2b808ef29eb069332"
+  },
+  "exact_view_routing_pixel_model_reused_files": [
+    "fixture.go",
+    "fixture_test.go",
+    "observe_darwin.go",
+    "observe_darwin.m",
+    "go.sum"
+  ],
+  "all_original_HAL_archive_members_verified": 84,
+  "only_lock_change": "wgpu-hal 29.0.3 registry-to-private-path; all package name/versions and other entries equal",
+  "one_binary_both_modes_observers_on": true,
+  "actual_gpu_pixels_verified_by_this_fixture": false,
+  "source_audit_sha256": "e6b29ccb4ad5a15336515dd58b468049473d18365227d032084791e2cc110f30",
+  "shipping_SDK_or_app_modified": false,
+  "gate_changed": false
+}

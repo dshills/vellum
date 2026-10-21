@@ -1678,3 +1678,8 @@ write-combined 0.642–0.684 ms. This standalone serial workload does not explai
 framework CPU-copy gap or justify asynchronous pooling/cache-policy adoption.
 Next compare cache modes in the actual private framework without changing shipped
 bytes, ownership or the 33.3 ms gate. Features frozen, M3–M7 open.
+
+The [private framework upload-cache control](../tools/macos-calibration/cachecontrol/PLAN.md)
+will test the standalone cache-mode observation in the actual framework process.
+Same diagnostic binary, three bounded pairs, observed Metal mode counters, no
+ownership or shipping changes; gate remains unchanged.
