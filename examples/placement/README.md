@@ -592,3 +592,7 @@ Commands. Its modal and callbacks use the native window lifetime and draft ident
 **Edit → Copy Fill Style** copies the primary member's actual color. Select other components or groups and choose **Paste Fill Style** to change their fills in one Undo/Redo. This uses a separate bounded, versioned native text clipboard payload; ordinary text and copied component payloads are rejected. Style actions do not change positions, names, grouping, selection or the ordinary Paste offset sequence. A pending read is rejected if the drawing or selection changes before owner admission.
 
 The frozen native clipboard service returns complete text before app validation; the 256-byte style limit bounds parsing/admission rather than native pasteboard allocation. Copy captures the primary color at invocation, like ordinary Copy; it does not track later selection changes.
+
+## Export Selected SVG (internal 23)
+
+**More → Export Selected SVG…** exports only the selected visible components and complete groups, retaining paint order, names, opaque fills and world geometry. The SVG viewBox fits their bounds. Camera, grid and selection handles are omitted. Export captures a snapshot before the chooser opens and leaves the active path, dirty state and Undo/Redo unchanged. The separate destination cannot overwrite the active drawing. SVG import remains unavailable.

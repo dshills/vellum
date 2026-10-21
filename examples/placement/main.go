@@ -179,7 +179,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 			{ID: "open", Kind: ui.Button, Text: "Open…", Disabled: m.files == nil || m.commandDisabled("open"), Activate: invoke("open")},
 			{ID: "save", Kind: ui.Button, Text: "Save", Disabled: m.files == nil || m.commandDisabled("save"), Activate: invoke("save")},
 			{ID: "save-as", Kind: ui.Button, Text: "Save As…", Disabled: m.files == nil || m.commandDisabled("save-as"), Activate: invoke("save-as")},
-			m.actionMenu("file-extra-menu", "More", []ui.Option{{ID: "save-copy", Label: "Save a Copy…"}, {ID: "export-svg", Label: "Export SVG…"}}, invoke),
+			m.actionMenu("file-extra-menu", "More", []ui.Option{{ID: "save-copy", Label: "Save a Copy…"}, {ID: "export-svg", Label: "Export SVG…"}, {ID: "export-selected-svg", Label: "Export Selected SVG…"}}, invoke),
 			m.recentMenu(a, ref, update),
 			{ID: "commands-open", Kind: ui.Button, Text: "Commands…", Disabled: m.commandDisabled("command-palette"), Activate: invoke("command-palette")},
 			{ID: "help-open", Kind: ui.Button, Text: "Help…", Disabled: m.commandDisabled("help-guide"), Activate: invoke("help-guide")},
