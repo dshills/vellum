@@ -193,7 +193,10 @@ framework CPU-copy gap or justify asynchronous pooling/cache-policy adoption.
 Next compare cache modes in the actual private framework without changing shipped
 bytes, ownership or the 33.3 ms gate. Features frozen, M3–M7 open.
 
-The [private framework upload-cache control](../tools/macos-calibration/cachecontrol/PLAN.md)
-will test the standalone cache-mode observation in the actual framework process.
-Same diagnostic binary, three bounded pairs, observed Metal mode counters, no
-ownership or shipping changes; gate remains unchanged.
+The [private framework upload-cache result](../docs/reports/macos-cache-control/README.md)
+validates all three pairs. Default-cache CPU-copy p95 is 1.631–1.793 ms versus
+write-combined 2.433–2.577 ms, but presentation remains 35.993–36.242 ms p95 in the
+default-cache cases, above the unchanged 33.3 ms gate. No shipping policy adopted.
+All 517 eligible buffers/case have requested cache/shared storage, including other
+transient write-buffer staging; ownership unchanged. Next inspect bounded reuse
+only at proven GPU-completion retirement. Features frozen, M3–M7 open.

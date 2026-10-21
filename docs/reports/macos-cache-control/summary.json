@@ -1,0 +1,1020 @@
+{
+  "outcome": "VALID_PRIVATE_FRAMEWORK_CACHE_CONTROL",
+  "started_utc": "2026-10-21T22:40:09.998520+00:00",
+  "finished_utc": "2026-10-21T22:43:27.349976+00:00",
+  "elapsed_seconds": 197.351456,
+  "maximum_seconds": 240,
+  "total_warmup": 768,
+  "total_measured": 720,
+  "owned_native_and_probe_groups": 54,
+  "runs": [
+    {
+      "pair": 1,
+      "mode": "writecombined",
+      "metrics": {
+        "outcome": "VALID_CPU_SOURCE_DIAGNOSTIC",
+        "warmup": 128,
+        "measured": 120,
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "source_phase_ms": {
+          "DrawNS": {
+            "count": 120,
+            "p50": 2.996875,
+            "p95": 3.584541,
+            "p99": 3.828083,
+            "max": 4.461167
+          },
+          "RasterNS": {
+            "count": 120,
+            "p50": 0.724417,
+            "p95": 0.777709,
+            "p99": 0.820541,
+            "max": 1.00875
+          },
+          "CopyNS": {
+            "count": 120,
+            "p50": 2.265875,
+            "p95": 2.852917,
+            "p99": 3.101708,
+            "max": 3.737375
+          },
+          "SetFromGoImageNS": {
+            "count": 120,
+            "p50": 2.256917,
+            "p95": 2.844083,
+            "p99": 3.094334,
+            "max": 3.728708
+          }
+        },
+        "totals": {
+          "DrawNS": 343865161,
+          "RasterNS": 78367840,
+          "CopyNS": 265157956,
+          "SetFromGoImageNS": 264207668,
+          "SetFromGoImageAttempts": 120,
+          "ImageCacheHits": 0,
+          "LogicalUploadRGBABytes": 923065920
+        },
+        "nested_shares_of_source_draw": {
+          "RasterNS": 0.22790282031508274,
+          "CopyNS": 0.7711102666780483,
+          "SetFromGoImageNS": 0.7683467183231162
+        },
+        "presentation_feedback_accounting_valid": true,
+        "latency_gate_qualified": false,
+        "diagnostic_only": "Additional source clocks/counters and private compiler overlays; these timings are not ordinary latency qualification or successful GPU transfer evidence.",
+        "observer_mode": "on",
+        "native_trace_records": 254,
+        "retained_startup_uploads": 6,
+        "joined_cohort_uploads": 248,
+        "CPU_phase_ms": {
+          "create_ns": {
+            "count": 120,
+            "p50": 0.10404177010059357,
+            "p95": 0.1177499070763588,
+            "p99": 0.14337501488626003,
+            "max": 0.15312503091990948
+          },
+          "map_ns": {
+            "count": 120,
+            "p50": 0.0013334210962057114,
+            "p95": 0.0017916318029165268,
+            "p99": 0.0019166618585586548,
+            "max": 0.002041459083557129
+          },
+          "copy_ns": {
+            "count": 120,
+            "p50": 2.0251250825822353,
+            "p95": 2.5774165987968445,
+            "p99": 2.844375092536211,
+            "max": 3.117874963209033
+          },
+          "flush_ns": {
+            "count": 120,
+            "p50": 0.0007918570190668106,
+            "p95": 0.001125037670135498,
+            "p99": 0.0013748649507761002,
+            "max": 0.001375097781419754
+          },
+          "encode_ns": {
+            "count": 120,
+            "p50": 0.06133317947387695,
+            "p95": 0.06874999962747097,
+            "p99": 0.13112486340105534,
+            "max": 0.4114583134651184
+          },
+          "native_total_ns": {
+            "count": 120,
+            "p50": 2.2356666158884764,
+            "p95": 2.8230000752955675,
+            "p99": 3.0747083947062492,
+            "max": 3.7070834077894688
+          },
+          "other_native_ns": {
+            "count": 120,
+            "p50": 0.050166621804237366,
+            "p95": 0.06016693077981472,
+            "p99": 0.08654128760099411,
+            "max": 0.1105000264942646
+          },
+          "Go_API_outside_native_ns": {
+            "count": 120,
+            "p50": 0.019166956265091895,
+            "p95": 0.022583207085728644,
+            "p99": 0.023833401903510094,
+            "max": 0.028333712939739228
+          }
+        },
+        "uploads_per_measured_frame": {
+          "count": 120,
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1
+        },
+        "interpretation": "Same private binary with source/GPU-upload timing observers enabled in both modes. Exact transient staging cache mode changes; ownership and completion unchanged. Extra write-buffer staging participates. No ordinary binary equivalence, observer neutrality, pixel correctness or shipping latency acceptance.",
+        "cache_mode": "writecombined",
+        "cache_policy": [
+          1,
+          517,
+          517,
+          0,
+          0,
+          0
+        ]
+      },
+      "presentation_diagnostic": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 28.6767918150872,
+          "p95": 38.42054167762399,
+          "p99": 51.67616647668183,
+          "max": 51.74933350645006
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.430791664868593,
+          "p95": 4.063166677951813,
+          "p99": 4.2577083222568035,
+          "max": 4.900791682302952
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 26.257708435878158,
+          "p95": 34.45937507785857,
+          "p99": 48.0530415661633,
+          "max": 48.32808347418904
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "diagnostic_receipt_p95_within_limit": false
+    },
+    {
+      "pair": 1,
+      "mode": "default",
+      "metrics": {
+        "outcome": "VALID_CPU_SOURCE_DIAGNOSTIC",
+        "warmup": 128,
+        "measured": 120,
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "source_phase_ms": {
+          "DrawNS": {
+            "count": 120,
+            "p50": 2.081875,
+            "p95": 2.593167,
+            "p99": 2.773041,
+            "max": 2.836791
+          },
+          "RasterNS": {
+            "count": 120,
+            "p50": 0.720125,
+            "p95": 0.734042,
+            "p99": 0.741708,
+            "max": 0.75825
+          },
+          "CopyNS": {
+            "count": 120,
+            "p50": 1.372541,
+            "p95": 1.876875,
+            "p99": 2.047,
+            "max": 2.1045
+          },
+          "SetFromGoImageNS": {
+            "count": 120,
+            "p50": 1.364,
+            "p95": 1.868667,
+            "p99": 2.037958,
+            "max": 2.096334
+          }
+        },
+        "totals": {
+          "DrawNS": 231488956,
+          "RasterNS": 71747456,
+          "CopyNS": 159441209,
+          "SetFromGoImageNS": 158529707,
+          "SetFromGoImageAttempts": 120,
+          "ImageCacheHits": 0,
+          "LogicalUploadRGBABytes": 923065920
+        },
+        "nested_shares_of_source_draw": {
+          "RasterNS": 0.3099390020144201,
+          "CopyNS": 0.688763782752556,
+          "SetFromGoImageNS": 0.6848262212561017
+        },
+        "presentation_feedback_accounting_valid": true,
+        "latency_gate_qualified": false,
+        "diagnostic_only": "Additional source clocks/counters and private compiler overlays; these timings are not ordinary latency qualification or successful GPU transfer evidence.",
+        "observer_mode": "on",
+        "native_trace_records": 254,
+        "retained_startup_uploads": 6,
+        "joined_cohort_uploads": 248,
+        "CPU_phase_ms": {
+          "create_ns": {
+            "count": 120,
+            "p50": 0.09724986739456654,
+            "p95": 0.11224998161196709,
+            "p99": 0.11512497439980507,
+            "max": 0.15641655772924423
+          },
+          "map_ns": {
+            "count": 120,
+            "p50": 0.0014165416359901428,
+            "p95": 0.0017918646335601807,
+            "p99": 0.0018749851733446121,
+            "max": 0.002125045284628868
+          },
+          "copy_ns": {
+            "count": 120,
+            "p50": 1.1317916214466095,
+            "p95": 1.6309581696987152,
+            "p99": 1.7747499514371157,
+            "max": 1.8746666610240936
+          },
+          "flush_ns": {
+            "count": 120,
+            "p50": 0.0006668269634246826,
+            "p95": 0.00100000761449337,
+            "p99": 0.0010833609849214554,
+            "max": 0.0013748649507761002
+          },
+          "encode_ns": {
+            "count": 120,
+            "p50": 0.060125021263957024,
+            "p95": 0.07645832374691963,
+            "p99": 0.08050003089010715,
+            "max": 0.1044166274368763
+          },
+          "native_total_ns": {
+            "count": 120,
+            "p50": 1.3457916211336851,
+            "p95": 1.8518748693168163,
+            "p99": 2.018833300098777,
+            "max": 2.078375080600381
+          },
+          "other_native_ns": {
+            "count": 120,
+            "p50": 0.05170772783458233,
+            "p95": 0.059625133872032166,
+            "p99": 0.08187489584088326,
+            "max": 0.09929155930876732
+          },
+          "Go_API_outside_native_ns": {
+            "count": 120,
+            "p50": 0.01758262795841694,
+            "p95": 0.020750453372120857,
+            "p99": 0.025083494891047477,
+            "max": 0.037749934583902356
+          }
+        },
+        "uploads_per_measured_frame": {
+          "count": 120,
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1
+        },
+        "interpretation": "Same private binary with source/GPU-upload timing observers enabled in both modes. Exact transient staging cache mode changes; ownership and completion unchanged. Extra write-buffer staging participates. No ordinary binary equivalence, observer neutrality, pixel correctness or shipping latency acceptance.",
+        "cache_mode": "default",
+        "cache_policy": [
+          2,
+          517,
+          0,
+          517,
+          0,
+          0
+        ]
+      },
+      "presentation_diagnostic": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 29.337374959141016,
+          "p95": 36.084125051274896,
+          "p99": 42.885374976322055,
+          "max": 44.91170821711421
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 2.524999901652336,
+          "p95": 3.0449165496975183,
+          "p99": 3.4499582834541798,
+          "max": 3.6429583560675383
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 26.706374948844314,
+          "p95": 33.96891662850976,
+          "p99": 40.24224984459579,
+          "max": 43.27429155819118
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "diagnostic_receipt_p95_within_limit": false
+    },
+    {
+      "pair": 2,
+      "mode": "default",
+      "metrics": {
+        "outcome": "VALID_CPU_SOURCE_DIAGNOSTIC",
+        "warmup": 128,
+        "measured": 120,
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "source_phase_ms": {
+          "DrawNS": {
+            "count": 120,
+            "p50": 2.100459,
+            "p95": 2.74325,
+            "p99": 2.886,
+            "max": 2.972041
+          },
+          "RasterNS": {
+            "count": 120,
+            "p50": 0.723,
+            "p95": 0.747792,
+            "p99": 1.089917,
+            "max": 1.116333
+          },
+          "CopyNS": {
+            "count": 120,
+            "p50": 1.393584,
+            "p95": 2.0195,
+            "p99": 2.1605,
+            "max": 2.185792
+          },
+          "SetFromGoImageNS": {
+            "count": 120,
+            "p50": 1.386375,
+            "p95": 2.010959,
+            "p99": 2.1525,
+            "max": 2.173042
+          }
+        },
+        "totals": {
+          "DrawNS": 249275254,
+          "RasterNS": 75170791,
+          "CopyNS": 173819913,
+          "SetFromGoImageNS": 172904956,
+          "SetFromGoImageAttempts": 120,
+          "ImageCacheHits": 0,
+          "LogicalUploadRGBABytes": 923065920
+        },
+        "nested_shares_of_source_draw": {
+          "RasterNS": 0.30155737400231475,
+          "CopyNS": 0.6973011167807295,
+          "SetFromGoImageNS": 0.693630648150899
+        },
+        "presentation_feedback_accounting_valid": true,
+        "latency_gate_qualified": false,
+        "diagnostic_only": "Additional source clocks/counters and private compiler overlays; these timings are not ordinary latency qualification or successful GPU transfer evidence.",
+        "observer_mode": "on",
+        "native_trace_records": 254,
+        "retained_startup_uploads": 6,
+        "joined_cohort_uploads": 248,
+        "CPU_phase_ms": {
+          "create_ns": {
+            "count": 120,
+            "p50": 0.09854184463620186,
+            "p95": 0.11237501166760921,
+            "p99": 0.11683348566293716,
+            "max": 0.14262506738305092
+          },
+          "map_ns": {
+            "count": 120,
+            "p50": 0.001375097781419754,
+            "p95": 0.0017499551177024841,
+            "p99": 0.0018333084881305695,
+            "max": 0.0020833685994148254
+          },
+          "copy_ns": {
+            "count": 120,
+            "p50": 1.1385001707822084,
+            "p95": 1.7553751822561026,
+            "p99": 1.8734585028141737,
+            "max": 1.8919166177511215
+          },
+          "flush_ns": {
+            "count": 120,
+            "p50": 0.0007085036486387253,
+            "p95": 0.00100000761449337,
+            "p99": 0.0010416842997074127,
+            "max": 0.0010833609849214554
+          },
+          "encode_ns": {
+            "count": 120,
+            "p50": 0.06133317947387695,
+            "p95": 0.07883342914283276,
+            "p99": 0.07991655729711056,
+            "max": 0.09225006215274334
+          },
+          "native_total_ns": {
+            "count": 120,
+            "p50": 1.3625416904687881,
+            "p95": 1.9904582295566797,
+            "p99": 2.1236666943877935,
+            "max": 2.134624868631363
+          },
+          "other_native_ns": {
+            "count": 120,
+            "p50": 0.05008326843380928,
+            "p95": 0.060833292081952095,
+            "p99": 0.0700000673532486,
+            "max": 0.09175017476081848
+          },
+          "Go_API_outside_native_ns": {
+            "count": 120,
+            "p50": 0.01770853163731098,
+            "p95": 0.02775021936428547,
+            "p99": 0.04529135021138191,
+            "max": 0.04937530561220646
+          }
+        },
+        "uploads_per_measured_frame": {
+          "count": 120,
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1
+        },
+        "interpretation": "Same private binary with source/GPU-upload timing observers enabled in both modes. Exact transient staging cache mode changes; ownership and completion unchanged. Extra write-buffer staging participates. No ordinary binary equivalence, observer neutrality, pixel correctness or shipping latency acceptance.",
+        "cache_mode": "default",
+        "cache_policy": [
+          2,
+          517,
+          0,
+          517,
+          0,
+          0
+        ]
+      },
+      "presentation_diagnostic": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 28.753791702911258,
+          "p95": 35.99349991418421,
+          "p99": 45.722458278760314,
+          "max": 48.68895816616714
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 2.5493751745671034,
+          "p95": 3.2507916912436485,
+          "p99": 3.4107083920389414,
+          "max": 3.741208231076598
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 26.13816666416824,
+          "p95": 33.7059167213738,
+          "p99": 44.235500041395426,
+          "max": 46.23016668483615
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "diagnostic_receipt_p95_within_limit": false
+    },
+    {
+      "pair": 2,
+      "mode": "writecombined",
+      "metrics": {
+        "outcome": "VALID_CPU_SOURCE_DIAGNOSTIC",
+        "warmup": 128,
+        "measured": 120,
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "source_phase_ms": {
+          "DrawNS": {
+            "count": 120,
+            "p50": 2.94475,
+            "p95": 3.422625,
+            "p99": 3.534375,
+            "max": 3.539667
+          },
+          "RasterNS": {
+            "count": 120,
+            "p50": 0.721666,
+            "p95": 0.745,
+            "p99": 0.802417,
+            "max": 0.856833
+          },
+          "CopyNS": {
+            "count": 120,
+            "p50": 2.220292,
+            "p95": 2.687042,
+            "p99": 2.810458,
+            "max": 2.816458
+          },
+          "SetFromGoImageNS": {
+            "count": 120,
+            "p50": 2.210792,
+            "p95": 2.676667,
+            "p99": 2.801333,
+            "max": 2.808041
+          }
+        },
+        "totals": {
+          "DrawNS": 342434792,
+          "RasterNS": 81065624,
+          "CopyNS": 261017750,
+          "SetFromGoImageNS": 260057620,
+          "SetFromGoImageAttempts": 120,
+          "ImageCacheHits": 0,
+          "LogicalUploadRGBABytes": 923065920
+        },
+        "nested_shares_of_source_draw": {
+          "RasterNS": 0.23673302448776876,
+          "CopyNS": 0.7622407421731843,
+          "SetFromGoImageNS": 0.759436909086037
+        },
+        "presentation_feedback_accounting_valid": true,
+        "latency_gate_qualified": false,
+        "diagnostic_only": "Additional source clocks/counters and private compiler overlays; these timings are not ordinary latency qualification or successful GPU transfer evidence.",
+        "observer_mode": "on",
+        "native_trace_records": 254,
+        "retained_startup_uploads": 6,
+        "joined_cohort_uploads": 248,
+        "CPU_phase_ms": {
+          "create_ns": {
+            "count": 120,
+            "p50": 0.10533328168094158,
+            "p95": 0.11783326044678688,
+            "p99": 0.16645831055939198,
+            "max": 0.29104179702699184
+          },
+          "map_ns": {
+            "count": 120,
+            "p50": 0.0015418045222759247,
+            "p95": 0.0019166618585586548,
+            "p99": 0.00200001522898674,
+            "max": 0.0020416919142007828
+          },
+          "copy_ns": {
+            "count": 120,
+            "p50": 1.9736667163670063,
+            "p95": 2.43637477979064,
+            "p99": 2.5114999152719975,
+            "max": 2.5674167554825544
+          },
+          "flush_ns": {
+            "count": 120,
+            "p50": 0.0008749775588512421,
+            "p95": 0.0010831281542778015,
+            "p99": 0.001125037670135498,
+            "max": 0.0012083910405635834
+          },
+          "encode_ns": {
+            "count": 120,
+            "p50": 0.06120838224887848,
+            "p95": 0.07712515071034431,
+            "p99": 0.08187512867152691,
+            "max": 0.09004166349768639
+          },
+          "native_total_ns": {
+            "count": 120,
+            "p50": 2.1916250698268414,
+            "p95": 2.6600416749715805,
+            "p99": 2.781999995931983,
+            "max": 2.7895832899957895
+          },
+          "other_native_ns": {
+            "count": 120,
+            "p50": 0.05112495273351669,
+            "p95": 0.060458434745669365,
+            "p99": 0.06350013427436352,
+            "max": 0.1956664491444826
+          },
+          "Go_API_outside_native_ns": {
+            "count": 120,
+            "p50": 0.01845771000421047,
+            "p95": 0.024875446055650712,
+            "p99": 0.04216592971122265,
+            "max": 0.049250615098714826
+          }
+        },
+        "uploads_per_measured_frame": {
+          "count": 120,
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1
+        },
+        "interpretation": "Same private binary with source/GPU-upload timing observers enabled in both modes. Exact transient staging cache mode changes; ownership and completion unchanged. Extra write-buffer staging participates. No ordinary binary equivalence, observer neutrality, pixel correctness or shipping latency acceptance.",
+        "cache_mode": "writecombined",
+        "cache_policy": [
+          1,
+          517,
+          517,
+          0,
+          0,
+          0
+        ]
+      },
+      "presentation_diagnostic": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 29.112083138898015,
+          "p95": 36.36987484060228,
+          "p99": 39.17637490667403,
+          "max": 50.24666665121913
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.3991667442023754,
+          "p95": 3.8956666830927134,
+          "p99": 4.005833296105266,
+          "max": 4.023874877020717
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.725499959662557,
+          "p95": 33.37370837107301,
+          "p99": 36.880916683003306,
+          "max": 46.789499931037426
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "diagnostic_receipt_p95_within_limit": false
+    },
+    {
+      "pair": 3,
+      "mode": "writecombined",
+      "metrics": {
+        "outcome": "VALID_CPU_SOURCE_DIAGNOSTIC",
+        "warmup": 128,
+        "measured": 120,
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "source_phase_ms": {
+          "DrawNS": {
+            "count": 120,
+            "p50": 2.887084,
+            "p95": 3.396333,
+            "p99": 3.695583,
+            "max": 4.16925
+          },
+          "RasterNS": {
+            "count": 120,
+            "p50": 0.72325,
+            "p95": 0.739208,
+            "p99": 0.944833,
+            "max": 1.119375
+          },
+          "CopyNS": {
+            "count": 120,
+            "p50": 2.158292,
+            "p95": 2.667917,
+            "p99": 2.969959,
+            "max": 3.221041
+          },
+          "SetFromGoImageNS": {
+            "count": 120,
+            "p50": 2.150791,
+            "p95": 2.659708,
+            "p99": 2.962334,
+            "max": 3.211416
+          }
+        },
+        "totals": {
+          "DrawNS": 318055085,
+          "RasterNS": 76432048,
+          "CopyNS": 241326127,
+          "SetFromGoImageNS": 240419502,
+          "SetFromGoImageAttempts": 120,
+          "ImageCacheHits": 0,
+          "LogicalUploadRGBABytes": 923065920
+        },
+        "nested_shares_of_source_draw": {
+          "RasterNS": 0.2403107247915876,
+          "CopyNS": 0.7587557576700904,
+          "SetFromGoImageNS": 0.7559052294353351
+        },
+        "presentation_feedback_accounting_valid": true,
+        "latency_gate_qualified": false,
+        "diagnostic_only": "Additional source clocks/counters and private compiler overlays; these timings are not ordinary latency qualification or successful GPU transfer evidence.",
+        "observer_mode": "on",
+        "native_trace_records": 254,
+        "retained_startup_uploads": 6,
+        "joined_cohort_uploads": 248,
+        "CPU_phase_ms": {
+          "create_ns": {
+            "count": 120,
+            "p50": 0.1041668001562357,
+            "p95": 0.11654151603579521,
+            "p99": 0.16254163347184658,
+            "max": 0.22933329455554485
+          },
+          "map_ns": {
+            "count": 120,
+            "p50": 0.0014582183212041855,
+            "p95": 0.0018333084881305695,
+            "p99": 0.0020416919142007828,
+            "max": 0.0021248124539852142
+          },
+          "copy_ns": {
+            "count": 120,
+            "p50": 1.917458139359951,
+            "p95": 2.4326664861291647,
+            "p99": 2.7166667860001326,
+            "max": 2.9662500601261854
+          },
+          "flush_ns": {
+            "count": 120,
+            "p50": 0.0008333008736371994,
+            "p95": 0.0010833609849214554,
+            "p99": 0.0011667143553495407,
+            "max": 0.0011667143553495407
+          },
+          "encode_ns": {
+            "count": 120,
+            "p50": 0.060666585341095924,
+            "p95": 0.07162499241530895,
+            "p99": 0.08316664025187492,
+            "max": 0.08370843715965748
+          },
+          "native_total_ns": {
+            "count": 120,
+            "p50": 2.1323750261217356,
+            "p95": 2.641083439812064,
+            "p99": 2.9437916819006205,
+            "max": 3.1862915493547916
+          },
+          "other_native_ns": {
+            "count": 120,
+            "p50": 0.05112518556416035,
+            "p95": 0.05995854735374451,
+            "p99": 0.09179161861538887,
+            "max": 0.10845833458006382
+          },
+          "Go_API_outside_native_ns": {
+            "count": 120,
+            "p50": 0.018208755378246306,
+            "p95": 0.02166615576183796,
+            "p99": 0.03829131981301308,
+            "max": 0.04679145353603363
+          }
+        },
+        "uploads_per_measured_frame": {
+          "count": 120,
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1
+        },
+        "interpretation": "Same private binary with source/GPU-upload timing observers enabled in both modes. Exact transient staging cache mode changes; ownership and completion unchanged. Extra write-buffer staging participates. No ordinary binary equivalence, observer neutrality, pixel correctness or shipping latency acceptance.",
+        "cache_mode": "writecombined",
+        "cache_policy": [
+          1,
+          517,
+          517,
+          0,
+          0,
+          0
+        ]
+      },
+      "presentation_diagnostic": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 28.76433334313333,
+          "p95": 37.0102918241173,
+          "p99": 42.11716656573117,
+          "max": 51.79099994711578
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.334208158776164,
+          "p95": 3.909833263605833,
+          "p99": 4.1178748942911625,
+          "max": 4.576416686177254
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 26.234291726723313,
+          "p95": 34.09329173155129,
+          "p99": 40.12149991467595,
+          "max": 48.21408330462873
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "diagnostic_receipt_p95_within_limit": false
+    },
+    {
+      "pair": 3,
+      "mode": "default",
+      "metrics": {
+        "outcome": "VALID_CPU_SOURCE_DIAGNOSTIC",
+        "warmup": 128,
+        "measured": 120,
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "source_phase_ms": {
+          "DrawNS": {
+            "count": 120,
+            "p50": 2.113541,
+            "p95": 2.756458,
+            "p99": 2.988917,
+            "max": 3.149666
+          },
+          "RasterNS": {
+            "count": 120,
+            "p50": 0.721417,
+            "p95": 0.772541,
+            "p99": 0.892916,
+            "max": 1.038833
+          },
+          "CopyNS": {
+            "count": 120,
+            "p50": 1.391292,
+            "p95": 2.042625,
+            "p99": 2.184083,
+            "max": 2.6985
+          },
+          "SetFromGoImageNS": {
+            "count": 120,
+            "p50": 1.382084,
+            "p95": 2.035083,
+            "p99": 2.174375,
+            "max": 2.691375
+          }
+        },
+        "totals": {
+          "DrawNS": 250078123,
+          "RasterNS": 75080625,
+          "CopyNS": 174669086,
+          "SetFromGoImageNS": 173724246,
+          "SetFromGoImageAttempts": 120,
+          "ImageCacheHits": 0,
+          "LogicalUploadRGBABytes": 923065920
+        },
+        "nested_shares_of_source_draw": {
+          "RasterNS": 0.300228680939036,
+          "CopyNS": 0.6984580814372155,
+          "SetFromGoImageNS": 0.6946799020880368
+        },
+        "presentation_feedback_accounting_valid": true,
+        "latency_gate_qualified": false,
+        "diagnostic_only": "Additional source clocks/counters and private compiler overlays; these timings are not ordinary latency qualification or successful GPU transfer evidence.",
+        "observer_mode": "on",
+        "native_trace_records": 254,
+        "retained_startup_uploads": 6,
+        "joined_cohort_uploads": 248,
+        "CPU_phase_ms": {
+          "create_ns": {
+            "count": 120,
+            "p50": 0.10033324360847473,
+            "p95": 0.11354172602295876,
+            "p99": 0.1163750421255827,
+            "max": 0.11770823039114475
+          },
+          "map_ns": {
+            "count": 120,
+            "p50": 0.0013748649507761002,
+            "p95": 0.0018335413187742233,
+            "p99": 0.0019166618585586548,
+            "max": 0.020791776478290558
+          },
+          "copy_ns": {
+            "count": 120,
+            "p50": 1.150291645899415,
+            "p95": 1.793124945834279,
+            "p99": 1.9487501122057438,
+            "max": 2.495333319529891
+          },
+          "flush_ns": {
+            "count": 120,
+            "p50": 0.0006249174475669861,
+            "p95": 0.0008749775588512421,
+            "p99": 0.0010416842997074127,
+            "max": 0.0010833609849214554
+          },
+          "encode_ns": {
+            "count": 120,
+            "p50": 0.060999998822808266,
+            "p95": 0.07737497799098492,
+            "p99": 0.08179154247045517,
+            "max": 0.08950009942054749
+          },
+          "native_total_ns": {
+            "count": 120,
+            "p50": 1.3651666231453419,
+            "p95": 2.0198749843984842,
+            "p99": 2.153833396732807,
+            "max": 2.6718750596046448
+          },
+          "other_native_ns": {
+            "count": 120,
+            "p50": 0.050625065341591835,
+            "p95": 0.06370828486979008,
+            "p99": 0.0688750296831131,
+            "max": 0.09437487460672855
+          },
+          "Go_API_outside_native_ns": {
+            "count": 120,
+            "p50": 0.017792158935785292,
+            "p95": 0.024249935269355774,
+            "p99": 0.03250078801178932,
+            "max": 0.04854196300041676
+          }
+        },
+        "uploads_per_measured_frame": {
+          "count": 120,
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1
+        },
+        "interpretation": "Same private binary with source/GPU-upload timing observers enabled in both modes. Exact transient staging cache mode changes; ownership and completion unchanged. Extra write-buffer staging participates. No ordinary binary equivalence, observer neutrality, pixel correctness or shipping latency acceptance.",
+        "cache_mode": "default",
+        "cache_policy": [
+          2,
+          517,
+          0,
+          517,
+          0,
+          0
+        ]
+      },
+      "presentation_diagnostic": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 29.478416545316577,
+          "p95": 36.242416594177485,
+          "p99": 36.61587508395314,
+          "max": 37.66075009480119
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 2.5574583560228348,
+          "p95": 3.2291666138917208,
+          "p99": 3.5476249177008867,
+          "max": 3.5519583616405725
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 26.897166622802615,
+          "p95": 33.71841670013964,
+          "p99": 34.247041679918766,
+          "max": 34.681208431720734
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "diagnostic_receipt_p95_within_limit": false
+    }
+  ],
+  "gate_changed": false,
+  "release_qualified": false,
+  "shipping_policy_adopted": false,
+  "interpretation": "Same private library/binary with detailed Go and native CPU observers on in both modes. Only exact transient upload staging cache mode differs, including extra write_buffer staging. Ordinary binary equivalence, observer neutrality, physical pixel correctness, resource allocation balance and release qualification are not established.",
+  "receipt_to_actual_presentation_p95_limit_ms": 33.3,
+  "release_gate_met": false
+}
