@@ -1,0 +1,325 @@
+{
+  "outcome": "VALID_OFFSCREEN_METAL_COPY_CONTROL",
+  "started_utc": "2026-10-21T22:28:44.982532+00:00",
+  "finished_utc": "2026-10-21T22:28:55.782887+00:00",
+  "elapsed_seconds": 10.800355,
+  "maximum_seconds": 120,
+  "cases": [
+    {
+      "pair": 1,
+      "mode": "writecombined",
+      "metrics": {
+        "outcome": "VALID_OFFSCREEN_COPY_CONTROL",
+        "mode": "writecombined",
+        "warmup": 128,
+        "measured": 120,
+        "GPU_verified_transfers": 496,
+        "GPU_verified_bytes": 3815339136,
+        "CPU_ms": {
+          "create_ns": {
+            "count": 120,
+            "p50": 0.008249888196587563,
+            "p95": 0.013333279639482498,
+            "p99": 0.015916768461465836,
+            "max": 0.01650000922381878
+          },
+          "map_ns": {
+            "count": 120,
+            "p50": 4.1676685214042664e-05,
+            "p95": 8.335337042808533e-05,
+            "p99": 0.000125030055642128,
+            "max": 0.00016670674085617065
+          },
+          "first_copy_ns": {
+            "count": 120,
+            "p50": 0.5655416753143072,
+            "p95": 0.6843749433755875,
+            "p99": 0.7574167102575302,
+            "max": 1.0726249311119318
+          },
+          "subsequent_copy_ns": {
+            "count": 120,
+            "p50": 0.08637504652142525,
+            "p95": 0.10283337906002998,
+            "p99": 0.10649999603629112,
+            "max": 0.10704179294407368
+          }
+        },
+        "paired_subsequent_minus_first_ms": {
+          "count": 120,
+          "p50": -0.47533330507576466,
+          "p95": -0.4230835475027561,
+          "p99": -0.41308323852717876,
+          "max": -0.4111665766686201
+        },
+        "release_qualified": false,
+        "interpretation": "Standalone serial Metal copies with complete GPU readback. No shipping equivalence, asynchronous pooling safety or UI latency acceptance."
+      }
+    },
+    {
+      "pair": 1,
+      "mode": "default",
+      "metrics": {
+        "outcome": "VALID_OFFSCREEN_COPY_CONTROL",
+        "mode": "default",
+        "warmup": 128,
+        "measured": 120,
+        "GPU_verified_transfers": 496,
+        "GPU_verified_bytes": 3815339136,
+        "CPU_ms": {
+          "create_ns": {
+            "count": 120,
+            "p50": 0.00866665504872799,
+            "p95": 0.00974978320300579,
+            "p99": 0.011041760444641113,
+            "max": 0.011166790500283241
+          },
+          "map_ns": {
+            "count": 120,
+            "p50": 4.1676685214042664e-05,
+            "p95": 8.335337042808533e-05,
+            "p99": 8.335337042808533e-05,
+            "max": 8.335337042808533e-05
+          },
+          "first_copy_ns": {
+            "count": 120,
+            "p50": 0.42629148811101913,
+            "p95": 0.5070418119430542,
+            "p99": 0.5416250787675381,
+            "max": 0.5546249449253082
+          },
+          "subsequent_copy_ns": {
+            "count": 120,
+            "p50": 0.08595827966928482,
+            "p95": 0.08749985136091709,
+            "p99": 0.09345822036266327,
+            "max": 0.10050018317997456
+          }
+        },
+        "paired_subsequent_minus_first_ms": {
+          "count": 120,
+          "p50": -0.34187501296401024,
+          "p95": -0.317208468914032,
+          "p99": -0.30758348293602467,
+          "max": -0.3063746262341738
+        },
+        "release_qualified": false,
+        "interpretation": "Standalone serial Metal copies with complete GPU readback. No shipping equivalence, asynchronous pooling safety or UI latency acceptance."
+      }
+    },
+    {
+      "pair": 2,
+      "mode": "default",
+      "metrics": {
+        "outcome": "VALID_OFFSCREEN_COPY_CONTROL",
+        "mode": "default",
+        "warmup": 128,
+        "measured": 120,
+        "GPU_verified_transfers": 496,
+        "GPU_verified_bytes": 3815339136,
+        "CPU_ms": {
+          "create_ns": {
+            "count": 120,
+            "p50": 0.008083414286375046,
+            "p95": 0.010999850928783417,
+            "p99": 0.016249949112534523,
+            "max": 0.031083356589078903
+          },
+          "map_ns": {
+            "count": 120,
+            "p50": 4.1676685214042664e-05,
+            "p95": 8.335337042808533e-05,
+            "p99": 0.000125030055642128,
+            "max": 0.000125030055642128
+          },
+          "first_copy_ns": {
+            "count": 120,
+            "p50": 0.4180832765996456,
+            "p95": 0.47066668048501015,
+            "p99": 0.519083347171545,
+            "max": 0.5675000138580799
+          },
+          "subsequent_copy_ns": {
+            "count": 120,
+            "p50": 0.08625001646578312,
+            "p95": 0.09070825763046741,
+            "p99": 0.09820843115448952,
+            "max": 0.11254171840846539
+          }
+        },
+        "paired_subsequent_minus_first_ms": {
+          "count": 120,
+          "p50": -0.33199996687471867,
+          "p95": -0.30441698618233204,
+          "p99": -0.2899998798966408,
+          "max": -0.28074998408555984
+        },
+        "release_qualified": false,
+        "interpretation": "Standalone serial Metal copies with complete GPU readback. No shipping equivalence, asynchronous pooling safety or UI latency acceptance."
+      }
+    },
+    {
+      "pair": 2,
+      "mode": "writecombined",
+      "metrics": {
+        "outcome": "VALID_OFFSCREEN_COPY_CONTROL",
+        "mode": "writecombined",
+        "warmup": 128,
+        "measured": 120,
+        "GPU_verified_transfers": 496,
+        "GPU_verified_bytes": 3815339136,
+        "CPU_ms": {
+          "create_ns": {
+            "count": 120,
+            "p50": 0.008708331733942032,
+            "p95": 0.011875061318278313,
+            "p99": 0.016083475202322006,
+            "max": 0.016750069335103035
+          },
+          "map_ns": {
+            "count": 120,
+            "p50": 4.1676685214042664e-05,
+            "p95": 8.335337042808533e-05,
+            "p99": 0.000125030055642128,
+            "max": 0.00016670674085617065
+          },
+          "first_copy_ns": {
+            "count": 120,
+            "p50": 0.5681249313056469,
+            "p95": 0.6695415358990431,
+            "p99": 0.6901666056364775,
+            "max": 0.7052915170788765
+          },
+          "subsequent_copy_ns": {
+            "count": 120,
+            "p50": 0.0871666707098484,
+            "p95": 0.09066658094525337,
+            "p99": 0.10370835661888123,
+            "max": 0.10445830412209034
+          }
+        },
+        "paired_subsequent_minus_first_ms": {
+          "count": 120,
+          "p50": -0.47933333553373814,
+          "p95": -0.42574992403388023,
+          "p99": -0.42220810428261757,
+          "max": -0.4189165774732828
+        },
+        "release_qualified": false,
+        "interpretation": "Standalone serial Metal copies with complete GPU readback. No shipping equivalence, asynchronous pooling safety or UI latency acceptance."
+      }
+    },
+    {
+      "pair": 3,
+      "mode": "writecombined",
+      "metrics": {
+        "outcome": "VALID_OFFSCREEN_COPY_CONTROL",
+        "mode": "writecombined",
+        "warmup": 128,
+        "measured": 120,
+        "GPU_verified_transfers": 496,
+        "GPU_verified_bytes": 3815339136,
+        "CPU_ms": {
+          "create_ns": {
+            "count": 120,
+            "p50": 0.0077500008046627045,
+            "p95": 0.009875046089291573,
+            "p99": 0.011416617780923843,
+            "max": 0.01300009898841381
+          },
+          "map_ns": {
+            "count": 120,
+            "p50": 4.1676685214042664e-05,
+            "p95": 8.335337042808533e-05,
+            "p99": 8.335337042808533e-05,
+            "max": 0.00012479722499847412
+          },
+          "first_copy_ns": {
+            "count": 120,
+            "p50": 0.5606249906122684,
+            "p95": 0.6416249088943005,
+            "p99": 0.6818750407546759,
+            "max": 0.7024167571216822
+          },
+          "subsequent_copy_ns": {
+            "count": 120,
+            "p50": 0.08787494152784348,
+            "p95": 0.09699980728328228,
+            "p99": 0.09975000284612179,
+            "max": 0.10266667231917381
+          }
+        },
+        "paired_subsequent_minus_first_ms": {
+          "count": 120,
+          "p50": -0.4699584096670151,
+          "p95": -0.4175831563770771,
+          "p99": -0.4091248847544193,
+          "max": -0.40266686119139194
+        },
+        "release_qualified": false,
+        "interpretation": "Standalone serial Metal copies with complete GPU readback. No shipping equivalence, asynchronous pooling safety or UI latency acceptance."
+      }
+    },
+    {
+      "pair": 3,
+      "mode": "default",
+      "metrics": {
+        "outcome": "VALID_OFFSCREEN_COPY_CONTROL",
+        "mode": "default",
+        "warmup": 128,
+        "measured": 120,
+        "GPU_verified_transfers": 496,
+        "GPU_verified_bytes": 3815339136,
+        "CPU_ms": {
+          "create_ns": {
+            "count": 120,
+            "p50": 0.007666647434234619,
+            "p95": 0.012333272024989128,
+            "p99": 0.013083219528198242,
+            "max": 0.016958219930529594
+          },
+          "map_ns": {
+            "count": 120,
+            "p50": 4.1676685214042664e-05,
+            "p95": 8.335337042808533e-05,
+            "p99": 0.00012479722499847412,
+            "max": 0.000125030055642128
+          },
+          "first_copy_ns": {
+            "count": 120,
+            "p50": 0.42450008913874626,
+            "p95": 0.49841683357954025,
+            "p99": 0.5114164669066668,
+            "max": 0.52258325740695
+          },
+          "subsequent_copy_ns": {
+            "count": 120,
+            "p50": 0.08895830251276493,
+            "p95": 0.10179169476032257,
+            "p99": 0.10970840230584145,
+            "max": 0.1141249667853117
+          }
+        },
+        "paired_subsequent_minus_first_ms": {
+          "count": 120,
+          "p50": -0.33562490716576576,
+          "p95": -0.2925416920334101,
+          "p99": -0.28858333826065063,
+          "max": -0.28654164634644985
+        },
+        "release_qualified": false,
+        "interpretation": "Standalone serial Metal copies with complete GPU readback. No shipping equivalence, asynchronous pooling safety or UI latency acceptance."
+      }
+    }
+  ],
+  "total_warmup_iterations": 768,
+  "total_measured_iterations": 720,
+  "total_GPU_verified_transfers": 2976,
+  "total_GPU_verified_bytes": 22892034816,
+  "owned_native_and_probe_groups": 54,
+  "interpretation": "Subsequent copies are faster in this serial standalone control. Default-cache fresh-copy p95 is lower in all three pairs, but modes differ much less than the framework-versus-standalone gap. Full readback establishes these transfer bytes, not ordinary UI latency, cache-policy shipping equivalence or safe asynchronous pooling. No shipping change adopted.",
+  "features_frozen": true,
+  "experimental_rendering_pacing": false,
+  "gate_changed": false,
+  "release_qualified": false
+}

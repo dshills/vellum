@@ -185,7 +185,10 @@ SDK, resource ownership and defaults remain unchanged. Next compare first versus
 subsequent native copies and CPU cache modes with GPU byte readback. This remains
 diagnostic-only; features/gate stay frozen and M3–M7 remain open.
 
-The [offscreen Metal copy control](../tools/macos-calibration/copycontrol/PLAN.md)
-will distinguish fresh/subsequent source copies and CPU cache modes with complete
-GPU byte readback. Three predeclared pairs, 120 seconds overall, no framework or
-SDK changes. This diagnostic does not qualify UI latency or change the gate.
+The [offscreen Metal copy control result](../docs/reports/macos-copy-control/README.md)
+validates all three pairs and 2,976 full GPU readbacks within 10.801 seconds.
+Subsequent copies are faster; default-cache fresh-copy p95 is 0.471–0.507 ms versus
+write-combined 0.642–0.684 ms. This standalone serial workload does not explain the
+framework CPU-copy gap or justify asynchronous pooling/cache-policy adoption.
+Next compare cache modes in the actual private framework without changing shipped
+bytes, ownership or the 33.3 ms gate. Features frozen, M3–M7 open.
