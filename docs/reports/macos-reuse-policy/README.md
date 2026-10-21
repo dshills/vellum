@@ -1,7 +1,7 @@
 # Completed staging reuse: policy and source audit
 
 This checkpoint supplies a tested ownership policy and a concrete private-prototype
-plan. **No native buffer pool is implemented or connected to the framework.**
+plan. **At this policy checkpoint, no native pool was implemented or connected to the framework.**
 The preceding cache-mode control still misses the 33.3 ms gate.
 
 The exact locked wgpu-core 29.0.3 source has an explicit completed-submission path:
@@ -45,3 +45,6 @@ Internal review and complete six-file Prism Anthropic Claude Sonnet 5.5 review
 are recorded. A proposed empty-eviction concern was disposed by tracing the private
 field invariants and all mutation paths; no unchecked empty removal is reachable
 through this module API. The disposition and tests remain in the evidence archive.
+
+A later [private native prototype preparation](../macos-staging-reuse/README.md)
+builds from this policy; it requires its own native byte/lifetime proof.

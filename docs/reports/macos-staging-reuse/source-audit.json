@@ -1,0 +1,35 @@
+{
+  "base": "Private upload observer0640a2e, native6aed50955d934ac36049ba8d002034841633ae02, core29.0.3",
+  "exact_core_changed_files": [
+    "src/device/life.rs",
+    "src/device/queue.rs",
+    "src/device/resource.rs",
+    "src/lib.rs",
+    "src/resource.rs",
+    "src/upload_probe.rs"
+  ],
+  "exact_core_added_files": [
+    "src/staging_reuse.rs",
+    "src/staging_reuse_policy.rs"
+  ],
+  "native_root_only_change": "source/src/lib.rs appends diagnostic ABI",
+  "original_metal_HAL_and_cache_policy_unchanged": true,
+  "Cargo_lock_and_manifest_bytes_unchanged": true,
+  "all_package_versions_unchanged": true,
+  "fresh_recipe_outputs_byte_identical": [
+    "core/src/device/life.rs",
+    "core/src/device/queue.rs",
+    "core/src/device/resource.rs",
+    "core/src/lib.rs",
+    "core/src/resource.rs",
+    "core/src/upload_probe.rs",
+    "core/src/staging_reuse.rs",
+    "core/src/staging_reuse_policy.rs",
+    "source/src/lib.rs"
+  ],
+  "recipe_sha256": "d6d5d94e0daefb11889fb0c9736353d5d2416d3f61677be5658aa5ea058217c9",
+  "private_native_diff_sha256": "7f5df32c2cb01132aa3fd9b51663825d343b5ac7cb374599ce5f2845231b0636",
+  "public_mapped_staging_and_write_buffer_remain_fresh": "StagingBuffer.new delegates None,false; only Queue.write_texture supplies allow_reuse flag; exact D2/one layer/RGBA8/BGRA8+Metal filter, zero size before eligibility",
+  "GPU_executed": false,
+  "review_corrections": "Nonzero values before raw take; defensive completed-policy error destroys original raw; stable journal read retries partial/active/count/device changes."
+}

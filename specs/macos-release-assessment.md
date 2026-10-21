@@ -206,3 +206,8 @@ provides five passing Rust policy methods and two compiler rejection controls.
 No native pool is integrated. Proposed texture-only reuse must return explicitly
 from real completed-submission retirement, keep original failure/teardown paths,
 bound idle storage and prove GPU bytes/ownership before timing. Gate unchanged.
+
+The [private completed-staging prototype](../docs/reports/macos-staging-reuse/README.md)
+is implemented and builds, with policy5 and lifecycle/protocol9 focused methods
+passing. Native GPU correctness remains unexecuted: require the declared 24-write/
+22-readback off/on pair before timing. No shipping/SDK/app or gate change.
