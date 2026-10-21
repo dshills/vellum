@@ -76,7 +76,7 @@ func (e *commandPaletteKeys) Sync(w core.Widget) error {
 		if base != nil && base.Property(prop+"-key") != e {
 			base.SetProperty(prop+"-key", e)
 			base.OnFirst(events.KeyChord, func(event events.Event) {
-				if event.IsHandled() || event.Modifiers() != 0 || e.ref.Context().Err() != nil {
+				if event.IsHandled() || key.HasAnyModifier(event.Modifiers(), key.Control, key.Meta, key.Alt, key.Shift) || e.ref.Context().Err() != nil {
 					return
 				}
 				if _, _, active := field.NativeCompositionRange(); active {

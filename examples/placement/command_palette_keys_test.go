@@ -70,3 +70,27 @@ func TestCommandPaletteOldWidgetDraftCannotRunNewPalette(t *testing.T) {
 		t.Fatal("old widget ran new draft")
 	}
 }
+
+func TestCommandPaletteNativeReturnIgnoresLockState(t *testing.T) {
+	for _, mods := range []key.Modifiers{1 << key.NumLock, 1 << key.CapsLock, 1<<key.NumLock | 1<<key.CapsLock} {
+		t.Run(mods.String(), func(t *testing.T) {
+			f := fileModel(t, false)
+			f.place(t, "block", canvas.Point{})
+			f.owner(t, func() { _ = f.m.beginCommandPalette() })
+			body := core.NewBody()
+			field := core.NewTextField(body)
+			field.SetName("command-query")
+			e := &commandPaletteKeys{a: f.a, ref: f.ref, m: f.m}
+			_ = e.Sync(e.Mount(body))
+			field.SetText("nudge-1-right")
+			field.HandleEvent(events.NewKey(events.KeyChord, 0, key.CodeReturnEnter, mods|1<<key.Control))
+			if f.m.commandDraft == nil || f.m.scene.Objects[0].X != 0 {
+				t.Fatal("modified Return ran command")
+			}
+			field.HandleEvent(events.NewKey(events.KeyChord, 0, key.CodeReturnEnter, mods))
+			if f.m.commandDraft != nil || f.m.scene.Objects[0].X != 1 || f.m.journal.Snapshot().UndoCount != 2 {
+				t.Fatal("lock state blocked Return")
+			}
+		})
+	}
+}
