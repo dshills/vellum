@@ -155,7 +155,7 @@ func (m *model) fillColorDialog(a *app.Application, ref app.WindowRef) ui.Node {
 	}
 	picker, swatches := m.fillPickerNodes(a, ref, d, active)
 	return ui.Node{ID: "fill-dialog", Kind: ui.Dialog, Text: "Selection fill color", Open: active(), Dismiss: cancel, Children: []ui.Node{
-		{ID: "fill-help", Kind: ui.Label, Text: "Choose a swatch or adjust RGB. Blank hex means mixed fills; preview starts with the primary. Default previews the primary but restores each type. Apply changes all selected members in one Undo.", Style: ui.Style{MaxSize: ui.Some(ui.Size{Width: 420})}},
+		{ID: "fill-help", Kind: ui.Label, Text: "Choose a swatch or adjust RGB. Blank hex means mixed fills; preview starts with the primary. Default previews the primary but restores each type. Apply changes all selected members in one Undo.", Style: ui.Style{MaxSize: ui.Some(ui.Size{Width: 740})}},
 		picker, swatches,
 		{ID: "fill-value", Kind: ui.TextField, Text: value, Accessibility: ui.Accessibility{Name: "Fill color"}, Change: func(e ui.ChangeEvent) {
 			if active() {
