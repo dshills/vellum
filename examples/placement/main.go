@@ -163,6 +163,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 	display := m.canvasForView()
 	root := ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{
 		{ID: "file-tools", Kind: ui.Toolbar, Children: []ui.Node{
+			{ID: "new", Kind: ui.Button, Text: "New", Disabled: m.files == nil || m.commandDisabled("new"), Activate: invoke("new")},
 			{ID: "open", Kind: ui.Button, Text: "Open…", Disabled: m.files == nil || m.commandDisabled("open"), Activate: invoke("open")},
 			{ID: "save", Kind: ui.Button, Text: "Save", Disabled: m.files == nil || m.commandDisabled("save"), Activate: invoke("save")},
 			{ID: "save-as", Kind: ui.Button, Text: "Save As…", Disabled: m.files == nil || m.commandDisabled("save-as"), Activate: invoke("save-as")},

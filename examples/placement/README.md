@@ -428,3 +428,11 @@ release and capture/camera/lifecycle cancellation keep the original marquee set.
 Plain empty drag still pans and the wheel still zooms. Shift on a selected corner
 handle retains temporary aspect-lock resizing. Mode/group membership are captured
 at press; preferences cannot change a gesture midway. The mode is session state.
+
+## New drawing (internal 19)
+
+**New / Cmd+N** starts an empty, untitled drawing. Unsaved changes require an
+explicit Discard and New decision; Cancel keeps the document and history. New
+resets history, selection, groups, camera and the Save destination, like Open
+replaces document history. Existing files and Recent entries are kept. The next
+Save asks for a destination. Framework scope remains frozen.

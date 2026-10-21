@@ -33,6 +33,7 @@ type model struct {
 	snap, locked, rejectNotes         bool
 	status                            string
 	files                             *document.Session[drawingFile]
+	newFileSession                    func() (*document.Session[drawingFile], error)
 	recent                            *recentDrawings
 	geometry                          *geometryDraft
 	aspectLocked                      bool
