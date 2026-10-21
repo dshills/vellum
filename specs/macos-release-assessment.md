@@ -184,3 +184,8 @@ All248 on-mode cohort writes and six startup writes are retained/matched; source
 SDK, resource ownership and defaults remain unchanged. Next compare first versus
 subsequent native copies and CPU cache modes with GPU byte readback. This remains
 diagnostic-only; features/gate stay frozen and M3–M7 remain open.
+
+The [offscreen Metal copy control](../tools/macos-calibration/copycontrol/PLAN.md)
+will distinguish fresh/subsequent source copies and CPU cache modes with complete
+GPU byte readback. Three predeclared pairs, 120 seconds overall, no framework or
+SDK changes. This diagnostic does not qualify UI latency or change the gate.
