@@ -506,3 +506,14 @@ are unchanged. The native chooser confirms overwrites; choosing the active file
 or an existing alias of it is refused. Successful copies appear in Recent.
 Cancel or failed storage keeps the drawing. IO uses the existing bounded document
 worker and atomic replacement; closing during output first cancels that operation.
+
+## SVG export (internal 20)
+
+**More → Export SVG…** exports all visible components, including locked ones,
+in paint order using their original world coordinates and colors. The SVG viewBox
+fits visible geometry; pan/zoom, grid, editor controls, selection outlines and
+resize handles are omitted. Layer names become escaped SVG titles. Hidden groups
+and components are omitted. Export uses the detached-save worker, preserves the
+active drawing/dirty state/history, and does not add SVG files to Recent drawings.
+It exports rectangles only; the SVG is an output artifact, not an editable drawing
+format for Open. Empty visible drawings are refused.

@@ -63,8 +63,11 @@ func (m *model) bindFiles(a *app.Application, ref app.WindowRef, choose func(con
 	if err != nil {
 		return err
 	}
-	for _, c := range []struct{ id, label, shortcut string }{{"new", "New", "Meta+N"}, {"open", "Open…", "Meta+O"}, {"save", "Save", "Meta+S"}, {"save-as", "Save As…", "Meta+Shift+S"}, {"save-copy", "Save a Copy…", ""}} {
+	for _, c := range []struct{ id, label, shortcut string }{{"new", "New", "Meta+N"}, {"open", "Open…", "Meta+O"}, {"save", "Save", "Meta+S"}, {"save-as", "Save As…", "Meta+Shift+S"}, {"save-copy", "Save a Copy…", ""}, {"export-svg", "Export SVG…", ""}} {
 		if err := m.commands.Register(command.Command{ID: c.id, Label: c.label, Shortcut: c.shortcut, Available: func() error {
+			if c.id == "export-svg" {
+				return m.svgAvailable()
+			}
 			if m.fileBusy() || m.move != nil || m.prompt != "" || m.palette.State().Active {
 				return document.ErrBusy
 			}
@@ -96,6 +99,8 @@ func (m *model) fileAction(a *app.Application, ref app.WindowRef, action string,
 	}
 	var err error
 	switch action {
+	case "export-svg":
+		return m.exportSVG(a, ref, nil)
 	case "save-copy":
 		return m.saveCopy(a, ref, nil)
 	case "new":

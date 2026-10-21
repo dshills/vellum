@@ -166,7 +166,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 			{ID: "open", Kind: ui.Button, Text: "Open…", Disabled: m.files == nil || m.commandDisabled("open"), Activate: invoke("open")},
 			{ID: "save", Kind: ui.Button, Text: "Save", Disabled: m.files == nil || m.commandDisabled("save"), Activate: invoke("save")},
 			{ID: "save-as", Kind: ui.Button, Text: "Save As…", Disabled: m.files == nil || m.commandDisabled("save-as"), Activate: invoke("save-as")},
-			m.actionMenu("file-extra-menu", "More", []ui.Option{{ID: "save-copy", Label: "Save a Copy…"}}, invoke),
+			m.actionMenu("file-extra-menu", "More", []ui.Option{{ID: "save-copy", Label: "Save a Copy…"}, {ID: "export-svg", Label: "Export SVG…"}}, invoke),
 			m.recentMenu(a, ref, update),
 			{ID: "filename", Kind: ui.Label, Text: filename, Style: ui.Style{MaxSize: ui.Some(ui.Size{Width: 320})}},
 		}},
