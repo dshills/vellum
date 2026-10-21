@@ -1,0 +1,271 @@
+{
+  "outcome": "VALID_DEFAULT_CAPTURE_LATENCY_GATE_FAILED",
+  "runtime_source": "bd3cbc9ce2566955dae5dbb61385b0e1a9307eaa",
+  "main_at_assessment": "7047740e7d5ae5acf910d367cd3b16545aff2e70",
+  "experimental_backpressure": false,
+  "release_qualified": false,
+  "started": {
+    "started_utc": "2026-10-21T17:27:31.825429+00:00",
+    "deadline_utc": "2026-10-21T17:47:31.825429+00:00",
+    "human_authorization": "Yes, test when ready",
+    "features_frozen": true,
+    "experimental_backpressure": false
+  },
+  "finished_utc": "2026-10-21T17:28:02.318952+00:00",
+  "cases": {
+    "serial-grid-cpu": {
+      "submetric_population": "strict validator measured-role tags only; setup/warmup excluded",
+      "configuration_after_captured": true,
+      "journal_sha256": "6bc8f50f5cbe1c4e61c21559349db904576d99e2c213096b56400aafcfb9effe",
+      "capture": "VALID_SERIAL_NATIVE_FEEDBACK_JOURNAL",
+      "latency_ms": {
+        "count": 120,
+        "p50": 47.604875173419714,
+        "p95": 48.12966659665108,
+        "p99": 48.34324982948601,
+        "max": 48.41287503950298
+      },
+      "receipt_to_acquired_ms": {
+        "count": 120,
+        "p50": 15.807624906301498,
+        "p95": 16.331708524376154,
+        "p99": 16.552833141759038,
+        "max": 16.561791533604264
+      },
+      "acquired_to_presented_ms": {
+        "count": 120,
+        "p50": 31.797500094398856,
+        "p95": 32.0291668176651,
+        "p99": 32.14975004084408,
+        "max": 32.15962485410273
+      },
+      "cpu_ms": {
+        "QueuedNS": {
+          "count": 120,
+          "p50": 0.006125,
+          "p95": 0.010458,
+          "p99": 0.014208,
+          "max": 0.025459
+        },
+        "TotalUIWorkNS": {
+          "count": 120,
+          "p50": 3.683794,
+          "p95": 4.332585,
+          "p99": 4.796833,
+          "max": 4.892044
+        },
+        "AcquireNS": {
+          "count": 120,
+          "p50": 11.589041,
+          "p95": 12.251416,
+          "p99": 12.328583,
+          "max": 12.499417
+        }
+      },
+      "before_state_counts": {
+        "pending": 0,
+        "presented": 251,
+        "skipped": 0,
+        "unavailable": 0,
+        "invalid": 0,
+        "retired": 0
+      },
+      "after_state_counts": {
+        "pending": 0,
+        "presented": 251,
+        "skipped": 0,
+        "unavailable": 0,
+        "invalid": 0,
+        "retired": 0
+      },
+      "geometry_unchanged": true,
+      "native_retired": true,
+      "native_exit_code": 0
+    },
+    "serial-tree-gpu": {
+      "submetric_population": "strict validator measured-role tags only; setup/warmup excluded",
+      "configuration_after_captured": true,
+      "journal_sha256": "a9ce123d72e250cb32c68506b9b57088592d5fe60387f49035d434c845f21b01",
+      "capture": "VALID_SERIAL_NATIVE_FEEDBACK_JOURNAL",
+      "latency_ms": {
+        "count": 120,
+        "p50": 47.67237510532141,
+        "p95": 48.22875000536442,
+        "p99": 48.26266667805612,
+        "max": 48.302041832357645
+      },
+      "receipt_to_acquired_ms": {
+        "count": 120,
+        "p50": 15.894124982878566,
+        "p95": 16.444874927401543,
+        "p99": 16.50350005365908,
+        "max": 16.51012501679361
+      },
+      "acquired_to_presented_ms": {
+        "count": 120,
+        "p50": 31.780791701748967,
+        "p95": 32.00170840136707,
+        "p99": 32.105624908581376,
+        "max": 32.10945846512914
+      },
+      "cpu_ms": {
+        "QueuedNS": {
+          "count": 120,
+          "p50": 0.003542,
+          "p95": 0.006,
+          "p99": 0.011833,
+          "max": 0.025041
+        },
+        "TotalUIWorkNS": {
+          "count": 120,
+          "p50": 3.261666,
+          "p95": 4.655459,
+          "p99": 8.034748,
+          "max": 8.227668
+        },
+        "AcquireNS": {
+          "count": 120,
+          "p50": 12.556166,
+          "p95": 13.210624,
+          "p99": 13.428709,
+          "max": 13.430375
+        }
+      },
+      "before_state_counts": {
+        "pending": 0,
+        "presented": 256,
+        "skipped": 2,
+        "unavailable": 0,
+        "invalid": 0,
+        "retired": 0
+      },
+      "after_state_counts": {
+        "pending": 0,
+        "presented": 256,
+        "skipped": 2,
+        "unavailable": 0,
+        "invalid": 0,
+        "retired": 0
+      },
+      "geometry_unchanged": true,
+      "native_retired": true,
+      "native_exit_code": 0
+    },
+    "paced-grid-gpu": {
+      "submetric_population": "strict validator measured-role tags only; setup/warmup excluded",
+      "configuration_after_captured": false,
+      "journal_sha256": "a7741833883cc5a2bc0d33d1cbe4d82504449096c9a4dcac09e7a0fa46f50f63",
+      "capture": "VALID_PACED_NATIVE_FEEDBACK_JOURNAL",
+      "latency_ms": {
+        "count": 600,
+        "p50": 47.819583443924785,
+        "p95": 62.22416670061648,
+        "p99": 62.43545841425657,
+        "max": 62.49158317223191
+      },
+      "receipt_to_acquired_ms": {
+        "count": 600,
+        "p50": 15.79495845362544,
+        "p95": 16.443708445876837,
+        "p99": 16.682916786521673,
+        "max": 30.326333362609148
+      },
+      "acquired_to_presented_ms": {
+        "count": 600,
+        "p50": 31.821833457797766,
+        "p95": 48.504999838769436,
+        "p99": 48.75058331526816,
+        "max": 48.85487491264939
+      },
+      "cpu_ms": {
+        "QueuedNS": {
+          "count": 600,
+          "p50": 0.005417,
+          "p95": 0.010083,
+          "p99": 0.016833,
+          "max": 0.029583
+        },
+        "TotalUIWorkNS": {
+          "count": 600,
+          "p50": 2.690376,
+          "p95": 3.633042,
+          "p99": 3.990001,
+          "max": 4.935502
+        },
+        "AcquireNS": {
+          "count": 600,
+          "p50": 12.480167,
+          "p95": 13.305333,
+          "p99": 13.464417,
+          "max": 27.001168
+        }
+      },
+      "before_state_counts": {
+        "pending": 0,
+        "presented": 734,
+        "skipped": 0,
+        "unavailable": 0,
+        "invalid": 0,
+        "retired": 0
+      },
+      "after_state_counts": {
+        "pending": 0,
+        "presented": 734,
+        "skipped": 0,
+        "unavailable": 0,
+        "invalid": 0,
+        "retired": 0
+      },
+      "geometry_unchanged": true,
+      "native_retired": true,
+      "native_exit_code": 0,
+      "paced": {
+        "planned_states": 600,
+        "ordered_distinct_final_times": true,
+        "distinct_final_presentation_times": 600,
+        "interval_population": "one final armed state per scheduled tag, in request order; no warmup anchor; N-1 intervals",
+        "interval_count": 599,
+        "within_1_1_period": 599,
+        "within_fraction": 1.0,
+        "cadence_threshold_met": true,
+        "planned_duration_ns": 10000000000,
+        "actual_hold_end_ns": 10014668541,
+        "final_work_overrun_ns": 14668125,
+        "worst_schedule_debt_ns": 15559375,
+        "worst_consecutive_deadline_misses": 506,
+        "clock_correlation_model": "conditional constant origin offset and common nanosecond rate over cohort; receipt call brackets, not independent clock calibration",
+        "clock_origin_uncertainty_ns": 2381,
+        "native_receipt_rounding_bound_ns": 3,
+        "native_presentation_rounding_bound_ns": 3,
+        "held_tail": "idle; no extra changing interval; callback drain/teardown separate",
+        "release_qualified": false,
+        "input_latency_threshold_met": false,
+        "interval_ms": {
+          "count": 599,
+          "p50": 16.666666604578495,
+          "p95": 16.666749957948923,
+          "p99": 16.666791634634137,
+          "max": 16.666791634634137
+        },
+        "over_two_periods": 0
+      }
+    }
+  },
+  "unexecuted": [
+    "paced-tree-cpu",
+    "rounds2-5"
+  ],
+  "five_runs_qualified": false,
+  "native_library": {
+    "path": "/private/tmp/vellum-doclinks-sdk-bd3cbc9/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent/build/libs-darwin/arm64/libwgpu_native.a",
+    "sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883"
+  },
+  "binaries": {
+    "grid": {
+      "sha256": "320d7a96f7be38dd0b47292e7c06469418434aeac91ee2921d626f76a9e49c11"
+    },
+    "tree": {
+      "sha256": "5c61569352faef4e91b9c0a9b1669c3bb1d14f2f29b195192517af3229af687e"
+    }
+  }
+}

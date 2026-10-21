@@ -1,0 +1,582 @@
+{
+  "files": {
+    "adapter_test.py": {
+      "bytes": 1930,
+      "sha256": "a3defb13ddefe056633aae31020591977c08eda52c71f74135d911fd79c5a866"
+    },
+    "assessment.py": {
+      "bytes": 8907,
+      "sha256": "a7c5a9d900a615339bef1d5c4c7a20293bf5142b422c9d95945ae1acbfda89c2"
+    },
+    "build-grid.log": {
+      "bytes": 1041,
+      "sha256": "2fbd87253e70c30a824bc5e8cb5c78592162f72c6aa351e61dff5539866d22ae"
+    },
+    "build-tree.log": {
+      "bytes": 1041,
+      "sha256": "c75834f74dc62b4ba5d45a94a7f614467cf5225aa470eb46a91870574cd33e8a"
+    },
+    "grid-build-info.txt": {
+      "bytes": 3783,
+      "sha256": "25fd5dbde0b5b24f937cee4c1d5326cb5db186fa4c9208a733bb337cab1bf492"
+    },
+    "grid-tests.log": {
+      "bytes": 1104,
+      "sha256": "48c5bc772b87ccb0a51c59d6228ff0a4c2fc8a326c21c20c66676cef72b37829"
+    },
+    "inputs/check-presentation.py": {
+      "bytes": 22536,
+      "sha256": "b94c5aa49820959088a13d2907aa7658e6fa92bca7d5e543bc92784d40fbf9ff"
+    },
+    "inputs/controller.py": {
+      "bytes": 29734,
+      "sha256": "d990675f85bb70002048df4adf3bb97b7d9bea554893fb706980dc7b49399844"
+    },
+    "inputs/live_lease.py": {
+      "bytes": 910,
+      "sha256": "90137d3675603d3018c62b46b55dbc35242d0869127acc53fdae00d35bd0f1f4"
+    },
+    "inputs/owned_executor.py": {
+      "bytes": 11845,
+      "sha256": "e76238012be63f58cbc5923e27f6fc227a3aca8443d85d64f466c0675382c7ac"
+    },
+    "phase1/disposition.json": {
+      "bytes": 454,
+      "sha256": "84483f5c157a57e3e87c1cab895b09d0684f0b09a02f928f41927589b25d0ffd"
+    },
+    "phase1/prism.json": {
+      "bytes": 5579,
+      "sha256": "24b9f534d8d51653324457750cd47d018543a9b7cd270dc26847130cd73bbe8d"
+    },
+    "phase1/receipt.json": {
+      "bytes": 1657,
+      "sha256": "a604cfe318837a099e6a4fcecec31b489b667cf4bda371cbb1e11567dcad9d54"
+    },
+    "phase1/rules.json": {
+      "bytes": 681,
+      "sha256": "27a922ad126b2e58ef92dfaac08b5ee2d1553074b1b0e5cdebf82eea24b7b1a1"
+    },
+    "phase1/run/owned.json": {
+      "bytes": 798,
+      "sha256": "bc0829833be7390ad1216027fa10d661c517aa56578e7bd436459b6a399e85d4"
+    },
+    "phase1/run/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "phase1/run/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "plan.json": {
+      "bytes": 1113970,
+      "sha256": "623894823db167d3ae693e91c8bf10d9abfac5a4a20a9dd76b8b15e8611cf4b5"
+    },
+    "record_result.py": {
+      "bytes": 4001,
+      "sha256": "a78244f85f586a34be6f3e71ae3330cb14a1591c0c8ed2e0dd8f726dfd1863dc"
+    },
+    "result-review/disposition.json": {
+      "bytes": 535,
+      "sha256": "003b074407f27632352d8d446f896c4f6434bb34951405c233f56c601eabe6a5"
+    },
+    "result-review/prism.json": {
+      "bytes": 2525,
+      "sha256": "5e50a82ff34f7a2f70b0e962cc9788fb0d26175d77b8ebf9f6338ef6a68ac606"
+    },
+    "result-review/receipt.json": {
+      "bytes": 1897,
+      "sha256": "4ee85c9ef9046c61ee28db14b63f4047017feb9c1f60dafd624a2bf67fa8d657"
+    },
+    "result-review/rules.json": {
+      "bytes": 837,
+      "sha256": "852968687db429a5fa4c34c27be7165d4520aab48fc9f72004d51668e718ad41"
+    },
+    "result-review/run/owned.json": {
+      "bytes": 1038,
+      "sha256": "af3442bb259a57ca2ad9b2b1f32d9f1d3fbac0dfae45b4cac8f896d3dd1f54ad"
+    },
+    "result-review/run/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "result-review/run/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "result-verification.log": {
+      "bytes": 139,
+      "sha256": "5f41f7bddefe7e10fffd74d0074864606522ed8303d0ee495f664e7298ded16a"
+    },
+    "result.json": {
+      "bytes": 190660,
+      "sha256": "37c93fcfa10baf90e0b74c5d2f3c24c5d6036caf3789a13f1f2a536cc6348c12"
+    },
+    "review.py": {
+      "bytes": 2057,
+      "sha256": "7dcb7bab63945ce751378d77364ad5264c24fd27e6a65f218e8cf7cac435749d"
+    },
+    "review_result.py": {
+      "bytes": 2067,
+      "sha256": "249b0a2990a66b0992d6c25d7478efbdb88be773d077429859029583a4a7e98e"
+    },
+    "round1/paced-grid-gpu/before/display-command.json": {
+      "bytes": 1791,
+      "sha256": "d6cf9fea691be6c9b56148302c241c97eefcde5e834ee53786c1f3f3dc3d0e37"
+    },
+    "round1/paced-grid-gpu/before/display/owned.json": {
+      "bytes": 903,
+      "sha256": "229683d5421d2423ee0f204d745784d83317bb3b9ea99bec598e370cc21a005f"
+    },
+    "round1/paced-grid-gpu/before/display/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/paced-grid-gpu/before/display/stdout": {
+      "bytes": 1162,
+      "sha256": "df98fd1930d8885dbf3a6b932b8bde06a4a7feacaec6de3110eee5b831b8e43e"
+    },
+    "round1/paced-grid-gpu/before/os-command.json": {
+      "bytes": 1743,
+      "sha256": "d304ac0bb31149c54243fc708c3c41906f8268033740d11a6e17ded5de7d855a"
+    },
+    "round1/paced-grid-gpu/before/os/owned.json": {
+      "bytes": 855,
+      "sha256": "169a98ab8eac4f5324b583ffd8ea32bf4e4ff0a4020cee40cb02c5c50bcec478"
+    },
+    "round1/paced-grid-gpu/before/os/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/paced-grid-gpu/before/os/stdout": {
+      "bytes": 65,
+      "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+    },
+    "round1/paced-grid-gpu/before/power-command.json": {
+      "bytes": 1763,
+      "sha256": "ed9e62302ffcc9198d9f1b08cc2d659992d7204e29c45ef2032ac490c2a856f8"
+    },
+    "round1/paced-grid-gpu/before/power-settings-command.json": {
+      "bytes": 1765,
+      "sha256": "89e2701ae209dd2f366968f2293def568c9820e87ae696ede96550fe0b4b4da0"
+    },
+    "round1/paced-grid-gpu/before/power-settings/owned.json": {
+      "bytes": 877,
+      "sha256": "461f1bd82122f0299472c53b4a5ba412b79f640491b2ea4fb94dd35c030df4fd"
+    },
+    "round1/paced-grid-gpu/before/power-settings/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/paced-grid-gpu/before/power-settings/stdout": {
+      "bytes": 325,
+      "sha256": "b4e363b7b2de39b590149004429a55a255a9e0a8e393a939e5736d54da4499bf"
+    },
+    "round1/paced-grid-gpu/before/power/owned.json": {
+      "bytes": 875,
+      "sha256": "d4159e1c568cefc1a9ff7e7f1da7ae8ede8bc22e8721e32035390a7bb37f79bd"
+    },
+    "round1/paced-grid-gpu/before/power/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/paced-grid-gpu/before/power/stdout": {
+      "bytes": 28,
+      "sha256": "14726fc52ddf54b166819a66551cc819147724eae55b3e45b20676b0545c7234"
+    },
+    "round1/paced-grid-gpu/native-command.json": {
+      "bytes": 2141,
+      "sha256": "9a9bceab63f5c78bd8984c2946cf77426c7340d24de28cfb5542a9282d9b8ae6"
+    },
+    "round1/paced-grid-gpu/native/owned.json": {
+      "bytes": 1251,
+      "sha256": "60dbd8b8a3be7dcc8cdf827510156741761a0b45023825cd08ca103a189a1f97"
+    },
+    "round1/paced-grid-gpu/native/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/paced-grid-gpu/native/stdout": {
+      "bytes": 3477,
+      "sha256": "1e9883bc693a5475c15290a69f7ac63136a742959d5bef33796e0cf4f15b0922"
+    },
+    "round1/paced-grid-gpu/presentation.json": {
+      "bytes": 1091010,
+      "sha256": "a7741833883cc5a2bc0d33d1cbe4d82504449096c9a4dcac09e7a0fa46f50f63"
+    },
+    "round1/paced-grid-gpu/result.json": {
+      "bytes": 11784,
+      "sha256": "562ffe59306f503844622196b1b9508dfe86732bd20c75972d5f1c308b687513"
+    },
+    "round1/paced-grid-gpu/sealed": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/paced-grid-gpu/validation.json": {
+      "bytes": 177810,
+      "sha256": "79c60dadc24023b611e7a96c9927a1df2b1ca5939916f5efd8bac82f87b5da13"
+    },
+    "round1/result.json": {
+      "bytes": 168486,
+      "sha256": "2d4a6e6b85599178a19292c2868dc4ef2883ea0fbcc95c9e26654e92095a7ff4"
+    },
+    "round1/serial-grid-cpu/after/display-command.json": {
+      "bytes": 1793,
+      "sha256": "a39b069b31d912ba3fcbf2d806c5fec36fe6678b0f5b889de2271fc58afc70b9"
+    },
+    "round1/serial-grid-cpu/after/display/owned.json": {
+      "bytes": 903,
+      "sha256": "7b81d8aa55b2188d57599579740f3a108aad872f69d4af5c4d418dd5b51b6add"
+    },
+    "round1/serial-grid-cpu/after/display/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-grid-cpu/after/display/stdout": {
+      "bytes": 1162,
+      "sha256": "df98fd1930d8885dbf3a6b932b8bde06a4a7feacaec6de3110eee5b831b8e43e"
+    },
+    "round1/serial-grid-cpu/after/os-command.json": {
+      "bytes": 1743,
+      "sha256": "e1cd1e4b7629cc056936f9ffa0684aa1613eff4651dbf2021452d479d978f501"
+    },
+    "round1/serial-grid-cpu/after/os/owned.json": {
+      "bytes": 855,
+      "sha256": "ee4fc76f03d84fee314925fb3a0992117c0de9ebd1f0b052c4147c68dd209897"
+    },
+    "round1/serial-grid-cpu/after/os/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-grid-cpu/after/os/stdout": {
+      "bytes": 65,
+      "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+    },
+    "round1/serial-grid-cpu/after/power-command.json": {
+      "bytes": 1763,
+      "sha256": "292f6450354851bcd7bd574cca8040c8016a97ed9e04ebc91b55854125e91581"
+    },
+    "round1/serial-grid-cpu/after/power-settings-command.json": {
+      "bytes": 1765,
+      "sha256": "3831bae9b87e5b7d2c704e5d4001cb283ab001499392b8065755d9cf9799b7b1"
+    },
+    "round1/serial-grid-cpu/after/power-settings/owned.json": {
+      "bytes": 877,
+      "sha256": "6137fa85f73d2bec8a133c65855c7136efbde1d8fa94e9089b66d4232272e2d4"
+    },
+    "round1/serial-grid-cpu/after/power-settings/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-grid-cpu/after/power-settings/stdout": {
+      "bytes": 325,
+      "sha256": "b4e363b7b2de39b590149004429a55a255a9e0a8e393a939e5736d54da4499bf"
+    },
+    "round1/serial-grid-cpu/after/power/owned.json": {
+      "bytes": 875,
+      "sha256": "cd3fd170da2bf47a81550c9877a65fc589f3a9bbab3fe37f595830507c53bc54"
+    },
+    "round1/serial-grid-cpu/after/power/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-grid-cpu/after/power/stdout": {
+      "bytes": 28,
+      "sha256": "14726fc52ddf54b166819a66551cc819147724eae55b3e45b20676b0545c7234"
+    },
+    "round1/serial-grid-cpu/before/display-command.json": {
+      "bytes": 1793,
+      "sha256": "4d435621dd76dac96212a18bb12b93b231c2796e1627c914c5e56c838dcc4102"
+    },
+    "round1/serial-grid-cpu/before/display/owned.json": {
+      "bytes": 904,
+      "sha256": "b7d7102c1d714a21d969dcb91947e11b08dac189001ebfbf51a50d28afeb2bca"
+    },
+    "round1/serial-grid-cpu/before/display/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-grid-cpu/before/display/stdout": {
+      "bytes": 1162,
+      "sha256": "df98fd1930d8885dbf3a6b932b8bde06a4a7feacaec6de3110eee5b831b8e43e"
+    },
+    "round1/serial-grid-cpu/before/os-command.json": {
+      "bytes": 1744,
+      "sha256": "f3d10f74247734c5cab987ba18458fef58ac7e8d95beaa25fef8a00e72f45591"
+    },
+    "round1/serial-grid-cpu/before/os/owned.json": {
+      "bytes": 856,
+      "sha256": "8946ac19f0a408b94740fcd7d0d7c31e026a879d3c3fec2d1ff2f6de3ee4cc1b"
+    },
+    "round1/serial-grid-cpu/before/os/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-grid-cpu/before/os/stdout": {
+      "bytes": 65,
+      "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+    },
+    "round1/serial-grid-cpu/before/power-command.json": {
+      "bytes": 1763,
+      "sha256": "df65d30ba3a4cb42604d349de208ad192995d26506fb726ef6316300efa9e97f"
+    },
+    "round1/serial-grid-cpu/before/power-settings-command.json": {
+      "bytes": 1767,
+      "sha256": "942ba00193e38fd32b79d97254cce710271e1ea408395c5c5bae3b3b5e8ce458"
+    },
+    "round1/serial-grid-cpu/before/power-settings/owned.json": {
+      "bytes": 878,
+      "sha256": "8cffb1e7f6446fe014c7d707d7ab66f5988cbbebe3874e8a24abeff7e3dfba4f"
+    },
+    "round1/serial-grid-cpu/before/power-settings/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-grid-cpu/before/power-settings/stdout": {
+      "bytes": 325,
+      "sha256": "b4e363b7b2de39b590149004429a55a255a9e0a8e393a939e5736d54da4499bf"
+    },
+    "round1/serial-grid-cpu/before/power/owned.json": {
+      "bytes": 876,
+      "sha256": "78ca8ad8953f77ce7a1c7c913ae971084d84769306d83693603f385ca4afdf0e"
+    },
+    "round1/serial-grid-cpu/before/power/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-grid-cpu/before/power/stdout": {
+      "bytes": 28,
+      "sha256": "14726fc52ddf54b166819a66551cc819147724eae55b3e45b20676b0545c7234"
+    },
+    "round1/serial-grid-cpu/native-command.json": {
+      "bytes": 2108,
+      "sha256": "a1987df2264205875719200fcc67db6d7052c461768b5fd39a4c2819ee5e8e32"
+    },
+    "round1/serial-grid-cpu/native/owned.json": {
+      "bytes": 1217,
+      "sha256": "5dda741eefd47c0203913a30c9173eda5648ecfd76a641f096c9625c1ff5bec4"
+    },
+    "round1/serial-grid-cpu/native/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-grid-cpu/native/stdout": {
+      "bytes": 158172,
+      "sha256": "8ccf15c98d83989222f209becfb047e3adc7a6a3a01d69c6f372fd7b4efd2dd0"
+    },
+    "round1/serial-grid-cpu/presentation.json": {
+      "bytes": 269460,
+      "sha256": "6bc8f50f5cbe1c4e61c21559349db904576d99e2c213096b56400aafcfb9effe"
+    },
+    "round1/serial-grid-cpu/result.json": {
+      "bytes": 67403,
+      "sha256": "1c1ef1e5f49878dd466c33864f85c07b00f16215537983840ceb5e95a746b957"
+    },
+    "round1/serial-grid-cpu/sealed": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-grid-cpu/validation.json": {
+      "bytes": 43666,
+      "sha256": "3162f9b906c0a4e23d2f680ce880f48bb7b8acdb2a5d75602820989c738ae7d8"
+    },
+    "round1/serial-tree-gpu/after/display-command.json": {
+      "bytes": 1792,
+      "sha256": "6616ccfa13640dac9583f136c860e9f934519643188aeb9a1761700d20a91b10"
+    },
+    "round1/serial-tree-gpu/after/display/owned.json": {
+      "bytes": 903,
+      "sha256": "4e80ae20bd5a392126f2b67b0157f37ad334885655a1a47c24108de4913ef50b"
+    },
+    "round1/serial-tree-gpu/after/display/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-tree-gpu/after/display/stdout": {
+      "bytes": 1162,
+      "sha256": "df98fd1930d8885dbf3a6b932b8bde06a4a7feacaec6de3110eee5b831b8e43e"
+    },
+    "round1/serial-tree-gpu/after/os-command.json": {
+      "bytes": 1742,
+      "sha256": "8c2397baed5cf0180e1068fae95d64421d747287b7387eb00e35912b6a7d3d72"
+    },
+    "round1/serial-tree-gpu/after/os/owned.json": {
+      "bytes": 855,
+      "sha256": "13aada2bb9fa5a36d9ced73f723a5876c73bb200c576899bcadddee97f0e2059"
+    },
+    "round1/serial-tree-gpu/after/os/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-tree-gpu/after/os/stdout": {
+      "bytes": 65,
+      "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+    },
+    "round1/serial-tree-gpu/after/power-command.json": {
+      "bytes": 1763,
+      "sha256": "fb82830d80cfac02811048c4831b4414d529178740cc9ca1aa50db2adc417abe"
+    },
+    "round1/serial-tree-gpu/after/power-settings-command.json": {
+      "bytes": 1765,
+      "sha256": "9548efd36fe1a8c4df45bccc4a196c3dc2c7159049d1c8678b5718b511958321"
+    },
+    "round1/serial-tree-gpu/after/power-settings/owned.json": {
+      "bytes": 877,
+      "sha256": "c262d5787a8a9b76fa9e802c6add8f8258feb4190f2100c3cbd1c5ac4fede1aa"
+    },
+    "round1/serial-tree-gpu/after/power-settings/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-tree-gpu/after/power-settings/stdout": {
+      "bytes": 325,
+      "sha256": "b4e363b7b2de39b590149004429a55a255a9e0a8e393a939e5736d54da4499bf"
+    },
+    "round1/serial-tree-gpu/after/power/owned.json": {
+      "bytes": 875,
+      "sha256": "015bff53e0f9a49997ac0b38197e3b17360d2a4d2896866f1ea1412e6bcf87fe"
+    },
+    "round1/serial-tree-gpu/after/power/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-tree-gpu/after/power/stdout": {
+      "bytes": 28,
+      "sha256": "14726fc52ddf54b166819a66551cc819147724eae55b3e45b20676b0545c7234"
+    },
+    "round1/serial-tree-gpu/before/display-command.json": {
+      "bytes": 1793,
+      "sha256": "33e48d1bf93b373d11bd7e9ea4231c3729a693832da9925c121bd208b861fb83"
+    },
+    "round1/serial-tree-gpu/before/display/owned.json": {
+      "bytes": 904,
+      "sha256": "6bef328d6ff09e25efb7efcd963685931e2c8623ddfaa78b82a0a317c2b47d73"
+    },
+    "round1/serial-tree-gpu/before/display/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-tree-gpu/before/display/stdout": {
+      "bytes": 1162,
+      "sha256": "df98fd1930d8885dbf3a6b932b8bde06a4a7feacaec6de3110eee5b831b8e43e"
+    },
+    "round1/serial-tree-gpu/before/os-command.json": {
+      "bytes": 1744,
+      "sha256": "f48e868f1f674081ecaa8a1af6dcfd4f7fb3ee305bef6dd3041afa2a7b1efcc9"
+    },
+    "round1/serial-tree-gpu/before/os/owned.json": {
+      "bytes": 856,
+      "sha256": "a1252eb87035053ff3d9e08556b319b7b941ead9d1a895df71e0694311701a2c"
+    },
+    "round1/serial-tree-gpu/before/os/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-tree-gpu/before/os/stdout": {
+      "bytes": 65,
+      "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+    },
+    "round1/serial-tree-gpu/before/power-command.json": {
+      "bytes": 1764,
+      "sha256": "130d21181c6e671269f6a65993b80929d44c2496d6b3f16bb31e0029a03f5939"
+    },
+    "round1/serial-tree-gpu/before/power-settings-command.json": {
+      "bytes": 1767,
+      "sha256": "8177003aa22da839e662d1c60f092a6459fa6b98ea64c57368cc7640b1a5e2a5"
+    },
+    "round1/serial-tree-gpu/before/power-settings/owned.json": {
+      "bytes": 878,
+      "sha256": "a379bb7d81293976b0eb5e7713b0c210c4364106fc57e9a700f07fbd1c27ce44"
+    },
+    "round1/serial-tree-gpu/before/power-settings/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-tree-gpu/before/power-settings/stdout": {
+      "bytes": 325,
+      "sha256": "b4e363b7b2de39b590149004429a55a255a9e0a8e393a939e5736d54da4499bf"
+    },
+    "round1/serial-tree-gpu/before/power/owned.json": {
+      "bytes": 876,
+      "sha256": "edbcfad62aed29e27cfe861559f2d5c31530d0bc90fc89cb07ee8c99c1d4d83d"
+    },
+    "round1/serial-tree-gpu/before/power/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-tree-gpu/before/power/stdout": {
+      "bytes": 28,
+      "sha256": "14726fc52ddf54b166819a66551cc819147724eae55b3e45b20676b0545c7234"
+    },
+    "round1/serial-tree-gpu/native-command.json": {
+      "bytes": 2132,
+      "sha256": "acf7a22fe9169cd5078029aeb9b4d1b608e8b69fff5a0212e432edc2fc1bb2f2"
+    },
+    "round1/serial-tree-gpu/native/owned.json": {
+      "bytes": 1241,
+      "sha256": "0c46bc46bdc3a4e471cd39c191532ba6946721ba04fec9b1427c40e26f7e5d09"
+    },
+    "round1/serial-tree-gpu/native/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-tree-gpu/native/stdout": {
+      "bytes": 172131,
+      "sha256": "d0d1a73b160395acb11de168743864ef4f13294e67472f2f2c96f7a7b1920b29"
+    },
+    "round1/serial-tree-gpu/presentation.json": {
+      "bytes": 267683,
+      "sha256": "a9ce123d72e250cb32c68506b9b57088592d5fe60387f49035d434c845f21b01"
+    },
+    "round1/serial-tree-gpu/result.json": {
+      "bytes": 66970,
+      "sha256": "fa6899d9949ae2f64b7382ab8ed0ead195a6cbfbcaee7ce1a4dc955ba6cafd93"
+    },
+    "round1/serial-tree-gpu/sealed": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "round1/serial-tree-gpu/validation.json": {
+      "bytes": 43170,
+      "sha256": "6a37df90119eb01c842f034546e66bb2f3f0487c15ad0b05af2b4debce7dd066"
+    },
+    "round1/stop-live": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "started.json": {
+      "bytes": 224,
+      "sha256": "316e969bdb79a7dfee26a05051785650fe9e4e134265e0562e640537b92d9e79"
+    },
+    "stop-live": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "tree-build-info.txt": {
+      "bytes": 3783,
+      "sha256": "c543a5bd63c13fedfa8c7859aa154b622900d3f3611f12e9760e050c364ab5c5"
+    },
+    "tree-tests.log": {
+      "bytes": 1104,
+      "sha256": "ba6234c18045ff75531fceb1df2bc7d14fcae8887e38230681ba68f6a2a333e0"
+    },
+    "validator-tests.log": {
+      "bytes": 126,
+      "sha256": "8e91b03f24ea59222c7f8a25d308a8a160bf654f381d6bf89632c5280da7d4df"
+    },
+    "verify_result.py": {
+      "bytes": 2648,
+      "sha256": "d65060dbc5a0d8b84b0fdecea8972f1178f94c0a549524fa8d31ec7e0a11684a"
+    }
+  },
+  "archive": {
+    "bytes": 480300,
+    "sha256": "2f6c40e557036a8d0ef3e97af39db5b9422c058629188891ec202d8a4fda5270"
+  },
+  "excluded": [
+    "executables",
+    "SDK payload",
+    "historical archives",
+    "superseded preparation plans"
+  ]
+}

@@ -58,3 +58,11 @@ Each checkpoint retains a concise requirement/source/command/result/next-action
 entry, focused tests, internal review and Prism review using Anthropic Claude
 Sonnet5.5, then a commit. Preserve historical evidence without recursively copying
 it. No completion claim follows while a required release gate is open.
+
+## First result
+
+The [21 October default-path report](../docs/reports/macos-default-responsiveness/README.md)
+records valid feedback, passing single-run paced-grid cadence and failed latency.
+The campaign stopped at that failure; no repeated or fourth case was run. The
+next focused boundary is effective native configuration/outstanding frames,
+before any presentation policy change. M3 and the Mac release remain open.

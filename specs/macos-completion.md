@@ -9,15 +9,17 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
-The latest [source-105 SDK/native checkpoint](../docs/reports/macos-source105-native/README.md)
-passes actual private packaging/relocation, one generated native consumer and
-four strict capture-validity cases. Performance acceptance fails: p95 latency is
-61–63 ms and both paced cohorts have 0/599 intervals within 18.333 ms. Late work
-is retained. Resource/endurance, physical/human, final application/component/rights
-and M7 documentation/final audit checks remain open; no Mac completion or
-default backpressure adoption is claimed. See the current
-[delivery status](macos-delivery.md) and the archived exact evidence.
-
+The latest [default-path assessment](../docs/reports/macos-default-responsiveness/README.md)
+uses retained SDK `bd3cbc9` with experimental backpressure disabled. Three native
+captures are valid. One paced-grid run passes cadence (599/599 intervals within
+18.333 ms) but fails latency (62.224 ms p95); serial grid/tree are 48.130/48.229 ms.
+The campaign stops at that failure; the fourth case and repeated runs remain
+unexecuted. M3 remains open. The earlier
+[source-105 comparison](../docs/reports/macos-source105-native/README.md) explicitly
+enabled experimental backpressure and retains its separate failed results.
+Resources/endurance, physical/human, final SDK/rights and final audit also remain
+open; no Mac completion or new presentation policy is claimed. See the current
+[delivery status](macos-delivery.md).
 
 The [paced presentation checkpoint](../docs/reports/macos-paced-presentation/README.md)
 implements an opt-in fixed-deadline 60 Hz grid/tree workload and strict version 2
