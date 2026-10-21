@@ -170,6 +170,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 			{ID: "reject-notes", Kind: ui.Checkbox, Text: "Reject notes", Checked: m.rejectNotes, Change: func(e ui.ChangeEvent) { m.rejectNotes = e.Checked; update() }},
 		}},
 		{ID: "edit-tools", Kind: ui.Toolbar, Children: []ui.Node{
+			{ID: "cut", Kind: ui.Button, Text: "Cut", Disabled: m.commandDisabled("cut"), Activate: invoke("cut")},
 			{ID: "copy", Kind: ui.Button, Text: "Copy", Disabled: m.commandDisabled("copy"), Activate: invoke("copy")},
 			{ID: "paste", Kind: ui.Button, Text: "Paste", Disabled: m.commandDisabled("paste"), Activate: invoke("paste")},
 			{ID: "duplicate", Kind: ui.Button, Text: "Duplicate", Disabled: m.commandDisabled("duplicate"), Activate: invoke("duplicate")},

@@ -128,7 +128,7 @@ at a time, a five-second deadline and window-scoped result delivery. Existing
 edit/file/navigation actions are gated while it is pending. Close cancels and
 retires pending delivery so a late Paste cannot mutate the drawing. As with the
 existing native clipboard service, cancellation can race an OS write already
-in progress. There is no Cut or interoperability with other shape formats.
+in progress. There is no interoperability with other shape formats.
 
 From the repository root, prepare the pinned native dependencies:
 
@@ -354,3 +354,9 @@ also protect that group. Layer rows remain focusable for Unlock, Rename and
 visibility controls. Locking clears the editable selection; Undo restores it.
 Unlocked components may still be reordered around locked layers. No framework
 behavior changes.
+
+**Cut / Cmd+X** writes the selected components to the native clipboard first, then
+removes the original selection in one Undo/Redo entry. A failed, canceled or stale
+clipboard operation keeps the drawing. Cut shares Copy/Paste validation and
+retains component/group names, geometry and membership; Paste allocates fresh IDs.
+Native focused text fields retain their standard Cut shortcut.
