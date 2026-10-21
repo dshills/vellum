@@ -9,7 +9,22 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
-## Current checkpoint — ready native reference; latency gate still open
+## Current checkpoint — foreground control; no accepted latency repair
+
+The [foreground-controlled native reference](../docs/reports/macos-native-foreground-control/README.md)
+passes both scoped cohorts with actual active/key/visible/foreground-PID boundary
+snapshots and no focus-loss notifications. Raw request p95 is 65.265 ms; direct
+provided-drawable callback p95 is 49.868 ms and follows its approximately 50 ms
+native target. Boundaries differ; neither establishes an OS floor or a framework
+pass. Both native and all 16 probe groups retire; the SDK is unchanged.
+
+No safe repair meeting 33.3 ms was found in this bounded investigation. Stop
+repeating rejected variants. Owner direction on retaining that absolute budget
+versus a predeclared native-calibrated assessment is needed before more backend
+changes. No gate is waived: fresh representative measurements remain required
+under any approved policy. M3–M7 stay open and features remain frozen.
+
+## Previous checkpoint — ready native reference; latency gate still open
 
 The [ready-window native reference](../docs/reports/macos-native-ready-reference/README.md)
 passes two scoped native cohorts after explicit setup readiness, 128 warmups and

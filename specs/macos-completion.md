@@ -9,11 +9,18 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
+The [foreground control](../docs/reports/macos-native-foreground-control/README.md)
+now records actual active/key/visible/foreground-PID boundary states with no loss
+notifications. Raw native p95 is 65.265 ms; direct-link p95 is 49.868 ms. These
+bounded native controls still do not meet 33.3 ms; no safe framework repair or
+policy change is adopted. Owner direction on the budget/assessment is needed
+before further backend changes. M3–M7 remain open; this does not prove an OS floor.
+
 The [ready native reference](../docs/reports/macos-native-ready-reference/README.md)
 now passes both scoped native cohorts: raw render-request p95 48.843 ms and direct
 provided-drawable callback p95 49.908 ms, with approximately 50 ms native target
 lead. The receipt boundaries differ. This is diagnostic evidence, not a framework
-pass or universal OS floor; foreground/key-window state remains unverified.
+pass or universal OS floor; foreground/key-window state was unverified in that earlier capture.
 The 33.3 ms gate, M3 and the Mac release remain open. No rejected path is adopted.
 
 The latest [native latency investigation](../docs/reports/macos-native-latency-investigation/README.md)

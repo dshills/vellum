@@ -98,3 +98,17 @@ change or a baseline-derived release-policy proposal, verify foreground/key-wind
 state and scheduling configuration. Any policy revision needs owner approval,
 predeclared criteria and fresh representative measurements; the minimal reference
 does not qualify the framework. Existing failed 33.3 ms scopes remain failed.
+
+## Foreground-controlled follow-up
+
+The [foreground control](../docs/reports/macos-native-foreground-control/README.md)
+records valid actual active/key/visible/foreground-PID boundaries and no focus-loss
+notifications in both native cohorts. Raw p95 is 65.265 ms; direct provided-drawable
+callback p95 is 49.868 ms with approximately 50 ms target lead. These different
+receipt boundaries must not be pooled or treated as a causal A/B pair. Both paths
+remain above 33.3 ms; this is not an OS-floor or framework-qualification claim.
+
+The bounded investigation found no safe accepted repair. Stop rejected-variant
+retries and obtain owner direction on retaining the absolute budget versus a new
+predeclared native/framework calibration. No threshold is changed here; any revised
+policy requires approval and fresh representative measurements. M3–M7 remain open.
