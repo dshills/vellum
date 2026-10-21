@@ -378,3 +378,12 @@ One app instance owns the private slot at a time; another instance stays editabl
 with recovery unavailable. macOS is the recovery target for this internal build. Shutdown joins local file
 IO before releasing ownership; stalled storage can delay shutdown.
 Framework scope and experimental rendering/pacing settings remain unchanged.
+
+## Recent drawings (internal app)
+
+**Recent** lists the last ten successfully opened or saved drawings, newest first,
+with their locations. The bounded private list survives relaunch. A missing or
+invalid drawing leaves the current document unchanged; opening a recent drawing
+uses the same unsaved-change prompt as Open. Cancel keeps the drawing and clears
+the pending destination. Save As suggests a base name without repeated `.vellum`
+suffixes; the OS-confirmed destination is never renamed by the app.

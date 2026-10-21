@@ -37,7 +37,12 @@ func run() {
 		fail(err)
 	}
 	var recoveryErr error
+	var recentErr error
 	if err := a.Do(func() {
+		m.recent, recentErr = newRecentDrawings(a, windowRef, recentConfig{})
+		if recentErr != nil {
+			m.status = "Recent drawings unavailable: " + recentErr.Error()
+		}
 		m.recovery, recoveryErr = newPlacementRecovery(a, windowRef, m, recoveryConfig{})
 		if recoveryErr != nil {
 			m.status = "Recovery unavailable: " + recoveryErr.Error()
@@ -46,7 +51,11 @@ func run() {
 		fail(err)
 	}
 	defer m.recovery.Stop(false)
+	defer m.recent.Stop()
 	runErr := a.Run(context.Background(), cogent.Driver{Commands: m.commands})
+	if err := m.recent.Stop(); err != nil {
+		fmt.Fprintln(os.Stderr, "Recent drawings:", err)
+	}
 	if err := m.recovery.Stop(runErr == nil && m.removeRecoveryOnClose); err != nil {
 		fmt.Fprintln(os.Stderr, "Recovery cleanup:", err)
 	}
@@ -153,6 +162,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 			{ID: "open", Kind: ui.Button, Text: "Open…", Disabled: m.files == nil || m.commandDisabled("open"), Activate: invoke("open")},
 			{ID: "save", Kind: ui.Button, Text: "Save", Disabled: m.files == nil || m.commandDisabled("save"), Activate: invoke("save")},
 			{ID: "save-as", Kind: ui.Button, Text: "Save As…", Disabled: m.files == nil || m.commandDisabled("save-as"), Activate: invoke("save-as")},
+			m.recentMenu(a, ref, update),
 			{ID: "filename", Kind: ui.Label, Text: filename},
 		}},
 		{ID: "toolbar", Kind: ui.Toolbar, Children: []ui.Node{

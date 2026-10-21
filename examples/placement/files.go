@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"path/filepath"
+	"strings"
 
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/command"
@@ -17,7 +18,22 @@ func (m *model) fileBusy() bool {
 
 func (m *model) bindFiles(a *app.Application, ref app.WindowRef, choose func(context.Context, app.FileOptions) (string, error)) error {
 	var err error
-	m.files, err = document.New(document.Config[drawingFile]{Owner: a, Window: "placement", Journal: m.journal, Codec: drawingCodec(m), Filename: "Drawing.vellum", Extensions: []string{"vellum"}, MaxBytes: drawingByteLimit, Choose: choose, OnComplete: func(r document.Result) {
+	// Session invokes this on its worker. Normalize only the suggestion, never
+	// the destination returned by the OS after overwrite confirmation.
+	chooseDrawing := func(ctx context.Context, options app.FileOptions) (string, error) {
+		if options.Mode == app.SaveFile {
+			options.Filename = drawingSuggestion(options.Filename)
+		}
+		if choose != nil {
+			return choose(ctx, options)
+		}
+		services, err := a.Services()
+		if err != nil {
+			return "", err
+		}
+		return services.ChooseFile(ctx, options)
+	}
+	m.files, err = document.New(document.Config[drawingFile]{Owner: a, Window: "placement", Journal: m.journal, Codec: drawingCodec(m), Filename: "Drawing.vellum", Extensions: []string{"vellum"}, MaxBytes: drawingByteLimit, Choose: chooseDrawing, OnComplete: func(r document.Result) {
 		switch {
 		case errors.Is(r.Err, app.ErrCanceled), errors.Is(r.Err, context.Canceled):
 			m.status = "File operation canceled; drawing kept"
@@ -29,6 +45,11 @@ func (m *model) bindFiles(a *app.Application, ref app.WindowRef, choose func(con
 			m.status = "Opened " + filepath.Base(r.Path)
 		}
 		if r.Err == nil {
+			if m.recent != nil && (r.Action == document.Open || r.Action == document.Save) {
+				if err := m.recent.Record(r.Path); err != nil {
+					m.status += " • Recent drawings unavailable: " + err.Error()
+				}
+			}
 			m.recovery.Request()
 		}
 		_ = a.Invalidate("placement")
@@ -49,27 +70,67 @@ func (m *model) bindFiles(a *app.Application, ref app.WindowRef, choose func(con
 	return nil
 }
 
+func drawingSuggestion(name string) string {
+	const suffix = ".vellum"
+	for len(name) >= len(suffix) && strings.EqualFold(name[len(name)-len(suffix):], suffix) {
+		name = name[:len(name)-len(suffix)]
+	}
+	if name == "" {
+		return "Drawing"
+	}
+	return name
+}
+
 func (m *model) fileAction(a *app.Application, ref app.WindowRef, action string, discard bool) error {
 	if m.files == nil {
 		return app.ErrUnavailable
 	}
-	if m.recovery.pending() {
+	if m.recovery.pending() || m.clipboardAvailable() != nil {
 		return document.ErrBusy
 	}
 	var err error
 	switch action {
 	case "open":
-		err = m.files.Open(ref.Context(), document.OpenOptions{DiscardChanges: discard})
-		if errors.Is(err, document.ErrUnsaved) {
-			m.prompt = "open"
-			err = nil
-		} else if err == nil {
-			m.status = "Opening drawing…"
+		path := ""
+		if discard {
+			path = m.pendingOpenPath
 		}
+		return m.openDrawing(a, ref, path, discard)
 	case "save", "save-as":
 		err = m.files.Save(ref.Context(), document.SaveOptions{Choose: action == "save-as"})
 		if err == nil {
 			m.status = "Saving drawing…"
+		}
+	}
+	_ = a.Invalidate("placement")
+	return err
+}
+
+func (m *model) openRecent(a *app.Application, ref app.WindowRef, path string) error {
+	if m.recent == nil || !slicesContainsPath(m.recent.Paths(), path) {
+		return app.ErrUnavailable
+	}
+	return m.openDrawing(a, ref, path, false)
+}
+
+func (m *model) openDrawing(a *app.Application, ref app.WindowRef, path string, discard bool) error {
+	if m.files == nil {
+		return app.ErrUnavailable
+	}
+	if ref.Context().Err() != nil {
+		return app.ErrWindowClosed
+	}
+	if m.recovery.pending() || m.clipboardAvailable() != nil {
+		return document.ErrBusy
+	}
+	err := m.files.Open(ref.Context(), document.OpenOptions{Path: path, DiscardChanges: discard})
+	if errors.Is(err, document.ErrUnsaved) {
+		m.pendingOpenPath, m.prompt = path, "open"
+		err = nil
+	} else {
+		m.pendingOpenPath = ""
+		if err == nil {
+			m.status = "Opening drawing…"
 		}
 	}
 	_ = a.Invalidate("placement")
@@ -105,7 +166,17 @@ func (m *model) requestClose(a *app.Application) bool {
 }
 
 func (m *model) filePrompt(a *app.Application, ref app.WindowRef) ui.Node {
-	cancel := func() { m.prompt = ""; _ = a.Invalidate("placement") }
+	expectedPrompt, expectedPath := m.prompt, m.pendingOpenPath
+	current := func() bool {
+		return ref.Context().Err() == nil && m.prompt == expectedPrompt && m.pendingOpenPath == expectedPath
+	}
+	cancel := func() {
+		if !current() {
+			return
+		}
+		m.prompt, m.pendingOpenPath = "", ""
+		_ = a.Invalidate("placement")
+	}
 	text := "Discard unsaved changes and open another drawing?"
 	label := "Discard and Open…"
 	if m.prompt == "close" {
@@ -114,9 +185,13 @@ func (m *model) filePrompt(a *app.Application, ref app.WindowRef) ui.Node {
 	return ui.Node{ID: "file-decision", Kind: ui.Dialog, Text: "Unsaved drawing", Open: m.prompt == "open" || m.prompt == "close", Dismiss: cancel, Children: []ui.Node{
 		{ID: "file-decision-text", Kind: ui.Label, Text: text},
 		{ID: "file-discard", Kind: ui.Button, Text: label, Activate: func() {
+			if !current() {
+				return
+			}
 			prompt := m.prompt
 			m.prompt = ""
 			if prompt == "close" {
+				m.pendingOpenPath = ""
 				m.removeRecoveryOnClose = true
 				_ = a.CloseWindow(ref)
 			} else if err := m.fileAction(a, ref, "open", true); err != nil {
