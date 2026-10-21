@@ -86,11 +86,7 @@ func (e *canvasEditor) press(w *core.WidgetBase, event events.Event) {
 		if err != nil {
 			return
 		}
-		if event.HasAnyModifier(key.Shift) {
-			move = e.model.selectionToggle(g, eventPoint(event))
-		} else {
-			move = e.model.beginMove(g, eventPoint(event))
-		}
+		move = e.model.beginCanvasGesture(g, eventPoint(event), event.HasAnyModifier(key.Shift))
 		if move == nil {
 			return
 		}

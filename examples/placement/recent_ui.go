@@ -30,7 +30,7 @@ func (m *model) recentMenu(a *app.Application, ref app.WindowRef, update func())
 	if empty {
 		options = append(options, ui.Option{ID: "none", Label: "No recent drawings", Disabled: true})
 	}
-	return ui.Node{ID: "recent-drawings", Kind: ui.MenuButton, Text: "Recent", Options: options, Accessibility: ui.Accessibility{Name: "Recent drawings", Help: help}, Disabled: empty || m.files == nil || m.clipboardAvailable() != nil, Change: func(e ui.ChangeEvent) {
+	return ui.Node{ID: "recent-drawings", Kind: ui.MenuButton, Text: "Recent", Options: options, Accessibility: ui.Accessibility{Name: "Recent drawings", Help: help}, Disabled: m.controlDisabled("recent", empty || m.files == nil || m.clipboardAvailable() != nil), Change: func(e ui.ChangeEvent) {
 		path, ok := paths[e.SelectedID]
 		if !ok || ref.Context().Err() != nil {
 			return

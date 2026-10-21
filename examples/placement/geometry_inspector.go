@@ -14,13 +14,14 @@ import (
 )
 
 type geometryDraft struct {
-	values   [4]string
-	message  string
-	before   []canvas.Rect
-	ids      []string
-	primary  string
-	revision uint64
-	scene    *canvas.Scene
+	values       [4]string
+	message      string
+	aspectLocked bool
+	before       []canvas.Rect
+	ids          []string
+	primary      string
+	revision     uint64
+	scene        *canvas.Scene
 }
 
 // Exact numeric edits use world units and deliberately bypass grid snapping.
@@ -86,7 +87,7 @@ func (m *model) beginGeometry() error {
 	if !ok {
 		return errNoSelection
 	}
-	d := &geometryDraft{before: slices.Clone(m.scene.Objects), ids: ids, primary: m.scene.Selected, revision: m.journal.Snapshot().Revision, scene: m.scene}
+	d := &geometryDraft{aspectLocked: m.aspectLocked, before: slices.Clone(m.scene.Objects), ids: ids, primary: m.scene.Selected, revision: m.journal.Snapshot().Revision, scene: m.scene}
 	for i, v := range []float64{bounds.X, bounds.Y, bounds.Width, bounds.Height} {
 		d.values[i] = strconv.FormatFloat(v, 'g', -1, 64)
 	}
@@ -108,6 +109,27 @@ func (m *model) applyGeometry(d *geometryDraft) error {
 			return fmt.Errorf("%s must be a finite number", []string{"X", "Y", "Width", "Height"}[i])
 		}
 		values[i] = v
+	}
+	if d.aspectLocked {
+		bounds, _ := selectionBounds(d.before, d.ids)
+		if values[2] <= 0 || values[3] <= 0 {
+			return errors.New("width and height must be positive")
+		}
+		wChanged, hChanged := values[2] != bounds.Width, values[3] != bounds.Height
+		if wChanged && hChanged && math.Abs(values[2]/bounds.Width-values[3]/bounds.Height) > 1e-12*math.Max(1, math.Max(values[2]/bounds.Width, values[3]/bounds.Height)) {
+			return errors.New("aspect lock requires matching width/height proportions; edit one dimension")
+		}
+		if wChanged {
+			values[3] = (bounds.Height / bounds.Width) * values[2]
+			if len(d.ids) == 1 {
+				values[3] = derivedSizeBoundary(values[3])
+			}
+		} else if hChanged {
+			values[2] = (bounds.Width / bounds.Height) * values[3]
+			if len(d.ids) == 1 {
+				values[2] = derivedSizeBoundary(values[2])
+			}
+		}
 	}
 	after, err := transformedSelection(d.before, d.ids, canvas.Rect{X: values[0], Y: values[1], Width: values[2], Height: values[3]})
 	if err != nil {
@@ -131,7 +153,7 @@ func (m *model) geometryDialog(a *app.Application, ref app.WindowRef) ui.Node {
 			_ = a.Invalidate("placement")
 		}
 	}
-	children := []ui.Node{{ID: "geometry-help", Kind: ui.Label, Text: "World units; exact values ignore grid snapping. Groups scale together.", Style: ui.Style{MaxSize: ui.Some(ui.Size{Width: 380})}}}
+	children := []ui.Node{{ID: "geometry-help", Kind: ui.Label, Text: "World units; exact values ignore grid snapping. Groups scale together. Aspect lock derives the other dimension when one size changes.", Style: ui.Style{MaxSize: ui.Some(ui.Size{Width: 380})}}}
 	for i, label := range []string{"X", "Y", "Width", "Height"} {
 		text := ""
 		if d != nil {
@@ -167,4 +189,15 @@ func (m *model) geometryDialog(a *app.Application, ref app.WindowRef) ui.Node {
 		_ = a.Invalidate("placement")
 	}}, ui.Node{ID: "geometry-cancel", Kind: ui.Button, Text: "Cancel", Activate: cancel})
 	return ui.Node{ID: "geometry-dialog", Kind: ui.Dialog, Text: "Selection geometry", Open: active(), Dismiss: cancel, Children: children}
+}
+
+// Only derived sizes receive a one-ULP boundary correction; typed sizes remain exact.
+func derivedSizeBoundary(v float64) float64 {
+	if v < minComponentSize && v >= math.Nextafter(minComponentSize, math.Inf(-1)) {
+		return minComponentSize
+	}
+	if v > maxComponentSize && v <= math.Nextafter(maxComponentSize, math.Inf(1)) {
+		return maxComponentSize
+	}
+	return v
 }

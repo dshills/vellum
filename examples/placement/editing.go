@@ -20,6 +20,7 @@ type objectMove struct {
 	geometry        placement.Geometry
 	dragging, valid bool
 	resize          bool
+	aspectLocked    bool
 	corner          resizeCorner
 	selection       []string
 	selectionOnly   bool
@@ -129,7 +130,7 @@ func (m *model) beginMove(g placement.Geometry, p canvas.Point) *objectMove {
 	}
 	m.setSelection(ids, id)
 	m.scene.View = g.View
-	s := &objectMove{id: id, before: slices.Clone(m.scene.Objects), start: p, grab: world, geometry: g, valid: true, resize: corner != noCorner, corner: corner, selection: m.selectedIDs()}
+	s := &objectMove{id: id, before: slices.Clone(m.scene.Objects), start: p, grab: world, geometry: g, valid: true, resize: corner != noCorner, aspectLocked: m.aspectLocked, corner: corner, selection: m.selectedIDs()}
 	m.move = s
 	return s
 }
@@ -154,8 +155,8 @@ func (m *model) previewMove(s *objectMove, p canvas.Point) {
 	// Keep the initial world grab point while mapping the current pointer with
 	// the latest layout, preserving the offset inside the object.
 	dx, dy := world.X-s.grab.X, world.Y-s.grab.Y
-	if s.resize && len(s.selection) > 1 {
-		after, err := resizedSelection(s.before, s.selection, s.corner, dx, dy, m.snap)
+	if s.resize && (len(s.selection) > 1 || s.aspectLocked) {
+		after, err := resizedSelection(s.before, s.selection, s.corner, dx, dy, m.snap, s.aspectLocked)
 		if err != nil {
 			s.valid = false
 			return
@@ -170,7 +171,7 @@ func (m *model) previewMove(s *objectMove, p canvas.Point) {
 			continue
 		}
 		if s.resize {
-			after[i] = resizedCorner(after[i], s.corner, dx, dy, m.snap)
+			after[i] = resizedCorner(after[i], s.corner, dx, dy, m.snap, s.aspectLocked)
 			if !validPosition(after[i].X, after[i].Y) {
 				s.valid = false
 				return
@@ -304,10 +305,34 @@ func (m *model) resizeSelected(dw, dh float64) error {
 	}
 	i := m.selectedIndex()
 	after := slices.Clone(m.scene.Objects)
-	after[i].Width, after[i].Height = resizedDimensions(after[i], dw*step, dh*step, m.snap)
+	if m.aspectLocked {
+		var err error
+		after, err = resizedSelection(after, m.selectedIDs(), southEast, dw*step, dh*step, m.snap, true)
+		if err != nil {
+			return err
+		}
+	} else {
+		after[i].Width, after[i].Height = resizedDimensions(after[i], dw*step, dh*step, m.snap)
+	}
 	if err := m.applyObjects("Resize "+after[i].ID, after, after[i].ID); err != nil {
 		return err
 	}
 	m.status = fmt.Sprintf("Resized %s to %.0f × %.0f", after[i].ID, after[i].Width, after[i].Height)
 	return nil
+}
+
+// Shift has handle priority; elsewhere it retains selection/marquee behavior.
+func (m *model) beginCanvasGesture(g placement.Geometry, p canvas.Point, shift bool) *objectMove {
+	if shift {
+		bounds, ok := selectionBounds(m.scene.Objects, m.selectedIDs())
+		if ok && handleAt(bounds, g, p) != noCorner {
+			s := m.beginMove(g, p)
+			if s != nil && s.resize {
+				s.aspectLocked = true
+			}
+			return s
+		}
+		return m.selectionToggle(g, p)
+	}
+	return m.beginMove(g, p)
 }

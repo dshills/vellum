@@ -81,6 +81,9 @@ func (m *model) beginLayerDrag(source string, p canvas.Point, g layerLayout) *la
 	for _, c := range m.commands.Search("") {
 		s.disabled[c.ID] = m.commands.Enabled(c.ID) != nil
 	}
+	s.disabled["control:geometry"] = m.editAvailable() != nil
+	s.disabled["control:interaction"] = m.clipboardAvailable() != nil
+	s.disabled["control:recent"] = m.files == nil || len(m.recent.Paths()) == 0 || m.clipboardAvailable() != nil
 	m.layerDrag = s
 	return s
 }
@@ -283,4 +286,14 @@ func (m *model) commandDisabled(id string) bool {
 		}
 	}
 	return m.commands.Enabled(id) != nil
+}
+
+// Keep presentation stable during a layer capture; callbacks still check live admission.
+func (m *model) controlDisabled(id string, current bool) bool {
+	if s := m.layerDrag; s != nil {
+		if value, ok := s.disabled["control:"+id]; ok {
+			return value
+		}
+	}
+	return current
 }

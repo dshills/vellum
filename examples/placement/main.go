@@ -192,15 +192,24 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 			}},
 		}},
 		m.compactActions(invoke),
-		{ID: "geometry-tools", Kind: ui.Row, Children: []ui.Node{{ID: "geometry-open", Kind: ui.Button, Text: "Geometry…", Style: compactControlStyle(), Disabled: m.editAvailable() != nil, Activate: func() {
-			if ref.Context().Err() != nil {
-				return
-			}
-			if err := m.beginGeometry(); err != nil {
-				m.status = err.Error()
-			}
-			update()
-		}}}},
+		{ID: "geometry-tools", Kind: ui.Row, Children: []ui.Node{
+			{ID: "geometry-open", Kind: ui.Button, Text: "Geometry…", Style: compactControlStyle(), Disabled: m.controlDisabled("geometry", m.editAvailable() != nil), Activate: func() {
+				if ref.Context().Err() != nil {
+					return
+				}
+				if err := m.beginGeometry(); err != nil {
+					m.status = err.Error()
+				}
+				update()
+			}},
+			{ID: "aspect-lock", Kind: ui.Checkbox, Text: "Lock aspect ratio", Checked: m.aspectLocked, Disabled: m.controlDisabled("interaction", m.clipboardAvailable() != nil), Change: func(e ui.ChangeEvent) {
+				if ref.Context().Err() != nil || m.clipboardAvailable() != nil {
+					return
+				}
+				m.aspectLocked = e.Checked
+				update()
+			}},
+		}},
 		{ID: "help", Kind: ui.Label, Text: dimensions + " • " + help, Style: compactControlStyle()},
 		{ID: "workspace", Kind: ui.Row, Grow: true, Children: []ui.Node{
 			{ID: "palette", Kind: ui.Column, MinWidth: 145, Children: tools},

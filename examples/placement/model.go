@@ -35,6 +35,7 @@ type model struct {
 	files                             *document.Session[drawingFile]
 	recent                            *recentDrawings
 	geometry                          *geometryDraft
+	aspectLocked                      bool
 	pendingOpenPath                   string
 	recovery                          *placementRecovery
 	removeRecoveryOnClose             bool

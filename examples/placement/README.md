@@ -402,3 +402,15 @@ Groups and multiple selections scale members and spacing together. Exact numeric
 values ignore Snap. Apply validates every component before one Undo/Redo change;
 invalid, stale or canceled drafts keep the drawing. IDs, order, names, visibility
 and locks remain intact. Individual sizes remain 8–2000; origins remain ±10000.
+
+## Aspect-locked resizing
+
+**Lock aspect ratio** preserves one uniform scale for a selected component or set.
+Alternatively hold Shift when pressing an existing selected corner handle; that
+gesture locks the ratio without changing the checkbox. Shift elsewhere retains
+selection behavior. The captured lock stays fixed through the gesture. Only the
+driving dimension snaps; all members share the strictest size/origin limit, keep
+the opposite corner and do not flip. One committed resize is one Undo/Redo entry.
+The numeric inspector derives the other dimension when one size changes; incompatible
+explicit sizes are rejected. Step resizing of a single component also respects lock.
+The checkbox is session state and does not change saved drawing formats.
