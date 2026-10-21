@@ -475,3 +475,10 @@ selection or history. Clicks still select whole groups. Drag reordering is disab
 while filtering; clear the filter to drag. Collapsed group markers remain valid
 whole-group drop targets. Projection settings are session-only, clear on New/Open,
 and cannot change during a gesture.
+
+## Descriptive history (internal 20)
+
+Undo and Redo include the next operation's journal label, for example **Undo Move
+selection** or **Redo Resize selection**. Empty stacks show plain disabled Undo
+or Redo. Command identities and keyboard shortcuts are unchanged; captions follow
+replay, new history branches, and New/Open history resets.
