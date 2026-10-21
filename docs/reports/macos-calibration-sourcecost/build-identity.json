@@ -1,0 +1,50 @@
+{
+  "scope": "private compiler overlay source-cost diagnostic only",
+  "fixture_binary_sha256": "ecb69e16b2d4da16aeabef5ed25f1221141c95f691e83f748a7675f969de7913",
+  "original_native_library": "/private/tmp/vellum-doclinks-sdk-bd3cbc9/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent/build/libs-darwin/arm64/libwgpu_native.a",
+  "native_library_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "SDK_source": "bd3cbc9ce2566955dae5dbb61385b0e1a9307eaa",
+  "overlay_identity": {
+    "desktop_session.go": {
+      "original_sha256": "1989f3920a5335ce93d9d34e5fcfdfc1ddd3d9d04d541b11e37c174d58cabe4a",
+      "overlay_sha256": "3e3b8bc6f79edbac67433813103a39eccdf31e1075e62f9aaca0d8bbbeb58cf4",
+      "original": "/private/tmp/vellum-doclinks-sdk-bd3cbc9/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent/desktop_session.go",
+      "overlay": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-calibration-sourcecost/desktop_session.go",
+      "replacement_count": 1
+    },
+    "desktop_measurement.go": {
+      "original_sha256": "7397d858f283cb244fbc772a1584cef12e8109b5a88576e62318e3bce109e961",
+      "overlay_sha256": "ac8a07ac2175f82a41b8c6d4953a7e5b34f35f69beba572e4efe4db91b65bceb",
+      "original": "/private/tmp/vellum-doclinks-sdk-bd3cbc9/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent/desktop_measurement.go",
+      "overlay": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-calibration-sourcecost/desktop_measurement.go",
+      "replacement_count": 1
+    }
+  },
+  "overlay_recipe": {
+    "scope": "private compiler overlay only; immutable SDK not edited",
+    "patches": [
+      {
+        "file": "desktop_session.go",
+        "before": "trace: &core.FrameTrace{}, revision: 1",
+        "after": "trace: core.NewFrameTraceWithSourceDetails(), revision: 1"
+      },
+      {
+        "file": "desktop_measurement.go",
+        "before": "Failure: v.Failure}",
+        "after": "Failure: v.Failure, SourceDetails: frameSourceDetails(v.SourceDetails)}"
+      }
+    ]
+  },
+  "SDK_modified": false,
+  "native_rebuilt": false,
+  "experimental_options_enabled": false,
+  "new_API": false,
+  "tests": {
+    "new_wrapper_methods": 5,
+    "nested_failure_subcases": 6,
+    "reused": "18 parent, prior existing detailed scalar validator and exact view/routing/pixels"
+  },
+  "warnings": "Inherited frozen SDK AppKit accessibility deprecation warnings retained in build stderr.",
+  "release_qualified": false,
+  "gate_changed": false
+}

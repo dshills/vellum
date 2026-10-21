@@ -1,0 +1,15 @@
+{
+  "scope": "private compiler overlay only; immutable SDK not edited",
+  "patches": [
+    {
+      "file": "desktop_session.go",
+      "before": "trace: &core.FrameTrace{}, revision: 1",
+      "after": "trace: core.NewFrameTraceWithSourceDetails(), revision: 1"
+    },
+    {
+      "file": "desktop_measurement.go",
+      "before": "Failure: v.Failure}",
+      "after": "Failure: v.Failure, SourceDetails: frameSourceDetails(v.SourceDetails)}"
+    }
+  ]
+}
