@@ -387,3 +387,10 @@ invalid drawing leaves the current document unchanged; opening a recent drawing
 uses the same unsaved-change prompt as Open. Cancel keeps the drawing and clears
 the pending destination. Save As suggests a base name without repeated `.vellum`
 suffixes; the OS-confirmed destination is never renamed by the app.
+
+## Compact command menus
+
+Edit, Move, Resize, Arrange and Layers menus retain the existing commands and
+shortcuts. Open/Save/Recent, Undo/Redo, Fit/Reset and Snap stay directly available.
+Drop-rejection test switches are beside the palette. The compact controls replace
+four wide command rows to leave more vertical canvas and layer-list space.

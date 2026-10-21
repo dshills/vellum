@@ -110,6 +110,10 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 			update()
 		}})
 	}
+	tools = append(tools,
+		ui.Node{ID: "lock", Kind: ui.Checkbox, Text: "Reject all drops", Checked: m.locked, Change: func(e ui.ChangeEvent) { m.locked = e.Checked; update() }},
+		ui.Node{ID: "reject-notes", Kind: ui.Checkbox, Text: "Reject notes", Checked: m.rejectNotes, Change: func(e ui.ChangeEvent) { m.rejectNotes = e.Checked; update() }},
+	)
 	grid := float32(0)
 	if m.snap {
 		grid = 20
@@ -152,10 +156,6 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		dimensions = fmt.Sprintf("%d selected • %d groups • corners resize", len(selection), len(selectedGroups))
 	}
 	help := "Group: Cmd+G • Ungroup: Cmd+Shift+G • Shift-drag selects • plain empty drag pans • corners resize selection"
-	arrangementTools := []ui.Node{{ID: "arrange-label", Kind: ui.Label, Text: "Arrange:"}}
-	for _, action := range arrangementActions {
-		arrangementTools = append(arrangementTools, ui.Node{ID: action.id, Kind: ui.Button, Text: action.label, Disabled: m.commandDisabled(action.id), Activate: invoke(action.id)})
-	}
 	display := m.canvasForView()
 	root := ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{
 		{ID: "file-tools", Kind: ui.Toolbar, Children: []ui.Node{
@@ -163,19 +163,19 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 			{ID: "save", Kind: ui.Button, Text: "Save", Disabled: m.files == nil || m.commandDisabled("save"), Activate: invoke("save")},
 			{ID: "save-as", Kind: ui.Button, Text: "Save As…", Disabled: m.files == nil || m.commandDisabled("save-as"), Activate: invoke("save-as")},
 			m.recentMenu(a, ref, update),
-			{ID: "filename", Kind: ui.Label, Text: filename},
+			{ID: "filename", Kind: ui.Label, Text: filename, Style: ui.Style{MaxSize: ui.Some(ui.Size{Width: 320})}},
 		}},
 		{ID: "toolbar", Kind: ui.Toolbar, Children: []ui.Node{
 			{ID: "undo", Kind: ui.Button, Text: "Undo", Disabled: m.commandDisabled("undo"), Activate: invoke("undo")},
 			{ID: "redo", Kind: ui.Button, Text: "Redo", Disabled: m.commandDisabled("redo"), Activate: invoke("redo")},
-			{ID: "fit", Kind: ui.Button, Text: "Fit objects", Disabled: navigatingDisabled, Activate: func() {
+			{ID: "fit", Kind: ui.Button, Text: "Fit", Disabled: navigatingDisabled, Activate: func() {
 				if m.fileBusy() || m.move != nil {
 					return
 				}
 				m.fitVisible()
 				update()
 			}},
-			{ID: "reset", Kind: ui.Button, Text: "Reset view", Disabled: navigatingDisabled, Activate: func() {
+			{ID: "reset", Kind: ui.Button, Text: "Reset", Disabled: navigatingDisabled, Activate: func() {
 				if m.fileBusy() || m.move != nil {
 					return
 				}
@@ -183,45 +183,16 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 				m.scene.View.Zoom = 1
 				update()
 			}},
-			{ID: "snap", Kind: ui.Checkbox, Text: "Snap to grid", Disabled: navigatingDisabled, Checked: m.snap, Change: func(e ui.ChangeEvent) {
+			{ID: "snap", Kind: ui.Checkbox, Text: "Snap", Disabled: navigatingDisabled, Checked: m.snap, Change: func(e ui.ChangeEvent) {
 				if m.fileBusy() || m.move != nil {
 					return
 				}
 				m.snap = e.Checked
 				update()
 			}},
-			{ID: "lock", Kind: ui.Checkbox, Text: "Reject all drops", Checked: m.locked, Change: func(e ui.ChangeEvent) { m.locked = e.Checked; update() }},
-			{ID: "reject-notes", Kind: ui.Checkbox, Text: "Reject notes", Checked: m.rejectNotes, Change: func(e ui.ChangeEvent) { m.rejectNotes = e.Checked; update() }},
 		}},
-		{ID: "edit-tools", Kind: ui.Toolbar, Children: []ui.Node{
-			{ID: "cut", Kind: ui.Button, Text: "Cut", Disabled: m.commandDisabled("cut"), Activate: invoke("cut")},
-			{ID: "copy", Kind: ui.Button, Text: "Copy", Disabled: m.commandDisabled("copy"), Activate: invoke("copy")},
-			{ID: "paste", Kind: ui.Button, Text: "Paste", Disabled: m.commandDisabled("paste"), Activate: invoke("paste")},
-			{ID: "duplicate", Kind: ui.Button, Text: "Duplicate", Disabled: m.commandDisabled("duplicate"), Activate: invoke("duplicate")},
-			{ID: "move-label", Kind: ui.Label, Text: "Move selected:"},
-			{ID: "move-left", Kind: ui.Button, Text: "Left", Disabled: m.commandDisabled("move-left"), Activate: invoke("move-left")},
-			{ID: "move-right", Kind: ui.Button, Text: "Right", Disabled: m.commandDisabled("move-right"), Activate: invoke("move-right")},
-			{ID: "move-up", Kind: ui.Button, Text: "Up", Disabled: m.commandDisabled("move-up"), Activate: invoke("move-up")},
-			{ID: "move-down", Kind: ui.Button, Text: "Down", Disabled: m.commandDisabled("move-down"), Activate: invoke("move-down")},
-			{ID: "delete", Kind: ui.Button, Text: "Delete selected", Disabled: m.commandDisabled("delete"), Activate: invoke("delete")},
-		}},
-		{ID: "stack-tools", Kind: ui.Toolbar, Children: []ui.Node{
-			{ID: "group", Kind: ui.Button, Text: "Group", Disabled: m.commandDisabled("group"), Activate: invoke("group")},
-			{ID: "ungroup", Kind: ui.Button, Text: "Ungroup", Disabled: m.commandDisabled("ungroup"), Activate: invoke("ungroup")},
-			{ID: "bring-front", Kind: ui.Button, Text: "Bring to front", Disabled: m.commandDisabled("bring-front"), Activate: invoke("bring-front")},
-			{ID: "send-back", Kind: ui.Button, Text: "Send to back", Disabled: m.commandDisabled("send-back"), Activate: invoke("send-back")},
-			{ID: "bring-forward", Kind: ui.Button, Text: "Bring forward", Disabled: m.commandDisabled("bring-forward"), Activate: invoke("bring-forward")},
-			{ID: "send-backward", Kind: ui.Button, Text: "Send backward", Disabled: m.commandDisabled("send-backward"), Activate: invoke("send-backward")},
-		}},
-		{ID: "resize-tools", Kind: ui.Toolbar, Children: []ui.Node{
-			{ID: "width-less", Kind: ui.Button, Text: "Width −", Disabled: m.commandDisabled("width-less"), Activate: invoke("width-less")},
-			{ID: "width-more", Kind: ui.Button, Text: "Width +", Disabled: m.commandDisabled("width-more"), Activate: invoke("width-more")},
-			{ID: "height-less", Kind: ui.Button, Text: "Height −", Disabled: m.commandDisabled("height-less"), Activate: invoke("height-less")},
-			{ID: "height-more", Kind: ui.Button, Text: "Height +", Disabled: m.commandDisabled("height-more"), Activate: invoke("height-more")},
-			{ID: "dimensions", Kind: ui.Label, Text: dimensions},
-		}},
-		{ID: "arrange-tools", Kind: ui.Toolbar, Children: arrangementTools},
-		{ID: "help", Kind: ui.Label, Text: help},
+		m.compactActions(invoke),
+		{ID: "help", Kind: ui.Label, Text: dimensions + " • " + help, Style: compactControlStyle()},
 		{ID: "workspace", Kind: ui.Row, Grow: true, Children: []ui.Node{
 			{ID: "palette", Kind: ui.Column, MinWidth: 145, Children: tools},
 			{ID: "drawing", Kind: ui.Canvas2D, Disabled: busy, Canvas: display, CanvasObjects: objects, CanvasGrid: grid, PlacementTarget: m.target, Grow: true, Accessibility: ui.Accessibility{Name: "Component canvas", Help: "Shift-click toggles a component; Shift-drag empty canvas adds intersected components using a marquee; click empty space to clear selection; drag a selected component to move the selection; Option+Left/Right/Home/End selects one; drag selection corner handles to resize the set; plain empty drag or arrow keys pan; scroll zooms."}, Change: func(e ui.ChangeEvent) {
@@ -237,5 +208,13 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		{ID: "status", Kind: ui.StatusBar, Children: []ui.Node{{ID: "message", Kind: ui.Label, Text: fmt.Sprintf("%s • %d objects • %d selected • Undo %d / Redo %d", m.status, len(m.scene.Objects), len(selection), m.journal.Snapshot().UndoCount, m.journal.Snapshot().RedoCount)}}},
 	}}
 	root.Children = append(root.Children, m.filePrompt(a, ref), m.renameDialog(a, ref), m.recovery.promptNode())
+	for i := range root.Children {
+		if root.Children[i].Kind == ui.Toolbar {
+			for j := range root.Children[i].Children {
+				n := &root.Children[i].Children[j]
+				n.Style = compactControlStyle().Overlay(n.Style)
+			}
+		}
+	}
 	return root
 }

@@ -5,6 +5,7 @@ package main
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"image"
@@ -136,6 +137,10 @@ func TestPublicPaletteCanvasConsumer(t *testing.T) {
 					input(cogent.ManualInput{Type: typ, Button: events.Left, Position: e.Bounds.Min.Add(e.Bounds.Size().Div(2))})
 				}
 			}
+			chooseMenu := func(menu, action string) {
+				click(menu)
+				click("menu:" + base64.RawURLEncoding.EncodeToString([]byte(menu)) + ":" + base64.RawURLEncoding.EncodeToString([]byte(action)))
+			}
 			settle()
 			for _, id := range []string{"block", "connector", "note"} {
 				_, source := element("tool-" + id)
@@ -233,7 +238,7 @@ func TestPublicPaletteCanvasConsumer(t *testing.T) {
 				t.Fatal("move shortcut was intercepted by canvas navigation")
 			}
 			click("undo")
-			click("delete")
+			chooseMenu("edit-menu", "delete")
 			if len(m.scene.Objects) != 3 {
 				t.Fatal("routed delete")
 			}
@@ -249,7 +254,7 @@ func TestPublicPaletteCanvasConsumer(t *testing.T) {
 
 			index = m.selectedIndex()
 			originalSize := m.scene.Objects[index]
-			click("width-more")
+			chooseMenu("resize-menu", "width-more")
 			if m.scene.Objects[index].Width != originalSize.Width+20 || m.scene.Objects[index].Height != originalSize.Height {
 				t.Fatal("routed resize width")
 			}
