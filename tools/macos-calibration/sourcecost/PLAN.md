@@ -7,9 +7,12 @@ cost; do not repeat that closed experiment or assume its split fits this fixture
 Use one matched-rectangle diagnostic to separate current scene RasterNS, CopyNS
 and nested SetFromGoImageNS using the existing source-cost implementation.
 
-A compiler overlay changes exactly two owned Go lines in the retained SDK:
+A compiler overlay changes three exact owned Go locations in the retained SDK:
 construct the existing source-detail FrameTrace for DesktopSession, and detach its
-existing SourceDetails into DesktopInputMeasurement.Frame. The original SDK files
+existing SourceDetails into DesktopInputMeasurement.Frame. Include the stage106
+repair allocating source-detail storage for grouped tickets, which the previous
+constructor-only overlay revealed missing. The first attempt remains sealed and
+failed at its first measured input; no timing acceptance is inferred. The original SDK files
 are never written. Bind original/overlay hashes, exact overlay recipe, fixture
 source/binary, SDK manifest and original786aa native archive. No Rust build,
 private backend archive, renderer/pacing option, public API or default change.

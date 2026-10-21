@@ -280,12 +280,14 @@ class PreparationChecks(unittest.TestCase):
         core, font = manifest["dependencies"]
         self.assertEqual(core["module"], "cogentcore.org/core")
         numbers = [int(Path(patch["file"]).name[:4]) for stage in core["stages"] for patch in stage["patches"]]
-        self.assertEqual(numbers, list(range(1, 106)))
-        stage105 = core["stages"][-1]
+        self.assertEqual(numbers, list(range(1, 107)))
+        index105 = next(i for i, stage in enumerate(core["stages"]) if any(Path(patch["file"]).name == "0105-acknowledged-skipped-drawable.patch" for patch in stage["patches"]))
+        stage105 = core["stages"][index105]
+        self.assertEqual(Path(core["stages"][-1]["patches"][0]["file"]).name, "0106-group-source-detail-storage.patch")
         self.assertEqual(Path(stage105["patches"][0]["file"]).name, "0105-acknowledged-skipped-drawable.patch")
         original = json.loads((ROOT / stage105["inputs"]).read_text())
         result = json.loads((ROOT / stage105["outputs"]).read_text())
-        previous = json.loads((ROOT / core["stages"][-2]["outputs"]).read_text())
+        previous = json.loads((ROOT / core["stages"][index105-1]["outputs"]).read_text())
         expected = {"core/display_backpressure_vellum_test.go", "system/driver/desktop/display_backpressure.go",
                     "system/driver/desktop/display_backpressure_darwin.go", "system/driver/desktop/display_backpressure_vellum_test.go"}
         self.assertEqual(set(original), expected)
@@ -312,7 +314,8 @@ class PreparationChecks(unittest.TestCase):
         import shutil
         from unittest import mock
         core = json.loads((ROOT / "native/dependencies.json").read_text())["dependencies"][0]
-        prior, stage = core["stages"][-2:]
+        index105 = next(i for i, stage in enumerate(core["stages"]) if any(Path(patch["file"]).name == "0105-acknowledged-skipped-drawable.patch" for patch in stage["patches"]))
+        prior, stage = core["stages"][index105-1:index105+1]
         original = json.loads((ROOT / stage["inputs"]).read_text())
         outputs = json.loads((ROOT / stage["outputs"]).read_text())
         lines = (ROOT / prior["patches"][0]["file"]).read_text().splitlines(keepends=True)

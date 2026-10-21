@@ -1,14 +1,30 @@
-# Matched-rectangle source-cost preparation
+# Matched-rectangle source-cost diagnostic preparation
 
-The retained-original CPU counters put most current work in raster/upload. A
-single [diagnostic](../../../tools/macos-calibration/sourcecost/PLAN.md) separates
-existing scene raster, image copy and image API timers. Two private compiler
-overlay lines enable/detach existing detailed trace data; SDK files remain
-unchanged and the original source-built native archive is reused. No rendering
-or pacing option, public API, feature or release policy changes.
+The first constructor-only diagnostic is sealed and failed at its first input:
+Core's grouped detailed tracer lacked its per-ticket source-detail container.
+Its native process exits1 with "source diagnostic composition details unavailable"
+after1.237 seconds; no complete cohort or timing acceptance exists. The raw data,
+original36ad689 source snapshot and [refusal](refusal-analysis.json) are retained.
 
-Build, five new wrapper controls (six nested negative subcases), exact overlay,
-binary/native library/SDK identities and existing view/routing/validator reuse
-are checked. Extra clocks affect timings; no ordinary latency qualification can
-follow. Internal and Prism review precede the one-process 60-second bounded
-campaign. Actual results will be recorded after the source checkpoint commits.
+Stage0106 initializes that container in BeginGroup, mirroring the existing Begin
+path only when source details are enabled. Ordinary traces remain unchanged.
+The two new Core regression methods cover prefix/final detached data, shared32
+record cap/33 refusal, cancellation with live composition and ordinary isolation.
+They fail by assertions on original105 and pass with the existing group/source
+trace tests under race detection. All34 preparation checks and a full fresh
+prepare pass. Initial test assumptions about last-stage105/patch-only stages were
+corrected and failed outputs retained. This repairs diagnostics, not latency.
+
+The fresh [one-process protocol](../../../tools/macos-calibration/sourcecost/PLAN.md)
+uses three exact private compiler-overlay locations: existing detailed constructor,
+existing detached result field, and the identical grouped initialization repair.
+Original SDK Go/native files are untouched, original786aa native archive is reused,
+and no renderer/pacing/default/public API or release policy changes. Five wrapper
+methods with six nested negative subcases pass; earlier view/routing/pixel and
+existing scalar-validator checks are reused. Extra clocks perturb elapsed time.
+
+Native build/overlay identities are in [original](build-identity.json) and
+[corrected](build-identity-v2.json) records. The actual stage106 patch is owned
+under native/patches/groupsourcedetails. Internal/Prism review and source commit
+precede a fresh single-process60-second scope. No ordinary latency qualification
+or Mac milestone closes from this diagnostic preparation.

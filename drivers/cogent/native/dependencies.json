@@ -1381,6 +1381,17 @@
               "sha256": "f03b7af13f29d992add76f857f26da55bfd1604a40eee6cc7ab38c1e5b03b46a"
             }
           ]
+        },
+        {
+          "origin": "Vellum grouped source-detail initialization repair",
+          "inputs": "native/patches/groupsourcedetails/original-hashes.json",
+          "outputs": "native/patches/groupsourcedetails/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/groupsourcedetails/0106-group-source-detail-storage.patch",
+              "sha256": "0b2d7466463f1cd828a20a966c255c59a76fb27066d070357b885a77e1314793"
+            }
+          ]
         }
       ]
     },

@@ -1,0 +1,15 @@
+{
+  "outcome": "RETAINED_NATIVE_DIAGNOSTIC_FAILURE",
+  "source_checkpoint": "36ad689",
+  "reason": "Detailed BeginGroup did not initialize pending.SourceDetails; first composition refused with source diagnostic composition details unavailable",
+  "native_exit_code": 1,
+  "native_seconds": 1.236999874934554,
+  "completed_diagnostic_cohort": false,
+  "measured_requests_reserved": 1,
+  "first_composition_completed": false,
+  "public_API_or_default_changed": false,
+  "SDK_modified": false,
+  "fix": "Stage106 initializes the existing bounded source-detail container for BeginGroup like Begin. Original regression fails, fixed tests pass. Fresh three-location compiler overlay includes identicalrepair withoutwritingSDK.",
+  "release_qualified": false,
+  "gate_changed": false
+}

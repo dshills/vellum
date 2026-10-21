@@ -80,3 +80,14 @@ Stop an unsuccessful calibration implementation after 90 minutes to reassess its
 boundary. No new controls, renderer policies, public API or app features belong
 in this work. Diagnostic sources live under `tools/macos-calibration`; they are
 not included in the SDK or internal Placement application.
+
+
+## Grouped source-cost diagnostic repair
+
+The first private source-cost overlay fails immediately because detailed
+BeginGroup omitted ticket storage already allocated by Begin. Stage0106 adds
+that conditional initialization and regressions for prefix/final bounded data,
+cancellation and ordinary isolation. A fresh compiler overlay adds the identical
+fix while retaining immutable SDK bytes. No rendering/pacing default, public API,
+release threshold or earlier failed scope changes. The source-cost experiment
+remains diagnostic-only; it cannot qualify ordinary latency or complete M3.

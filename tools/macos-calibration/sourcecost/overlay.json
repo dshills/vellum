@@ -10,6 +10,11 @@
       "file": "desktop_measurement.go",
       "before": "Failure: v.Failure}",
       "after": "Failure: v.Failure, SourceDetails: frameSourceDetails(v.SourceDetails)}"
+    },
+    {
+      "file": "build/upstream/core/frame_trace.go",
+      "before": "\ttrace.pending = &frameTracePending{FrameTraceSample: FrameTraceSample{Tag: tag}, group: append([]events.Event(nil), group...), transaction: true, ownerExpected: true, queued: time.Now()}\n",
+      "after": "\ttrace.pending = &frameTracePending{FrameTraceSample: FrameTraceSample{Tag: tag}, group: append([]events.Event(nil), group...), transaction: true, ownerExpected: true, queued: time.Now()}\n\tif trace.sourceDetails {\n\t\ttrace.pending.SourceDetails = &composer.SourceDetails{}\n\t}\n"
     }
   ]
 }

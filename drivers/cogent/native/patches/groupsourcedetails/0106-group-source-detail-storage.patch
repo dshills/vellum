@@ -1,0 +1,106 @@
+--- a/core/frame_trace.go
++++ b/core/frame_trace.go
+@@ -104,6 +104,9 @@
+ 		return ErrFrameTraceBusy
+ 	}
+ 	trace.pending = &frameTracePending{FrameTraceSample: FrameTraceSample{Tag: tag}, group: append([]events.Event(nil), group...), transaction: true, ownerExpected: true, queued: time.Now()}
++	if trace.sourceDetails {
++		trace.pending.SourceDetails = &composer.SourceDetails{}
++	}
+ 	return nil
+ }
+ 
+--- /dev/null
++++ b/core/group_source_details_vellum_test.go
+@@ -0,0 +1,91 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT.
++package core
++
++import (
++	"cogentcore.org/core/events"
++	"testing"
++)
++
++func TestVellumGroupSourceDetailsPrefixFinalBudgetAndDetach(t *testing.T) {
++	for _, overflow := range []bool{false, true} {
++		t.Run(map[bool]string{false: "fits", true: "overflow"}[overflow], func(t *testing.T) {
++			trace := NewFrameTraceWithSourceDetails()
++			first, second := &events.CustomEvent{}, &events.CustomEvent{}
++			if err := trace.BeginGroup(71, []events.Event{first, second}); err != nil {
++				t.Fatal(err)
++			}
++			tag, start := trace.startEvent(first)
++			trace.endEvent(tag, start)
++			trace.GroupOwnerWork(71, 3)
++			trace.Reconciled(71, 5)
++			if trace.startFrame() != 71 {
++				t.Fatal("missing prefix")
++			}
++			prefix := sourceTraceComposition(20)
++			trace.finishFrame(71, prefix)
++			if _, ok := trace.Take(); ok {
++				t.Fatal("prefix completed or failed before final group terminal")
++			}
++			prefix.SourceDetails.Records[0].DrawNS = 999
++			tag, start = trace.startEvent(second)
++			trace.endEvent(tag, start)
++			trace.GroupOwnerWork(71, 3)
++			trace.Reconciled(71, 5)
++			if !trace.GroupReady(71) {
++				t.Fatal("group not ready")
++			}
++			if err := trace.CommitGroup(71, 17); err != nil {
++				t.Fatal(err)
++			}
++			if trace.startFrame() != 71 {
++				t.Fatal("missing final")
++			}
++			n := 12
++			if overflow {
++				n = 13
++			}
++			trace.finishFrame(71, sourceTraceComposition(n))
++			s, ok := trace.Take()
++			if !ok || s.SourceDetails == nil || s.SourceDetails.Compositions != 2 || s.SourceDetails.Records[0].DrawNS != 2 || s.TotalUIWorkNS != s.InputNS+6+10+200+40 {
++				t.Fatalf("lost detached group details/totals: %+v", s)
++			}
++			if overflow {
++				if s.Completed || s.Failure == "" || len(s.SourceDetails.Records) > 32 {
++					t.Fatal("qualified overflowing details")
++				}
++			} else if !s.Completed || s.Failure != "" || len(s.SourceDetails.Records) != 32 || s.SourceDetails.Records[20].Composition != 2 || s.SourceDetails.Records[20].Source != 0 {
++				t.Fatal("lost bounded prefix/final order")
++			}
++			if trace.Pending() {
++				t.Fatal("retained group after take")
++			}
++		})
++	}
++}
++func TestVellumGroupSourceDetailsCancellationAndDefaultIsolation(t *testing.T) {
++	ordinary := &FrameTrace{}
++	event := &events.CustomEvent{}
++	ordinary.BeginGroup(72, []events.Event{event})
++	if ordinary.pending.SourceDetails != nil {
++		t.Fatal("ordinary trace gained diagnostics")
++	}
++	ordinary.Retire(72, "done")
++	ordinary.Take()
++	trace := NewFrameTraceWithSourceDetails()
++	trace.BeginGroup(73, []events.Event{event})
++	tag, start := trace.startEvent(event)
++	trace.endEvent(tag, start)
++	trace.GroupOwnerWork(73, 1)
++	trace.Reconciled(73, 1)
++	trace.CommitGroup(73, 18)
++	trace.startFrame()
++	trace.Fail(73, "cancelled")
++	if _, ok := trace.Take(); ok {
++		t.Fatal("released live composition")
++	}
++	trace.finishFrame(73, sourceTraceComposition(1))
++	s, ok := trace.Take()
++	if !ok || s.Completed || s.Failure != "cancelled" || s.SourceDetails == nil || len(s.SourceDetails.Records) != 0 {
++		t.Fatalf("late completion changed cancellation: %+v", s)
++	}
++}
