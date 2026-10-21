@@ -28,6 +28,9 @@ func (m *model) bindFiles(a *app.Application, ref app.WindowRef, choose func(con
 		case r.Action == document.Open:
 			m.status = "Opened " + filepath.Base(r.Path)
 		}
+		if r.Err == nil {
+			m.recovery.Request()
+		}
 		_ = a.Invalidate("placement")
 	}})
 	if err != nil {
@@ -50,6 +53,9 @@ func (m *model) fileAction(a *app.Application, ref app.WindowRef, action string,
 	if m.files == nil {
 		return app.ErrUnavailable
 	}
+	if m.recovery.pending() {
+		return document.ErrBusy
+	}
 	var err error
 	switch action {
 	case "open":
@@ -71,6 +77,11 @@ func (m *model) fileAction(a *app.Application, ref app.WindowRef, action string,
 }
 
 func (m *model) requestClose(a *app.Application) bool {
+	m.removeRecoveryOnClose = false
+	if m.recovery.pending() {
+		// Closing a startup decision keeps the interrupted session's copy.
+		return true
+	}
 	m.cancelLayerDrag(m.layerDrag)
 	m.cancelMove(m.move)
 	if job := m.clipboardJob; job != nil {
@@ -89,6 +100,7 @@ func (m *model) requestClose(a *app.Application) bool {
 		_ = a.Invalidate("placement")
 		return false
 	}
+	m.removeRecoveryOnClose = true
 	return true
 }
 
@@ -105,6 +117,7 @@ func (m *model) filePrompt(a *app.Application, ref app.WindowRef) ui.Node {
 			prompt := m.prompt
 			m.prompt = ""
 			if prompt == "close" {
+				m.removeRecoveryOnClose = true
 				_ = a.CloseWindow(ref)
 			} else if err := m.fileAction(a, ref, "open", true); err != nil {
 				m.status = err.Error()

@@ -33,6 +33,8 @@ type model struct {
 	snap, locked, rejectNotes         bool
 	status                            string
 	files                             *document.Session[drawingFile]
+	recovery                          *placementRecovery
+	removeRecoveryOnClose             bool
 	prompt                            string
 	move                              *objectMove
 	canvasEditor                      *canvasEditor

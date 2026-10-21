@@ -36,15 +36,29 @@ func run() {
 	if err := m.bindClipboard(a, windowRef); err != nil {
 		fail(err)
 	}
-	if err := a.Run(context.Background(), cogent.Driver{Commands: m.commands}); err != nil {
+	var recoveryErr error
+	if err := a.Do(func() {
+		m.recovery, recoveryErr = newPlacementRecovery(a, windowRef, m, recoveryConfig{})
+		if recoveryErr != nil {
+			m.status = "Recovery unavailable: " + recoveryErr.Error()
+		}
+	}); err != nil {
 		fail(err)
+	}
+	defer m.recovery.Stop(false)
+	runErr := a.Run(context.Background(), cogent.Driver{Commands: m.commands})
+	if err := m.recovery.Stop(runErr == nil && m.removeRecoveryOnClose); err != nil {
+		fmt.Fprintln(os.Stderr, "Recovery cleanup:", err)
+	}
+	if runErr != nil {
+		fail(runErr)
 	}
 }
 func fail(err error) { fmt.Fprintln(os.Stderr, err); os.Exit(1) }
 func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 	update := func() { _ = a.Invalidate("placement") }
 	// Capture gates execution while preserving native layout/presentation.
-	busy := m.fileBusy() && m.layerDrag == nil
+	busy := (m.fileBusy() && m.layerDrag == nil) || m.recovery.pending()
 	if m.canvasEditor == nil {
 		m.canvasEditor = &canvasEditor{a: a, ref: ref, model: m}
 	}
@@ -212,6 +226,6 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		}},
 		{ID: "status", Kind: ui.StatusBar, Children: []ui.Node{{ID: "message", Kind: ui.Label, Text: fmt.Sprintf("%s • %d objects • %d selected • Undo %d / Redo %d", m.status, len(m.scene.Objects), len(selection), m.journal.Snapshot().UndoCount, m.journal.Snapshot().RedoCount)}}},
 	}}
-	root.Children = append(root.Children, m.filePrompt(a, ref), m.renameDialog(a, ref))
+	root.Children = append(root.Children, m.filePrompt(a, ref), m.renameDialog(a, ref), m.recovery.promptNode())
 	return root
 }

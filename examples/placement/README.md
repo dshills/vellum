@@ -334,8 +334,8 @@ needs direct/manual verification; posting receipts do not prove app delivery.
 
 Select a row or group marker and choose **Rename…**. Names are app metadata: stable
 IDs, paint order and group membership stay unchanged. Empty names restore the ID
-label. Names allow at most80 characters/128 UTF-8 bytes with no controls. Each
-changed name is one Undo/Redo entry and persists in app drawing format4; formats
+label. Names allow at most 80 characters/128 UTF-8 bytes with no controls. Each
+changed name is one Undo/Redo entry and persists in app drawing format 4; formats
 1–3 remain readable. Deleted/ungrouped metadata is pruned and restored by Undo.
 Framework APIs, renderer and clipboard formats are unchanged in this phase.
 
@@ -360,3 +360,21 @@ removes the original selection in one Undo/Redo entry. A failed, canceled or sta
 clipboard operation keeps the drawing. Cut shares Copy/Paste validation and
 retains component/group names, geometry and membership; Paste allocates fresh IDs.
 Native focused text fields retain their standard Cut shortcut.
+
+## Private recovery (internal macOS app)
+
+While a drawing is dirty, the app checks for settled changes every 15 seconds and
+writes a bounded private recovery copy to
+`~/Library/Caches/VellumPlacementInternal/recovery.vellum`. This never changes the
+Save path or marks the document saved. After an interruption, startup offers
+**Restore Drawing**, **Discard Recovery**, or **Close; Keep Recovery**. Restore
+creates one undoable edit and remains untitled/unsaved until an explicit Save.
+Names, visibility, locks, grouping, geometry and camera state are retained.
+
+A clean close or an explicit discard-and-close removes recovery after joining
+the worker. Failed operations keep the last completed copy. Capture is attempted every 15 seconds; recovery retains the last completed copy.
+Slow or failed storage and busy gesture/file/clipboard work can defer a newer copy. Recovery is not a replacement for Save or a document version log.
+One app instance owns the private slot at a time; another instance stays editable
+with recovery unavailable. macOS is the recovery target for this internal build. Shutdown joins local file
+IO before releasing ownership; stalled storage can delay shutdown.
+Framework scope and experimental rendering/pacing settings remain unchanged.
