@@ -9,6 +9,13 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
+The [matched calibration](../docs/reports/macos-matched-calibration/README.md)
+now completes five valid small-fixture pairs. Native p95 is 31.951–32.416 ms;
+Vellum p95 is 37.420–52.250 ms. The existing 33.3 ms gate remains unchanged.
+The former busy-reference results do not establish an OS floor. Sparse input,
+different APIs/algorithms and observation costs limit attribution; M3–M7 are not
+qualified. Inspect submit/present scheduling after acquisition before a repair.
+
 The [foreground control](../docs/reports/macos-native-foreground-control/README.md)
 now records actual active/key/visible/foreground-PID boundary states with no loss
 notifications. Raw native p95 is 65.265 ms; direct-link p95 is 49.868 ms. These

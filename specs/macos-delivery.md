@@ -9,14 +9,21 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
-## Current checkpoint — matched calibration prepared; gate unchanged
+## Current checkpoint — matched calibration complete; gate unchanged
 
-The owner authorized the [predeclared matched calibration](macos-calibration.md).
-The [preparation checkpoint](../docs/reports/macos-matched-calibration/README.md)
-records diagnostic-only sources, optimized builds, actual offscreen routing/pixel
-checks and strict classifier controls, reviewed with Prism using Anthropic Claude
-Sonnet 5.5. Live pilot/pairs await a quiet desktop window. Features and the existing
-release gate remain frozen; no framework repair or qualification is claimed.
+The [matched calibration](../docs/reports/macos-matched-calibration/README.md)
+completes all five predeclared alternating-order pairs. Native p95 is
+31.951–32.416 ms; Vellum p95 is 37.420–52.250 ms. All 1,280 warmups and 1,200
+measured states are valid. Eleven native and 88 probe groups retire; SDK,
+configuration, geometry and runtime pins hold. Earlier refusals remain sealed.
+
+The sparse small-operation control does not qualify 60 Hz cadence or professional
+workflows. Algorithms, input APIs and recorder observation costs differ; this is
+not pure framework-cost subtraction or proof of an OS floor. Keep 33.3 ms and the
+existing gate unchanged. Two Vellum bands primarily differ after acquisition;
+inspect actual submission/present scheduling before a further repair. No GPU/
+present-request clocks or fixed extra-frame cause are proven. M3–M7 remain open,
+features frozen, and release-gate changes still require owner approval.
 
 ## Previous checkpoint — foreground control; no accepted latency repair
 

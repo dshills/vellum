@@ -112,3 +112,15 @@ The bounded investigation found no safe accepted repair. Stop rejected-variant
 retries and obtain owner direction on retaining the absolute budget versus a new
 predeclared native/framework calibration. No threshold is changed here; any revised
 policy requires approval and fresh representative measurements. M3–M7 remain open.
+
+## Matched calibration result
+
+The [predeclared matched calibration](macos-calibration.md) and its
+[source-bound result](../docs/reports/macos-matched-calibration/README.md) complete
+five pairs: native p95 31.951–32.416 ms, Vellum 37.420–52.250 ms, with all states
+accounted for. Keep the release gate unchanged; the earlier native-reference
+numbers are not a universal floor. This sparse rectangle fixture is not 60 Hz or
+professional-workflow qualification, nor does its difference isolate observer or
+production-framework overhead. The next bounded boundary is actual submit/
+present scheduling after acquisition; causal extra-frame/GPU timing is unproven.
+No earlier failure is relabeled; M3–M7 stay open and features remain frozen.

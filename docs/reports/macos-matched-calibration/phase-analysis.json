@@ -1,0 +1,71 @@
+{
+  "source": "same actual framework journals; not a new native run",
+  "runs": [
+    {
+      "pair": 1,
+      "all_acquisitions": 252,
+      "measured_intervening_unarmed_histogram": {
+        "0": 120
+      },
+      "cpu_total_ui_work_ms": {
+        "p50": 2.557919,
+        "p95": 3.394541,
+        "p99": 3.707667,
+        "max": 4.337333
+      }
+    },
+    {
+      "pair": 2,
+      "all_acquisitions": 252,
+      "measured_intervening_unarmed_histogram": {
+        "0": 120
+      },
+      "cpu_total_ui_work_ms": {
+        "p50": 2.577583,
+        "p95": 3.493084,
+        "p99": 3.911376,
+        "max": 4.723332
+      }
+    },
+    {
+      "pair": 3,
+      "all_acquisitions": 252,
+      "measured_intervening_unarmed_histogram": {
+        "0": 120
+      },
+      "cpu_total_ui_work_ms": {
+        "p50": 3.976499,
+        "p95": 6.703333,
+        "p99": 7.589249,
+        "max": 8.07475
+      }
+    },
+    {
+      "pair": 4,
+      "all_acquisitions": 252,
+      "measured_intervening_unarmed_histogram": {
+        "0": 120
+      },
+      "cpu_total_ui_work_ms": {
+        "p50": 2.75729,
+        "p95": 4.107916,
+        "p99": 5.482206,
+        "max": 6.552331
+      }
+    },
+    {
+      "pair": 5,
+      "all_acquisitions": 252,
+      "measured_intervening_unarmed_histogram": {
+        "0": 120
+      },
+      "cpu_total_ui_work_ms": {
+        "p50": 5.008043,
+        "p95": 7.207874,
+        "p99": 11.165249,
+        "max": 11.201708
+      }
+    }
+  ],
+  "inference_limit": "No intervening unarmed acquisition in 600 measured responses; does not isolate GPU/submit/present timing or observer overhead"
+}

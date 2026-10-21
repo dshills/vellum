@@ -1,5 +1,87 @@
 # Matched native/framework calibration
 
+## Completed result — five valid pairs, release gate unchanged
+
+The successful campaign ran 15:14:59–15:20:27 America/Chicago on 21 October 2026
+(327.755 seconds, within the 480-second bound). The actual M4 Pro/macOS
+26.6.2/25G83, LG 5120×1440/60 Hz, AC, scale-1 configuration is unchanged. Both
+implementations match the locked 1519×1266 surface, payload rectangle
+(8,8)–(1511,1258), pixel format 81, two drawables, vsync enabled, transaction
+presentation disabled and next-drawable timeout disabled. Actual active/key/
+visible/own-foreground-PID states hold at capture boundaries; the monitored
+pre-cohort-to-end loss count stays zero, with per-request foreground checks.
+
+All five predeclared alternating-order pairs pass strict accounting. The ten
+timed processes retain 1,280 positive ordered warmups and 1,200 positive ordered
+measured responses: 2,480 routed cohort states in total. Ten native setup zeroes
+(two per native run) remain explicit before readiness; framework setup has no
+losses. No failed case is substituted, omitted or reclassified.
+
+| Pair / order | Native p50 / p95 / p99 / max ms | Vellum p50 / p95 / p99 / max ms | Difference of run p95 values ms |
+| --- | --- | --- | --- |
+| 1 N/F | 25.519 / 32.303 / 32.396 / 32.465 | 43.280 / 51.118 / 52.566 / 52.744 | 18.815 |
+| 2 F/N | 25.654 / 32.416 / 32.472 / 32.478 | 45.021 / 52.063 / 52.406 / 52.710 | 19.647 |
+| 3 N/F | 25.648 / 32.387 / 32.531 / 32.582 | 29.472 / 37.420 / 38.724 / 39.990 | 5.034 |
+| 4 F/N | 25.499 / 32.361 / 32.439 / 32.451 | 45.132 / 52.250 / 53.106 / 53.213 | 19.889 |
+| 5 N/F | 24.958 / 31.951 / 41.794 / 48.765 | 29.361 / 38.252 / 41.712 / 42.014 | 6.301 |
+
+These are per-run statistics; samples are not pooled. The last column subtracts
+two p95 values, not individual latencies, and is not a percentile of differences
+or a measurement of pure framework overhead. Pair 5's native tail remains fully
+included. This deliberately sparse 120 ms request fixture does not establish
+60 Hz changing-state cadence, resize response or professional-workflow acceptance.
+
+The native reference meets the existing 33.3 ms p95 number in each run of this
+small fixture; Vellum exceeds it in every run. The earlier 49–65 ms busy/native
+references therefore do not justify an irreducible OS-floor claim or raising the
+gate. **Keep the release gate unchanged.** This result does not demonstrate that
+representative framework workloads can already meet it.
+
+### Boundary to investigate
+
+Vellum receipt-to-acquisition p95 is 3.175–7.287 ms, versus native 0.731–1.157 ms.
+Vellum acquisition-to-presentation p95 is approximately 49 ms in runs 1/2/4 and
+33 ms in runs 3/5, versus native 31.544–32.133 ms. These quantiles must not be
+added as if they were a decomposition of p95. The two Vellum bands differ by
+roughly one refresh period. Source-bound journals have exactly 252 acquisitions
+per framework run; none of the 600 measured responses has an intervening unarmed
+acquisition between receipt and its attributed armed acquisition.
+
+[phase-analysis.json](phase-analysis.json) records that accounting and measured
+CPU UI-work statistics. The slower-latency runs have CPU-work p95 around
+3.4–4.1 ms, while the lower-latency runs have about 6.7–7.2 ms. CPU duration alone
+therefore does not explain the observed band ordering. No GPU completion,
+submission or present-request host timestamps were recorded, so the next focused
+boundary is actual submit/present scheduling after acquisition, before proposing
+another backend repair. A fixed one-frame queue penalty or cause is not proven.
+
+### Material limits and verification
+
+Output/geometry and receipt-before-FIFO boundaries are matched, but input APIs
+and algorithms differ: internal AppKit key-down/cached-texture blit versus Core
+KeyChord/public command/normal view paint and upload. Native requires
+framebufferOnly=NO for blitting. Vellum polls detached public snapshots while
+native polls atomic slots; observer allocation/locking overhead is not isolated.
+These differences prevent interpreting subtraction as pure production-framework
+cost. No physical input-to-photon, native pixel-readback, resource allocation
+balance, endurance or whole-framework release claim follows.
+
+All eleven native process groups (pilot plus ten timed cases) and 88 probe groups
+are reaped and observed absent. Both setup and timed framework scopes retire with
+no pending records. Configuration probe bytes, geometry persistence, all runtime
+source/binary/match pins and all 8,321 SDK members verify unchanged. The strict
+classifier revalidates the actual journals; arithmetic, populations and archives
+are independently checked. The previous refused attempts remain sealed.
+
+[summary.json](summary.json) retains exact statistics and limits. The
+[result evidence index](result-evidence-index.json) binds the
+[result archive](result-evidence.tar.xz): actual records, commands, configuration,
+ownership, match/source/binary bindings, analysis and review receipts. Executables,
+full SDK and earlier archives are excluded. M3–M7 remain open. Results passed a
+scoped Prism review using Anthropic Claude Sonnet 5.5. The derived JSON prose
+spacing finding was corrected; archives and arithmetic were revalidated. No
+findings remain unresolved.
+
 ## Attempt 2 — framework pilot valid; native startup refused
 
 The corrected framework pilot passes strict setup accounting and locks a

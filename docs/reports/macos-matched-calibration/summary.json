@@ -1,0 +1,451 @@
+{
+  "outcome": "FIVE_VALID_MATCHED_SMALL_FIXTURE_PAIRS",
+  "started_utc": "2026-10-21T20:14:59.753340+00:00",
+  "finished_utc": "2026-10-21T20:20:27.508503+00:00",
+  "candidate_source": "bd3cbc9ce2566955dae5dbb61385b0e1a9307eaa",
+  "framework_fixture_source": "ff95b1c; binary reused unchanged in the 6c60ca9 native readiness repair",
+  "match": {
+    "drawables": 2,
+    "height": 1266,
+    "pixel_format": 81,
+    "rect": [
+      8,
+      8,
+      1511,
+      1258
+    ],
+    "scale": 1,
+    "timeout": false,
+    "transactions": false,
+    "vsync": true,
+    "width": 1519
+  },
+  "orders": [
+    [
+      "native",
+      "framework"
+    ],
+    [
+      "framework",
+      "native"
+    ],
+    [
+      "native",
+      "framework"
+    ],
+    [
+      "framework",
+      "native"
+    ],
+    [
+      "native",
+      "framework"
+    ]
+  ],
+  "runs": [
+    {
+      "pair": 1,
+      "kind": "native",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 2,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 25.51899990066886,
+          "p95": 32.30325016193092,
+          "p99": 32.395875081419945,
+          "max": 32.46483323164284
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 0.2723333891481161,
+          "p95": 1.1567501351237297,
+          "p99": 1.2344582937657833,
+          "max": 1.2787501327693462
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.229583494365215,
+          "p95": 32.03287487849593,
+          "p99": 32.234708312898874,
+          "max": 32.306666718795896
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "seconds": 30.27358041703701,
+      "configuration_bytes_unchanged": true,
+      "geometry_unchanged": true
+    },
+    {
+      "pair": 1,
+      "kind": "framework",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 43.27970836311579,
+          "p95": 51.11841671168804,
+          "p99": 52.56562493741512,
+          "max": 52.743666572496295
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 2.3886666167527437,
+          "p95": 3.1752916984260082,
+          "p99": 3.5155415534973145,
+          "max": 4.160124808549881
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 40.999166667461395,
+          "p95": 48.86045819148421,
+          "p99": 49.389583291485906,
+          "max": 49.76483341306448
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "seconds": 30.38412904110737,
+      "configuration_bytes_unchanged": true,
+      "geometry_unchanged": true
+    },
+    {
+      "pair": 2,
+      "kind": "framework",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 45.0205416418612,
+          "p95": 52.06283344887197,
+          "p99": 52.40570823661983,
+          "max": 52.709874929860234
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 2.3956249933689833,
+          "p95": 3.284999867901206,
+          "p99": 3.6033333744853735,
+          "max": 3.765333443880081
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 42.09770821034908,
+          "p95": 49.74066652357578,
+          "p99": 49.91533327847719,
+          "max": 49.91604154929519
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "seconds": 30.379628166090697,
+      "configuration_bytes_unchanged": true,
+      "geometry_unchanged": true
+    },
+    {
+      "pair": 2,
+      "kind": "native",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 2,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 25.654041673988104,
+          "p95": 32.41620841436088,
+          "p99": 32.47220837511122,
+          "max": 32.478041714057326
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 0.2710833214223385,
+          "p95": 1.1290416587144136,
+          "p99": 1.165291527286172,
+          "max": 1.239833189174533
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.371749885380268,
+          "p95": 32.13333315216005,
+          "p99": 32.21258334815502,
+          "max": 32.22704166546464
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "seconds": 30.119806417031214,
+      "configuration_bytes_unchanged": true,
+      "geometry_unchanged": true
+    },
+    {
+      "pair": 3,
+      "kind": "native",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 2,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 25.647833244875073,
+          "p95": 32.386791659519076,
+          "p99": 32.530999975278974,
+          "max": 32.58241666480899
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 0.28137490153312683,
+          "p95": 1.0166666470468044,
+          "p99": 1.0573333129286766,
+          "max": 1.241541700437665
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.36812494508922,
+          "p95": 32.12720830924809,
+          "p99": 32.27229160256684,
+          "max": 32.40412496961653
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "seconds": 30.139467915985733,
+      "configuration_bytes_unchanged": true,
+      "geometry_unchanged": true
+    },
+    {
+      "pair": 3,
+      "kind": "framework",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 29.471708461642265,
+          "p95": 37.42029168643057,
+          "p99": 38.723666686564684,
+          "max": 39.98958319425583
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.8394166622310877,
+          "p95": 6.619499996304512,
+          "p99": 7.33766658231616,
+          "max": 7.761708227917552
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.81862499937415,
+          "p95": 32.99625008367002,
+          "p99": 33.59583322890103,
+          "max": 33.82124984636903
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "seconds": 30.38736595888622,
+      "configuration_bytes_unchanged": true,
+      "geometry_unchanged": true
+    },
+    {
+      "pair": 4,
+      "kind": "framework",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 45.13150011189282,
+          "p95": 52.24991659633815,
+          "p99": 53.10579179786146,
+          "max": 53.213125094771385
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 2.5948749389499426,
+          "p95": 4.0353331714868546,
+          "p99": 5.552583374083042,
+          "max": 5.83041668869555
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 42.124166851863265,
+          "p95": 49.75012503564358,
+          "p99": 49.947416642680764,
+          "max": 50.09920848533511
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "seconds": 30.371261999942362,
+      "configuration_bytes_unchanged": true,
+      "geometry_unchanged": true
+    },
+    {
+      "pair": 4,
+      "kind": "native",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 2,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 25.499333394691348,
+          "p95": 32.360708341002464,
+          "p99": 32.438916619867086,
+          "max": 32.45075000450015
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 0.40324986912310123,
+          "p95": 0.7307918276637793,
+          "p99": 0.7957082707434893,
+          "max": 0.8051667828112841
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.239499984309077,
+          "p95": 32.094333320856094,
+          "p99": 32.19174989499152,
+          "max": 32.215291634202
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "seconds": 30.18667541584,
+      "configuration_bytes_unchanged": true,
+      "geometry_unchanged": true
+    },
+    {
+      "pair": 5,
+      "kind": "native",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 2,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 24.95791669934988,
+          "p95": 31.950583215802908,
+          "p99": 41.79449984803796,
+          "max": 48.76483348198235
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 0.6477499846369028,
+          "p95": 0.7581249810755253,
+          "p99": 0.8050000760704279,
+          "max": 1.0090416762977839
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 24.31104169227183,
+          "p95": 31.544000143185258,
+          "p99": 41.224374901503325,
+          "max": 48.382458509877324
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "seconds": 30.151301000034437,
+      "configuration_bytes_unchanged": true,
+      "geometry_unchanged": true
+    },
+    {
+      "pair": 5,
+      "kind": "framework",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 29.361166525632143,
+          "p95": 38.252041675150394,
+          "p99": 41.712166741490364,
+          "max": 42.014416540041566
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 4.711874993517995,
+          "p95": 7.2865833062678576,
+          "p99": 10.842833202332258,
+          "max": 11.168083408847451
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.133625138550997,
+          "p95": 32.8575000166893,
+          "p99": 33.78770826384425,
+          "max": 35.060750087723136
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      },
+      "seconds": 30.379590374883264,
+      "configuration_bytes_unchanged": true,
+      "geometry_unchanged": true
+    }
+  ],
+  "differences_of_run_p95_values": [
+    {
+      "pair": 1,
+      "framework_minus_native_p95_ms": 18.815166549757123
+    },
+    {
+      "pair": 2,
+      "framework_minus_native_p95_ms": 19.64662503451109
+    },
+    {
+      "pair": 3,
+      "framework_minus_native_p95_ms": 5.033500026911497
+    },
+    {
+      "pair": 4,
+      "framework_minus_native_p95_ms": 19.88920825533569
+    },
+    {
+      "pair": 5,
+      "framework_minus_native_p95_ms": 6.3014584593474865
+    }
+  ],
+  "all_owned_groups_retired": true,
+  "native_commands": 11,
+  "probe_commands": 88,
+  "warmup_states": 1280,
+  "measured_states": 1200,
+  "total_routed_cohort_states": 2480,
+  "release_gate_ms": 33.3,
+  "release_gate_changed": false,
+  "framework_qualified": false,
+  "physical_input_verified": false,
+  "cadence_qualified": false,
+  "OS_latency_floor_proven": false,
+  "native_meets_existing_p95_number_in_small_fixture": true,
+  "framework_meets_existing_p95_number_in_small_fixture": false,
+  "limitations": [
+    "Small sparse 120 ms rectangle operation; no professional-workflow or 60 Hz cadence qualification.",
+    "Native cached-texture blit with framebufferOnly=NO; framework uses normal UI paint and upload.",
+    "Native NSEvent key-down versus Core KeyChord and command routing.",
+    "Framework detached-snapshot polling versus native atomic polling; observer overhead is not isolated.",
+    "Different scheduling bands; differences of quantiles are not quantiles of differences or pure framework cost.",
+    "No physical-input, pixel-readback, endurance or native-allocation qualification."
+  ]
+}
