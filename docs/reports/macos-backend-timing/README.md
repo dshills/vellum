@@ -1,21 +1,46 @@
-# Actual backend timing diagnostic preparation
+# Actual backend timing diagnostic
 
-A private source-built observer records actual Metal render submit, GPU execution,
-present request and drawable feedback. It is never installed in the retained SDK
-or packaged app. The [protocol](../../../tools/macos-calibration/backend/PLAN.md)
-limits execution to three on/off observer pairs under four minutes; all earlier
-failed campaigns stay sealed and the release gate remains unchanged.
+The first observer-off/on scope is **sealed and rejected**, with no valid pair.
+The process, callback drain and foreground/configuration checks pass, but the
+original whole-population equality check refuses the first observer-on result:
+its 1,548 command records contain 258 present buffers, while the public recorder
+contains 252 presentations. All 252 public records have trace timestamp matches.
+Six extra leading startup presents (two zero, four positive feedback) have request
+times before the first public acquisition. Their actual drawable IDs were not
+recorded; no IDs are retrofitted and this result is not relabeled valid. All two
+native and sixteen probe process groups retire. See [refusal analysis](refusal-analysis.json).
 
-The original locked backend source and package versions are preserved, except an
-explicit local wgpu-hal path patch adding fixed atomic trace storage and callbacks.
-The same diagnostic binary/archive runs both observer modes. This controls observer
-impact but does not prove binary equivalence or zero overhead. Callback observation
-clocks are labeled separately from GPU execution and actual presentation clocks.
+The backend observer starts before the runtime, while the native public recorder
+attaches to its layer scope later. The retained SDK passes actual Metal drawableID
+in its presented callback (`system/driver/desktop/presentation_darwin.m:97`).
+The corrected private observer records that same native ID, requiring complete
+one-to-one admitted ID and timestamp feedback. Only an explicitly retained leading
+startup prefix of at most64 lower IDs may precede admission; every request must
+precede the first public acquisition, and its positive feedback must precede the
+first cohort receipt. All prefix rows and zero/positive counts remain visible.
+Any unmatched admitted/cohort record still refuses. The old scope stays rejected.
 
-Native and Go diagnostic builds pass. Nine backend classifier methods, including
-eight invalid-record and four drain/overflow subcases, pass alongside the existing
-18 parent controls. The original view/routing/pixel tests are reused by exact source
-identity and unchanged SDK, rather than rerun. Inherited compiler warnings and
-preparation failures are disclosed in [build identity](build-identity.json).
-No live or release acceptance follows from preparation. Reviewed results will be
-added after source checkpoint commit and bounded native execution.
+A second checker defect was found before another native run: it selected measured
+frames by numeric tag threshold. Public tags are opaque and can be sparse. The
+checker now uses explicit scope/tag/generation membership of the last120 measured
+requests. A sparse-tag regression discriminates the original failure. Four new
+methods cover valid retained prefix, unmatched/late prefix refusal and sparse tags;
+14 backend plus18 unchanged parent methods pass. The fixture view/routing/pixel
+regressions are reused by exact source identity and unchanged SDK. A fifth new
+control refuses an unset recording flag while preserving valid native drawable
+ID zero. The flag publishes the ID with Release/Acquire ordering.
+
+A fresh private source/archive/binary under `vellum-backend-timing-v2` preserves
+the rejected attempt and its source snapshots. Its [protocol](../../../tools/macos-calibration/backend/PLAN.md)
+retains three off/on pairs, 240-second global/40-second per-process bounds and all
+original stop rules. [Original build identity](build-identity.json) and
+[revised build identity](build-identity-v2.json) disclose source, library, binary,
+package versions, inherited warnings and build failures. Explicit archive-derived
+Go link identity prevents binary cache reuse after native archive changes.
+
+This is a private diagnostic derivative, never installed in the retained SDK,
+shipping framework or packaged app. Observer-off/on runs the same diagnostic
+binary/archive and does not prove zero observer impact or binary equivalence to
+the retained original. No live acceptance follows from preparation. The 33.3 ms
+release gate, feature freeze and failed earlier scopes remain unchanged. Actual
+submit/GPU/presentation timing conclusions require a valid corrected campaign.

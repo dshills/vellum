@@ -29,17 +29,30 @@ Stop at the first invalid process, focus/config/source drift, deadline, missing 
 ambiguous timing. No unchanged retry or fallback. Preserve setup losses and tails.
 No new setup pilot is needed: use the sealed valid match and refuse drift.
 
+The first f9462e8 scope is sealed/rejected: its observer recorded six startup
+presents (two zero/four positive) before public recorder admission. All252 public
+records matched; equality of whole-lifetime versus admitted populations was an
+incorrect assumption. Actual extra drawable IDs were not recorded then; do not
+retrofit or accept that scope. Use a fresh private build/campaign adding IDs.
+
 On-mode requires one queue, strictly ordered commit reservations, successful
-completion for every recorded buffer and complete callback drain. Every actual
-positive framework presentation must match exactly one backend present timestamp
-within one microsecond (serialization precision only), and every positive backend
-presentation must match a framework record. Retain equal counts of zero startup
-feedback on both sides. For each cohort frame, attribute all render commands after
-the preceding present ordinal and before its matched present ordinal; require at
-least one, positive GPU times, execution after commit and completion before shown.
-Reject ambiguity/cross-queue or reordered commits instead of guessing. Empty
-present/signal buffers may have zero GPU times. Callback observations are CPU
-clocks and do not impose invented GPU/callback ordering.
+completion for every recorded buffer and complete callback drain. Native drawable
+IDs and admitted public IDs must each be unique/increasing. A release-published
+recorded flag distinguishes a valid native ID zero from an unset slot; zero is
+allowed by the Metal API. Nonpresent rows must not claim drawable recording. Match every admitted
+ID exactly once, with actual shown timestamps equal within one microsecond
+(serialization precision only), including admitted zero/skipped feedback. Allow
+only an explicitly retained leading startup prefix of at most64 lower drawable
+IDs whose requests precede first public acquisition, and whose positive feedback
+precedes first cohort receipt. Record every prefix ID and zero/positive count;
+exclude none from the raw trace. Any unmatched admitted/cohort ID refuses. For
+each cohort frame attribute all render commands after the preceding present
+ordinal and before the matched present ordinal. Require at least one, positive
+GPU times, execution after commit and completion before shown. Select the final
+120 measured frames by explicit measurement scope/tag/generation membership;
+frame tags are opaque and need not be consecutive. Empty present/signal buffers
+may have zero GPU times. Callback observations are CPU clocks and do not impose
+invented GPU/callback ordering.
 
 Report per-run distributions for receipt-to-submit, submit-to-GPU-start, render
 GPU span, last-render-GPU-end-to-present-request (signed) and GPU-end-to-shown.

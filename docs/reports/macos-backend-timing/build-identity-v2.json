@@ -1,0 +1,37 @@
+{
+  "private_root": "/private/tmp/vellum-backend-timing-v2",
+  "shipping_SDK_changed": false,
+  "native_source_commit": "6aed50955d934ac36049ba8d002034841633ae02",
+  "hal_original_SHA256": "16aaa879cf85bf853243bbdaa815b6087cff2ebfe72a2d7e6d08acac4fe906ad",
+  "hal_patched_SHA256": "340f6ebb509cd2bb86a83adba4308791be92e87c12fa59d2a8d4032d41528408",
+  "probe_SHA256": "972cce716850aadf748c525f1ece7b8d9f56e040e6e42e94abd20b6656319570",
+  "archive_SHA256": "e83be75d484cf4db272b2e6c415d82d3eff3a513b67771406eefc39913c3bb5d",
+  "framework_binary_SHA256": "7a4b3bbf3349a7594ad0c41b6e9afe8ac321386e95071291f101f71fa3f76880",
+  "original_Cargo_lock_SHA256": "9f780c3e7e792c19ae22e708cf899eb177b5696c9ab61215c6ae235adcecbdb0",
+  "diagnostic_Cargo_lock_SHA256": "607f3509d734b94eb21817d72083b00923d6a04c89ee0829b9c1b9717d5743b5",
+  "all_locked_package_name_versions_preserved": true,
+  "only_lock_difference": "wgpu-hal registry source/checksum removed for exact private path patch; all other package fields equal",
+  "view_routing_test_reuse": "fixture.go and fixture_test.go byte-identical to qualified prior offscreen fixture; immutable SDK",
+  "successful_build_receipts": [
+    "build-receipt.json",
+    "build-v2-receipt.json",
+    "go-build-receipt.json",
+    "go-build-v2-receipt.json"
+  ],
+  "retained_failures": [
+    "../macos-backend-timing/build-receipt.json: earlier binding-selector compile failure",
+    "../macos-backend-timing/initial-go-build-failure.json: earlier wrapper destination omission",
+    "../macos-backend-timing/result.json: original startup population accounting refusal; never accepted"
+  ],
+  "warnings": "Private path dependency exposes inherited cfg_alias macro warnings suppressed for registry dependencies; rust-objcopy libLLVM stripping warning inherited from toolchain. Go AppKit accessibility deprecation warnings inherited from frozen SDK. No warning suppression or unrelated source repair.",
+  "focused_controls": {
+    "parent_classifier_methods": 18,
+    "backend_classifier_methods": 14,
+    "invalid_record_subcases": 8,
+    "invalid_drain_subcases": 4
+  },
+  "release_qualified": false,
+  "gate_changed": false,
+  "review_fix": "Preserve rejected original scope; add exact native drawable IDs, explicit bounded retained startup prefix, complete admitted feedback join, and sparse-tag measurement membership regression.",
+  "forced_Go_relink": "-ldflags=-buildid=e83be75d484cf4db272b2e6c415d82d3eff3a513b67771406eefc39913c3bb5d"
+}

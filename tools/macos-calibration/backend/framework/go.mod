@@ -51,5 +51,5 @@ github.com/dshills/vellum => "/private/tmp/vellum-doclinks-sdk-bd3cbc9/retained 
 github.com/dshills/vellum/drivers/cogent => "/private/tmp/vellum-doclinks-sdk-bd3cbc9/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent"
 cogentcore.org/core => "/private/tmp/vellum-doclinks-sdk-bd3cbc9/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent/build/upstream"
 github.com/go-text/typesetting => "/private/tmp/vellum-doclinks-sdk-bd3cbc9/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent/build/typesetting"
-github.com/oliverbestmann/webgpu/libs-darwin => "/private/tmp/vellum-backend-timing/libs-darwin"
+github.com/oliverbestmann/webgpu/libs-darwin => "/private/tmp/vellum-backend-timing-v2/libs-darwin"
 )

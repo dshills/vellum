@@ -3,7 +3,7 @@
 from pathlib import Path
 import hashlib,json,sys
 root=Path(sys.argv[1]).resolve();code=Path(__file__).resolve().parent
-assert root==Path('/private/tmp/vellum-backend-timing') and (root/'hal').is_dir()
+assert root in [Path('/private/tmp/vellum-backend-timing'),Path('/private/tmp/vellum-backend-timing-v2')] and (root/'hal').is_dir()
 p=root/'hal/src/metal/mod.rs';original=p.read_bytes();assert hashlib.sha256(original).hexdigest()=='16aaa879cf85bf853243bbdaa815b6087cff2ebfe72a2d7e6d08acac4fe906ad'
 s=original.decode();assert s.count('cmd_buffer.raw.commit();')==1 and s.count('raw.commit();')==2
 s=s.replace('mod time;','mod time;\npub mod probe;').replace('cmd_buffer.raw.commit();','probe::commit(&cmd_buffer.raw, 0);').replace('                raw.commit();','                probe::commit(&raw, 1);')
