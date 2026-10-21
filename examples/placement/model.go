@@ -22,29 +22,32 @@ type component struct {
 	Color         color.RGBA
 }
 type model struct {
-	scene                     *canvas.Scene
-	palette                   *placement.Controller[component]
-	target                    *placement.Target
-	commands                  *command.Registry
-	journal                   *history.Journal
-	pending                   *placement.Request[component]
-	next                      uint64
-	snap, locked, rejectNotes bool
-	status                    string
-	files                     *document.Session[drawingFile]
-	prompt                    string
-	move                      *objectMove
-	canvasEditor              *canvasEditor
-	selectionIDs              []string
-	selectionPrimary          string
-	groups                    map[string]string
-	nextGroup                 uint64
-	clipboardJob              *clipboardOperation
-	pasteText                 string
-	pasteCount                uint64
-	layerAdd                  bool
-	layerDrag                 *layerDrag
-	layerEditor               *layerEditor
+	scene                             *canvas.Scene
+	palette                           *placement.Controller[component]
+	target                            *placement.Target
+	commands                          *command.Registry
+	journal                           *history.Journal
+	pending                           *placement.Request[component]
+	next                              uint64
+	snap, locked, rejectNotes         bool
+	status                            string
+	files                             *document.Session[drawingFile]
+	prompt                            string
+	move                              *objectMove
+	canvasEditor                      *canvasEditor
+	selectionIDs                      []string
+	selectionPrimary                  string
+	groups                            map[string]string
+	nextGroup                         uint64
+	clipboardJob                      *clipboardOperation
+	pasteText                         string
+	pasteCount                        uint64
+	renameEpoch                       uint64
+	layerInfo                         map[string]layerMetadata
+	layerFocus, renameID, renameDraft string
+	layerAdd                          bool
+	layerDrag                         *layerDrag
+	layerEditor                       *layerEditor
 }
 
 func componentByKind(kind string) (component, bool) {

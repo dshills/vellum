@@ -34,12 +34,12 @@ func (m *model) layerRows() []layerRow {
 		o := m.scene.Objects[i]
 		g := m.groups[o.ID]
 		if g != "" && !seen[g] {
-			rows = append(rows, layerRow{g, fmt.Sprintf("Group %s · %d", g, counts[g]), selected[o.ID]})
+			rows = append(rows, layerRow{g, fmt.Sprintf("Group %s · %d", m.layerLabel(g), counts[g]), selected[o.ID]})
 			seen[g] = true
 		}
-		label := o.ID
+		label := m.layerLabel(o.ID)
 		if g != "" {
-			label += " · " + g
+			label += " · " + m.layerLabel(g)
 		}
 		rows = append(rows, layerRow{o.ID, label, selected[o.ID]})
 	}
@@ -55,6 +55,7 @@ func (m *model) selectLayer(id string) error {
 	}
 	if id == "" {
 		m.setSelection(nil, "")
+		m.layerFocus = ""
 		m.status = "Cleared selection"
 		return nil
 	}
@@ -80,6 +81,7 @@ func (m *model) selectLayer(id string) error {
 		}
 	}
 	m.setSelection(ids, primary)
+	m.layerFocus = id
 	m.status = fmt.Sprintf("Layer selection: %d components", len(m.selectedIDs()))
 	return nil
 }
@@ -129,6 +131,19 @@ func (m *model) layersPanel(ref app.WindowRef, update func(), invoke func(string
 			{ID: "layers-forward", Kind: ui.Button, Text: "Forward", Style: compact, Disabled: m.commandDisabled("bring-forward"), Activate: invoke("bring-forward")},
 			{ID: "layers-backward", Kind: ui.Button, Text: "Backward", Style: compact, Disabled: m.commandDisabled("send-backward"), Activate: invoke("send-backward")},
 		}},
+		{ID: "layers-properties", Kind: ui.Row, Children: []ui.Node{{ID: "layers-rename", Kind: ui.Button, Text: "Rename…", Style: compact, Disabled: disabled || m.layerActionTarget() == "", Activate: func() {
+			if ref.Context().Err() != nil || m.clipboardAvailable() != nil {
+				return
+			}
+			if m.renameEpoch == ^uint64(0) {
+				return
+			}
+			m.renameEpoch++
+			m.renameID = m.layerActionTarget()
+			m.renameDraft = m.layerInfo[m.renameID].Name
+			m.prompt = "rename"
+			update()
+		}}}},
 		{ID: "layers-scroll", Kind: ui.Scroll, Grow: true, Children: []ui.Node{{ID: "layers-rows", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1)), Gap: ui.Some(float32(1))}, Children: rows}}},
 	}}
 }

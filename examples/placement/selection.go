@@ -20,6 +20,7 @@ func (m *model) setSelection(ids []string, primary string) {
 		}
 	}
 	m.selectionIDs, m.selectionPrimary, m.scene.Selected = selected, primary, primary
+	m.layerFocus = primary
 }
 
 // Reading selection is side-effect free, including during View construction.

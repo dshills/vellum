@@ -51,23 +51,30 @@ func prunedGroups(groups map[string]string, objects []canvas.Rect) map[string]st
 // Every document edit snapshots geometry, membership and selection together.
 // ID counters remain monotonic outside history so a new branch cannot reuse IDs.
 func (m *model) applyDocument(label string, objects []canvas.Rect, groups map[string]string, ids []string, primary string) error {
+	return m.applyDocumentMetadata(label, objects, groups, prunedLayerInfo(m.layerInfo, objects, groups), ids, primary)
+}
+func (m *model) applyDocumentMetadata(label string, objects []canvas.Rect, groups map[string]string, info map[string]layerMetadata, ids []string, primary string) error {
+	if err := validateLayerInfo(info, objects, groups); err != nil {
+		return err
+	}
+	beforeInfo, afterInfo := maps.Clone(m.layerInfo), maps.Clone(info)
 	before, beforeGroups, priorIDs, priorPrimary := slices.Clone(m.scene.Objects), maps.Clone(m.groups), m.selectedIDs(), m.scene.Selected
 	after, afterGroups, nextIDs := slices.Clone(objects), maps.Clone(groups), slices.Clone(ids)
-	if slices.Equal(before, after) && maps.Equal(beforeGroups, afterGroups) {
+	if slices.Equal(before, after) && maps.Equal(beforeGroups, afterGroups) && maps.Equal(beforeInfo, afterInfo) {
 		return nil
 	}
 	return m.journal.Apply(history.Change{Label: label, Apply: func() error {
-		if !slices.Equal(m.scene.Objects, before) || !maps.Equal(m.groups, beforeGroups) {
+		if !slices.Equal(m.scene.Objects, before) || !maps.Equal(m.groups, beforeGroups) || !maps.Equal(m.layerInfo, beforeInfo) {
 			return history.ErrStale
 		}
-		m.scene.Objects, m.groups = slices.Clone(after), maps.Clone(afterGroups)
+		m.scene.Objects, m.groups, m.layerInfo = slices.Clone(after), maps.Clone(afterGroups), maps.Clone(afterInfo)
 		m.setSelection(nextIDs, primary)
 		return nil
 	}, Revert: func() error {
-		if !slices.Equal(m.scene.Objects, after) || !maps.Equal(m.groups, afterGroups) {
+		if !slices.Equal(m.scene.Objects, after) || !maps.Equal(m.groups, afterGroups) || !maps.Equal(m.layerInfo, afterInfo) {
 			return history.ErrStale
 		}
-		m.scene.Objects, m.groups = slices.Clone(before), maps.Clone(beforeGroups)
+		m.scene.Objects, m.groups, m.layerInfo = slices.Clone(before), maps.Clone(beforeGroups), maps.Clone(beforeInfo)
 		m.setSelection(priorIDs, priorPrimary)
 		return nil
 	}})

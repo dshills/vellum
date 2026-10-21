@@ -106,7 +106,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		if group := m.groups[object.ID]; group != "" {
 			label = group + " · " + label
 		}
-		objects = append(objects, ui.CanvasObject{ID: object.ID, Name: label + " " + object.ID, Help: fmt.Sprintf("Select this component; size %.0f by %.0f.", object.Width, object.Height)})
+		objects = append(objects, ui.CanvasObject{ID: object.ID, Name: label + " " + m.layerLabel(object.ID), Help: fmt.Sprintf("Select this component; size %.0f by %.0f.", object.Width, object.Height)})
 	}
 	dimensions := "Select a component"
 	if i := m.selectedIndex(); i >= 0 {
@@ -206,6 +206,6 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		}},
 		{ID: "status", Kind: ui.StatusBar, Children: []ui.Node{{ID: "message", Kind: ui.Label, Text: fmt.Sprintf("%s • %d objects • %d selected • Undo %d / Redo %d", m.status, len(m.scene.Objects), len(selection), m.journal.Snapshot().UndoCount, m.journal.Snapshot().RedoCount)}}},
 	}}
-	root.Children = append(root.Children, m.filePrompt(a, ref))
+	root.Children = append(root.Children, m.filePrompt(a, ref), m.renameDialog(a, ref))
 	return root
 }

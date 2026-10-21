@@ -329,3 +329,12 @@ passes cancellation-isolation/routing race tests and reaches native window/AX
 readiness, but the bounded PID-directed click/Return attempt creates no object
 and fails its observation bound. It is sealed without retry. Native placement
 needs direct/manual verification; posting receipts do not prove app delivery.
+
+## Layer properties (internal app)
+
+Select a row or group marker and choose **Rename…**. Names are app metadata: stable
+IDs, paint order and group membership stay unchanged. Empty names restore the ID
+label. Names allow at most80 characters/128 UTF-8 bytes with no controls. Each
+changed name is one Undo/Redo entry and persists in app drawing format4; formats
+1–3 remain readable. Deleted/ungrouped metadata is pruned and restored by Undo.
+Framework APIs, renderer and clipboard formats are unchanged in this phase.

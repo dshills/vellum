@@ -99,7 +99,7 @@ func (m *model) filePrompt(a *app.Application, ref app.WindowRef) ui.Node {
 	if m.prompt == "close" {
 		text, label = "Discard unsaved changes and close? Cancel to save first.", "Discard and Close"
 	}
-	return ui.Node{ID: "file-decision", Kind: ui.Dialog, Text: "Unsaved drawing", Open: m.prompt != "", Dismiss: cancel, Children: []ui.Node{
+	return ui.Node{ID: "file-decision", Kind: ui.Dialog, Text: "Unsaved drawing", Open: m.prompt == "open" || m.prompt == "close", Dismiss: cancel, Children: []ui.Node{
 		{ID: "file-decision-text", Kind: ui.Label, Text: text},
 		{ID: "file-discard", Kind: ui.Button, Text: label, Activate: func() {
 			prompt := m.prompt
