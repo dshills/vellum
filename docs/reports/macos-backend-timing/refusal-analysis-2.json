@@ -1,0 +1,18 @@
+{
+  "outcome": "RETAINED_CHECKER_KEYERROR",
+  "source_checkpoint": "c18f74f",
+  "reason": "KeyError (1,1): armed setup frame is not a measured request",
+  "valid_pairs": 0,
+  "completed_cases": 2,
+  "all_native_processes_exit0": true,
+  "owned_groups_retired": 18,
+  "public_records": 252,
+  "trace_records": 1548,
+  "trace_pending": 0,
+  "overflow": false,
+  "posthoc_corrected_classifier_regression_passes": true,
+  "posthoc_is_native_acceptance": false,
+  "original_scope_remains_rejected": true,
+  "next_action": "Use explicit measurement membership for both warmup and measured arithmetic; retain every setup feedback record. Test synthetic armed-startup counterfactual and retained raw regression, review, commit, then fresh campaign reusing unchanged binary/library.",
+  "gate_changed": false
+}

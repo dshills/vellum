@@ -50,7 +50,12 @@ each cohort frame attribute all render commands after the preceding present
 ordinal and before the matched present ordinal. Require at least one, positive
 GPU times, execution after commit and completion before shown. Select the final
 120 measured frames by explicit measurement scope/tag/generation membership;
-frame tags are opaque and need not be consecutive. Empty present/signal buffers
+frame tags are opaque and need not be consecutive. Both warmup/measured
+cohorts use explicit measurement membership; an armed startup setup frame may
+have no measured input receipt and must not enter cohort timing arithmetic.
+All its drawable feedback is still matched and retained. The c18f74f campaign
+that discovered this checker KeyError remains sealed/rejected; no raw output is
+retroactively accepted. Reuse its unchanged binary/library in a fresh scope. Empty present/signal buffers
 may have zero GPU times. Callback observations are CPU clocks and do not impose
 invented GPU/callback ordering.
 

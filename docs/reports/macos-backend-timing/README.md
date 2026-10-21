@@ -44,3 +44,20 @@ binary/archive and does not prove zero observer impact or binary equivalence to
 the retained original. No live acceptance follows from preparation. The 33.3 ms
 release gate, feature freeze and failed earlier scopes remain unchanged. Actual
 submit/GPU/presentation timing conclusions require a valid corrected campaign.
+
+## Second checker refusal and source-only correction
+
+The c18f74f attempt is also sealed/rejected after valid off and rejected on, with
+no accepted pair. Exact drawable identities/prefix/feedback checks passed, then
+timing arithmetic raised KeyError `(1,1)`: it treated an armed setup frame as a
+measured request. Startup `Frame` calls can be armed without a measured receipt.
+All two native and sixteen probe groups retire, callbacks drain and no overflow
+occurs. See [second refusal analysis](refusal-analysis-2.json).
+
+Both warmup and measured timing arithmetic now require explicit measurement
+scope/tag/generation membership. All startup feedback remains joined/retained.
+An armed-startup regression and the exact retained raw journal exercise this
+correction before more desktop use. Posthoc checker success is only a regression
+control; it does not accept or relabel the earlier scope. Fifteen backend plus18
+parent methods pass. A fresh reviewed campaign reuses the byte-identical c18f74f
+binary and private archive; no native/Go rebuild or SDK change is justified.

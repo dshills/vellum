@@ -38,11 +38,12 @@ def validate(doc,match,mode):
   need(abs(r['shown']-f['Presented'])<=EPS and (r['shown']>0 and f['State']=='presented' or r['shown']==0 and f['State']=='skipped'),'drawable feedback mismatch')
   joins[r['ordinal']]=f
  need(len(joins)==len(samples),'missing admitted drawable')
+ cohort_keys={(m['Scope'],m['Frame']['Tag'],m['Frame']['Generation']) for m in doc['measurements']['Samples']}
  measured_keys={(m['Scope'],m['Frame']['Tag'],m['Frame']['Generation']) for m in doc['measurements']['Samples'][128:]}
  receipts={(r['Scope'],r['Tag']):r['Received'] for r in doc['before_close']['Inputs']};phases=[]
  for p in present:
   f=joins.get(p['ordinal'])
-  if f is None or not f['Armed']:continue
+  if f is None or (f['Scope'],f['Tag'],f['Generation']) not in cohort_keys:continue
   previous=max((r['ordinal'] for r in present if r['ordinal']<p['ordinal']),default=-1)
   render=[r for r in rows[previous+1:p['ordinal']] if r['kind']==0];need(render,'no attributed render')
   receipt=receipts[(f['Scope'],f['Tag'])];first=render[0];gpu_start=min(r['gpu_start'] for r in render);gpu_end=max(r['gpu_end'] for r in render)

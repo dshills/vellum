@@ -66,4 +66,9 @@ class Backend(unittest.TestCase):
  def test_unrecorded_zero_id_refused(self):
   d,m=self.with_prefix();d['backend_trace']['records'][0]['drawable_recorded']=False
   with self.assertRaises(ValueError):validate(d,m,'on')
+ def test_armed_setup_without_measured_receipt(self):
+  d,m=self.data()
+  for folder in ['before_close','after_close']:
+   startup=d[folder]['Samples'][1];startup.update(Tag=9999,Generation=9,Armed=True)
+  self.assertEqual(validate(d,m,'on')['phase_ms']['receipt_to_submit']['count'],120)
 if __name__=='__main__':unittest.main()
