@@ -394,3 +394,11 @@ Edit, Move, Resize, Arrange and Layers menus retain the existing commands and
 shortcuts. Open/Save/Recent, Undo/Redo, Fit/Reset and Snap stay directly available.
 Drop-rejection test switches are beside the palette. The compact controls replace
 four wide command rows to leave more vertical canvas and layer-list space.
+
+## Numeric geometry
+
+**Geometry…** edits the current selection's world X/Y and bounding width/height.
+Groups and multiple selections scale members and spacing together. Exact numeric
+values ignore Snap. Apply validates every component before one Undo/Redo change;
+invalid, stale or canceled drafts keep the drawing. IDs, order, names, visibility
+and locks remain intact. Individual sizes remain 8–2000; origins remain ±10000.

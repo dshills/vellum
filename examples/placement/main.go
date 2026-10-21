@@ -192,6 +192,15 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 			}},
 		}},
 		m.compactActions(invoke),
+		{ID: "geometry-tools", Kind: ui.Row, Children: []ui.Node{{ID: "geometry-open", Kind: ui.Button, Text: "Geometry…", Style: compactControlStyle(), Disabled: m.editAvailable() != nil, Activate: func() {
+			if ref.Context().Err() != nil {
+				return
+			}
+			if err := m.beginGeometry(); err != nil {
+				m.status = err.Error()
+			}
+			update()
+		}}}},
 		{ID: "help", Kind: ui.Label, Text: dimensions + " • " + help, Style: compactControlStyle()},
 		{ID: "workspace", Kind: ui.Row, Grow: true, Children: []ui.Node{
 			{ID: "palette", Kind: ui.Column, MinWidth: 145, Children: tools},
@@ -207,7 +216,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		}},
 		{ID: "status", Kind: ui.StatusBar, Children: []ui.Node{{ID: "message", Kind: ui.Label, Text: fmt.Sprintf("%s • %d objects • %d selected • Undo %d / Redo %d", m.status, len(m.scene.Objects), len(selection), m.journal.Snapshot().UndoCount, m.journal.Snapshot().RedoCount)}}},
 	}}
-	root.Children = append(root.Children, m.filePrompt(a, ref), m.renameDialog(a, ref), m.recovery.promptNode())
+	root.Children = append(root.Children, m.filePrompt(a, ref), m.renameDialog(a, ref), m.recovery.promptNode(), m.geometryDialog(a, ref))
 	for i := range root.Children {
 		if root.Children[i].Kind == ui.Toolbar {
 			for j := range root.Children[i].Children {
