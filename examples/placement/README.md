@@ -608,3 +608,7 @@ The frozen native clipboard service returns complete text before app validation;
 ## Bulk layer controls (internal 24)
 
 **Layers → Hide Selected / Lock Selected** affects complete selected groups in one Undo/Redo step. These actions clear the editable selection; Undo restores it. **Show All / Unlock All** clears the corresponding property throughout the drawing, including imported member flags, while preserving names and the other property. No-op actions add no history. All four use existing document metadata and Save/Open paths.
+
+## Overlapping-object picker (internal 24)
+
+**Option-click** on the canvas opens a front-first list of visible, unlocked components beneath that exact point. Names, stable IDs and group names distinguish candidates; choosing a member selects its complete group. The press/release is consumed and does not also move, pan or select another object. **Edit → Pick overlapping component…** provides the same picker with editable world X/Y, initially at the view center. Cancel and stale dialogs preserve the selection. No selection action enters history or marks dirty.

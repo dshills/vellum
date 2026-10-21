@@ -76,6 +76,7 @@ func (e *canvasEditor) press(w *core.WidgetBase, event events.Event) {
 	if event.Type() != events.MouseDown || event.MouseButton() != events.Left || w.IsDisabled() || e.ref.Context().Err() != nil {
 		return
 	}
+	picked := false
 	var move *objectMove
 	var ticket *app.Completion
 	_ = e.a.Do(func() {
@@ -84,6 +85,13 @@ func (e *canvasEditor) press(w *core.WidgetBase, event events.Event) {
 		}
 		g, err := editGeometry(w, e.model.scene.View)
 		if err != nil {
+			return
+		}
+		if event.HasAnyModifier(key.Alt) && !event.HasAnyModifier(key.Meta, key.Control, key.Shift) {
+			picked = true
+			if err := e.model.beginOverlapAt(g, eventPoint(event)); err != nil {
+				e.model.status = err.Error()
+			}
 			return
 		}
 		move = e.model.beginCanvasGesture(g, eventPoint(event), event.HasAnyModifier(key.Shift))
@@ -96,6 +104,12 @@ func (e *canvasEditor) press(w *core.WidgetBase, event events.Event) {
 			move = nil
 		}
 	})
+	if picked {
+		event.SetHandled()
+		w.Scene.Events.ConsumePointerRelease()
+		_ = e.a.Invalidate("placement")
+		return
+	}
 	if move == nil {
 		return
 	} // Empty-space input retains ordinary canvas navigation.

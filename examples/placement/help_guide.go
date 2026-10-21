@@ -18,6 +18,7 @@ var helpTopics = []helpTopic{
 	{"gestures", "Mouse and canvas", []string{
 		"Drag Block, Connector or Note from the palette to the canvas. Release over an accepted area to place once. Escape, outside release or focus loss cancels.",
 		"Drag empty canvas to pan. Scroll to zoom at the pointer. Zoom offers In, Out, 100% and Fit Selection; Fit shows visible objects, Reset returns to origin at 100%.",
+		"Option-click a canvas point to choose among overlapping components in front-first order. Edit → Pick overlapping component also accepts world coordinates. Hidden/locked units are omitted and groups stay whole.",
 		"Click a component to select. Drag a selected component to move the selection. Drag a visible corner handle to resize it. Hold Shift on a selected corner for temporary proportional resizing.",
 		"Drag layer rows to reorder; edge holding autoscrolls. Filtering disables layer dragging. Groups menu collapses or expands member rows without changing canvas visibility.",
 	}},
