@@ -566,3 +566,7 @@ Commands. Its modal and callbacks use the native window lifetime and draft ident
 ## Fill color (internal 22)
 
 **Edit → Fill color…** applies an opaque `#RRGGBB` value to the selected components and complete groups in one Undo/Redo. Mixed selections begin blank; blank Apply is rejected. Enter `default` to restore each component type's original fill. Colors persist through drawings, clipboard, duplication, recovery and SVG export. Custom colors use drawing format5 and clipboard format3; earlier formats still open, while older app builds cannot read the new custom-color formats. No framework APIs or rendering changes.
+
+## Select matching (internal 22)
+
+**Edit → Select matching…** combines a component type with a case-insensitive name/ID substring (128 characters maximum), including group names. Supply at least one filter. Any member match selects its complete visible, unlocked group. Replace clears selection on no matches; Add preserves the existing selection. The current primary remains if it survives, otherwise the frontmost selected component becomes primary. Selection changes leave document/history unchanged.
