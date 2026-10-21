@@ -1,0 +1,40 @@
+{
+  "outcome": "BLOCKED_BY_RETAINED_INVALID_CASE",
+  "started_utc": "2026-10-21T20:09:45.373164+00:00",
+  "finished_utc": "2026-10-21T20:09:50.936961+00:00",
+  "framework_pilot": {
+    "outcome": "VALID_SETUP_ONLY",
+    "setup_losses": 0,
+    "release_qualified": false
+  },
+  "match": {
+    "drawables": 2,
+    "height": 1266,
+    "pixel_format": 81,
+    "rect": [
+      8,
+      8,
+      1511,
+      1258
+    ],
+    "scale": 1,
+    "timeout": false,
+    "transactions": false,
+    "vsync": true,
+    "width": 1519
+  },
+  "native_before_startup_exit": 2,
+  "native_seconds": 0.40498687513172626,
+  "native_failure": "foreground readiness refused before startup",
+  "failed_native_field": "not logged; no assertion of actual visibility value",
+  "timed_pairs": 0,
+  "timed_native_requests": 0,
+  "native_commands": 2,
+  "probe_commands": 16,
+  "all_owned_groups_retired": true,
+  "repair": "complete readiness predicate shared by wait and final guard; failed state logging; main-thread window number",
+  "focused_test": "Foundation original-three-field predicate accepts invisible; new predicate refuses visibility/key/active/PID/loss negatives",
+  "source_review": "Prism Anthropic Claude Sonnet5.5 complete,zero actionable findings",
+  "gate_changed": false,
+  "release_qualified": false
+}

@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "observe.h"
+#import "ready.h"
 typedef struct{_Atomic(double) receipt,acquired;_Atomic(int) accepted;} Entry;
 static Entry records[512];static _Atomic(double) shown[512];static _Atomic(int) pending;
 static void refuse(const char *why){
@@ -53,11 +54,12 @@ int main(int argc,const char **argv){@autoreleasepool{
   id<MTLTexture>texture=[device newTextureWithDescriptor:desc];if(!texture){free(bytes);return 2;}[texture replaceRegion:MTLRegionMake2D(0,0,width,height) mipmapLevel:0 withBytes:bytes bytesPerRow:width*4];free(bytes);[textures addObject:texture];
  }view.textures=textures;
  [window makeKeyAndOrderFront:nil];[window makeFirstResponder:view];[app activateIgnoringOtherApps:YES];
+ NSInteger number=window.windowNumber;
  dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE,0),^{@autoreleasepool{
   NSDictionary *begin=nil;double readyDeadline=cal_clock()+2;
-  do{char *raw=cal_observe(0);begin=[NSJSONSerialization JSONObjectWithData:[NSData dataWithBytes:raw length:strlen(raw)] options:0 error:nil];free(raw);if([begin[@"active"] boolValue] && [begin[@"key"] boolValue] && [begin[@"pid"] isEqual:begin[@"front_pid"]])break;usleep(1000);}while(cal_clock()<readyDeadline);
+  do{char *raw=cal_observe(0);begin=[NSJSONSerialization JSONObjectWithData:[NSData dataWithBytes:raw length:strlen(raw)] options:0 error:nil];free(raw);if(cal_ready(begin))break;usleep(1000);}while(cal_clock()<readyDeadline);
   char *raw=cal_observe(1);begin=[NSJSONSerialization JSONObjectWithData:[NSData dataWithBytes:raw length:strlen(raw)] options:0 error:nil];free(raw);
-  if(![begin[@"active"] boolValue] || ![begin[@"key"] boolValue] || ![begin[@"visible"] boolValue] || ![begin[@"pid"] isEqual:begin[@"front_pid"]] || [begin[@"losses"] intValue])refuse("foreground readiness refused before startup");
+  if(!cal_ready(begin)){printJSON(@{@"failure":@"foreground readiness refused before startup",@"state":begin});refuse("foreground readiness refused before startup");}
   int setup=0;BOOL ready=NO;
   for(;setup<64;setup++){atomic_store(&records[setup].receipt,cal_clock());dispatch_sync(dispatch_get_main_queue(),^{[view render:setup];});if(dispatch_group_wait(view.callbacks,dispatch_time(DISPATCH_TIME_NOW,NSEC_PER_SEC))){refuse("setup callback timeout");}if(atomic_load(&shown[setup])>0){setup++;ready=YES;break;}}
   if(!ready){refuse("no positive ready frame");}
@@ -67,7 +69,7 @@ int main(int argc,const char **argv){@autoreleasepool{
    char *stateRaw=cal_observe(0);NSDictionary *state=[NSJSONSerialization JSONObjectWithData:[NSData dataWithBytes:stateRaw length:strlen(stateRaw)] options:0 error:nil];free(stateRaw);
    if(![state[@"active"] boolValue] || ![state[@"key"] boolValue] || ![state[@"visible"] boolValue] || ![state[@"pid"] isEqual:state[@"front_pid"]] || [state[@"losses"] intValue])refuse("foreground changed during cohort");
    double late=cal_clock()-deadline;[lateness addObject:@(late*1e9)];if(late>.020){refuse("request deadline lateness");}
-   int i=setup+n-1;atomic_store(&pending,i);NSEvent *event=[NSEvent keyEventWithType:NSEventTypeKeyDown location:NSZeroPoint modifierFlags:0 timestamp:cal_clock() windowNumber:window.windowNumber context:nil characters:@" " charactersIgnoringModifiers:@" " isARepeat:NO keyCode:49];atomic_store(&records[i].receipt,cal_clock());[NSApp postEvent:event atStart:NO];
+   int i=setup+n-1;atomic_store(&pending,i);NSEvent *event=[NSEvent keyEventWithType:NSEventTypeKeyDown location:NSZeroPoint modifierFlags:0 timestamp:cal_clock() windowNumber:number context:nil characters:@" " charactersIgnoringModifiers:@" " isARepeat:NO keyCode:49];atomic_store(&records[i].receipt,cal_clock());[NSApp postEvent:event atStart:NO];
    while(atomic_load(&shown[i])<=0 && cal_clock()<deadline+.12)usleep(1000);
    if(atomic_load(&shown[i])<=0 || cal_clock()>=deadline+.12){refuse("response missed next deadline");}
   }}

@@ -1,5 +1,31 @@
 # Matched native/framework calibration
 
+## Attempt 2 — framework pilot valid; native startup refused
+
+The corrected framework pilot passes strict setup accounting and locks a
+1519×1266, scale-1, pixel-format-81 surface with payload bounds
+(8,8)–(1511,1258), two drawables, vsync, no transaction presentation and no
+next-drawable timeout. Callback drain and shutdown pass. The following native
+process refuses foreground readiness before any startup or timed request.
+Its generic error did not record the exact failing field, so the prior visibility
+value must not be inferred. No timed pair exists. Both processes and 16 probes
+retire; the successful framework setup is preserved.
+
+Source inspection finds that the native wait checked active/key/foreground PID
+but omitted visibility required by its following guard. Both now use the same
+complete predicate. A Foundation unit proves the original predicate accepts an
+invisible state and the new predicate refuses visibility/key/active/PID/loss
+negatives. A failed guard now retains its state dictionary. Window number is
+captured on main before request production. The native build passes warning-free;
+Prism using Anthropic Claude Sonnet 5.5 has complete coverage with no actionable
+findings. The framework executable and its verification are reused unchanged.
+This is a concrete diagnostic repair, not an unmodified repeat or SDK policy fix.
+
+[pilot2.json](pilot2.json) and [indexed evidence](pilot2-evidence-index.json)
+bind the successful setup, refused native command, exact match and review/regression
+receipts in [the archive](pilot2-evidence.tar.xz). Features and release gates remain
+unchanged. A fresh bounded attempt still has to establish the paired calibration.
+
 ## Pilot 1 — refused; diagnostic repair prepared
 
 The first live pilot refused its native configuration because the visibility bit
