@@ -489,3 +489,11 @@ replay, new history branches, and New/Open history resets.
 of Snap and grid spacing. Complete selected groups move rigidly. Each accepted
 action creates one Undo/Redo entry; a bounds violation rejects the entire move.
 The existing Move menu and Cmd+Option+arrow shortcuts retain grid-aware movement.
+
+## Paste at View Center (internal 20)
+
+**Edit → Paste at View Center** centers the copied set's complete bounds on the
+current world-space view center, preserving relative positions, group membership
+and names with fresh IDs. It bypasses snapping and creates one Undo entry; Redo
+restores the same IDs. Invalid/out-of-bounds payloads are rejected atomically.
+Existing Paste keeps its offset cascade; centered Paste does not advance it.

@@ -231,6 +231,9 @@ func copiedGroupCounts(objects []copiedComponent) (map[int]int, error) {
 }
 
 func (m *model) insertCopies(objects []copiedComponent, offset float64, label string) error {
+	return m.insertCopiesOffset(objects, canvas.Point{X: offset, Y: offset}, label)
+}
+func (m *model) insertCopiesOffset(objects []copiedComponent, offset canvas.Point, label string) error {
 	if err := m.clipboardAvailable(); err != nil {
 		return err
 	}
@@ -257,11 +260,11 @@ func (m *model) insertCopies(objects []copiedComponent, offset float64, label st
 	after, ids := slices.Clone(before), make([]string, 0, len(objects))
 	for i, o := range objects {
 		c, ok := componentByKind(o.Kind)
-		if !ok || (m.rejectNotes && o.Kind == "note") || !validPosition(o.X+offset, o.Y+offset) || !validSize(o.Width, o.Height) {
+		if !ok || (m.rejectNotes && o.Kind == "note") || !validPosition(o.X+offset.X, o.Y+offset.Y) || !validSize(o.Width, o.Height) {
 			return errors.New("copied components rejected or outside drawing bounds")
 		}
 		id := fmt.Sprintf("%s-%d", o.Kind, m.next+uint64(i)+1)
-		after = append(after, canvas.Rect{ID: id, X: o.X + offset, Y: o.Y + offset, Width: o.Width, Height: o.Height, Color: c.Color})
+		after = append(after, canvas.Rect{ID: id, X: o.X + offset.X, Y: o.Y + offset.Y, Width: o.Width, Height: o.Height, Color: c.Color})
 		ids = append(ids, id)
 		if value := o.componentMetadata(); value != (layerMetadata{}) {
 			info[id] = value
@@ -329,9 +332,9 @@ func (m *model) pasteSelection(text string) error {
 }
 
 func (m *model) bindClipboard(a *app.Application, ref app.WindowRef) error {
-	for _, c := range []struct{ id, label, shortcut string }{{"copy", "Copy", "Meta+C"}, {"cut", "Cut", "Meta+X"}, {"paste", "Paste", "Meta+V"}, {"duplicate", "Duplicate", "Meta+D"}} {
+	for _, c := range []struct{ id, label, shortcut string }{{"copy", "Copy", "Meta+C"}, {"cut", "Cut", "Meta+X"}, {"paste", "Paste", "Meta+V"}, {"paste-center", "Paste at View Center", ""}, {"duplicate", "Duplicate", "Meta+D"}} {
 		available := m.editAvailable
-		if c.id == "paste" {
+		if c.id == "paste" || c.id == "paste-center" {
 			available = m.clipboardAvailable
 		}
 		if err := m.commands.Register(command.Command{ID: c.id, Label: c.label, Shortcut: c.shortcut, ShortcutScope: command.AfterFocusShortcuts, Available: available, Execute: func(context.Context) error {
@@ -357,7 +360,14 @@ func (m *model) startClipboardAction(a *app.Application, ref app.WindowRef, acti
 	if err := m.clipboardAvailable(); err != nil {
 		return err
 	}
-	paste := action == "paste"
+	paste := action == "paste" || action == "paste-center"
+	center := canvas.Point{}
+	if action == "paste-center" {
+		if m.scene == nil || !finiteResize(m.scene.View.Center.X) || !finiteResize(m.scene.View.Center.Y) {
+			return errors.New("invalid paste center")
+		}
+		center = m.scene.View.Center
+	}
 	var cut *cutSelection
 	if action == "cut" {
 		var err error
@@ -383,7 +393,7 @@ func (m *model) startClipboardAction(a *app.Application, ref app.WindowRef, acti
 		return err
 	}
 	ctx, cancel := context.WithTimeout(ref.Context(), 5*time.Second)
-	ticket, err := a.ReserveWindowCompletion(ref, nil)
+	ticket, err := a.ReserveWindowCompletion(ref, func(error) { cancel() })
 	if err != nil {
 		cancel()
 		return err
@@ -399,7 +409,7 @@ func (m *model) startClipboardAction(a *app.Application, ref app.WindowRef, acti
 	go func() {
 		// Cut keeps its context live through owner admission, so a canceled or
 		// timed-out successful write cannot remove objects while queued.
-		if cut == nil {
+		if cut == nil && action != "paste-center" {
 			defer cancel()
 		}
 		var err error
@@ -423,12 +433,16 @@ func (m *model) startClipboardAction(a *app.Application, ref app.WindowRef, acti
 				return
 			}
 			m.clipboardJob = nil
-			if err == nil && cut != nil {
+			if err == nil && (cut != nil || action == "paste-center") {
 				err = ctx.Err()
 			}
 			if err == nil {
 				if paste {
-					err = m.pasteSelection(text)
+					if action == "paste-center" {
+						err = m.pasteSelectionAt(text, center)
+					} else {
+						err = m.pasteSelection(text)
+					}
 				} else if cut != nil {
 					err = m.completeCut(cut)
 				} else {
@@ -446,4 +460,28 @@ func (m *model) startClipboardAction(a *app.Application, ref app.WindowRef, acti
 		}
 	}()
 	return nil
+}
+
+// Center the payload's complete bounds, independent of camera zoom and grid.
+// insertion still validates the entire proposed drawing and allocates fresh IDs.
+func (m *model) pasteSelectionAt(text string, center canvas.Point) error {
+	if err := m.selectionAvailable(); err != nil {
+		return err
+	}
+	objects, err := decodeSelection(text)
+	if err != nil {
+		return err
+	}
+	if !finiteResize(center.X) || !finiteResize(center.Y) {
+		return errors.New("invalid paste center")
+	}
+	left, top, right, bottom := math.Inf(1), math.Inf(1), math.Inf(-1), math.Inf(-1)
+	for _, o := range objects {
+		left = math.Min(left, o.X)
+		top = math.Min(top, o.Y)
+		right = math.Max(right, o.X+o.Width)
+		bottom = math.Max(bottom, o.Y+o.Height)
+	}
+	offset := canvas.Point{X: center.X - (left+right)/2, Y: center.Y - (top+bottom)/2}
+	return m.insertCopiesOffset(objects, offset, "Paste at view center")
 }
