@@ -1,0 +1,473 @@
+{
+  "outcome": "THREE_VALID_NATIVE_SUBMISSION_PAIRS",
+  "started_utc": "2026-10-21T20:39:33.135634+00:00",
+  "finished_utc": "2026-10-21T20:42:41.552535+00:00",
+  "elapsed_seconds": 188.416901,
+  "maximum_seconds": 240,
+  "native_commands": 6,
+  "probe_commands": 48,
+  "retired_owned_groups": 54,
+  "warmup_states": 768,
+  "measured_states": 720,
+  "retained_zero_startup_feedback": 12,
+  "runs": [
+    {
+      "pair": 1,
+      "mode": "combined",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 2,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 25.292666628956795,
+          "p95": 32.03262505121529,
+          "p99": 32.16191683895886,
+          "max": 35.43799999170005
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 0.35962508991360664,
+          "p95": 0.6311249453574419,
+          "p99": 0.7663751021027565,
+          "max": 0.769791891798377
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 24.93424993008375,
+          "p95": 31.391458120197058,
+          "p99": 31.457208329811692,
+          "max": 35.2179582696408
+        },
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "mode": "combined",
+        "phase_ms": {
+          "receipt_to_render_commit": {
+            "count": 120,
+            "p50": 0.45154173858463764,
+            "p95": 0.7187917362898588,
+            "p99": 0.8341667708009481,
+            "max": 0.8429584559053183
+          },
+          "render_commit_to_gpu_start": {
+            "count": 120,
+            "p50": 0.47599966637790203,
+            "p95": 0.5263332277536392,
+            "p99": 0.5367081612348557,
+            "max": 0.543499831110239
+          },
+          "gpu_duration": {
+            "count": 120,
+            "p50": 0.10962504893541336,
+            "p95": 0.14500017277896404,
+            "p99": 0.20112493075430393,
+            "max": 0.21779164671897888
+          },
+          "gpu_end_to_present": {
+            "count": 120,
+            "p50": 24.21925007365644,
+            "p95": 30.696916859596968,
+            "p99": 30.828583519905806,
+            "max": 34.958416828885674
+          },
+          "present_request_to_present": {
+            "count": 120,
+            "p50": 24.84704158268869,
+            "p95": 31.310750171542168,
+            "p99": 31.399291707202792,
+            "max": 35.17491673119366
+          }
+        },
+        "interpretation": "CPU callback observation clocks are not GPU clocks; quantiles are not additive; no release qualification"
+      }
+    },
+    {
+      "pair": 1,
+      "mode": "split",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 2,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 25.281916605308652,
+          "p95": 32.07270824350417,
+          "p99": 32.46241668239236,
+          "max": 35.35579168237746
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 0.3631250001490116,
+          "p95": 0.6149164400994778,
+          "p99": 0.8888749871402979,
+          "max": 0.9106667712330818
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 24.914208333939314,
+          "p95": 31.478708377107978,
+          "p99": 31.551749911159277,
+          "max": 35.106666618958116
+        },
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "mode": "split",
+        "phase_ms": {
+          "receipt_to_render_commit": {
+            "count": 120,
+            "p50": 0.4452082794159651,
+            "p95": 0.6962083280086517,
+            "p99": 0.9479583241045475,
+            "max": 0.9519166778773069
+          },
+          "render_commit_to_gpu_start": {
+            "count": 120,
+            "p50": 0.4738331772387028,
+            "p95": 0.5242079496383667,
+            "p99": 0.5419999361038208,
+            "max": 0.552791403606534
+          },
+          "gpu_duration": {
+            "count": 120,
+            "p50": 0.10945834219455719,
+            "p95": 0.11124997399747372,
+            "p99": 0.2188333310186863,
+            "max": 0.23650005459785461
+          },
+          "gpu_end_to_present": {
+            "count": 120,
+            "p50": 24.21441674232483,
+            "p95": 30.7905834633857,
+            "p99": 31.00495832040906,
+            "max": 34.829625161364675
+          },
+          "present_request_to_present": {
+            "count": 120,
+            "p50": 24.801291525363922,
+            "p95": 31.38200007379055,
+            "p99": 31.499708304181695,
+            "max": 35.037708235904574
+          }
+        },
+        "interpretation": "CPU callback observation clocks are not GPU clocks; quantiles are not additive; no release qualification"
+      }
+    },
+    {
+      "pair": 2,
+      "mode": "split",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 2,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 25.31395829282701,
+          "p95": 32.020000042393804,
+          "p99": 32.316625118255615,
+          "max": 32.34316664747894
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 0.3540001343935728,
+          "p95": 0.47200010158121586,
+          "p99": 0.6520000752061605,
+          "max": 0.7107916753739119
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 24.99612490646541,
+          "p95": 31.55766660347581,
+          "p99": 31.637958250939846,
+          "max": 31.664625043049455
+        },
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "mode": "split",
+        "phase_ms": {
+          "receipt_to_render_commit": {
+            "count": 120,
+            "p50": 0.4332917742431164,
+            "p95": 0.5557085387408733,
+            "p99": 0.6818333640694618,
+            "max": 0.7570416200906038
+          },
+          "render_commit_to_gpu_start": {
+            "count": 120,
+            "p50": 0.46283332630991936,
+            "p95": 0.5511248018592596,
+            "p99": 0.58749970048666,
+            "max": 0.62383315525949
+          },
+          "gpu_duration": {
+            "count": 120,
+            "p50": 0.10945834219455719,
+            "p95": 0.11124997399747372,
+            "p99": 0.1265415921807289,
+            "max": 0.12812507338821888
+          },
+          "gpu_end_to_present": {
+            "count": 120,
+            "p50": 24.370500119403005,
+            "p95": 30.92941688373685,
+            "p99": 31.048208475112915,
+            "max": 31.14325017668307
+          },
+          "present_request_to_present": {
+            "count": 120,
+            "p50": 24.88574991002679,
+            "p95": 31.477499986067414,
+            "p99": 31.584375072270632,
+            "max": 31.626458279788494
+          }
+        },
+        "interpretation": "CPU callback observation clocks are not GPU clocks; quantiles are not additive; no release qualification"
+      }
+    },
+    {
+      "pair": 2,
+      "mode": "combined",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 2,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 25.268208235502243,
+          "p95": 32.043833285570145,
+          "p99": 32.112666638568044,
+          "max": 45.41945829987526
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 0.34904177300632,
+          "p95": 0.4174166824668646,
+          "p99": 0.4890833515673876,
+          "max": 0.5004582926630974
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 24.907374987378716,
+          "p95": 31.649375101551414,
+          "p99": 31.712708296254277,
+          "max": 45.18020828254521
+        },
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "mode": "combined",
+        "phase_ms": {
+          "receipt_to_render_commit": {
+            "count": 120,
+            "p50": 0.4375833086669445,
+            "p95": 0.5076667293906212,
+            "p99": 0.5828752182424068,
+            "max": 0.5918333772569895
+          },
+          "render_commit_to_gpu_start": {
+            "count": 120,
+            "p50": 0.46212482266128063,
+            "p95": 0.5271662957966328,
+            "p99": 0.5400832742452621,
+            "max": 0.5470830947160721
+          },
+          "gpu_duration": {
+            "count": 120,
+            "p50": 0.10941666550934315,
+            "p95": 0.11062482371926308,
+            "p99": 0.11345837265253067,
+            "max": 0.4281247965991497
+          },
+          "gpu_end_to_present": {
+            "count": 120,
+            "p50": 24.229791946709156,
+            "p95": 31.00879187695682,
+            "p99": 31.065250048413873,
+            "max": 44.60141691379249
+          },
+          "present_request_to_present": {
+            "count": 120,
+            "p50": 24.82529147528112,
+            "p95": 31.58445842564106,
+            "p99": 31.638166634365916,
+            "max": 45.13066657818854
+          }
+        },
+        "interpretation": "CPU callback observation clocks are not GPU clocks; quantiles are not additive; no release qualification"
+      }
+    },
+    {
+      "pair": 3,
+      "mode": "combined",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 2,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 25.317458203062415,
+          "p95": 32.15166670270264,
+          "p99": 32.43508329614997,
+          "max": 45.51149997860193
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 0.34604151733219624,
+          "p95": 0.43037510477006435,
+          "p99": 0.6270415615290403,
+          "max": 0.6273332983255386
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.014041690155864,
+          "p95": 31.750375172123313,
+          "p99": 31.80804173462093,
+          "max": 45.23929161950946
+        },
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "mode": "combined",
+        "phase_ms": {
+          "receipt_to_render_commit": {
+            "count": 120,
+            "p50": 0.43370830826461315,
+            "p95": 0.5238750018179417,
+            "p99": 0.6599999032914639,
+            "max": 0.6626665126532316
+          },
+          "render_commit_to_gpu_start": {
+            "count": 120,
+            "p50": 0.45066652819514275,
+            "p95": 0.5226247012615204,
+            "p99": 0.5485415458679199,
+            "max": 0.5612913519144058
+          },
+          "gpu_duration": {
+            "count": 120,
+            "p50": 0.10900013148784637,
+            "p95": 0.11095823720097542,
+            "p99": 0.15566684305667877,
+            "max": 0.1652499195188284
+          },
+          "gpu_end_to_present": {
+            "count": 120,
+            "p50": 24.368041893467307,
+            "p95": 31.10983339138329,
+            "p99": 31.282833544537425,
+            "max": 44.73754181526601
+          },
+          "present_request_to_present": {
+            "count": 120,
+            "p50": 24.921958334743977,
+            "p95": 31.675125006586313,
+            "p99": 31.77695837803185,
+            "max": 45.19641655497253
+          }
+        },
+        "interpretation": "CPU callback observation clocks are not GPU clocks; quantiles are not additive; no release qualification"
+      }
+    },
+    {
+      "pair": 3,
+      "mode": "split",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 2,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 25.325708324089646,
+          "p95": 32.086708350107074,
+          "p99": 32.15787513181567,
+          "max": 49.188749864697456
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 0.34791650250554085,
+          "p95": 0.44175004586577415,
+          "p99": 0.4795000422745943,
+          "max": 0.6316250655800104
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 24.979791836813092,
+          "p95": 31.767166685312986,
+          "p99": 31.839416595175862,
+          "max": 48.557124799117446
+        },
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "mode": "split",
+        "phase_ms": {
+          "receipt_to_render_commit": {
+            "count": 120,
+            "p50": 0.43212505988776684,
+            "p95": 0.5294999573379755,
+            "p99": 0.5700418259948492,
+            "max": 0.6628332193940878
+          },
+          "render_commit_to_gpu_start": {
+            "count": 120,
+            "p50": 0.48708333633840084,
+            "p95": 0.5348748527467251,
+            "p99": 0.5837497301399708,
+            "max": 0.626666471362114
+          },
+          "gpu_duration": {
+            "count": 120,
+            "p50": 0.10920828208327293,
+            "p95": 0.11037499643862247,
+            "p99": 0.11124997399747372,
+            "max": 0.11279177851974964
+          },
+          "gpu_end_to_present": {
+            "count": 120,
+            "p50": 24.266666965559125,
+            "p95": 31.115041812881827,
+            "p99": 31.2028753105551,
+            "max": 48.08483342640102
+          },
+          "present_request_to_present": {
+            "count": 120,
+            "p50": 24.86204169690609,
+            "p95": 31.679958337917924,
+            "p99": 31.76170843653381,
+            "max": 48.51562483236194
+          }
+        },
+        "interpretation": "CPU callback observation clocks are not GPU clocks; quantiles are not additive; no release qualification"
+      }
+    }
+  ],
+  "differences_of_run_p95_values": [
+    {
+      "pair": 1,
+      "split_minus_combined_p95_ms": 0.04008319228887558
+    },
+    {
+      "pair": 2,
+      "split_minus_combined_p95_ms": -0.023833243176341057
+    },
+    {
+      "pair": 3,
+      "split_minus_combined_p95_ms": -0.0649583525955677
+    }
+  ],
+  "release_gate_changed": false,
+  "framework_qualified": false,
+  "OS_latency_floor_proven": false,
+  "conclusion": "Separate present submission alone did not reproduce the framework extra-refresh-period band in this native fixture; reject it as a sufficient cause. No backend repair/adoption follows.",
+  "limits": [
+    "native cached-texture sparse diagnostic only",
+    "CPU callback observations differ from actual GPU execution",
+    "per-run quantiles are not additive and paired differences of p95 values are not per-frame difference percentiles",
+    "native tails above 33.3ms retained",
+    "not physical pointer/pixel readback/professional workflow/60Hz cadence/endurance/allocation qualification",
+    "framework not re-run or modified"
+  ]
+}

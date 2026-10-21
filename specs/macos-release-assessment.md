@@ -124,3 +124,16 @@ professional-workflow qualification, nor does its difference isolate observer or
 production-framework overhead. The next bounded boundary is actual submit/
 present scheduling after acquisition; causal extra-frame/GPU timing is unproven.
 No earlier failure is relabeled; M3–M7 stay open and features remain frozen.
+
+
+### Native submission topology control (21 October 2026)
+
+The [three-pair native control](../docs/reports/macos-native-submit-probe/README.md)
+finds combined/split p95 near 32 ms in all six runs. Separate present submission
+alone does not reproduce the framework extra-refresh-period band; reject it as a
+sufficient cause in this fixture. Actual render GPU clocks, all cohort states,
+startup losses, owned-process retirement and unchanged SDK/configuration are
+validated. No framework repair, release-gate revision or Mac qualification follows.
+Keep features frozen; inspect actual framework backend submit/GPU/present-request
+timing before another architecture change. Do not repeat this closed hypothesis
+without a concrete new failure or source change. M3–M7 remain open.

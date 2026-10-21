@@ -992,3 +992,16 @@ No native or performance gate is closed by these offscreen checks.
 ## Embedded icon origins checkpoint (19 October 2026)
 
 [Stage 0099](../docs/reviews/macos-icon-origins/README.md) provides a complete 4,105-file provenance ledger, thirteen original neutral replacements and five per-file Apache modification notices. It preserves public exports and the preceding Material artwork pixels; old mixed-origin artwork is replaced rather than relicensed. All 4,090 resolved Material source links and every prepared SVG hash are independently checked. Race/raster, preparation and generator checks pass. The identified icon-chain defects are resolved; final source-bound SDK/application notice transport and relocated native consumption remain required M6 checks. This checkpoint does not approve public distribution or complete M6/Mac acceptance.
+
+
+### Native submission topology control (21 October 2026)
+
+The [three-pair native control](../docs/reports/macos-native-submit-probe/README.md)
+finds combined/split p95 near 32 ms in all six runs. Separate present submission
+alone does not reproduce the framework extra-refresh-period band; reject it as a
+sufficient cause in this fixture. Actual render GPU clocks, all cohort states,
+startup losses, owned-process retirement and unchanged SDK/configuration are
+validated. No framework repair, release-gate revision or Mac qualification follows.
+Keep features frozen; inspect actual framework backend submit/GPU/present-request
+timing before another architecture change. Do not repeat this closed hypothesis
+without a concrete new failure or source change. M3–M7 remain open.
