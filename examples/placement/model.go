@@ -22,6 +22,7 @@ type component struct {
 	Color         color.RGBA
 }
 type model struct {
+	visibleScene                      *canvas.Scene
 	scene                             *canvas.Scene
 	palette                           *placement.Controller[component]
 	target                            *placement.Target

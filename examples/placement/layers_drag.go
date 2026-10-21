@@ -71,7 +71,7 @@ func (m *model) beginLayerDrag(source string, p canvas.Point, g layerLayout) *la
 		return nil
 	}
 	selection := m.selectedIDs()
-	ids := m.expandedSelection([]string{primary})
+	ids := m.layerUnitIDs(primary)
 	if slices.Contains(selection, primary) {
 		ids = slices.Clone(selection)
 		primary = m.scene.Selected

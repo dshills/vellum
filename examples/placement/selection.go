@@ -63,7 +63,7 @@ func (m *model) selectionToggle(g placement.Geometry, p canvas.Point) *objectMov
 		return nil
 	}
 	ids := m.selectedIDs()
-	id := m.scene.ObjectAt(m.scene.View.Screen(world))
+	id := m.objectAtWorld(world)
 	primary := m.scene.Selected
 	if id == "" {
 		m.scene.View = g.View

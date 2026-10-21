@@ -338,3 +338,11 @@ label. Names allow at most80 characters/128 UTF-8 bytes with no controls. Each
 changed name is one Undo/Redo entry and persists in app drawing format4; formats
 1–3 remain readable. Deleted/ungrouped metadata is pruned and restored by Undo.
 Framework APIs, renderer and clipboard formats are unchanged in this phase.
+
+**Hide / Show** in the Layers panel changes an undoable, saved visibility property.
+Hidden objects stay in the document and layer order but are excluded from canvas
+painting, picking, keyboard/accessibility traversal and marquee selection. Groups
+remain interaction units: hiding/showing a member controls its whole group. A hidden
+row can still be focused for Show/Rename and dragged to reorder. Fit uses visible
+objects. Canvas navigation continues through the app's visible projection; no
+framework APIs or renderer changed.

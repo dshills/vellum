@@ -97,7 +97,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		selectedSet[id] = true
 	}
 	objects := make([]ui.CanvasObject, 0, len(m.scene.Objects))
-	for _, object := range m.scene.Objects {
+	for _, object := range m.visibleObjects() {
 		kind, _, _ := strings.Cut(object.ID, "-")
 		label := map[string]string{"block": "Block", "connector": "Connector", "note": "Note"}[kind]
 		if selectedSet[object.ID] && len(selection) > 1 {
@@ -130,6 +130,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 	for _, action := range arrangementActions {
 		arrangementTools = append(arrangementTools, ui.Node{ID: action.id, Kind: ui.Button, Text: action.label, Disabled: m.commandDisabled(action.id), Activate: invoke(action.id)})
 	}
+	display := m.canvasForView()
 	root := ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{
 		{ID: "file-tools", Kind: ui.Toolbar, Children: []ui.Node{
 			{ID: "open", Kind: ui.Button, Text: "Open…", Disabled: m.files == nil || m.commandDisabled("open"), Activate: invoke("open")},
@@ -144,7 +145,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 				if m.fileBusy() || m.move != nil {
 					return
 				}
-				m.scene.Fit()
+				m.fitVisible()
 				update()
 			}},
 			{ID: "reset", Kind: ui.Button, Text: "Reset view", Disabled: navigatingDisabled, Activate: func() {
@@ -195,7 +196,8 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		{ID: "help", Kind: ui.Label, Text: help},
 		{ID: "workspace", Kind: ui.Row, Grow: true, Children: []ui.Node{
 			{ID: "palette", Kind: ui.Column, MinWidth: 145, Children: tools},
-			{ID: "drawing", Kind: ui.Canvas2D, Disabled: busy, Canvas: m.scene, CanvasObjects: objects, CanvasGrid: grid, PlacementTarget: m.target, Grow: true, Accessibility: ui.Accessibility{Name: "Component canvas", Help: "Shift-click toggles a component; Shift-drag empty canvas adds intersected components using a marquee; click empty space to clear selection; drag a selected component to move the selection; Option+Left/Right/Home/End selects one; drag selection corner handles to resize the set; plain empty drag or arrow keys pan; scroll zooms."}, Change: func(e ui.ChangeEvent) {
+			{ID: "drawing", Kind: ui.Canvas2D, Disabled: busy, Canvas: display, CanvasObjects: objects, CanvasGrid: grid, PlacementTarget: m.target, Grow: true, Accessibility: ui.Accessibility{Name: "Component canvas", Help: "Shift-click toggles a component; Shift-drag empty canvas adds intersected components using a marquee; click empty space to clear selection; drag a selected component to move the selection; Option+Left/Right/Home/End selects one; drag selection corner handles to resize the set; plain empty drag or arrow keys pan; scroll zooms."}, Change: func(e ui.ChangeEvent) {
+				m.scene.View = display.View
 				m.managedSelection(e.SelectedID)
 				m.status = fmt.Sprintf("Selected: %s • zoom %.0f%%", e.SelectedID, e.Number*100)
 				update()

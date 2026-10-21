@@ -34,10 +34,17 @@ func (m *model) layerRows() []layerRow {
 		o := m.scene.Objects[i]
 		g := m.groups[o.ID]
 		if g != "" && !seen[g] {
-			rows = append(rows, layerRow{g, fmt.Sprintf("Group %s · %d", m.layerLabel(g), counts[g]), selected[o.ID]})
+			label := fmt.Sprintf("Group %s · %d", m.layerLabel(g), counts[g])
+			if m.layerHidden(g) {
+				label += " [hidden]"
+			}
+			rows = append(rows, layerRow{g, label, selected[o.ID]})
 			seen[g] = true
 		}
 		label := m.layerLabel(o.ID)
+		if m.layerHidden(o.ID) {
+			label += " [hidden]"
+		}
 		if g != "" {
 			label += " · " + m.layerLabel(g)
 		}
@@ -113,6 +120,10 @@ func (m *model) layersPanel(ref app.WindowRef, update func(), invoke func(string
 		rows = append(rows, ui.Node{ID: "layers-empty", Kind: ui.Label, Text: "No components"})
 	}
 	compact := ui.Style{Padding: ui.Some(ui.UniformInsets(4)), Typography: ui.Some(ui.Typography{Size: 12})}
+	visibilityLabel := "Hide"
+	if m.layerHidden(m.layerActionTarget()) {
+		visibilityLabel = "Show"
+	}
 	return ui.Node{ID: "layers-panel", Kind: ui.Column, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 260}), MaxSize: ui.Some(ui.Size{Width: 260}), GrowY: ui.Some(float32(1)), Gap: ui.Some(float32(4)), Padding: ui.Some(ui.UniformInsets(4))}, Accessibility: ui.Accessibility{Name: "Layers panel"}, Children: []ui.Node{
 		{ID: "layers-heading", Kind: ui.Label, Text: "Layers · front first"},
 		{ID: "layers-options", Kind: ui.Row, Children: []ui.Node{
@@ -143,7 +154,7 @@ func (m *model) layersPanel(ref app.WindowRef, update func(), invoke func(string
 			m.renameDraft = m.layerInfo[m.renameID].Name
 			m.prompt = "rename"
 			update()
-		}}}},
+		}}, {ID: "layers-visible", Kind: ui.Button, Text: visibilityLabel, Style: compact, Disabled: disabled || m.layerActionTarget() == "", Activate: func() { finish(func() error { return m.toggleLayerVisibility(m.layerActionTarget()) }) }}}},
 		{ID: "layers-scroll", Kind: ui.Scroll, Grow: true, Children: []ui.Node{{ID: "layers-rows", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1)), Gap: ui.Some(float32(1))}, Children: rows}}},
 	}}
 }

@@ -13,7 +13,8 @@ import (
 )
 
 type layerMetadata struct {
-	Name string `json:"name,omitempty"`
+	Name   string `json:"name,omitempty"`
+	Hidden bool   `json:"hidden,omitempty"`
 }
 
 func validLayerName(name string) bool {
@@ -81,16 +82,7 @@ func (m *model) renameLayer(id, name string) error {
 	v.Name = name
 	info[id] = v
 	info = prunedLayerInfo(info, m.scene.Objects, m.groups)
-	f, err := drawingCodec(m).Capture()
-	if err != nil {
-		return err
-	}
-	f.Version = 4
-	f.Layers = info
-	if _, err = drawingCodec(m).Encode(f); err != nil {
-		return err
-	}
-	if err := m.applyDocumentMetadata("Rename layer", m.scene.Objects, m.groups, info, m.selectedIDs(), m.scene.Selected); err != nil {
+	if err := m.applyLayerProperties("Rename layer", info); err != nil {
 		return err
 	}
 	m.status = "Renamed " + id
@@ -138,4 +130,17 @@ func (m *model) layerActionTarget() string {
 		return m.layerFocus
 	}
 	return m.scene.Selected
+}
+
+func (m *model) applyLayerProperties(label string, info map[string]layerMetadata) error {
+	f, err := drawingCodec(m).Capture()
+	if err != nil {
+		return err
+	}
+	f.Version = 4
+	f.Layers = info
+	if _, err = drawingCodec(m).Encode(f); err != nil {
+		return err
+	}
+	return m.applyDocumentMetadata(label, m.scene.Objects, m.groups, info, m.selectedIDs(), m.scene.Selected)
 }

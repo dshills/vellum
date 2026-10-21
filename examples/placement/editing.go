@@ -119,7 +119,7 @@ func (m *model) beginMove(g placement.Geometry, p canvas.Point) *objectMove {
 		}
 	}
 	if id == "" {
-		id = m.scene.ObjectAt(m.scene.View.Screen(world))
+		id = m.objectAtWorld(world)
 	}
 	if id == "" {
 		return nil
