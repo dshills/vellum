@@ -600,3 +600,7 @@ The frozen native clipboard service returns complete text before app validation;
 ## Revert to Saved (internal 23)
 
 **More → Revert to Saved…** reloads the current file without a chooser. It is unavailable for an untitled drawing or during another action. Unsaved edits require **Discard and Revert** confirmation; Cancel keeps the current drawing. A successful validated reload restores saved geometry, fills, groups, metadata, camera and snapping, marks it clean and clears Undo/Redo. Missing, unreadable or invalid files leave the current drawing, path and both history stacks intact. This is reload from disk, not a version browser; another program's valid changes are loaded too.
+
+## Paste in Place (internal 23)
+
+**Edit → Paste in Place / Cmd+Shift+V** inserts copied components at their exact copied world positions, ignoring grid and camera transforms. It preserves relative geometry, fills, names and flat groups, assigns fresh component/group identities and selects the new copies. The complete insertion is one Undo/Redo and leaves the ordinary Paste offset sequence alone. Overlapping the source is intentional; use Layers to distinguish copies. It also works in an empty drawing. Invalid or rejected payloads do not create partial copies.

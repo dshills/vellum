@@ -70,6 +70,15 @@ func (m *model) captureCut() (*cutSelection, error) {
 	if err := m.editAvailable(); err != nil {
 		return nil, err
 	}
+	return m.captureClipboardSnapshot()
+}
+
+// Insert-only paste can begin in an empty drawing without a selection. Copy,
+// Cut and fill paste retain their stronger editAvailable requirement.
+func (m *model) captureClipboardSnapshot() (*cutSelection, error) {
+	if err := m.clipboardAvailable(); err != nil {
+		return nil, err
+	}
 	f, err := drawingCodec(m).Capture()
 	if err != nil {
 		return nil, err
@@ -360,9 +369,9 @@ func (m *model) pasteSelection(text string) error {
 }
 
 func (m *model) bindClipboard(a *app.Application, ref app.WindowRef) error {
-	for _, c := range []struct{ id, label, shortcut string }{{"copy", "Copy", "Meta+C"}, {"cut", "Cut", "Meta+X"}, {"paste", "Paste", "Meta+V"}, {"paste-center", "Paste at View Center", ""}, {"duplicate", "Duplicate", "Meta+D"}, {"copy-fill", "Copy Fill Style", ""}, {"paste-fill", "Paste Fill Style", ""}} {
+	for _, c := range []struct{ id, label, shortcut string }{{"copy", "Copy", "Meta+C"}, {"cut", "Cut", "Meta+X"}, {"paste", "Paste", "Meta+V"}, {"paste-center", "Paste at View Center", ""}, {"duplicate", "Duplicate", "Meta+D"}, {"copy-fill", "Copy Fill Style", ""}, {"paste-fill", "Paste Fill Style", ""}, {"paste-in-place", "Paste in Place", "Meta+Shift+V"}} {
 		available := m.editAvailable
-		if c.id == "paste" || c.id == "paste-center" {
+		if c.id == "paste" || c.id == "paste-center" || c.id == "paste-in-place" {
 			available = m.clipboardAvailable
 		}
 		if err := m.commands.Register(command.Command{ID: c.id, Label: c.label, Shortcut: c.shortcut, ShortcutScope: command.AfterFocusShortcuts, Available: available, Execute: func(context.Context) error {
@@ -388,7 +397,7 @@ func (m *model) startClipboardAction(a *app.Application, ref app.WindowRef, acti
 	if err := m.clipboardAvailable(); err != nil {
 		return err
 	}
-	paste := action == "paste" || action == "paste-center" || action == "paste-fill"
+	paste := action == "paste" || action == "paste-center" || action == "paste-fill" || action == "paste-in-place"
 	center := canvas.Point{}
 	if action == "paste-center" {
 		if m.scene == nil || !finiteResize(m.scene.View.Center.X) || !finiteResize(m.scene.View.Center.Y) {
@@ -408,6 +417,12 @@ func (m *model) startClipboardAction(a *app.Application, ref app.WindowRef, acti
 	if action == "paste-fill" {
 		var err error
 		snapshot, err = m.captureCut()
+		if err != nil {
+			return err
+		}
+	} else if action == "paste-in-place" {
+		var err error
+		snapshot, err = m.captureClipboardSnapshot()
 		if err != nil {
 			return err
 		}
@@ -495,6 +510,8 @@ func (m *model) startClipboardAction(a *app.Application, ref app.WindowRef, acti
 				if paste {
 					if action == "paste-fill" {
 						err = m.pasteFillStyle(text)
+					} else if action == "paste-in-place" {
+						err = m.pasteSelectionInPlace(text)
 					} else if action == "paste-center" {
 						err = m.pasteSelectionAt(text, center)
 					} else {
@@ -543,4 +560,17 @@ func (m *model) pasteSelectionAt(text string, center canvas.Point) error {
 	}
 	offset := canvas.Point{X: center.X - (left+right)/2, Y: center.Y - (top+bottom)/2}
 	return m.insertCopiesOffset(objects, offset, "Paste at view center")
+}
+
+// Paste in Place reproduces document coordinates exactly, regardless of camera
+// pan, zoom or snapping, without advancing the ordinary Paste offset sequence.
+func (m *model) pasteSelectionInPlace(text string) error {
+	if err := m.clipboardAvailable(); err != nil {
+		return err
+	}
+	objects, err := decodeSelection(text)
+	if err != nil {
+		return err
+	}
+	return m.insertCopiesOffset(objects, canvas.Point{}, "Paste in place")
 }
