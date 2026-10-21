@@ -32,8 +32,12 @@ func selectionBounds(objects []canvas.Rect, ids []string) (canvas.Rect, bool) {
 // corner. One shared scale per axis preserves spacing and relative sizes.
 // Member limits constrain the shared scale, never individual rectangles.
 func resizedSelection(before []canvas.Rect, ids []string, corner resizeCorner, dx, dy float64, snap bool, aspectLocked ...bool) ([]canvas.Rect, error) {
-	if len(aspectLocked) > 0 && aspectLocked[0] {
-		return resizedAspectSelection(before, ids, corner, dx, dy, snap)
+	return resizedSelectionGrid(before, ids, corner, dx, dy, snap, 20, len(aspectLocked) > 0 && aspectLocked[0])
+}
+func resizedSelectionGrid(before []canvas.Rect, ids []string, corner resizeCorner, dx, dy float64, snap bool, spacing float64, aspectLocked bool) ([]canvas.Rect, error) {
+	spacing = gridUnit(spacing)
+	if aspectLocked {
+		return resizedAspectSelectionGrid(before, ids, corner, dx, dy, snap, spacing)
 	}
 	bounds, ok := selectionBounds(before, ids)
 	if !ok || corner < northWest || corner > southWest || math.IsNaN(dx) || math.IsNaN(dy) || math.IsInf(dx, 0) || math.IsInf(dy, 0) {
@@ -69,7 +73,7 @@ func resizedSelection(before []canvas.Rect, ids []string, corner resizeCorner, d
 		}
 		next := size + delta
 		if snap {
-			next = math.Round(next/20) * 20
+			next = math.Round(next/spacing) * spacing
 		}
 		return math.Max(min, math.Min(max, next/size))
 	}

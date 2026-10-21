@@ -56,8 +56,12 @@ func handleAt(o canvas.Rect, g placement.Geometry, p canvas.Point) resizeCorner 
 // Resize from the original rectangle and hold its opposite corner fixed.
 // Clamping keeps that anchor fixed even when the dragged corner crosses it.
 func resizedCorner(before canvas.Rect, corner resizeCorner, dx, dy float64, snap bool, aspectLocked ...bool) canvas.Rect {
-	if len(aspectLocked) > 0 && aspectLocked[0] {
-		after, err := resizedAspectSelection([]canvas.Rect{before}, []string{before.ID}, corner, dx, dy, snap)
+	return resizedCornerGrid(before, corner, dx, dy, snap, 20, len(aspectLocked) > 0 && aspectLocked[0])
+}
+func resizedCornerGrid(before canvas.Rect, corner resizeCorner, dx, dy float64, snap bool, spacing float64, aspectLocked bool) canvas.Rect {
+	spacing = gridUnit(spacing)
+	if aspectLocked {
+		after, err := resizedAspectSelectionGrid([]canvas.Rect{before}, []string{before.ID}, corner, dx, dy, snap, spacing)
 		if err == nil {
 			return after[0]
 		}
@@ -71,7 +75,7 @@ func resizedCorner(before canvas.Rect, corner resizeCorner, dx, dy float64, snap
 		dy = -dy
 	}
 	after := before
-	after.Width, after.Height = resizedDimensions(before, dx, dy, snap)
+	after.Width, after.Height = resizedDimensionsGrid(before, dx, dy, snap, spacing)
 	if west {
 		after.X = before.X + before.Width - after.Width
 	}

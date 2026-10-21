@@ -37,6 +37,8 @@ type model struct {
 	recent                            *recentDrawings
 	geometry                          *geometryDraft
 	aspectLocked                      bool
+	gridHidden                        bool
+	gridSpacing                       float64
 	selectionSubtract                 bool
 	pendingOpenPath                   string
 	recovery                          *placementRecovery
@@ -157,8 +159,8 @@ func newModel() (*model, error) {
 	m.target, err = m.palette.NewTarget(placement.TargetConfig[component]{ID: "drawing", Snap: func(r placement.Request[component]) (canvas.Point, error) {
 		p := r.Position
 		if m.snap {
-			p.X = math.Round(p.X/20) * 20
-			p.Y = math.Round(p.Y/20) * 20
+			p.X = math.Round(p.X/m.spacing()) * m.spacing()
+			p.Y = math.Round(p.Y/m.spacing()) * m.spacing()
 		}
 		return p, nil
 	}, Accept: func(r placement.Request[component]) error {

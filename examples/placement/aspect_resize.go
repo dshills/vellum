@@ -12,6 +12,10 @@ import (
 // change (width wins ties). Only that world-space dimension snaps; a single
 // shared scale derives the other dimension, every member size and spacing.
 func resizedAspectSelection(before []canvas.Rect, ids []string, corner resizeCorner, dx, dy float64, snap bool) ([]canvas.Rect, error) {
+	return resizedAspectSelectionGrid(before, ids, corner, dx, dy, snap, 20)
+}
+func resizedAspectSelectionGrid(before []canvas.Rect, ids []string, corner resizeCorner, dx, dy float64, snap bool, spacing float64) ([]canvas.Rect, error) {
+	spacing = gridUnit(spacing)
 	bounds, wanted, err := aspectSelection(before, ids)
 	if err != nil || corner < northWest || corner > southWest || !finiteResize(dx) || !finiteResize(dy) {
 		return nil, errors.New("invalid aspect resize")
@@ -32,7 +36,7 @@ func resizedAspectSelection(before []canvas.Rect, ids []string, corner resizeCor
 	}
 	next := size + delta
 	if snap {
-		next = math.Round(next/20) * 20
+		next = math.Round(next/spacing) * spacing
 	}
 	ax, ay := bounds.X, bounds.Y
 	if west {

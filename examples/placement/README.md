@@ -452,3 +452,12 @@ reflects the current view, including wheel zoom. Menu zoom keeps the world-space
 view center; Fit Selection includes complete selected groups. Fit continues to
 fit all visible objects; Reset returns to origin at 100%. Navigation changes no
 object geometry or Undo history, and is blocked during gestures and dialogs.
+
+## Grid controls (internal 19)
+
+**Grid** shows/hides the grid independently of **Snap**. The Grid spacing menu
+offers 5, 10, 20, 50 and 100 world units. The selected interval applies to placement,
+move and corner/step resizing, including proportional resizing; numeric geometry
+remains exact. Edits keep their usual one-step Undo/Redo. Visibility and spacing
+are session preferences (default visible, 20); existing saved Snap behavior stays
+compatible with earlier drawings. Settings cannot change during a gesture.

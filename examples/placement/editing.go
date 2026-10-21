@@ -87,7 +87,7 @@ func (m *model) nudge(dx, dy float64) error {
 	}
 	step := float64(1)
 	if m.snap {
-		step = 20
+		step = m.spacing()
 	}
 	ids := m.selectedIDs()
 	after, err := movedSelection(m.scene.Objects, ids, dx*step, dy*step)
@@ -162,7 +162,7 @@ func (m *model) previewMove(s *objectMove, p canvas.Point) {
 	// the latest layout, preserving the offset inside the object.
 	dx, dy := world.X-s.grab.X, world.Y-s.grab.Y
 	if s.resize && (len(s.selection) > 1 || s.aspectLocked) {
-		after, err := resizedSelection(s.before, s.selection, s.corner, dx, dy, m.snap, s.aspectLocked)
+		after, err := resizedSelectionGrid(s.before, s.selection, s.corner, dx, dy, m.snap, m.spacing(), s.aspectLocked)
 		if err != nil {
 			s.valid = false
 			return
@@ -177,7 +177,7 @@ func (m *model) previewMove(s *objectMove, p canvas.Point) {
 			continue
 		}
 		if s.resize {
-			after[i] = resizedCorner(after[i], s.corner, dx, dy, m.snap, s.aspectLocked)
+			after[i] = resizedCornerGrid(after[i], s.corner, dx, dy, m.snap, m.spacing(), s.aspectLocked)
 			if !validPosition(after[i].X, after[i].Y) {
 				s.valid = false
 				return
@@ -187,8 +187,8 @@ func (m *model) previewMove(s *objectMove, p canvas.Point) {
 			return
 		}
 		if m.snap {
-			dx = math.Round((after[i].X+dx)/20)*20 - after[i].X
-			dy = math.Round((after[i].Y+dy)/20)*20 - after[i].Y
+			dx = math.Round((after[i].X+dx)/m.spacing())*m.spacing() - after[i].X
+			dy = math.Round((after[i].Y+dy)/m.spacing())*m.spacing() - after[i].Y
 		}
 		moved, err := movedSelection(s.before, s.selection, dx, dy)
 		if err != nil {
@@ -285,13 +285,17 @@ func validSize(width, height float64) bool {
 // Only changed axes snap; resizing width must not change a component's height.
 // Clamp to positive bounded sizes so crossing the anchor never flips an object.
 func resizedDimensions(before canvas.Rect, dx, dy float64, snap bool) (float64, float64) {
+	return resizedDimensionsGrid(before, dx, dy, snap, 20)
+}
+func resizedDimensionsGrid(before canvas.Rect, dx, dy float64, snap bool, spacing float64) (float64, float64) {
+	spacing = gridUnit(spacing)
 	axis := func(size, delta float64) float64 {
 		if delta == 0 {
 			return size
 		}
 		size += delta
 		if snap {
-			size = math.Round(size/20) * 20
+			size = math.Round(size/spacing) * spacing
 		}
 		return math.Max(minComponentSize, math.Min(maxComponentSize, size))
 	}
@@ -307,18 +311,18 @@ func (m *model) resizeSelected(dw, dh float64) error {
 	}
 	step := 1.0
 	if m.snap {
-		step = 20
+		step = m.spacing()
 	}
 	i := m.selectedIndex()
 	after := slices.Clone(m.scene.Objects)
 	if m.aspectLocked {
 		var err error
-		after, err = resizedSelection(after, m.selectedIDs(), southEast, dw*step, dh*step, m.snap, true)
+		after, err = resizedSelectionGrid(after, m.selectedIDs(), southEast, dw*step, dh*step, m.snap, m.spacing(), true)
 		if err != nil {
 			return err
 		}
 	} else {
-		after[i].Width, after[i].Height = resizedDimensions(after[i], dw*step, dh*step, m.snap)
+		after[i].Width, after[i].Height = resizedDimensionsGrid(after[i], dw*step, dh*step, m.snap, m.spacing())
 	}
 	if err := m.applyObjects("Resize "+after[i].ID, after, after[i].ID); err != nil {
 		return err
