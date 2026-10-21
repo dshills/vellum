@@ -1,0 +1,876 @@
+{
+  "created_utc": "2026-10-21T14:19:37.468647+00:00",
+  "main_start": "f35c5a0477b4b0d30df9ae4116cbb0efd44e0cce",
+  "branches": [
+    {
+      "branch": "codex/foundation-completion",
+      "head": "f35c5a0477b4b0d30df9ae4116cbb0efd44e0cce",
+      "included_in_main": true
+    },
+    {
+      "branch": "codex/icon-origin-completion",
+      "head": "93b47306ba6cc4ad3ac03253f5e01723505b0603",
+      "included_in_main": true
+    },
+    {
+      "branch": "codex/m3-input-presentation",
+      "head": "dc3fc63159ad679e614dcf44da6de65e59d37f3f",
+      "included_in_main": true
+    },
+    {
+      "branch": "codex/m3-measurement-integration",
+      "head": "ad91bc695acb5ef5e3062adf4f39e370fda35b99",
+      "included_in_main": true
+    },
+    {
+      "branch": "codex/macos-breadcrumb-composed",
+      "head": "2c87a3d877c092b8ccf8b281cf6473f494d4c567",
+      "included_in_main": true
+    },
+    {
+      "branch": "codex/macos-geometry-reuse",
+      "head": "8c1709e3ecc7a1a787cc5530df966155203f0053",
+      "included_in_main": true
+    },
+    {
+      "branch": "codex/macos-idle-soak",
+      "head": "2c87a3d877c092b8ccf8b281cf6473f494d4c567",
+      "included_in_main": true
+    },
+    {
+      "branch": "codex/macos-native-evidence",
+      "head": "608e695bf4cbadb3731883f67fe78b25a96c1a89",
+      "included_in_main": true
+    },
+    {
+      "branch": "codex/macos-native-results",
+      "head": "f35c5a0477b4b0d30df9ae4116cbb0efd44e0cce",
+      "included_in_main": true
+    },
+    {
+      "branch": "codex/macos-scoped-geometry",
+      "head": "b003d3759a9a121093f93f14656eec73b33daabd",
+      "included_in_main": true
+    },
+    {
+      "branch": "codex/native-activity-current",
+      "head": "8a594000a487991cbfa91912d22b5b2f6bbde46f",
+      "included_in_main": true
+    },
+    {
+      "branch": "codex/native-input-headroom",
+      "head": "97aee13132b41b35b7c041da7426b22948263f7a",
+      "included_in_main": true
+    },
+    {
+      "branch": "codex/perf-fixture-isolation",
+      "head": "7e97a1a850d47ba1490d99b3b257b61302df5e9d",
+      "included_in_main": true
+    },
+    {
+      "branch": "codex/sdk-benchmark-isolation",
+      "head": "c519c956546a60a74e1b12569bc2f974e979abfc",
+      "included_in_main": true
+    },
+    {
+      "branch": "main",
+      "head": "f35c5a0477b4b0d30df9ae4116cbb0efd44e0cce",
+      "included_in_main": true
+    }
+  ],
+  "worktrees": [
+    {
+      "path": "/Users/dshills/Development/projects/Vellum",
+      "branch": "refs/heads/codex/foundation-completion",
+      "head": "f35c5a0477b4b0d30df9ae4116cbb0efd44e0cce",
+      "head_in_latest": true,
+      "status_counts": {},
+      "tracked_count": 6052,
+      "missing_deletions_actually_present": 0,
+      "nondeleted": [],
+      "top_level": [
+        ".git",
+        ".gitattributes",
+        ".github",
+        ".gitignore",
+        "LICENSE",
+        "README.md",
+        "app",
+        "automation",
+        "canvas",
+        "command",
+        "docs",
+        "document",
+        "drivers",
+        "editor",
+        "examples",
+        "execution"
+      ]
+    },
+    {
+      "path": "/private/tmp/vellum-breadcrumb-composed",
+      "branch": "refs/heads/codex/macos-breadcrumb-composed",
+      "head": "2c87a3d877c092b8ccf8b281cf6473f494d4c567",
+      "head_in_latest": true,
+      "status_counts": {
+        " D": 4299
+      },
+      "tracked_count": 4299,
+      "missing_deletions_actually_present": 0,
+      "nondeleted": [],
+      "top_level": [
+        ".git",
+        ".github",
+        "app",
+        "automation",
+        "canvas",
+        "command",
+        "docs",
+        "document",
+        "drivers",
+        "editor",
+        "examples",
+        "execution",
+        "history",
+        "prototypes",
+        "release",
+        "replay"
+      ]
+    },
+    {
+      "path": "/private/tmp/vellum-geometry-reuse",
+      "branch": "refs/heads/codex/macos-geometry-reuse",
+      "head": "8c1709e3ecc7a1a787cc5530df966155203f0053",
+      "head_in_latest": true,
+      "status_counts": {
+        " D": 4287
+      },
+      "tracked_count": 4287,
+      "missing_deletions_actually_present": 0,
+      "nondeleted": [],
+      "top_level": [
+        ".git",
+        ".github",
+        "app",
+        "automation",
+        "canvas",
+        "command",
+        "docs",
+        "document",
+        "drivers",
+        "editor",
+        "examples",
+        "execution",
+        "history",
+        "prototypes",
+        "release",
+        "replay"
+      ]
+    },
+    {
+      "path": "/private/tmp/vellum-icon-origin-completion-93b4730",
+      "branch": "refs/heads/codex/icon-origin-completion",
+      "head": "93b47306ba6cc4ad3ac03253f5e01723505b0603",
+      "head_in_latest": true,
+      "status_counts": {
+        " M": 2,
+        "??": 2
+      },
+      "tracked_count": 5742,
+      "missing_deletions_actually_present": 0,
+      "nondeleted": [
+        " M drivers/cogent/native/dependencies.json",
+        " M drivers/cogent/prepare_test.py",
+        "?? drivers/cogent/native/assets/iconorigins/",
+        "?? drivers/cogent/native/patches/iconorigins/"
+      ],
+      "top_level": [
+        ".git",
+        ".gitattributes",
+        ".github",
+        ".gitignore",
+        "LICENSE",
+        "README.md",
+        "app",
+        "automation",
+        "canvas",
+        "command",
+        "docs",
+        "document",
+        "drivers",
+        "editor",
+        "examples",
+        "execution"
+      ]
+    },
+    {
+      "path": "/private/tmp/vellum-idle-soak",
+      "branch": "refs/heads/codex/macos-idle-soak",
+      "head": "2c87a3d877c092b8ccf8b281cf6473f494d4c567",
+      "head_in_latest": true,
+      "status_counts": {
+        " D": 4294,
+        "AD": 4,
+        "MD": 5
+      },
+      "tracked_count": 4303,
+      "missing_deletions_actually_present": 0,
+      "nondeleted": [
+        "AD drivers/cogent/cmd/window-cycle-smoke/diagnostics.go",
+        "AD drivers/cogent/cmd/window-cycle-smoke/diagnostics_test.go",
+        "MD drivers/cogent/cmd/window-cycle-smoke/interactions.go",
+        "MD drivers/cogent/cmd/window-cycle-smoke/main.go",
+        "AD drivers/cogent/cmd/window-cycle-smoke/soak.go",
+        "AD drivers/cogent/cmd/window-cycle-smoke/soak_test.go",
+        "MD drivers/cogent/native_services_checks_darwin.go",
+        "MD drivers/cogent/native_services_checks_darwin.m",
+        "MD specs/workbench-endurance.md"
+      ],
+      "top_level": [
+        ".git",
+        ".github",
+        "app",
+        "automation",
+        "canvas",
+        "command",
+        "docs",
+        "document",
+        "drivers",
+        "editor",
+        "examples",
+        "execution",
+        "history",
+        "prototypes",
+        "release",
+        "replay"
+      ]
+    },
+    {
+      "path": "/private/tmp/vellum-m3-input-presentation-dc3fc63",
+      "branch": "refs/heads/codex/m3-input-presentation",
+      "head": "dc3fc63159ad679e614dcf44da6de65e59d37f3f",
+      "head_in_latest": true,
+      "status_counts": {
+        " M": 7,
+        "??": 3
+      },
+      "tracked_count": 5732,
+      "missing_deletions_actually_present": 0,
+      "nondeleted": [
+        " M drivers/cogent/desktop_session.go",
+        " M drivers/cogent/driver.go",
+        " M drivers/cogent/manual_offscreen.go",
+        " M drivers/cogent/native/README.md",
+        " M drivers/cogent/native/dependencies.json",
+        " M drivers/cogent/prepare_test.py",
+        " M specs/native-presentation.md",
+        "?? drivers/cogent/desktop_measurement.go",
+        "?? drivers/cogent/desktop_measurement_offscreen_test.go",
+        "?? drivers/cogent/native/patches/desktopmeasurement/"
+      ],
+      "top_level": [
+        ".git",
+        ".gitattributes",
+        ".github",
+        ".gitignore",
+        "LICENSE",
+        "README.md",
+        "app",
+        "automation",
+        "canvas",
+        "command",
+        "docs",
+        "document",
+        "drivers",
+        "editor",
+        "examples",
+        "execution"
+      ]
+    },
+    {
+      "path": "/private/tmp/vellum-m3-measurement-93b4730",
+      "branch": "refs/heads/codex/m3-measurement-integration",
+      "head": "ad91bc695acb5ef5e3062adf4f39e370fda35b99",
+      "head_in_latest": true,
+      "status_counts": {},
+      "tracked_count": 5759,
+      "missing_deletions_actually_present": 0,
+      "nondeleted": [],
+      "top_level": [
+        ".git",
+        ".gitattributes",
+        ".github",
+        ".gitignore",
+        "LICENSE",
+        "README.md",
+        "app",
+        "automation",
+        "canvas",
+        "command",
+        "docs",
+        "document",
+        "drivers",
+        "editor",
+        "examples",
+        "execution"
+      ]
+    },
+    {
+      "path": "/private/tmp/vellum-macos-native-results-97aee13",
+      "branch": "refs/heads/codex/macos-native-results",
+      "head": "f35c5a0477b4b0d30df9ae4116cbb0efd44e0cce",
+      "head_in_latest": true,
+      "status_counts": {},
+      "tracked_count": 6052,
+      "missing_deletions_actually_present": 0,
+      "nondeleted": [],
+      "top_level": [
+        ".git",
+        ".gitattributes",
+        ".github",
+        ".gitignore",
+        "LICENSE",
+        "README.md",
+        "app",
+        "automation",
+        "canvas",
+        "command",
+        "docs",
+        "document",
+        "drivers",
+        "editor",
+        "examples",
+        "execution"
+      ]
+    },
+    {
+      "path": "/private/tmp/vellum-native-activity-current",
+      "branch": "refs/heads/codex/native-activity-current",
+      "head": "8a594000a487991cbfa91912d22b5b2f6bbde46f",
+      "head_in_latest": true,
+      "status_counts": {
+        " D": 4581
+      },
+      "tracked_count": 4581,
+      "missing_deletions_actually_present": 0,
+      "nondeleted": [],
+      "top_level": [
+        ".git",
+        ".github",
+        "app",
+        "automation",
+        "canvas",
+        "command",
+        "docs",
+        "document",
+        "drivers",
+        "editor",
+        "examples",
+        "execution",
+        "history",
+        "placement",
+        "prototypes",
+        "release"
+      ]
+    },
+    {
+      "path": "/private/tmp/vellum-native-evidence",
+      "branch": "refs/heads/codex/macos-native-evidence",
+      "head": "608e695bf4cbadb3731883f67fe78b25a96c1a89",
+      "head_in_latest": true,
+      "status_counts": {
+        " D": 4291
+      },
+      "tracked_count": 4291,
+      "missing_deletions_actually_present": 0,
+      "nondeleted": [],
+      "top_level": [
+        ".git",
+        ".github",
+        "app",
+        "automation",
+        "canvas",
+        "command",
+        "docs",
+        "document",
+        "drivers",
+        "editor",
+        "examples",
+        "execution",
+        "history",
+        "prototypes",
+        "release",
+        "replay"
+      ]
+    },
+    {
+      "path": "/private/tmp/vellum-native-input-headroom-c519c95",
+      "branch": "refs/heads/codex/native-input-headroom",
+      "head": "97aee13132b41b35b7c041da7426b22948263f7a",
+      "head_in_latest": true,
+      "status_counts": {
+        " D": 4585
+      },
+      "tracked_count": 4585,
+      "missing_deletions_actually_present": 0,
+      "nondeleted": [],
+      "top_level": [
+        ".git",
+        ".github",
+        "app",
+        "automation",
+        "canvas",
+        "command",
+        "docs",
+        "document",
+        "drivers",
+        "editor",
+        "examples",
+        "execution",
+        "history",
+        "placement",
+        "prototypes",
+        "release"
+      ]
+    },
+    {
+      "path": "/private/tmp/vellum-perf-fixture-isolation",
+      "branch": "refs/heads/codex/perf-fixture-isolation",
+      "head": "7e97a1a850d47ba1490d99b3b257b61302df5e9d",
+      "head_in_latest": true,
+      "status_counts": {
+        " D": 4581
+      },
+      "tracked_count": 4581,
+      "missing_deletions_actually_present": 0,
+      "nondeleted": [],
+      "top_level": [
+        ".git",
+        ".github",
+        "app",
+        "automation",
+        "canvas",
+        "command",
+        "docs",
+        "document",
+        "drivers",
+        "editor",
+        "examples",
+        "execution",
+        "history",
+        "placement",
+        "prototypes",
+        "release"
+      ]
+    },
+    {
+      "path": "/private/tmp/vellum-scoped-geometry",
+      "branch": "refs/heads/codex/macos-scoped-geometry",
+      "head": "b003d3759a9a121093f93f14656eec73b33daabd",
+      "head_in_latest": true,
+      "status_counts": {
+        " D": 4295
+      },
+      "tracked_count": 4295,
+      "missing_deletions_actually_present": 0,
+      "nondeleted": [],
+      "top_level": [
+        ".git",
+        ".github",
+        "app",
+        "automation",
+        "canvas",
+        "command",
+        "docs",
+        "document",
+        "drivers",
+        "editor",
+        "examples",
+        "execution",
+        "history",
+        "prototypes",
+        "release",
+        "replay"
+      ]
+    },
+    {
+      "path": "/private/tmp/vellum-sdk-benchmark-isolation",
+      "branch": "refs/heads/codex/sdk-benchmark-isolation",
+      "head": "c519c956546a60a74e1b12569bc2f974e979abfc",
+      "head_in_latest": true,
+      "status_counts": {
+        " D": 4581
+      },
+      "tracked_count": 4581,
+      "missing_deletions_actually_present": 0,
+      "nondeleted": [],
+      "top_level": [
+        ".git",
+        ".github",
+        "app",
+        "automation",
+        "canvas",
+        "command",
+        "docs",
+        "document",
+        "drivers",
+        "editor",
+        "examples",
+        "execution",
+        "history",
+        "placement",
+        "prototypes",
+        "release"
+      ]
+    }
+  ],
+  "draft_records": [
+    {
+      "path": "/private/tmp/vellum-icon-origin-completion-93b4730",
+      "branch": "refs/heads/codex/icon-origin-completion",
+      "head": "93b47306ba6cc4ad3ac03253f5e01723505b0603",
+      "entries": [
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/LICENSE",
+          "path": "drivers/cogent/native/assets/iconorigins/LICENSE",
+          "state": "working",
+          "sha256": "07c4328563b9066be35c2ac90c6744e6ac904882fd2355ea82d7f0756c940b43"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/README.md",
+          "path": "drivers/cogent/native/assets/iconorigins/README.md",
+          "state": "working",
+          "sha256": "3ca2b04508e5941764ccdf9681541542eb7225cd0d8bfb7e7fe7d998af16a6ca"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/file-exe.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/file-exe.svg",
+          "state": "working",
+          "sha256": "f2d00430ae9456158a1a5448625451a98b4d0bc96849ff98afb5142ebb374ec4"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/file-markdown.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/file-markdown.svg",
+          "state": "working",
+          "sha256": "c28f8b11083bd588af172ef8459b55b5b2d8932c05074edad011d89ccd55992a"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/generate.py",
+          "path": "drivers/cogent/native/assets/iconorigins/generate.py",
+          "state": "working",
+          "sha256": "29fbeccd8540e5bc7a2acbf5eeaa5182e409f05378b156f546c44ff575fe6425"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/git-hub.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/git-hub.svg",
+          "state": "working",
+          "sha256": "fcfd07808f1fdba7f1c1b5c5012346c15f7297837b0c83dfe1c655afc54bee75"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/git.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/git.svg",
+          "state": "working",
+          "sha256": "a9669b7af17c80084616a492406cb98599ec17e19308d1f7605c6e06f8b66cc4"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/go.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/go.svg",
+          "state": "working",
+          "sha256": "18965ca2ef1daebcffabb5fb63a4aa430efc7ea0c4e3f4cb2334f468bab7bf32"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/json.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/json.svg",
+          "state": "working",
+          "sha256": "d60544efa0ea51f3c55d115f8249d7c1c292677470c7db761ee5f23de7b8486f"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/latex.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/latex.svg",
+          "state": "working",
+          "sha256": "3d57c27b2934b7d36d46ceec91d7cbdca07955deb827d78eecebe8a4020ef569"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/make.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/make.svg",
+          "state": "working",
+          "sha256": "7eecf1bc43b9fccf799fc797a8f3094cd50f56da33f67458da7a3ea69f96fdc1"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/makefile.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/makefile.svg",
+          "state": "working",
+          "sha256": "7eecf1bc43b9fccf799fc797a8f3094cd50f56da33f67458da7a3ea69f96fdc1"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/manifest.json",
+          "path": "drivers/cogent/native/assets/iconorigins/manifest.json",
+          "state": "working",
+          "sha256": "9e470edd505b9b8c92a051874a4b12c8db80313d9bccf86fb4f504b70226faaa"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/material-notices/LICENSE_APACHE",
+          "path": "drivers/cogent/native/assets/iconorigins/material-notices/LICENSE_APACHE",
+          "state": "working",
+          "sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/material-notices/README.md",
+          "path": "drivers/cogent/native/assets/iconorigins/material-notices/README.md",
+          "state": "working",
+          "sha256": "fe3665b7a81f080675b9d1d774cc263b5a67b25278e9c5c204f15b37c70b02a7"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/material-notices/check_box_outline_blank.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/material-notices/check_box_outline_blank.svg",
+          "state": "working",
+          "sha256": "65cd828eb8b8d45e2f0d2ecea91689d7df48c357708f8acdfef15f8932874c77"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/material-notices/toggle_off-fill.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/material-notices/toggle_off-fill.svg",
+          "state": "working",
+          "sha256": "85cd2ca3448093ed7fb9369f8d371f252dbc8736309bc75b67a72d4647db59f9"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/material-notices/toggle_off.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/material-notices/toggle_off.svg",
+          "state": "working",
+          "sha256": "2deb94fe3e6c27fde44021ac77fbfa62b290f9c4f1c9d43d52c19a127a95917f"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/material-notices/toggle_on-fill.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/material-notices/toggle_on-fill.svg",
+          "state": "working",
+          "sha256": "99789406e0f6bf22b3c48b2aaa488c38d7cc52d8f0953f7e7a8ad183a841ef9b"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/material-notices/toggle_on.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/material-notices/toggle_on.svg",
+          "state": "working",
+          "sha256": "a42e8c1f7df4db77d166e24e49457d49abb883978105a012095e35080f43fbc1"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/radio_button_partial.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/radio_button_partial.svg",
+          "state": "working",
+          "sha256": "34252bd4f32a922716ff662b60b733e470337671b52519d7a37fe8d571b99c23"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/test_generate.py",
+          "path": "drivers/cogent/native/assets/iconorigins/test_generate.py",
+          "state": "working",
+          "sha256": "37affafdbf90858e2135584dda5670d263f22ec261c127130ed1d1a97cee5366"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/tex.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/tex.svg",
+          "state": "working",
+          "sha256": "3d57c27b2934b7d36d46ceec91d7cbdca07955deb827d78eecebe8a4020ef569"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/toggle_mid.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/toggle_mid.svg",
+          "state": "working",
+          "sha256": "698c21a3ff278298069be754dab648fc26f6e1ca26e2f7c0b3ec0ebfff28f8a1"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/assets/iconorigins/toml.svg",
+          "path": "drivers/cogent/native/assets/iconorigins/toml.svg",
+          "state": "working",
+          "sha256": "85af7313420ecf926de803d4cf422d53ec6e396641ffe8757b23f6c787092e95"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/dependencies.json",
+          "path": "drivers/cogent/native/dependencies.json",
+          "state": "working",
+          "sha256": "ef8c4858543b24ac58f8781c412c27978550ec54347db00f92be4db0695e5731"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/patches/iconorigins/0099-icon-origins.patch",
+          "path": "drivers/cogent/native/patches/iconorigins/0099-icon-origins.patch",
+          "state": "working",
+          "sha256": "3677690e00000ae62459b29dd536a5e5e66803ba9562a900c154aa4728280a11"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/patches/iconorigins/README.md",
+          "path": "drivers/cogent/native/patches/iconorigins/README.md",
+          "state": "working",
+          "sha256": "6c9287b9a74a90505007d271842796f959d6505a5c16e6dd9bc39812add0c4ff"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/patches/iconorigins/original-hashes.json",
+          "path": "drivers/cogent/native/patches/iconorigins/original-hashes.json",
+          "state": "working",
+          "sha256": "9ee3ffcfdf9a5e5cbc2069545aa3f82b7cca239e03a0ff27f3e6c43e25055758"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/native/patches/iconorigins/output-hashes.json",
+          "path": "drivers/cogent/native/patches/iconorigins/output-hashes.json",
+          "state": "working",
+          "sha256": "96765fcdaee26880a645c4e3cd1f937d9d8c6b3454c7179cb0f2106b4497abba"
+        },
+        {
+          "archive_path": "vellum-icon-origin-completion-93b4730/working/drivers/cogent/prepare_test.py",
+          "path": "drivers/cogent/prepare_test.py",
+          "state": "working",
+          "sha256": "ce06d6354d2c914b0c3086c3610f06c7e91aa494ab21607ab0dcdb51b6ad1073"
+        }
+      ]
+    },
+    {
+      "path": "/private/tmp/vellum-idle-soak",
+      "branch": "refs/heads/codex/macos-idle-soak",
+      "head": "2c87a3d877c092b8ccf8b281cf6473f494d4c567",
+      "entries": [
+        {
+          "archive_path": "vellum-idle-soak/staged/drivers/cogent/cmd/window-cycle-smoke/diagnostics.go",
+          "path": "drivers/cogent/cmd/window-cycle-smoke/diagnostics.go",
+          "state": "staged",
+          "sha256": "cd1f8a80eaeb18ae416457476de9f80fd4ea9292671be2271a09675ccb596511"
+        },
+        {
+          "archive_path": "vellum-idle-soak/staged/drivers/cogent/cmd/window-cycle-smoke/diagnostics_test.go",
+          "path": "drivers/cogent/cmd/window-cycle-smoke/diagnostics_test.go",
+          "state": "staged",
+          "sha256": "d389d9de568cc66af03c529a784fd09eeba22ccabd5ecdf2d138457a42ace3fc"
+        },
+        {
+          "archive_path": "vellum-idle-soak/staged/drivers/cogent/cmd/window-cycle-smoke/interactions.go",
+          "path": "drivers/cogent/cmd/window-cycle-smoke/interactions.go",
+          "state": "staged",
+          "sha256": "818f773b003fcb22d489f32811630090755be4be34736b726d77f6ab0c2ed7c8"
+        },
+        {
+          "archive_path": "vellum-idle-soak/staged/drivers/cogent/cmd/window-cycle-smoke/main.go",
+          "path": "drivers/cogent/cmd/window-cycle-smoke/main.go",
+          "state": "staged",
+          "sha256": "15398ee99e238067d0f28b93280f3871a2e04fd75087413380e5e9a8085dc98d"
+        },
+        {
+          "archive_path": "vellum-idle-soak/staged/drivers/cogent/cmd/window-cycle-smoke/soak.go",
+          "path": "drivers/cogent/cmd/window-cycle-smoke/soak.go",
+          "state": "staged",
+          "sha256": "d4c5f7be2e86ab90ae99d40e974736b7bd31c0dd3229b45d98fd9de11f92df2a"
+        },
+        {
+          "archive_path": "vellum-idle-soak/staged/drivers/cogent/cmd/window-cycle-smoke/soak_test.go",
+          "path": "drivers/cogent/cmd/window-cycle-smoke/soak_test.go",
+          "state": "staged",
+          "sha256": "f069ded405cf67dcb14c7b25153e769a6e4fb977be5fb74b29d231c5e4a8d2b5"
+        },
+        {
+          "archive_path": "vellum-idle-soak/staged/drivers/cogent/native_services_checks_darwin.go",
+          "path": "drivers/cogent/native_services_checks_darwin.go",
+          "state": "staged",
+          "sha256": "6488c6bb21d1337424f0db7ad7f672af8e9e7c87d832d83f0d317f4cf42b921c"
+        },
+        {
+          "archive_path": "vellum-idle-soak/staged/drivers/cogent/native_services_checks_darwin.m",
+          "path": "drivers/cogent/native_services_checks_darwin.m",
+          "state": "staged",
+          "sha256": "caad6a11ffa30204193a8c0936c356b54c7c72e3e9d1d5786bca5772e37a32d6"
+        },
+        {
+          "archive_path": "vellum-idle-soak/staged/specs/workbench-endurance.md",
+          "path": "specs/workbench-endurance.md",
+          "state": "staged",
+          "sha256": "1b4a62716022515c2499bed4f2b521c5ae320290ce36cd762d95ad2b03c5f4dd"
+        }
+      ]
+    },
+    {
+      "path": "/private/tmp/vellum-m3-input-presentation-dc3fc63",
+      "branch": "refs/heads/codex/m3-input-presentation",
+      "head": "dc3fc63159ad679e614dcf44da6de65e59d37f3f",
+      "entries": [
+        {
+          "archive_path": "vellum-m3-input-presentation-dc3fc63/working/drivers/cogent/desktop_measurement.go",
+          "path": "drivers/cogent/desktop_measurement.go",
+          "state": "working",
+          "sha256": "b2ecc56e0bc08b264a985c43b52cece2f35cbfe019a3d1ab1daead82f6632147"
+        },
+        {
+          "archive_path": "vellum-m3-input-presentation-dc3fc63/working/drivers/cogent/desktop_measurement_offscreen_test.go",
+          "path": "drivers/cogent/desktop_measurement_offscreen_test.go",
+          "state": "working",
+          "sha256": "af7316fb2abc46a4f396539cb619303088550b4ce5016555be0f673d4365e1b8"
+        },
+        {
+          "archive_path": "vellum-m3-input-presentation-dc3fc63/working/drivers/cogent/desktop_session.go",
+          "path": "drivers/cogent/desktop_session.go",
+          "state": "working",
+          "sha256": "1989f3920a5335ce93d9d34e5fcfdfc1ddd3d9d04d541b11e37c174d58cabe4a"
+        },
+        {
+          "archive_path": "vellum-m3-input-presentation-dc3fc63/working/drivers/cogent/driver.go",
+          "path": "drivers/cogent/driver.go",
+          "state": "working",
+          "sha256": "9fcb7681f657b3406780fa608e7fe7be7ecd0033c94eef729a39bd222809a852"
+        },
+        {
+          "archive_path": "vellum-m3-input-presentation-dc3fc63/working/drivers/cogent/manual_offscreen.go",
+          "path": "drivers/cogent/manual_offscreen.go",
+          "state": "working",
+          "sha256": "3580adb2fe93915534f9b61f114a084e855c3f018900c4d47c0eaade0d4ddfe5"
+        },
+        {
+          "archive_path": "vellum-m3-input-presentation-dc3fc63/working/drivers/cogent/native/README.md",
+          "path": "drivers/cogent/native/README.md",
+          "state": "working",
+          "sha256": "b24954187304b2f48ff1c2258f80a75be18503630a4aad0ec91ab4dcd2905ef4"
+        },
+        {
+          "archive_path": "vellum-m3-input-presentation-dc3fc63/working/drivers/cogent/native/dependencies.json",
+          "path": "drivers/cogent/native/dependencies.json",
+          "state": "working",
+          "sha256": "92db27e67b37b9e1392bef16b57019657ab4d149f89394f9c8f069d6cb6a782f"
+        },
+        {
+          "archive_path": "vellum-m3-input-presentation-dc3fc63/working/drivers/cogent/native/patches/desktopmeasurement/0098-desktop-input-measurement.patch",
+          "path": "drivers/cogent/native/patches/desktopmeasurement/0098-desktop-input-measurement.patch",
+          "state": "working",
+          "sha256": "18e2cfa58a37a0e2c7bc2c1f41712d12096c01397a177244def584a6cda22555"
+        },
+        {
+          "archive_path": "vellum-m3-input-presentation-dc3fc63/working/drivers/cogent/native/patches/desktopmeasurement/README.md",
+          "path": "drivers/cogent/native/patches/desktopmeasurement/README.md",
+          "state": "working",
+          "sha256": "28350b2876eb676bd6346a833837aa6d60f5733a292c2477fb259182af611b6d"
+        },
+        {
+          "archive_path": "vellum-m3-input-presentation-dc3fc63/working/drivers/cogent/native/patches/desktopmeasurement/original-hashes.json",
+          "path": "drivers/cogent/native/patches/desktopmeasurement/original-hashes.json",
+          "state": "working",
+          "sha256": "322abb5e20a1d8f8cf1f3024f777dad63d21f7696a697c6dc055aeab31587b1e"
+        },
+        {
+          "archive_path": "vellum-m3-input-presentation-dc3fc63/working/drivers/cogent/native/patches/desktopmeasurement/output-hashes.json",
+          "path": "drivers/cogent/native/patches/desktopmeasurement/output-hashes.json",
+          "state": "working",
+          "sha256": "f597a3dc31a961c99c6f454e7a64f07b1da9f82214846dcf1216be4dbd71f3cd"
+        },
+        {
+          "archive_path": "vellum-m3-input-presentation-dc3fc63/working/drivers/cogent/prepare_test.py",
+          "path": "drivers/cogent/prepare_test.py",
+          "state": "working",
+          "sha256": "34817eaf67f976d8d01b04b948ec29f837ab0b8c104b0d4491cece5716df0eb4"
+        },
+        {
+          "archive_path": "vellum-m3-input-presentation-dc3fc63/working/specs/native-presentation.md",
+          "path": "specs/native-presentation.md",
+          "state": "working",
+          "sha256": "be4699380613cd0f39e808c80ff7b6c89c4d744d8a729e700ad2bd0936acb9b8"
+        }
+      ]
+    }
+  ],
+  "archive_sha256": "e69f6f315d3f35434c225531e94748e70d7874638b8c562528d15cbd5000c184",
+  "archive_files": 56,
+  "superseding_commits": {
+    "iconorigins": "bd0e1de",
+    "desktop_measurement": "ad91bc6",
+    "idle_soak": "60eaad1"
+  },
+  "handling": "All branch/worktree HEADs already ancestors of latest checkpoint. Create main there. Preserve exact historical dirty/index-only drafts and patches in archive, retaining original worktrees. Do not apply historical versions or absent-checkout deletions to current implementation. Separate research workspace is an unborn repository, not a Vellum worktree. No Git remote configured."
+}
