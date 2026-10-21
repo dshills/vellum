@@ -1623,3 +1623,16 @@ validated. No framework repair, release-gate revision or Mac qualification follo
 Keep features frozen; inspect actual framework backend submit/GPU/present-request
 timing before another architecture change. Do not repeat this closed hypothesis
 without a concrete new failure or source change. M3–M7 remain open.
+
+
+### Actual backend timing observer (21 October 2026)
+
+The [private-backend timing control](../docs/reports/macos-backend-timing/README.md)
+completes three observer off/on pairs: all six p95 responses are35.481–36.719 ms,
+above the unchanged33.3 ms gate. Actual GPU span across five render buffers has
+p95 below0.3 ms; receipt-to-submit is about4.1–4.2 ms and GPU-end-to-show about
+31.4–32.0 ms. Quantiles are not additive; these are private-derivative measurements,
+not isolated shipping cost or proof of zero observer impact. All startup prefixes
+and three prior rejected attempts remain retained; no SDK/default changes occur.
+Compare the retained original binary against the private observer-off derivative
+before choosing a production repair. Features remain frozen and M3–M7 stay open.

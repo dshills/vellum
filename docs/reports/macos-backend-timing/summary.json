@@ -1,0 +1,429 @@
+{
+  "outcome": "THREE_VALID_BACKEND_OBSERVER_PAIRS",
+  "source_checkpoint": "66df735",
+  "started_utc": "2026-10-21T21:09:54.516931+00:00",
+  "finished_utc": "2026-10-21T21:13:11.250806+00:00",
+  "elapsed_seconds": 196.733875,
+  "maximum_seconds": 240,
+  "native_commands": 6,
+  "probe_commands": 48,
+  "retired_owned_groups": 54,
+  "warmup_states": 768,
+  "measured_states": 720,
+  "on_measured_states": 360,
+  "retained_pre_admission_startup_rows": 18,
+  "retained_pre_admission_zero_feedback": 5,
+  "retained_pre_admission_positive_feedback": 13,
+  "runs": [
+    {
+      "pair": 1,
+      "mode": "off",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 28.81395840086043,
+          "p95": 36.546958377584815,
+          "p99": 37.53041662275791,
+          "max": 45.92724982649088
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.3962081652134657,
+          "p95": 4.0160417556762695,
+          "p99": 4.3204165995121,
+          "max": 4.571333527565002
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.055875070393085,
+          "p95": 33.18200004287064,
+          "p99": 34.38629163429141,
+          "max": 44.19474978931248
+        },
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "observer_mode": "off"
+      }
+    },
+    {
+      "pair": 1,
+      "mode": "on",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 29.125124914571643,
+          "p95": 35.95012496225536,
+          "p99": 36.80129162967205,
+          "max": 39.73983321338892
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.1416250858455896,
+          "p95": 3.867249935865402,
+          "p99": 4.009708296507597,
+          "max": 4.059208324179053
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.147333508357406,
+          "p95": 32.87379164248705,
+          "p99": 35.30145832337439,
+          "max": 38.270374992862344
+        },
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "observer_mode": "on",
+        "trace_records": 1548,
+        "admitted_feedback_joins": 252,
+        "retained_pre_admission_prefix": {
+          "count": 6,
+          "zero_feedback": 1,
+          "positive_feedback": 5,
+          "drawable_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "phase_ms": {
+          "receipt_to_submit": {
+            "count": 120,
+            "p50": 3.338041715323925,
+            "p95": 4.085958236828446,
+            "p99": 4.2235832661390305,
+            "max": 4.258833359926939
+          },
+          "submit_to_gpu_start": {
+            "count": 120,
+            "p50": 0.7081665098667145,
+            "p95": 0.7929997518658638,
+            "p99": 0.9071247186511755,
+            "max": 0.9375831577926874
+          },
+          "render_gpu_span": {
+            "count": 120,
+            "p50": 0.2585833426564932,
+            "p95": 0.2836249768733978,
+            "p99": 0.38412492722272873,
+            "max": 0.435791676864028
+          },
+          "gpu_end_to_present_request": {
+            "count": 120,
+            "p50": -0.8772080764174461,
+            "p95": -0.675249844789505,
+            "p99": -0.4525831900537014,
+            "max": -0.4091248847544193
+          },
+          "gpu_end_to_shown": {
+            "count": 120,
+            "p50": 24.034208385273814,
+            "p95": 31.92279185168445,
+            "p99": 34.52004189603031,
+            "max": 37.4401668086648
+          }
+        },
+        "render_buffers_per_measured_frame": {
+          "count": 120,
+          "p50": 5,
+          "p95": 5,
+          "p99": 5,
+          "max": 5
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "mode": "on",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 28.86708313599229,
+          "p95": 35.80462490208447,
+          "p99": 36.66166658513248,
+          "max": 37.2214165981859
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.289291635155678,
+          "p95": 3.94379161298275,
+          "p99": 4.232916748151183,
+          "max": 4.248583223670721
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.51662502810359,
+          "p95": 33.29783328808844,
+          "p99": 33.69116666726768,
+          "max": 33.72829151339829
+        },
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "observer_mode": "on",
+        "trace_records": 1548,
+        "admitted_feedback_joins": 252,
+        "retained_pre_admission_prefix": {
+          "count": 6,
+          "zero_feedback": 2,
+          "positive_feedback": 4,
+          "drawable_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "phase_ms": {
+          "receipt_to_submit": {
+            "count": 120,
+            "p50": 3.4920000471174717,
+            "p95": 4.15825005620718,
+            "p99": 4.426708212122321,
+            "max": 4.456833237782121
+          },
+          "submit_to_gpu_start": {
+            "count": 120,
+            "p50": 0.7182913832366467,
+            "p95": 0.7948330603539944,
+            "p99": 0.8092080242931843,
+            "max": 0.831749988719821
+          },
+          "render_gpu_span": {
+            "count": 120,
+            "p50": 0.25875004939734936,
+            "p95": 0.2764998935163021,
+            "p99": 0.29000011272728443,
+            "max": 0.3429998178035021
+          },
+          "gpu_end_to_present_request": {
+            "count": 120,
+            "p50": -0.8817499037832022,
+            "p95": -0.6697082426398993,
+            "p99": -0.5549581255763769,
+            "max": -0.4849163815379143
+          },
+          "gpu_end_to_shown": {
+            "count": 120,
+            "p50": 24.31916701607406,
+            "p95": 32.033375231549144,
+            "p99": 32.485083444043994,
+            "max": 32.50733343884349
+          }
+        },
+        "render_buffers_per_measured_frame": {
+          "count": 120,
+          "p50": 5,
+          "p95": 5,
+          "p99": 5,
+          "max": 5
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "mode": "off",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 28.107791673392057,
+          "p95": 36.42145846970379,
+          "p99": 38.24383346363902,
+          "max": 51.885958295315504
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.25045851059258,
+          "p95": 3.8921250961720943,
+          "p99": 4.016166552901268,
+          "max": 4.192083375528455
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 24.647000012919307,
+          "p95": 33.36195833981037,
+          "p99": 34.4951250590384,
+          "max": 49.62433339096606
+        },
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "observer_mode": "off"
+      }
+    },
+    {
+      "pair": 3,
+      "mode": "off",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 29.099708190187812,
+          "p95": 36.71933338046074,
+          "p99": 49.25908334553242,
+          "max": 50.953125115484
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.3486250322312117,
+          "p95": 4.046875052154064,
+          "p99": 4.7484165988862514,
+          "max": 5.115166772156954
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.70470841601491,
+          "p95": 33.70658331550658,
+          "p99": 46.72962496988475,
+          "max": 48.625166760757565
+        },
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "observer_mode": "off"
+      }
+    },
+    {
+      "pair": 3,
+      "mode": "on",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 28.107000049203634,
+          "p95": 35.480583319440484,
+          "p99": 38.01583335734904,
+          "max": 38.090000161901116
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.256791504099965,
+          "p95": 4.009125055745244,
+          "p99": 5.0316667184233665,
+          "max": 5.255750147625804
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 24.503166554495692,
+          "p95": 32.670541666448116,
+          "p99": 34.15045817382634,
+          "max": 34.19133345596492
+        },
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "observer_mode": "on",
+        "trace_records": 1548,
+        "admitted_feedback_joins": 252,
+        "retained_pre_admission_prefix": {
+          "count": 6,
+          "zero_feedback": 2,
+          "positive_feedback": 4,
+          "drawable_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "phase_ms": {
+          "receipt_to_submit": {
+            "count": 120,
+            "p50": 3.450208343565464,
+            "p95": 4.2259166948497295,
+            "p99": 5.315583432093263,
+            "max": 5.445500137284398
+          },
+          "submit_to_gpu_start": {
+            "count": 120,
+            "p50": 0.7102498784661293,
+            "p95": 0.8239164017140865,
+            "p99": 0.8493331260979176,
+            "max": 0.8543331641703844
+          },
+          "render_gpu_span": {
+            "count": 120,
+            "p50": 0.2602918539196253,
+            "p95": 0.27825008146464825,
+            "p99": 0.29595824889838696,
+            "max": 5.967624951153994
+          },
+          "gpu_end_to_present_request": {
+            "count": 120,
+            "p50": -0.8742914069443941,
+            "p95": -0.5853748880326748,
+            "p99": -0.46999985352158546,
+            "max": -0.40616653859615326
+          },
+          "gpu_end_to_shown": {
+            "count": 120,
+            "p50": 23.336791899055243,
+            "p95": 31.399708474054933,
+            "p99": 32.906416803598404,
+            "max": 32.97387529164553
+          }
+        },
+        "render_buffers_per_measured_frame": {
+          "count": 120,
+          "p50": 5,
+          "p95": 5,
+          "p99": 5,
+          "max": 5
+        }
+      }
+    }
+  ],
+  "differences_of_run_p95_values": [
+    {
+      "pair": 1,
+      "on_minus_off_p95_ms": -0.5968334153294563
+    },
+    {
+      "pair": 2,
+      "on_minus_off_p95_ms": -0.6168335676193237
+    },
+    {
+      "pair": 3,
+      "on_minus_off_p95_ms": -1.238750061020255
+    }
+  ],
+  "release_gate_changed": false,
+  "framework_qualified": false,
+  "zero_observer_overhead_proven": false,
+  "original_binary_equivalence_proven": false,
+  "OS_latency_floor_proven": false,
+  "conclusion": "Actual private-backend GPU span p95 is under0.3ms across5 renderbuffers per measuredframe; receipt-to-submit p95~4.1-4.2ms and GPU-end-to-show p95~31.4-32.0ms. All6 receipt-to-show p95 values exceed33.3ms. This does not isolate shipping-path cause or a repair.",
+  "limits": [
+    "same private diagnostic binary on/off, not original SDK binary",
+    "differences of run p95 are not paired sample difference percentiles or proof of observer neutrality",
+    "render GPU span includes gaps among5 buffers, not summed GPU busy duration",
+    "negative GPU-end-to-present-request means asynchronous request queued before GPU completion",
+    "sparse120ms fixture, not60Hz cadence/professional workflow/physicalinput/pixelreadback/endurance/resourcequalification",
+    "all original failures remain rejected; no setup data retagged or dropped"
+  ],
+  "next_action": "Bounded retained original binary versus private observer-off comparison before inferring shipping-path timing or choosing a CPU/backend repair."
+}
