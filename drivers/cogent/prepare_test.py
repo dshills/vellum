@@ -449,6 +449,40 @@ class AssetOverlayChecks(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, "changed during admission"):
                     prepare._read_stage_file(path, 64)
 
+    def test_windows_checkout_preserves_all_pinned_asset_bytes(self):
+        import hashlib
+        import os
+        import shutil
+        import subprocess
+        manifest = json.loads((ROOT / "native/dependencies.json").read_text())
+        assets = {item["source"]: item["sha256"] for dep in manifest["dependencies"] for stage in dep["stages"] for item in stage.get("assets", [])}
+        with tempfile.TemporaryDirectory() as tmp:
+            repository, checkout = Path(tmp) / "repo", Path(tmp) / "checkout"
+            repository.mkdir(); checkout.mkdir()
+            shutil.copyfile(ROOT.parent.parent / ".gitattributes", repository / ".gitattributes")
+            names = ["drivers/cogent/" + name for name in assets]
+            for source, name in zip(assets, names):
+                target = repository / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / source, target)
+            def git(*arguments):
+                subprocess.run(["git", "-c", "core.autocrlf=true", "-c", "core.safecrlf=false", "-c", "core.attributesFile=" + os.devnull, *arguments], cwd=repository, check=True, capture_output=True)
+            git("init", "-q")
+            git("add", "--", ".gitattributes", *names)
+            git("checkout-index", "--all", "--prefix=" + str(checkout) + os.sep)
+            for source, name in zip(assets, names):
+                with self.subTest(source=source):
+                    self.assertEqual(hashlib.sha256((checkout / name).read_bytes()).hexdigest(), assets[source])
+            # Negative control proves checkout-index runs the CRLF smudge path:
+            # without the new attribute at least one pinned SVG must change.
+            attributes = repository / ".gitattributes"
+            attributes.write_text(attributes.read_text().replace("drivers/cogent/native/assets/** -text -whitespace", ""))
+            git("add", "--", ".gitattributes")
+            control = Path(tmp) / "control"
+            control.mkdir()
+            git("checkout-index", "--all", "--prefix=" + str(control) + os.sep)
+            self.assertTrue(any(hashlib.sha256((control / name).read_bytes()).hexdigest() != assets[source] for source, name in zip(assets, names)))
+
     def test_explicit_font_limit_admits_large_original_and_result_preserving_default(self):
         import hashlib
         from unittest import mock

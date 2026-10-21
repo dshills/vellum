@@ -7,3 +7,6 @@ drivers/cogent/native/patches/**/*.patch -whitespace
 
 # Third-party notice hashes identify original bytes, including CRLF/spacing.
 release/native-components/wgpu-darwin-arm64/NOTICES/** -text -whitespace
+
+# Asset overlay hashes identify exact source bytes on every platform.
+drivers/cogent/native/assets/** -text -whitespace
