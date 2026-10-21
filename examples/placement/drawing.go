@@ -159,6 +159,7 @@ func drawingCodec(m *model) document.Codec[drawingFile] {
 			m.setSelection([]string{scene.Selected}, scene.Selected)
 			m.next, m.snap = f.NextID, f.Snap
 			m.pasteText, m.pasteCount = "", 0
+			m.layerFilter, m.collapsedGroups = "", nil
 			return nil
 		},
 	}

@@ -57,6 +57,8 @@ type model struct {
 	layerInfo                         map[string]layerMetadata
 	layerFocus, renameID, renameDraft string
 	layerAdd                          bool
+	layerFilter                       string
+	collapsedGroups                   map[string]bool
 	layerDrag                         *layerDrag
 	layerEditor                       *layerEditor
 }

@@ -52,7 +52,7 @@ func (g layerLayout) rowAt(p canvas.Point) (string, bool, float64) {
 	return "", false, 0
 }
 func (m *model) beginLayerDrag(source string, p canvas.Point, g layerLayout) *layerDrag {
-	if m.clipboardAvailable() != nil || g.scale <= 0 || math.IsNaN(g.scale) || math.IsInf(g.scale, 0) {
+	if m.layerFilterActive() || m.clipboardAvailable() != nil || g.scale <= 0 || math.IsNaN(g.scale) || math.IsInf(g.scale, 0) {
 		return nil
 	}
 	hit, _, _ := g.rowAt(p)
@@ -97,7 +97,7 @@ func (m *model) updateLayerDrag(s *layerDrag, p canvas.Point, g layerLayout) boo
 	if s == nil || m.layerDrag != s {
 		return false
 	}
-	if g.clip != s.layout.clip || g.scale != s.layout.scale || !slices.Equal(g.rows, s.layout.rows) || !slices.Equal(m.scene.Objects, s.before) || !maps.Equal(m.groups, s.groups) || m.scene.Selected != s.priorPrimary || !slices.Equal(m.selectedIDs(), s.selection) {
+	if m.layerFilterActive() || g.clip != s.layout.clip || g.scale != s.layout.scale || !slices.Equal(g.rows, s.layout.rows) || !slices.Equal(m.scene.Objects, s.before) || !maps.Equal(m.groups, s.groups) || m.scene.Selected != s.priorPrimary || !slices.Equal(m.selectedIDs(), s.selection) {
 		m.cancelLayerDrag(s)
 		return false
 	}
@@ -112,7 +112,7 @@ func (m *model) updateLayerDrag(s *layerDrag, p canvas.Point, g layerLayout) boo
 		s.valid = err == nil
 		// A group marker targets the outer group boundary, including members
 		// below the viewport. Clamp its indicator to the visible list edge.
-		if s.valid && !s.front {
+		if s.valid && !s.front && !m.collapsedGroups[s.target] {
 			for _, o := range s.before {
 				if s.groups[o.ID] != s.target {
 					continue

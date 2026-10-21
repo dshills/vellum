@@ -461,3 +461,17 @@ move and corner/step resizing, including proportional resizing; numeric geometry
 remains exact. Edits keep their usual one-step Undo/Redo. Visibility and spacing
 are session preferences (default visible, 20); existing saved Snap behavior stays
 compatible with earlier drawings. Settings cannot change during a gesture.
+
+## Layer filtering and collapsed groups (internal 19)
+
+**Filter layers…** searches names and stable IDs, ignoring case (128 characters
+maximum). A member match retains its group marker; a group-name match reveals
+all members. **Groups** offers per-group Collapse/Expand and Collapse All/Expand
+All. Filtering reveals matches even inside collapsed groups; Clear filter restores
+the previous collapse state. Collapsing does not change flat group membership.
+
+Filtering and collapsing change only panel rows, never canvas visibility,
+selection or history. Clicks still select whole groups. Drag reordering is disabled
+while filtering; clear the filter to drag. Collapsed group markers remain valid
+whole-group drop targets. Projection settings are session-only, clear on New/Open,
+and cannot change during a gesture.

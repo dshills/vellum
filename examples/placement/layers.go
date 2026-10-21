@@ -18,7 +18,7 @@ type layerRow struct {
 // A fresh projection, bounded by 512 components plus at most 256 group markers.
 // Only component rows encode paint order. Each group's selector precedes its
 // frontmost member, without pretending interleaved flat groups are a tree.
-func (m *model) layerRows() []layerRow {
+func (m *model) allLayerRows() []layerRow {
 	selected := make(map[string]bool)
 	for _, id := range m.selectedIDs() {
 		selected[id] = true
@@ -120,10 +120,10 @@ func (m *model) layersPanel(ref app.WindowRef, update func(), invoke func(string
 		if row.selected {
 			style.Background = ui.Some(color.NRGBA{R: 218, G: 232, B: 252, A: 255})
 		}
-		rows = append(rows, ui.Node{ID: "layer-select-" + row.id, Kind: ui.Button, Text: text, Appearance: ui.ButtonQuiet, Disabled: disabled, Style: style, Accessibility: ui.Accessibility{Name: "Layer " + text, Help: "Click to select; drag above or below another row to reorder. Escape cancels. Add selection toggles membership."}, Activate: func() { finish(func() error { return m.selectLayer(row.id) }) }})
+		rows = append(rows, ui.Node{ID: "layer-select-" + row.id, Kind: ui.Button, Text: text, Appearance: ui.ButtonQuiet, Disabled: disabled, Style: style, Accessibility: ui.Accessibility{Name: "Layer " + text, Help: "Click to select; drag to reorder when no filter is active. Groups menu collapses or expands member rows. Escape cancels. Add selection toggles membership."}, Activate: func() { finish(func() error { return m.selectLayer(row.id) }) }})
 	}
 	if len(rows) == 0 {
-		rows = append(rows, ui.Node{ID: "layers-empty", Kind: ui.Label, Text: "No components"})
+		rows = append(rows, ui.Node{ID: "layers-empty", Kind: ui.Label, Text: m.emptyLayersLabel()})
 	}
 	compact := ui.Style{Padding: ui.Some(ui.UniformInsets(4)), Typography: ui.Some(ui.Typography{Size: 12})}
 	lockLabel := "Lock"
@@ -136,6 +136,7 @@ func (m *model) layersPanel(ref app.WindowRef, update func(), invoke func(string
 	}
 	return ui.Node{ID: "layers-panel", Kind: ui.Column, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 260}), MaxSize: ui.Some(ui.Size{Width: 260}), GrowY: ui.Some(float32(1)), Gap: ui.Some(float32(4)), Padding: ui.Some(ui.UniformInsets(4))}, Accessibility: ui.Accessibility{Name: "Layers panel"}, Children: []ui.Node{
 		{ID: "layers-heading", Kind: ui.Label, Text: "Layers · front first"},
+		m.layerOrganizationControls(ref, update),
 		{ID: "layers-options", Kind: ui.Row, Children: []ui.Node{
 			{ID: "layers-add", Kind: ui.Checkbox, Text: "Add selection", Checked: m.layerAdd, Disabled: disabled, Change: func(e ui.ChangeEvent) {
 				finish(func() error {
