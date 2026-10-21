@@ -1,0 +1,46 @@
+{
+  "scope": "private CPU allocation/map/copy/flush/encode observer, not renderer policy or repair",
+  "root": "/private/tmp/vellum-upload-probe",
+  "source_native_commit": "6aed50955d934ac36049ba8d002034841633ae02",
+  "core_version": "29.0.3",
+  "archive_sha256": "2bece763dbe7d2ec088fa8c69bd6af8944a6633ba4ef4d805f8af9eee7ae359f",
+  "binary_sha256": "886581f875129098cc07397901be9f2a4b7483e118ac1f0cfa528907602930da",
+  "binary_mode": "0o755",
+  "probe_sha256": "88b0f4092fcd9930ca5c2ae9b4c6134e8a5d132e751901e28cc115e9aca3f628",
+  "private_source_pins": {
+    "/private/tmp/vellum-upload-probe/core/src/device/queue.rs": "3974fd73c652ffe6e2fe998da051c0aca4403e6cbcd93d929b7b4fd4f19b4ddc",
+    "/private/tmp/vellum-upload-probe/core/src/resource.rs": "92d321ba6c6eeb4042ab3799aac9b1dd3278b2b5ecb978101c339e11a1158c18",
+    "/private/tmp/vellum-upload-probe/core/src/lib.rs": "71a6a765e9a4f7db0fdc6e84e8962a0b619e5927c373636ce8ebef0090c7a689",
+    "/private/tmp/vellum-upload-probe/core/src/upload_probe.rs": "88b0f4092fcd9930ca5c2ae9b4c6134e8a5d132e751901e28cc115e9aca3f628",
+    "/private/tmp/vellum-upload-probe/source/src/lib.rs": "042414debcc07df7f0d478f2799db007eb8cdbaac03f7dd0727232fb48aa9072",
+    "/private/tmp/vellum-upload-probe/source/Cargo.toml": "e10f54c0b52b0f200322ca5fa7ea0671cfcb07bdd172e36a139f6704769ae85e",
+    "/private/tmp/vellum-upload-probe/source/Cargo.lock": "586ceacb71e9f407856f24098ed71c64d97e6c8ff000dc200b1354f4503b9f85"
+  },
+  "all_package_name_versions_preserved": true,
+  "only_lock_change": "wgpu-core switches from exact locked registry package to private path clone",
+  "overlay_files_sha256": {
+    "artifacts/macos-upload-probe/overlay.json": "04dee00a667e07cb4aac6bba16fd9efb21a9e8a0b651f1f005a2c67eb910a8f3",
+    "artifacts/macos-upload-probe/desktop_session.go": "3e3b8bc6f79edbac67433813103a39eccdf31e1075e62f9aaca0d8bbbeb58cf4",
+    "artifacts/macos-upload-probe/desktop_measurement.go": "ac8a07ac2175f82a41b8c6d4953a7e5b34f35f69beba572e4efe4db91b65bceb",
+    "artifacts/macos-upload-probe/frame_trace.go": "3154804322a30dabc9003f552d822e1bea5c791dd53309c2b808ef29eb069332"
+  },
+  "native_build_receipts": [
+    "build-receipt.json",
+    "build-v2-receipt.json"
+  ],
+  "Go_build_receipts": [
+    "go-build-receipt.json",
+    "go-build-v2-receipt.json"
+  ],
+  "initial_build_notes": "Stage-completeness flags added before execution; final Go relink pins overlay files and uses archive-derived buildID. No native test has run.",
+  "tests": {
+    "new_wrapper_methods": 7,
+    "bad_record_subcases": 8,
+    "bad_terminal_subcases": 4,
+    "reused": "parent18, sourcecost5/detailedscalarvalidator, exact view/routing/pixels and stage106 Core/race/prepare proof"
+  },
+  "allocation_lifetime_or_policy_changed": false,
+  "SDK_or_app_modified": false,
+  "gate_changed": false,
+  "warnings": "Inherited local path cfg-alias macro warnings, rust-objcopy/libLLVM strip warnings and frozen SDK AppKit accessibility deprecations retained. No warning suppression."
+}
