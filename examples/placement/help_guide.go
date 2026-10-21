@@ -30,6 +30,7 @@ var helpTopics = []helpTopic{
 		"Plain arrows pan. Option+Left/Right/Home/End selects components in paint order. Focus a palette tool and press Return to place at canvas center. Tab moves through enabled controls.",
 	}},
 	{"selection", "Selection and arrangement", []string{
+		"Layers → Batch rename selected previews prefix-plus-number names in back-to-front order, one name per component or whole group. Apply is one Undo step and preserves member names and stable IDs.",
 		"Layers → Hide Selected / Lock Selected changes complete selected units in one Undo. Show All / Unlock All clears that property throughout the drawing. Undo restores the previous selection and properties.",
 		"Shift-click toggles complete components/groups. Shift-drag from empty canvas adds a marquee selection. With Subtract selection enabled, these gestures remove instead. Plain empty dragging continues to pan.",
 		"Groups are flat interaction units: touching any member selects the whole group. Hide or Lock affects the whole group. Ungroup before editing a member independently.",

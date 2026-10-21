@@ -32,6 +32,6 @@ func (m *model) compactActions(invoke func(string) func()) ui.Node {
 		m.actionMenu("nudge-menu", "Nudge", exactNudgeOptions(), invoke),
 		m.actionMenu("resize-menu", "Resize", []ui.Option{{ID: "width-less", Label: "Width −"}, {ID: "width-more", Label: "Width +"}, {ID: "height-less", Label: "Height −"}, {ID: "height-more", Label: "Height +"}}, invoke),
 		m.actionMenu("arrange-menu", "Arrange", arrange, invoke),
-		m.actionMenu("stack-menu", "Layers", []ui.Option{{ID: "hide-selected", Label: "Hide Selected"}, {ID: "show-all", Label: "Show All"}, {ID: "lock-selected", Label: "Lock Selected"}, {ID: "unlock-all", Label: "Unlock All"}, {ID: "group", Label: "Group  ⌘G"}, {ID: "ungroup", Label: "Ungroup  ⌘⇧G"}, {ID: "bring-front", Label: "Bring to front"}, {ID: "send-back", Label: "Send to back"}, {ID: "bring-forward", Label: "Bring forward"}, {ID: "send-backward", Label: "Send backward"}}, invoke),
+		m.actionMenu("stack-menu", "Layers", []ui.Option{{ID: "batch-rename", Label: "Batch rename selected…"}, {ID: "hide-selected", Label: "Hide Selected"}, {ID: "show-all", Label: "Show All"}, {ID: "lock-selected", Label: "Lock Selected"}, {ID: "unlock-all", Label: "Unlock All"}, {ID: "group", Label: "Group  ⌘G"}, {ID: "ungroup", Label: "Ungroup  ⌘⇧G"}, {ID: "bring-front", Label: "Bring to front"}, {ID: "send-back", Label: "Send to back"}, {ID: "bring-forward", Label: "Bring forward"}, {ID: "send-backward", Label: "Send backward"}}, invoke),
 	}}
 }

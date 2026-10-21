@@ -23,6 +23,7 @@ type component struct {
 	Color         color.RGBA
 }
 type model struct {
+	batchRename                       *batchRenameDraft
 	overlapDraft                      *overlapDraft
 	visibleScene                      *canvas.Scene
 	scene                             *canvas.Scene
@@ -229,6 +230,10 @@ func newModel() (*model, error) {
 		return nil, err
 	}
 	if err := m.bindSelectionCommands(); err != nil {
+		m.palette.Close()
+		return nil, err
+	}
+	if err := m.bindBatchRename(); err != nil {
 		m.palette.Close()
 		return nil, err
 	}
