@@ -1,0 +1,39 @@
+{
+  "private_root": "/private/tmp/vellum-backend-timing",
+  "shipping_SDK_changed": false,
+  "native_source_commit": "6aed50955d934ac36049ba8d002034841633ae02",
+  "hal_original_SHA256": "16aaa879cf85bf853243bbdaa815b6087cff2ebfe72a2d7e6d08acac4fe906ad",
+  "hal_patched_SHA256": "340f6ebb509cd2bb86a83adba4308791be92e87c12fa59d2a8d4032d41528408",
+  "probe_SHA256": "787516d43e9e4c40f78b1d7dca2d1d107fa7c646f9ac8b0d56689fbf76956a14",
+  "archive_SHA256": "12b9b77ef50d2a6f12d5e8da872641fdcb221c41e29ae9fca98dea058e8b9923",
+  "framework_binary_SHA256": "f790b520f3a97ca60ee3b42b2eeb2d004c46847f261312f84adfd04195088a9d",
+  "original_Cargo_lock_SHA256": "9f780c3e7e792c19ae22e708cf899eb177b5696c9ab61215c6ae235adcecbdb0",
+  "diagnostic_Cargo_lock_SHA256": "607f3509d734b94eb21817d72083b00923d6a04c89ee0829b9c1b9717d5743b5",
+  "all_locked_package_name_versions_preserved": true,
+  "only_lock_difference": "wgpu-hal registry source/checksum removed for exact private path patch; all other package fields equal",
+  "view_routing_test_reuse": "fixture.go and fixture_test.go byte-identical to qualified prior offscreen fixture; immutable SDK",
+  "successful_build_receipts": [
+    "build-v2-receipt.json",
+    "build-v3-receipt.json",
+    "build-v4-receipt.json",
+    "go-build-receipt.json",
+    "go-build-v2-receipt.json"
+  ],
+  "retained_failures": [
+    "build-receipt.json: locked bindings omit timing methods; fixed direct documented selectors",
+    "initial-go-build-failure.json: missing private wrapper directory; fixed copy destination",
+    "first adapter import failed before compilation; corrected local helper path"
+  ],
+  "warnings": "Private path dependency exposes inherited cfg_alias macro warnings suppressed for registry dependencies; rust-objcopy libLLVM stripping warning inherited from toolchain. Go AppKit accessibility deprecation warnings inherited from frozen SDK. No warning suppression or unrelated source repair.",
+  "focused_controls": {
+    "parent_classifier_methods": 18,
+    "backend_classifier_methods": 9,
+    "invalid_record_subcases": 8,
+    "invalid_drain_subcases": 4
+  },
+  "release_qualified": false,
+  "gate_changed": false,
+  "review_fix": "Snapshots with callbacks pending emit counts only; serialize rows only after acquire pending==0. Source runtime closed before snapshot; callback writes precede release decrement.",
+  "forced_Go_relink": "-ldflags=-buildid=12b9b77ef50d2a6f12d5e8da872641fdcb221c41e29ae9fca98dea058e8b9923",
+  "source_difference_sha256": "8b1403e4e24c2d9f189b27a08c4e25e3265cf45e9d01d23871c473c60b3c915f"
+}
