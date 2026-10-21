@@ -604,3 +604,7 @@ The frozen native clipboard service returns complete text before app validation;
 ## Paste in Place (internal 23)
 
 **Edit → Paste in Place / Cmd+Shift+V** inserts copied components at their exact copied world positions, ignoring grid and camera transforms. It preserves relative geometry, fills, names and flat groups, assigns fresh component/group identities and selects the new copies. The complete insertion is one Undo/Redo and leaves the ordinary Paste offset sequence alone. Overlapping the source is intentional; use Layers to distinguish copies. It also works in an empty drawing. Invalid or rejected payloads do not create partial copies.
+
+## Bulk layer controls (internal 24)
+
+**Layers → Hide Selected / Lock Selected** affects complete selected groups in one Undo/Redo step. These actions clear the editable selection; Undo restores it. **Show All / Unlock All** clears the corresponding property throughout the drawing, including imported member flags, while preserving names and the other property. No-op actions add no history. All four use existing document metadata and Save/Open paths.

@@ -29,6 +29,7 @@ var helpTopics = []helpTopic{
 		"Plain arrows pan. Option+Left/Right/Home/End selects components in paint order. Focus a palette tool and press Return to place at canvas center. Tab moves through enabled controls.",
 	}},
 	{"selection", "Selection and arrangement", []string{
+		"Layers → Hide Selected / Lock Selected changes complete selected units in one Undo. Show All / Unlock All clears that property throughout the drawing. Undo restores the previous selection and properties.",
 		"Shift-click toggles complete components/groups. Shift-drag from empty canvas adds a marquee selection. With Subtract selection enabled, these gestures remove instead. Plain empty dragging continues to pan.",
 		"Groups are flat interaction units: touching any member selects the whole group. Hide or Lock affects the whole group. Ungroup before editing a member independently.",
 		"Geometry enters exact world X/Y/width/height. Lock aspect ratio preserves proportions. Grid visibility is independent of Snap; spacing controls snapped placement, moves and resizing.",

@@ -231,6 +231,10 @@ func newModel() (*model, error) {
 		m.palette.Close()
 		return nil, err
 	}
+	if err := m.bindBulkLayers(); err != nil {
+		m.palette.Close()
+		return nil, err
+	}
 	if err := m.bindGrouping(); err != nil {
 		m.palette.Close()
 		return nil, err
