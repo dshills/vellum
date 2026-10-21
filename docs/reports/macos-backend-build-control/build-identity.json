@@ -1,0 +1,19 @@
+{
+  "binaries": {
+    "retained": {
+      "reused_from": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-matched-calibration-v3/framework",
+      "sha256": "5c63dfa71e3ffb8988d3738a897b8859ed6af0c914c661469c999ca5bc05e2dd",
+      "mode": "0o755"
+    },
+    "derived": {
+      "reused_from": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-backend-timing-v2/framework",
+      "sha256": "7a4b3bbf3349a7594ad0c41b6e9afe8ac321386e95071291f101f71fa3f76880",
+      "mode": "0o755"
+    }
+  },
+  "rebuild": false,
+  "retained_SDK_changed": false,
+  "test_reuse": "18parent+15backend controls unchanged; exact view/routing tests andSDK; byteidentical binary reuse",
+  "not_proven": "pure librarycost,binaryinternalequivalence,productionGPUtiming,zeroobserverimpact",
+  "gate_changed": false
+}
