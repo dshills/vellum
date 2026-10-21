@@ -482,3 +482,10 @@ Undo and Redo include the next operation's journal label, for example **Undo Mov
 selection** or **Redo Resize selection**. Empty stacks show plain disabled Undo
 or Redo. Command identities and keyboard shortcuts are unchanged; captions follow
 replay, new history branches, and New/Open history resets.
+
+## Exact nudges (internal 20)
+
+**Nudge** offers Left/Right/Up/Down at exactly 1 or 10 world units, independent
+of Snap and grid spacing. Complete selected groups move rigidly. Each accepted
+action creates one Undo/Redo entry; a bounds violation rejects the entire move.
+The existing Move menu and Cmd+Option+arrow shortcuts retain grid-aware movement.

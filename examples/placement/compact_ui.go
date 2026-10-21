@@ -26,6 +26,7 @@ func (m *model) compactActions(invoke func(string) func()) ui.Node {
 	return ui.Node{ID: "action-tools", Kind: ui.Toolbar, Children: []ui.Node{
 		m.actionMenu("edit-menu", "Edit", []ui.Option{{ID: "cut", Label: "Cut  ⌘X"}, {ID: "copy", Label: "Copy  ⌘C"}, {ID: "paste", Label: "Paste  ⌘V"}, {ID: "duplicate", Label: "Duplicate  ⌘D"}, {ID: "delete", Label: "Delete selected"}, {ID: "select-all", Label: "Select All  ⌘A"}, {ID: "deselect-all", Label: "Deselect All  ⌘⇧A"}, {ID: "invert-selection", Label: "Invert Selection"}}, invoke),
 		m.actionMenu("move-menu", "Move", []ui.Option{{ID: "move-left", Label: "Left"}, {ID: "move-right", Label: "Right"}, {ID: "move-up", Label: "Up"}, {ID: "move-down", Label: "Down"}}, invoke),
+		m.actionMenu("nudge-menu", "Nudge", exactNudgeOptions(), invoke),
 		m.actionMenu("resize-menu", "Resize", []ui.Option{{ID: "width-less", Label: "Width −"}, {ID: "width-more", Label: "Width +"}, {ID: "height-less", Label: "Height −"}, {ID: "height-more", Label: "Height +"}}, invoke),
 		m.actionMenu("arrange-menu", "Arrange", arrange, invoke),
 		m.actionMenu("stack-menu", "Layers", []ui.Option{{ID: "group", Label: "Group  ⌘G"}, {ID: "ungroup", Label: "Ungroup  ⌘⇧G"}, {ID: "bring-front", Label: "Bring to front"}, {ID: "send-back", Label: "Send to back"}, {ID: "bring-forward", Label: "Bring forward"}, {ID: "send-backward", Label: "Send backward"}}, invoke),

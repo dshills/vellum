@@ -89,12 +89,23 @@ func (m *model) nudge(dx, dy float64) error {
 	if m.snap {
 		step = m.spacing()
 	}
+	return m.nudgeWorld(dx*step, dy*step, "Move selection")
+}
+
+// Exact app nudges bypass grid snapping and share the same atomic group move.
+func (m *model) nudgeWorld(dx, dy float64, label string) error {
+	if err := m.selectionAvailable(); err != nil {
+		return err
+	}
+	if err := m.editAvailable(); err != nil {
+		return err
+	}
 	ids := m.selectedIDs()
-	after, err := movedSelection(m.scene.Objects, ids, dx*step, dy*step)
+	after, err := movedSelection(m.scene.Objects, ids, dx, dy)
 	if err != nil {
 		return err
 	}
-	if err = m.applyObjects("Move selection", after, m.scene.Selected); err != nil {
+	if err = m.applyObjects(label, after, m.scene.Selected); err != nil {
 		return err
 	}
 	m.status = fmt.Sprintf("Moved %d selected components", len(ids))
