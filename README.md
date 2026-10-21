@@ -1,105 +1,136 @@
 # Vellum
 
-Vellum is an experimental Go-native professional UI framework. Applications use
-ordinary Go values, stable widget IDs, explicit commands and cancellable tasks.
-A separate native driver reuses Cogent Core's windowing and WebGPU stack.
+Vellum is a desktop UI framework written in Go, with a current focus on macOS.
+Applications compose UI descriptions from Go values and stable widget IDs, then
+handle changes through explicit commands, cancellable tasks, and Undo/Redo history.
+A separate native driver uses Cogent Core for windowing and WebGPU rendering.
 
-The framework includes multiwindow docking, native macOS accessibility, standard
-controls, document editors, virtual data views and shared-device GPU meshes, tiled
-images and custom 3D views. Production readiness,
-complete assistive/input acceptance and Windows/Linux runtime qualification remain
-open. The workbench does not change system input sources.
+**Status:** experimental, `v0.1.0-alpha.2`. The macOS drawing test application is
+usable for internal testing. Full framework qualification and production release
+remain in progress; Windows and Linux adapters are unqualified. Framework scope
+is currently frozen while the internal application is developed and tested.
+
+## What is available
+
+- UI controls, keyboard focus, native macOS text input and accessibility integration.
+- Multiple windows, dockable workbench panels, menus, clipboard and file dialogs.
+- Commands, bounded Undo/Redo, document persistence and cancellable background work.
+- Virtual grids and trees with worker-built data views.
+- Palette-to-canvas placement, retained 2D scenes, GPU meshes, images and custom 3D views.
+- Offscreen routing tests, deterministic replay and opt-in local automation.
+
+See the [framework contract](specs/framework.md) and
+[implementation status](docs/implementation.md) for subsystem behavior and limits.
+
+## Quick start on macOS
+
+Install the Go version declared in [go.mod](go.mod), Python 3, Git, `patch`, and
+Xcode Command Line Tools. Native applications require a supported GPU. Current
+internal app testing targets Apple Silicon macOS.
+
+```sh
+git clone https://github.com/dshills/vellum.git
+cd vellum
+
+# Prepare the pinned native dependencies and local build environment.
+export VELLUM_CACHE_DIR=/tmp/vellum-go-cache
+./drivers/cogent/prepare.sh
+. ./drivers/cogent/env.sh
+
+# Launch the drawing test application.
+(cd examples/placement && go run .)
+```
+
+Preparation verifies pinned dependency sources and applies the driver-owned
+patches. The native driver and example modules use explicit local replacements;
+follow this preparation workflow when building from the checkout.
+
+### Drawing test application
+
+The [placement application](examples/placement/README.md) demonstrates:
+
+- Drag components from a palette onto a pannable, zoomable canvas with optional snapping.
+- Select, move, resize, group, reorder and edit component fills.
+- Align, distribute, match dimensions and create repeated copies of selected units.
+- Use a layers panel, command search, keyboard shortcuts and built-in help.
+- Save/Open drawings, recover interrupted work, export SVG and Undo/Redo edits.
+
+Placement stays within one window, groups are flat, and fills use opaque RGB.
+Rotation, nested groups and SVG import are not implemented. See the application's
+README for bounds, file compatibility and verification details.
+
+## More examples
+
+The following commands assume dependencies are prepared and the shell is at the
+repository root with `drivers/cogent/env.sh` sourced.
+
+| Example | Run | Purpose |
+| --- | --- | --- |
+| [Hello](examples/hello/README.md) | `(cd examples/hello && go run .)` | Minimal public-API application |
+| [Workbench](drivers/cogent/cmd/workbench/) | `(cd drivers/cogent && go run ./cmd/workbench)` | Docking and composed UI |
+| [Calculator](examples/macapps/calculator/README.md) | `(cd examples/macapps && go run ./cmd/calculator)` | Fixed-size calculator with arithmetic and keyboard input |
+| [Notes](examples/macapps/notes/README.md) | `(cd examples/macapps && go run ./cmd/notes)` | Folders, search, plain-text editing and Undo/Redo |
+| [Weather](examples/macapps/weather/README.md) | `(cd examples/macapps && go run ./cmd/weather)` | Sample cities, forecasts and unit selection |
+| [Reminders](examples/macapps/reminders/README.md) | `(cd examples/macapps && go run ./cmd/reminders)` | Lists, details and completion |
+
+The macOS-style examples use sample data and approximate familiar application
+layouts; they do not connect to Apple's services. The [example index](examples/README.md)
+also covers large-data grids/trees, GPU drawing, imaging, 3D, replay and automation.
+
+## Build your own application
+
+After preparation, create an independent application module outside this checkout:
+
+```sh
+python3 scripts/new-app.py ../my-vellum-app --module example.com/my-vellum-app
+(cd ../my-vellum-app && go run .)
+```
+
+The generated module uses explicit replacements pointing at this local checkout.
+See the [application tutorial](docs/tutorials/building-an-app.md) and
+[SDK contract](specs/sdk.md) for consumption and relocation details.
 
 ## Repository layout
 
 | Path | Purpose |
 | --- | --- |
-| `app/`, `ui/` | Application lifecycle, UI ownership and keyed widget descriptions |
-| `command/`, `tasks/`, `history/`, `document/` | Commands, asynchronous work, undo/redo and document persistence |
-| `replay/` | Bounded input records, explicit draining and deterministic checkpoint capture |
-| `automation/` | Opt-in Mac-local semantic queries/actions with capability and revision checks |
-| [examples/automation/](examples/automation/README.md) | Independent public-Go client checking native workbench command/history semantics |
-| `execution/` | Bounded explicit worker and timer stepping, plus real schedulers |
-| `editor/` | Exact UTF-8 document editing, composition, sparse history and input epochs |
-| `workbench/`, `virtual/`, `canvas/` | Dock layouts, large-data views and canvas models |
-| `drivers/cogent/` | Separate native driver module |
-| `drivers/cogent/cmd/workbench/` | Executable workbench example in the native module |
-| `examples/replay/` | Independent fixed-record consumers, including stored professional workspace replay |
-| `examples/editor/` | Independent managed multiline editor with exact-byte save/open and native input settling |
-| `examples/loadedgrid/` | Independent stored-data grid with cancellable worker sort/filter and separate domain/view revisions |
-| `examples/loadedtree/` | Independent stored 100k-node tree with worker-built indexes and bounded managed navigation |
-| `examples/grid/` | Independent managed two-axis grid with procedural 10k/million-row windows and routed-input checks |
-| `placement/` | Typed palette placement, capture, target validation and keyboard placement |
-| `examples/placement/` | Independent palette-to-canvas demo with snapping and Undo/Redo |
-| `examples/drawing/` | Independent retained GPU mesh/image drawing and scalable workload consumer |
-| `examples/imaging/` | Independent compute, HDR float rendering and asynchronous frame capture consumer |
-| `examples/viewport3d/` | Independent custom GPU shader/depth viewport with retained camera and geometry |
-| `examples/hello/` | Standalone application module consuming the local SDK |
-| [examples/macapps/](examples/macapps/README.md) | Calculator, Notes, Weather and Reminders demonstrations |
-| [docs/](docs/README.md) | Development guide, research, decisions, reports and review evidence |
-| [specs/](specs/README.md) | Framework contract and foundation validation plan |
-| `scripts/` | Repository checks, SDK release and private application packaging |
-| `prototypes/` | Independent experimental modules and historical foundation evidence |
+| `app/`, `ui/`, `canvas/`, `placement/` | Public application, UI and canvas APIs |
+| `command/`, `history/`, `document/`, `editor/` | Commands, persistence and editing models |
+| `tasks/`, `execution/`, `virtual/`, `workbench/` | Background work, scheduling, data views and docking |
+| `replay/`, `automation/` | Deterministic input and local semantic automation |
+| `drivers/cogent/` | Native driver module; executable tools under `cmd/` |
+| [examples/](examples/README.md) | Independent application and contract modules |
+| [docs/](docs/README.md), [specs/](specs/README.md) | Guides, contracts, research and historical evidence |
+| `scripts/`, `release/`, `prototypes/` | Build/packaging tools, notices and isolated historical experiments |
 
-The [indexed grid foundation](specs/grid.md) adds fixed-height two-axis
-virtualization and frozen regions through `virtual.Grid`. The
-[managed grid adapter](specs/grid-native.md) connects it to `ui.DataGrid`, with
-bounded native cell pools, pointer/key navigation and measured cell geometry.
-[Worker-built grid views](specs/grid-projection.md) add bounded immutable sort/filter indexes and latest-result owner admission.
-Performance and the complete large-data workload remain under development.
+The root module, `github.com/dshills/vellum`, uses only the standard library.
+Native dependencies belong to `github.com/dshills/vellum/drivers/cogent`.
+Historical reports have a separate module boundary and stay out of framework
+module downloads. See the [layout guide](docs/repository-layout.md).
 
-Public packages stay at the module root so framework consumers can import them
-directly. Native driver commands live in `drivers/cogent/cmd/`; standalone
-example modules use either a root `main` package or their own `cmd/<name>/`.
-Prototype modules remain separate from the framework API. Historical reports have
-an archive module boundary so they stay out of framework module downloads.
+## Development and checks
 
-See the [layout guide](docs/repository-layout.md), [example index](examples/README.md)
-and [contribution instructions](CONTRIBUTING.md) for module boundaries and checks.
-
-## Build and run
-
-The dependency-free root module is `github.com/dshills/vellum`; the native driver is
-`github.com/dshills/vellum/drivers/cogent`. Test the portable packages from the repository root:
+From the repository root, portable checks are:
 
 ```sh
 go test -race ./...
+go vet ./...
 ```
 
-Prepare the pinned native dependencies and run the example:
+Each driver/example module is checked separately. For example, after preparation:
 
 ```sh
-cd drivers/cogent
-export VELLUM_CACHE_DIR=/tmp/vellum-go-cache
-./prepare.sh
-. ./env.sh
-go run ./cmd/workbench
+(cd examples/placement && go test -race -tags offscreen ./...)
 ```
 
-The native driver requires Go, a C compiler, platform graphics libraries and a
-supported GPU. Runtime evidence currently covers macOS. It supports multiple native
-windows in one process main loop and must run from main.
+Offscreen tests do not open desktop windows. Live input, accessibility, GPU and
+display checks have separate verification requirements. The full prepared-repo
+workflow is `scripts/check.sh`; see [CONTRIBUTING](CONTRIBUTING.md) and the
+[development guide](docs/development.md) before running native campaigns.
 
-See the [development guide](docs/development.md) for the full check workflow,
-[framework contract](specs/framework.md) for implemented behavior and limits, and
-[implementation status](docs/implementation.md) for completed phases and remaining acceptance gates.
+## License and release status
 
-The [independent hello application](examples/hello/README.md) has its own module.
-Use `python3 scripts/new-app.py /path/to/my-app --module example.com/my-app`
-after preparation to create an application outside the checkout. Native patches
-and preparation inputs belong to the driver; prototype directories are not needed.
-See the [local SDK contract](specs/sdk.md) and run `scripts/benchmark.sh` for
-portable baselines or `scripts/benchmark.sh --native` for visible GPU measurements.
-
-The SDK identifies `v0.1.0-alpha.2`; see the [window lifetime API migration](specs/window-lifetimes.md). Follow the
-[application tutorial](docs/tutorials/building-an-app.md) and
-[release contract](specs/release.md) to create and verify a relocatable private SDK.
-Vellum's own code uses the [MIT license](LICENSE). The selected module namespace
-and license are recorded in `release/version.json`; public packaging still requires
-the third-party/native distribution audit and target qualification.
-
-Retained Canvas2D scenes may expose named objects with `ui.Node.CanvasObjects`, with
-completed clipped geometry, stable-ID selection and Option-key traversal. The
-[placement example](examples/placement/README.md) demonstrates this alongside
-palette placement and Undo/Redo; see the [contract](specs/canvas-accessibility.md)
-and [scoped acceptance](docs/reports/macos-canvas-accessibility/README.md).
+Vellum's own code is [MIT licensed](LICENSE). Third-party components retain their
+original licenses and notices. Public SDK/binary distribution qualification,
+including the third-party/native distribution audit, remains open; see the
+[release contract](specs/release.md) and [release metadata](release/version.json).
