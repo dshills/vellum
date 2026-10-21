@@ -399,6 +399,56 @@ class AssetOverlayChecks(unittest.TestCase):
                     os.fstat(opened[0])
                 self.assertEqual(error.exception.errno, errno.EBADF)
 
+    def test_windows_path_and_descriptor_ctime_can_differ(self):
+        from types import SimpleNamespace
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "asset"
+            path.write_bytes(b"binary\r\n\x1a\xff")
+            by_path = prepare.os.stat
+            by_fd = prepare.os.fstat
+            def windows_fstat(fd):
+                value = by_fd(fd)
+                fields = {name: getattr(value, name) for name in ("st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns", "st_mode")}
+                fields["st_birthtime_ns"] = 123
+                return SimpleNamespace(**fields)
+            def windows_stat(*args, **kwargs):
+                value = by_path(*args, **kwargs)
+                fields = {name: getattr(value, name) for name in ("st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns", "st_mode")}
+                fields["st_ctime_ns"] += 100
+                fields["st_birthtime_ns"] = 123
+                return SimpleNamespace(**fields)
+            with mock.patch.object(prepare.sys, "platform", "win32"), mock.patch.object(prepare.os, "stat", side_effect=windows_stat), mock.patch.object(prepare.os, "fstat", side_effect=windows_fstat):
+                self.assertEqual(prepare._read_stage_file(path, 64)[0], b"binary\r\n\x1a\xff")
+
+    def test_windows_legacy_creation_time_fallback_is_retained(self):
+        from types import SimpleNamespace
+        from unittest import mock
+        value = SimpleNamespace(st_dev=1, st_ino=2, st_size=3, st_mtime_ns=4, st_ctime_ns=5)
+        with mock.patch.object(prepare.sys, "platform", "win32"):
+            self.assertEqual(prepare._asset_path_identity(value), (1, 2, 3, 4, 5))
+
+    def test_descriptor_change_time_drift_is_still_rejected_on_windows(self):
+        from types import SimpleNamespace
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "asset"
+            path.write_bytes(b"stable")
+            fstat = prepare.os.fstat
+            calls = 0
+            def changed(fd):
+                nonlocal calls
+                value = fstat(fd)
+                fields = {name: getattr(value, name) for name in ("st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns", "st_mode")}
+                fields["st_birthtime_ns"] = getattr(value, "st_birthtime_ns", None)
+                if calls:
+                    fields["st_ctime_ns"] += 100
+                calls += 1
+                return SimpleNamespace(**fields)
+            with mock.patch.object(prepare.sys, "platform", "win32"), mock.patch.object(prepare.os, "fstat", side_effect=changed):
+                with self.assertRaisesRegex(RuntimeError, "changed during admission"):
+                    prepare._read_stage_file(path, 64)
+
     def test_explicit_font_limit_admits_large_original_and_result_preserving_default(self):
         import hashlib
         from unittest import mock

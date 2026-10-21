@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
 	"image"
 	"image/color"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 )
 
@@ -178,5 +180,25 @@ func TestResizeAcceptanceRequiresObservedNativeAndCanvasTransition(t *testing.T)
 				t.Fatalf("accepted=%v want=%v", got, tc.want)
 			}
 		})
+	}
+}
+
+func TestProbeViewRetainsCanvasExtensionIdentity(t *testing.T) {
+	a, err := app.New(app.Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	var views atomic.Int32
+	var shown atomic.Bool
+	w, renderer, model := newProbeWindow(a, "first", &views, &shown)
+	first, next := w.View(), w.View()
+	p, ok := first.Children[1].Custom.(*shownCanvasProbe)
+	if !ok || p != next.Children[1].Custom || p.renderer != renderer || renderer.Model != model || renderer.Owner != a || p.shown != &shown || views.Load() != 2 {
+		t.Fatal("refresh replaced the mounted canvas extension")
+	}
+	other, _, _ := newProbeWindow(a, "second", &views, &shown)
+	if other.View().Children[1].Custom == p {
+		t.Fatal("windows shared extension identity")
 	}
 }

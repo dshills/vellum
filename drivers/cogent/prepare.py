@@ -79,8 +79,16 @@ def _asset_identity(value):
     return (value.st_dev, value.st_ino, value.st_size, value.st_mtime_ns, value.st_ctime_ns)
 
 
+def _asset_path_identity(value):
+    # Windows path stat exposes creation time as ctime, while fstat in recent
+    # CPython exposes filesystem change time. Compare birthtime across APIs and
+    # retain full ctime checks between descriptor snapshots below.
+    timestamp = getattr(value, "st_birthtime_ns", value.st_ctime_ns) if sys.platform == "win32" else value.st_ctime_ns
+    return (value.st_dev, value.st_ino, value.st_size, value.st_mtime_ns, timestamp)
+
+
 def _read_stage_file(path, bound):
-    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+    flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
     descriptor = os.open(path, flags)
     try:
         # This owner closes even when constructing the stream itself fails.
@@ -98,7 +106,7 @@ def _read_stage_file(path, bound):
             if stream.read(1):
                 raise RuntimeError("Stage file grew beyond admitted size")
             if (_asset_identity(os.fstat(stream.fileno())) != _asset_identity(before)
-                    or _asset_identity(os.stat(path, follow_symlinks=False)) != _asset_identity(before)):
+                    or _asset_path_identity(os.stat(path, follow_symlinks=False)) != _asset_path_identity(before)):
                 raise RuntimeError("Stage file changed during admission")
     finally:
         os.close(descriptor)
@@ -229,7 +237,7 @@ def stage_assets(stage, destination, inputs, outputs, patches):
             raise RuntimeError("Stage asset source and destination files overlap")
         # Open all writers without truncation before any stage patch/write.
         for item in snapshots:
-            fd = os.open(item["path"], os.O_WRONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0))
+            fd = os.open(item["path"], os.O_WRONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0))
             descriptors.append(fd)
             if _asset_identity(os.fstat(fd)) != _asset_identity(item["before"]):
                 raise RuntimeError("Stage asset target changed before mutation")
@@ -245,7 +253,7 @@ def _write_stage_assets(snapshots):
     # the dependency's owned staging/installation boundary, not atomic multi-file IO.
     for item in snapshots:
         if (_asset_identity(os.fstat(item["fd"])) != _asset_identity(item["before"])
-                or _asset_identity(os.stat(item["path"], follow_symlinks=False)) != _asset_identity(item["before"])):
+                or _asset_path_identity(os.stat(item["path"], follow_symlinks=False)) != _asset_path_identity(item["before"])):
             raise RuntimeError("Stage asset target drift before overlay")
     for item in snapshots:
         os.lseek(item["fd"], 0, os.SEEK_SET)

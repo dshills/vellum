@@ -90,6 +90,20 @@ func (p *shownCanvasProbe) Mount(parent tree.Node) core.Widget {
 }
 func (p *shownCanvasProbe) Sync(widget core.Widget) error { return p.renderer.Sync(widget) }
 
+func newProbeWindow(a *app.Application, id string, views *atomic.Int32, shown *atomic.Bool) (app.Window, *cogent.GPUCanvas, *canvas.Scene) {
+	model, err := canvas.New([]canvas.Rect{{ID: "probe", X: 0, Y: 0, Width: 100, Height: 60, Color: color.RGBA{67, 197, 166, 255}}})
+	if err != nil {
+		fail(err)
+	}
+	model.Fit()
+	renderer := &cogent.GPUCanvas{Owner: a, Window: id, Model: model}
+	probe := &shownCanvasProbe{renderer: renderer, shown: shown}
+	return app.Window{ID: id, Title: "Vellum platform " + id, Width: 640, Height: 480, View: func() ui.Node {
+		views.Add(1)
+		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "label", Kind: ui.Label, Text: "Temporary platform qualification smoke"}, {ID: "canvas", Kind: ui.Extension, Grow: true, Custom: probe}}}
+	}}, renderer, model
+}
+
 func main() {
 	clipboardWrite := flag.Bool("clipboard-write", false, "round trip and restore plain text clipboard (use disposable desktop)")
 	requireComplete := flag.Bool("require-complete", false, "fail if any OS qualification gate remains")
@@ -102,22 +116,11 @@ func main() {
 		fail(err)
 	}
 	defer a.Close()
-	makeWindow := func(id string, views *atomic.Int32, shown *atomic.Bool) (app.Window, *cogent.GPUCanvas, *canvas.Scene) {
-		model, err := canvas.New([]canvas.Rect{{ID: "probe", X: 0, Y: 0, Width: 100, Height: 60, Color: color.RGBA{67, 197, 166, 255}}})
-		if err != nil {
-			fail(err)
-		}
-		model.Fit()
-		renderer := &cogent.GPUCanvas{Owner: a, Window: id, Model: model}
-		return app.Window{ID: id, Title: "Vellum platform " + id, Width: 640, Height: 480, View: func() ui.Node {
-			views.Add(1)
-			return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "label", Kind: ui.Label, Text: "Temporary platform qualification smoke"}, {ID: "canvas", Kind: ui.Extension, Grow: true, Custom: &shownCanvasProbe{renderer: renderer, shown: shown}}}}
-		}}, renderer, model
-	}
+
 	var firstViews, secondViews atomic.Int32
 	var firstShown, secondShown atomic.Bool
-	first, firstGPU, firstModel := makeWindow("first", &firstViews, &firstShown)
-	second, secondGPU, secondModel := makeWindow("second", &secondViews, &secondShown)
+	first, firstGPU, firstModel := newProbeWindow(a, "first", &firstViews, &firstShown)
+	second, secondGPU, secondModel := newProbeWindow(a, "second", &secondViews, &secondShown)
 	firstRef, err := a.OpenWindow(first)
 	if err != nil {
 		fail(err)
