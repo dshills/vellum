@@ -90,7 +90,7 @@ func TestViewMenuAndZoomLabel(t *testing.T) {
 		f.m.scene.View.Zoom = 1.25
 		root := view(f.a, f.ref, f.m)
 		menu := geometryDialogControl(t, root, "view-menu")
-		if len(menu.Options) != 4 {
+		if len(menu.Options) != 5 || menu.Options[4].ID != "saved-views" {
 			t.Fatal("view menu")
 		}
 		if geometryDialogControl(t, root, "zoom-percent").Text != "125%" {
