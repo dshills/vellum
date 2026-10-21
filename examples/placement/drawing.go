@@ -8,6 +8,7 @@ import (
 	"io"
 	"maps"
 	"math"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -21,6 +22,7 @@ const drawingByteLimit = 256 << 10
 // Legacy versions remain readable; never-grouped drawings save as version 2.
 // Viewport dimensions belong to the receiving window and are never restored.
 type drawingFile struct {
+	Views     []savedView              `json:"views,omitempty"`
 	Layers    map[string]layerMetadata `json:"layers,omitempty"`
 	Format    string                   `json:"format"`
 	Version   int                      `json:"version"`
@@ -45,8 +47,14 @@ type drawingObject struct {
 
 func (f drawingFile) scene() (*canvas.Scene, error) {
 	finite := func(v float64) bool { return !math.IsNaN(v) && !math.IsInf(v, 0) }
-	if f.Format != "vellum-placement" || (f.Version != 1 && f.Version != 2 && f.Version != 3 && f.Version != 4 && f.Version != 5) || len(f.Objects) > 512 || !finite(f.Zoom) || f.Zoom < .01 || f.Zoom > 100 || !finite(f.Center.X) || !finite(f.Center.Y) || math.Abs(f.Center.X) > 1e12 || math.Abs(f.Center.Y) > 1e12 {
+	if f.Format != "vellum-placement" || (f.Version != 1 && f.Version != 2 && f.Version != 3 && f.Version != 4 && f.Version != 5 && f.Version != 6) || len(f.Objects) > 512 || !finite(f.Zoom) || f.Zoom < .01 || f.Zoom > 100 || !finite(f.Center.X) || !finite(f.Center.Y) || math.Abs(f.Center.X) > 1e12 || math.Abs(f.Center.Y) > 1e12 {
 		return nil, errors.New("invalid or unsupported Vellum drawing")
+	}
+	if f.Version < 6 && len(f.Views) > 0 {
+		return nil, errors.New("saved views require drawing version 6")
+	}
+	if err := validSavedViews(f.Views); err != nil {
+		return nil, err
 	}
 	objects := make([]canvas.Rect, 0, len(f.Objects))
 	for _, o := range f.Objects {
@@ -121,6 +129,10 @@ func drawingCodec(m *model) document.Codec[drawingFile] {
 					f.Version = 5
 				}
 			}
+			if len(m.savedViews) > 0 {
+				f.Version = 6
+				f.Views = slices.Clone(m.savedViews)
+			}
 			_, err := f.scene()
 			return f, err
 		},
@@ -165,6 +177,7 @@ func drawingCodec(m *model) document.Codec[drawingFile] {
 			if err != nil {
 				return err
 			}
+			m.savedViews = slices.Clone(f.Views)
 			// Preserve the bound Scene identity and current window dimensions.
 			m.scene.Objects, m.scene.Selected = scene.Objects, scene.Selected
 			m.scene.View.Center, m.scene.View.Zoom = scene.View.Center, scene.View.Zoom

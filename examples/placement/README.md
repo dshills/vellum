@@ -616,3 +616,7 @@ The frozen native clipboard service returns complete text before app validation;
 ## Batch rename (internal 24)
 
 **Layers → Batch rename selected…** previews names made from a prefix, a space, and sequential numbers (starting at 0–1000000). Selected units are numbered back-to-front by first paint position. A group gets one group name; member names remain intact. Names need not be unique; stable IDs remain unchanged. Apply validates every final name and the complete file size before one Undo/Redo entry. Cancel or stale drafts keep the document.
+
+## Saved views (internal 24)
+
+**Zoom → Saved views…** names the current pan/zoom position. Up to 16 unique names travel with each drawing; saving an existing name updates its camera. Save current view and Remove view each create one Undo/Redo entry and mark dirty; Restore view changes only navigation and keeps selection, geometry and history. Window size is never restored. Bookmarks use drawing format6; versions1–5 still open, while older builds cannot read drawings containing bookmarks. Save/Open, Save a Copy and recovery retain them; New clears them. The dialog captures the current camera when opened.

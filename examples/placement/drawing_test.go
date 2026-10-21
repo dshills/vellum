@@ -179,7 +179,7 @@ func TestInvalidDrawingRefusesWithoutChangingModel(t *testing.T) {
 			bad.Objects = append([]drawingObject(nil), original.Objects...)
 			switch name {
 			case "version":
-				bad.Version = 6
+				bad.Version = 7
 			case "kind":
 				bad.Objects[0].Kind = "foreign"
 			case "duplicate":

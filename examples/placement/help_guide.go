@@ -44,6 +44,7 @@ var helpTopics = []helpTopic{
 		"More → Export SVG writes visible rectangles in world coordinates and paint order, including locked objects. Hidden objects, grid and selection handles are omitted. SVG is output only; Open uses .vellum drawings.",
 		"More → Export Selected SVG exports only whole selected visible units with a viewBox fitted to their bounds. More → Revert to Saved reloads the active file; dirty drawings require confirmation. Cancel or a failed read preserves the drawing and history. Successful reload clears Undo/Redo.",
 		"Private recovery offers the latest completed interrupted-session copy at startup. It is not a document version log. Explicit Save and Save a Copy remain the durable file workflow.",
+		"Zoom → Saved views names the current pan/zoom, up to 16 per drawing. Save/Remove is undoable and marks dirty; Restore changes only navigation. Drawings with views use format6 and need this build or newer.",
 		"Grid visibility/spacing, aspect lock and subtract mode are remembered separately from drawings. Snap is saved with the drawing. Filter/collapse state clears on New/Open.",
 	}},
 	{"editing", "Fill, matching and repeated copies", []string{

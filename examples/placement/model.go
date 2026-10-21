@@ -23,6 +23,8 @@ type component struct {
 	Color         color.RGBA
 }
 type model struct {
+	savedViews                        []savedView
+	viewsDraft                        *savedViewsDraft
 	batchRename                       *batchRenameDraft
 	overlapDraft                      *overlapDraft
 	visibleScene                      *canvas.Scene
@@ -230,6 +232,10 @@ func newModel() (*model, error) {
 		return nil, err
 	}
 	if err := m.bindSelectionCommands(); err != nil {
+		m.palette.Close()
+		return nil, err
+	}
+	if err := m.bindSavedViews(); err != nil {
 		m.palette.Close()
 		return nil, err
 	}

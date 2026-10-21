@@ -190,7 +190,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 			{ID: "redo", Kind: ui.Button, Text: m.historyCaption("Redo"), Disabled: m.commandDisabled("redo"), Activate: invoke("redo")},
 			{ID: "fit", Kind: ui.Button, Text: "Fit", Disabled: m.commandDisabled("fit"), Activate: invoke("fit")},
 			{ID: "reset", Kind: ui.Button, Text: "Reset", Disabled: m.commandDisabled("reset"), Activate: invoke("reset")},
-			m.actionMenu("view-menu", "Zoom", []ui.Option{{ID: "zoom-in", Label: "Zoom In"}, {ID: "zoom-out", Label: "Zoom Out"}, {ID: "zoom-100", Label: "100%"}, {ID: "fit-selection", Label: "Fit Selection"}}, invoke),
+			m.actionMenu("view-menu", "Zoom", []ui.Option{{ID: "zoom-in", Label: "Zoom In"}, {ID: "zoom-out", Label: "Zoom Out"}, {ID: "zoom-100", Label: "100%"}, {ID: "fit-selection", Label: "Fit Selection"}, {ID: "saved-views", Label: "Saved views…"}}, invoke),
 			{ID: "zoom-percent", Kind: ui.Label, Text: fmt.Sprintf("%.0f%%", m.scene.View.Zoom*100), Accessibility: ui.Accessibility{Name: "Canvas zoom"}},
 			{ID: "snap", Kind: ui.Checkbox, Text: "Snap", Disabled: navigatingDisabled, Checked: m.snap, Change: func(e ui.ChangeEvent) {
 				if m.fileBusy() || m.move != nil {
@@ -244,7 +244,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		{ID: "status", Kind: ui.StatusBar, Children: []ui.Node{{ID: "message", Kind: ui.Label, Text: fmt.Sprintf("%s • %d objects • %d selected • Undo %d / Redo %d", m.status, len(m.scene.Objects), len(selection), m.journal.Snapshot().UndoCount, m.journal.Snapshot().RedoCount)}}},
 	}}
 	root.Children[1].Children = append(root.Children[1].Children, m.gridControls(ref, update)...)
-	root.Children = append(root.Children, m.filePrompt(a, ref), m.renameDialog(a, ref), m.recovery.promptNode(), m.geometryDialog(a, ref), m.commandPaletteDialog(a, ref), m.spacingDialog(a, ref), m.helpGuideDialog(a, ref), m.fillColorDialog(a, ref), m.selectMatchingDialog(a, ref), m.primarySelectionDialog(a, ref), m.repeatDuplicatesDialog(a, ref), m.revertPrompt(a, ref), m.overlapDialog(a, ref), m.batchRenameDialog(a, ref))
+	root.Children = append(root.Children, m.filePrompt(a, ref), m.renameDialog(a, ref), m.recovery.promptNode(), m.geometryDialog(a, ref), m.commandPaletteDialog(a, ref), m.spacingDialog(a, ref), m.helpGuideDialog(a, ref), m.fillColorDialog(a, ref), m.selectMatchingDialog(a, ref), m.primarySelectionDialog(a, ref), m.repeatDuplicatesDialog(a, ref), m.revertPrompt(a, ref), m.overlapDialog(a, ref), m.batchRenameDialog(a, ref), m.savedViewsDialog(a, ref))
 	for i := range root.Children {
 		if root.Children[i].Kind == ui.Toolbar {
 			for j := range root.Children[i].Children {
@@ -279,6 +279,9 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 	}
 	if m.prompt == "batch-rename" && m.batchRename != nil {
 		root.Focus = ui.FocusRequest{ID: "batch-prefix", Sequence: m.modalEpoch}
+	}
+	if m.prompt == "saved-views" && m.viewsDraft != nil {
+		root.Focus = ui.FocusRequest{ID: "view-name", Sequence: m.modalEpoch}
 	}
 	return root
 }
