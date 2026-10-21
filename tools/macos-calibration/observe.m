@@ -5,6 +5,7 @@
 #include <stdatomic.h>
 #include <unistd.h>
 #include "observe.h"
+#import "flags.h"
 static _Atomic(int) losses;
 static NSArray *tokens;
 static id workspaceToken;
@@ -31,7 +32,7 @@ char *cal_observe(int phase) {
 #if !__has_feature(objc_arc)
   if(phase==1 && workspaceToken)[workspaceToken retain];
 #endif
-  NSDictionary *d=@{@"clock":@(cal_clock()),@"pid":@(getpid()),@"front_pid":@(NSWorkspace.sharedWorkspace.frontmostApplication.processIdentifier),@"active":@(NSApp.active),@"key":@(w.keyWindow),@"visible":@((w.occlusionState&NSWindowOcclusionStateVisible)!=0),@"losses":@(atomic_load(&losses)),@"width":@(layer.drawableSize.width),@"height":@(layer.drawableSize.height),@"scale":@(w.backingScaleFactor),@"pixel_format":@(layer.pixelFormat),@"drawables":@(layer.maximumDrawableCount),@"vsync":@(layer.displaySyncEnabled),@"transactions":@(layer.presentsWithTransaction),@"timeout":@(layer.allowsNextDrawableTimeout)};
+  NSDictionary *d=@{@"clock":@(cal_clock()),@"pid":@(getpid()),@"front_pid":@(NSWorkspace.sharedWorkspace.frontmostApplication.processIdentifier),@"active":cal_flag(NSApp.active),@"key":cal_flag(w.keyWindow),@"visible":cal_flag((w.occlusionState&NSWindowOcclusionStateVisible)!=0),@"losses":@(atomic_load(&losses)),@"width":@(layer.drawableSize.width),@"height":@(layer.drawableSize.height),@"scale":@(w.backingScaleFactor),@"pixel_format":@(layer.pixelFormat),@"drawables":@(layer.maximumDrawableCount),@"vsync":cal_flag(layer.displaySyncEnabled),@"transactions":cal_flag(layer.presentsWithTransaction),@"timeout":cal_flag(layer.allowsNextDrawableTimeout)};
   NSData *data=[NSJSONSerialization dataWithJSONObject:d options:NSJSONWritingSortedKeys error:nil];out=strndup(data.bytes,data.length);
   if(phase==2){for(id token in tokens)[NSNotificationCenter.defaultCenter removeObserver:token];if(workspaceToken)[NSWorkspace.sharedWorkspace.notificationCenter removeObserver:workspaceToken];
 #if !__has_feature(objc_arc)

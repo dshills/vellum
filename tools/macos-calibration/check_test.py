@@ -50,4 +50,6 @@ class Controls(unittest.TestCase):
   d,m=self.data();d['records'][0]['acquired']=math.nan;self.refused(d,m)
  def test_unmatched_armed_frame(self):
   d,m=self.data('framework');r=copy.deepcopy(d['before_close']['Samples'][-1]);r['Tag']=999;r['Sequence']=999;d['before_close']['Samples'].append(r);d['after_close']['Samples']=copy.deepcopy(d['before_close']['Samples']);self.refused(d,m)
+ def test_numeric_visibility_is_not_a_boolean(self):
+  d,m=self.data();d['begin']['visible']=1;self.refused(d,m)
 if __name__=='__main__':unittest.main()

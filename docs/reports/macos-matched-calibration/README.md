@@ -1,4 +1,29 @@
-# Matched native/framework calibration — preparation
+# Matched native/framework calibration
+
+## Pilot 1 — refused; diagnostic repair prepared
+
+The first live pilot refused its native configuration because the visibility bit
+was serialized as JSON number `1`, while the strict check requires boolean `true`.
+The actual capture retained active/key/own-foreground-PID state, but is still
+invalid. No match file or timed pair was admitted. The process exited with status
+1 and was reaped; all eight probes retired. Three pending setup acquisitions
+became explicit retirement records at closure. None is reclassified as displayed.
+
+The diagnostic now uses explicit Foundation boolean objects. A Foundation-only
+regression reproduces the original numeric expression and verifies corrected
+true/false output; the strict numeric-visibility negative remains refused. It also
+waits for setup callbacks before closing the pilot, with a two-second refusal
+bound. Eighteen classifier controls and both source builds pass. Prism using
+Anthropic Claude Sonnet 5.5 reviewed this repair; its early-return concern was
+checked against the existing worker defers and runtime/worker shutdown path.
+No findings remain unresolved. No shipping code, SDK, workload, cutoff or release
+gate changes. A fresh bounded attempt uses the same predeclared populations.
+
+[pilot1.json](pilot1.json) and its [indexed evidence](pilot1-evidence-index.json)
+retain the rejection, raw samples, process/configuration receipts, source-review
+receipt, repair regression and dispositions in [the archive](pilot1-evidence.tar.xz).
+
+## Preparation checkpoint — 26ac90a
 
 The owner authorized a matched calibration on 21 October 2026 and explicitly
 reserved approval of release-gate changes. The [predeclared protocol](../../../specs/macos-calibration.md)

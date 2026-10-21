@@ -94,6 +94,24 @@ func run() (result error) {
 			}
 			time.Sleep(time.Millisecond)
 		}
+		settleDeadline := time.Now().Add(2 * time.Second)
+		for {
+			s := metrics.Snapshot()
+			if s.Failed || s.Overflow {
+				return errors.New("startup recorder failure")
+			}
+			if s.Pending == 0 {
+				break
+			}
+			if time.Now().After(settleDeadline) {
+				return errors.New("startup callback drain deadline")
+			}
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-time.After(time.Millisecond):
+			}
+		}
 		begin := observe(1)
 		out["begin"] = begin
 		if !good(begin) {
