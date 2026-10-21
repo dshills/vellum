@@ -436,3 +436,11 @@ explicit Discard and New decision; Cancel keeps the document and history. New
 resets history, selection, groups, camera and the Save destination, like Open
 replaces document history. Existing files and Recent entries are kept. The next
 Save asks for a destination. Framework scope remains frozen.
+
+## Selection commands (internal 19)
+
+The Edit menu offers **Select All / Cmd+A**, **Deselect All / Cmd+Shift+A**
+and **Invert Selection**. They operate on all visible, unlocked components,
+regardless of viewport position, and keep flat groups whole. Selection-only
+changes do not enter Undo history or mark the drawing dirty. Focused text
+fields retain their standard text-selection shortcuts.
