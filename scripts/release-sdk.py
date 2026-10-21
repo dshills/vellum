@@ -248,7 +248,7 @@ def source_files(root, include_untracked=False, dependencies=None):
         path = Path(name)
         if name.startswith("drivers/cogent/build/") or "__pycache__" in path.parts:
             continue
-        if path.parts[0] not in allowed and name not in {"go.mod", "go.sum", "README.md", "LICENSE"} and not (len(path.parts) == 1 and path.suffix == ".go"):
+        if path.parts[0] not in allowed and name not in {"go.mod", "go.sum", "README.md", "CONTRIBUTING.md", "LICENSE"} and not (len(path.parts) == 1 and path.suffix == ".go"):
             if not (name.startswith("specs/") or name.startswith("docs/") and not repository_documentation(name)):
                 continue
         source = root / path

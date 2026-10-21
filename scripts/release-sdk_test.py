@@ -500,13 +500,18 @@ func TestExportedHistory(t *testing.T) {
     def test_source_whitelist_covers_root_api_and_refuses_links(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);(root/"vellum.go").write_text("package vellum")
+            (root/"CONTRIBUTING.md").write_text("See [guide](docs/guide.md).")
+            (root/"docs").mkdir();(root/"docs/guide.md").write_text("# Guide\n")
             (root/"automation").mkdir();(root/"automation/protocol.go").write_text("package automation")
             for dependency in ("upstream","typesetting"):
                 directory=root/"drivers/cogent/build"/dependency;directory.mkdir(parents=True);(directory/"go.mod").write_text("module source")
-            with mock.patch.object(release,"check_child_output",return_value=b"vellum.go\0automation/protocol.go\0"):
+            with mock.patch.object(release,"check_child_output",return_value=b"vellum.go\0automation/protocol.go\0CONTRIBUTING.md\0docs/guide.md\0"):
                 files=dict(release.source_files(root))
                 self.assertIn("vellum.go",files)
                 self.assertIn("automation/protocol.go",files)
+                self.assertIn("CONTRIBUTING.md",files)
+                data=(root/"CONTRIBUTING.md").read_bytes()
+                self.assertEqual(release.sdk_documentation(root,"CONTRIBUTING.md",data,set(files),set(files)),(data,None))
             (root/"link").symlink_to(root/"drivers",target_is_directory=True)
             with self.assertRaisesRegex(ValueError,"symlinks"):release.require_regular_source(root,root/"link/cogent/build/upstream/go.mod")
 

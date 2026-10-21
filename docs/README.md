@@ -4,6 +4,7 @@ Start with the [project overview](../README.md), [development guide](development
 and [implementation status](implementation.md). For current Mac work, follow the
 [delivery plan](../specs/macos-delivery.md).
 
+- [Repository layout](repository-layout.md): package, module, command and archive boundaries.
 - [Research and recommendations](research/README.md): source-backed investigation and architecture alternatives.
 - [Architecture decisions](decisions/): recorded choices and the evidence available when each was made.
 - [Foundation and SDK reports](reports/README.md): investigation outcomes, fixes and remaining validation gaps.

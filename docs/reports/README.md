@@ -120,3 +120,10 @@ A passing local check does not imply production or cross-platform certification.
 - [Grid intrinsic sizing and native comparison](macos-grid-intrinsic-sizing/README.md): guarded source reuse, mixed-text geometry oracles and separately reviewed matched native frame evidence.
 
 - [Current private SDK and relocated consumers](macos-sdk-refresh/README.md): source `2010a33` archive/consumer checks, thirteen compiled entrypoints and one separately reviewed native SDK hello.
+
+## Archive module boundary
+
+The local `go.mod` keeps these historical evidence files out of the parent
+framework's Go module archive. Reports remain in Git at their recorded paths;
+this directory is not a framework dependency or a separately supported API.
+See [repository layout](../repository-layout.md#evidence-and-generated-files).

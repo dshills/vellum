@@ -35,6 +35,7 @@ open. The workbench does not change system input sources.
 | `examples/imaging/` | Independent compute, HDR float rendering and asynchronous frame capture consumer |
 | `examples/viewport3d/` | Independent custom GPU shader/depth viewport with retained camera and geometry |
 | `examples/hello/` | Standalone application module consuming the local SDK |
+| [examples/macapps/](examples/macapps/README.md) | Calculator, Notes, Weather and Reminders demonstrations |
 | [docs/](docs/README.md) | Development guide, research, decisions, reports and review evidence |
 | [specs/](specs/README.md) | Framework contract and foundation validation plan |
 | `scripts/` | Repository checks, SDK release and private application packaging |
@@ -48,8 +49,13 @@ bounded native cell pools, pointer/key navigation and measured cell geometry.
 Performance and the complete large-data workload remain under development.
 
 Public packages stay at the module root so framework consumers can import them
-directly. Executable code lives under `cmd/` in the module that owns its native
-dependencies. Prototype modules remain separate from the framework API.
+directly. Native driver commands live in `drivers/cogent/cmd/`; standalone
+example modules use either a root `main` package or their own `cmd/<name>/`.
+Prototype modules remain separate from the framework API. Historical reports have
+an archive module boundary so they stay out of framework module downloads.
+
+See the [layout guide](docs/repository-layout.md), [example index](examples/README.md)
+and [contribution instructions](CONTRIBUTING.md) for module boundaries and checks.
 
 ## Build and run
 
