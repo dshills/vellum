@@ -189,6 +189,10 @@ func newModel() (*model, error) {
 		m.palette.Close()
 		return nil, err
 	}
+	if err := m.bindPrimaryAlignment(); err != nil {
+		m.palette.Close()
+		return nil, err
+	}
 	if err := m.bindPrimarySelection(); err != nil {
 		m.palette.Close()
 		return nil, err

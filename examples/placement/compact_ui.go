@@ -23,6 +23,7 @@ func (m *model) compactActions(invoke func(string) func()) ui.Node {
 	for _, a := range arrangementActions {
 		arrange = append(arrange, ui.Option{ID: a.id, Label: a.label})
 	}
+	arrange = append(arrange, primaryAlignOptions()...)
 	arrange = append(arrange, matchDimensionOptions...)
 	arrange = append(arrange, ui.Option{ID: "numeric-spacing", Label: "Set exact spacing…"})
 	return ui.Node{ID: "action-tools", Kind: ui.Toolbar, Children: []ui.Node{

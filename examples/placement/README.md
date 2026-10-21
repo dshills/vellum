@@ -574,3 +574,7 @@ Commands. Its modal and callbacks use the native window lifetime and draft ident
 ## Explicit primary selection (internal 22)
 
 **Edit → Choose primary…** chooses among already-selected components and whole groups without clearing any selection or changing history/dirty state. Layers marks the primary member and its group. Choosing another group uses its frontmost selected member; keeping the current group retains the existing primary member. Match dimensions and primary alignment use this reference unit.
+
+## Align to primary (internal 22)
+
+**Arrange → … to primary** aligns other selected components/groups to the reference unit's left/right/top/bottom edges or horizontal/vertical center. The primary unit stays fixed; groups move rigidly and perpendicular positions, sizes and paint order stay unchanged. Exact world-coordinate alignment ignores snapping and camera transforms. A changed arrangement is one Undo/Redo; no-op or invalid bounds adds none.
