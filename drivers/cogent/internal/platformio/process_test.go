@@ -29,6 +29,12 @@ func TestFileArgsKeepValuesOutOfCode(t *testing.T) {
 	if fmt.Sprint(args) != fmt.Sprint(want) {
 		t.Fatalf("%q", args)
 	}
+	directoryOnly := o
+	directoryOnly.Filename = ""
+	directoryArgs, err := LinuxFileArgs(directoryOnly)
+	if err != nil || !strings.Contains(strings.Join(directoryArgs, "\n"), "--filename=/tmp/a b/") {
+		t.Fatal("Linux directory separator changed with host OS", directoryArgs, err)
+	}
 	for _, ext := range []string{"*", "x|y", "é", "a?"} {
 		o.Extensions = []string{ext}
 		if _, err := LinuxFileArgs(o); err == nil {

@@ -10,7 +10,9 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -90,6 +92,14 @@ func Run(ctx context.Context, executable string, args []string, input []byte) ([
 	}
 	if err != nil {
 		if errors.Is(err, exec.ErrNotFound) || errors.Is(err, fs.ErrNotExist) {
+			// Windows executable-extension lookup can report ErrNotFound for
+			// an explicit existing directory/non-executable path. That is a
+			// startup failure, not an absent dependency to silently replace.
+			if strings.ContainsAny(executable, `/\`) || filepath.VolumeName(executable) != "" {
+				if _, statErr := os.Stat(executable); statErr == nil || !errors.Is(statErr, fs.ErrNotExist) {
+					return nil, &ProcessError{Executable: executable, Err: errors.Join(err, statErr), Diagnostic: strings.TrimSpace(diagnostic.String())}
+				}
+			}
 			return nil, fmt.Errorf("%w: %s missing", app.ErrUnavailable, executable)
 		}
 		return nil, &ProcessError{Executable: executable, Err: err, Diagnostic: strings.TrimSpace(diagnostic.String())}
@@ -123,14 +133,16 @@ func LinuxFileArgs(o app.FileOptions) ([]string, error) {
 	if o.Mode == app.SaveFile {
 		args = append(args, "--save", "--confirm-overwrite")
 	}
-	path := o.Directory
+	// Zenity paths use Linux syntax even when this pure argument builder is
+	// tested from another host OS.
+	candidate := o.Directory
 	if o.Filename != "" {
-		path = filepath.Join(path, o.Filename)
-	} else if path != "" {
-		path += string(filepath.Separator)
+		candidate = path.Join(candidate, o.Filename)
+	} else if candidate != "" {
+		candidate += "/"
 	}
-	if path != "" {
-		args = append(args, "--filename="+path)
+	if candidate != "" {
+		args = append(args, "--filename="+candidate)
 	}
 	if len(o.Extensions) > 0 {
 		var patterns []string
