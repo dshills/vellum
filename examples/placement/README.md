@@ -444,3 +444,11 @@ and **Invert Selection**. They operate on all visible, unlocked components,
 regardless of viewport position, and keep flat groups whole. Selection-only
 changes do not enter Undo history or mark the drawing dirty. Focused text
 fields retain their standard text-selection shortcuts.
+
+## Explicit zoom controls (internal 19)
+
+**Zoom** offers Zoom In, Zoom Out, 100% and Fit Selection. The adjacent percentage
+reflects the current view, including wheel zoom. Menu zoom keeps the world-space
+view center; Fit Selection includes complete selected groups. Fit continues to
+fit all visible objects; Reset returns to origin at 100%. Navigation changes no
+object geometry or Undo history, and is blocked during gestures and dialogs.

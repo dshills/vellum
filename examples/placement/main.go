@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/dshills/vellum/app"
-	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/ui"
 )
@@ -173,21 +172,10 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		{ID: "toolbar", Kind: ui.Toolbar, Children: []ui.Node{
 			{ID: "undo", Kind: ui.Button, Text: "Undo", Disabled: m.commandDisabled("undo"), Activate: invoke("undo")},
 			{ID: "redo", Kind: ui.Button, Text: "Redo", Disabled: m.commandDisabled("redo"), Activate: invoke("redo")},
-			{ID: "fit", Kind: ui.Button, Text: "Fit", Disabled: navigatingDisabled, Activate: func() {
-				if m.fileBusy() || m.move != nil {
-					return
-				}
-				m.fitVisible()
-				update()
-			}},
-			{ID: "reset", Kind: ui.Button, Text: "Reset", Disabled: navigatingDisabled, Activate: func() {
-				if m.fileBusy() || m.move != nil {
-					return
-				}
-				m.scene.View.Center = canvas.Point{}
-				m.scene.View.Zoom = 1
-				update()
-			}},
+			{ID: "fit", Kind: ui.Button, Text: "Fit", Disabled: m.commandDisabled("fit"), Activate: invoke("fit")},
+			{ID: "reset", Kind: ui.Button, Text: "Reset", Disabled: m.commandDisabled("reset"), Activate: invoke("reset")},
+			m.actionMenu("view-menu", "Zoom", []ui.Option{{ID: "zoom-in", Label: "Zoom In"}, {ID: "zoom-out", Label: "Zoom Out"}, {ID: "zoom-100", Label: "100%"}, {ID: "fit-selection", Label: "Fit Selection"}}, invoke),
+			{ID: "zoom-percent", Kind: ui.Label, Text: fmt.Sprintf("%.0f%%", m.scene.View.Zoom*100), Accessibility: ui.Accessibility{Name: "Canvas zoom"}},
 			{ID: "snap", Kind: ui.Checkbox, Text: "Snap", Disabled: navigatingDisabled, Checked: m.snap, Change: func(e ui.ChangeEvent) {
 				if m.fileBusy() || m.move != nil {
 					return
