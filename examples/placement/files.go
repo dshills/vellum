@@ -13,7 +13,7 @@ import (
 )
 
 func (m *model) fileBusy() bool {
-	return m.layerDrag != nil || m.clipboardJob != nil || (m.output != nil && m.output.State().Busy) || (m.files != nil && m.files.State().Busy)
+	return m.preferencesLoading || m.layerDrag != nil || m.clipboardJob != nil || (m.output != nil && m.output.State().Busy) || (m.files != nil && m.files.State().Busy)
 }
 
 func (m *model) bindFiles(a *app.Application, ref app.WindowRef, choose func(context.Context, app.FileOptions) (string, error)) error {
@@ -154,6 +154,7 @@ func (m *model) openDrawing(a *app.Application, ref app.WindowRef, path string, 
 
 func (m *model) requestClose(a *app.Application) bool {
 	m.removeRecoveryOnClose = false
+	m.cancelPreferenceStartup()
 	if m.recovery.pending() {
 		// Closing a startup decision keeps the interrupted session's copy.
 		return true

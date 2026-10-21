@@ -25,6 +25,7 @@ func (m *model) setGridSpacing(id string) error {
 		return errors.New("unknown grid spacing")
 	}
 	m.gridSpacing = value
+	m.preferencesChanged(prefGridSpacing)
 	m.status = fmt.Sprintf("Grid spacing %.0f world units", value)
 	return nil
 }
@@ -40,6 +41,7 @@ func (m *model) gridControls(ref app.WindowRef, update func()) []ui.Node {
 				return
 			}
 			m.gridHidden = !e.Checked
+			m.preferencesChanged(prefGridVisible)
 			update()
 		}},
 		{ID: "grid-spacing", Kind: ui.MenuButton, Text: fmt.Sprintf("Grid: %.0f", m.spacing()), Options: options, Disabled: disabled, Change: func(e ui.ChangeEvent) {

@@ -38,6 +38,9 @@ type model struct {
 	chooseFile                        func(context.Context, app.FileOptions) (string, error)
 	newFileSession                    func() (*document.Session[drawingFile], error)
 	recent                            *recentDrawings
+	preferences                       *editorPreferences
+	preferencesLoading                bool
+	preferenceTouched                 uint8
 	geometry                          *geometryDraft
 	aspectLocked                      bool
 	gridHidden                        bool

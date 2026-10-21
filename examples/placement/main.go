@@ -37,21 +37,34 @@ func run() {
 	}
 	var recoveryErr error
 	var recentErr error
+	var preferencesErr error
 	if err := a.Do(func() {
+		var startupWarnings []string
+		m.preferences, preferencesErr = newEditorPreferences(a, windowRef, m, preferenceConfig{})
+		if preferencesErr != nil {
+			startupWarnings = append(startupWarnings, "Preferences unavailable: "+preferencesErr.Error())
+		}
 		m.recent, recentErr = newRecentDrawings(a, windowRef, recentConfig{})
 		if recentErr != nil {
-			m.status = "Recent drawings unavailable: " + recentErr.Error()
+			startupWarnings = append(startupWarnings, "Recent drawings unavailable: "+recentErr.Error())
 		}
 		m.recovery, recoveryErr = newPlacementRecovery(a, windowRef, m, recoveryConfig{})
 		if recoveryErr != nil {
-			m.status = "Recovery unavailable: " + recoveryErr.Error()
+			startupWarnings = append(startupWarnings, "Recovery unavailable: "+recoveryErr.Error())
+		}
+		if len(startupWarnings) > 0 {
+			m.status = strings.Join(startupWarnings, " • ")
 		}
 	}); err != nil {
 		fail(err)
 	}
 	defer m.recovery.Stop(false)
 	defer m.recent.Stop()
+	defer m.preferences.Stop()
 	runErr := a.Run(context.Background(), cogent.Driver{Commands: m.commands})
+	if err := m.preferences.Stop(); err != nil {
+		fmt.Fprintln(os.Stderr, "Preferences:", err)
+	}
 	if err := m.recent.Stop(); err != nil {
 		fmt.Fprintln(os.Stderr, "Recent drawings:", err)
 	}
@@ -202,6 +215,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 					return
 				}
 				m.aspectLocked = e.Checked
+				m.preferencesChanged(prefAspect)
 				update()
 			}},
 			{ID: "selection-subtract", Kind: ui.Checkbox, Text: "Subtract selection", Checked: m.selectionSubtract, Disabled: m.controlDisabled("interaction", m.clipboardAvailable() != nil), Change: func(e ui.ChangeEvent) {
@@ -209,6 +223,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 					return
 				}
 				m.selectionSubtract = e.Checked
+				m.preferencesChanged(prefSubtract)
 				update()
 			}},
 		}},

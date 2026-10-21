@@ -544,3 +544,13 @@ bottom (paint-order ties); the first stays fixed. Other units translate rigidly,
 keeping their perpendicular positions. Groups stay whole and snapping is ignored.
 Invalid gaps or member bounds reject the complete edit. Apply is one Undo entry;
 Cancel and stale dialog callbacks do not change geometry or history.
+
+## Persistent editor preferences (internal 21)
+
+Grid visibility/spacing, aspect lock and subtract-selection mode now survive
+restart in a bounded private settings file under the user configuration directory,
+separate from drawings and Recent. Snap remains a drawing setting. Defaults are
+visible grid, 20-unit spacing, aspect/subtract off. Loading finishes before editing
+starts; malformed settings fall back to defaults with a visible status. One
+coalesced worker writes atomic updates and joins on shutdown. Preferences never
+mark a drawing dirty or add Undo history.
