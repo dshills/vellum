@@ -78,8 +78,10 @@ func (m *model) captureCut() (*cutSelection, error) {
 		document: f, ids: slices.Clone(m.selectedIDs()), primary: m.scene.Selected}, nil
 }
 
-func (m *model) completeCut(cut *cutSelection) error {
-	if err := m.editAvailable(); err != nil {
+// A clipboard read may wait while native IO finishes. Admit it only against the
+// same detached document and selection that initiated the operation.
+func (m *model) validateClipboardSnapshot(cut *cutSelection) error {
+	if err := m.clipboardAvailable(); err != nil {
 		return err
 	}
 	if m.scene != cut.scene || m.journal != cut.journal || m.journal.Snapshot().Revision != cut.revision ||
@@ -92,6 +94,16 @@ func (m *model) completeCut(cut *cutSelection) error {
 	}
 	if !reflect.DeepEqual(f, cut.document) {
 		return history.ErrStale
+	}
+	return nil
+}
+
+func (m *model) completeCut(cut *cutSelection) error {
+	if err := m.editAvailable(); err != nil {
+		return err
+	}
+	if err := m.validateClipboardSnapshot(cut); err != nil {
+		return err
 	}
 	selected := make(map[string]bool, len(cut.ids))
 	for _, id := range cut.ids {
@@ -348,7 +360,7 @@ func (m *model) pasteSelection(text string) error {
 }
 
 func (m *model) bindClipboard(a *app.Application, ref app.WindowRef) error {
-	for _, c := range []struct{ id, label, shortcut string }{{"copy", "Copy", "Meta+C"}, {"cut", "Cut", "Meta+X"}, {"paste", "Paste", "Meta+V"}, {"paste-center", "Paste at View Center", ""}, {"duplicate", "Duplicate", "Meta+D"}} {
+	for _, c := range []struct{ id, label, shortcut string }{{"copy", "Copy", "Meta+C"}, {"cut", "Cut", "Meta+X"}, {"paste", "Paste", "Meta+V"}, {"paste-center", "Paste at View Center", ""}, {"duplicate", "Duplicate", "Meta+D"}, {"copy-fill", "Copy Fill Style", ""}, {"paste-fill", "Paste Fill Style", ""}} {
 		available := m.editAvailable
 		if c.id == "paste" || c.id == "paste-center" {
 			available = m.clipboardAvailable
@@ -376,7 +388,7 @@ func (m *model) startClipboardAction(a *app.Application, ref app.WindowRef, acti
 	if err := m.clipboardAvailable(); err != nil {
 		return err
 	}
-	paste := action == "paste" || action == "paste-center"
+	paste := action == "paste" || action == "paste-center" || action == "paste-fill"
 	center := canvas.Point{}
 	if action == "paste-center" {
 		if m.scene == nil || !finiteResize(m.scene.View.Center.X) || !finiteResize(m.scene.View.Center.Y) {
@@ -392,8 +404,22 @@ func (m *model) startClipboardAction(a *app.Application, ref app.WindowRef, acti
 			return err
 		}
 	}
+	var snapshot *cutSelection
+	if action == "paste-fill" {
+		var err error
+		snapshot, err = m.captureCut()
+		if err != nil {
+			return err
+		}
+	}
 	var text string
-	if !paste {
+	if action == "copy-fill" {
+		var err error
+		text, err = m.copyFillStyle()
+		if err != nil {
+			return err
+		}
+	} else if !paste {
 		objects, err := m.copiedSelection()
 		if err != nil {
 			return err
@@ -422,10 +448,16 @@ func (m *model) startClipboardAction(a *app.Application, ref app.WindowRef, acti
 	} else if cut != nil {
 		m.status = "Cutting components…"
 	}
+	if action == "copy-fill" {
+		m.status = "Copying fill style…"
+	} else if action == "paste-fill" {
+		m.status = "Reading fill style clipboard…"
+	}
+	guarded := cut != nil || snapshot != nil || action == "paste-center" || action == "copy-fill"
 	go func() {
-		// Cut keeps its context live through owner admission, so a canceled or
-		// timed-out successful write cannot remove objects while queued.
-		if cut == nil && action != "paste-center" {
+		// Guarded operations keep their context live through owner admission,
+		// so cancellation after native IO still refuses the queued completion.
+		if !guarded {
 			defer cancel()
 		}
 		var err error
@@ -434,7 +466,11 @@ func (m *model) startClipboardAction(a *app.Application, ref app.WindowRef, acti
 		} else {
 			err = service.WriteClipboard(ctx, text)
 		}
-		if paste && len(text) > drawingByteLimit {
+		limit := drawingByteLimit
+		if action == "paste-fill" {
+			limit = fillStyleByteLimit
+		}
+		if paste && len(text) > limit {
 			err = document.ErrTooLarge
 		}
 		if err == nil {
@@ -449,18 +485,25 @@ func (m *model) startClipboardAction(a *app.Application, ref app.WindowRef, acti
 				return
 			}
 			m.clipboardJob = nil
-			if err == nil && (cut != nil || action == "paste-center") {
+			if err == nil && guarded {
 				err = ctx.Err()
+			}
+			if err == nil && snapshot != nil {
+				err = m.validateClipboardSnapshot(snapshot)
 			}
 			if err == nil {
 				if paste {
-					if action == "paste-center" {
+					if action == "paste-fill" {
+						err = m.pasteFillStyle(text)
+					} else if action == "paste-center" {
 						err = m.pasteSelectionAt(text, center)
 					} else {
 						err = m.pasteSelection(text)
 					}
 				} else if cut != nil {
 					err = m.completeCut(cut)
+				} else if action == "copy-fill" {
+					m.status = "Copied primary component fill style"
 				} else {
 					m.pasteText, m.pasteCount = "", 0
 					m.status = "Copied selected components"

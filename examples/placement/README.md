@@ -586,3 +586,9 @@ Commands. Its modal and callbacks use the native window lifetime and draft ident
 ## Visual fill picker (internal 23)
 
 **Edit → Fill color…** now previews RGB slider and named swatch choices before Apply. The existing hex field and Default button remain available. Mixed selections start with a blank hex field and the primary member's preview. Apply changes the editable selection in one Undo; Cancel changes nothing. Fills remain opaque RGB. This composes the frozen public ColorPicker API in the app only.
+
+## Copy and paste fill style (internal 23)
+
+**Edit → Copy Fill Style** copies the primary member's actual color. Select other components or groups and choose **Paste Fill Style** to change their fills in one Undo/Redo. This uses a separate bounded, versioned native text clipboard payload; ordinary text and copied component payloads are rejected. Style actions do not change positions, names, grouping, selection or the ordinary Paste offset sequence. A pending read is rejected if the drawing or selection changes before owner admission.
+
+The frozen native clipboard service returns complete text before app validation; the 256-byte style limit bounds parsing/admission rather than native pasteboard allocation. Copy captures the primary color at invocation, like ordinary Copy; it does not track later selection changes.
