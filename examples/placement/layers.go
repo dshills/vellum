@@ -34,7 +34,7 @@ func (m *model) allLayerRows() []layerRow {
 		o := m.scene.Objects[i]
 		g := m.groups[o.ID]
 		if g != "" && !seen[g] {
-			label := fmt.Sprintf("Group %s · %d", m.layerLabel(g), counts[g])
+			label := fmt.Sprintf("Group %s · %d", m.layerLabel(g), counts[g]) + m.primaryLayerSuffix(g)
 			if m.layerLocked(g) {
 				label += " [locked]"
 			}
@@ -44,7 +44,7 @@ func (m *model) allLayerRows() []layerRow {
 			rows = append(rows, layerRow{g, label, selected[o.ID]})
 			seen[g] = true
 		}
-		label := m.layerLabel(o.ID)
+		label := m.layerLabel(o.ID) + m.primaryLayerSuffix(o.ID)
 		if m.layerLocked(o.ID) {
 			label += " [locked]"
 		}

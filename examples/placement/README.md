@@ -570,3 +570,7 @@ Commands. Its modal and callbacks use the native window lifetime and draft ident
 ## Select matching (internal 22)
 
 **Edit → Select matching…** combines a component type with a case-insensitive name/ID substring (128 characters maximum), including group names. Supply at least one filter. Any member match selects its complete visible, unlocked group. Replace clears selection on no matches; Add preserves the existing selection. The current primary remains if it survives, otherwise the frontmost selected component becomes primary. Selection changes leave document/history unchanged.
+
+## Explicit primary selection (internal 22)
+
+**Edit → Choose primary…** chooses among already-selected components and whole groups without clearing any selection or changing history/dirty state. Layers marks the primary member and its group. Choosing another group uses its frontmost selected member; keeping the current group retains the existing primary member. Match dimensions and primary alignment use this reference unit.
