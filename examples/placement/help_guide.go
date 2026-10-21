@@ -42,6 +42,12 @@ var helpTopics = []helpTopic{
 		"Private recovery offers the latest completed interrupted-session copy at startup. It is not a document version log. Explicit Save and Save a Copy remain the durable file workflow.",
 		"Grid visibility/spacing, aspect lock and subtract mode are remembered separately from drawings. Snap is saved with the drawing. Filter/collapse state clears on New/Open.",
 	}},
+	{"editing", "Fill, matching and repeated copies", []string{
+		"Edit → Fill color applies opaque #RRGGBB to the whole selected set in one Undo. Blank means mixed colors; enter default to restore type colors. Custom fills persist in drawings, clipboard and SVG.",
+		"Edit → Select matching combines type and case-insensitive name/ID filters, including group names. Supply at least one filter. Replace with no results clears selection; Add retains the previous set. Hidden or locked units are excluded.",
+		"Edit → Choose primary changes only the primary within the selected set. Layers marks that member and its group. Arrange → edges/centers to primary keeps the reference fixed while translating other units rigidly.",
+		"Edit → Repeat duplicates creates 1–100 additional copies at successive world X/Y offsets. Each copied group is independent. Zero offsets intentionally overlap. Capacity and all component origins must remain valid; one Undo removes the complete batch.",
+	}},
 	{"limits", "Known limitations", []string{
 		"This is an internal unsigned arm64 macOS test app. Framework scope is frozen and experimental rendering/pacing options remain disabled.",
 		"Placement and editing are same-window. Groups are flat. Rotation, independent grouped-member editing, cross-window drag and SVG import are not available.",

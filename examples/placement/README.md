@@ -578,3 +578,7 @@ Commands. Its modal and callbacks use the native window lifetime and draft ident
 ## Align to primary (internal 22)
 
 **Arrange → … to primary** aligns other selected components/groups to the reference unit's left/right/top/bottom edges or horizontal/vertical center. The primary unit stays fixed; groups move rigidly and perpendicular positions, sizes and paint order stay unchanged. Exact world-coordinate alignment ignores snapping and camera transforms. A changed arrangement is one Undo/Redo; no-op or invalid bounds adds none.
+
+## Repeated duplicates (internal 22)
+
+**Edit → Repeat duplicates…** creates 1–100 additional copies of the selection at successive numeric X/Y offsets in world units (each offset ±20000, final origins ±10000, total capacity512). Copy n uses n×offset from the originals; zero offsets intentionally overlap. Groups are independently recreated for every copy, preserving relative positions, sizes, names, custom fills and paint order. All copies are one Undo entry and receive fresh component/group IDs, with exact Redo and non-reused branch IDs. Snapping and clipboard contents are unchanged. All validation is atomic; invalid/canceled/stale dialogs leave the drawing unchanged. The built-in Help includes the Internal22 additions.

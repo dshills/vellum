@@ -56,6 +56,7 @@ type model struct {
 	fillDraft                         *fillDraft
 	matchingDraft                     *selectMatchingDraft
 	primaryDraft                      *primarySelectionDraft
+	repeatDraft                       *repeatDraft
 	commandKeys                       *commandPaletteKeys
 	modalEpoch                        uint64
 	move                              *objectMove
@@ -186,6 +187,10 @@ func newModel() (*model, error) {
 		return nil
 	}})
 	if err != nil {
+		m.palette.Close()
+		return nil, err
+	}
+	if err := m.bindRepeatDuplicates(); err != nil {
 		m.palette.Close()
 		return nil, err
 	}
