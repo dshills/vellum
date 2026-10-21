@@ -36,6 +36,7 @@ type model struct {
 	recent                            *recentDrawings
 	geometry                          *geometryDraft
 	aspectLocked                      bool
+	selectionSubtract                 bool
 	pendingOpenPath                   string
 	recovery                          *placementRecovery
 	removeRecoveryOnClose             bool

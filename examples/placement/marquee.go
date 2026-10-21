@@ -11,16 +11,40 @@ func marqueeRect(a, b canvas.Point) canvas.Rect {
 }
 
 // Shift-marquee adds positive-area intersections to the captured selection.
-// Paint order determines result order; edge-only contact does not select.
+// Keep this ungrouped additive entry point for existing callers.
 func marqueeIDs(objects []canvas.Rect, prior []string, bounds canvas.Rect) []string {
+	return marqueeSelection(objects, nil, prior, bounds, false)
+}
+
+// marqueeSelection computes a detached selection from one gesture snapshot.
+// Any intersected member affects its entire flat group. Results follow paint
+// order, contain only live IDs, and never mutate the snapshot or prior set.
+// The model's canonical setter separately excludes hidden and locked units.
+func marqueeSelection(objects []canvas.Rect, groups map[string]string, prior []string, bounds canvas.Rect, subtract bool) []string {
+	unit := func(id string) string {
+		if group := groups[id]; group != "" {
+			return group
+		}
+		return id
+	}
 	wanted := make(map[string]bool, len(prior))
 	for _, id := range prior {
-		wanted[id] = true
+		wanted[unit(id)] = true
+	}
+	touched := make(map[string]bool)
+	for _, o := range objects {
+		if bounds.Width > 0 && bounds.Height > 0 && o.X < bounds.X+bounds.Width && o.X+o.Width > bounds.X && o.Y < bounds.Y+bounds.Height && o.Y+o.Height > bounds.Y {
+			touched[unit(o.ID)] = true
+		}
 	}
 	ids := make([]string, 0, len(objects))
 	for _, o := range objects {
-		intersects := bounds.Width > 0 && bounds.Height > 0 && o.X < bounds.X+bounds.Width && o.X+o.Width > bounds.X && o.Y < bounds.Y+bounds.Height && o.Y+o.Height > bounds.Y
-		if wanted[o.ID] || intersects {
+		key := unit(o.ID)
+		keep := wanted[key] || touched[key]
+		if subtract {
+			keep = wanted[key] && !touched[key]
+		}
+		if keep {
 			ids = append(ids, o.ID)
 		}
 	}

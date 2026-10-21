@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"slices"
 
 	"github.com/dshills/vellum/canvas"
@@ -67,12 +68,12 @@ func (m *model) selectionToggle(g placement.Geometry, p canvas.Point) *objectMov
 	primary := m.scene.Selected
 	if id == "" {
 		m.scene.View = g.View
-		s := &objectMove{id: primary, before: slices.Clone(m.scene.Objects), selection: ids, start: p, grab: world, geometry: g, valid: true, marquee: true}
+		s := &objectMove{id: primary, before: slices.Clone(m.scene.Objects), selection: ids, start: p, grab: world, geometry: g, valid: true, marquee: true, marqueeSubtract: m.selectionSubtract, marqueeGroups: maps.Clone(m.groups)}
 		m.move = s
 		return s
 	}
 	unit := m.expandedSelection([]string{id})
-	if slices.Contains(ids, id) {
+	if m.selectionSubtract || slices.Contains(ids, id) {
 		ids = slices.DeleteFunc(ids, func(member string) bool { return slices.Contains(unit, member) })
 	} else {
 		ids = append(ids, unit...)

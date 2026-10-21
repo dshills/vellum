@@ -155,7 +155,11 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 	if len(selectedGroups) > 0 {
 		dimensions = fmt.Sprintf("%d selected • %d groups • corners resize", len(selection), len(selectedGroups))
 	}
-	help := "Group: Cmd+G • Ungroup: Cmd+Shift+G • Shift-drag selects • plain empty drag pans • corners resize selection"
+	selectionAction := "adds"
+	if m.selectionSubtract {
+		selectionAction = "subtracts"
+	}
+	help := "Shift-drag empty canvas " + selectionAction + " selection • empty drag pans • scroll zooms • Shift+corner locks ratio"
 	display := m.canvasForView()
 	root := ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{
 		{ID: "file-tools", Kind: ui.Toolbar, Children: []ui.Node{
@@ -209,11 +213,18 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 				m.aspectLocked = e.Checked
 				update()
 			}},
+			{ID: "selection-subtract", Kind: ui.Checkbox, Text: "Subtract selection", Checked: m.selectionSubtract, Disabled: m.controlDisabled("interaction", m.clipboardAvailable() != nil), Change: func(e ui.ChangeEvent) {
+				if ref.Context().Err() != nil || m.clipboardAvailable() != nil {
+					return
+				}
+				m.selectionSubtract = e.Checked
+				update()
+			}},
 		}},
 		{ID: "help", Kind: ui.Label, Text: dimensions + " • " + help, Style: compactControlStyle()},
 		{ID: "workspace", Kind: ui.Row, Grow: true, Children: []ui.Node{
 			{ID: "palette", Kind: ui.Column, MinWidth: 145, Children: tools},
-			{ID: "drawing", Kind: ui.Canvas2D, Disabled: busy, Canvas: display, CanvasObjects: objects, CanvasGrid: grid, PlacementTarget: m.target, Grow: true, Accessibility: ui.Accessibility{Name: "Component canvas", Help: "Shift-click toggles a component; Shift-drag empty canvas adds intersected components using a marquee; click empty space to clear selection; drag a selected component to move the selection; Option+Left/Right/Home/End selects one; drag selection corner handles to resize the set; plain empty drag or arrow keys pan; scroll zooms."}, Change: func(e ui.ChangeEvent) {
+			{ID: "drawing", Kind: ui.Canvas2D, Disabled: busy, Canvas: display, CanvasObjects: objects, CanvasGrid: grid, PlacementTarget: m.target, Grow: true, Accessibility: ui.Accessibility{Name: "Component canvas", Help: "Subtract selection changes Shift-click and Shift-marquee from add/toggle to remove; Shift-drag starts on empty canvas; click empty space to clear selection; drag a selected component to move the selection; Option+Left/Right/Home/End selects one; drag selection corner handles to resize the set; plain empty drag or arrow keys pan; scroll zooms."}, Change: func(e ui.ChangeEvent) {
 				m.scene.View = display.View
 				m.managedSelection(e.SelectedID)
 				m.status = fmt.Sprintf("Selected: %s • zoom %.0f%%", e.SelectedID, e.Number*100)

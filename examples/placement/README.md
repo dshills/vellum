@@ -414,3 +414,17 @@ the opposite corner and do not flip. One committed resize is one Undo/Redo entry
 The numeric inspector derives the other dimension when one size changes; incompatible
 explicit sizes are rejected. Step resizing of a single component also respects lock.
 The checkbox is session state and does not change saved drawing formats.
+
+## Subtractive selection
+
+Enable **Subtract selection**, then Shift-click a selected component or Shift-drag
+from empty canvas to remove intersected components and whole flat groups from the
+selection. A touch with any member removes that complete group. The rectangle
+uses positive-area intersections in either drag direction. Subtraction never adds
+components; the remaining set stays in paint order, keeping the primary if it
+survives. Disable the checkbox to restore additive Shift-marquee/toggle behavior.
+Selection changes do not dirty the drawing or add history. Escape, invalid/outside
+release and capture/camera/lifecycle cancellation keep the original marquee set.
+Plain empty drag still pans and the wheel still zooms. Shift on a selected corner
+handle retains temporary aspect-lock resizing. Mode/group membership are captured
+at press; preferences cannot change a gesture midway. The mode is session state.

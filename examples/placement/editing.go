@@ -25,6 +25,8 @@ type objectMove struct {
 	selection       []string
 	selectionOnly   bool
 	marquee         bool
+	marqueeSubtract bool
+	marqueeGroups   map[string]string
 	marqueeBounds   canvas.Rect
 }
 
@@ -149,7 +151,11 @@ func (m *model) previewMove(s *objectMove, p canvas.Point) {
 	s.dragging = true
 	if s.marquee {
 		s.marqueeBounds = marqueeRect(s.grab, world)
-		m.status = fmt.Sprintf("Marquee: %d components • release to select • Escape cancels", len(m.expandedSelection(marqueeIDs(s.before, s.selection, s.marqueeBounds))))
+		action := "add"
+		if s.marqueeSubtract {
+			action = "subtract"
+		}
+		m.status = fmt.Sprintf("Marquee "+action+": %d components • release to select • Escape cancels", len(m.expandedSelection(marqueeSelection(s.before, s.marqueeGroups, s.selection, s.marqueeBounds, s.marqueeSubtract))))
 		return
 	}
 	// Keep the initial world grab point while mapping the current pointer with
@@ -215,7 +221,7 @@ func (m *model) finishMove(s *objectMove, p canvas.Point) error {
 	if s.marquee {
 		m.move = nil
 		if s.dragging {
-			m.setSelection(marqueeIDs(s.before, s.selection, s.marqueeBounds), s.id)
+			m.setSelection(marqueeSelection(s.before, s.marqueeGroups, s.selection, s.marqueeBounds, s.marqueeSubtract), s.id)
 			m.status = fmt.Sprintf("Marquee selected %d components", len(m.selectedIDs()))
 		}
 		return nil
