@@ -1,0 +1,91 @@
+{
+  "outcome": "VALID_CPU_SOURCE_COST_DIAGNOSTIC",
+  "source_checkpoint": "29f6cf4",
+  "started_utc": "2026-10-21T21:43:24.188591+00:00",
+  "finished_utc": "2026-10-21T21:43:57.021423+00:00",
+  "elapsed_seconds": 32.832832,
+  "maximum_seconds": 60,
+  "native_commands": 1,
+  "probe_commands": 8,
+  "retired_owned_groups": 9,
+  "warmup_states": 128,
+  "measured_states": 120,
+  "source_records_all_phases": 248,
+  "source_kind_counts": {
+    "1": 248
+  },
+  "metrics": {
+    "outcome": "VALID_CPU_SOURCE_DIAGNOSTIC",
+    "warmup": 128,
+    "measured": 120,
+    "release_qualified": false,
+    "physical_input_verified": false,
+    "source_phase_ms": {
+      "DrawNS": {
+        "count": 120,
+        "p50": 2.770083,
+        "p95": 3.387041,
+        "p99": 3.52075,
+        "max": 3.666375
+      },
+      "RasterNS": {
+        "count": 120,
+        "p50": 0.718959,
+        "p95": 0.741875,
+        "p99": 0.963625,
+        "max": 0.997459
+      },
+      "CopyNS": {
+        "count": 120,
+        "p50": 2.074083,
+        "p95": 2.659208,
+        "p99": 2.958625,
+        "max": 3.046208
+      },
+      "SetFromGoImageNS": {
+        "count": 120,
+        "p50": 2.065334,
+        "p95": 2.6495,
+        "p99": 2.949459,
+        "max": 3.036792
+      }
+    },
+    "totals": {
+      "DrawNS": 320576580,
+      "RasterNS": 73246875,
+      "CopyNS": 247037708,
+      "SetFromGoImageNS": 245990883,
+      "SetFromGoImageAttempts": 120,
+      "ImageCacheHits": 0,
+      "LogicalUploadRGBABytes": 923065920
+    },
+    "nested_shares_of_source_draw": {
+      "RasterNS": 0.22848479761060525,
+      "CopyNS": 0.7706043529443105,
+      "SetFromGoImageNS": 0.7673389085378601
+    },
+    "presentation_feedback_accounting_valid": true,
+    "latency_gate_qualified": false,
+    "diagnostic_only": "Additional source clocks/counters and two private compiler overlays; these timings are not ordinary latency qualification or successful GPU transfer evidence."
+  },
+  "release_gate_changed": false,
+  "framework_qualified": false,
+  "successful_GPU_upload_or_physical_transfer_proven": false,
+  "conclusion": "Current rectangle workload source draw CPU cost is mainly image copy/upload API work, not rasterization: pooled nested shares about77% copy and23% raster. Inspect actual allocation/copy/queue boundary before choosing a repair.",
+  "limits": [
+    "One detailed run only; extra clocks and three compiler overlay locations affect elapsed time.",
+    "Nested phase quantiles are not additive and source costs are not additional UI work.",
+    "Logical image bytes count attempted inputs, not successful or physical GPU transfers.",
+    "Original failed constructor-only scope remains failed; regression-proven stage106 fixes diagnostic initialization, not presentation latency.",
+    "Frozen classifier informational string says two overlays; actual pinned overlay JSON contains three locations. Only that wording is corrected after retaining exact original source.",
+    "No renderer/pacing/public API/retained SDK or release-gate change; no ordinary latency qualification."
+  ],
+  "metrics_producer": {
+    "source_checkpoint": "29f6cf4",
+    "frozen_classifier_sha256": "9580cb07ac41d0b1d6ccd6f57441077df6f76993ab41de3baabf220628f75dcc",
+    "saved_source_evidence_member": "source-snapshot/tools/macos-calibration/sourcecost/check.py",
+    "metrics_copied_from_frozen_validation": true,
+    "metrics_regenerated_with_current_classifier": false,
+    "wording_erratum": "Frozen metrics description says two overlays; original pinned overlay JSON and exact files show three. Current source fixes only that informational phrase. Numeric fields and raw acceptance are unchanged."
+  }
+}

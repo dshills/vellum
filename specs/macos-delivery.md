@@ -1029,3 +1029,15 @@ build improvement follows; earlier original 51–52 ms failures remain unwaived.
 All states/process/source/SDK/configuration checks pass without rebuild or default
 change. Inspect actual input/observer source work before selecting a repair;
 features remain frozen, release gate unchanged and M3–M7 open.
+
+
+### Matched-rectangle source cost and diagnostic repair (21 October 2026)
+
+The [one-shot source-cost diagnostic](../docs/reports/macos-calibration-sourcecost/README.md)
+locates about77% of source Draw CPU time in image copy/upload API work and23% in
+raster for this fixture; image API p95 is2.650 ms versus raster0.742 ms. Extra
+clocks prevent ordinary latency qualification. Stage0106 fixes missing grouped
+diagnostic storage with original-failing/race-passing regressions; it changes no
+ordinary rendering/pacing behavior or public API. Retained SDK and native archive
+remain unchanged. Inspect native allocation/mapping/copy/queue work inside image
+upload before choosing a performance repair; gate/freeze and M3–M7 stay unchanged.
