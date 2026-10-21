@@ -9,6 +9,15 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
+The latest [native latency investigation](../docs/reports/macos-native-latency-investigation/README.md)
+confirms the effective two-drawable synchronized native configuration, but rejects
+all four private repair candidates for invalid capture or excessive latency.
+No production change is adopted. A minimal Metal reference is diagnostic only;
+startup feedback loss prevents qualification or an OS-floor claim. Frame-
+production/provided-drawable integration and matched target-timestamp evidence
+are the next implementation boundary. The latency blocker and Mac release remain
+open.
+
 The latest [default-path assessment](../docs/reports/macos-default-responsiveness/README.md)
 uses retained SDK `bd3cbc9` with experimental backpressure disabled. Three native
 captures are valid. One paced-grid run passes cadence (599/599 intervals within

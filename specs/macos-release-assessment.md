@@ -66,3 +66,20 @@ records valid feedback, passing single-run paced-grid cadence and failed latency
 The campaign stopped at that failure; no repeated or fourth case was run. The
 next focused boundary is effective native configuration/outstanding frames,
 before any presentation policy change. M3 and the Mac release remain open.
+
+## Focused native investigation result
+
+The [native investigation](../docs/reports/macos-native-latency-investigation/README.md)
+confirms the two-drawable synchronized native configuration. Transaction mode,
+explicit transaction flush, temporary display-link acquisition and a persistent
+acquisition broker are rejected: invalid prefix feedback or latency above the
+unchanged gate. No shipping framework change is adopted. The minimal Metal clear
+reference also has startup feedback loss and is not qualification or an OS floor.
+
+Do not tune those rejected paths again. The next implementation boundary is a
+window-owned native frame request before reconciliation, with explicit provided-
+drawable ownership through the native surface rather than interception of
+`nextDrawable`. First bind a matched ready-window reference and record actual
+callback/target-presentation timestamps. Preserve receipt-before-queue semantics,
+all states, FIFO/vsync, cancellation and shutdown. Missing target timestamps and
+failed prefixes currently prevent choosing a safe repair; this does not waive M3.

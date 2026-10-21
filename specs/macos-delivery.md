@@ -9,7 +9,22 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
-## Current checkpoint — bounded default-path assessment
+## Current checkpoint — native latency investigation; blocker unresolved
+
+The [native investigation](../docs/reports/macos-native-latency-investigation/README.md)
+confirms two native drawables with vsync. All four private presentation candidates
+are rejected: invalid capture or valid p95 47.856 ms above 33.3 ms. No framework
+policy or SDK change is adopted. A minimal native Metal reference has startup
+losses and is not qualification or proof of an OS latency floor. Seven native
+and 16 probe groups retire; this is not a native deallocation certificate.
+
+The next implementation boundary is a native frame-production request ahead of
+reconciliation with explicit provided-drawable ownership, plus a matched ready-
+window reference recording callback/target timestamps. Do not repeat rejected
+acquisition-policy trials, move the input receipt, discard states or relax gates.
+M3 and M4–M7 remain open. See the [bounded plan](macos-release-assessment.md).
+
+## Previous checkpoint — bounded default-path assessment
 
 The [21 October assessment](../docs/reports/macos-default-responsiveness/README.md)
 uses the retained manifest-valid SDK `bd3cbc9`, default pacing, and source-built

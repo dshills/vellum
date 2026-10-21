@@ -1,0 +1,194 @@
+{
+  "outcome": "BLOCKER_UNRESOLVED_NO_POLICY_ADOPTED",
+  "framework_unchanged": true,
+  "baseline_sdk_source": "bd3cbc9ce2566955dae5dbb61385b0e1a9307eaa",
+  "current_main_at_start": "f0c797f",
+  "effective_native_configuration": {
+    "event": "vellum.native.layer-config",
+    "maximum_drawable_count": 2,
+    "display_sync_enabled": true,
+    "presents_with_transaction": false,
+    "allows_next_drawable_timeout": false
+  },
+  "trials": {
+    "config-probe-v2": {
+      "native_binary_sha256": "30e2889d931745cf9f8a558277c729edbb41bf4336fc6934cc970fafcc8fc6c4",
+      "exit_code": 0,
+      "seconds": 5.612804624950513,
+      "owned_retired": true,
+      "journal_sha256": "7bbffbeb8357e9f4ed54d6a4ee00e53251208aec58cd6cc19379cec573509eb0",
+      "prefix_states": {
+        "Pending": 0,
+        "Skipped": 0,
+        "Unavailable": 0,
+        "Invalid": 0,
+        "Retired": 0,
+        "Overflow": false,
+        "Failed": false,
+        "Failure": ""
+      },
+      "prefix_records": 251,
+      "run_error": "",
+      "decision": "REFUSE_CONFIGURATION_EVIDENCE; C source overlay absent from executable"
+    },
+    "config-probe-v3": {
+      "native_binary_sha256": "529ba99c7c3fd98b2f53f91c97cfb8e7ad080fd6b6310cbe3046372e3c6ab9a8",
+      "exit_code": 0,
+      "seconds": 5.396227791905403,
+      "owned_retired": true,
+      "journal_sha256": "fcf10b0cf08d80e615bfc8b0ef2753b48a2fe9531c21ebcdf2f6a9821e142a4b",
+      "prefix_states": {
+        "Pending": 0,
+        "Skipped": 0,
+        "Unavailable": 0,
+        "Invalid": 0,
+        "Retired": 0,
+        "Overflow": false,
+        "Failed": false,
+        "Failure": ""
+      },
+      "prefix_records": 251,
+      "run_error": "",
+      "decision": "CONFIGURATION_READ_COMPLETE;observational only"
+    },
+    "transaction-candidate": {
+      "native_binary_sha256": "9b95744a05f1df684561b5889f9f1f7d691f63031441ba25866e092fcace7e15",
+      "exit_code": 1,
+      "seconds": 3.6435920828953385,
+      "owned_retired": true,
+      "journal_sha256": "01d8a3484e78064fe5d14834d7393b2f7f04225c4e4f0a57b5e5e08a1b88505a",
+      "prefix_states": {
+        "Pending": 0,
+        "Skipped": 251,
+        "Unavailable": 0,
+        "Invalid": 0,
+        "Retired": 0,
+        "Overflow": false,
+        "Failed": false,
+        "Failure": ""
+      },
+      "prefix_records": 251,
+      "run_error": "presentation capture: lost prefix feedback\npresentation capture: lost prefix feedback",
+      "decision": "REJECT_ALL_PREFIX_STATES_SKIPPED"
+    },
+    "transaction-flush-candidate": {
+      "native_binary_sha256": "76fd1d2e722eed7c0526d1ee854ba360bebbaed5471a5c34650b1fc34cabcc5f",
+      "exit_code": 0,
+      "seconds": 5.561634584097192,
+      "owned_retired": true,
+      "journal_sha256": "ef40768f204f19209501359f44567a905339271aeb5249bfeb1217477321d238",
+      "prefix_states": {
+        "Pending": 0,
+        "Skipped": 0,
+        "Unavailable": 0,
+        "Invalid": 0,
+        "Retired": 0,
+        "Overflow": false,
+        "Failed": false,
+        "Failure": ""
+      },
+      "prefix_records": 251,
+      "run_error": "",
+      "strict_validation": "VALID_SERIAL_NATIVE_FEEDBACK_JOURNAL",
+      "measured_latency_ms": {
+        "count": 120,
+        "p50": 47.22220846451819,
+        "p95": 47.85604169592261,
+        "p99": 47.94954159297049,
+        "max": 48.441499937325716
+      },
+      "decision": "REJECT_VALID_CAPTURE_LATENCY_FAILED"
+    },
+    "displaylink-candidate": {
+      "native_binary_sha256": "6027bb9daec85867426a1aeb81b62ddad817967fac76546f0dbdc017004d127b",
+      "exit_code": 1,
+      "seconds": 5.451798541005701,
+      "owned_retired": true,
+      "journal_sha256": "d11a10e68f7c966b89194400adb18419a60ef9f74df64ad2e572d82688c1ae64",
+      "prefix_states": {
+        "Pending": 0,
+        "Skipped": 83,
+        "Unavailable": 0,
+        "Invalid": 0,
+        "Retired": 0,
+        "Overflow": false,
+        "Failed": false,
+        "Failure": ""
+      },
+      "prefix_records": 251,
+      "run_error": "presentation capture: lost prefix feedback\npresentation capture: lost prefix feedback",
+      "decision": "REJECT_INVALID_CAPTURE",
+      "candidate_binding": {
+        "kind": "private bounded per-acquisition display-link prototype; not production/adopted",
+        "baseline": "bd3cbc9ce2566955dae5dbb61385b0e1a9307eaa",
+        "original_m_sha256": "7d80dc11d7f0f9aa739a62e9349a5156a33d4272a1a60b58570de578fd04f4d6",
+        "candidate_m_sha256": "b66200527bb6844eb85cc547cc3983441540928e9c6ae3b9310b21033659bed5",
+        "guard": "250ms per-acquisition deadline; every link invalidated in finally; process watchdog45seconds; no link retained after return; no fallback on macOS14+"
+      }
+    },
+    "persistent-link-candidate": {
+      "native_binary_sha256": "616f2be0a81dd5a93b75991295e44c3cda2cda909d471e1e9087d8f859cb2698",
+      "exit_code": 1,
+      "seconds": 5.654545333003625,
+      "owned_retired": true,
+      "journal_sha256": "26ce87c8ab91361de686157152720d97fdcd5e08693f1b29f8d90eded9500fdf",
+      "prefix_states": {
+        "Pending": 0,
+        "Skipped": 1,
+        "Unavailable": 0,
+        "Invalid": 0,
+        "Retired": 0,
+        "Overflow": false,
+        "Failed": false,
+        "Failure": ""
+      },
+      "prefix_records": 252,
+      "run_error": "presentation capture: lost prefix feedback\npresentation capture: lost prefix feedback",
+      "decision": "REJECT_INVALID_CAPTURE",
+      "candidate_binding": {
+        "kind": "private persistent display-link owner; not adopted;one paused native thread,wake source,drawable slot",
+        "baseline": "bd3cbc9ce2566955dae5dbb61385b0e1a9307eaa",
+        "original_m_sha256": "7d80dc11d7f0f9aa739a62e9349a5156a33d4272a1a60b58570de578fd04f4d6",
+        "candidate_m_sha256": "ef5d0b4450633328f5e8af656c4eeacf5a3df54b937a7c31b19c4e947124f13c",
+        "guard": "250ms acquisition;2second join;timeout explicitly reports/quarantines native owner;not release-qualified on timeout"
+      }
+    },
+    "metal-reference": {
+      "native_binary_sha256": "d60d417b25f003f36a1bd433747cf3fd8a728a231c0f26fba8b3caf05e8d3c7e",
+      "exit_code": 0,
+      "seconds": 4.499068374978378,
+      "owned_retired": true,
+      "decision": "REFUSE_QUALIFICATION_STARTUP_FEEDBACK_INVALID",
+      "all_record_count": 248,
+      "nonpositive_feedback_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        14
+      ],
+      "measured_nonpositive_count": 0,
+      "partial_measured_diagnostic_ms": {
+        "count": 120,
+        "p50": 48.59770811162889,
+        "p95": 48.83179091848433,
+        "p99": 48.887083074077964,
+        "max": 48.890499863773584
+      },
+      "native_os_floor_proven": false
+    }
+  },
+  "native_commands": 7,
+  "probe_commands": 16,
+  "all_owned_groups_retired": true,
+  "release_qualified": false
+}
