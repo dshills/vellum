@@ -179,7 +179,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 			{ID: "open", Kind: ui.Button, Text: "Open…", Disabled: m.files == nil || m.commandDisabled("open"), Activate: invoke("open")},
 			{ID: "save", Kind: ui.Button, Text: "Save", Disabled: m.files == nil || m.commandDisabled("save"), Activate: invoke("save")},
 			{ID: "save-as", Kind: ui.Button, Text: "Save As…", Disabled: m.files == nil || m.commandDisabled("save-as"), Activate: invoke("save-as")},
-			m.actionMenu("file-extra-menu", "More", []ui.Option{{ID: "save-copy", Label: "Save a Copy…"}, {ID: "export-svg", Label: "Export SVG…"}, {ID: "export-selected-svg", Label: "Export Selected SVG…"}}, invoke),
+			m.actionMenu("file-extra-menu", "More", []ui.Option{{ID: "save-copy", Label: "Save a Copy…"}, {ID: "export-svg", Label: "Export SVG…"}, {ID: "export-selected-svg", Label: "Export Selected SVG…"}, {ID: "revert-saved", Label: "Revert to Saved…"}}, invoke),
 			m.recentMenu(a, ref, update),
 			{ID: "commands-open", Kind: ui.Button, Text: "Commands…", Disabled: m.commandDisabled("command-palette"), Activate: invoke("command-palette")},
 			{ID: "help-open", Kind: ui.Button, Text: "Help…", Disabled: m.commandDisabled("help-guide"), Activate: invoke("help-guide")},
@@ -244,7 +244,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		{ID: "status", Kind: ui.StatusBar, Children: []ui.Node{{ID: "message", Kind: ui.Label, Text: fmt.Sprintf("%s • %d objects • %d selected • Undo %d / Redo %d", m.status, len(m.scene.Objects), len(selection), m.journal.Snapshot().UndoCount, m.journal.Snapshot().RedoCount)}}},
 	}}
 	root.Children[1].Children = append(root.Children[1].Children, m.gridControls(ref, update)...)
-	root.Children = append(root.Children, m.filePrompt(a, ref), m.renameDialog(a, ref), m.recovery.promptNode(), m.geometryDialog(a, ref), m.commandPaletteDialog(a, ref), m.spacingDialog(a, ref), m.helpGuideDialog(a, ref), m.fillColorDialog(a, ref), m.selectMatchingDialog(a, ref), m.primarySelectionDialog(a, ref), m.repeatDuplicatesDialog(a, ref))
+	root.Children = append(root.Children, m.filePrompt(a, ref), m.renameDialog(a, ref), m.recovery.promptNode(), m.geometryDialog(a, ref), m.commandPaletteDialog(a, ref), m.spacingDialog(a, ref), m.helpGuideDialog(a, ref), m.fillColorDialog(a, ref), m.selectMatchingDialog(a, ref), m.primarySelectionDialog(a, ref), m.repeatDuplicatesDialog(a, ref), m.revertPrompt(a, ref))
 	for i := range root.Children {
 		if root.Children[i].Kind == ui.Toolbar {
 			for j := range root.Children[i].Children {

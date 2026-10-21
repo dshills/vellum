@@ -54,6 +54,7 @@ type model struct {
 	spacingDraft                      *spacingDraft
 	helpDraft                         *helpDraft
 	fillDraft                         *fillDraft
+	revertDraft                       *revertDraft
 	matchingDraft                     *selectMatchingDraft
 	primaryDraft                      *primarySelectionDraft
 	repeatDraft                       *repeatDraft

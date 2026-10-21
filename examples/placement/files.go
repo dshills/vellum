@@ -79,7 +79,7 @@ func (m *model) bindFiles(a *app.Application, ref app.WindowRef, choose func(con
 			return err
 		}
 	}
-	return nil
+	return m.bindRevertSaved(a, ref)
 }
 
 func drawingSuggestion(name string) string {

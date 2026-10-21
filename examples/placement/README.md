@@ -596,3 +596,7 @@ The frozen native clipboard service returns complete text before app validation;
 ## Export Selected SVG (internal 23)
 
 **More → Export Selected SVG…** exports only the selected visible components and complete groups, retaining paint order, names, opaque fills and world geometry. The SVG viewBox fits their bounds. Camera, grid and selection handles are omitted. Export captures a snapshot before the chooser opens and leaves the active path, dirty state and Undo/Redo unchanged. The separate destination cannot overwrite the active drawing. SVG import remains unavailable.
+
+## Revert to Saved (internal 23)
+
+**More → Revert to Saved…** reloads the current file without a chooser. It is unavailable for an untitled drawing or during another action. Unsaved edits require **Discard and Revert** confirmation; Cancel keeps the current drawing. A successful validated reload restores saved geometry, fills, groups, metadata, camera and snapping, marks it clean and clears Undo/Redo. Missing, unreadable or invalid files leave the current drawing, path and both history stacks intact. This is reload from disk, not a version browser; another program's valid changes are loaded too.
