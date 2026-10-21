@@ -23,6 +23,7 @@ func (m *model) compactActions(invoke func(string) func()) ui.Node {
 	for _, a := range arrangementActions {
 		arrange = append(arrange, ui.Option{ID: a.id, Label: a.label})
 	}
+	arrange = append(arrange, matchDimensionOptions...)
 	return ui.Node{ID: "action-tools", Kind: ui.Toolbar, Children: []ui.Node{
 		m.actionMenu("edit-menu", "Edit", []ui.Option{{ID: "cut", Label: "Cut  ⌘X"}, {ID: "copy", Label: "Copy  ⌘C"}, {ID: "paste", Label: "Paste  ⌘V"}, {ID: "paste-center", Label: "Paste at View Center"}, {ID: "duplicate", Label: "Duplicate  ⌘D"}, {ID: "delete", Label: "Delete selected"}, {ID: "select-all", Label: "Select All  ⌘A"}, {ID: "deselect-all", Label: "Deselect All  ⌘⇧A"}, {ID: "invert-selection", Label: "Invert Selection"}}, invoke),
 		m.actionMenu("move-menu", "Move", []ui.Option{{ID: "move-left", Label: "Left"}, {ID: "move-right", Label: "Right"}, {ID: "move-up", Label: "Up"}, {ID: "move-down", Label: "Down"}}, invoke),

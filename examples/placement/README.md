@@ -525,3 +525,13 @@ the search field chooses a result; Return runs it; Escape or Cancel closes the
 palette. The first twelve matches are shown; narrow the query to find more.
 Shortcuts and disabled reasons are displayed. Running uses the same command
 registry and live admission checks as menus, with no separate edit/history path.
+
+## Match dimensions (internal 21)
+
+Arrange offers **Match width/height/size to primary** with at least two selected
+components or flat groups. The primary component's group bounds are the reference
+and stay unchanged. Other units keep their top-left position. Groups always scale
+uniformly, including member spacing; aspect lock also makes single components
+scale uniformly. Matching both dimensions refuses incompatible proportions rather
+than distort a group. Unlocked single components can match both dimensions exactly.
+Bounds failures reject the whole action; accepted changes are one Undo/Redo edit.
