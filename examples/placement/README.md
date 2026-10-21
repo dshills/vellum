@@ -346,3 +346,11 @@ remain interaction units: hiding/showing a member controls its whole group. A hi
 row can still be focused for Show/Rename and dragged to reorder. Fit uses visible
 objects. Canvas navigation continues through the app's visible projection; no
 framework APIs or renderer changed.
+
+**Lock / Unlock** persists an undoable protection property. Locked objects remain
+painted but cannot be canvas-selected, moved, resized, deleted, grouped or layer-
+dragged. Locking a member controls its whole flat group; imported member locks
+also protect that group. Layer rows remain focusable for Unlock, Rename and
+visibility controls. Locking clears the editable selection; Undo restores it.
+Unlocked components may still be reordered around locked layers. No framework
+behavior changes.

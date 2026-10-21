@@ -67,7 +67,7 @@ func (m *model) beginLayerDrag(source string, p canvas.Point, g layerLayout) *la
 			break
 		}
 	}
-	if primary == "" {
+	if primary == "" || m.layerLocked(primary) {
 		return nil
 	}
 	selection := m.selectedIDs()

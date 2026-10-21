@@ -15,6 +15,7 @@ import (
 type layerMetadata struct {
 	Name   string `json:"name,omitempty"`
 	Hidden bool   `json:"hidden,omitempty"`
+	Locked bool   `json:"locked,omitempty"`
 }
 
 func validLayerName(name string) bool {

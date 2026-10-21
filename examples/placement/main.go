@@ -98,6 +98,9 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 	}
 	objects := make([]ui.CanvasObject, 0, len(m.scene.Objects))
 	for _, object := range m.visibleObjects() {
+		if m.layerLocked(object.ID) {
+			continue
+		}
 		kind, _, _ := strings.Cut(object.ID, "-")
 		label := map[string]string{"block": "Block", "connector": "Connector", "note": "Note"}[kind]
 		if selectedSet[object.ID] && len(selection) > 1 {

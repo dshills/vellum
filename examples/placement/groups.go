@@ -25,7 +25,7 @@ func (m *model) expandedSelection(ids []string) []string {
 	}
 	result := make([]string, 0, len(ids))
 	for _, o := range m.scene.Objects {
-		if (wanted[o.ID] || (m.groups[o.ID] != "" && groups[m.groups[o.ID]])) && !m.layerHidden(o.ID) {
+		if (wanted[o.ID] || (m.groups[o.ID] != "" && groups[m.groups[o.ID]])) && !m.layerHidden(o.ID) && !m.layerLocked(o.ID) {
 			result = append(result, o.ID)
 		}
 	}

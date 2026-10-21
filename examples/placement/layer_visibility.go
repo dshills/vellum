@@ -106,7 +106,7 @@ func (m *model) canvasForView() *canvas.Scene {
 func (m *model) objectAtWorld(p canvas.Point) string {
 	for i := len(m.scene.Objects) - 1; i >= 0; i-- {
 		o := m.scene.Objects[i]
-		if !m.layerHidden(o.ID) && p.X >= o.X && p.X <= o.X+o.Width && p.Y >= o.Y && p.Y <= o.Y+o.Height {
+		if !m.layerHidden(o.ID) && !m.layerLocked(o.ID) && p.X >= o.X && p.X <= o.X+o.Width && p.Y >= o.Y && p.Y <= o.Y+o.Height {
 			return o.ID
 		}
 	}
