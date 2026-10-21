@@ -1018,3 +1018,14 @@ not isolated shipping cost or proof of zero observer impact. All startup prefixe
 and three prior rejected attempts remain retained; no SDK/default changes occur.
 Compare the retained original binary against the private observer-off derivative
 before choosing a production repair. Features remain frozen and M3–M7 stay open.
+
+
+### Retained-versus-derivative binary control (21 October 2026)
+
+The [three-pair control](../docs/reports/macos-backend-build-control/README.md)
+finds retained-original p95 35.190–36.014 ms and private observer-off derivative
+35.575–45.871 ms. All six miss 33.3 ms. No binary equivalence or consistent private
+build improvement follows; earlier original 51–52 ms failures remain unwaived.
+All states/process/source/SDK/configuration checks pass without rebuild or default
+change. Inspect actual input/observer source work before selecting a repair;
+features remain frozen, release gate unchanged and M3–M7 open.

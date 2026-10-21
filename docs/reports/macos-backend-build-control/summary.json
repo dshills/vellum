@@ -1,0 +1,244 @@
+{
+  "outcome": "THREE_VALID_RETAINED_DERIVATIVE_PAIRS",
+  "source_checkpoint": "5746cff",
+  "started_utc": "2026-10-21T21:19:56.447363+00:00",
+  "finished_utc": "2026-10-21T21:23:18.169037+00:00",
+  "elapsed_seconds": 201.721674,
+  "maximum_seconds": 240,
+  "native_commands": 6,
+  "probe_commands": 48,
+  "retired_owned_groups": 54,
+  "warmup_states": 768,
+  "measured_states": 720,
+  "runs": [
+    {
+      "pair": 1,
+      "mode": "retained",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 28.484791750088334,
+          "p95": 35.42441665194929,
+          "p99": 42.25904168561101,
+          "max": 42.50287497416139
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.358416724950075,
+          "p95": 3.973666811361909,
+          "p99": 4.216333385556936,
+          "max": 4.321666667237878
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 24.75804160349071,
+          "p95": 32.30766672641039,
+          "p99": 40.255166590213776,
+          "max": 41.03050008416176
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      }
+    },
+    {
+      "pair": 1,
+      "mode": "derived",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 29.217249946668744,
+          "p95": 35.9697500243783,
+          "p99": 47.97912482172251,
+          "max": 49.58083340898156
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.2762084156274796,
+          "p95": 3.9099999703466892,
+          "p99": 4.478916758671403,
+          "max": 4.5697917230427265
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.54887509904802,
+          "p95": 32.60549996048212,
+          "p99": 45.26591650210321,
+          "max": 47.279666643589735
+        },
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "observer_mode": "off"
+      }
+    },
+    {
+      "pair": 2,
+      "mode": "derived",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 28.944416670128703,
+          "p95": 45.87120842188597,
+          "p99": 49.42329158075154,
+          "max": 49.44595834240317
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.324958262965083,
+          "p95": 4.012041725218296,
+          "p99": 4.570291610434651,
+          "max": 4.888624884188175
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.536208413541317,
+          "p95": 43.55020844377577,
+          "p99": 48.19820821285248,
+          "max": 48.218416748568416
+        },
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "observer_mode": "off"
+      }
+    },
+    {
+      "pair": 2,
+      "mode": "retained",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 28.26149994507432,
+          "p95": 35.18995828926563,
+          "p99": 36.18462500162423,
+          "max": 36.738791735842824
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.3479167614132166,
+          "p95": 3.9089166093617678,
+          "p99": 4.175666719675064,
+          "max": 5.498499842360616
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 24.84295843169093,
+          "p95": 32.75712509639561,
+          "p99": 33.257083501666784,
+          "max": 34.19766668230295
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      }
+    },
+    {
+      "pair": 3,
+      "mode": "retained",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 29.212249908596277,
+          "p95": 36.01370844990015,
+          "p99": 37.10420825518668,
+          "max": 46.27275001257658
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.3332083839923143,
+          "p95": 3.847541520372033,
+          "p99": 4.1092499159276485,
+          "max": 4.1224167216569185
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.611166609451175,
+          "p95": 33.19633333012462,
+          "p99": 34.54275010153651,
+          "max": 43.93262509256601
+        },
+        "release_qualified": false,
+        "physical_input_verified": false
+      }
+    },
+    {
+      "pair": 3,
+      "mode": "derived",
+      "metrics": {
+        "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+        "warmup": 128,
+        "measured": 120,
+        "setup_losses": 0,
+        "receipt_to_present_ms": {
+          "count": 120,
+          "p50": 28.658750001341105,
+          "p95": 35.5752082541585,
+          "p99": 37.33062488026917,
+          "max": 38.57520851306617
+        },
+        "receipt_to_acquire_ms": {
+          "count": 120,
+          "p50": 3.325708443298936,
+          "p95": 3.9771250449121,
+          "p99": 4.15687495842576,
+          "max": 4.168166778981686
+        },
+        "acquire_to_present_ms": {
+          "count": 120,
+          "p50": 25.244708405807614,
+          "p95": 33.257874893024564,
+          "p99": 34.093749942258,
+          "max": 34.625250147655606
+        },
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "observer_mode": "off"
+      }
+    }
+  ],
+  "differences_of_run_p95_values": [
+    {
+      "pair": 1,
+      "derived_minus_retained_p95_ms": 0.5453333724290133
+    },
+    {
+      "pair": 2,
+      "derived_minus_retained_p95_ms": 10.681250132620335
+    },
+    {
+      "pair": 3,
+      "derived_minus_retained_p95_ms": -0.43850019574165344
+    }
+  ],
+  "release_gate_changed": false,
+  "framework_qualified": false,
+  "binary_equivalence_proven": false,
+  "pure_native_library_cost_isolated": false,
+  "OS_latency_floor_proven": false,
+  "conclusion": "Retained original p95 is about 35.2\u201336.0 ms; derivative is about 35.6\u201336.0 ms in two pairs and 45.9 ms in one. No binary equivalence or consistent derivative improvement follows. Earlier original 51\u201352 ms observations were not reproduced here and remain valid failures. All six exceed 33.3 ms.",
+  "limits": [
+    "Same public view, output and receipt; private native wrappers, ABI, Go adapter, build and code layout differ.",
+    "Differences of run p95 are not percentiles of paired sample differences.",
+    "Three pairs establish no arbitrary equivalence tolerance.",
+    "Earlier original higher-latency runs remain failed and unwaived.",
+    "Sparse fixture does not qualify 60 Hz, professional workflows, physical input, pixels, endurance, allocations or resize."
+  ],
+  "next_action": "Inspect actual input and observer path/source before choosing a CPU/backend change; avoid unchanged reruns or adopting diagnostic derivative as a repair."
+}
