@@ -13,6 +13,10 @@ func TestAtomicWriteBoundedReadAndPermissions(t *testing.T) {
 	if err := os.WriteFile(path, []byte("old"), 0640); err != nil {
 		t.Fatal(err)
 	}
+	before, err := os.Stat(path)
+	if err != nil {
+		t.Fatal(err)
+	}
 	written, err := (FileStore{}).Write(context.Background(), path, []byte("new bytes"), 16)
 	if !written || err != nil {
 		t.Fatal(written, err)
@@ -22,7 +26,7 @@ func TestAtomicWriteBoundedReadAndPermissions(t *testing.T) {
 		t.Fatal(string(data), err)
 	}
 	info, _ := os.Stat(path)
-	if info.Mode().Perm() != 0640 {
+	if info.Mode().Perm() != before.Mode().Perm() {
 		t.Fatal(info.Mode())
 	}
 	if _, err = (FileStore{}).Read(context.Background(), path, 3); !errors.Is(err, ErrTooLarge) {
@@ -49,7 +53,7 @@ func TestAtomicFailuresPreserveOriginalAndCleanTemporaryFiles(t *testing.T) {
 			case "cancel-before":
 				ops.syncFile = func(f *os.File) error { cancel(); return f.Sync() }
 			case "cancel-after":
-				ops.syncDirectory = func(f *os.File) error { cancel(); return f.Sync() }
+				ops.syncDirectory = func(f *os.File) error { cancel(); return defaultAtomicFileOps.syncDirectory(f) }
 			}
 			written, err := writeAtomic(ctx, path, []byte("new"), 16, ops)
 			post := stage == "directory" || stage == "cancel-after"

@@ -20,6 +20,9 @@ type Store interface {
 	Write(context.Context, string, []byte, int64) (bool, error)
 }
 
+// FileStore syncs temporary file contents before replacement. On Unix it also
+// syncs the parent directory after rename. Windows does not support syncing a
+// directory through os.File.Sync; rename power-loss durability is not promised.
 type FileStore struct{}
 
 func validateLimit(max int64) error {
@@ -84,7 +87,7 @@ type atomicFileOps struct {
 	syncDirectory func(*os.File) error
 }
 
-var defaultAtomicFileOps = atomicFileOps{syncFile: func(f *os.File) error { return f.Sync() }, rename: os.Rename, syncDirectory: func(f *os.File) error { return f.Sync() }}
+var defaultAtomicFileOps = atomicFileOps{syncFile: func(f *os.File) error { return f.Sync() }, rename: os.Rename, syncDirectory: syncParentDirectory}
 
 func (FileStore) Write(ctx context.Context, path string, data []byte, max int64) (bool, error) {
 	return writeAtomic(ctx, path, data, max, defaultAtomicFileOps)
