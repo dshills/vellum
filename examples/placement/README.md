@@ -562,3 +562,7 @@ selection/arrangement, files/settings/export and known limitations. Escape or
 Close help returns to the app. Reading help and changing topics never alter
 selection, geometry, dirty state or history. The same guide is searchable through
 Commands. Its modal and callbacks use the native window lifetime and draft identity.
+
+## Fill color (internal 22)
+
+**Edit → Fill color…** applies an opaque `#RRGGBB` value to the selected components and complete groups in one Undo/Redo. Mixed selections begin blank; blank Apply is rejected. Enter `default` to restore each component type's original fill. Colors persist through drawings, clipboard, duplication, recovery and SVG export. Custom colors use drawing format5 and clipboard format3; earlier formats still open, while older app builds cannot read the new custom-color formats. No framework APIs or rendering changes.

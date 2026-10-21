@@ -104,7 +104,7 @@ func TestClipboardMetadataVersionValidationAndVisibilityLockPreservation(t *test
 			case "legacy-metadata":
 				version = 1
 			case "future-version":
-				version = 3
+				version = 4
 			case "long-name":
 				bad[0].Name = strings.Repeat("a", 129)
 			case "control-name":

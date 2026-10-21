@@ -23,6 +23,7 @@ import (
 )
 
 type copiedComponent struct {
+	Color       string  `json:"color,omitempty"`
 	Kind        string  `json:"kind"`
 	X           float64 `json:"x"`
 	Y           float64 `json:"y"`
@@ -140,7 +141,7 @@ func (m *model) copiedSelection() ([]copiedComponent, error) {
 				groupInfo = m.layerInfo[group]
 			}
 			info := m.layerInfo[o.ID]
-			objects = append(objects, copiedComponent{Kind: kind, X: o.X, Y: o.Y, Width: o.Width, Height: o.Height, Group: tag,
+			objects = append(objects, copiedComponent{Kind: kind, Color: savedFill(kind, o.Color), X: o.X, Y: o.Y, Width: o.Width, Height: o.Height, Group: tag,
 				Name: info.Name, Hidden: info.Hidden, Locked: info.Locked,
 				GroupName: groupInfo.Name, GroupHidden: groupInfo.Hidden, GroupLocked: groupInfo.Locked})
 		}
@@ -156,6 +157,14 @@ func encodeSelection(objects []copiedComponent) (string, error) {
 	for _, o := range objects {
 		if o.componentMetadata() != (layerMetadata{}) || o.groupMetadata() != (layerMetadata{}) {
 			version = 2
+		}
+	}
+	for _, o := range objects {
+		if _, err := componentFill(o.Kind, o.Color); err != nil {
+			return "", err
+		}
+		if o.Color != "" {
+			version = 3
 		}
 	}
 	data, err := json.Marshal(selectionClipboard{"vellum-placement-selection", version, objects})
@@ -184,10 +193,16 @@ func decodeSelection(text string) ([]copiedComponent, error) {
 	if err := d.Decode(new(any)); err != io.EOF {
 		return nil, errors.New("clipboard contains trailing data")
 	}
-	if f.Format != "vellum-placement-selection" || (f.Version != 1 && f.Version != 2) || len(f.Objects) == 0 || len(f.Objects) > 512 {
+	if f.Format != "vellum-placement-selection" || (f.Version != 1 && f.Version != 2 && f.Version != 3) || len(f.Objects) == 0 || len(f.Objects) > 512 {
 		return nil, errors.New("unsupported Vellum component clipboard")
 	}
 	for _, o := range f.Objects {
+		if _, err := componentFill(o.Kind, o.Color); err != nil {
+			return nil, err
+		}
+		if f.Version < 3 && o.Color != "" {
+			return nil, errors.New("custom fill requires clipboard version 3")
+		}
 		if _, ok := componentByKind(o.Kind); !ok || !validPosition(o.X, o.Y) || !validSize(o.Width, o.Height) {
 			return nil, errors.New("invalid clipboard component")
 		}
@@ -259,12 +274,13 @@ func (m *model) insertCopiesOffset(objects []copiedComponent, offset canvas.Poin
 	}
 	after, ids := slices.Clone(before), make([]string, 0, len(objects))
 	for i, o := range objects {
-		c, ok := componentByKind(o.Kind)
-		if !ok || (m.rejectNotes && o.Kind == "note") || !validPosition(o.X+offset.X, o.Y+offset.Y) || !validSize(o.Width, o.Height) {
+		_, ok := componentByKind(o.Kind)
+		fill, fillErr := componentFill(o.Kind, o.Color)
+		if fillErr != nil || !ok || (m.rejectNotes && o.Kind == "note") || !validPosition(o.X+offset.X, o.Y+offset.Y) || !validSize(o.Width, o.Height) {
 			return errors.New("copied components rejected or outside drawing bounds")
 		}
 		id := fmt.Sprintf("%s-%d", o.Kind, m.next+uint64(i)+1)
-		after = append(after, canvas.Rect{ID: id, X: o.X + offset.X, Y: o.Y + offset.Y, Width: o.Width, Height: o.Height, Color: c.Color})
+		after = append(after, canvas.Rect{ID: id, X: o.X + offset.X, Y: o.Y + offset.Y, Width: o.Width, Height: o.Height, Color: fill})
 		ids = append(ids, id)
 		if value := o.componentMetadata(); value != (layerMetadata{}) {
 			info[id] = value

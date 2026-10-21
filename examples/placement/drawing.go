@@ -34,6 +34,7 @@ type drawingFile struct {
 	NextGroup uint64                   `json:"next_group,omitempty"`
 }
 type drawingObject struct {
+	Color  string  `json:"color,omitempty"`
 	ID     string  `json:"id"`
 	Kind   string  `json:"kind"`
 	X      float64 `json:"x"`
@@ -44,7 +45,7 @@ type drawingObject struct {
 
 func (f drawingFile) scene() (*canvas.Scene, error) {
 	finite := func(v float64) bool { return !math.IsNaN(v) && !math.IsInf(v, 0) }
-	if f.Format != "vellum-placement" || (f.Version != 1 && f.Version != 2 && f.Version != 3 && f.Version != 4) || len(f.Objects) > 512 || !finite(f.Zoom) || f.Zoom < .01 || f.Zoom > 100 || !finite(f.Center.X) || !finite(f.Center.Y) || math.Abs(f.Center.X) > 1e12 || math.Abs(f.Center.Y) > 1e12 {
+	if f.Format != "vellum-placement" || (f.Version != 1 && f.Version != 2 && f.Version != 3 && f.Version != 4 && f.Version != 5) || len(f.Objects) > 512 || !finite(f.Zoom) || f.Zoom < .01 || f.Zoom > 100 || !finite(f.Center.X) || !finite(f.Center.Y) || math.Abs(f.Center.X) > 1e12 || math.Abs(f.Center.Y) > 1e12 {
 		return nil, errors.New("invalid or unsupported Vellum drawing")
 	}
 	objects := make([]canvas.Rect, 0, len(f.Objects))
@@ -65,7 +66,14 @@ func (f drawingFile) scene() (*canvas.Scene, error) {
 		if !validSize(width, height) {
 			return nil, fmt.Errorf("invalid dimensions for %q", o.ID)
 		}
-		objects = append(objects, canvas.Rect{ID: o.ID, X: o.X, Y: o.Y, Width: width, Height: height, Color: c.Color})
+		if f.Version < 5 && o.Color != "" {
+			return nil, errors.New("custom fill requires drawing version 5")
+		}
+		fill, err := componentFill(o.Kind, o.Color)
+		if err != nil {
+			return nil, err
+		}
+		objects = append(objects, canvas.Rect{ID: o.ID, X: o.X, Y: o.Y, Width: width, Height: height, Color: fill})
 	}
 	scene, err := canvas.New(objects)
 	if err != nil {
@@ -97,7 +105,7 @@ func drawingCodec(m *model) document.Codec[drawingFile] {
 			f := drawingFile{Format: "vellum-placement", Version: 2, Objects: make([]drawingObject, 0, len(m.scene.Objects)), Center: m.scene.View.Center, Zoom: m.scene.View.Zoom, Selected: m.scene.Selected, Snap: m.snap, NextID: m.next}
 			for _, o := range m.scene.Objects {
 				kind, _, _ := strings.Cut(o.ID, "-")
-				f.Objects = append(f.Objects, drawingObject{ID: o.ID, Kind: kind, X: o.X, Y: o.Y, Width: o.Width, Height: o.Height})
+				f.Objects = append(f.Objects, drawingObject{ID: o.ID, Kind: kind, Color: savedFill(kind, o.Color), X: o.X, Y: o.Y, Width: o.Width, Height: o.Height})
 			}
 			if len(m.groups) > 0 || m.nextGroup != 0 {
 				f.Version = 3
@@ -107,6 +115,11 @@ func drawingCodec(m *model) document.Codec[drawingFile] {
 			if len(m.layerInfo) > 0 {
 				f.Version = 4
 				f.Layers = maps.Clone(m.layerInfo)
+			}
+			for _, o := range f.Objects {
+				if o.Color != "" {
+					f.Version = 5
+				}
 			}
 			_, err := f.scene()
 			return f, err

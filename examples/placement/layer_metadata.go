@@ -138,7 +138,9 @@ func (m *model) applyLayerProperties(label string, info map[string]layerMetadata
 	if err != nil {
 		return err
 	}
-	f.Version = 4
+	if f.Version < 4 {
+		f.Version = 4
+	}
 	f.Layers = info
 	if _, err = drawingCodec(m).Encode(f); err != nil {
 		return err

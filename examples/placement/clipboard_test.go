@@ -81,7 +81,7 @@ func TestClipboardRejectsAtomicallyAndBounded(t *testing.T) {
 	before := slices.Clone(m.scene.Objects)
 	next := m.next
 	text := copiedText(t, m)
-	for _, bad := range []string{"", "ordinary text", text + " {}", strings.Replace(text, "\"version\":1", "\"version\":3", 1), strings.Replace(text, "\"kind\":\"block\"", "\"kind\":\"unknown\"", 1), strings.Repeat("x", drawingByteLimit+1)} {
+	for _, bad := range []string{"", "ordinary text", text + " {}", strings.Replace(text, "\"version\":1", "\"version\":4", 1), strings.Replace(text, "\"kind\":\"block\"", "\"kind\":\"unknown\"", 1), strings.Repeat("x", drawingByteLimit+1)} {
 		if m.pasteSelection(bad) == nil {
 			t.Fatal("invalid clipboard accepted")
 		}

@@ -53,6 +53,7 @@ type model struct {
 	commandDraft                      *commandPaletteDraft
 	spacingDraft                      *spacingDraft
 	helpDraft                         *helpDraft
+	fillDraft                         *fillDraft
 	commandKeys                       *commandPaletteKeys
 	modalEpoch                        uint64
 	move                              *objectMove
@@ -183,6 +184,10 @@ func newModel() (*model, error) {
 		return nil
 	}})
 	if err != nil {
+		m.palette.Close()
+		return nil, err
+	}
+	if err := m.bindFillColor(); err != nil {
 		m.palette.Close()
 		return nil, err
 	}
