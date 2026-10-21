@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"math/rand"
+	"path/filepath"
 	"reflect"
 	"sync"
 	"testing"
@@ -119,7 +120,7 @@ func TestPartStoreRandomUpdatesAgainstFlatOracle(t *testing.T) {
 func TestSharedDocumentCapturePreservesV1WireAndLoadedSnapshot(t *testing.T) {
 	source := newParts(100000)
 	board, _ := canvas.New([]canvas.Rect{{ID: "component:1", Width: 25, Height: 50}})
-	refs := &fileReferences{paths: []string{"/tmp/ref"}}
+	refs := &fileReferences{paths: []string{filepath.Join(t.TempDir(), "ref")}}
 	frozen := captureDocument(source, board, refs)
 	if frozen.Parts != nil || frozen.captured.parts.root != source.parts.root {
 		t.Fatal("owner capture enumerated parts")

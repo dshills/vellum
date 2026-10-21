@@ -166,7 +166,7 @@ func TestFileReferencesUndoRedoPreserveCapturedBatches(t *testing.T) {
 }
 
 func TestFileReferenceSummaryBoundsChromeWithoutChangingPaths(t *testing.T) {
-	refs := &fileReferences{paths: []string{filepath.Join(t.TempDir(), strings.Repeat("Ω", 1000)), "/tmp/two", "/tmp/three", "/tmp/four"}}
+	refs := &fileReferences{paths: []string{filepath.Join(t.TempDir(), strings.Repeat("Ω", 1000)), filepath.Join(t.TempDir(), "two"), filepath.Join(t.TempDir(), "three"), filepath.Join(t.TempDir(), "four")}}
 	original := append([]string(nil), refs.paths...)
 	summary := refs.summary()
 	if len(summary) > 800 || !strings.Contains(summary, "Referenced 4 files") || !strings.Contains(summary, "…") || strings.Contains(summary, "four") || !reflect.DeepEqual(refs.paths, original) {

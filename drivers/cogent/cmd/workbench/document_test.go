@@ -13,13 +13,13 @@ import (
 func TestDocumentRoundtripDetachedGeometryReferencesAndEpoch(t *testing.T) {
 	s := newParts(100000)
 	board, _ := canvas.New([]canvas.Rect{{ID: "component:1", X: 2, Y: 4, Width: 25, Height: 50}})
-	refs := &fileReferences{paths: []string{filepath.Join(t.TempDir(), "Ω\nfirst"), "/tmp/second"}}
+	refs := &fileReferences{paths: []string{filepath.Join(t.TempDir(), "Ω\nfirst"), filepath.Join(t.TempDir(), "second")}}
 	image := materializeDocument(captureDocument(s, board, refs))
 	changed := s.parts.at(0)
 	changed.Value++
 	s.parts = s.parts.with(0, changed)
 	board.Objects[0].X++
-	refs.paths[0] = "/tmp/mutated"
+	refs.paths[0] = filepath.Join(t.TempDir(), "mutated")
 	data, err := encodeDocument(image)
 	if err != nil {
 		t.Fatal(err)

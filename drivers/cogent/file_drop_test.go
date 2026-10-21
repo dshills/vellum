@@ -23,8 +23,9 @@ func dropGeometry(widget core.Widget) {
 	w.Geom.TotalBBox = image.Rect(20, 0, 200, 200)
 	w.Styles.UnitContext.DPI = units.DpPerInch * 2
 }
-func testFileDrop() *events.DragDrop {
-	e := events.NewExternalDrop(events.Drop, events.Left, image.Pt(30, 40), 0, mimedata.Mimes{mimedata.NewTextData(filepath.Join("/", "tmp", "space Ω\nfile"))})
+func testFileDrop(t *testing.T) *events.DragDrop {
+	t.Helper()
+	e := events.NewExternalDrop(events.Drop, events.Left, image.Pt(30, 40), 0, mimedata.Mimes{mimedata.NewTextData(filepath.Join(t.TempDir(), "space Ω\nfile"))})
 	e.Init()
 	return e
 }
@@ -55,7 +56,7 @@ func TestFileDropBubblesWithPrivatePathsAndRetainedCallbacks(t *testing.T) {
 	child := r.children[0]
 	dropGeometry(r.widget)
 	dropGeometry(child.widget)
-	e := testFileDrop()
+	e := testFileDrop(t)
 	child.widget.AsWidget().HandleEvent(e)
 	if e.IsHandled() {
 		t.Fatal("declining child handled")
@@ -76,7 +77,7 @@ func TestFileDropBubblesWithPrivatePathsAndRetainedCallbacks(t *testing.T) {
 			t.Fatal("callback update remounted")
 		}
 		before := len(calls)
-		event := testFileDrop()
+		event := testFileDrop(t)
 		retained.AsWidget().HandleEvent(event)
 		if callback == nil && (len(calls) != before || event.IsHandled()) {
 			t.Fatal("removed callback ran")
@@ -94,7 +95,7 @@ func TestFileDropBubblesWithPrivatePathsAndRetainedCallbacks(t *testing.T) {
 	for _, edit := range []func(*events.DragDrop){func(e *events.DragDrop) { e.Source = retained }, func(e *events.DragDrop) { e.Data = mimedata.Mimes{mimedata.NewTextData("relative")} }, func(e *events.DragDrop) { e.Data = mimedata.Mimes{nil} }, func(e *events.DragDrop) {
 		e.Data = mimedata.Mimes{&mimedata.Data{Type: "text/uri-list", Data: []byte("file:///tmp/name")}}
 	}, func(e *events.DragDrop) { e.Where = image.Pt(19, 40) }} {
-		event := testFileDrop()
+		event := testFileDrop(t)
 		edit(event)
 		event.SetLocalOff(event.LocalOff())
 		retained.AsWidget().HandleEvent(event)
@@ -107,7 +108,7 @@ func TestFileDropBubblesWithPrivatePathsAndRetainedCallbacks(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	retained.AsWidget().HandleEvent(testFileDrop())
+	retained.AsWidget().HandleEvent(testFileDrop(t))
 	if len(calls) != before {
 		t.Fatal("disabled ancestor admitted drop")
 	}
@@ -118,7 +119,7 @@ func TestFileDropBubblesWithPrivatePathsAndRetainedCallbacks(t *testing.T) {
 	}
 	for _, scale := range []float32{-1, float32(math.NaN()), float32(math.Inf(1))} {
 		retained.AsWidget().Styles.UnitContext.DPI = scale
-		retained.AsWidget().HandleEvent(testFileDrop())
+		retained.AsWidget().HandleEvent(testFileDrop(t))
 		if len(calls) != before {
 			t.Fatal("invalid scale admitted drop")
 		}
@@ -127,7 +128,7 @@ func TestFileDropBubblesWithPrivatePathsAndRetainedCallbacks(t *testing.T) {
 	if err := a.CloseWindow(fixtureWindowRef(a, "main")); err != nil {
 		t.Fatal(err)
 	}
-	retained.AsWidget().HandleEvent(testFileDrop())
+	retained.AsWidget().HandleEvent(testFileDrop(t))
 	if len(calls) != before {
 		t.Fatal("closed window admitted drop")
 	}
@@ -145,18 +146,18 @@ func TestFileDropInactiveTabsAndModalHost(t *testing.T) {
 	for _, child := range r.children {
 		dropGeometry(child.widget)
 	}
-	r.children[1].widget.AsWidget().HandleEvent(testFileDrop())
+	r.children[1].widget.AsWidget().HandleEvent(testFileDrop(t))
 	if calls != 0 {
 		t.Fatal("inactive tab admitted")
 	}
-	r.children[0].widget.AsWidget().HandleEvent(testFileDrop())
+	r.children[0].widget.AsWidget().HandleEvent(testFileDrop(t))
 	if calls != 1 {
 		t.Fatal("active tab refused")
 	}
 	// Native selection is optimistic; a drop may precede the custom wake that
 	// admits or refuses the controlled tab Change. The model still selects one.
 	r.widget.(*core.Tabs).SelectTabByName("two")
-	r.children[1].widget.AsWidget().HandleEvent(testFileDrop())
+	r.children[1].widget.AsWidget().HandleEvent(testFileDrop(t))
 	if calls != 1 {
 		t.Fatal("unaccepted native tab switch admitted a drop")
 	}
@@ -166,7 +167,7 @@ func TestFileDropInactiveTabsAndModalHost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	r.children[0].widget.AsWidget().HandleEvent(testFileDrop())
+	r.children[0].widget.AsWidget().HandleEvent(testFileDrop(t))
 	if calls != 1 {
 		t.Fatal("disabled selected page admitted")
 	}
@@ -180,20 +181,20 @@ func TestFileDropInactiveTabsAndModalHost(t *testing.T) {
 	d.control.dialog.active = true
 	dropGeometry(d.control.dialog.host)
 	dropGeometry(d.children[0].widget)
-	event := testFileDrop()
+	event := testFileDrop(t)
 	d.children[0].widget.AsWidget().HandleEvent(event)
 	d.control.dialog.host.HandleEvent(event)
 	if calls != 2 || !event.IsHandled() || event.Target != d.control.dialog.host {
 		t.Fatal("visible modal host did not receive fallback")
 	}
 	d.node.Open = false
-	d.control.dialog.host.HandleEvent(testFileDrop())
+	d.control.dialog.host.HandleEvent(testFileDrop(t))
 	if calls != 2 {
 		t.Fatal("closed modal admitted")
 	}
 	d.node.Open = true
 	d.control.dialog.dismissed = true
-	d.control.dialog.host.HandleEvent(testFileDrop())
+	d.control.dialog.host.HandleEvent(testFileDrop(t))
 	if calls != 2 {
 		t.Fatal("dismissed modal admitted")
 	}
@@ -219,11 +220,11 @@ func TestFileDropInactiveWorkbenchPanelAndWindowIdentity(t *testing.T) {
 	for _, r := range w.records {
 		dropGeometry(r.widget)
 	}
-	w.records["two"].widget.AsWidget().HandleEvent(testFileDrop())
+	w.records["two"].widget.AsWidget().HandleEvent(testFileDrop(t))
 	if len(calls) != 0 {
 		t.Fatal("inactive dock panel admitted")
 	}
-	w.records["one"].widget.AsWidget().HandleEvent(testFileDrop())
+	w.records["one"].widget.AsWidget().HandleEvent(testFileDrop(t))
 	if !reflect.DeepEqual(calls, []string{"one:other"}) {
 		t.Fatal(calls)
 	}

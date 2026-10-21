@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"math"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
@@ -197,11 +198,12 @@ func TestWorkbenchEpochExhaustionPreservesDomain(t *testing.T) {
 	if source.parts.at(0) != before || journal.Snapshot().UndoCount != 0 {
 		t.Fatal("mutation before epoch refusal")
 	}
-	refs := &fileReferences{paths: []string{"/original"}, revision: math.MaxUint64}
-	if err := refs.replace(journal, []string{"/replacement"}); !errors.Is(err, history.ErrRevisionExhausted) {
+	original := filepath.Join(t.TempDir(), "original")
+	refs := &fileReferences{paths: []string{original}, revision: math.MaxUint64}
+	if err := refs.replace(journal, []string{filepath.Join(t.TempDir(), "replacement")}); !errors.Is(err, history.ErrRevisionExhausted) {
 		t.Fatal(err)
 	}
-	if refs.paths[0] != "/original" || journal.Snapshot().UndoCount != 0 {
+	if refs.paths[0] != original || journal.Snapshot().UndoCount != 0 {
 		t.Fatal("reference mutation before refusal")
 	}
 }
