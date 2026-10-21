@@ -1,0 +1,93 @@
+{
+  "source": "exact locked wgpu-core29.0.3; prior CPU observer changes only resource/queue CPU timing",
+  "registry_archive_sha256": "02da3ad1b568337f25513b317870960ef87073ea0945502e44b864b67a8c77b7",
+  "files": {
+    "/private/tmp/vellum-upload-probe/core/src/resource.rs": "92d321ba6c6eeb4042ab3799aac9b1dd3278b2b5ecb978101c339e11a1158c18",
+    "/private/tmp/vellum-upload-probe/core/src/device/queue.rs": "3974fd73c652ffe6e2fe998da051c0aca4403e6cbcd93d929b7b4fd4f19b4ddc",
+    "/private/tmp/vellum-upload-probe/core/src/device/life.rs": "44bd34cf5ab1c1a21729f2188df6d2ca0238f11c5f723380c8a4a16fbbd90b88",
+    "/private/tmp/vellum-upload-probe/core/src/device/resource.rs": "796858f878f290e872a113cb474d7ff947dfdd61f5dcf38f6f64b9e69c959644"
+  },
+  "original_archive_member_sha256": {
+    "src/resource.rs": "9e317487575483203979a334e29c73f6da5ceb2a7c2f51ba6bbcc69ee802bee1",
+    "src/device/queue.rs": "b1a943fccedd5882a75252ff3e82a0d4ba8c7d46346041d2dd1bb66c5f5cba34",
+    "src/device/life.rs": "44bd34cf5ab1c1a21729f2188df6d2ca0238f11c5f723380c8a4a16fbbd90b88",
+    "src/device/resource.rs": "796858f878f290e872a113cb474d7ff947dfdd61f5dcf38f6f64b9e69c959644"
+  },
+  "call_sites": {
+    "src/resource.rs": [
+      {
+        "needle": "impl Drop for FlushedStagingBuffer",
+        "lines": [
+          1244
+        ]
+      },
+      {
+        "needle": "unsafe { self.device.raw().destroy_buffer(raw) };",
+        "lines": [
+          1249
+        ]
+      }
+    ],
+    "src/device/queue.rs": [
+      {
+        "needle": ".track_submission(submit_index, active_executions);",
+        "lines": [
+          1481
+        ]
+      },
+      {
+        "needle": "pub fn create_staging_buffer(",
+        "lines": [
+          573
+        ]
+      }
+    ],
+    "src/device/life.rs": [
+      {
+        "needle": "pub fn triage_submissions(",
+        "lines": [
+          298
+        ]
+      },
+      {
+        "needle": ".position(|a| a.index > last_done)",
+        "lines": [
+          309
+        ]
+      },
+      {
+        "needle": "drop(encoder);",
+        "lines": [
+          320
+        ]
+      }
+    ],
+    "src/device/resource.rs": [
+      {
+        "needle": "let fence_value_result = unsafe { self.raw().get_fence_value(fence.as_ref()) };",
+        "lines": [
+          894
+        ]
+      },
+      {
+        "needle": "queue.maintain(current_finished_submission, &snatch_guard)",
+        "lines": [
+          910
+        ]
+      },
+      {
+        "needle": "impl Drop for Device",
+        "lines": [
+          307
+        ]
+      },
+      {
+        "needle": "self.raw.destroy_fence(fence);",
+        "lines": [
+          333
+        ]
+      }
+    ]
+  },
+  "conclusion": "Only explicit completed-submission retirement is a proposed admission point. Generic staging Drop is also failure/unsent cleanup, not completion proof. Public create_staging_buffer exposes a mapped pointer and must remain outside proposed texture-only reuse. No native pool implemented."
+}

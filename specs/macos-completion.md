@@ -1686,3 +1686,9 @@ default-cache cases, above the unchanged 33.3 ms gate. No shipping policy adopte
 All 517 eligible buffers/case have requested cache/shared storage, including other
 transient write-buffer staging; ownership unchanged. Next inspect bounded reuse
 only at proven GPU-completion retirement. Features frozen, M3–M7 open.
+
+The [completed-staging reuse policy/source audit](../docs/reports/macos-reuse-policy/README.md)
+provides five passing Rust policy methods and two compiler rejection controls.
+No native pool is integrated. Proposed texture-only reuse must return explicitly
+from real completed-submission retirement, keep original failure/teardown paths,
+bound idle storage and prove GPU bytes/ownership before timing. Gate unchanged.
