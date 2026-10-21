@@ -47,6 +47,9 @@ type model struct {
 	recovery                          *placementRecovery
 	removeRecoveryOnClose             bool
 	prompt                            string
+	commandDraft                      *commandPaletteDraft
+	commandKeys                       *commandPaletteKeys
+	modalEpoch                        uint64
 	move                              *objectMove
 	canvasEditor                      *canvasEditor
 	selectionIDs                      []string
@@ -179,6 +182,10 @@ func newModel() (*model, error) {
 		return nil, err
 	}
 	if err := m.bindExactNudges(); err != nil {
+		m.palette.Close()
+		return nil, err
+	}
+	if err := m.bindCommandPalette(); err != nil {
 		m.palette.Close()
 		return nil, err
 	}

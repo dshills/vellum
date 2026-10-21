@@ -23,7 +23,7 @@ func (m *model) bindExactNudges() error {
 			dx, dy float64
 		}{{"left", -1, 0}, {"right", 1, 0}, {"up", 0, -1}, {"down", 0, 1}} {
 			label := fmt.Sprintf("Move selection %d unit(s)", step)
-			if err := m.commands.Register(command.Command{ID: fmt.Sprintf("nudge-%d-%s", step, dir.id), Label: label, Available: m.editAvailable, Execute: func(context.Context) error { return m.nudgeWorld(float64(step)*dir.dx, float64(step)*dir.dy, label) }}); err != nil {
+			if err := m.commands.Register(command.Command{ID: fmt.Sprintf("nudge-%d-%s", step, dir.id), Label: label + " " + dir.id, Available: m.editAvailable, Execute: func(context.Context) error { return m.nudgeWorld(float64(step)*dir.dx, float64(step)*dir.dy, label) }}); err != nil {
 				return err
 			}
 		}

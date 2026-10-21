@@ -517,3 +517,11 @@ and components are omitted. Export uses the detached-save worker, preserves the
 active drawing/dirty state/history, and does not add SVG files to Recent drawings.
 It exports rectangles only; the SVG is an output artifact, not an editable drawing
 format for Open. Empty visible drawings are refused.
+
+## Search Commands (internal 21)
+
+**Commands… / Cmd+Shift+P** searches existing command names and IDs. Up/Down in
+the search field chooses a result; Return runs it; Escape or Cancel closes the
+palette. The first twelve matches are shown; narrow the query to find more.
+Shortcuts and disabled reasons are displayed. Running uses the same command
+registry and live admission checks as menus, with no separate edit/history path.

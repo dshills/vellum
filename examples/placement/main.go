@@ -168,6 +168,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 			{ID: "save-as", Kind: ui.Button, Text: "Save As…", Disabled: m.files == nil || m.commandDisabled("save-as"), Activate: invoke("save-as")},
 			m.actionMenu("file-extra-menu", "More", []ui.Option{{ID: "save-copy", Label: "Save a Copy…"}, {ID: "export-svg", Label: "Export SVG…"}}, invoke),
 			m.recentMenu(a, ref, update),
+			{ID: "commands-open", Kind: ui.Button, Text: "Commands…", Disabled: m.commandDisabled("command-palette"), Activate: invoke("command-palette")},
 			{ID: "filename", Kind: ui.Label, Text: filename, Style: ui.Style{MaxSize: ui.Some(ui.Size{Width: 320})}},
 		}},
 		{ID: "toolbar", Kind: ui.Toolbar, Children: []ui.Node{
@@ -227,7 +228,7 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 		{ID: "status", Kind: ui.StatusBar, Children: []ui.Node{{ID: "message", Kind: ui.Label, Text: fmt.Sprintf("%s • %d objects • %d selected • Undo %d / Redo %d", m.status, len(m.scene.Objects), len(selection), m.journal.Snapshot().UndoCount, m.journal.Snapshot().RedoCount)}}},
 	}}
 	root.Children[1].Children = append(root.Children[1].Children, m.gridControls(ref, update)...)
-	root.Children = append(root.Children, m.filePrompt(a, ref), m.renameDialog(a, ref), m.recovery.promptNode(), m.geometryDialog(a, ref))
+	root.Children = append(root.Children, m.filePrompt(a, ref), m.renameDialog(a, ref), m.recovery.promptNode(), m.geometryDialog(a, ref), m.commandPaletteDialog(a, ref))
 	for i := range root.Children {
 		if root.Children[i].Kind == ui.Toolbar {
 			for j := range root.Children[i].Children {
@@ -235,6 +236,9 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 				n.Style = compactControlStyle().Overlay(n.Style)
 			}
 		}
+	}
+	if m.commandDraftActive(m.commandDraft) {
+		root.Focus = ui.FocusRequest{ID: "command-query", Sequence: m.modalEpoch}
 	}
 	return root
 }
