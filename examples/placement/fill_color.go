@@ -45,6 +45,8 @@ func savedFill(kind string, value color.RGBA) string {
 
 type fillDraft struct {
 	value, message string
+	picker         ui.ColorPicker
+	pickerInvalid  bool
 	scene          *canvas.Scene
 	revision       uint64
 	before         []canvas.Rect
@@ -77,7 +79,13 @@ func (m *model) beginFillColor() error {
 	if mixed {
 		value = ""
 	}
+	index := m.selectedIndex()
+	if index < 0 {
+		return errNoSelection
+	}
+	primary := m.scene.Objects[index].Color
 	m.fillDraft = &fillDraft{value: value, scene: m.scene, revision: m.journal.Snapshot().Revision, before: slices.Clone(m.scene.Objects), ids: ids, primary: m.scene.Selected}
+	m.fillDraft.picker = ui.ColorPicker{ID: "fill-picker", Label: "Fill", Color: color.NRGBA{R: primary.R, G: primary.G, B: primary.B, A: 255}}
 	m.prompt = "fill-color"
 	m.modalEpoch++
 	return nil
@@ -88,6 +96,9 @@ func (m *model) applyFillColor(d *fillDraft) error {
 	}
 	if err := m.editAvailable(); err != nil {
 		return err
+	}
+	if d.pickerInvalid {
+		return ui.ErrColorChannel
 	}
 	value := strings.TrimSpace(d.value)
 	if value == "" {
@@ -142,8 +153,10 @@ func (m *model) fillColorDialog(a *app.Application, ref app.WindowRef) ui.Node {
 	if d != nil {
 		value, message = d.value, d.message
 	}
+	picker, swatches := m.fillPickerNodes(a, ref, d, active)
 	return ui.Node{ID: "fill-dialog", Kind: ui.Dialog, Text: "Selection fill color", Open: active(), Dismiss: cancel, Children: []ui.Node{
-		{ID: "fill-help", Kind: ui.Label, Text: "Opaque #RRGGBB, or default to restore each type. Blank means mixed colors. Applies to all selected group members in one Undo.", Style: ui.Style{MaxSize: ui.Some(ui.Size{Width: 420})}},
+		{ID: "fill-help", Kind: ui.Label, Text: "Choose a swatch or adjust RGB. Blank hex means mixed fills; preview starts with the primary. Default previews the primary but restores each type. Apply changes all selected members in one Undo.", Style: ui.Style{MaxSize: ui.Some(ui.Size{Width: 420})}},
+		picker, swatches,
 		{ID: "fill-value", Kind: ui.TextField, Text: value, Accessibility: ui.Accessibility{Name: "Fill color"}, Change: func(e ui.ChangeEvent) {
 			if active() {
 				if len(e.Text) <= 32 {
@@ -151,6 +164,17 @@ func (m *model) fillColorDialog(a *app.Application, ref app.WindowRef) ui.Node {
 				} else {
 					d.value = "invalid"
 				}
+				d.pickerInvalid = false
+				d.message = ""
+				kind, _, _ := strings.Cut(d.primary, "-")
+				wire := strings.TrimSpace(d.value)
+				if wire == "default" {
+					wire = ""
+				}
+				if c, err := componentFill(kind, wire); err == nil && strings.TrimSpace(d.value) != "" {
+					d.picker.Color = color.NRGBA{R: c.R, G: c.G, B: c.B, A: 255}
+				}
+				_ = a.Invalidate("placement")
 			}
 		}},
 		{ID: "fill-error", Kind: ui.Label, Text: message},
@@ -174,4 +198,66 @@ func (m *model) fillColorDialog(a *app.Application, ref app.WindowRef) ui.Node {
 		}},
 		{ID: "fill-cancel", Kind: ui.Button, Text: "Cancel", Activate: cancel},
 	}}
+}
+
+// The app supports opaque RGB fills. Compose the existing public picker while
+// keeping its alpha/hex inputs out of this dialog; the bounded legacy hex field
+// also accepts the app-specific "default" action.
+func (m *model) fillPickerNodes(a *app.Application, ref app.WindowRef, d *fillDraft, active func() bool) (ui.Node, ui.Node) {
+	if d == nil {
+		return ui.Node{ID: "fill-picker-empty", Kind: ui.Label}, ui.Node{ID: "fill-swatches-empty", Kind: ui.Label}
+	}
+	choose := func(c color.NRGBA) {
+		if active() {
+			c.A = 255
+			d.picker.Color = c
+			d.value = fmt.Sprintf("#%02x%02x%02x", c.R, c.G, c.B)
+			d.pickerInvalid = false
+			d.message = ""
+			_ = a.Invalidate("placement")
+		}
+	}
+	d.picker.Change = func(e ui.ColorEdit) { choose(e.Apply(d.picker.Color)) }
+	d.picker.Invalid = func(err error) {
+		if active() {
+			d.pickerInvalid = true
+			d.message = err.Error()
+			_ = a.Invalidate("placement")
+		}
+	}
+	picker := d.picker.View()
+	picker.Children = slices.DeleteFunc(picker.Children, func(n ui.Node) bool {
+		return fillNodeContains(n, ui.ColorFieldID(d.picker.ID, ui.ColorAlpha)) || fillNodeContains(n, ui.ColorFieldID(d.picker.ID, ui.ColorHex))
+	})
+	row := ui.Node{ID: "fill-swatches", Kind: ui.Row}
+	for _, s := range []struct {
+		name string
+		c    color.NRGBA
+	}{{"Blue", color.NRGBA{55, 120, 225, 255}}, {"Purple", color.NRGBA{160, 90, 204, 255}}, {"Red", color.NRGBA{210, 55, 65, 255}}, {"Green", color.NRGBA{45, 150, 85, 255}}, {"Gold", color.NRGBA{220, 170, 35, 255}}, {"Gray", color.NRGBA{100, 110, 120, 255}}} {
+		c := s.c
+		row.Children = append(row.Children, ui.Node{ID: "fill-swatch-" + strings.ToLower(s.name), Kind: ui.Button, Text: s.name, Accessibility: ui.Accessibility{Name: "Fill swatch " + s.name}, Style: ui.Style{Background: ui.Some(c), Foreground: ui.Some(color.NRGBA{255, 255, 255, 255})}, Activate: func() { choose(c) }})
+	}
+	row.Children = append(row.Children, ui.Node{ID: "fill-default", Kind: ui.Button, Text: "Default", Activate: func() {
+		if active() {
+			kind, _, _ := strings.Cut(d.primary, "-")
+			c, _ := componentFill(kind, "")
+			d.picker.Color = color.NRGBA{R: c.R, G: c.G, B: c.B, A: 255}
+			d.value = "default"
+			d.pickerInvalid = false
+			d.message = ""
+			_ = a.Invalidate("placement")
+		}
+	}})
+	return picker, row
+}
+func fillNodeContains(n ui.Node, id string) bool {
+	if n.ID == id {
+		return true
+	}
+	for _, c := range n.Children {
+		if fillNodeContains(c, id) {
+			return true
+		}
+	}
+	return false
 }

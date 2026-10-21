@@ -582,3 +582,7 @@ Commands. Its modal and callbacks use the native window lifetime and draft ident
 ## Repeated duplicates (internal 22)
 
 **Edit → Repeat duplicates…** creates 1–100 additional copies of the selection at successive numeric X/Y offsets in world units (each offset ±20000, final origins ±10000, total capacity512). Copy n uses n×offset from the originals; zero offsets intentionally overlap. Groups are independently recreated for every copy, preserving relative positions, sizes, names, custom fills and paint order. All copies are one Undo entry and receive fresh component/group IDs, with exact Redo and non-reused branch IDs. Snapping and clipboard contents are unchanged. All validation is atomic; invalid/canceled/stale dialogs leave the drawing unchanged. The built-in Help includes the Internal22 additions.
+
+## Visual fill picker (internal 23)
+
+**Edit → Fill color…** now previews RGB slider and named swatch choices before Apply. The existing hex field and Default button remain available. Mixed selections start with a blank hex field and the primary member's preview. Apply changes the editable selection in one Undo; Cancel changes nothing. Fills remain opaque RGB. This composes the frozen public ColorPicker API in the app only.
