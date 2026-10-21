@@ -413,7 +413,7 @@ driving dimension snaps; all members share the strictest size/origin limit, keep
 the opposite corner and do not flip. One committed resize is one Undo/Redo entry.
 The numeric inspector derives the other dimension when one size changes; incompatible
 explicit sizes are rejected. Step resizing of a single component also respects lock.
-The checkbox is session state and does not change saved drawing formats.
+The checkbox is an editor preference persisted separately from drawing files.
 
 ## Subtractive selection
 
@@ -427,7 +427,7 @@ Selection changes do not dirty the drawing or add history. Escape, invalid/outsi
 release and capture/camera/lifecycle cancellation keep the original marquee set.
 Plain empty drag still pans and the wheel still zooms. Shift on a selected corner
 handle retains temporary aspect-lock resizing. Mode/group membership are captured
-at press; preferences cannot change a gesture midway. The mode is session state.
+at press; preferences cannot change a gesture midway. The mode is an editor preference persisted separately.
 
 ## New drawing (internal 19)
 
@@ -459,7 +459,7 @@ object geometry or Undo history, and is blocked during gestures and dialogs.
 offers 5, 10, 20, 50 and 100 world units. The selected interval applies to placement,
 move and corner/step resizing, including proportional resizing; numeric geometry
 remains exact. Edits keep their usual one-step Undo/Redo. Visibility and spacing
-are session preferences (default visible, 20); existing saved Snap behavior stays
+are persisted editor preferences (default visible, 20); saved Snap behavior stays
 compatible with earlier drawings. Settings cannot change during a gesture.
 
 ## Layer filtering and collapsed groups (internal 19)
@@ -554,3 +554,11 @@ visible grid, 20-unit spacing, aspect/subtract off. Loading finishes before edit
 starts; malformed settings fall back to defaults with a visible status. One
 coalesced worker writes atomic updates and joins on shutdown. Preferences never
 mark a drawing dirty or add Undo history.
+
+## Built-in help (internal 21)
+
+**Help… / F1** opens topic-based guidance for mouse gestures, keyboard shortcuts,
+selection/arrangement, files/settings/export and known limitations. Escape or
+Close help returns to the app. Reading help and changing topics never alter
+selection, geometry, dirty state or history. The same guide is searchable through
+Commands. Its modal and callbacks use the native window lifetime and draft identity.

@@ -52,6 +52,7 @@ type model struct {
 	prompt                            string
 	commandDraft                      *commandPaletteDraft
 	spacingDraft                      *spacingDraft
+	helpDraft                         *helpDraft
 	commandKeys                       *commandPaletteKeys
 	modalEpoch                        uint64
 	move                              *objectMove
@@ -186,6 +187,10 @@ func newModel() (*model, error) {
 		return nil, err
 	}
 	if err := m.bindExactNudges(); err != nil {
+		m.palette.Close()
+		return nil, err
+	}
+	if err := m.bindHelpGuide(); err != nil {
 		m.palette.Close()
 		return nil, err
 	}
