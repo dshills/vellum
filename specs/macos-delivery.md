@@ -9,7 +9,16 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
-## Current checkpoint — foreground control; no accepted latency repair
+## Current checkpoint — matched calibration prepared; gate unchanged
+
+The owner authorized the [predeclared matched calibration](macos-calibration.md).
+The [preparation checkpoint](../docs/reports/macos-matched-calibration/README.md)
+records diagnostic-only sources, optimized builds, actual offscreen routing/pixel
+checks and strict classifier controls, reviewed with Prism using Anthropic Claude
+Sonnet 5.5. Live pilot/pairs await a quiet desktop window. Features and the existing
+release gate remain frozen; no framework repair or qualification is claimed.
+
+## Previous checkpoint — foreground control; no accepted latency repair
 
 The [foreground-controlled native reference](../docs/reports/macos-native-foreground-control/README.md)
 passes both scoped cohorts with actual active/key/visible/foreground-PID boundary
