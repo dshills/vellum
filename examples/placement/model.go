@@ -48,6 +48,7 @@ type model struct {
 	removeRecoveryOnClose             bool
 	prompt                            string
 	commandDraft                      *commandPaletteDraft
+	spacingDraft                      *spacingDraft
 	commandKeys                       *commandPaletteKeys
 	modalEpoch                        uint64
 	move                              *objectMove
@@ -202,6 +203,10 @@ func newModel() (*model, error) {
 		return nil, err
 	}
 	if err := m.bindStacking(); err != nil {
+		m.palette.Close()
+		return nil, err
+	}
+	if err := m.bindNumericSpacing(); err != nil {
 		m.palette.Close()
 		return nil, err
 	}

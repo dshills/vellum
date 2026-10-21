@@ -535,3 +535,12 @@ uniformly, including member spacing; aspect lock also makes single components
 scale uniformly. Matching both dimensions refuses incompatible proportions rather
 than distort a group. Unlocked single components can match both dimensions exactly.
 Bounds failures reject the whole action; accepted changes are one Undo/Redo edit.
+
+## Exact spacing (internal 21)
+
+**Arrange → Set exact spacing…** accepts a horizontal or vertical gap from 0
+to 10000 world units. Selected components/groups sort left-to-right or top-to-
+bottom (paint-order ties); the first stays fixed. Other units translate rigidly,
+keeping their perpendicular positions. Groups stay whole and snapping is ignored.
+Invalid gaps or member bounds reject the complete edit. Apply is one Undo entry;
+Cancel and stale dialog callbacks do not change geometry or history.
