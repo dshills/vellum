@@ -18,7 +18,7 @@ and target qualification.
 ## Documentation in the SDK archive
 
 Consumer guides and contracts retain their links to other packaged files.
-Repository-only reports, reviews, research, artwork and prototypes remain excluded.
+Repository-only reports, reviews, research, artwork, prototypes and repository diagnostic tools remain excluded.
 For first-party inline Markdown links into those known existing source trees,
 the exporter retains the label and exact repository path/fragment as an explicit
 nonlinked full-repository reference. It adds a link to `SDK_DOCUMENTATION.md`,

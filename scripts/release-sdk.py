@@ -96,7 +96,7 @@ def require_regular_source(root, source):
         raise ValueError(f"SDK source must be a regular file: {relative}")
 
 
-REPOSITORY_DOCUMENTATION = ("docs/reviews/", "docs/reports/", "docs/research/", "docs/assets/", "prototypes/")
+REPOSITORY_DOCUMENTATION = ("docs/reviews/", "docs/reports/", "docs/research/", "docs/assets/", "prototypes/", "tools/")
 DOCUMENTATION_NOTE = "SDK_DOCUMENTATION.md"
 DOCUMENTATION_LINK = re.compile(
     r"!?\[(?P<label>[^\]]*)\]\(\s*"
