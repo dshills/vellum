@@ -1,0 +1,122 @@
+{
+  "outcome": "VALID_OFFSCREEN_COMMAND_STRUCTURE_ONLY",
+  "frames": [
+    {
+      "index": 0,
+      "target": {
+        "Min": {
+          "X": 0,
+          "Y": 0
+        },
+        "Max": {
+          "X": 1500,
+          "Y": 1250
+        }
+      },
+      "command_types": {
+        "*render.ContextPush": 4,
+        "*pimage.Params": 8,
+        "*render.Path": 4,
+        "*render.ContextPop": 4
+      },
+      "image_draw_parameters": 8,
+      "unpainted_paths": 4,
+      "patch_recorded_rgba": [
+        0,
+        65535,
+        0,
+        65535
+      ]
+    },
+    {
+      "index": 1,
+      "target": {
+        "Min": {
+          "X": 0,
+          "Y": 0
+        },
+        "Max": {
+          "X": 1500,
+          "Y": 1250
+        }
+      },
+      "command_types": {
+        "*render.ContextPush": 4,
+        "*pimage.Params": 8,
+        "*render.Path": 4,
+        "*render.ContextPop": 4
+      },
+      "image_draw_parameters": 8,
+      "unpainted_paths": 4,
+      "patch_recorded_rgba": [
+        0,
+        65535,
+        0,
+        65535
+      ]
+    },
+    {
+      "index": 2,
+      "target": {
+        "Min": {
+          "X": 0,
+          "Y": 0
+        },
+        "Max": {
+          "X": 1500,
+          "Y": 1250
+        }
+      },
+      "command_types": {
+        "*render.ContextPush": 4,
+        "*pimage.Params": 8,
+        "*render.Path": 4,
+        "*render.ContextPop": 4
+      },
+      "image_draw_parameters": 8,
+      "unpainted_paths": 4,
+      "patch_recorded_rgba": [
+        65535,
+        0,
+        0,
+        65535
+      ]
+    },
+    {
+      "index": 3,
+      "target": {
+        "Min": {
+          "X": 0,
+          "Y": 0
+        },
+        "Max": {
+          "X": 1500,
+          "Y": 1250
+        }
+      },
+      "command_types": {
+        "*render.ContextPush": 4,
+        "*pimage.Params": 8,
+        "*render.Path": 4,
+        "*render.ContextPop": 4
+      },
+      "image_draw_parameters": 8,
+      "unpainted_paths": 4,
+      "patch_recorded_rgba": [
+        0,
+        65535,
+        0,
+        65535
+      ]
+    }
+  ],
+  "recorded_items": 80,
+  "pixel_oracle": "Original routed TestRoutedStateAndExactPatchPixels passes state0/1/2 and full image pixels; unrelatedkey no-op preserved",
+  "recorder_tests": "2focused methods pass: no custom RGBAcallbacks, detached snapshots, exact32frame/1024item caps, overflow and reset",
+  "owned_successful_groups": 2,
+  "retained_failed_setup_groups": 1,
+  "scope": "Manual1500x1250/96DPI route, not native1519x1266/actualpresentation. 8recorded draw params do not imply8executed full fills: existing covered/crop optimizations can skip or narrow work. No per-source/tag attribution or raster-cost cause established.",
+  "native_attempts": 0,
+  "performance_candidate_adopted": false,
+  "gate_changed": false
+}

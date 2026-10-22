@@ -1746,3 +1746,9 @@ The [private uniform-fill control](../docs/reports/macos-uniform-fill/README.md)
 is rejected before native testing: pixel oracle passes but bounded CPU benchmark
 overlaps; pinnedGo already copies rows. No adoption/unchangedretry; inspectactual
 rastercommands next. Features/defaults/SDK/app/gate unchanged; M3–M7 open.
+
+The [offscreen raster command observer](../docs/reports/macos-raster-commands/README.md)
+retains4renderer calls/80records while original full pixel/state checks pass.
+Recordedcommands are notexecutedfillcounts ornativecostattribution; geometrydiffers.
+Caps/reset/callback/snapshot tests pass. Next reviewedboundednative3transition
+structuralcapture, no new repair/gate/default/SDK/app change; M3–M7 open.
