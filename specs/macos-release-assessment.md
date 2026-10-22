@@ -330,3 +330,16 @@ reused by exact source comparison. One newly approved 40s native/60s overall
 capture may follow review and commit. GPU span includes gaps; final-render-GPU-end
 to shown is not exclusively compositor cost. No native result, repair, feature,
 default, SDK/app or 33.3ms gate change. M3–M7 remain open.
+
+The [same-input backend result](../docs/reports/macos-joined-backend/README.md)
+passes 248 joins in 37.509 s, with nine owned command groups retired. Instrumented
+p95 is 36.329 ms; 34 of 120 measured observations exceed 33.3 ms. On that actual
+ranked input, the render GPU span is 0.289 ms and final render GPU end to shown
+is 30.933 ms. Presentation was requested 1.138 ms before final render GPU end.
+Separate present-command GPU end to shown is 30.929 ms. This localizes the
+remainder beyond the recorded commands without isolating compositor cost,
+proving a fixed frame penalty or attributing the cause to WebGPU. All startup,
+command, source, SDK, configuration and log accounting is retained. The original
+design, SDK, app, defaults, features and 33.3 ms gate remain unchanged. M3–M7 are
+open; no repair or ordinary-build qualification follows. The approved live scope
+is consumed; this result does not authorize another native attempt.
