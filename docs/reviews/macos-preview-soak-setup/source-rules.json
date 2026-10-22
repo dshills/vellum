@@ -1,0 +1,8 @@
+{
+  "rules": [
+    {
+      "id": "fixture-only-geometry",
+      "text": "Only existing native soak fixture cover geometry changes: margin32->128 to inset target under cover body instead of translucent titlebar/rounded edges. Hypothesis being tested, no guaranteed native visibility from geometry. Exact existing strict target Cocoa OcclusionVisible=false, cover opaque+front+containment, endpoint sample predicates unchanged. No product driver/runtime/rendering/pacing/API code changes. Focused Soak race tests, command vet, native build pass. Review introduced correctness or lifecycle issues; no new performance gate/harness/features."
+    }
+  ]
+}

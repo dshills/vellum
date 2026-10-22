@@ -1,0 +1,50 @@
+[
+  {
+    "argv": [
+      "gofmt",
+      "-w",
+      "cmd/window-cycle-smoke/soak.go"
+    ],
+    "exit_code": 0,
+    "seconds": 0.030017332872375846
+  },
+  {
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "vellum_native_checks",
+      "./cmd/window-cycle-smoke",
+      "-run",
+      "Soak",
+      "-count=1"
+    ],
+    "exit_code": 0,
+    "seconds": 28.21737604099326
+  },
+  {
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "vellum_native_checks",
+      "./cmd/window-cycle-smoke"
+    ],
+    "exit_code": 0,
+    "seconds": 2.0372436249163
+  },
+  {
+    "argv": [
+      "go",
+      "build",
+      "-tags",
+      "vellum_native_checks",
+      "-o",
+      "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/window-cycle-inset",
+      "./cmd/window-cycle-smoke"
+    ],
+    "exit_code": 0,
+    "seconds": 4.95636274991557
+  }
+]

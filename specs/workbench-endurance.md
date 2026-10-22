@@ -179,8 +179,10 @@ windows, their actual Cocoa outer frames, native ordering indices, opacity,
 alpha and levels, and whether the cover's frame contains the target. Failed
 transitions preserve the last observation and fail the run. Frame containment
 and ordering never substitute for `OcclusionVisible=false` in the occluded phase.
-The cover requests 32 window-manager points of margin on each side of the
-unchanged composed target. Occluded-phase admission additionally requires the
+The cover requests 128 window-manager points of margin on each side of the
+unchanged composed target, placing it farther inside the cover body rather than
+under translucent title-bar/rounded-edge regions. This is fixture geometry, not
+an assumed occlusion guarantee. Occluded-phase admission additionally requires the
 observed cover to be visible, unminimized, opaque with alpha one, at the same
 native level, ordered ahead of the target, and to contain its full Cocoa frame.
 Requested margins are not assumed to survive window-manager constraints.

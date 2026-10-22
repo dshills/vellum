@@ -189,10 +189,11 @@ func checkSoak(ctx context.Context, a *app.Application, survivor *cogent.GPUCanv
 	for _, phase := range []string{"visible", "occluded", "minimized", "background"} {
 		native.Raise()
 		if phase == "occluded" {
-			// Equal decorated frames need not fully occlude their bounding boxes.
-			// Keep the composed target size and surround it with a larger cover.
-			cover.SetWinSize(soakWindowSize(win).Add(image.Pt(64, 64)))
-			cover.SetPos(native.Position(nil).Sub(image.Pt(32, 32)), nil)
+			// A containing outer frame can still leave the target under the cover's
+			// translucent title bar or rounded edges. Inset it farther into the
+			// cover's body; the native occlusion predicate below remains decisive.
+			cover.SetWinSize(soakWindowSize(win).Add(image.Pt(256, 256)))
+			cover.SetPos(native.Position(nil).Sub(image.Pt(128, 128)), nil)
 		} else {
 			cover.SetWinSize(image.Pt(320, 160))
 			cover.SetPos(image.Pt(0, 0), nil)
