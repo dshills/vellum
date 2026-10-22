@@ -1,0 +1,86 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "43754a1ae553b3cd9a8af143ff10c3b9",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "587657f70514c37cd28c970f563c47e48d86bda1",
+    "branch": "codex/macos-preview"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3834,
+    "totalMs": 3862
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 14,
+    "bytes": 23517,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 12050,
+        "output": 390,
+        "costUSD": 0.028
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "28585e1c22fce9fd",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Zoom evidence record shows no change",
+        "message": "The zoom scroll record shows status_before and status_after both at zoom 100%, so it does not itself show that the zoom changed. The README acknowledges a stale status, but this raw evidence cannot independently support the claim that scroll zoom passed. The 94% result is only in the summary JSON and the saved file.",
+        "suggestion": "Capture the dedicated zoom-control value before and after the scroll in the zoom record, or add a screenshot or accessibility readout showing 94%.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "docs/reports/macos-preview-final-private/final-native-zoom.json",
+            "lines": {
+              "start": 1,
+              "end": 1
+            }
+          }
+        ],
+        "tags": [
+          "evidence",
+          "acceptance"
+        ],
+        "evidence": "\"status_after\":\"Selected:  • zoom 100% • 1 objects • 0 selected • Undo 1 \\/ Redo 0\",\"status_before\":\"Selected:  • zoom 100% • 1 objects • 0 selected • Undo 1 \\/ Redo 0\"",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/macos-preview-final-private/final-native-zoom.json"
+    }
+  ],
+  "suppressed": []
+}
