@@ -1075,9 +1075,9 @@ No native pool is integrated. Proposed texture-only reuse must return explicitly
 from real completed-submission retirement, keep original failure/teardown paths,
 bound idle storage and prove GPU bytes/ownership before timing. Gate unchanged.
 
-The [private staging prototype first case](../docs/reports/macos-staging-reuse/README.md)
-is rejected on an empty derived diagnostic GPU name, after a successful off-mode
-process. Enabled-pool mode never runs. Use the primary AdapterInfo.Device field
-in a rebuilt fixture and a fresh bounded scope; retain the original refusal and
-all source-bound byte/lifetime data. No native pooling or release acceptance,
-shipping/SDK/app change or 33.3 ms gate change.
+The [private staging byte/lifetime pair](../docs/reports/macos-staging-reuse/README.md)
+passes after the concrete primary-name fix: 44 full GPU readbacks/97,912,700 bytes,
+48 CPU writes, reuse6/eviction5/idlepeak8 and closed eligible/device ledgers. All
+18 groups retire within 4.588 seconds; source/SDK/config/geometry pins hold. The
+original metadata refusal remains rejected. Next one reviewed bounded framework
+timing pair; no shipping/SDK/app, feature/pacing or 33.3 ms gate change.

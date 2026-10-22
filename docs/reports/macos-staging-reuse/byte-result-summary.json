@@ -1,0 +1,1067 @@
+{
+  "outcome": "VALID_PRIVATE_STAGING_BYTE_PAIR",
+  "started_utc": "2026-10-22T00:05:15.178943+00:00",
+  "finished_utc": "2026-10-22T00:05:19.766661+00:00",
+  "elapsed_seconds": 4.587718,
+  "maximum_seconds": 90,
+  "CPU_writes": 48,
+  "GPU_verified_readbacks": 44,
+  "GPU_verified_bytes": 97912700,
+  "owned_native_and_probe_groups": 18,
+  "runs": [
+    {
+      "mode": "off",
+      "metrics": {
+        "outcome": "VALID_PRIVATE_STAGING_BYTE_CHECK",
+        "mode": "off",
+        "CPU_writes": 24,
+        "GPU_verified_readbacks": 22,
+        "GPU_verified_bytes": 48956350,
+        "lifecycle": {
+          "fresh": 22,
+          "takes": 0,
+          "evictions": 0,
+          "owners": 2,
+          "peak_idle_count": 0,
+          "peak_idle_bytes": 0,
+          "leases": [
+            {
+              "call": 2,
+              "id": 1,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 1,
+              "acquire_clock": 1157063.4935766668,
+              "submit": 1,
+              "submit_sequence": 2,
+              "retire_sequence": 3,
+              "cache_sequence": null,
+              "destroy_sequence": 4,
+              "retire_fence": 1
+            },
+            {
+              "call": 3,
+              "id": 2,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 5,
+              "acquire_clock": 1157063.4967199168,
+              "submit": 2,
+              "submit_sequence": 6,
+              "retire_sequence": 7,
+              "cache_sequence": null,
+              "destroy_sequence": 8,
+              "retire_fence": 2
+            },
+            {
+              "call": 4,
+              "id": 3,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 9,
+              "acquire_clock": 1157063.498397792,
+              "submit": 3,
+              "submit_sequence": 10,
+              "retire_sequence": 11,
+              "cache_sequence": null,
+              "destroy_sequence": 12,
+              "retire_fence": 3
+            },
+            {
+              "call": 5,
+              "id": 4,
+              "owner": 1,
+              "bytes": 140,
+              "acquire_sequence": 13,
+              "acquire_clock": 1157063.5000392504,
+              "submit": 4,
+              "submit_sequence": 14,
+              "retire_sequence": 15,
+              "cache_sequence": null,
+              "destroy_sequence": 16,
+              "retire_fence": 4
+            },
+            {
+              "call": 6,
+              "id": 5,
+              "owner": 1,
+              "bytes": 140,
+              "acquire_sequence": 17,
+              "acquire_clock": 1157063.5016769168,
+              "submit": 5,
+              "submit_sequence": 18,
+              "retire_sequence": 19,
+              "cache_sequence": null,
+              "destroy_sequence": 20,
+              "retire_fence": 5
+            },
+            {
+              "call": 7,
+              "id": 6,
+              "owner": 1,
+              "bytes": 7692216,
+              "acquire_sequence": 21,
+              "acquire_clock": 1157063.5066847086,
+              "submit": 6,
+              "submit_sequence": 22,
+              "retire_sequence": 23,
+              "cache_sequence": null,
+              "destroy_sequence": 24,
+              "retire_fence": 6
+            },
+            {
+              "call": 8,
+              "id": 7,
+              "owner": 1,
+              "bytes": 7692216,
+              "acquire_sequence": 25,
+              "acquire_clock": 1157063.517729542,
+              "submit": 7,
+              "submit_sequence": 26,
+              "retire_sequence": 27,
+              "cache_sequence": null,
+              "destroy_sequence": 28,
+              "retire_fence": 7
+            },
+            {
+              "call": 9,
+              "id": 8,
+              "owner": 1,
+              "bytes": 33570816,
+              "acquire_sequence": 29,
+              "acquire_clock": 1157063.5385247502,
+              "submit": 8,
+              "submit_sequence": 30,
+              "retire_sequence": 31,
+              "cache_sequence": null,
+              "destroy_sequence": 32,
+              "retire_fence": 8
+            },
+            {
+              "call": 10,
+              "id": 9,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 33,
+              "acquire_clock": 1157063.5690340835,
+              "submit": 9,
+              "submit_sequence": 36,
+              "retire_sequence": 39,
+              "cache_sequence": null,
+              "destroy_sequence": 40,
+              "retire_fence": 9
+            },
+            {
+              "call": 11,
+              "id": 10,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 34,
+              "acquire_clock": 1157063.569072542,
+              "submit": 9,
+              "submit_sequence": 37,
+              "retire_sequence": 41,
+              "cache_sequence": null,
+              "destroy_sequence": 42,
+              "retire_fence": 9
+            },
+            {
+              "call": 12,
+              "id": 11,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 35,
+              "acquire_clock": 1157063.5690834168,
+              "submit": 9,
+              "submit_sequence": 38,
+              "retire_sequence": 43,
+              "cache_sequence": null,
+              "destroy_sequence": 44,
+              "retire_fence": 9
+            },
+            {
+              "call": 13,
+              "id": 12,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 45,
+              "acquire_clock": 1157063.5711122085,
+              "submit": 10,
+              "submit_sequence": 46,
+              "retire_sequence": 47,
+              "cache_sequence": null,
+              "destroy_sequence": 48,
+              "retire_fence": 10
+            },
+            {
+              "call": 14,
+              "id": 13,
+              "owner": 1,
+              "bytes": 36,
+              "acquire_sequence": 49,
+              "acquire_clock": 1157063.5726775003,
+              "submit": 11,
+              "submit_sequence": 50,
+              "retire_sequence": 51,
+              "cache_sequence": null,
+              "destroy_sequence": 52,
+              "retire_fence": 11
+            },
+            {
+              "call": 15,
+              "id": 14,
+              "owner": 1,
+              "bytes": 48,
+              "acquire_sequence": 53,
+              "acquire_clock": 1157063.5742973336,
+              "submit": 12,
+              "submit_sequence": 54,
+              "retire_sequence": 55,
+              "cache_sequence": null,
+              "destroy_sequence": 56,
+              "retire_fence": 12
+            },
+            {
+              "call": 16,
+              "id": 15,
+              "owner": 1,
+              "bytes": 60,
+              "acquire_sequence": 57,
+              "acquire_clock": 1157063.5759414586,
+              "submit": 13,
+              "submit_sequence": 58,
+              "retire_sequence": 59,
+              "cache_sequence": null,
+              "destroy_sequence": 60,
+              "retire_fence": 13
+            },
+            {
+              "call": 17,
+              "id": 16,
+              "owner": 1,
+              "bytes": 72,
+              "acquire_sequence": 61,
+              "acquire_clock": 1157063.577574292,
+              "submit": 14,
+              "submit_sequence": 62,
+              "retire_sequence": 63,
+              "cache_sequence": null,
+              "destroy_sequence": 64,
+              "retire_fence": 14
+            },
+            {
+              "call": 18,
+              "id": 17,
+              "owner": 1,
+              "bytes": 84,
+              "acquire_sequence": 65,
+              "acquire_clock": 1157063.5791913336,
+              "submit": 15,
+              "submit_sequence": 66,
+              "retire_sequence": 67,
+              "cache_sequence": null,
+              "destroy_sequence": 68,
+              "retire_fence": 15
+            },
+            {
+              "call": 19,
+              "id": 18,
+              "owner": 1,
+              "bytes": 96,
+              "acquire_sequence": 69,
+              "acquire_clock": 1157063.5808400835,
+              "submit": 16,
+              "submit_sequence": 70,
+              "retire_sequence": 71,
+              "cache_sequence": null,
+              "destroy_sequence": 72,
+              "retire_fence": 16
+            },
+            {
+              "call": 20,
+              "id": 19,
+              "owner": 1,
+              "bytes": 108,
+              "acquire_sequence": 73,
+              "acquire_clock": 1157063.5824275003,
+              "submit": 17,
+              "submit_sequence": 74,
+              "retire_sequence": 75,
+              "cache_sequence": null,
+              "destroy_sequence": 76,
+              "retire_fence": 17
+            },
+            {
+              "call": 21,
+              "id": 20,
+              "owner": 1,
+              "bytes": 120,
+              "acquire_sequence": 77,
+              "acquire_clock": 1157063.583980917,
+              "submit": 18,
+              "submit_sequence": 78,
+              "retire_sequence": 79,
+              "cache_sequence": null,
+              "destroy_sequence": 80,
+              "retire_fence": 18
+            },
+            {
+              "call": 22,
+              "id": 21,
+              "owner": 2,
+              "bytes": 24,
+              "acquire_sequence": 82,
+              "acquire_clock": 1157063.5862422085,
+              "submit": 1,
+              "submit_sequence": 83,
+              "retire_sequence": 84,
+              "cache_sequence": null,
+              "destroy_sequence": 85,
+              "retire_fence": 1
+            },
+            {
+              "call": 24,
+              "id": 22,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 88,
+              "acquire_clock": 1157063.5897613335,
+              "submit": 0,
+              "submit_sequence": null,
+              "retire_sequence": null,
+              "cache_sequence": null,
+              "destroy_sequence": 89
+            }
+          ]
+        },
+        "release_qualified": false,
+        "physical_GPU_overlap_verified": false,
+        "interpretation": "Full-byte readbacks and scalar source-bound lifecycle accounting for these private texture staging resources. No physical allocation balance, device-fault injection, UI latency or shipping qualification."
+      },
+      "resource_lifetimes": [
+        {
+          "id": 1,
+          "owner": 1,
+          "bytes": 24,
+          "fresh_sequence": 1,
+          "acquisition_calls": [
+            2
+          ],
+          "destroy_sequence": 4
+        },
+        {
+          "id": 2,
+          "owner": 1,
+          "bytes": 24,
+          "fresh_sequence": 5,
+          "acquisition_calls": [
+            3
+          ],
+          "destroy_sequence": 8
+        },
+        {
+          "id": 3,
+          "owner": 1,
+          "bytes": 24,
+          "fresh_sequence": 9,
+          "acquisition_calls": [
+            4
+          ],
+          "destroy_sequence": 12
+        },
+        {
+          "id": 4,
+          "owner": 1,
+          "bytes": 140,
+          "fresh_sequence": 13,
+          "acquisition_calls": [
+            5
+          ],
+          "destroy_sequence": 16
+        },
+        {
+          "id": 5,
+          "owner": 1,
+          "bytes": 140,
+          "fresh_sequence": 17,
+          "acquisition_calls": [
+            6
+          ],
+          "destroy_sequence": 20
+        },
+        {
+          "id": 6,
+          "owner": 1,
+          "bytes": 7692216,
+          "fresh_sequence": 21,
+          "acquisition_calls": [
+            7
+          ],
+          "destroy_sequence": 24
+        },
+        {
+          "id": 7,
+          "owner": 1,
+          "bytes": 7692216,
+          "fresh_sequence": 25,
+          "acquisition_calls": [
+            8
+          ],
+          "destroy_sequence": 28
+        },
+        {
+          "id": 8,
+          "owner": 1,
+          "bytes": 33570816,
+          "fresh_sequence": 29,
+          "acquisition_calls": [
+            9
+          ],
+          "destroy_sequence": 32
+        },
+        {
+          "id": 9,
+          "owner": 1,
+          "bytes": 24,
+          "fresh_sequence": 33,
+          "acquisition_calls": [
+            10
+          ],
+          "destroy_sequence": 40
+        },
+        {
+          "id": 10,
+          "owner": 1,
+          "bytes": 24,
+          "fresh_sequence": 34,
+          "acquisition_calls": [
+            11
+          ],
+          "destroy_sequence": 42
+        },
+        {
+          "id": 11,
+          "owner": 1,
+          "bytes": 24,
+          "fresh_sequence": 35,
+          "acquisition_calls": [
+            12
+          ],
+          "destroy_sequence": 44
+        },
+        {
+          "id": 12,
+          "owner": 1,
+          "bytes": 24,
+          "fresh_sequence": 45,
+          "acquisition_calls": [
+            13
+          ],
+          "destroy_sequence": 48
+        },
+        {
+          "id": 13,
+          "owner": 1,
+          "bytes": 36,
+          "fresh_sequence": 49,
+          "acquisition_calls": [
+            14
+          ],
+          "destroy_sequence": 52
+        },
+        {
+          "id": 14,
+          "owner": 1,
+          "bytes": 48,
+          "fresh_sequence": 53,
+          "acquisition_calls": [
+            15
+          ],
+          "destroy_sequence": 56
+        },
+        {
+          "id": 15,
+          "owner": 1,
+          "bytes": 60,
+          "fresh_sequence": 57,
+          "acquisition_calls": [
+            16
+          ],
+          "destroy_sequence": 60
+        },
+        {
+          "id": 16,
+          "owner": 1,
+          "bytes": 72,
+          "fresh_sequence": 61,
+          "acquisition_calls": [
+            17
+          ],
+          "destroy_sequence": 64
+        },
+        {
+          "id": 17,
+          "owner": 1,
+          "bytes": 84,
+          "fresh_sequence": 65,
+          "acquisition_calls": [
+            18
+          ],
+          "destroy_sequence": 68
+        },
+        {
+          "id": 18,
+          "owner": 1,
+          "bytes": 96,
+          "fresh_sequence": 69,
+          "acquisition_calls": [
+            19
+          ],
+          "destroy_sequence": 72
+        },
+        {
+          "id": 19,
+          "owner": 1,
+          "bytes": 108,
+          "fresh_sequence": 73,
+          "acquisition_calls": [
+            20
+          ],
+          "destroy_sequence": 76
+        },
+        {
+          "id": 20,
+          "owner": 1,
+          "bytes": 120,
+          "fresh_sequence": 77,
+          "acquisition_calls": [
+            21
+          ],
+          "destroy_sequence": 80
+        },
+        {
+          "id": 21,
+          "owner": 2,
+          "bytes": 24,
+          "fresh_sequence": 82,
+          "acquisition_calls": [
+            22
+          ],
+          "destroy_sequence": 85
+        },
+        {
+          "id": 22,
+          "owner": 1,
+          "bytes": 24,
+          "fresh_sequence": 88,
+          "acquisition_calls": [
+            24
+          ],
+          "destroy_sequence": 89
+        }
+      ]
+    },
+    {
+      "mode": "on",
+      "metrics": {
+        "outcome": "VALID_PRIVATE_STAGING_BYTE_CHECK",
+        "mode": "on",
+        "CPU_writes": 24,
+        "GPU_verified_readbacks": 22,
+        "GPU_verified_bytes": 48956350,
+        "lifecycle": {
+          "fresh": 16,
+          "takes": 6,
+          "evictions": 5,
+          "owners": 2,
+          "peak_idle_count": 8,
+          "peak_idle_bytes": 7692572,
+          "leases": [
+            {
+              "call": 2,
+              "id": 1,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 1,
+              "acquire_clock": 1157065.5992849169,
+              "submit": 1,
+              "submit_sequence": 2,
+              "retire_sequence": 3,
+              "cache_sequence": 4,
+              "destroy_sequence": null,
+              "retire_fence": 1
+            },
+            {
+              "call": 3,
+              "id": 1,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 5,
+              "acquire_clock": 1157065.6027288337,
+              "submit": 2,
+              "submit_sequence": 6,
+              "retire_sequence": 7,
+              "cache_sequence": 8,
+              "destroy_sequence": null,
+              "retire_fence": 2
+            },
+            {
+              "call": 4,
+              "id": 1,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 9,
+              "acquire_clock": 1157065.6043472085,
+              "submit": 3,
+              "submit_sequence": 10,
+              "retire_sequence": 11,
+              "cache_sequence": 12,
+              "destroy_sequence": null,
+              "retire_fence": 3
+            },
+            {
+              "call": 5,
+              "id": 2,
+              "owner": 1,
+              "bytes": 140,
+              "acquire_sequence": 13,
+              "acquire_clock": 1157065.6060440002,
+              "submit": 4,
+              "submit_sequence": 14,
+              "retire_sequence": 15,
+              "cache_sequence": 16,
+              "destroy_sequence": null,
+              "retire_fence": 4
+            },
+            {
+              "call": 6,
+              "id": 2,
+              "owner": 1,
+              "bytes": 140,
+              "acquire_sequence": 17,
+              "acquire_clock": 1157065.6071078752,
+              "submit": 5,
+              "submit_sequence": 18,
+              "retire_sequence": 19,
+              "cache_sequence": 20,
+              "destroy_sequence": 66,
+              "retire_fence": 5
+            },
+            {
+              "call": 7,
+              "id": 3,
+              "owner": 1,
+              "bytes": 7692216,
+              "acquire_sequence": 21,
+              "acquire_clock": 1157065.6117840419,
+              "submit": 6,
+              "submit_sequence": 22,
+              "retire_sequence": 23,
+              "cache_sequence": 24,
+              "destroy_sequence": null,
+              "retire_fence": 6
+            },
+            {
+              "call": 8,
+              "id": 3,
+              "owner": 1,
+              "bytes": 7692216,
+              "acquire_sequence": 25,
+              "acquire_clock": 1157065.6224537503,
+              "submit": 7,
+              "submit_sequence": 26,
+              "retire_sequence": 27,
+              "cache_sequence": 28,
+              "destroy_sequence": 72,
+              "retire_fence": 7
+            },
+            {
+              "call": 9,
+              "id": 4,
+              "owner": 1,
+              "bytes": 33570816,
+              "acquire_sequence": 29,
+              "acquire_clock": 1157065.6426972502,
+              "submit": 8,
+              "submit_sequence": 30,
+              "retire_sequence": 31,
+              "cache_sequence": null,
+              "destroy_sequence": 32,
+              "retire_fence": 8
+            },
+            {
+              "call": 10,
+              "id": 1,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 33,
+              "acquire_clock": 1157065.6733183337,
+              "submit": 9,
+              "submit_sequence": 36,
+              "retire_sequence": 39,
+              "cache_sequence": 40,
+              "destroy_sequence": null,
+              "retire_fence": 9
+            },
+            {
+              "call": 11,
+              "id": 5,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 34,
+              "acquire_clock": 1157065.6733577503,
+              "submit": 9,
+              "submit_sequence": 37,
+              "retire_sequence": 41,
+              "cache_sequence": 42,
+              "destroy_sequence": 78,
+              "retire_fence": 9
+            },
+            {
+              "call": 12,
+              "id": 6,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 35,
+              "acquire_clock": 1157065.6733719585,
+              "submit": 9,
+              "submit_sequence": 38,
+              "retire_sequence": 43,
+              "cache_sequence": 44,
+              "destroy_sequence": 84,
+              "retire_fence": 9
+            },
+            {
+              "call": 13,
+              "id": 1,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 45,
+              "acquire_clock": 1157065.6750693335,
+              "submit": 10,
+              "submit_sequence": 46,
+              "retire_sequence": 47,
+              "cache_sequence": 48,
+              "destroy_sequence": 90,
+              "retire_fence": 10
+            },
+            {
+              "call": 14,
+              "id": 7,
+              "owner": 1,
+              "bytes": 36,
+              "acquire_sequence": 49,
+              "acquire_clock": 1157065.6766712086,
+              "submit": 11,
+              "submit_sequence": 50,
+              "retire_sequence": 51,
+              "cache_sequence": 52,
+              "destroy_sequence": 102,
+              "retire_fence": 11
+            },
+            {
+              "call": 15,
+              "id": 8,
+              "owner": 1,
+              "bytes": 48,
+              "acquire_sequence": 53,
+              "acquire_clock": 1157065.6782589168,
+              "submit": 12,
+              "submit_sequence": 54,
+              "retire_sequence": 55,
+              "cache_sequence": 56,
+              "destroy_sequence": 103,
+              "retire_fence": 12
+            },
+            {
+              "call": 16,
+              "id": 9,
+              "owner": 1,
+              "bytes": 60,
+              "acquire_sequence": 57,
+              "acquire_clock": 1157065.6798555003,
+              "submit": 13,
+              "submit_sequence": 58,
+              "retire_sequence": 59,
+              "cache_sequence": 60,
+              "destroy_sequence": 104,
+              "retire_fence": 13
+            },
+            {
+              "call": 17,
+              "id": 10,
+              "owner": 1,
+              "bytes": 72,
+              "acquire_sequence": 61,
+              "acquire_clock": 1157065.6814260003,
+              "submit": 14,
+              "submit_sequence": 62,
+              "retire_sequence": 63,
+              "cache_sequence": 65,
+              "destroy_sequence": 105,
+              "retire_fence": 14
+            },
+            {
+              "call": 18,
+              "id": 11,
+              "owner": 1,
+              "bytes": 84,
+              "acquire_sequence": 67,
+              "acquire_clock": 1157065.6830138753,
+              "submit": 15,
+              "submit_sequence": 68,
+              "retire_sequence": 69,
+              "cache_sequence": 71,
+              "destroy_sequence": 106,
+              "retire_fence": 15
+            },
+            {
+              "call": 19,
+              "id": 12,
+              "owner": 1,
+              "bytes": 96,
+              "acquire_sequence": 73,
+              "acquire_clock": 1157065.6846243336,
+              "submit": 16,
+              "submit_sequence": 74,
+              "retire_sequence": 75,
+              "cache_sequence": 77,
+              "destroy_sequence": 107,
+              "retire_fence": 16
+            },
+            {
+              "call": 20,
+              "id": 13,
+              "owner": 1,
+              "bytes": 108,
+              "acquire_sequence": 79,
+              "acquire_clock": 1157065.6857176253,
+              "submit": 17,
+              "submit_sequence": 80,
+              "retire_sequence": 81,
+              "cache_sequence": 83,
+              "destroy_sequence": 108,
+              "retire_fence": 17
+            },
+            {
+              "call": 21,
+              "id": 14,
+              "owner": 1,
+              "bytes": 120,
+              "acquire_sequence": 85,
+              "acquire_clock": 1157065.6872787087,
+              "submit": 18,
+              "submit_sequence": 86,
+              "retire_sequence": 87,
+              "cache_sequence": 89,
+              "destroy_sequence": 109,
+              "retire_fence": 18
+            },
+            {
+              "call": 22,
+              "id": 15,
+              "owner": 2,
+              "bytes": 24,
+              "acquire_sequence": 92,
+              "acquire_clock": 1157065.6894977503,
+              "submit": 1,
+              "submit_sequence": 93,
+              "retire_sequence": 94,
+              "cache_sequence": 95,
+              "destroy_sequence": 97,
+              "retire_fence": 1
+            },
+            {
+              "call": 24,
+              "id": 16,
+              "owner": 1,
+              "bytes": 24,
+              "acquire_sequence": 99,
+              "acquire_clock": 1157065.693165292,
+              "submit": 0,
+              "submit_sequence": null,
+              "retire_sequence": null,
+              "cache_sequence": null,
+              "destroy_sequence": 100
+            }
+          ]
+        },
+        "release_qualified": false,
+        "physical_GPU_overlap_verified": false,
+        "interpretation": "Full-byte readbacks and scalar source-bound lifecycle accounting for these private texture staging resources. No physical allocation balance, device-fault injection, UI latency or shipping qualification."
+      },
+      "resource_lifetimes": [
+        {
+          "id": 1,
+          "owner": 1,
+          "bytes": 24,
+          "fresh_sequence": 1,
+          "acquisition_calls": [
+            2,
+            3,
+            4,
+            10,
+            13
+          ],
+          "destroy_sequence": 90
+        },
+        {
+          "id": 2,
+          "owner": 1,
+          "bytes": 140,
+          "fresh_sequence": 13,
+          "acquisition_calls": [
+            5,
+            6
+          ],
+          "destroy_sequence": 66
+        },
+        {
+          "id": 3,
+          "owner": 1,
+          "bytes": 7692216,
+          "fresh_sequence": 21,
+          "acquisition_calls": [
+            7,
+            8
+          ],
+          "destroy_sequence": 72
+        },
+        {
+          "id": 4,
+          "owner": 1,
+          "bytes": 33570816,
+          "fresh_sequence": 29,
+          "acquisition_calls": [
+            9
+          ],
+          "destroy_sequence": 32
+        },
+        {
+          "id": 5,
+          "owner": 1,
+          "bytes": 24,
+          "fresh_sequence": 34,
+          "acquisition_calls": [
+            11
+          ],
+          "destroy_sequence": 78
+        },
+        {
+          "id": 6,
+          "owner": 1,
+          "bytes": 24,
+          "fresh_sequence": 35,
+          "acquisition_calls": [
+            12
+          ],
+          "destroy_sequence": 84
+        },
+        {
+          "id": 7,
+          "owner": 1,
+          "bytes": 36,
+          "fresh_sequence": 49,
+          "acquisition_calls": [
+            14
+          ],
+          "destroy_sequence": 102
+        },
+        {
+          "id": 8,
+          "owner": 1,
+          "bytes": 48,
+          "fresh_sequence": 53,
+          "acquisition_calls": [
+            15
+          ],
+          "destroy_sequence": 103
+        },
+        {
+          "id": 9,
+          "owner": 1,
+          "bytes": 60,
+          "fresh_sequence": 57,
+          "acquisition_calls": [
+            16
+          ],
+          "destroy_sequence": 104
+        },
+        {
+          "id": 10,
+          "owner": 1,
+          "bytes": 72,
+          "fresh_sequence": 61,
+          "acquisition_calls": [
+            17
+          ],
+          "destroy_sequence": 105
+        },
+        {
+          "id": 11,
+          "owner": 1,
+          "bytes": 84,
+          "fresh_sequence": 67,
+          "acquisition_calls": [
+            18
+          ],
+          "destroy_sequence": 106
+        },
+        {
+          "id": 12,
+          "owner": 1,
+          "bytes": 96,
+          "fresh_sequence": 73,
+          "acquisition_calls": [
+            19
+          ],
+          "destroy_sequence": 107
+        },
+        {
+          "id": 13,
+          "owner": 1,
+          "bytes": 108,
+          "fresh_sequence": 79,
+          "acquisition_calls": [
+            20
+          ],
+          "destroy_sequence": 108
+        },
+        {
+          "id": 14,
+          "owner": 1,
+          "bytes": 120,
+          "fresh_sequence": 85,
+          "acquisition_calls": [
+            21
+          ],
+          "destroy_sequence": 109
+        },
+        {
+          "id": 15,
+          "owner": 2,
+          "bytes": 24,
+          "fresh_sequence": 92,
+          "acquisition_calls": [
+            22
+          ],
+          "destroy_sequence": 97
+        },
+        {
+          "id": 16,
+          "owner": 1,
+          "bytes": 24,
+          "fresh_sequence": 99,
+          "acquisition_calls": [
+            24
+          ],
+          "destroy_sequence": 100
+        }
+      ]
+    }
+  ],
+  "release_qualified": false,
+  "shipping_adopted": false,
+  "gate_changed": false,
+  "interpretation": "Same private binary/library, original shared/WC policy, headless correctness. Eligible staging API ledger closes with both device scopes each mode; not physical resident-memory/all-GPU allocation balance, fault injection, displayed pixels or UI latency acceptance."
+}
