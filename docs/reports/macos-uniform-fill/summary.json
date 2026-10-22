@@ -1,0 +1,76 @@
+{
+  "outcome": "REJECT_PRIVATE_FILL_CANDIDATE_NO_USEFUL_GAIN",
+  "pixel_tests": "3 methods pass, including1200 deterministic randomized Params.Render cases, explicit fastpath/padded-subimage/sourceclipping/customcolor fallback parity",
+  "benchmark_rows": [
+    {
+      "variant": "stdlib",
+      "reported_GOMAXPROCS": 14,
+      "iterations": 1346,
+      "ns_per_op": 151044,
+      "MB_per_s": 49753.82,
+      "bytes_per_op": 0,
+      "allocs_per_op": 0
+    },
+    {
+      "variant": "stdlib",
+      "reported_GOMAXPROCS": 14,
+      "iterations": 1658,
+      "ns_per_op": 162019,
+      "MB_per_s": 46383.58,
+      "bytes_per_op": 0,
+      "allocs_per_op": 0
+    },
+    {
+      "variant": "stdlib",
+      "reported_GOMAXPROCS": 14,
+      "iterations": 1491,
+      "ns_per_op": 142556,
+      "MB_per_s": 52716.29,
+      "bytes_per_op": 0,
+      "allocs_per_op": 0
+    },
+    {
+      "variant": "rowcopy",
+      "reported_GOMAXPROCS": 14,
+      "iterations": 1822,
+      "ns_per_op": 147623,
+      "MB_per_s": 50906.66,
+      "bytes_per_op": 0,
+      "allocs_per_op": 0
+    },
+    {
+      "variant": "rowcopy",
+      "reported_GOMAXPROCS": 14,
+      "iterations": 1826,
+      "ns_per_op": 142023,
+      "MB_per_s": 52913.81,
+      "bytes_per_op": 0,
+      "allocs_per_op": 0
+    },
+    {
+      "variant": "rowcopy",
+      "reported_GOMAXPROCS": 14,
+      "iterations": 1842,
+      "ns_per_op": 146508,
+      "MB_per_s": 51294.0,
+      "bytes_per_op": 0,
+      "allocs_per_op": 0
+    }
+  ],
+  "benchmark_scope": "Serial cached CPU fill1519x1266 inset8,200ms each/count3. Reported runtime suffix14, despite go-check launcher setting GOMAXPROCS2; not a controlled application CPU limit or release assessment. No rerun/no inferred CPU control.",
+  "source_fact": "Pinned Go1.25.6 src/image/draw/draw.go411-439 already fills first row and uses copy for later rows. Prototype changes only first-row fill to doubling and adds dispatch guards.",
+  "source_fact_pin": {
+    "/Users/dshills/Development/Go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.6.darwin-arm64/src/image/draw/draw.go": "24f42de1373014deefce87d4dd02856010ac8d385c4e61eb0c52a1a1273b0207"
+  },
+  "native_attempts": 0,
+  "adopted": false,
+  "gate_changed": false,
+  "ordinary_latency_qualified": false,
+  "candidate_pins": {
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/uniformfill/apply.py": "8f3fe5b0ecb9b418523243bcbf7124b74ec04dccf378e73e4f8e688ae4838744",
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/uniformfill/testdata/uniform_fill_test.go": "64b10e893365ed85e4194122cea3f8a4197726ac821e81c9aa24e260746c8c67",
+    "/private/tmp/vellum-macos-native-results-97aee13/tools/macos-calibration/uniformfill/testdata/uniform_fill.go": "e0d71176ab8f26f8c2f3c096a3c5dc2e3ee1a55343e4407a1f0316f0973f3143"
+  },
+  "original_pimage_sha256": "775d0ee32162115fad4d3d2ab2f4cc9c60832bd59be3565364644b23e4c883c5",
+  "private_pimage_sha256": "9e2a11f8a3e9c427eb3e84b3d6bba28f0ace60d7549c12aa748016c82e2da96b"
+}

@@ -255,3 +255,8 @@ is valid: copy p95 0.804/0.770ms, presentation 36.089/34.931ms
 (WC/default), bothmiss33.3. Both120measuredreusehits/3fresh/closedledgers, exact
 cachecounts/18groups/SDKpins. No further unchanged cache campaign or adoption;
 inspect remaining raster cost. Features/defaults/gate unchanged; M3–M7 open.
+
+The [private uniform-fill control](../docs/reports/macos-uniform-fill/README.md)
+is rejected before native testing: pixel oracle passes but bounded CPU benchmark
+overlaps; pinnedGo already copies rows. No adoption/unchangedretry; inspectactual
+rastercommands next. Features/defaults/SDK/app/gate unchanged; M3–M7 open.
