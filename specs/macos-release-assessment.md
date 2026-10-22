@@ -466,3 +466,15 @@ process/45s total, no rebuild or routed cohort. Eight focused methods/23negative
 subcases plus actual unauthorized-CLI refusal pass; source/compiled/SDK pins verify.
 No UI has run and no release gate closes. Fresh up-to1minute quiet approval is
 needed; features/defaults/SDK/app and33.3ms/60Hz gate unchanged, M3–M7 open.
+
+
+The [isolated corrected-framework startup](../docs/reports/macos-framework-startup-result/README.md)
+passes in8.111seconds (native1.462seconds):4positive scoped samples exactly join
+attempts7–10, scope closes, pending/acquiring0. All10attempts/30events are retained,
+including2zero callbacks among6pre-observer scope0attempts.9ownedgroups/18logs,
+source/binary/geometry/configuration andSDK8321verify. This closes only the
+corrected-binary startup prerequisite. Observer lifecycle passes with0ticks;
+no phase pair, cadence, latency or release qualification follows. Earlier scopes
+stay rejected/sealed; no unchanged retry or feature/gate/default/SDK/app change.
+Next measure corrected-framework input/presentation/pending state under a separate
+reviewed scope and fresh quiet approval. M3–M7 remain open.
