@@ -1,0 +1,85 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "8bd87eb578636e4133cc2bf68992896c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "5a14e653caaf39e4b77ea9f03125dc59b50d5140",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3783,
+    "totalMs": 3806
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 21823,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 11384,
+        "output": 275,
+        "costUSD": 0.025518
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "b688450c27702cae",
+        "severity": "medium",
+        "category": "maintainability",
+        "title": "Hardcoded absolute user path in verifier",
+        "message": "The verifier script hardcodes a developer's absolute home path and requires external inputs that are not committed. It cannot run on any other machine or in CI, which undermines the claim of an independent verifier.",
+        "suggestion": "Take the repo root from an environment variable or CLI argument, or derive it relative to the file, and document the required external inputs.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "docs/reports/macos-render-priority-result/execution-sources/verify_result.py.txt",
+            "lines": {
+              "start": 4,
+              "end": 4
+            }
+          }
+        ],
+        "tags": [
+          "portability",
+          "reproducibility"
+        ],
+        "evidence": "R=Path('/Users/dshills/Development/projects/Vellum')",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/macos-render-priority-result/execution-sources/verify_result.py.txt"
+    }
+  ],
+  "suppressed": []
+}

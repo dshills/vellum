@@ -9,7 +9,22 @@ not establish presentation or close the new gate. Functional correctness,
 lifecycle, bounded-resource safety and final delivery checks remain required.
 
 
-## Current checkpoint — matched calibration complete; gate unchanged
+## Current checkpoint — bounded implementation candidate rejected
+
+The [22 October representative grid check](../docs/reports/macos-render-priority-result/README.md)
+rejects scoped render-worker priority: valid120inputs/253presentations, p9548.286ms
+against33.3ms. Native exit/worker/runtime shutdown pass; allfivegroups retire and
+SDK/native/source/geometry remain unchanged. Paced case and after probes are
+unrun by the predeclared stop rule. No candidate is adopted and no additional
+performance variant is authorized by this one-candidate session.
+
+The latency blocker is real; no release fix or completion date is demonstrated.
+The proposed next boundary is larger frame-production/drawable ownership inside
+the existing backend, with explicit feasibility risk and unchanged input/lifetime/
+gate requirements. It is not a proven fix. A separate preview policy would need
+owner approval. M3–M7 and the full existing release objective remain open.
+
+## Previous checkpoint — matched calibration complete; gate unchanged
 
 The [matched calibration](../docs/reports/macos-matched-calibration/README.md)
 completes all five predeclared alternating-order pairs. Native p95 is

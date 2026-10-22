@@ -533,3 +533,14 @@ benefit remain unproven. Only private common composition owner/helper differs;
 SDK8321/nativearchive/rendering/pacing/defaults unchanged. One serial120 case,
 only ifpassing one paced600 case;60s/process150s/overall, unchanged strict journal
 and33.3ms/60Hz criteria. No native run or shipping adoption yet; no feature/gatechange.
+
+
+The [one render-worker priority candidate](../docs/reports/macos-render-priority-result/README.md)
+is rejected by a valid representative serial grid result:120inputs/253positive
+presentations, p9548.286ms>33.3ms, nativeexit0/normalshutdown/pending0.5groups/10logs,
+SDK8321/pins/geometry verify. Stop-on-failure leaves paced case and after probes
+unrun; no after-configuration equality claim. No shipping adoption or newvariant
+this session. Existing small native reference passes33.3ms, so no OS-floor claim
+or gate change follows. Recommended larger frame-production/drawable-ownership
+integration remains unproven and risks windowed target lead; record that backend
+versus explicitly approved preview-policy decision. M3–M7 remain open.
