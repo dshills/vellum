@@ -501,3 +501,12 @@ No latency/cadence/native comparison or release qualification follows. Another P
 was foreground; its identity/cause is unknown. Nil key-window layer does not prove
 window destruction. Record the first failed per-request state before a fresh
 attempt; do not retry this sealed scope. Features and release gate remain unchanged.
+
+
+The [foreground-context diagnostic](../docs/reports/macos-framework-context/README.md)
+adds first-invalid-state retention and failure-only foreground bundle/name/window
+count after the rejected warmup. Two Go race tests and three routing/patch methods
+pass; source-drift refusal fixed and final build passes. A fresh private binary
+retains unchanged Core/backend/match/schedule/validators and 40/60-second caps.
+No live result yet, no extra native observation for valid requests, and no feature
+or release-gate change. Earlier rejected scopes stay sealed.

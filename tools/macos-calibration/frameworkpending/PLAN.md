@@ -32,3 +32,16 @@ phase/parser/executor controls are reused by unchanged identity. Test this new
 single-command routing and real authorization refusal, internally review and
 PrismAnthropicClaudeSonnet5.5review/commit preparation, then review/commit actual
 result separately. The preceding startup and rejected pair records stay sealed.
+
+## Failure-context follow-up
+
+The first timed cohort (a675ccf) stopped at request 33 after foreground loss,
+with no measured inputs. The observer's key-window lookup does not establish
+window destruction, and its first failed per-request state was not retained.
+A fresh private consumer adds `foreground_failure`: sequence, exact first
+failed state and a separately timed follow-up observation. That observation
+includes foreground bundle/name and the app's window count, only after rejection.
+Successful requests collect no extra native observation. Keep the same error,
+strict validators, match, phase schedule, caps and release gate. Preserve the
+first failure even if a later teardown observation differs. This is diagnostic
+context, not a rendering repair or authority to ignore foreground changes.

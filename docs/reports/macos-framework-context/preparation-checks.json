@@ -1,0 +1,25 @@
+{
+  "result": "PREPARED_OFFSCREEN_PASS",
+  "new_binary_sha256": "cf8fd277cc28398d9583f2d28301339a385d33fd442629ddd77b49b9b3535379",
+  "prior_binary_sha256": "6825d90efe89f75ce1361c8bf75542ff2866c2869061b5ae95405a576646466a",
+  "context_only_changes": [
+    "consumer/main_darwin.go",
+    "consumer/observe_darwin.m",
+    "consumer/failure_context.go",
+    "consumer/failure_context_test.go"
+  ],
+  "all_other_consumer_bytes_unchanged": true,
+  "rendering_and_Core_and_native_archive_unchanged": true,
+  "focused_Go_race_tests": 2,
+  "routing_and_patch_methods": 3,
+  "refusal_subcases": 13,
+  "initial_patch_check_failure": "Observer anchor survived replacement and allowed repeated patch; guarded recipe and six regression cases now pass. Initial receipts retained.",
+  "owned_final_commands_retired": 3,
+  "plan_sha256": "6fc10321f5330b6cecc3e4251875f9a208a3428eac25f91ae7f65b7f153b6f4e",
+  "process_seconds": 40,
+  "overall_seconds": 60,
+  "native_run": false,
+  "features_changed": false,
+  "release_gate_changed": false,
+  "internal_review": "Success path has no extra native observation. Invalid state and sequence are retained before follow-up context. Follow-up identity is separately observed and may differ; neither it nor a loss notification proves causality. Same original rejection and strict validators. Same physical Core and instrumented native archive, no SDK changes. Fresh scope, no retry of old sealed capture."
+}

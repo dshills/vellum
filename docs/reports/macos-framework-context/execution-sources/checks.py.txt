@@ -1,0 +1,10 @@
+from pathlib import Path
+import hashlib,importlib.util,json,sys
+sys.dont_write_bytecode=True
+X=Path(__file__).resolve().parent;A=X.parent;Q=X/'prepared';R=Path('/Users/dshills/Development/projects/Vellum');C=R/'tools/macos-calibration/frameworkpending';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();sys.path.insert(0,str(R/'scripts'));sys.path.insert(0,str(A/'macos-grid-capture-repair/preflight-v2'));s=importlib.util.spec_from_file_location('context_owned',A/'macos-sdk-native-238b3b6/run.py');g=importlib.util.module_from_spec(s);sys.modules[s.name]=g;s.loader.exec_module(g)
+pins=json.loads((Q/'build-inputs.json').read_text());base=['/usr/bin/sandbox-exec','-p','(version 1)(allow default)(deny network*)'];case=sys.argv[1];name=case+'-final';go=['/bin/sh',str(A/'macos-app-examples/go-check')]
+if case=='patch-tests':argv=base+['/usr/bin/env','python3','-B','-m','unittest','discover','-p','*_test.py','-v'];cwd=C
+elif case=='context-tests':argv=base+go+['test','-race','-count=1','-v',str(C/'testdata/failure_context.go'),str(C/'testdata/failure_context_test.go')];cwd=R
+elif case=='framework-build':argv=base+go+['build','-modfile='+str(Q/'framework.mod'),'-overlay='+str(Q/'overlay.json'),'-ldflags=-buildid=10e39953bda1045da3bd9c315dcac0add646fa86e74627b3c896723d31b86a35','-o',str(Q/'framework'),'.'];cwd=Q/'consumer'
+else:raise ValueError(case)
+run=g.execute(argv,cwd,Q/name,lambda:False,lambda:all(sha(Path(p))==h for p,h in pins.items()),timeout=180,limit=4<<20);(Q/(name+'-receipt.json')).write_text(json.dumps({'pins':pins,'run':run},indent=2)+'\n');print(json.dumps({k:run[k] for k in ['exit_code','error','seconds']}));assert run['exit_code']==0 and run['error'] is None and run['owned']['terminal'] and run['owned']['group_absent'] and run['logs_complete'] and run['pins_stable']
