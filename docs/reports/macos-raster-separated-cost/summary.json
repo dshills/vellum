@@ -1,0 +1,518 @@
+{
+  "outcome": "VALID_OFFSCREEN_REPLAY_CONDITION_CONTROL",
+  "source_checkpoint": "7a2614d",
+  "sdk_files": 8321,
+  "rendering_code_changed": false,
+  "native_app_launches": 0,
+  "owned_test_groups_retired": 1,
+  "test_seconds": 7.350620749872178,
+  "conditions_seconds": 1.998244834,
+  "condition_order": "Eight rounds, rotating starting condition; all32samples retained. Each sample primes the same persistent per-condition renderer with opposite color outside timing, then toggles uniform color and optionally sleeps/touches scratch before timing one full replay.",
+  "configuration": {
+    "cpu": 2,
+    "target": [
+      1519,
+      1266
+    ],
+    "pressure_bytes": 33554432,
+    "cache_flush_proven": false
+  },
+  "observations": {
+    "immediate": {
+      "count": 8,
+      "min_replay_ns": 177833,
+      "median_replay_ns": 421188.0,
+      "max_replay_ns": 709541,
+      "min_gap_ns": 125,
+      "max_gap_ns": 625,
+      "pressure_ns": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "separated_120ms": {
+      "count": 8,
+      "min_replay_ns": 337417,
+      "median_replay_ns": 572187.0,
+      "max_replay_ns": 901791,
+      "min_gap_ns": 120148166,
+      "max_gap_ns": 121054917,
+      "pressure_ns": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "immediate_pressure32m": {
+      "count": 8,
+      "min_replay_ns": 268666,
+      "median_replay_ns": 369854.0,
+      "max_replay_ns": 441458,
+      "min_gap_ns": 1314750,
+      "max_gap_ns": 3158167,
+      "pressure_ns": [
+        3157875,
+        1649500,
+        2468083,
+        1345125,
+        1901333,
+        1313458,
+        1842125,
+        1424083
+      ]
+    },
+    "separated_120ms_pressure32m": {
+      "count": 8,
+      "min_replay_ns": 321750,
+      "median_replay_ns": 627104.5,
+      "max_replay_ns": 728375,
+      "min_gap_ns": 121517292,
+      "max_gap_ns": 123556375,
+      "pressure_ns": [
+        1461375,
+        1380834,
+        1372875,
+        1494458,
+        1278333,
+        2960375,
+        2375333,
+        1706500
+      ]
+    }
+  },
+  "raw_samples": [
+    {
+      "Round": 0,
+      "Condition": "immediate",
+      "ReplayNS": 177833,
+      "GapNS": 125,
+      "PressureNS": 0,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 0,
+      "Condition": "separated_120ms",
+      "ReplayNS": 621041,
+      "GapNS": 121017875,
+      "PressureNS": 0,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 0,
+      "Condition": "immediate_pressure32m",
+      "ReplayNS": 268666,
+      "GapNS": 3158167,
+      "PressureNS": 3157875,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 0,
+      "Condition": "separated_120ms_pressure32m",
+      "ReplayNS": 698708,
+      "GapNS": 122506875,
+      "PressureNS": 1461375,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 1,
+      "Condition": "separated_120ms",
+      "ReplayNS": 337417,
+      "GapNS": 121047750,
+      "PressureNS": 0,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 1,
+      "Condition": "immediate_pressure32m",
+      "ReplayNS": 378875,
+      "GapNS": 1650625,
+      "PressureNS": 1649500,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 1,
+      "Condition": "separated_120ms_pressure32m",
+      "ReplayNS": 321750,
+      "GapNS": 121902333,
+      "PressureNS": 1380834,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 1,
+      "Condition": "immediate",
+      "ReplayNS": 278750,
+      "GapNS": 208,
+      "PressureNS": 0,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 2,
+      "Condition": "immediate_pressure32m",
+      "ReplayNS": 441458,
+      "GapNS": 2468959,
+      "PressureNS": 2468083,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 2,
+      "Condition": "separated_120ms_pressure32m",
+      "ReplayNS": 380958,
+      "GapNS": 121517292,
+      "PressureNS": 1372875,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 2,
+      "Condition": "immediate",
+      "ReplayNS": 477042,
+      "GapNS": 458,
+      "PressureNS": 0,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 2,
+      "Condition": "separated_120ms",
+      "ReplayNS": 346666,
+      "GapNS": 121027084,
+      "PressureNS": 0,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 3,
+      "Condition": "separated_120ms_pressure32m",
+      "ReplayNS": 718750,
+      "GapNS": 122526416,
+      "PressureNS": 1494458,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 3,
+      "Condition": "immediate",
+      "ReplayNS": 408792,
+      "GapNS": 250,
+      "PressureNS": 0,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 3,
+      "Condition": "separated_120ms",
+      "ReplayNS": 889417,
+      "GapNS": 120148166,
+      "PressureNS": 0,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 3,
+      "Condition": "immediate_pressure32m",
+      "ReplayNS": 359667,
+      "GapNS": 1345583,
+      "PressureNS": 1345125,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 4,
+      "Condition": "immediate",
+      "ReplayNS": 352542,
+      "GapNS": 375,
+      "PressureNS": 0,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 4,
+      "Condition": "separated_120ms",
+      "ReplayNS": 901791,
+      "GapNS": 120582750,
+      "PressureNS": 0,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 4,
+      "Condition": "immediate_pressure32m",
+      "ReplayNS": 425625,
+      "GapNS": 1902875,
+      "PressureNS": 1901333,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 4,
+      "Condition": "separated_120ms_pressure32m",
+      "ReplayNS": 418292,
+      "GapNS": 121722292,
+      "PressureNS": 1278333,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 5,
+      "Condition": "separated_120ms",
+      "ReplayNS": 387542,
+      "GapNS": 121027666,
+      "PressureNS": 0,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 5,
+      "Condition": "immediate_pressure32m",
+      "ReplayNS": 331666,
+      "GapNS": 1314750,
+      "PressureNS": 1313458,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 5,
+      "Condition": "separated_120ms_pressure32m",
+      "ReplayNS": 674584,
+      "GapNS": 123556375,
+      "PressureNS": 2960375,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 5,
+      "Condition": "immediate",
+      "ReplayNS": 473542,
+      "GapNS": 208,
+      "PressureNS": 0,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 6,
+      "Condition": "immediate_pressure32m",
+      "ReplayNS": 378708,
+      "GapNS": 1843333,
+      "PressureNS": 1842125,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 6,
+      "Condition": "separated_120ms_pressure32m",
+      "ReplayNS": 728375,
+      "GapNS": 123429791,
+      "PressureNS": 2375333,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 6,
+      "Condition": "immediate",
+      "ReplayNS": 433584,
+      "GapNS": 625,
+      "PressureNS": 0,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 6,
+      "Condition": "separated_120ms",
+      "ReplayNS": 723958,
+      "GapNS": 121054917,
+      "PressureNS": 0,
+      "Color": {
+        "R": 255,
+        "G": 0,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 7,
+      "Condition": "separated_120ms_pressure32m",
+      "ReplayNS": 579625,
+      "GapNS": 122765416,
+      "PressureNS": 1706500,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 7,
+      "Condition": "immediate",
+      "ReplayNS": 709541,
+      "GapNS": 334,
+      "PressureNS": 0,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 7,
+      "Condition": "separated_120ms",
+      "ReplayNS": 523333,
+      "GapNS": 120179833,
+      "PressureNS": 0,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    },
+    {
+      "Round": 7,
+      "Condition": "immediate_pressure32m",
+      "ReplayNS": 361000,
+      "GapNS": 1424584,
+      "PressureNS": 1424083,
+      "Color": {
+        "R": 0,
+        "G": 255,
+        "B": 0,
+        "A": 255
+      }
+    }
+  ],
+  "pixel_check": "All four final full images equal original legacy replay after measurements. Prior routed/pixel and warm breakdown code reused unchanged; this one condition method is the only new Go run.",
+  "interpretation": "Replay times vary substantially even with unchanged rendering code. Separated and pressure conditions overlap each other and immediate values; one balanced short run cannot isolate cache eviction, CPU frequency, scheduling, GC or native upload sharing. No hardware cache flush is proven. No native p95 or optimization effect is established. Prior warm microbench cannot be substituted for temporal native raster cost.",
+  "next": "Do not adopt no-paint elision or a cache policy from these observations. Any next timing diagnostic must retain same-ticket renderer and surrounding upload/schedule boundaries; no new native run is authorized by this offscreen checkpoint.",
+  "release_qualified": false,
+  "gate_changed": false,
+  "production_change_adopted": false
+}

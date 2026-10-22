@@ -368,3 +368,90 @@ func BenchmarkRasterReplayBreakdown(b *testing.B) {
 		})
 	}
 }
+
+// TestRasterReplaySeparatedConditions compares controlled preconditions around
+// unchanged replay. CPU idle, cache state and OS scheduling are not isolated.
+func TestRasterReplaySeparatedConditions(t *testing.T) {
+	if runtime.GOMAXPROCS(0) != 2 {
+		t.Fatal("requires explicit -cpu=2")
+	}
+	items := capturedReplay(t)
+	checkReplay(t, items)
+	type condition struct {
+		name               string
+		separate, pressure bool
+		rd                 render.Renderer
+		items              render.Render
+	}
+	cases := []condition{{name: "immediate"}, {name: "separated_120ms", separate: true}, {name: "immediate_pressure32m", pressure: true}, {name: "separated_120ms_pressure32m", separate: true, pressure: true}}
+	for i := range cases {
+		cases[i].rd = replayRenderer()
+		cases[i].items = cloneReplay(items)
+	}
+	defer func() {
+		for _, c := range cases {
+			if rd, ok := c.rd.(interface{ Release() }); ok {
+				rd.Release()
+			}
+		}
+	}()
+	// Touch each64-byte region. This imposes a footprint; it does not guarantee
+	// eviction from any hardware cache. CPU work is outside measured replay.
+	pressure := make([]byte, 32<<20)
+	touch := func() {
+		for i := 0; i < len(pressure); i += 64 {
+			pressure[i]++
+		}
+	}
+	touch()
+	type sample struct {
+		Round                       int
+		Condition                   string
+		ReplayNS, GapNS, PressureNS int64
+		Color                       color.NRGBA
+	}
+	samples := make([]sample, 0, 32)
+	started := time.Now()
+	for round := range 8 {
+		for offset := range len(cases) {
+			c := &cases[(round+offset)%len(cases)]
+			_, _, last := replayParts(c.items)
+			u := last[0].(*pimage.Params).Source.(*image.Uniform)
+			u.C = shade(uint64(round))
+			c.rd.Render(c.items)
+			priorEnd := time.Now()
+			u.C = shade(uint64(round + 1))
+			if c.separate {
+				time.Sleep(120 * time.Millisecond)
+			}
+			var pressureNS int64
+			if c.pressure {
+				before := time.Now()
+				touch()
+				pressureNS = time.Since(before).Nanoseconds()
+			}
+			start := time.Now()
+			c.rd.Render(c.items)
+			end := time.Now()
+			elapsed, gap := end.Sub(start).Nanoseconds(), start.Sub(priorEnd).Nanoseconds()
+			if elapsed <= 0 || c.separate && gap < int64(120*time.Millisecond) || time.Since(started) > 10*time.Second {
+				t.Fatal("invalid duration/separation/deadline")
+			}
+			samples = append(samples, sample{Round: round, Condition: c.name, ReplayNS: elapsed, GapNS: gap, PressureNS: pressureNS, Color: shade(uint64(round + 1))})
+		}
+	}
+	// Validate final full images after measurements, never between samples.
+	want := replayRenderer()
+	_, _, last := replayParts(items)
+	last[0].(*pimage.Params).Source.(*image.Uniform).C = shade(8)
+	legacyReplay(want, items)
+	for _, c := range cases {
+		replayPixels(t, c.rd.Image(), want.Image())
+	}
+	runtime.KeepAlive(pressure)
+	raw, e := json.Marshal(map[string]any{"kind": "offscreen-separated-raster", "elapsed_ns": time.Since(started).Nanoseconds(), "cpu": runtime.GOMAXPROCS(0), "samples": samples, "target": [2]int{1519, 1266}, "pressure_bytes": len(pressure), "cache_flush_proven": false, "release_qualified": false, "gate_changed": false})
+	if e != nil {
+		t.Fatal(e)
+	}
+	t.Log("SEPARATED_RASTER_JSON=" + string(raw))
+}

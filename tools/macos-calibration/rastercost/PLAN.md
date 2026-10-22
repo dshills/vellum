@@ -47,7 +47,7 @@ To prepare elsewhere with the same pinned Go1.25.6/cache and prepared SDK:
 python3 tools/macos-calibration/rastercost/prepare.py --sdk "$SDK" --core "$NEW_CORE" --artifacts "$NEW_OUTPUT"
 cd tools/macos-calibration/stagingreuse/framework
 # Use the pinned offline Go environment; these are headless test binaries.
-go test -tags=offscreen -modfile="$NEW_OUTPUT/framework.mod" -overlay="$NEW_OUTPUT/overlay.json" -run='^TestRasterReplay' -count=1 -v .
+go test -tags=offscreen -modfile="$NEW_OUTPUT/framework.mod" -overlay="$NEW_OUTPUT/overlay.json" -run='^TestRasterReplay' -count=1 -cpu=2 -v .
 go test -tags=offscreen -modfile="$NEW_OUTPUT/framework.mod" -overlay="$NEW_OUTPUT/overlay.json" -run='^$' -bench='^BenchmarkRasterReplayBreakdown$' -benchtime=200ms -count=3 -cpu=2 -parallel=1 -timeout=90s .
 ```
 
@@ -56,3 +56,18 @@ deny,120s timeout, source/SDK/log vectors and process-group retirement. Preparat
 reproduction checks exact fixture/test/module/sum and complete Core bytes without
 rerunning a benchmark. Internal review, Prism Anthropic Claude Sonnet5.5, specs,
 indexed evidence and a local checkpoint complete this investigation. M3–M7 open.
+
+
+## Separated-condition follow-up
+
+After warm checkpoint7a2614d, one new focused method primes four persistent
+renderers outside timing, toggles the patch color, and times one full replay.
+Eight rounds rotate the starting condition: immediate,120ms pause, immediate
+32MiB scratch touch,120ms pause plus32MiB scratch touch. Touch each64-byte region
+outside replay timing; this is a footprint, not proof of cache eviction. Retain
+all32values, actual gaps and pressure times. FixedCPU2,10s sample-phase/15s Go/
+45s owner deadlines; check allfourfinalfullimages against legacy replay after
+timing. Original routed/pixel fixture and helpers unchanged. No new hot benchmark.
+One parser method refuses nine wrong-scope/order/partial/duration/color cases.
+No cache/CPU/scheduler/GC causality or native-p95/adoption claim follows. See the
+[separated result](../../../docs/reports/macos-raster-separated-cost/README.md).

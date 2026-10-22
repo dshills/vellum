@@ -291,3 +291,12 @@ conditions differ, so no native equivalence, phase sum or latency claim follows.
 No path-elision candidate or new native run is justified. Investigate separated
 replay/cache conditions offscreen next; features/defaults/SDK/app and33.3ms gate
 unchanged. M3–M7 open; no production repair adopted.
+
+The [separated offscreen replay control](../docs/reports/macos-raster-separated-cost/README.md)
+retains32samples/eightpercondition in1.998s with unchanged renderer. Immediate,
+120ms pause and32MiB scratch-footprint conditions overlap; observed replay ranges
+0.178–0.902ms. Final legacy pixels/focused method/nine parser refusals and source/
+SDK/log/group checks pass. Hot microbench timing is not native timing; no proven
+cache flush, isolated CPU/scheduling/GC cause, native-p95 or repair/adoption claim.
+Keep future timing joined to surrounding upload/schedule boundaries. No new
+native test; features/defaults/SDK/app/33.3ms gate unchanged, M3–M7 open.
