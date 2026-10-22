@@ -34,7 +34,7 @@ reproduction uses the tracked preparation contract, not those machine paths.
 | P2 | Matching packaged Placement app must pass listed editing, Save/Open/history, text/window and shutdown workflows; earlier app24 evidence is scoped, not final artifact acceptance. | Implementation agent: build from frozen candidate, reuse applicable tests, run the written acceptance script. | R2/R3/R5 |
 | P3 | Native idle/activity/lifecycle/soak must establish bounded retained work/resources; historical hidden TUINS window ownership and accumulation remain unclassified. | Implementation agent: use existing lifecycle harness and prescribed samples; classify stable owner/count or report exact growth/cleanup defect. | R3 |
 | P4 | Public SDK/app rights and notices remain pending; presence inventories alone do not approve redistribution. Upstream objc2 notice explicitly raises Apple-SDK-derived binding terms. | Implementation agent: review actual shipped component applicability; seek a concrete rights-holder/owner decision only for the unresolved component. | R4 |
-| P5 | Existing CLI accepts a source-built native capsule only for private SDKs; final supported public native dependency route must be explicit. | Implementation agent: inspect normal public source-build path and linked inputs; fix only an actual packaging blocker, without bypassing audit guards. | R4 |
+| P5 | Guarded public native route implemented at b0e5106; actual public packaging remains blocked by pending rights approval. | Implementation agent: retain release-audit and exact-archive notice gates; no further tooling repair required for this route. | R4 |
 | P6 | Final version, artifact checksums, installation/signing status and publication approval are not complete. | Implementation agent: prepare exact reviewed artifacts and release text, then owner publication decision. | R4/R5 |
 
 These are uncompleted acceptance tasks and known distribution questions, not six
@@ -46,7 +46,18 @@ or gesture, expected/actual behavior, smallest fix and focused retest here.
 - R1: policy approved, branch/source selected, pinned dependencies prepared and
   bound; Prism review is clean and checkpoint commit is `578cf74`.
 - R2: complete for private candidate source `d8de4fc`; [external SDK/app result](reports/macos-preview-r2/README.md).
-- R3–R5: pending. No preview release or full Mac qualification is claimed.
+- R3: acceptance in progress; full repository check passed and initial packaged
+  drawing workflows passed. The first 100-cycle run stopped at 83 cycles; the owner
+  subsequently confirmed other desktop activity. Its raw failure remains unchanged
+  and is inconclusive as a controlled run. A fresh quiet run is required before acceptance. The first
+  soak stopped after native close requests at about 152 seconds; no two-hour soak
+  pass is claimed. See the [first checkpoint](reports/macos-preview-r3-first/README.md).
+- R4: alpha.3 identity committed at `aaa0a3a`; guarded public native exporter repair
+  at `b0e5106`; stale exported contract version corrected at `412e5b8`. All changes
+  have focused tests and Prism reviews. Applicable notice collection and real
+  distribution-rights approval remain separate and pending.
+- R5: final packaged-byte acceptance and publication decision pending. No preview
+  release or full Mac qualification is claimed.
 
 ## Disclosed performance
 

@@ -147,8 +147,9 @@ python3 scripts/release-sdk.py --output /private/tmp/candidate-sdk.tar.gz \
   --macos-gpu-provenance /absolute/path/provenance.json
 ```
 
-All three options are required together. `--public` rejects them before inventory,
-download or output creation, including when other public gates are approved.
+All three options are required together. Private candidates retain pending audit
+status. The approved public route below additionally requires the existing release
+approval gates and notices bound to the selected archive before output creation.
 Ordinary packaging does not discover or reuse an ignored candidate directory.
 The root framework module and portable example modules remain unchanged.
 

@@ -1,0 +1,62 @@
+{
+  "scope": "Existing declared-notice inventory and primary-source clarification only, not a completed legal applicability approval",
+  "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "native_components": 82,
+  "affected_binding_components": [
+    {
+      "name": "block2",
+      "version": "0.6.2",
+      "declared_license": "MIT",
+      "status": "declarations-collected; rights-review-pending",
+      "link_inclusion": "compiled-source superset; individual runtime inclusion not established"
+    },
+    {
+      "name": "objc2",
+      "version": "0.6.4",
+      "declared_license": "MIT",
+      "status": "declarations-collected; rights-review-pending",
+      "link_inclusion": "compiled-source superset; individual runtime inclusion not established"
+    },
+    {
+      "name": "objc2-core-foundation",
+      "version": "0.3.2",
+      "declared_license": "Zlib OR Apache-2.0 OR MIT",
+      "status": "declarations-collected; rights-review-pending",
+      "link_inclusion": "compiled-source superset; individual runtime inclusion not established"
+    },
+    {
+      "name": "objc2-encode",
+      "version": "4.1.0",
+      "declared_license": "MIT",
+      "status": "declarations-collected; rights-review-pending",
+      "link_inclusion": "compiled-source superset; individual runtime inclusion not established"
+    },
+    {
+      "name": "objc2-foundation",
+      "version": "0.3.2",
+      "declared_license": "MIT",
+      "status": "declarations-collected; rights-review-pending",
+      "link_inclusion": "compiled-source superset; individual runtime inclusion not established"
+    },
+    {
+      "name": "objc2-metal",
+      "version": "0.3.2",
+      "declared_license": "Zlib OR Apache-2.0 OR MIT",
+      "status": "declarations-collected; rights-review-pending",
+      "link_inclusion": "compiled-source superset; individual runtime inclusion not established"
+    },
+    {
+      "name": "objc2-quartz-core",
+      "version": "0.3.2",
+      "declared_license": "Zlib OR Apache-2.0 OR MIT",
+      "status": "declarations-collected; rights-review-pending",
+      "link_inclusion": "compiled-source superset; individual runtime inclusion not established"
+    }
+  ],
+  "primary_sources": [
+    "https://raw.githubusercontent.com/madsmtm/objc2/objc2-0.6.4/LICENSE.md",
+    "https://www.apple.com/legal/sla/docs/xcode.pdf"
+  ],
+  "observation": "Upstream pinned license note still explicitly raises the Apple-SDK-derived binding distribution question; official Xcode agreement is not a component-specific disposition of that question. No terms accepted or rights approved by this lookup.",
+  "smallest_next_action": "Finish exact final payload and conservative notices; present concrete owner distribution decision with the upstream caveat and final assets rather than ask for blanket legal certification. Preserve pending audit until resolved."
+}
