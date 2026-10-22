@@ -374,3 +374,15 @@ and full source/SDK identity checks pass without rebuilding unchanged native cod
 The old off/on scope stays sealed. One newly approved quiet scope may follow
 review and commit, capped at 100 seconds overall and 40 seconds per native case.
 No result yet. Features, SDK/app, defaults and 33.3 ms gate unchanged; M3–M7 open.
+
+The [reversed-order observer result](../docs/reports/macos-display-reversed/README.md)
+passes the fresh on/off pair in 74.272 seconds with
+18 owned groups retired and 248 joined inputs per case.
+Receipt-to-shown p95 is 37.882 ms on and
+37.923 ms off; on-minus-off run p95 is
+-0.040 ms. The previous off/on pair remains
+separate (33.947 ms on / 51.101 ms off).
+No pooling, causal claim, observer overhead calibration or ordinary qualification.
+Complete callbacks/startup/held tails and source/native/SDK identity are retained.
+No permanent link or production/default/feature/SDK/app/gate change. M3–M7 open;
+approved scope consumed, desktop free, no native job active.

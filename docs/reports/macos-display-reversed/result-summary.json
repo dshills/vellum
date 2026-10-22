@@ -1,0 +1,223 @@
+{
+  "outcome": "VALID_REVERSED_DISPLAY_CLOCK_CONTROL",
+  "prepared_commit": "2b498f583a45674d6a7d01a4508bdeebe14609d1",
+  "elapsed_seconds": 74.272063,
+  "owned_groups_retired": 18,
+  "cases": [
+    {
+      "mode": "on",
+      "native_seconds": 31.27504308288917,
+      "receipt_to_shown_ms": {
+        "count": 120,
+        "p50": 28.16112502478063,
+        "p95": 37.88216668181121,
+        "p99": 39.37658341601491,
+        "max": 41.28833347931504
+      },
+      "over33_3ms": 31,
+      "joined_inputs": 248,
+      "p95_rank_ticket": {
+        "accepted_revision": 167,
+        "scope": 1,
+        "opaque_tag": 336,
+        "generation": 170,
+        "drawable_id": 176,
+        "receipt_to_shown_ms": 37.88216668181121,
+        "present_gpu_end_to_shown_ms": 30.811708653345704
+      },
+      "display_trace_terminal": {
+        "configured": true,
+        "enabled": true,
+        "started": true,
+        "stopped": true,
+        "invalid": false,
+        "overflow": false,
+        "count": 1789,
+        "window": 172511,
+        "display": 3,
+        "start": 1206983.593741792,
+        "stop": 1207013.4282109586
+      },
+      "retained_backend_startup_present_count": 10,
+      "retained_backend_startup_command_count": 50,
+      "callback_count": 1789,
+      "callback_timestamp_intervals_ms": {
+        "count": 1788,
+        "p50": 16.666666604578495,
+        "p95": 16.66666683740914,
+        "p99": 16.66666683740914,
+        "max": 16.66666683740914
+      },
+      "callback_observation_minus_timestamp_ms": {
+        "count": 1789,
+        "p50": 16.21179166249931,
+        "p95": 16.327999997884035,
+        "p99": 16.363833332434297,
+        "max": 17.168041551485658
+      },
+      "target_minus_timestamp_ms": {
+        "count": 1789,
+        "p50": 16.66670828126371,
+        "p95": 16.666708514094353,
+        "p99": 16.666708514094353,
+        "max": 16.666708514094353
+      },
+      "measured_clock_ms": {
+        "gpu_to_next_reported_timestamp_ms": {
+          "count": 120,
+          "p50": 9.260125225409865,
+          "p95": 15.182416653260589,
+          "p99": 16.515333438292146,
+          "max": 16.618166817352176
+        },
+        "shown_minus_nearest_reported_timestamp_ms": {
+          "count": 120,
+          "p50": -0.067166518419981,
+          "p95": -0.04687486216425896,
+          "p99": -0.045166583731770515,
+          "max": -0.044791726395487785
+        },
+        "present_gpu_end_to_shown_ms": {
+          "count": 120,
+          "p50": 23.516125278547406,
+          "p95": 30.811708653345704,
+          "p99": 31.624333700165153,
+          "max": 33.247083658352494
+        }
+      },
+      "reported_timestamp_counts": {
+        "count": 120,
+        "p50": 1,
+        "p95": 1,
+        "p99": 1,
+        "max": 2
+      },
+      "p95_rank_ticket_clock_join": {
+        "accepted_revision": 167,
+        "scope": 1,
+        "opaque_tag": 336,
+        "generation": 170,
+        "drawable_id": 176,
+        "phase": "measured",
+        "present_gpu_end": 1207003.6445970417,
+        "shown": 1207003.6754087503,
+        "gpu_preceding_tick": {
+          "duration": 0.016666708333333335,
+          "observed": 1207003.6583400837,
+          "ordinal": 1202,
+          "target": 1207003.6588009587,
+          "timestamp": 1207003.6421342504
+        },
+        "gpu_following_tick": {
+          "duration": 0.016666708333333335,
+          "observed": 1207003.6749360836,
+          "ordinal": 1203,
+          "target": 1207003.6754676253,
+          "timestamp": 1207003.658800917
+        },
+        "shown_preceding_tick": {
+          "duration": 0.016666708333333335,
+          "observed": 1207003.6749360836,
+          "ordinal": 1203,
+          "target": 1207003.6754676253,
+          "timestamp": 1207003.658800917
+        },
+        "shown_following_tick": {
+          "duration": 0.016666708333333335,
+          "observed": 1207003.691733792,
+          "ordinal": 1204,
+          "target": 1207003.6921342919,
+          "timestamp": 1207003.6754675836
+        },
+        "nearest_reported_tick_to_shown": {
+          "duration": 0.016666708333333335,
+          "observed": 1207003.691733792,
+          "ordinal": 1204,
+          "target": 1207003.6921342919,
+          "timestamp": 1207003.6754675836
+        },
+        "reported_timestamps_between_gpu_and_shown": 1,
+        "gpu_to_next_reported_timestamp_ms": 14.203875325620174,
+        "shown_minus_nearest_reported_timestamp_ms": -0.058833276852965355,
+        "present_gpu_end_to_shown_ms": 30.811708653345704
+      },
+      "interpretation": "Actual order is on/off; retained reported clocks do not prove scanout/latch, causal observer impact or ordinary qualification.",
+      "reported_timestamp_between_counts": {
+        "0": 9,
+        "1": 110,
+        "2": 1
+      },
+      "nearest_reported_timestamp_absolute_error_ms": {
+        "count": 120,
+        "p50": 0.06679166108369827,
+        "p95": 0.08741673082113266,
+        "p99": 0.08933339267969131,
+        "max": 0.08958321996033192
+      },
+      "callback_target_minus_observed_ms": {
+        "count": 1789,
+        "p50": 0.4549166187644005,
+        "p95": 0.5752500146627426,
+        "p99": 0.6060833111405373,
+        "max": 16.59679156728089
+      }
+    },
+    {
+      "mode": "off",
+      "native_seconds": 30.639991082949564,
+      "receipt_to_shown_ms": {
+        "count": 120,
+        "p50": 30.895750038325787,
+        "p95": 37.92266664095223,
+        "p99": 39.41487497650087,
+        "max": 39.700208231806755
+      },
+      "over33_3ms": 41,
+      "joined_inputs": 248,
+      "p95_rank_ticket": {
+        "accepted_revision": 147,
+        "scope": 1,
+        "opaque_tag": 296,
+        "generation": 150,
+        "drawable_id": 156,
+        "receipt_to_shown_ms": 37.92266664095223,
+        "present_gpu_end_to_shown_ms": 31.06950013898313
+      },
+      "display_trace_terminal": {
+        "configured": true,
+        "enabled": false,
+        "started": true,
+        "stopped": true,
+        "invalid": false,
+        "overflow": false,
+        "count": 0,
+        "window": 172519,
+        "display": 3,
+        "start": 1207020.4105913753,
+        "stop": 1207050.2620262504
+      },
+      "retained_backend_startup_present_count": 10,
+      "retained_backend_startup_command_count": 50
+    }
+  ],
+  "difference_of_run_p95_on_minus_off_ms": -0.040499959141016006,
+  "interpretation": "One fresh same-binary on/off control. Compare separately with the earlier off/on pair; no pooling, causal estimate, observer overhead calibration or ordinary qualification. Display-link timestamps/targets are reported Core Animation clocks, not guaranteed latch opportunities or optical scanout. Retrospective tick joins do not imply prior callback delivery; retain gaps/lateness. Gate unchanged.",
+  "prior_pair": {
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-display-scheduling/prepared/result-summary.json",
+    "sha256": "6c7975166da803a75b64ac6beb73c25b763f75ee4a317c194290090874d63d81",
+    "prepared_commit": "633d5b92b5b51e9c21151e4df775646aa56ca012",
+    "order": [
+      "off",
+      "on"
+    ],
+    "run_p95_ms": {
+      "off": 51.101124845445156,
+      "on": 33.94712507724762
+    },
+    "difference_of_run_p95_on_minus_off_ms": -17.153999768197536
+  },
+  "SDK_files_unchanged": 8321,
+  "release_qualified": false,
+  "gate_changed": false,
+  "production_repair_adopted": false
+}
