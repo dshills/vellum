@@ -1,0 +1,24 @@
+{
+  "result": "PASS",
+  "focused_unit_methods": 7,
+  "syntax": true,
+  "four_raw_journals_reclassified": true,
+  "original_classifier_files_per_pair": 8,
+  "pinned_archives": 4,
+  "joined_inputs": 992,
+  "measured_inputs": 480,
+  "warmup_inputs": 512,
+  "byte_identical_reproduction": {
+    "summary.json": "6de060bd47c9f9bc72c0bfd93819ec0c55f0f2d5597578a56823e0f6ee7d9737",
+    "rows.json": "8eb422ad9b6f0f2a2a30b5814f76a7ca08a17df3998287c957ce1adfb40ae8c7"
+  },
+  "existing_output_refused_without_mutation": true,
+  "source_sha256": {
+    "tools/macos-calibration/displayclock/phase_analysis.py": "babf835ff2efbecf41619ac98fc2f15e472479ebd65cb37050cf36c7aecc0a21",
+    "tools/macos-calibration/displayclock/phase_test.py": "8844a152cecc589048e950a57bd934ad8a66f966d20a10c287ad3190d4703f5e"
+  },
+  "native_executions": 0,
+  "no_SDK_app_framework_rebuild": true,
+  "release_gate_changed": false,
+  "scope": "Offscreen only; prior native/SDK evidence reused as retained, no new physical/cadence/resize/ordinary qualification."
+}

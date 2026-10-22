@@ -386,3 +386,17 @@ No pooling, causal claim, observer overhead calibration or ordinary qualificatio
 Complete callbacks/startup/held tails and source/native/SDK identity are retained.
 No permanent link or production/default/feature/SDK/app/gate change. M3–M7 open;
 approved scope consumed, desktop free, no native job active.
+
+The [offscreen journal phase analysis](../docs/reports/macos-journal-phase/README.md)
+reclassifies all four immutable journals through the original pinned validators:
+992 joins, 512 warmup and 480 measured, without native execution or rebuilding.
+Seven focused methods and byte-identical independent reproduction pass. Actual
+p95 inputs retain 81–92% of latency after final-present GPU end. Reported timestamp
+and callback observation are independent event series: the preceding reported
+callback is still pending at 118/120 reversed-on receipts. Earlier on versus
+reversed on nearest-shown-timestamp callback observation lag has p95 10.912 versus
+16.340 ms. These are descriptive clock relations, not optical/latch/causal proof.
+No observer scheduling fix, ordinary qualification, feature/default/SDK/app/gate
+change follows; M3–M7 open. Future controls should match request phase and record
+pending presentation/drawable state before changing scheduling policy. No new
+native scope is prepared or authorized by this offscreen checkpoint.
