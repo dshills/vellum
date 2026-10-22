@@ -434,3 +434,14 @@ unchanged classifier/pixel/bounds evidence reused. First failure stays sealed an
 is not reclassified. No new live capture; fresh quiet approval pending. Phase
 protocol, features/defaults/SDK/app and33.3ms gate unchanged; M3–M7 open. Review and
 commit precede execution; actual results/rejection receive separate checkpoint.
+
+
+The [offscreen Objective-C overlay control](../docs/reports/macos-presentation-overlay/README.md)
+reproduces the missing instrumentation with the diagnostic's exact Go 1.25.6:
+Go/C replacements apply while `.m` compiles original bytes; a physical copy
+applies all replacements. Three scalar fixture builds/runs plus the version
+check pass, with seven bounded owned groups retired and prior build/capture pins
+unchanged. This confirms the materialization rationale, not the separate startup
+feedback failure. The user explicitly deferred the next live attempt; corrected
+capture remains unstarted. No UI launch, feature/default/SDK/app/gate change or
+release qualification; M3–M7 remain open.
