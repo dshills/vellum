@@ -249,3 +249,9 @@ The [texture-only cache timing pair](../docs/reports/macos-staging-cache-timing/
 is prepared after full byte proofs, reuse fixed enabled in both modes. Sameprivate
 library/binary,90seconds, all original validity/presentation/ownership checks. No
 result or shipping/default/SDK/app/gate change claimed; M3–M7 open.
+
+The [texture-cache/reuse timing pair](../docs/reports/macos-staging-cache-timing/README.md)
+is valid: copy p95 0.804/0.770ms, presentation 36.089/34.931ms
+(WC/default), bothmiss33.3. Both120measuredreusehits/3fresh/closedledgers, exact
+cachecounts/18groups/SDKpins. No further unchanged cache campaign or adoption;
+inspect remaining raster cost. Features/defaults/gate unchanged; M3–M7 open.
