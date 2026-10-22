@@ -1092,3 +1092,10 @@ unchanged retry. [Segmented request telemetry](../tools/macos-calibration/stagin
 now separates timer wake and synchronous foreground observation without changing
 20ms validity,33.3ms release gate, source/SDK/app/defaults or M3–M7. One90second
 instrumented pair after review; old cause unproven.
+
+The [segmented staging pair](../docs/reports/macos-staging-timing/README.md) is valid:
+CPU copy p95 2.953→0.813ms, actual presentation 38.273→34.969ms,
+all120 measured uploads reused on,18groups/closedledgers/SDKpins. Both miss33.3ms;
+one ordered instrumented pair does not qualify noise/equivalence or shipping.
+Original42.564ms schedule refusal remains unexplained; no unchanged retry, policy
+adoption or gate change. Inspect remaining source/presentation cost; M3–M7 open.

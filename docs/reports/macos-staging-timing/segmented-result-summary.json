@@ -1,0 +1,357 @@
+{
+  "outcome": "VALID_STAGING_FRAMEWORK_TIMING_PAIR",
+  "elapsed_seconds": 66.193616,
+  "runs": [
+    {
+      "mode": "off",
+      "metrics": {
+        "outcome": "VALID_CPU_SOURCE_DIAGNOSTIC",
+        "warmup": 128,
+        "measured": 120,
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "source_phase_ms": {
+          "DrawNS": {
+            "count": 120,
+            "p50": 3.404625,
+            "p95": 4.127833,
+            "p99": 4.340375,
+            "max": 4.383375
+          },
+          "RasterNS": {
+            "count": 120,
+            "p50": 0.757083,
+            "p95": 0.861542,
+            "p99": 0.998084,
+            "max": 1.373041
+          },
+          "CopyNS": {
+            "count": 120,
+            "p50": 2.62625,
+            "p95": 3.408,
+            "p99": 3.516667,
+            "max": 3.603791
+          },
+          "SetFromGoImageNS": {
+            "count": 120,
+            "p50": 2.612792,
+            "p95": 3.393083,
+            "p99": 3.502666,
+            "max": 3.592666
+          }
+        },
+        "totals": {
+          "DrawNS": 385566501,
+          "RasterNS": 86731167,
+          "CopyNS": 298308667,
+          "SetFromGoImageNS": 296967709,
+          "SetFromGoImageAttempts": 120,
+          "ImageCacheHits": 0,
+          "LogicalUploadRGBABytes": 923065920
+        },
+        "nested_shares_of_source_draw": {
+          "RasterNS": 0.2249447676991005,
+          "CopyNS": 0.7736892759778423,
+          "SetFromGoImageNS": 0.7702113856618472
+        },
+        "presentation_feedback_accounting_valid": true,
+        "latency_gate_qualified": false,
+        "diagnostic_only": "Additional source clocks/counters and private compiler overlays; these timings are not ordinary latency qualification or successful GPU transfer evidence.",
+        "observer_mode": "on",
+        "native_trace_records": 254,
+        "retained_startup_uploads": 6,
+        "joined_cohort_uploads": 248,
+        "CPU_phase_ms": {
+          "create_ns": {
+            "count": 120,
+            "p50": 0.165833393111825,
+            "p95": 0.1935416366904974,
+            "p99": 0.20012492313981056,
+            "max": 0.21945848129689693
+          },
+          "map_ns": {
+            "count": 120,
+            "p50": 0.001250067725777626,
+            "p95": 0.0022498425096273422,
+            "p99": 0.003041466698050499,
+            "max": 0.003041699528694153
+          },
+          "copy_ns": {
+            "count": 120,
+            "p50": 2.241833135485649,
+            "p95": 2.953000133857131,
+            "p99": 3.1955416779965162,
+            "max": 3.20395827293396
+          },
+          "flush_ns": {
+            "count": 120,
+            "p50": 0.0009583309292793274,
+            "p95": 0.0020416919142007828,
+            "p99": 0.0022917520254850388,
+            "max": 0.00237487256526947
+          },
+          "encode_ns": {
+            "count": 120,
+            "p50": 0.10083336383104324,
+            "p95": 0.11716666631400585,
+            "p99": 0.12487499043345451,
+            "max": 0.1327083446085453
+          },
+          "native_total_ns": {
+            "count": 120,
+            "p50": 2.5854166597127914,
+            "p95": 3.363249823451042,
+            "p99": 3.4829999785870314,
+            "max": 3.566291881725192
+          },
+          "other_native_ns": {
+            "count": 120,
+            "p50": 0.06591645069420338,
+            "p95": 0.08833291940391064,
+            "p99": 0.09366637095808983,
+            "max": 0.09650015272200108
+          },
+          "Go_API_outside_native_ns": {
+            "count": 120,
+            "p50": 0.022833313882350922,
+            "p95": 0.03270864995253086,
+            "p99": 0.07987508916854859,
+            "max": 0.08237539065313339
+          }
+        },
+        "uploads_per_measured_frame": {
+          "count": 120,
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1
+        },
+        "interpretation": "Same private binary/library, original WC cache fixed, detailed source+CPU+lifecycle observers on. Full eligible ledger closed. Headless byte proof reused; no displayed-pixel, observer-neutrality, ordinary-build equivalence or release qualification.",
+        "reuse_mode": "off",
+        "staging_lifecycle": {
+          "fresh": 254,
+          "takes": 0,
+          "evictions": 0,
+          "owners": 1,
+          "peak_idle_count": 0,
+          "peak_idle_bytes": 0
+        },
+        "measured_reuse_hits": 0,
+        "presentation_diagnostic": {
+          "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+          "warmup": 128,
+          "measured": 120,
+          "setup_losses": 0,
+          "receipt_to_present_ms": {
+            "count": 120,
+            "p50": 29.717208351939917,
+            "p95": 38.272833451628685,
+            "p99": 51.01091670803726,
+            "max": 51.14391655661166
+          },
+          "receipt_to_acquire_ms": {
+            "count": 120,
+            "p50": 4.1420417837798595,
+            "p95": 4.77370829321444,
+            "p99": 5.087708355858922,
+            "max": 5.0946250557899475
+          },
+          "acquire_to_present_ms": {
+            "count": 120,
+            "p50": 26.373624801635742,
+            "p95": 33.92699989490211,
+            "p99": 46.758916694670916,
+            "max": 47.30720818042755
+          },
+          "release_qualified": false,
+          "physical_input_verified": false
+        },
+        "ordinary_latency_qualified": false,
+        "request_schedule_segments": {
+          "requests": 248,
+          "maximum_wake_lateness_ns": 2535541,
+          "maximum_foreground_check_ns": 1682500,
+          "causality": "Observation only. Different maxima need not be the same request; no overhead calibration or timer repair inferred."
+        }
+      }
+    },
+    {
+      "mode": "on",
+      "metrics": {
+        "outcome": "VALID_CPU_SOURCE_DIAGNOSTIC",
+        "warmup": 128,
+        "measured": 120,
+        "release_qualified": false,
+        "physical_input_verified": false,
+        "source_phase_ms": {
+          "DrawNS": {
+            "count": 120,
+            "p50": 1.623167,
+            "p95": 1.885542,
+            "p99": 2.206084,
+            "max": 2.316417
+          },
+          "RasterNS": {
+            "count": 120,
+            "p50": 0.739875,
+            "p95": 0.848625,
+            "p99": 0.9745,
+            "max": 1.058541
+          },
+          "CopyNS": {
+            "count": 120,
+            "p50": 0.874458,
+            "p95": 1.05825,
+            "p99": 1.369,
+            "max": 1.472709
+          },
+          "SetFromGoImageNS": {
+            "count": 120,
+            "p50": 0.862541,
+            "p95": 1.046292,
+            "p99": 1.353542,
+            "max": 1.458875
+          }
+        },
+        "totals": {
+          "DrawNS": 177484459,
+          "RasterNS": 83757545,
+          "CopyNS": 93228549,
+          "SetFromGoImageNS": 91784165,
+          "SetFromGoImageAttempts": 120,
+          "ImageCacheHits": 0,
+          "LogicalUploadRGBABytes": 923065920
+        },
+        "nested_shares_of_source_draw": {
+          "RasterNS": 0.4719148114258274,
+          "CopyNS": 0.5252772525846897,
+          "SetFromGoImageNS": 0.5171391654071527
+        },
+        "presentation_feedback_accounting_valid": true,
+        "latency_gate_qualified": false,
+        "diagnostic_only": "Additional source clocks/counters and private compiler overlays; these timings are not ordinary latency qualification or successful GPU transfer evidence.",
+        "observer_mode": "on",
+        "native_trace_records": 254,
+        "retained_startup_uploads": 6,
+        "joined_cohort_uploads": 248,
+        "CPU_phase_ms": {
+          "create_ns": {
+            "count": 120,
+            "p50": 0.0014582183212041855,
+            "p95": 0.00200001522898674,
+            "p99": 0.0022083986550569534,
+            "max": 0.0022917520254850388
+          },
+          "map_ns": {
+            "count": 120,
+            "p50": 0.0029583461582660675,
+            "p95": 0.0045835040509700775,
+            "p99": 0.005666632205247879,
+            "max": 0.010791700333356857
+          },
+          "copy_ns": {
+            "count": 120,
+            "p50": 0.6488333456218243,
+            "p95": 0.8125000167638063,
+            "p99": 1.0400833562016487,
+            "max": 1.2399584520608187
+          },
+          "flush_ns": {
+            "count": 120,
+            "p50": 0.00062515027821064,
+            "p95": 0.0016249250620603561,
+            "p99": 0.0019166618585586548,
+            "max": 0.0020831357687711716
+          },
+          "encode_ns": {
+            "count": 120,
+            "p50": 0.10787486098706722,
+            "p95": 0.13387505896389484,
+            "p99": 0.15204166993498802,
+            "max": 0.15533342957496643
+          },
+          "native_total_ns": {
+            "count": 120,
+            "p50": 0.8376250043511391,
+            "p95": 1.0202082339674234,
+            "p99": 1.3072916772216558,
+            "max": 1.4274166896939278
+          },
+          "other_native_ns": {
+            "count": 120,
+            "p50": 0.06458326242864132,
+            "p95": 0.10287505574524403,
+            "p99": 0.14716689474880695,
+            "max": 0.15158322639763355
+          },
+          "Go_API_outside_native_ns": {
+            "count": 120,
+            "p50": 0.023499916687607765,
+            "p95": 0.03241701604855061,
+            "p99": 0.046250322778344156,
+            "max": 0.05749967233407497
+          }
+        },
+        "uploads_per_measured_frame": {
+          "count": 120,
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1
+        },
+        "interpretation": "Same private binary/library, original WC cache fixed, detailed source+CPU+lifecycle observers on. Full eligible ledger closed. Headless byte proof reused; no displayed-pixel, observer-neutrality, ordinary-build equivalence or release qualification.",
+        "reuse_mode": "on",
+        "staging_lifecycle": {
+          "fresh": 3,
+          "takes": 251,
+          "evictions": 0,
+          "owners": 1,
+          "peak_idle_count": 3,
+          "peak_idle_bytes": 15384448
+        },
+        "measured_reuse_hits": 120,
+        "presentation_diagnostic": {
+          "outcome": "VALID_MATCHED_SMALL_FIXTURE_CALIBRATION",
+          "warmup": 128,
+          "measured": 120,
+          "setup_losses": 0,
+          "receipt_to_present_ms": {
+            "count": 120,
+            "p50": 27.824541786685586,
+            "p95": 34.96862482279539,
+            "p99": 35.48204153776169,
+            "max": 47.61954164132476
+          },
+          "receipt_to_acquire_ms": {
+            "count": 120,
+            "p50": 2.3384999949485064,
+            "p95": 2.7563751209527254,
+            "p99": 3.2643750309944153,
+            "max": 4.289583303034306
+          },
+          "acquire_to_present_ms": {
+            "count": 120,
+            "p50": 25.52937506698072,
+            "p95": 33.216291572898626,
+            "p99": 34.336458425968885,
+            "max": 45.0618751347065
+          },
+          "release_qualified": false,
+          "physical_input_verified": false
+        },
+        "ordinary_latency_qualified": false,
+        "request_schedule_segments": {
+          "requests": 248,
+          "maximum_wake_lateness_ns": 3185084,
+          "maximum_foreground_check_ns": 1518708,
+          "causality": "Observation only. Different maxima need not be the same request; no overhead calibration or timer repair inferred."
+        }
+      }
+    }
+  ],
+  "ordinary_latency_qualified": false,
+  "gate_changed": false,
+  "previous_refusal": "Retained rejected; cause not reproduced or explained by this valid pair.",
+  "interpretation": "One ordered private instrumented pair; no noise bound, observer calibration, displayed-byte proof or shipping adoption. Original WC fixed. Headless byte/lifetime proof reused.",
+  "raw_detail": "Complete scalar lifecycle and request-segment journals retained in compressed segmented-result evidence."
+}

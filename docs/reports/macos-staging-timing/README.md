@@ -22,3 +22,31 @@ byte proof is reused. Neither instrumented binary is ordinary-build qualificatio
 No shipping SDK/app/pool/cache-policy, feature or pacing change. The33.3ms release
 gate remains unchanged and M3–M7 stay open. Evidence archives exclude executables,
 full SDK and build caches; hashes retain their identities.
+
+## Segmented pair result
+
+One off/on pair is valid in 66.194 seconds (<90);18 owned groups
+retired, source/SDK8321/binary/log/configuration/geometry pins held. Both modes
+retain248 accepted requests,128 warmup/120 measured, all CPU/source/presentation
+joins and closed eligible/device lifetime ledgers. Enabled mode reuses all120
+measured uploads.
+
+| Diagnostic p95 | Reuse off | Reuse on |
+| --- | ---: | ---: |
+| Native CPU staging copy | 2.953000 ms | 0.812500 ms |
+| Receipt to actual presentation | 38.272833 ms | 34.968625 ms |
+
+The pool reduces measured copy cost in this ordered pair; both presentation p95
+values remain above33.3ms. This is not a gate pass, repeatability/noise bound or
+ordinary-build equivalence. CPU acquire/create includes pool lookup on hits; phase
+quantiles are not added. Detailed source/CPU/lifecycle observers remain enabled.
+
+Request wake maxima are 2.535541/3.185084ms; foreground-check
+maxima 1.682500/1.518708ms (off/on). Different maxima need not be the
+same request. The original42.563959ms delay did not reproduce; its cause remains
+unproven. No schedule or release limits were relaxed.
+
+Next inspect remaining original-path copy/raster and presentation scheduling
+boundaries before choosing a production candidate. Do not rerun unchanged or
+adopt this private native pool based on one diagnostic pair. Features/defaults,
+SDK/application bytes and33.3ms gate remain frozen; M3–M7 open.
