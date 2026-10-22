@@ -1,26 +1,53 @@
-# Native raster root structure: preparation
+# Native raster root structure: captured result
 
-The [protocol](../../../tools/macos-calibration/rastercommands/NATIVE.md) prepares
-one three-transition capture using the original shipping Metal archive and private
-Core metadata hooks. It records actual root covered/crop/Params.Render/RenderPath
-branch choices, preserving the renderer algorithms. The [renderer diff](renderer.patch)
-is reviewable. Root depth/frame indices reset; nested replay is excluded.
+The approved one-attempt capture completed in **4.782 seconds**, including probes.
+It retained 11 renderer calls and 162 scalar command records: eight startup calls
+and three admitted calls at 1519 × 1266. Admission uses the explicit one-shot
+marker, rather than dimensions: five startup calls also have that extent but
+precede the marker. All three admitted calls used an owned
+scanner and completed with the same root decisions:
 
-The original offscreen full-pixel/state fixture and five focused observer methods
-pass. Three classifier methods pass eighteen refusal cases; no native result yet.
-The final native binary builds with the explicit locked-geometry admission marker.
-Earlier build/test receipts before that marker are retained, never run natively.
-SDK8321bytes and every shared private Core file except the reviewed renderer hook
-match their frozen originals; original native archive unchanged. No pool/cache
-experiment is linked. The old temporary worktree's701unrelated deletions remain
-untouched; canonical main is used instead.
+| Decision | Per admitted call | Total admitted |
+| --- | ---: | ---: |
+| Covered by next command | 4 | 12 |
+| Uniform crop branch | 3 | 9 |
+| RenderPath | 4 | 12 |
+| Params.Render | 1 | 3 |
 
-One attempt/three routed transitions,20seconds native/30overall within the approved
-two-minute quiet desktop window. Original match/foreground/lateness/response,
-presentation/ownership/pin/SDK/configuration/geometry checks remain. Startup and
-all failures retained; admission marker is not an input tag. Scalar colors are
-not GPU/displayed pixels, cropped branches are not full-fill counts, and this
-metadata observer does not qualify latency or ordinary-build equivalence.
+The single image-render call covers (8,8)–(1511,1258). Each of the four paths has
+20 path values, an identity transform, neither fill nor stroke enabled, and meets
+the existing crop no-paint predicate. Scalar patch colors proceed red/green/red.
+Existing coverage and crop optimization is already active; the earlier eight
+recorded image commands are **not eight executed full-screen fills**. Cropped
+branches can write zero or several bands, so these counts do not measure bytes
+written or CPU cost.
 
-Features/defaults/SDK/app frozen, experimental rendering/pacing disabled,33.3ms
-gate unchanged, M3–M7 open. No production performance repair is adopted.
+Three routed public model transitions join unique positive native presentations.
+Startup calls, opaque tags and actual timestamps remain in the raw evidence; no
+latency distribution is estimated from these three transitions. Geometry admission
+does not attribute commands to input tags. Scalar colors are not GPU readback or
+physical displayed-pixel proof. Physical pointer/keyboard testing was not done.
+
+Independent replay verified all nine owned process groups retired, complete log
+hashes, final v2 build/source/module/overlay pins, unchanged configuration and
+geometry, all 8,321 frozen SDK files, and the original Metal archive. Process
+retirement is not a whole-GPU allocation balance proof. Preparation passed five
+focused observer methods, the original routed full-pixel/state fixture and three
+classifier methods with eighteen rejection cases. These checks were reused;
+no broad campaign or unchanged native retry was run.
+
+The [protocol](../../../tools/macos-calibration/rastercommands/NATIVE.md),
+[renderer diff](renderer.patch), [machine-readable result](result-summary.json),
+and indexed preparation/result evidence archives retain the basis for this result.
+Preparation source checkpoint: `2330a9b`; preparation archive checkpoint: `fbedfc8`.
+The initial pre-admission-marker binary/test receipts are retained but were never
+run natively; the final v2 build supplied this capture. The 701 unrelated deletions
+in the old temporary worktree remain untouched; canonical main is used.
+
+This narrows the investigation; **it is not a performance repair**. Next inspect
+the existing no-paint RenderPath execution and raster stage boundary with source
+and focused offscreen evidence before proposing another native candidate. The
+metadata observer allocates and locks, so it does not establish ordinary-build
+cost or observer neutrality. No renderer/cache/pacing experiment is adopted.
+Features, SDK, application and shipping defaults remain frozen. The 33.3 ms
+receipt-to-actual-presentation p95 gate is unchanged; M3–M7 remain open.

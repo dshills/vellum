@@ -1,0 +1,224 @@
+{
+  "outcome": "VALID_NATIVE_RASTER_STRUCTURE",
+  "source_checkpoint": "2330a9b",
+  "preparation_evidence_checkpoint": "fbedfc8",
+  "elapsed_seconds": 4.781561,
+  "native_seconds": 1.6109881661832333,
+  "owned_groups_retired": 9,
+  "native_stdout_sha256": "3d6ecd24c6643a6ad875c172f87a1c6cc161fb0624c96caa6ff11ee51831242f",
+  "sdk_file_count": 8321,
+  "original_native_library_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "validation": {
+    "outcome": "VALID_THREE_TRANSITION_RASTER_STRUCTURE",
+    "responses": [
+      {
+        "accepted": 1,
+        "scope": 1,
+        "opaque_tag": 4,
+        "generation": 4,
+        "received": 1186393.8555463336,
+        "presented": 1186393.8811086253
+      },
+      {
+        "accepted": 2,
+        "scope": 1,
+        "opaque_tag": 6,
+        "generation": 5,
+        "received": 1186393.9753021253,
+        "presented": 1186393.9977745002
+      },
+      {
+        "accepted": 3,
+        "scope": 1,
+        "opaque_tag": 8,
+        "generation": 6,
+        "received": 1186394.096691917,
+        "presented": 1186394.1311069585
+      }
+    ],
+    "renderer_calls": 11,
+    "admitted_renderer_calls": 3,
+    "recorded_items": 162,
+    "admitted_root_decisions": {
+      "covered-next": 12,
+      "cropped-uniform": 9,
+      "render-path": 12,
+      "render-image": 3
+    },
+    "admitted_patch_colors": [
+      [
+        65535,
+        0,
+        0,
+        65535
+      ],
+      [
+        0,
+        65535,
+        0,
+        65535
+      ],
+      [
+        65535,
+        0,
+        0,
+        65535
+      ]
+    ],
+    "retained_startup_extents": [
+      {
+        "Min": {
+          "X": 0,
+          "Y": 0
+        },
+        "Max": {
+          "X": 16,
+          "Y": 16
+        }
+      },
+      {
+        "Min": {
+          "X": 0,
+          "Y": 0
+        },
+        "Max": {
+          "X": 32,
+          "Y": 32
+        }
+      },
+      {
+        "Min": {
+          "X": 0,
+          "Y": 0
+        },
+        "Max": {
+          "X": 48,
+          "Y": 48
+        }
+      },
+      {
+        "Min": {
+          "X": 0,
+          "Y": 0
+        },
+        "Max": {
+          "X": 1519,
+          "Y": 1266
+        }
+      },
+      {
+        "Min": {
+          "X": 0,
+          "Y": 0
+        },
+        "Max": {
+          "X": 1519,
+          "Y": 1266
+        }
+      },
+      {
+        "Min": {
+          "X": 0,
+          "Y": 0
+        },
+        "Max": {
+          "X": 1519,
+          "Y": 1266
+        }
+      },
+      {
+        "Min": {
+          "X": 0,
+          "Y": 0
+        },
+        "Max": {
+          "X": 1519,
+          "Y": 1266
+        }
+      },
+      {
+        "Min": {
+          "X": 0,
+          "Y": 0
+        },
+        "Max": {
+          "X": 1519,
+          "Y": 1266
+        }
+      }
+    ],
+    "latency_qualified": false,
+    "physical_input_verified": false,
+    "interpretation": "Three routed model/presentation transitions and bounded root replay metadata. Admission marks locked geometry, not input tags; scalar color order is not GPU/readback/displayed-byte proof. Cropped branch may write zero or several bands. No timing distribution, per-source/tag attribution, observer neutrality or release acceptance."
+  },
+  "admitted_frames": [
+    {
+      "decisions": {
+        "covered-next": 4,
+        "cropped-uniform": 3,
+        "render-path": 4,
+        "render-image": 1
+      },
+      "no_paint_identity_paths": 4,
+      "image_rect": {
+        "Min": {
+          "X": 8,
+          "Y": 8
+        },
+        "Max": {
+          "X": 1511,
+          "Y": 1258
+        }
+      }
+    },
+    {
+      "decisions": {
+        "covered-next": 4,
+        "cropped-uniform": 3,
+        "render-path": 4,
+        "render-image": 1
+      },
+      "no_paint_identity_paths": 4,
+      "image_rect": {
+        "Min": {
+          "X": 8,
+          "Y": 8
+        },
+        "Max": {
+          "X": 1511,
+          "Y": 1258
+        }
+      }
+    },
+    {
+      "decisions": {
+        "covered-next": 4,
+        "cropped-uniform": 3,
+        "render-path": 4,
+        "render-image": 1
+      },
+      "no_paint_identity_paths": 4,
+      "image_rect": {
+        "Min": {
+          "X": 8,
+          "Y": 8
+        },
+        "Max": {
+          "X": 1511,
+          "Y": 1258
+        }
+      }
+    }
+  ],
+  "all_admitted_scanners_owned": true,
+  "release_qualified": false,
+  "gate_changed": false,
+  "production_repair_adopted": false,
+  "limitations": [
+    "Instrumented three-transition structural capture, not a timing distribution or ordinary-build equivalence proof.",
+    "Geometry admission is not source/tag attribution. Scalar colors are not GPU readback or displayed-pixel verification.",
+    "Branch counts do not measure cropped band writes or CPU cost; process retirement does not prove whole-GPU allocation balance.",
+    "Automated command routing only; physical pointer and keyboard input not verified."
+  ],
+  "next_action": "Inspect the existing RenderPath no-paint execution and raster stage boundary using source and focused offscreen evidence before proposing another native performance candidate."
+}

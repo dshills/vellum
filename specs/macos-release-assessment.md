@@ -271,3 +271,13 @@ A [three-transition native raster structural capture](../docs/reports/macos-rast
 is prepared with originalMetal/defaults, bounded actual root branch metadata and
 strict existing routing/presentation/ownership checks. Focused tests/build pass;
 no native result, repair, latency qualification or gate change yet. M3–M7 open.
+
+The [native raster structural result](../docs/reports/macos-raster-native/README.md)
+is valid: one attempt/4.782 seconds, 11 calls/162 records, three admitted roots.
+Each root takes four covered branches, three uniform crop branches, four no-paint
+identity RenderPath calls and one Params.Render call. Existing optimization is
+active; eight recorded images are not eight executed fills. Nine groups retired,
+SDK/source/native/configuration/geometry pins stable. Three transitions are not
+a latency distribution, per-tag source attribution or displayed-byte proof.
+Inspect no-paint path execution/raster boundaries offscreen next; no repair,
+unchanged retry, default/SDK/app/gate change or release acceptance. M3–M7 open.
