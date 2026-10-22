@@ -57,8 +57,12 @@ or gesture, expected/actual behavior, smallest fix and focused retest here.
   pass is claimed. See the [first checkpoint](reports/macos-preview-r3-first/README.md).
   [Packaged alpha.3 editing/persistence/recovery acceptance](reports/macos-preview-app-acceptance/README.md)
   now passes for its listed interactions, including an exact-content controlled
-  recovery round trip and normal process retirement. Active editing and the soak
-  remain separate required resource checks; final corrected-notice packaging is pending.
+  recovery round trip and normal process retirement. The [resource checkpoint](reports/macos-preview-resource-check/README.md) passes ten-minute
+  active editing and document safety. A new two-hour attempt stopped at 30 minutes
+  because native occlusion never became false under a containing cover; a short
+  pilot reproduces the setup refusal. The soak remains blocked. Apple TUINS base
+  class origin and stable count are known; its retaining reference remains unknown.
+  Final corrected-notice packaging is prepared; delivered-byte renewal is separate.
 - R4: alpha.3 identity committed at `aaa0a3a`; guarded public native exporter repair
   at `b0e5106`; stale exported contract version corrected at `412e5b8`. All changes
   have focused tests and Prism reviews. Applicable notice collection and real

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/window-cycle",
+    "-composed",
+    "-cycles=1",
+    "-sample-every=1",
+    "-soak=80s",
+    "-soak-quiet=5s",
+    "-soak-settle=1s",
+    "-soak-interval=10s",
+    "-timeout=2m"
+  ],
+  "started_utc": "2026-10-22T21:55:49.132163+00:00",
+  "exit_code": 1,
+  "elapsed_seconds": 36.26897625019774,
+  "scope": "unchanged native fixture transition reproduction only; 5s quiet samples do not qualify 60s idle or two-hour soak"
+}
