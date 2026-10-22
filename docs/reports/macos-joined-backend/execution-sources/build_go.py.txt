@@ -1,0 +1,13 @@
+from pathlib import Path
+import json,hashlib,sys,importlib.util,shutil
+sys.dont_write_bytecode=True
+x=Path(__file__).resolve().parent.parent;q=Path(__file__).resolve().parent/'prepared';r=Path('/Users/dshills/Development/projects/Vellum');core=Path('/private/tmp/vellum-joined-backend-core');f=r/'tools/macos-calibration/upload/framework'
+sys.path.insert(0,str(r/'scripts'));sys.path.insert(0,str(x/'macos-grid-capture-repair/preflight-v2'));s=importlib.util.spec_from_file_location('owned_go',x/'macos-sdk-native-238b3b6/run.py');g=importlib.util.module_from_spec(s);s.loader.exec_module(g)
+sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest();native=json.loads((q/'native-identity.json').read_text());assert sha(Path(native['archive']))==native['archive_sha256'];pins=dict(native['pins']);pins[native['archive']]=native['archive_sha256'];pins.update({str(p):sha(p) for root in [core,f] for p in root.rglob('*') if p.is_file()});pins.update({str(q/n):sha(q/n) for n in ['framework.mod','framework.sum','core.mod','core.sum','overlay.json','native_main_darwin.go','backend_probe_darwin.go','fixture_test.go','desktop_session.go','desktop_measurement.go','frame_trace.go']})
+base=['/usr/bin/sandbox-exec','-p','(version 1)(allow default)(deny network*)','/bin/sh',str(x/'macos-app-examples/go-check')];case=sys.argv[1]
+if case=='pixels':cwd=f;argv=base+['test','-tags=offscreen','-modfile='+str(q/'framework.mod'),'-overlay='+str(q/'overlay.json'),'-run','^TestRoutedStateAndExactPatchPixels$','-count=1','-v','.']
+elif case=='build':cwd=f;argv=base+['build','-modfile='+str(q/'framework.mod'),'-overlay='+str(q/'overlay.json'),'-ldflags=-buildid='+native['archive_sha256'],'-o',str(q/'framework'),'.']
+else:raise ValueError(case)
+run=g.execute(argv,cwd,q/('go-'+case),lambda:False,lambda:all(sha(Path(p))==v for p,v in pins.items()),timeout=180,limit=4<<20);(q/('go-'+case+'-receipt.json')).write_text(json.dumps({'pins':pins,'run':run},indent=2)+'\n');print(json.dumps({case:{k:run[k] for k in ['exit_code','error','seconds']}}),flush=True);assert run['exit_code']==0 and run['error'] is None and run['owned']['group_absent']
+if case=='build':
+ shutil.copy2(x/'macos-joined-timing/match.json',q/'match.json');(q/'build-identity.json').write_text(json.dumps({'binary_sha256':sha(q/'framework'),'native_archive_sha256':native['archive_sha256'],'pins':pins,'SDK_changed':False,'policy_changed':False},indent=2)+'\n')

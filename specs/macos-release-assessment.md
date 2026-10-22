@@ -320,3 +320,13 @@ display phases; no compositor-only attribution, phase-quantile sum or fix follow
 Full startup/pins/SDK/configuration/geometry/closure retained. Next join backend
 boundaries to the same identifiers. No native retry, production/default/SDK/app/
 feature/gate change; M3–M7 open, no ordinary release qualification.
+
+The [joined CPU/backend preparation](../docs/reports/macos-joined-backend/README.md)
+continues the original Cogent/WebGPU design. Exact reviewed upload and backend
+observers compose privately with the unchanged raster clock. Six focused methods/
+19 negative mutations, original routed full pixels, fresh native/Go builds and
+full source/log/SDK/reproduction checks pass; prior recorder race checks are
+reused by exact source comparison. One newly approved 40s native/60s overall
+capture may follow review and commit. GPU span includes gaps; final-render-GPU-end
+to shown is not exclusively compositor cost. No native result, repair, feature,
+default, SDK/app or 33.3ms gate change. M3–M7 remain open.

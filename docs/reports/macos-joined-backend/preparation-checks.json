@@ -1,0 +1,22 @@
+{
+  "outcome": "PREPARED_NO_NATIVE_CAPTURE",
+  "classifier_methods": 6,
+  "negative_mutations": 19,
+  "original_routing_full_pixel_fixture": "PASS with unchanged raster clock",
+  "prior_5_race_recorder_methods": "Reused byte-identical renderer/journal/tests",
+  "fresh_native_and_Go_build": "PASS",
+  "only_native_source_changes_from_reviewed_copies": [
+    "Cargo.toml",
+    "Cargo.lock",
+    "src/lib.rs"
+  ],
+  "same_native_package_versions": true,
+  "exact_observer_composition": true,
+  "SDK_files_unchanged": 8321,
+  "source_pin_and_log_ownership_replay": "PASS",
+  "binary_sha256": "36b49aa1f3f7e470c000a21a4f77d176c6eb5094e22684b032e727ff2f85cd61",
+  "native_archive_sha256": "10e39953bda1045da3bd9c315dcac0add646fa86e74627b3c896723d31b86a35",
+  "retained_build_failure": "rust-build: incomplete offline cache; fixed cache path, no native attempt",
+  "release_qualified": false,
+  "gate_changed": false
+}
