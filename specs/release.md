@@ -10,7 +10,7 @@ M3–M7 complete or authorize public publication/signing.
 
 
 `release/version.json` and the public `vellum.Version` constant identify
-`v0.1.0-alpha.2`. This is an alpha packaging/API version; no Git tag or remote
+`v0.1.0-alpha.3`. This is a developer-preview candidate packaging/API version; no Git tag or remote
 release is created by these tools. The owner selected `github.com/dshills/vellum`
 and the MIT license for Vellum's own code. The native module is
 `github.com/dshills/vellum/drivers/cogent`; example module paths also match their

@@ -4,4 +4,4 @@ package vellum
 
 // Version is the framework API version. Alpha releases may change exported
 // contracts; see specs/release.md for the compatibility policy.
-const Version = "v0.1.0-alpha.2"
+const Version = "v0.1.0-alpha.3"
