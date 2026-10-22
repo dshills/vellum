@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "<USER_HOME>/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "docs/macos-preview-release.md,docs/reports/macos-preview-r2/README.md,docs/reports/macos-preview-r2/app-build-environment.json,docs/reports/macos-preview-r2/app-package-go125-tmp.json,docs/reports/macos-preview-r2/app-package-go125.stderr,docs/reports/macos-preview-r2/placement-build-go125.log,docs/reports/macos-preview-r2/result.json,docs/reports/macos-preview-r2/sdk-export-v2.json,docs/reports/macos-preview-r2/sdk-export.stderr,docs/reports/macos-preview-r2/sdk-relocation-go125.json,docs/reports/macos-preview-r2/sdk-relocation.json",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "4",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/r2-review/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/r2-review/prism.json"
+  ],
+  "cwd": "<USER_HOME>/Development/projects/Vellum",
+  "started_utc": "2026-10-22T18:28:02.100373+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 1,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 60046,
+  "group": 60046,
+  "owned": {
+    "created": true,
+    "pid": 60046,
+    "group": 60046,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 1,
+    "errors": [],
+    "observation": {
+      "group": 60046,
+      "members": [],
+      "observation_sha256": "b22f1c09051a17446acffe37ba1be21a21cd90b118410f9a34a9f718b64f22ca"
+    }
+  },
+  "seconds": 4.512910249875858,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

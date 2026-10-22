@@ -1,0 +1,15 @@
+<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/.vellum-app-gxubxm6z/application.app: replacing existing signature
+<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/Vellum Placement Preview Go125.app: resource fork, Finder information, or similar detritus not allowed
+Traceback (most recent call last):
+  File "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/retained SDK/vellum-v0.1.0-alpha.2/scripts/package-app.py", line 239, in <module>
+    if __name__=="__main__":main()
+                            ~~~~^^
+  File "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/retained SDK/vellum-v0.1.0-alpha.2/scripts/package-app.py", line 236, in main
+    print(json.dumps(package(args.binary.absolute(),args.output.absolute(),args.name,args.identifier,args.version,args.target,args.sign_identity,args.build_version,args.notice_bundle),indent=2))
+                     ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/retained SDK/vellum-v0.1.0-alpha.2/scripts/package-app.py", line 204, in package
+    run_child(["codesign","--verify","--strict",str(output)],check=True, env=child_environment(), timeout=NATIVE_TOOL_TIMEOUT_SECONDS)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/retained SDK/vellum-v0.1.0-alpha.2/scripts/child_process.py", line 210, in run_child
+    raise subprocess.CalledProcessError(completed.returncode, arguments, output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['codesign', '--verify', '--strict', '<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/Vellum Placement Preview Go125.app']' returned non-zero exit status 1.

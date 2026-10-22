@@ -30,7 +30,7 @@ reproduction uses the tracked preparation contract, not those machine paths.
 
 | ID | Required outcome / reproduction | Owner and smallest next action | Checkpoint |
 | --- | --- | --- | --- |
-| P1 | A new external Go module must build/run using the extracted candidate SDK without checkout/private-tree dependencies; not yet tested for this source. | Implementation agent: export private SDK, verify relocation, generate/build/run starter. | R2 |
+| P1 | A new external Go module must build/run using the extracted candidate SDK without checkout/private-tree dependencies; R2 now passes for SDK source d8de4fc; final delivered-byte renewal remains R5. | Implementation agent: export private SDK, verify relocation, generate/build/run starter. | R2 |
 | P2 | Matching packaged Placement app must pass listed editing, Save/Open/history, text/window and shutdown workflows; earlier app24 evidence is scoped, not final artifact acceptance. | Implementation agent: build from frozen candidate, reuse applicable tests, run the written acceptance script. | R2/R3/R5 |
 | P3 | Native idle/activity/lifecycle/soak must establish bounded retained work/resources; historical hidden TUINS window ownership and accumulation remain unclassified. | Implementation agent: use existing lifecycle harness and prescribed samples; classify stable owner/count or report exact growth/cleanup defect. | R3 |
 | P4 | Public SDK/app rights and notices remain pending; presence inventories alone do not approve redistribution. Upstream objc2 notice explicitly raises Apple-SDK-derived binding terms. | Implementation agent: review actual shipped component applicability; seek a concrete rights-holder/owner decision only for the unresolved component. | R4 |
@@ -44,8 +44,9 @@ or gesture, expected/actual behavior, smallest fix and focused retest here.
 ## Checkpoints
 
 - R1: policy approved, branch/source selected, pinned dependencies prepared and
-  bound; Prism review and commit are recorded with the checkpoint.
-- R2–R5: pending. No preview release or full Mac qualification is claimed.
+  bound; Prism review is clean and checkpoint commit is `578cf74`.
+- R2: complete for private candidate source `d8de4fc`; [external SDK/app result](reports/macos-preview-r2/README.md).
+- R3–R5: pending. No preview release or full Mac qualification is claimed.
 
 ## Disclosed performance
 
@@ -56,3 +57,10 @@ candidate measured 48.286 ms p95. Preserve these scopes and failures; none is a
 measurement of a newly packaged alpha.3 app or physical input-to-photon latency.
 See the [assessment](reports/macos-default-responsiveness/README.md) and
 [rejected candidate](reports/macos-render-priority-result/README.md).
+
+## R2 packaging finding for R5
+
+Documents-location packaging once failed strict signing verification due to
+Finder/resource-fork metadata; the tool cleaned the output. Temporary staging
+passes. R5 must verify signature after extraction of the actual final archive;
+do not call this a fixed general packaging defect without that check.
