@@ -1,0 +1,127 @@
+// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
+#import <QuartzCore/CAMetalLayer.h>
+#import <QuartzCore/CAMediaTiming.h>
+#import <Metal/MTLDrawable.h>
+#include <os/lock.h>
+#include "presentation_darwin.h"
+#include "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-phase/prepared/consumer/control.h"
+
+// Cgo exports receive scalars only. No Go pointer or native window is captured.
+extern uint64_t vellumGoDrawableAcquired(uint64_t, uint64_t, uint64_t, uint64_t, int, double);
+extern void vellumGoDrawableUnavailable(uint64_t, uint64_t, uint64_t, uint64_t, int, double);
+extern void vellumGoDrawablePresented(uint64_t, uint64_t, uint64_t, double);
+extern void vellumGoPresentationReceipt(uint64_t, uint64_t, double);
+extern uint64_t vellumGoDisplayAcquire(uint64_t,uint64_t);
+extern void vellumGoDisplayUnavailable(uint64_t,uint64_t);
+extern void vellumGoDisplayPresented(uint64_t,uint64_t,double);
+
+typedef struct {
+ uint64_t token, tag, generation, composition, displayToken, displayCredit;
+ int armed;
+} VellumPresentationStamp;
+
+// Only Vellum's own layer overrides acquisition; no global method replacement.
+@interface VellumPresentationLayer : CAMetalLayer {
+ os_unfair_lock _stampLock;
+ uint64_t _observerToken;
+ uint64_t _displayToken, _displayCredit;
+ int _acquisitionStarted;
+ VellumPresentationStamp _stamp;
+}
+- (void)setObserverToken:(uint64_t)token;
+- (void)setTag:(uint64_t)tag generation:(uint64_t)generation composition:(uint64_t)composition armed:(int)armed;
+- (VellumPresentationStamp)captureStamp;
+- (int)setDisplayToken:(uint64_t)token;
+- (void)setDisplayCredit:(uint64_t)credit;
+@end
+@implementation VellumPresentationLayer
+- (id)init {
+ if ((self=[super init])) { _stampLock=(os_unfair_lock)OS_UNFAIR_LOCK_INIT; _observerToken=0; _displayToken=0; _displayCredit=0; _acquisitionStarted=0; _stamp=(VellumPresentationStamp){0}; }
+ return self;
+}
+- (void)setObserverToken:(uint64_t)token {
+ os_unfair_lock_lock(&_stampLock);
+ _stamp=(VellumPresentationStamp){.token=token};
+ __atomic_store_n(&_observerToken,token,__ATOMIC_RELEASE);
+ os_unfair_lock_unlock(&_stampLock);
+}
+- (void)setTag:(uint64_t)tag generation:(uint64_t)generation composition:(uint64_t)composition armed:(int)armed {
+ if (!__atomic_load_n(&_observerToken,__ATOMIC_ACQUIRE))return;
+ os_unfair_lock_lock(&_stampLock);
+ _stamp.tag=tag;_stamp.generation=generation;_stamp.composition=composition;_stamp.armed=armed;
+ os_unfair_lock_unlock(&_stampLock);
+}
+- (VellumPresentationStamp)captureStamp {
+ if (!__atomic_load_n(&_observerToken,__ATOMIC_ACQUIRE) && !__atomic_load_n(&_displayToken,__ATOMIC_ACQUIRE))return (VellumPresentationStamp){0};
+ os_unfair_lock_lock(&_stampLock);
+ VellumPresentationStamp stamp=_stamp;
+ stamp.displayToken=_displayToken;stamp.displayCredit=_displayCredit;
+ os_unfair_lock_unlock(&_stampLock);
+ return stamp;
+}
+- (int)setDisplayToken:(uint64_t)token {
+ os_unfair_lock_lock(&_stampLock);
+ if (token && __atomic_load_n(&_acquisitionStarted,__ATOMIC_ACQUIRE)) { os_unfair_lock_unlock(&_stampLock);return 0; }
+ _displayCredit=0;__atomic_store_n(&_displayToken,token,__ATOMIC_RELEASE);
+ os_unfair_lock_unlock(&_stampLock);return 1;
+}
+- (void)setDisplayCredit:(uint64_t)credit {
+ os_unfair_lock_lock(&_stampLock);_displayCredit=credit;os_unfair_lock_unlock(&_stampLock);
+}
+- (id<CAMetalDrawable>)nextDrawable {
+ __atomic_store_n(&_acquisitionStarted,1,__ATOMIC_RELEASE);
+ VellumPresentationStamp before=[self captureStamp];
+ uint64_t displaySequence=0;
+ if (before.displayToken) {
+  displaySequence=vellumGoDisplayAcquire(before.displayToken,before.displayCredit);
+  if (!displaySequence) {
+   if (before.token)vellumGoDrawableUnavailable(before.token,before.tag,before.generation,before.composition,before.armed,CACurrentMediaTime());
+   return nil;
+  }
+ }
+ // Keep super's autoreleased return lifetime. No pool may drain it here.
+ uint64_t pcAttempt=pc_acquire_begin(before.token,before.tag,before.generation,CACurrentMediaTime());
+ id<CAMetalDrawable> drawable=[super nextDrawable];
+ double pcAcquired=CACurrentMediaTime();
+ if(drawable)pc_acquired(pcAttempt,drawable.drawableID,pcAcquired);else pc_unavailable(pcAttempt,pcAcquired);
+ if(drawable)[drawable addPresentedHandler:^(id<MTLDrawable> x){pc_presented(pcAttempt,x.presentedTime);}];
+ VellumPresentationStamp stamp=[self captureStamp];
+ if (!stamp.token && !displaySequence)return drawable;
+ double acquired=pcAcquired;
+ if (!drawable) {
+  if (displaySequence)vellumGoDisplayUnavailable(before.displayToken,displaySequence);
+  if (stamp.token)vellumGoDrawableUnavailable(stamp.token,stamp.tag,stamp.generation,stamp.composition,stamp.armed,acquired);
+  return nil;
+ }
+ uint64_t sequence=stamp.token ? vellumGoDrawableAcquired(stamp.token,stamp.tag,stamp.generation,stamp.composition,stamp.armed,acquired) : 0;
+ if (sequence || displaySequence) {
+  // One handler shares immutable scalar identities; no window/layer capture.
+  uint64_t token=stamp.token, displayToken=before.displayToken;
+  [drawable addPresentedHandler:^(id<MTLDrawable> shown) {
+   @autoreleasepool {
+    if (sequence)vellumGoDrawablePresented(token,sequence,shown.drawableID,shown.presentedTime);
+    if (displaySequence)vellumGoDisplayPresented(displayToken,displaySequence,shown.presentedTime);
+   }
+  }];
+ }
+ return drawable;
+}
+@end
+
+void *vellumNewPresentationLayer(void) { return (__bridge void *)[VellumPresentationLayer layer]; }
+void vellumPresentationObserver(void *layer,uint64_t token) { [(VellumPresentationLayer *)layer setObserverToken:token]; }
+void vellumPresentationFrame(void *layer,uint64_t tag,uint64_t generation,uint64_t composition,int armed) {
+ [(VellumPresentationLayer *)layer setTag:tag generation:generation composition:composition armed:armed];
+}
+void vellumPresentationReceipt(void *layer,uint64_t tag) {
+ if(!layer)return;
+ VellumPresentationStamp stamp=[(VellumPresentationLayer *)layer captureStamp];
+ if(stamp.token)vellumGoPresentationReceipt(stamp.token,tag,CACurrentMediaTime());
+}
+
+int vellumDisplayBackpressure(void *layer,uint64_t token) { return [(VellumPresentationLayer *)layer setDisplayToken:token]; }
+void vellumDisplayFrame(void *layer,uint64_t credit) { [(VellumPresentationLayer *)layer setDisplayCredit:credit]; }
+
+double vellumPresentationHostTime(void) { return CACurrentMediaTime(); }
+
+int vellumPresentationAvailable(void) { if (@available(macOS 10.15.4,*))return 1;return 0; }

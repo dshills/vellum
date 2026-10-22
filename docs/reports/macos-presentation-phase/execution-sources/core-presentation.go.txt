@@ -1,0 +1,108 @@
+//go:build darwin
+
+// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
+package desktop
+
+/*
+#cgo CFLAGS: -x objective-c
+#cgo LDFLAGS: -framework QuartzCore -framework Metal
+#include "presentation_darwin.h"
+#include "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-phase/prepared/consumer/control.h"
+*/
+import "C"
+import "errors"
+
+var presentationRegistry nativePresentationRegistry
+
+// SetPresentationObserver installs once on a live native window. The observer
+// must obey PresentationObserver's concurrency and retirement contract.
+func (w *Window) SetPresentationObserver(observer PresentationObserver) error {
+	if C.vellumPresentationAvailable() == 0 {
+		return errors.New("desktop: native presentation feedback requires macOS10.15.4 or later")
+	}
+	if !w.Lock() {
+		return errors.New("desktop: closed presentation window")
+	}
+	defer w.Unlock()
+	if w.nativeLayer == nil || w.presentationToken.Load() != 0 {
+		return errors.New("desktop: presentation observer unavailable or already installed")
+	}
+	token, err := presentationRegistry.register(observer)
+	if err != nil {
+		return err
+	}
+	C.vellumPresentationObserver(w.nativeLayer, C.uint64_t(token))
+	w.presentationToken.Store(token)
+	return nil
+}
+
+// PresentationHostTime returns the same host-time domain as MTLDrawable.presentedTime.
+// Sampling it does not acquire any window/main-thread lock.
+func PresentationHostTime() float64 { return float64(C.vellumPresentationHostTime()) }
+
+// RecordPresentationReceipt samples host time without waiting for the window's
+// render lock, before enqueue. A concurrent retirement revokes the scalar token.
+func (w *Window) RecordPresentationReceipt(tag uint64) {
+	if w == nil {
+		return
+	}
+	if token := w.presentationToken.Load(); token != 0 {
+		at := float64(C.vellumPresentationHostTime())
+		presentationRegistry.receipt(token, tag, at)
+	}
+}
+
+// PresentationEnabled and Begin/End require the existing window render lock.
+func (w *Window) PresentationEnabled() bool { return w.presentationToken.Load() != 0 }
+func (w *Window) BeginPresentationFrame(tag, generation uint64, armed bool) {
+	if !w.PresentationEnabled() {
+		return
+	}
+	// The recorder exhausts its bounded budget long before this guard. Never
+	// reuse an ordinal even if a caller leaves observation installed indefinitely.
+	if w.presentationComposition == ^uint64(0) {
+		w.closePresentationObserver()
+		return
+	}
+	w.presentationComposition++
+	flag := C.int(0)
+	if armed {
+		flag = 1
+	}
+	C.vellumPresentationFrame(w.nativeLayer, C.uint64_t(tag), C.uint64_t(generation), C.uint64_t(w.presentationComposition), flag)
+}
+func (w *Window) EndPresentationFrame() { C.vellumPresentationFrame(w.nativeLayer, 0, 0, 0, 0) }
+
+// closePresentationObserver requires Mu, before surface/view teardown. Handlers
+// own only scalar IDs and may complete later; removal does no window callback.
+func (w *Window) closePresentationObserver() {
+	token := w.presentationToken.Swap(0)
+	if w.nativeLayer != nil {
+		C.vellumPresentationObserver(w.nativeLayer, 0)
+	}
+	w.nativeLayer = nil
+	presentationRegistry.close(token)
+}
+
+//export vellumGoDrawableAcquired
+func vellumGoDrawableAcquired(token, tag, generation, composition C.uint64_t, armed C.int, at C.double) C.uint64_t {
+	return C.uint64_t(presentationRegistry.acquire(uint64(token), PresentationFrame{uint64(tag), uint64(generation), uint64(composition), armed != 0}, float64(at)))
+}
+
+//export vellumGoDrawableUnavailable
+func vellumGoDrawableUnavailable(token, tag, generation, composition C.uint64_t, armed C.int, at C.double) {
+	presentationRegistry.unavailable(uint64(token), PresentationFrame{uint64(tag), uint64(generation), uint64(composition), armed != 0}, float64(at))
+}
+
+//export vellumGoDrawablePresented
+func vellumGoDrawablePresented(token, sequence, drawable C.uint64_t, at C.double) {
+	presentationRegistry.presented(uint64(token), uint64(sequence), uint64(drawable), float64(at))
+}
+
+//export vellumGoPresentationReceipt
+func vellumGoPresentationReceipt(token, tag C.uint64_t, at C.double) {
+	presentationRegistry.receipt(uint64(token), uint64(tag), float64(at))
+}
+
+// Private diagnostic compiler overlay only; never part of the SDK.
+func VellumDiagnosticReceipt(tag uint64, at float64) { C.pc_receipt(C.uint64_t(tag), C.double(at)) }

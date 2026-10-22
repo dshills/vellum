@@ -400,3 +400,14 @@ No observer scheduling fix, ordinary qualification, feature/default/SDK/app/gate
 change follows; M3–M7 open. Future controls should match request phase and record
 pending presentation/drawable state before changing scheduling policy. No new
 native scope is prepared or authorized by this offscreen checkpoint.
+
+The [phase-matched pending-state preparation](../docs/reports/macos-presentation-phase/README.md)
+adds private native/framework consumers with four predeclared request phases,
+30measured inputs per phase and complete scalar acquisition/receipt/callback
+censuses. Actual native receipt matching is required before comparing latency;
+recorded pending feedback does not establish Metal pool availability or ownership.
+Eight focused methods, headless native concurrency/lifecycle/bounds/JSON, both
+builds, full routed pixels, recipe/source/log/SDK checks pass. No native capture
+yet. One approved100second overall/40second per-process scope may follow review
+and commit. Existing design/features/defaults/SDK/app and33.3ms gate unchanged;
+M3–M7 open. Actual results or rejection receive separate review and commit.
