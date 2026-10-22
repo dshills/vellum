@@ -1,0 +1,25 @@
+--- frozen/renderer.go
++++ private/renderer.go
+@@ -25,2 +25,3 @@
+-	size  math32.Vector2
+-	image *image.RGBA
++	vellumCommandFrame, vellumCommandDepth int
++	size                                   math32.Vector2
++	image                                  *image.RGBA
+@@ -99,0 +101,3 @@
++	rs.vellumCommandFrame = rs.vellumCaptureCommands(r)
++	rs.vellumCommandDepth = 0
++	defer func() { rs.vellumCommandFrame = -1; rs.vellumCommandDepth = 0 }()
+@@ -103,0 +108 @@
++	vellumFinishCommands(rs.vellumCommandFrame)
+@@ -107,0 +113,2 @@
++	rs.vellumCommandDepth++
++	defer func() { rs.vellumCommandDepth-- }()
+@@ -119,0 +127 @@
++			rs.vellumCommandDecision(i, "render-path")
+@@ -122,0 +131 @@
++					rs.vellumCommandDecision(i, "covered-next")
+@@ -127,0 +137 @@
++					rs.vellumCommandDecision(i, "cropped-uniform")
+@@ -130,0 +141 @@
++				rs.vellumCommandDecision(i, "render-image")

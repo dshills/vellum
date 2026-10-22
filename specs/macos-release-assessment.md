@@ -266,3 +266,8 @@ retains4renderer calls/80records while original full pixel/state checks pass.
 Recordedcommands are notexecutedfillcounts ornativecostattribution; geometrydiffers.
 Caps/reset/callback/snapshot tests pass. Next reviewedboundednative3transition
 structuralcapture, no new repair/gate/default/SDK/app change; M3–M7 open.
+
+A [three-transition native raster structural capture](../docs/reports/macos-raster-native/README.md)
+is prepared with originalMetal/defaults, bounded actual root branch metadata and
+strict existing routing/presentation/ownership checks. Focused tests/build pass;
+no native result, repair, latency qualification or gate change yet. M3–M7 open.
