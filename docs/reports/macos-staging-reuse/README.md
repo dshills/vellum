@@ -1,39 +1,32 @@
-# Private completed staging prototype: preparation
+# Private completed staging prototype: first refusal
 
-A texture-only completed-staging prototype is implemented and builds in an
-isolated native library. **It has not executed GPU work or passed native byte
-correctness yet. No shipping library or framework default changes.**
+The first native off-mode process exits successfully, but its case is **rejected**
+because the diagnostic uses an empty derived device display name. The controller
+stops immediately; enabled-pool mode never runs. No native pooling correctness
+or latency acceptance is claimed.
 
-The [protocol](../../../tools/macos-calibration/stagingreuse/PLAN.md) requires one
-bounded headless off/on pair before any timing work: 24 CPU texture writes and
-22 full GPU byte readbacks per mode, explicit pending-lease separation, original
-cache policy, row/offset/size cases, eviction, a second device, R8 exclusion and
-unsent cleanup. Thirty seconds/case, ninety overall, stop first invalid, no retry.
+The frozen Core helper derives GPU.DeviceName from AdapterInfo.Description or
+Vendor and ignores Device. The pinned native API puts the actual adapter name in
+AdapterInfo.Device; the optional description/vendor fields can both be empty.
+The fixture now records that primary Device field and complete AdapterInfo,
+without changing the framework helper or loosening any requirement.
 
-Five tests pass for the actual private no_std-adapted policy; nine methods pass
-for the lifecycle/protocol verifier, including synthetic documents explicitly
-marked as non-GPU evidence. The earlier two compiler rejection controls are reused.
-Native Rust and Go builds pass; a fresh recipe clone reproduces every source
-modification byte for byte, with unchanged manifests/lock/HAL/cache policy. An
-initial Vec/prelude compile error and a pre-execution format-narrowing revision
-remain retained. No native correctness campaign has run.
+The rejected raw document retains 24 CPU writes, backend Metal and no native
+error. A **posthoc-only** synthetic-name replay passes the remaining 22-readback/
+source-bound lifecycle checks; it is not accepted as a valid native case or
+hardware identity. The original raw journal and REJECT outcome remain untouched.
+All nine owned native/probe groups retire, and the second case never starts.
+Sources, binary/library, logs, configuration and geometry are retained/pinned.
 
-The existing completed-submission path retires encoders before explicit cache
-admission. Generic destruction never caches; failed/unsent work retains original
-destruction. Raw idle handles hold no Arc<Device>, eviction/destruction happens
-outside the cache mutex, and Device drains before backend/fence teardown. Scope
-is the pinned M4 Pro/Metal host and allowlisted single-layer 2D RGBA/BGRA8 uploads.
-Public mapped staging, write_buffer and other formats stay fresh. Idle limits are
-eight entries/32 MiB per device, not total GPU memory. Counters prove only their
-source-bound API lifetime, not physical allocation balance, injected GPU faults,
-physical overlap, displayed pixels or presentation latency.
+A fresh v2 scope is prepared only for this concrete metadata fix, using the same
+native library, 24-write/22-readback matrix and bounds. It needs its own reviewed
+source checkpoint before execution. See the [protocol](../../../tools/macos-calibration/stagingreuse/PLAN.md),
+[build identity](build-identity.json), [source audit](source-audit.json) and indexed
+evidence. The original preparation has complete 15-file plus focused four-file
+Prism Anthropic Claude Sonnet 5.5 reviews, policy5/protocol9/scalar-concurrency1
+checks and source-backed dispositions. No shipping library, SDK, app, renderer,
+pacing, feature or 33.3 ms gate changes; M3–M7 remain open.
 
-No compiler overlay, SDK byte, user data, Placement app, renderer/pacing setting
-or release gate changes. Features frozen, 33.3 ms gate unchanged, M3–M7 open.
-
-Complete 15-file Prism Anthropic Claude Sonnet 5.5 review and a focused four-file
-follow-up are recorded. Ownership transfer and snapshot stability were hardened;
-one scalar concurrency test passes in addition to policy5/protocol9. Remaining
-findings are source-backed dispositions for the declared per-host, pre-device,
-normal-execution protocol. It does not qualify concurrent configuration or poisoned/
-unwinding native state.
+Backlog: the Core adapterName display helper should eventually fall back to Device
+when Description/Vendor are blank. It does not block application/GPU operation;
+the frozen framework is not changed for this diagnostic display-label issue.

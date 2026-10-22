@@ -135,9 +135,14 @@ func run(out map[string]any) (err error) {
 		return errors.New("incomplete headless GPU pair")
 	}
 	out["backend"] = int(gp.Properties.BackendType)
-	out["device"] = gp.DeviceName
+	out["device"] = gp.Properties.Device
+	out["adapter_info"] = gp.Properties
+	out["device_name_source"] = "wgpu.AdapterInfo.Device"
 	if gp.Properties.BackendType != wgpu.BackendTypeMetal {
 		return errors.New("Metal backend required")
+	}
+	if gp.Properties.Device == "" {
+		return errors.New("empty adapter device name")
 	}
 	rows := []map[string]any{}
 	defer func() { out["writes"] = rows }()
