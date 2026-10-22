@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "ce78e267bd976c4454ccd5b1a5581400",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "45fe99fda6b7799bb7275c3f89d8a470c12a1ac0",
+    "branch": "codex/macos-preview"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "639911d2a4142933",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Public approval derived from the manifest's own release block",
+      "message": "The public check only validates that the release audit field is approved. It does not verify that the release metadata is the authoritative, hash-bound one, so a forged manifest with consistent hashes can self-declare approval. check-sdk's verify_archive trusts the manifest's own release block, so the approval gate is circular.",
+      "suggestion": "Treat the manifest release block as untrusted. Also require a trusted external approval (such as an expected audit status or a signed value) to be passed to verify_archive, or document that the check is only consistency-level.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "scripts/native_gpu.py",
+          "lines": {
+            "start": 241,
+            "end": 241
+          }
+        }
+      ],
+      "tags": [
+        "security",
+        "audit-bypass",
+        "location-corrected"
+      ],
+      "evidence": "if not private_build and (type(release_metadata) is not dict or release_metadata.get(\"third_party_distribution_audit\") != \"approved\" or \"component_notices\" not in record):",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4725,
+    "totalMs": 4751
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 37720,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 15538,
+        "output": 351,
+        "costUSD": 0.034586
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

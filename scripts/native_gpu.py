@@ -1,4 +1,4 @@
-"""Private, digest-pinned Mac GPU SDK overlays; provenance is caller-declared data."""
+"""Digest-pinned Mac GPU SDK overlays; provenance is caller-declared data."""
 import hashlib
 import json
 import math
@@ -140,8 +140,25 @@ def component_notice_record(record, files):
     return record
 
 
+
+def validate_component_binding(record, data):
+    """Verify the notice inventory's semantic archive binding, after member hashes."""
+    inventory = strict_json(data)
+    note = record["component_notices"]
+    if (type(inventory) is not dict or type(inventory.get("schema")) is not int or inventory["schema"] != 1
+            or inventory.get("artifact_sha256") != record["files"][LIBRARY]
+            or inventory.get("distribution_audit") != "pending"
+            or type(inventory.get("files")) is not dict or type(inventory.get("components")) is not list
+            or len(inventory["components"]) != note["components"]):
+        raise ValueError("native component inventory does not match selected archive or record")
+    expected = {COMPONENT_DIRECTORY + "/" + name: value for name, value in inventory["files"].items()}
+    expected[COMPONENT_INVENTORY] = digest(data)
+    if expected != note["files"]:
+        raise ValueError("native component inventory does not match notice record")
+
+
 def component_notices(root, artifact_sha256):
-    """Bind checked-in declarations to this exact private archive, when known."""
+    """Bind checked-in declarations to this exact archive, when known."""
     root = Path(root)
     path = root / COMPONENT_INVENTORY
     # Refuse symlinked ancestors even if a redirected final path is absent.
@@ -211,7 +228,7 @@ def overlay_modfile(name, data):
     return data + ("\n" + "\n".join(additions) + "\n").encode()
 
 
-def validate_record(record, files, private_build):
+def validate_record(record, files, private_build, release_metadata=None):
     if type(files) is not dict:
         raise ValueError("invalid native GPU SDK file map")
     capsule = {name for name in files if any(name.startswith(directory + "/") for directory in native_linkers.DIRECTORIES.values())}
@@ -219,8 +236,10 @@ def validate_record(record, files, private_build):
         if capsule:
             raise ValueError("native GPU capsule has no SDK manifest record")
         return None
-    if type(record) is not dict or type(record.get("schema")) is not int or record["schema"] != 1 or private_build is not True or record.get("target") != "darwin-arm64" or record.get("module") != MODULE or record.get("directory") != DIRECTORY or record.get("trust") != TRUST or record.get("distribution_audit") != "pending":
-        raise ValueError("invalid private native GPU manifest record")
+    if type(record) is not dict or type(record.get("schema")) is not int or record["schema"] != 1 or type(private_build) is not bool or record.get("target") != "darwin-arm64" or record.get("module") != MODULE or record.get("directory") != DIRECTORY or record.get("trust") != TRUST or record.get("distribution_audit") != ("pending" if private_build else "approved"):
+        raise ValueError("invalid native GPU manifest record")
+    if not private_build and (type(release_metadata) is not dict or release_metadata.get("third_party_distribution_audit") != "approved" or "component_notices" not in record):
+        raise ValueError("public native GPU SDK requires release audit approval and matching notices")
     hashes = record.get("files")
     owned = "owned_linkers" in record
     expected_sources = native_linkers.sources() if owned else {}
@@ -255,7 +274,7 @@ def sdk_candidate(root):
     manifest = strict_json(read_regular(manifest_path, MAX_MANIFEST_BYTES))
     if type(manifest) is not dict:
         raise ValueError("invalid native GPU SDK manifest")
-    record = validate_record(manifest.get("native_gpu"), manifest.get("files", {}), manifest.get("private_build"))
+    record = validate_record(manifest.get("native_gpu"), manifest.get("files", {}), manifest.get("private_build"), manifest.get("release"))
     if record is None and any((root / directory).exists() or (root / directory).is_symlink() for directory in native_linkers.DIRECTORIES.values()):
         raise ValueError("native GPU SDK capsule has no manifest record")
     if record is not None:

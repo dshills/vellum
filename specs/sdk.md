@@ -242,3 +242,28 @@ controls qualify the bounded test harness. This is a private consumption checkpo
 with internal reviews and no unchanged implementation Prism rerun. Physical/human
 workflows, presentation, ordinary/sustained latency, native/GPU memory, endurance,
 component/rights closure, public release and full Mac acceptance remain open.
+
+## Approved public native-library route
+
+The same three native-library options may be used with `--public` only after the
+existing release gates pass, including `third_party_distribution_audit=approved`,
+a clean committed source tree, selected namespace/license and index checks. Public
+prepared dependencies still regenerate and verify through the existing path.
+The selected archive must additionally have a component inventory and notice files
+bound to its exact SHA-256; absent or other-archive notices refuse packaging.
+
+The public manifest and generated third-party inventory record the release audit
+as approved. The copied component declarations retain their historical pending
+audit status: collecting notices does not grant distribution rights or approve a
+release. Relocated consumers and archive verification require both the public
+release approval record and the native notice record for consistency. These
+manifest fields are declarations, not signatures or independent rights approval;
+a consumer must obtain the expected archive SHA-256 through a trusted channel to
+bind checks to the intended producer artifact. The producer alone enforces the
+existing source release-audit gate. Consumers also check the
+notice inventory against the selected archive bytes. Private candidates retain
+pending status and may carry an unknown archive without matched declarations.
+
+This route changes tooling only. The repository's current release audit remains
+pending, so public packaging is still blocked. No public artifact is authorized
+or produced by this checkpoint; caller-declared provenance remains unattested.

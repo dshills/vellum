@@ -177,7 +177,16 @@ def verify_archive(path, expected_sha256=None):
             raise ValueError("invalid SDK member checksum")
         if hashes[name] != expected:
             raise ValueError(f"SDK member checksum mismatch: {name}")
-    native_gpu.validate_record(manifest.get("native_gpu"), files, manifest.get("private_build"))
+    native_gpu.validate_record(manifest.get("native_gpu"), files, manifest.get("private_build"), manifest.get("release"))
+    record = manifest.get("native_gpu")
+    if record is not None and "component_notices" in record:
+        # The inventory is a verified regular member with bounded framing. Its
+        # own archive identity must agree even in a hash-consistent SDK forgery.
+        with tarfile.open(fileobj=io.BytesIO(archive_bytes), mode="r:gz") as archive:
+            member = archive.getmember(prefix + "/" + native_gpu.COMPONENT_INVENTORY)
+            if member.size > native_gpu.MAX_COMPONENT_BYTES:
+                raise ValueError("native component inventory exceeds byte bound")
+            native_gpu.validate_component_binding(record, archive.extractfile(member).read())
     return {"archive_sha256": digest, "prefix": prefix, "manifest": manifest, "_archive_bytes": archive_bytes}
 
 

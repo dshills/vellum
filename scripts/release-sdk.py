@@ -414,8 +414,8 @@ def package(root, output, public=False, include_untracked=False, *, macos_gpu_li
     if public and include_untracked:
         raise ValueError("public SDK cannot include untracked files")
     gpu_arguments = [macos_gpu_library is not None, macos_gpu_sha256 is not None, macos_gpu_provenance is not None]
-    if any(gpu_arguments) and (public or not all(gpu_arguments)):
-        raise ValueError("native GPU candidates require all three options and a private SDK")
+    if any(gpu_arguments) and not all(gpu_arguments):
+        raise ValueError("native GPU candidates require all three options")
     gpu_record, gpu_files = native_gpu.candidate(macos_gpu_library, macos_gpu_sha256, macos_gpu_provenance) if all(gpu_arguments) else (None, {})
     if gpu_record is not None:
         component_notices = native_gpu.component_notices(root, macos_gpu_sha256)
@@ -438,6 +438,12 @@ def package(root, output, public=False, include_untracked=False, *, macos_gpu_li
     if not isinstance(version,str) or not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.-]+)?",version):
         raise ValueError("invalid release version")
     release_gates(root, metadata, public)
+    if public and gpu_record is not None:
+        if "component_notices" not in gpu_record:
+            raise ValueError("public native GPU SDK requires notices matching the exact archive")
+        # Only the existing release audit grants permission. Notice declarations
+        # remain pending; their presence alone never approves distribution.
+        gpu_record["distribution_audit"] = metadata["third_party_distribution_audit"]
     state = source_state(root)
     prefix = "vellum-" + version
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -453,7 +459,7 @@ def package(root, output, public=False, include_untracked=False, *, macos_gpu_li
             if gpu_record is not None:
                 inventory["native_gpu_candidate"] = {"artifact_sha256": gpu_record["files"][native_gpu.LIBRARY],
                     "provenance_sha256": gpu_record["files"][native_gpu.PROVENANCE],
-                    "trust": native_gpu.TRUST, "distribution_audit": "pending",
+                    "trust": native_gpu.TRUST, "distribution_audit": gpu_record["distribution_audit"],
                     "scope": "Go graph notices do not close this candidate's native/Rust/standard-library component or rights audit"}
             if gpu_record is not None and "component_notices" in gpu_record:
                 inventory["native_gpu_candidate"]["component_notices"] = gpu_record["component_notices"]
@@ -514,7 +520,7 @@ def package(root, output, public=False, include_untracked=False, *, macos_gpu_li
                             manifest["documentation_overlays"] = {"schema": 1, "scope_note": DOCUMENTATION_NOTE,
                                                                   "documents": documentation}
                         if gpu_record is not None:
-                            native_gpu.validate_record(gpu_record, checksums, True)
+                            native_gpu.validate_record(gpu_record, checksums, not public, metadata)
                             manifest["native_gpu"] = gpu_record
                         add_member(archive, prefix + "/SDK_MANIFEST.json", (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode())
                 temporary.flush()
@@ -536,8 +542,8 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--public", action="store_true", help="require the recorded public namespace and license/audit gates")
     parser.add_argument("--include-untracked", action="store_true", help="explicitly include nonignored whitelisted untracked files in a private precommit snapshot; their names are recorded")
-    parser.add_argument("--macos-gpu-library", type=Path, help="private SDK only: digest-pinned ARM64 static WGPU archive")
-    parser.add_argument("--macos-gpu-sha256", help="expected SHA-256 of the private native archive")
+    parser.add_argument("--macos-gpu-library", type=Path, help="digest-pinned ARM64 static WGPU archive; public SDK requires release audit approval and matching notices")
+    parser.add_argument("--macos-gpu-sha256", help="expected SHA-256 of the selected native archive")
     parser.add_argument("--macos-gpu-provenance", type=Path, help="bounded caller-declared JSON identifying target and exact artifact; not an attestation")
     args = parser.parse_args()
     print(json.dumps(package(ROOT, args.output.absolute(), args.public, args.include_untracked,
