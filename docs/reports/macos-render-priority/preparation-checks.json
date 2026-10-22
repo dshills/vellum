@@ -1,0 +1,31 @@
+{
+  "result": "PREPARED_NOT_RUN",
+  "candidate_binary_sha256": "f2097af2a840f0c54fa4a8d92412238cbb64e8432a94d5d278db10969de47830",
+  "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "SDK_files": 8321,
+  "Core_files": 6031,
+  "changed": [
+    "core/display_backpressure.go"
+  ],
+  "added": [
+    "core/frame_priority_darwin.go",
+    "core/frame_priority_other.go"
+  ],
+  "native_priority_tests": 2,
+  "native_cleanup_cycles": 1000,
+  "concurrent_workers": 8,
+  "concurrent_cycles_each": 25,
+  "panic_cleanup_verified": true,
+  "test_thread_requested_QoS_class": 33,
+  "candidate_premise": "Source lacks explicit worker assignment; test thread alreadyUSER_INTERACTIVE, actualcompositionworker priority deficit not established. One bounded candidate, no causal speedup claim.",
+  "common_measured_and_ordinary_owner_verified": true,
+  "initial_unrun_build": "Internal review found original hook covered only ordinary helper; common composition owner now wraps both measured and ordinary branches. Initial unrun identity/build retained.",
+  "build_admission_refusal": "First corrected build refused before creating child due relative-key vsabsolute-key pin mismatch; fixed, final v2 build passes. No native application ran.",
+  "final_native_build_seconds": 14.559905542060733,
+  "plan_sha256": "2f3ac316312409573b7e63a659c08fd68874c60a9b5e730833e2803e6dc7f943",
+  "maximum_native_live_seconds": 150,
+  "maximum_each_native_seconds": 60,
+  "features_changed": false,
+  "release_gate_changed": false,
+  "shipping_adopted": false
+}

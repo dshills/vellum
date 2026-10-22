@@ -1,0 +1,5 @@
+--- core/display_backpressure.go
++++ core/display_backpressure.go
+@@ -52,0 +53,2 @@
++	priority := beginRenderPriority()
++	defer priority.end()

@@ -522,3 +522,14 @@ No older recorded pending acquisition at the three inspected endpoints of120
 measured inputs; no compositor/pool-availability inference. Next move private
 scheduling preparation before target, final wait before dispatch, preserve the
 same actual receipt0..2ms and all unchanged gates. Scope sealed; no unchanged retry.
+
+
+A [single scoped render-priority candidate](../docs/reports/macos-render-priority/README.md)
+is prepared for one bounded session ending22October19:05:33UTC. Two native race
+methods verify scoped override retirement/owner/base-QoS and panic cleanup; final
+representative loadedgrid build and actual unauthorized-CLI refusal pass. Test
+thread already requestedUSER_INTERACTIVE, so actual worker priority deficit and
+benefit remain unproven. Only private common composition owner/helper differs;
+SDK8321/nativearchive/rendering/pacing/defaults unchanged. One serial120 case,
+only ifpassing one paced600 case;60s/process150s/overall, unchanged strict journal
+and33.3ms/60Hz criteria. No native run or shipping adoption yet; no feature/gatechange.

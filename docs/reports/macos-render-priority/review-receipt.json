@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "docs/reports/macos-render-priority/README.md,docs/reports/macos-render-priority/candidate.patch,docs/reports/macos-render-priority/evidence-index.json,docs/reports/macos-render-priority/execution-sources/bind_plan.py.txt,docs/reports/macos-render-priority/execution-sources/checks.py.txt,docs/reports/macos-render-priority/execution-sources/noauth.py.txt,docs/reports/macos-render-priority/execution-sources/prepare.py.txt,docs/reports/macos-render-priority/preparation-checks.json,specs/macos-release-assessment.md,tools/macos-render-priority/PLAN.md,tools/macos-render-priority/prepare.py,tools/macos-render-priority/run.py,tools/macos-render-priority/testdata/frame_priority_darwin.go,tools/macos-render-priority/testdata/frame_priority_other.go,tools/macos-render-priority/testdata/frame_priority_test.go,tools/macos-render-priority/testdata/priority_testhooks.go",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "4",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-render-priority/prepared/review/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-render-priority/prepared/review/prism.json"
+  ],
+  "cwd": "/Users/dshills/Development/projects/Vellum",
+  "started_utc": "2026-10-22T17:52:17.601468+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 1,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 29473,
+  "group": 29473,
+  "owned": {
+    "created": true,
+    "pid": 29473,
+    "group": 29473,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 1,
+    "errors": [],
+    "observation": {
+      "group": 29473,
+      "members": [],
+      "observation_sha256": "ac76067fd6f3a87f0297485e5029e45b529deed1f4a75bf4b23e2c2cce9a8ee2"
+    }
+  },
+  "seconds": 8.051553833065554,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}
