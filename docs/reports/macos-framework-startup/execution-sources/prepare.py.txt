@@ -1,0 +1,13 @@
+"""Offscreen binding only. No native UI execution or source rebuild."""
+from pathlib import Path
+import hashlib,importlib.util,json,sys
+sys.dont_write_bytecode=True
+X=Path(__file__).resolve().parent;A=X.parent;Q=X/'prepared';Q.mkdir();R=Path('/Users/dshills/Development/projects/Vellum');C=R/'tools/macos-calibration/startup';P=A/'macos-presentation-physical/prepared';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text())
+sys.path.insert(0,str(R/'scripts'));s=importlib.util.spec_from_file_location('startup_preparation_host',A/'macos-release-default-assessment/assessment.py');a=importlib.util.module_from_spec(s);sys.modules[s.name]=a;s.loader.exec_module(a)
+b=read(P/'build-identity.json');pins=dict(b['pins']);assert all(sha(Path(p))==h for p,h in pins.items());binary=P/'framework';assert sha(binary)==b['framework_sha256']=='6825d90efe89f75ce1361c8bf75542ff2866c2869061b5ae95405a576646466a';assert (P/'stop-live').exists() and read(P/'result.json')['outcome']=='REJECT'
+for root in [C,R/'tools/macos-calibration/presentationphase']:
+ pins.update({str(p):sha(p) for p in root.rglob('*') if p.is_file() and '__pycache__' not in p.parts})
+pins.update({str(p):sha(p) for p in [binary,P/'build-identity.json',P/'match.json',P/'linked-hook-audit.json',Path(a.__file__),Path(a.g.__file__),Path(a.c.__file__),a.LEASE,R/'scripts/child_process.py',R/'scripts/sdk_environment.py']})
+sdk=a.sdk_vector();assert sdk==read(A/'macos-release-default-assessment/plan.json')['sdk']
+plan={'binary':str(binary),'binary_sha256':sha(binary),'pins':pins,'sdk':sdk,'expected_match':read(P/'match.json'),'maximum_live_seconds':45,'per_process_seconds':20,'mode':'existing pilot; framework only; no routed inputs/native reference/phase cohort','gate_changed':False,'production_change':False,'prior_physical_capture_sealed':True};(Q/'plan.json').write_text(json.dumps(plan,indent=2)+'\n');(Q/'preparation-commit.json').write_text(json.dumps({'head':'PENDING_REVIEW_COMMIT','review_complete':False,'human_authorization':'PENDING_FRESH_QUIET_WINDOW'},indent=2)+'\n')
+checks={'result':'PREPARED_OFFSCREEN_NO_UI_RUN','binary_reused_unchanged':True,'binary_sha256':sha(binary),'compiled_pins_verified':len(b['pins']),'SDK_files_unchanged':len(sdk),'fresh_startup_plan_pins':len(pins),'no_native_UI_execution':True,'prior_scope_sealed':True,'existing_build_factory_pixels_controls':'Reused by exact compiled/source identity; no rebuild or unchanged broad campaign.','live_authorization':'Previous3minwindowconsumed. Startup-only1minuteapprovalneeded afterreviewandcommit.'};(Q/'preparation-checks.json').write_text(json.dumps(checks,indent=2)+'\n');print(json.dumps(checks))

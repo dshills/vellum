@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "4d6e1de01eaea303ab3d27388b55c6a2",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "a25ec8e322a760196591bd202479f02a102bb414",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "27b16c9dba506b56",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Cleanup in finally can fail and skip signal restoration",
+      "message": "The finally block writes stop-live and result.json and restores signal handlers sequentially. If touch() or write() raises, for example on a full disk or permission error, the signal handlers are never restored and the original error is masked. The sealing artifacts may also be left incomplete.",
+      "suggestion": "Restore signal handlers first, or put each step in its own try/finally so cleanup always completes.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "tools/macos-calibration/startup/run.py",
+          "lines": {
+            "start": 24,
+            "end": 24
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "cleanup"
+      ],
+      "evidence": "(Q/'stop-live').touch();result.update(finished_utc=datetime.datetime.now(datetime.timezone.utc).isoformat());a.write(Q/'result.json',result)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 11291,
+    "totalMs": 11318
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 26270,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 14228,
+        "output": 316,
+        "costUSD": 0.031616
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

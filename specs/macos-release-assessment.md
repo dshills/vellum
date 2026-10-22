@@ -457,3 +457,12 @@ and a matched latency comparison remain unverified. The attempt is sealed and
 desktop free. A separate startup-only check is the next direct unresolved test;
 none is authorized or executed here. Features/defaults/SDK/app and33.3ms release
 gate unchanged; M3–M7 open. Actual rejection receives review and commit.
+
+
+The [startup-only preparation](../docs/reports/macos-framework-startup/README.md)
+reuses the corrected framework's existing pilot mode, original setup validator,
+pending replay and owned Host, independently of native phase matching. One20s
+process/45s total, no rebuild or routed cohort. Eight focused methods/23negative
+subcases plus actual unauthorized-CLI refusal pass; source/compiled/SDK pins verify.
+No UI has run and no release gate closes. Fresh up-to1minute quiet approval is
+needed; features/defaults/SDK/app and33.3ms/60Hz gate unchanged, M3–M7 open.

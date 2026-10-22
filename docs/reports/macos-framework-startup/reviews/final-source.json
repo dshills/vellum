@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "1db8a59f83c5e1265e1b9b993dd21b09",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "a25ec8e322a760196591bd202479f02a102bb414",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "e0f4774dfb407780",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Precondition failures bypass result sealing",
+      "message": "The authorization/freshness gates and the checkpoint, SDK and pin checks run before the try/finally. If any of them raises (for example a pin mismatch, a dirty tree, or a missing plan.json), the script exits with a traceback. No result.json is written and no stop-live seal is created, which contradicts the 'seal on failure' design that the tests exercise only for failures inside the try block.",
+      "suggestion": "Move the validation steps inside the try block (or wrap them in one), so that REJECT results are always recorded and sealed. Take care not to overwrite an existing started.json or seal from a previous run.",
+      "confidence": 0.8,
+      "locations": [
+        {
+          "path": "tools/macos-calibration/startup/run.py",
+          "lines": {
+            "start": 11,
+            "end": 11
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "robustness",
+        "location-corrected"
+      ],
+      "evidence": "a.need(args.run_authorized and not (Q/'started.json').exists() and not (Q/'stop-live').exists(),'startup authorization/fresh scope')",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "2fdcdd2674f2e858",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Cleanup failure can mask result",
+      "message": "Only Exception is caught. The signal handlers merely set a stop flag, so KeyboardInterrupt is not raised in the normal flow. However, SystemExit or other BaseException leaves outcome as 'INCOMPLETE'. Separately, `a.need` uses assertion-style errors, and a failure inside the finally block (such as a write error) masks the original error and skips the final print.",
+      "suggestion": "In the finally block, protect each cleanup step (touch, write) so that the original error and the printed outcome are preserved. Alternatively, catch BaseException to record the outcome.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "tools/macos-calibration/startup/run.py",
+          "lines": {
+            "start": 22,
+            "end": 22
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "location-corrected"
+      ],
+      "evidence": "except Exception as error:result.update(outcome='REJECT',error={'type':type(error).__name__,'message':str(error)})",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6885,
+    "totalMs": 6898
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 2,
+    "bytes": 7290,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5428,
+        "output": 713,
+        "costUSD": 0.017986
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

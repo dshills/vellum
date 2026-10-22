@@ -1,0 +1,140 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "ce4ffe0687a341809f3ee6e353c35d58",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "a25ec8e322a760196591bd202479f02a102bb414",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "4d1091e5a6531d9a",
+      "severity": "medium",
+      "category": "bug",
+      "title": "host.finish skipped on exceptions",
+      "message": "The control resets nothing and raises on the first failure, but `host.finish()` is only called on the success path. If `host.command` or `host.probes` raises, the host is never finished or cleaned up; the surrounding lease exits but owned process or deadline state may be left unreleased.",
+      "suggestion": "Wrap the body in try/finally and call host.finish() in the finally block.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "tools/macos-calibration/startup/control.py",
+          "lines": {
+            "start": 5,
+            "end": 14
+          }
+        }
+      ],
+      "tags": [
+        "resource-cleanup"
+      ],
+      "evidence": " if not passed(result['native']) or result['native']['logs']['stderr']['bytes']:raise ValueError('startup command failure')",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "196d42bdfba8fc6c",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Rejected run exits with status 0",
+      "message": "The process always exits 0, even when outcome is REJECT. Callers and wrappers checking the exit code cannot detect a startup failure. Also, the earlier authorization failure raises before the try, giving exit 1, which is inconsistent.",
+      "suggestion": "After printing, call sys.exit(0 if result['outcome'].startswith('VALID') else 1).",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "tools/macos-calibration/startup/run.py",
+          "lines": {
+            "start": 26,
+            "end": 26
+          }
+        }
+      ],
+      "tags": [
+        "exit-code"
+      ],
+      "evidence": "print(json.dumps({k:result[k] for k in ['outcome','error'] if k in result}),flush=True)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7734,
+    "totalMs": 7778
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 14,
+    "bytes": 37235,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 18901,
+        "output": 828,
+        "costUSD": 0.046082
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "cddcf59533d79dd8",
+        "severity": "medium",
+        "category": "security",
+        "title": "Hardcoded absolute user path",
+        "message": "Hardcoded absolute developer-home paths make the committed evidence scripts unusable elsewhere and leak the local username/layout. Also, prepare.py's Q.mkdir() has no exist_ok, so reruns fail.",
+        "suggestion": "Derive the repo root from the script location or take it as an argument/environment variable.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "docs/reports/macos-framework-startup/execution-sources/checks.py.txt",
+            "lines": {
+              "start": 4,
+              "end": 5
+            }
+          }
+        ],
+        "tags": [
+          "portability"
+        ],
+        "evidence": "X=Path(__file__).resolve().parent;A=X.parent;Q=X/'prepared';R=Path('/Users/dshills/Development/projects/Vellum')",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/macos-framework-startup/execution-sources/checks.py.txt"
+    }
+  ],
+  "suppressed": []
+}

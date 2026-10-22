@@ -1,0 +1,41 @@
+{
+  "result": "PREPARATION_REVIEW_COMPLETE",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "coverage": [
+    {
+      "path": "reviews/initial.json",
+      "sha256": "e949ee8257d2d22cebd0ff83f84f33bab8a818aa4ceba0e5273fe564c3535997",
+      "complete": true,
+      "files": 14
+    },
+    {
+      "path": "reviews/followup.json",
+      "sha256": "78d26b7637e9742cd44a80d753bdef507af105588ff71c581de33092a3c610af",
+      "complete": true,
+      "files": 10
+    },
+    {
+      "path": "reviews/final-source.json",
+      "sha256": "64701b8d68dfa9d438b44b789c8a8bf138ed9f999105c6a69933b9988be54622",
+      "complete": true,
+      "files": 2
+    }
+  ],
+  "fixed_findings": 2,
+  "source_dispositioned_findings": 3,
+  "discarded_finding_inspected": 1,
+  "unresolved_actionable_findings": 0,
+  "dispositions_sha256": "cf6fa27722680dc2ebc40122b524ebb57bed14ae0a1d29b06d18cfeaa724e196",
+  "focused_methods": 8,
+  "negative_subcases": 23,
+  "actual_no_auth_control": true,
+  "actual_runner_fake_Host_controls": 2,
+  "native_UI_execution": false,
+  "archive_members_locally_verified": 37,
+  "archive_provider_reviewed": false,
+  "features_changed": false,
+  "release_gate_changed": false,
+  "startup_acceptance_closed": false,
+  "live_authorization": "Fresh up-to1minute quietwindow pending; prior3minutescope consumed."
+}

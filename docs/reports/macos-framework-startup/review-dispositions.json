@@ -1,0 +1,26 @@
+{
+  "4d1091e5a6531d9a": {
+    "status": "refuted_by_existing_ownership",
+    "basis": "Existing assessment.Host.finish lines92-93 asserts lease/source/SDK integrity only. Its command delegates to g.execute whose outer finally always retires/reaps owned children; run.py owns LiveLease with-context. No child/lease ownership is introduced in control.py. Calling integrity assertion in finally would not supply cleanup and can obscure original drift/stop error."
+  },
+  "196d42bdfba8fc6c": {
+    "status": "fixed",
+    "basis": "Exact VALID outcome returns0; REJECT returns1. Actual run.py executed with scalar fake Host proves rejection exit1 and stop/result sealing, without UI."
+  },
+  "27b16c9dba506b56": {
+    "status": "fixed",
+    "basis": "Signal handlers restore before stop/result I/O. Actual run.py with simulated final write OSError verifies both SIGINT/SIGTERM handlers restored, started/stop guards present and no UI process."
+  },
+  "e0f4774dfb407780": {
+    "status": "refuted_by_admission_contract",
+    "basis": "Authorization/freshness/checkpoint/SDK/compiled-pin admission precedes attempt start and process ownership. Refusal must not create or overwrite capture evidence. Actual unauthorized CLI control proves exit1 with no started/stop/native/match artifacts. Once admitted, started.json is written before the live lease/Host command; all subsequent paths have finally sealing. Original source and test assertions are explicit."
+  },
+  "2fdcdd2674f2e858": {
+    "status": "source_backed_fail_closed_limit",
+    "basis": "A BaseException keeps outcome INCOMPLETE, never VALID; Python propagates nonzero exit after finally sealing and restored handlers. Ordinary installed signal handlers use a stop flag, and the existing executor reaps on cancellation. Simulated result-write failure propagates OSError/nonzero after restored handlers and stop marker; it cannot claim success or admit a retry. started.json alone also refuses reuse. Durable result/console reporting cannot be guaranteed on unavailable storage; raw parent command logs remain the failure evidence. No required startup/ownership acceptance is waived."
+  },
+  "cddcf59533d79dd8": {
+    "status": "source_backed_archival_scope",
+    "basis": "Absolute developer paths are disclosed private build provenance, not public APIs or portable SDK dependencies. Fresh output mkdir refusal deliberately preserves failed prefixes and prevents overwrite/retry."
+  }
+}
