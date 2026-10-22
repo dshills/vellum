@@ -1,0 +1,114 @@
+{
+  "archive_sha256": "10ac5055b9daa080071d004be6305e74c843f82f192f040bfb37f40f10628057",
+  "files_scope": "Every key names a regular relative archive member.",
+  "files": {
+    "actual-no-authorization-final-receipt.json": {
+      "bytes": 2203,
+      "sha256": "2a9b9fcc04ae69bf0d3f2830e0c1c94d22e0802ba8fdae06bcaddba6c2488a17"
+    },
+    "actual-no-authorization-final/owned.json": {
+      "bytes": 532,
+      "sha256": "763c14a22a3a239800c5e3040ed17880cfdbb36617be758e44a632e7864057c2"
+    },
+    "actual-no-authorization-final/stderr": {
+      "bytes": 686,
+      "sha256": "161bb3b856de43a5d78b86b1f36876768aa21d90aa4b39aae8d28759a1968405"
+    },
+    "actual-no-authorization-final/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "actual-no-authorization-receipt.json": {
+      "bytes": 2203,
+      "sha256": "4c02375e04f6cb5d056c91edd1c6469a4bd95e9342d2f4935d33ce0d44633f36"
+    },
+    "actual-no-authorization/owned.json": {
+      "bytes": 532,
+      "sha256": "36396d66a352daf0e7b5f793f980063cb7686874ee66ad2e711b14d30c6a6b45"
+    },
+    "actual-no-authorization/stderr": {
+      "bytes": 686,
+      "sha256": "161bb3b856de43a5d78b86b1f36876768aa21d90aa4b39aae8d28759a1968405"
+    },
+    "actual-no-authorization/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "checks.py": {
+      "bytes": 1788,
+      "sha256": "557ccea5646dca1077723b8715969961eab6397b55256c29a20487eaad43d2e1"
+    },
+    "focused-tests-final-receipt.json": {
+      "bytes": 2034,
+      "sha256": "d6924ed5159ebce4b4a1bfa9a0979e6b00929ccae127a69366b3306f9d0f4d20"
+    },
+    "focused-tests-final/owned.json": {
+      "bytes": 361,
+      "sha256": "6347480ec56d9a27f080bb78c185f7e8c6d4d4be74a8c0fcb6f95b7c25ab1561"
+    },
+    "focused-tests-final/stderr": {
+      "bytes": 380,
+      "sha256": "cb9993f76aa03167a4a8ac3910126d1cea24c8b39b9140b833237b60dc29fd55"
+    },
+    "focused-tests-final/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "focused-tests-receipt.json": {
+      "bytes": 2034,
+      "sha256": "ccfe020b2add2684a056002d58c8f43fcbfa10fb778ea666a3595cfde8a2b8af"
+    },
+    "focused-tests/owned.json": {
+      "bytes": 361,
+      "sha256": "64a2157d394c94ef69151f0ab1462895205a6ab42d70236a6e659948332f6942"
+    },
+    "focused-tests/stderr": {
+      "bytes": 380,
+      "sha256": "cb9993f76aa03167a4a8ac3910126d1cea24c8b39b9140b833237b60dc29fd55"
+    },
+    "focused-tests/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "offscreen-checks.json": {
+      "bytes": 1069,
+      "sha256": "dc4861bb10d7e33062cdd36c9191564822aeb25edf39d9fe89ea7744b98ac3b0"
+    },
+    "preparation-checks.json": {
+      "bytes": 987,
+      "sha256": "903b378a33ec12d900db8272562f320662d047155b467cf674422fefa5b8774c"
+    },
+    "prepare.py": {
+      "bytes": 3100,
+      "sha256": "408fe622a32f17f6ad68e9dcbccd81fb2526ad43eb54df37fa256bbde0dbf5d6"
+    },
+    "verify.py": {
+      "bytes": 2251,
+      "sha256": "5181c65ccc0e162228314a1d2f8eae928174b9b9eb73d76825d875a28c297aec"
+    }
+  },
+  "committed_copies": {
+    "prepare.py": {
+      "path": "execution-sources/prepare.py.txt",
+      "sha256": "408fe622a32f17f6ad68e9dcbccd81fb2526ad43eb54df37fa256bbde0dbf5d6"
+    },
+    "checks.py": {
+      "path": "execution-sources/checks.py.txt",
+      "sha256": "557ccea5646dca1077723b8715969961eab6397b55256c29a20487eaad43d2e1"
+    },
+    "verify.py": {
+      "path": "execution-sources/verify.py.txt",
+      "sha256": "5181c65ccc0e162228314a1d2f8eae928174b9b9eb73d76825d875a28c297aec"
+    },
+    "preparation-checks.json": {
+      "path": "preparation-checks.json",
+      "sha256": "903b378a33ec12d900db8272562f320662d047155b467cf674422fefa5b8774c"
+    },
+    "offscreen-checks.json": {
+      "path": "offscreen-checks.json",
+      "sha256": "dc4861bb10d7e33062cdd36c9191564822aeb25edf39d9fe89ea7744b98ac3b0"
+    }
+  },
+  "excluded": "Executables, fullSDK/Core/nativearchive/toolchain/cache and prior sealed captures. Existingsource/build proofs reused; full freshplan stays local withhashrecorded.",
+  "publication": "Localonly; no publicpush."
+}

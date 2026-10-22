@@ -1,0 +1,11 @@
+from pathlib import Path
+import hashlib,importlib.util,json,sys
+sys.dont_write_bytecode=True
+X=Path(__file__).resolve().parent;A=X.parent;Q=X/'prepared';R=Path('/Users/dshills/Development/projects/Vellum');C=R/'tools/macos-calibration/frameworkpending';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();sys.path.insert(0,str(R/'scripts'));sys.path.insert(0,str(A/'macos-grid-capture-repair/preflight-v2'));s=importlib.util.spec_from_file_location('pending_owned',A/'macos-sdk-native-238b3b6/run.py');g=importlib.util.module_from_spec(s);sys.modules[s.name]=g;s.loader.exec_module(g)
+pins={str(p):sha(p) for p in C.rglob('*') if p.is_file()};base=['/usr/bin/sandbox-exec','-p','(version 1)(allow default)(deny network*)'];case=sys.argv[1];name=case+'-final'
+if case=='focused-tests':argv=base+['/usr/bin/env','python3','-B','-m','unittest','discover','-p','*_test.py','-v'];expected=0;cwd=C
+elif case=='actual-no-authorization':argv=base+['/usr/bin/env','python3','-B',str(C/'run.py'),'--artifacts',str(Q),'--reuse',str(A)];expected=1;cwd=R
+else:raise ValueError(name)
+run=g.execute(argv,cwd,Q/name,lambda:False,lambda:all(sha(Path(p))==h for p,h in pins.items()),timeout=20,limit=1<<20);(Q/(name+'-receipt.json')).write_text(json.dumps({'pins':pins,'run':run},indent=2)+'\n');assert run['exit_code']==expected and run['error'] is None and run['owned']['terminal'] and run['owned']['group_absent'] and run['logs_complete'] and run['pins_stable'] and not run['observation_errors']
+if case=='actual-no-authorization':assert 'pending authorization/fresh scope' in (Q/name/'stderr').read_text();assert not any((Q/n).exists() for n in ['started.json','stop-live','native'])
+print(json.dumps({'name':name,'exit_code':run['exit_code'],'seconds':run['seconds'],'owned_group_retired':True}))

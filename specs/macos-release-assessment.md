@@ -478,3 +478,14 @@ no phase pair, cadence, latency or release qualification follows. Earlier scopes
 stay rejected/sealed; no unchanged retry or feature/gate/default/SDK/app change.
 Next measure corrected-framework input/presentation/pending state under a separate
 reviewed scope and fresh quiet approval. M3–M7 remain open.
+
+
+The [corrected-framework cohort preparation](../docs/reports/macos-framework-pending/README.md)
+reuses startup-qualified binary6825d90e for its first timed cohort independently
+of the failed native-reference phase pair. Originalstrict128warm/120measured,
+phase/backend/clock/receipt/drawable/callback constraints remain unchanged, with
+40s process/60s overall caps andfail-firstsealing. Twofocusedrouting methods/
+7negativecases andactualunauthorizedCLIrefusalpass, allcompiled/SDK8321pinsverify.
+No UI or rebuild yet; ownerauthorizedscreenforremainingreleasetests. Review/commit
+preparationthenactualresult. No nativecomparison, representativequalification or
+feature/default/SDK/app/33.3ms/60Hz gatechange; M3–M7 open.
