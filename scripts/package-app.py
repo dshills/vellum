@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Package a prebuilt private app without research prototypes, publishing or notarization."""
+"""Package a prebuilt app; public Mac candidates require audit approval and notices."""
 import argparse
+import importlib.util
 import hashlib
 import gzip
 import json
@@ -30,6 +31,20 @@ from child_process import run_child, check_child_output
 from sdk_environment import child_environment
 
 NATIVE_TOOL_TIMEOUT_SECONDS = 60
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def load_release_policy():
+    path = Path(__file__).with_name("release-sdk.py")
+    if path.is_symlink() or not path.is_file():
+        raise ValueError("public app packaging requires its release policy script")
+    spec = importlib.util.spec_from_file_location("vellum_app_release_policy", path)
+    if spec is None or spec.loader is None:
+        raise ValueError("public app release policy loader is unavailable")
+    policy = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(policy)
+    return policy
 
 
 def valid_name(value):
@@ -142,11 +157,39 @@ def verify_app(stage, name, binary_sha256, manifest_bytes, notice_record):
         app_notices.verify(resources/app_notices.DIRECTORY, notice_record["artifact_sha256"], notice_record)
 
 
-def package(binary, output, name, identifier, version, target, identity=None, build_version="1", notice_bundle=None):
+def package(binary, output, name, identifier, version, target, identity=None, build_version="1", notice_bundle=None, *, public=False):
+    if type(public) is not bool:
+        raise ValueError("public mode must be boolean")
+    if public and target != "darwin":
+        raise ValueError("public app packaging is implemented only for macOS")
+    if public and notice_bundle is None:
+        raise ValueError("public app packaging requires explicit binary-bound notices")
     if notice_bundle is not None and target != "darwin":
         raise ValueError("app notice bundles are implemented only for macOS")
     validate(binary,name,identifier,version,target,identity,build_version)
-    sdk_release = json.loads((Path(__file__).resolve().parents[1]/"release/version.json").read_text())["version"]
+    metadata_bytes = (ROOT / "release/version.json").read_bytes()
+    metadata = json.loads(metadata_bytes)
+    release_policy = load_release_policy() if public else None
+    if public:
+        checkout = Path(release_policy.git_output(ROOT, ["rev-parse", "--show-toplevel"], text=True).strip()).resolve()
+        if checkout != ROOT.resolve():
+            raise ValueError("public app packaging requires its source checkout root")
+        release_source = release_policy.source_state(ROOT)
+        release_policy.release_gates(ROOT, metadata, True)
+        if release_policy.source_state(ROOT) != release_source:
+            raise ValueError("public app release source changed during authorization")
+    else:
+        release_source = None
+    def recheck_authorization():
+        if not public:
+            return
+        if (ROOT / "release/version.json").read_bytes() != metadata_bytes:
+            raise ValueError("public app release metadata changed during packaging")
+        release_policy.release_gates(ROOT, metadata, True)
+        if release_policy.source_state(ROOT) != release_source:
+            raise ValueError("public app release source changed during packaging")
+    sdk_release = metadata["version"]
+    audit = "approved" if public else "pending"
     if output.exists() or output.is_symlink():
         raise ValueError("app output already exists")
     if target == "darwin":
@@ -163,7 +206,13 @@ def package(binary, output, name, identifier, version, target, identity=None, bu
         validate(executable,name,identifier,version,target,identity,build_version)
         if target == "darwin":
             darwin_dependencies(executable)
-        manifest = {"schema":1,"name":name,"identifier":identifier,"version":version,"build_version":build_version,"sdk_release":sdk_release,"target":target,"source_binary_sha256":binary_digest(executable),"private_build":True,"signed_identity":identity,"notarized":False,"native_distribution_audit":"pending","target_runtime":"unverified"}
+        manifest = {"schema":1,"name":name,"identifier":identifier,"version":version,"build_version":build_version,"sdk_release":sdk_release,"target":target,"source_binary_sha256":binary_digest(executable),"private_build":not public,"signed_identity":identity,"notarized":False,"native_distribution_audit":audit,"target_runtime":"unverified"}
+        if public:
+            manifest["release_authorization"] = {
+                "metadata_sha256": hashlib.sha256(metadata_bytes).hexdigest(),
+                "source": release_source,
+                "scope": "producer release-audit declaration; not independent binary-source attestation",
+            }
         if target=="darwin":
             resources = stage/"Contents/Resources"
             resources.mkdir()
@@ -181,6 +230,9 @@ def package(binary, output, name, identifier, version, target, identity=None, bu
                 run_child(["codesign","--verify","--strict",str(stage)],check=True, env=child_environment(), timeout=NATIVE_TOOL_TIMEOUT_SECONDS)
             packaged_sha256 = binary_digest(executable) if identity is not None else manifest["source_binary_sha256"]
             verify_app(stage, name, packaged_sha256, manifest_bytes, notice_record)
+            # Recheck public authorization before output reservation. This remains
+            # sampled local provenance, not protection against transient reversal.
+            recheck_authorization()
             # Exclusive reservation; sampled identity guards preserve replacements.
             output.mkdir()
             owned = output.lstat()
@@ -203,6 +255,7 @@ def package(binary, output, name, identifier, version, target, identity=None, bu
                 if identity is not None:
                     run_child(["codesign","--verify","--strict",str(output)],check=True, env=child_environment(), timeout=NATIVE_TOOL_TIMEOUT_SECONDS)
                 verify_app(output, name, packaged_sha256, manifest_bytes, notice_record)
+                recheck_authorization()
                 require_owned()
             except BaseException:
                 if still_owned():
@@ -215,7 +268,7 @@ def package(binary, output, name, identifier, version, target, identity=None, bu
             application_archive(stage, artifact, name, target)
             artifact.chmod(0o644)
             publish_exclusive(artifact,output)
-    result = {"output":str(output),"private_build":True,"target":target,"signed":identity is not None,"notarized":False,"native_distribution_audit":"pending"}
+    result = {"output":str(output),"private_build":not public,"target":target,"signed":identity is not None,"notarized":False,"native_distribution_audit":audit}
     if target == "darwin":
         result["packaged_binary_sha256"] = packaged_sha256
     return result
@@ -231,9 +284,10 @@ def main():
     parser.add_argument("--build-version",default="1",help="numeric bundle build version (one to three components); increment for distribution")
     parser.add_argument("--platform",dest="target",choices=["darwin","windows","linux"],default=platform.system().lower())
     parser.add_argument("--notice-bundle",type=Path,help="explicit binary-bound original notice bundle for a macOS app; rights review remains pending")
+    parser.add_argument("--public",action="store_true",help="require existing source release-audit gates and binary-bound notices; does not publish or notarize")
     parser.add_argument("--sign-identity",help="explicit macOS code-signing identity; '-' requests ad-hoc signing")
     args=parser.parse_args()
-    print(json.dumps(package(args.binary.absolute(),args.output.absolute(),args.name,args.identifier,args.version,args.target,args.sign_identity,args.build_version,args.notice_bundle),indent=2))
+    print(json.dumps(package(args.binary.absolute(),args.output.absolute(),args.name,args.identifier,args.version,args.target,args.sign_identity,args.build_version,args.notice_bundle,public=args.public),indent=2))
 
 
 if __name__=="__main__":main()

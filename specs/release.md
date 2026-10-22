@@ -612,10 +612,12 @@ separate release gates.
 ### Explicit private GPU SDK overlays
 
 Private `release-sdk.py` builds may carry a digest-pinned ARM64 static WGPU
-candidate and separately hashed caller-declared provenance. All-or-none input
-validation and a hard public-release refusal precede inventory and output work.
-The bounded archive/header checks, four-file capsule, derived module hashes,
-absolute generated-application replacement and strict relocated Go origin follow
+candidate and separately hashed caller-declared provenance. All three native
+options are required together. Public packaging additionally requires the existing
+approved release audit and component notices bound to that exact archive; current
+pending audit metadata still refuses public output. The bounded archive/header
+checks, owned compatibility modules, derived module hashes, generated-application
+replacements and strict relocated Go origin follow
 [sdk.md](sdk.md#private-arm64-mac-gpu-candidate). Default SDK packaging does not
 select an ignored capsule. The private manifest retains pending audit status;
 matching library bytes, module origin and copied Go notices do not establish
@@ -626,3 +628,50 @@ closure. Observed build/linkage and admitted native qualification remain require
 ## Owned embedded-asset declaration candidates
 
 Inventory the mandatory root LICENSE and conventional named notices in ancestor directories of actual Go-selected embedded assets for owned/Main modules. Bound and sort discovery, deduplicate module/file identities, refuse redirected/nonregular inputs, exclude unrelated sibling trees, and recheck bytes and discovery at the final snapshot. Expose those original hashes through framework_declarations and asset nearby_notice_candidates. This is candidate discovery, not legal applicability or distribution approval. App packaging continues to transport the explicit executable-bound notice bundle supplied by its caller.
+
+## Audited macOS app candidates
+
+`scripts/package-app.py` remains private by default. Its explicit `--public` mode
+is implemented only for macOS and requires an executable-bound notice bundle plus
+the existing SDK release gates: selected namespace/license, matching root module,
+clean committed source, no hidden index flags and approved third-party distribution
+audit. It must run from its source checkout root, not a copied SDK inside another
+repository. The real audit remains pending; this tooling change approves nothing.
+
+Public app manifests record private_build=false and the release audit approval,
+with a hash of the release metadata and sampled source identity under
+release_authorization. Copied notice inventories retain pending/review-required
+status as historical declaration collection; notice presence never grants approval.
+The source binary hash must match the explicit notice inventory even after staging.
+Existing byte/membership checks, native dependency closure refusal, signed-output
+binding and final bundle validation remain in force. Public source/metadata gates
+are checked again before output reservation and after final bundle verification;
+changed authorization refuses and retires only an owned partial output. Policy
+loading and Git checks occur only in public mode; private non-Git SDK copies do
+not load the policy module. Source identity is also compared across the initial
+gate calls. These checks remain sampled, rather than atomic with
+respect to source changes or transient reversals.
+
+These are local producer declarations and consistency checks, not independent
+binary-source attestation or legal applicability certification. Use a trusted final
+artifact hash to identify the intended release. The switch does not upload,
+publish, sign, notarize or qualify runtime behavior. Signing remains an explicit
+separate option, notarized remains false, and owner publication approval is still
+required for the exact final assets. Default private and other-platform packaging
+behavior is unchanged. The stale test-only alpha.2 expectation now follows recorded
+release metadata, so future coordinated version changes do not invalidate that
+packaging transport check.
+
+The Python interpreter, repository release scripts and imported local helpers are
+trusted executable inputs. Release checks prevent accidental output from pending
+or changed authorization; they do not sandbox or authenticate a maliciously
+modified producer or compromised host. Hashing one helper with another untrusted
+local helper would not establish that separate trust boundary. Owner review of
+the intended source and final artifact hashes remains the publication decision.
+
+Local app output is reserved and populated nonatomically. A directory appearing
+at the destination is not success or publication. Consumers must wait for the
+producer's successful return and validate the returned/manifest hashes; directory
+watchers are not a release handoff. A later source change or transient reversal
+cannot be atomically excluded by these filesystem/Git samples. Distribution of
+the resulting artifacts is a separate owner-authorized action.

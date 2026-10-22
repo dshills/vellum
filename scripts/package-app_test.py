@@ -13,6 +13,7 @@ import unittest
 from unittest import mock
 import zipfile
 spec=importlib.util.spec_from_file_location("package_app",Path(__file__).with_name("package-app.py"));app=importlib.util.module_from_spec(spec);spec.loader.exec_module(app)
+policy=app.load_release_policy()
 class AppChecks(unittest.TestCase):
  def test_windows_and_linux_layouts(self):
   for target,magic in [("windows",b"MZ\x00\x00"),("linux",b"\x7fELF")]:
@@ -34,7 +35,7 @@ class AppChecks(unittest.TestCase):
    app.package(binary,out,"Test","org.example.test","0.1.0","darwin")
    self.assertTrue((out/"Contents/Info.plist").is_file());self.assertTrue((out/"Contents/MacOS/Test").is_file());execute.assert_not_called()
    info=plistlib.loads((out/"Contents/Info.plist").read_bytes());self.assertEqual(info["CFBundleShortVersionString"],"0.1.0");self.assertEqual(info["CFBundleVersion"],"1")
-   manifest=json.loads((out/"Contents/Resources/APP_MANIFEST.json").read_text());self.assertEqual(manifest["sdk_release"],"v0.1.0-alpha.2");self.assertEqual(manifest["build_version"],"1")
+   manifest=json.loads((out/"Contents/Resources/APP_MANIFEST.json").read_text());self.assertEqual(manifest["sdk_release"],json.loads((app.ROOT/"release/version.json").read_text())["version"]);self.assertEqual(manifest["build_version"],"1")
  def test_bundle_versions_are_distinct_and_numeric(self):
   with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"),mock.patch.object(app,"run_child"):
    root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture")
@@ -251,4 +252,70 @@ class AppChecks(unittest.TestCase):
    with mock.patch.object(Path,"lstat",new=fail_ownership_capture),self.assertRaisesRegex(PermissionError,"identity acquisition failed"):app.package(binary,out,"Test","org.example.test","0.1.0","darwin",notice_bundle=source)
    self.assertTrue(out.is_dir());self.assertEqual(list(out.iterdir()),[]);self.assertEqual(binary.read_bytes(),body);self.assertFalse(list(root.glob(".vellum-app-*")))
    with self.assertRaisesRegex(ValueError,"exists"):app.package(binary,out,"Test","org.example.test","0.1.0","darwin",notice_bundle=source)
+ def public_source(self, root, audit="approved"):
+  checkout=root/"checkout";(checkout/"release").mkdir(parents=True)
+  metadata={"version":"v9.8.7-preview.2","module":"github.com/dshills/vellum","namespace_status":"selected","license_status":"selected","third_party_distribution_audit":audit}
+  (checkout/"release/version.json").write_text(json.dumps(metadata));(checkout/"LICENSE").write_text("fixture license")
+  (checkout/"go.mod").write_text("module github.com/dshills/vellum\n")
+  return checkout,metadata
+ def test_public_requires_both_release_approval_and_binary_bound_notices(self):
+  with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"):
+   root=Path(tmp);checkout,metadata=self.public_source(root,"pending");binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");notes=self.notice_bundle(root,binary);out=root/"Public.app"
+   state={"commit":"a"*40,"clean":True}
+   with mock.patch.object(app,"load_release_policy",return_value=policy),mock.patch.object(app,"ROOT",checkout),mock.patch.object(policy,"source_state",return_value=state),mock.patch.object(policy,"hidden_index_paths",return_value=[]),mock.patch.object(policy,"git_output",return_value=str(checkout)):
+    with self.assertRaisesRegex(ValueError,"binary-bound notices"):app.package(binary,out,"Public","org.example.public","0.1.0","darwin",public=True)
+    with self.assertRaisesRegex(ValueError,"audit is incomplete"):app.package(binary,out,"Public","org.example.public","0.1.0","darwin",notice_bundle=notes,public=True)
+    self.assertFalse(out.exists())
+    metadata["third_party_distribution_audit"]="approved";(checkout/"release/version.json").write_text(json.dumps(metadata))
+    inventory=json.loads((notes/"INVENTORY.json").read_text());inventory["artifact_sha256"]="b"*64;(notes/"INVENTORY.json").write_text(json.dumps(inventory))
+    with self.assertRaisesRegex(ValueError,"binding"):app.package(binary,out,"Public","org.example.public","0.1.0","darwin",notice_bundle=notes,public=True)
+    self.assertFalse(out.exists())
+    inventory["artifact_sha256"]=hashlib.sha256(binary.read_bytes()).hexdigest();(notes/"INVENTORY.json").write_text(json.dumps(inventory))
+    result=app.package(binary,out,"Public","org.example.public","0.1.0","darwin",notice_bundle=notes,public=True)
+   manifest=json.loads((out/"Contents/Resources/APP_MANIFEST.json").read_text())
+   self.assertFalse(result["private_build"]);self.assertEqual(result["native_distribution_audit"],"approved");self.assertFalse(result["notarized"])
+   self.assertEqual(manifest["sdk_release"],metadata["version"]);self.assertEqual(manifest["release_authorization"]["source"],state)
+   self.assertEqual(manifest["release_authorization"]["metadata_sha256"],hashlib.sha256((checkout/"release/version.json").read_bytes()).hexdigest())
+   self.assertEqual(manifest["component_notices"]["distribution_audit"],"pending","declaration collection must not approve itself")
+ def test_public_keeps_source_index_and_publication_rechecks(self):
+  for case in ["dirty","index","wrong-checkout","metadata-changed","source-changed"]:
+   with self.subTest(case=case),tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"):
+    root=Path(tmp);checkout,metadata=self.public_source(root);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");notes=self.notice_bundle(root,binary);out=root/"Public.app";changed=False;original=app.normalize_layout
+    def state(path):return {"commit":("b" if changed and case=="source-changed" else "a")*40,"clean":case!="dirty"}
+    def normalize(stage):
+     nonlocal changed
+     original(stage);changed=True
+     if case=="metadata-changed":
+      metadata["third_party_distribution_audit"]="pending";(checkout/"release/version.json").write_text(json.dumps(metadata))
+    top=root if case=="wrong-checkout" else checkout
+    with mock.patch.object(app,"load_release_policy",return_value=policy),mock.patch.object(app,"ROOT",checkout),mock.patch.object(policy,"source_state",side_effect=state),mock.patch.object(policy,"hidden_index_paths",return_value=["hidden"] if case=="index" else []),mock.patch.object(policy,"git_output",return_value=str(top)),mock.patch.object(app,"normalize_layout",side_effect=normalize):
+     with self.assertRaises(ValueError):app.package(binary,out,"Public","org.example.public","0.1.0","darwin",notice_bundle=notes,public=True)
+    self.assertFalse(out.exists());self.assertTrue(binary.exists());self.assertFalse(list(root.glob(".vellum-app-*")))
+ def test_private_mode_in_non_git_copy_does_not_load_public_policy(self):
+  with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app,"load_release_policy",side_effect=AssertionError("private policy load")):
+   root=Path(tmp);checkout=root/"no-git";(checkout/"release").mkdir(parents=True);(checkout/"release/version.json").write_text('{"version":"v9.8.7"}')
+   binary=root/"binary";binary.write_bytes(b"\x7fELFfixture")
+   with mock.patch.object(app,"ROOT",checkout):result=app.package(binary,root/"out.tar.gz","App","org.example.app","0.1.0","linux")
+   self.assertTrue(result["private_build"])
+ def test_public_authorization_drift_during_output_move_removes_owned_bundle(self):
+  with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"):
+   root=Path(tmp);checkout,metadata=self.public_source(root);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");notes=self.notice_bundle(root,binary);out=root/"Public.app";actual=app.shutil.move
+   def move_and_revoke(src,dst):
+    result=actual(src,dst);metadata["third_party_distribution_audit"]="pending";(checkout/"release/version.json").write_text(json.dumps(metadata));return result
+   with mock.patch.object(app,"load_release_policy",return_value=policy),mock.patch.object(app,"ROOT",checkout),mock.patch.object(policy,"source_state",return_value={"clean":True,"commit":"a"*40}),mock.patch.object(policy,"hidden_index_paths",return_value=[]),mock.patch.object(policy,"git_output",return_value=str(checkout)),mock.patch.object(app.shutil,"move",side_effect=move_and_revoke):
+    with self.assertRaisesRegex(ValueError,"metadata changed"):app.package(binary,out,"Public","org.example.public","0.1.0","darwin",notice_bundle=notes,public=True)
+   self.assertFalse(out.exists());self.assertTrue(binary.exists());self.assertTrue((notes/"INVENTORY.json").exists())
+ def test_public_source_change_across_initial_gates_refuses(self):
+  with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"):
+   root=Path(tmp);checkout,_=self.public_source(root);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");notes=self.notice_bundle(root,binary);out=root/"Public.app"
+   a={"clean":True,"commit":"a"*40};b={"clean":True,"commit":"b"*40}
+   with mock.patch.object(app,"load_release_policy",return_value=policy),mock.patch.object(app,"ROOT",checkout),mock.patch.object(policy,"source_state",side_effect=[a,b,b]),mock.patch.object(policy,"hidden_index_paths",return_value=[]),mock.patch.object(policy,"git_output",return_value=str(checkout)):
+    with self.assertRaisesRegex(ValueError,"during authorization"):app.package(binary,out,"Public","org.example.public","0.1.0","darwin",notice_bundle=notes,public=True)
+   self.assertFalse(out.exists())
+ def test_public_mode_does_not_expand_other_platform_support(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\x7fELFfixture")
+   with self.assertRaisesRegex(ValueError,"only for macOS"):app.package(binary,root/"out","App","org.example.app","0.1.0","linux",public=True)
+   self.assertFalse((root/"out").exists())
+
 if __name__=="__main__":unittest.main()
