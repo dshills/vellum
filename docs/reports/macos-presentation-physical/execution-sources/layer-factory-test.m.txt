@@ -1,0 +1,17 @@
+#import "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-physical/prepared/private-core/system/driver/desktop/presentation_darwin.m"
+#import "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-physical/prepared/consumer/control.m"
+#include <assert.h>
+uint64_t vellumGoDrawableAcquired(uint64_t a,uint64_t b,uint64_t c,uint64_t d,int e,double f){(void)a;(void)b;(void)c;(void)d;(void)e;(void)f;return 1;}
+void vellumGoDrawableUnavailable(uint64_t a,uint64_t b,uint64_t c,uint64_t d,int e,double f){(void)a;(void)b;(void)c;(void)d;(void)e;(void)f;}
+void vellumGoDrawablePresented(uint64_t a,uint64_t b,uint64_t c,double d){(void)a;(void)b;(void)c;(void)d;}
+void vellumGoPresentationReceipt(uint64_t a,uint64_t b,double c){(void)a;(void)b;(void)c;}
+uint64_t vellumGoDisplayAcquire(uint64_t a,uint64_t b){(void)a;(void)b;return 1;}
+void vellumGoDisplayUnavailable(uint64_t a,uint64_t b){(void)a;(void)b;}
+void vellumGoDisplayPresented(uint64_t a,uint64_t b,double c){(void)a;(void)b;(void)c;}
+int main(void){@autoreleasepool{
+ assert(pc_configure());CAMetalLayer *layer=(CAMetalLayer*)vellumNewPresentationLayer();
+ assert([layer isKindOfClass:VellumPresentationLayer.class]);vellumPresentationObserver(layer,7);vellumPresentationFrame(layer,11,13,17,1);
+ VellumPresentationStamp stamp=[(VellumPresentationLayer*)layer captureStamp];assert(stamp.token==7&&stamp.tag==11&&stamp.generation==13&&stamp.composition==17&&stamp.armed==1);
+ vellumPresentationObserver(layer,0);assert(![(VellumPresentationLayer*)layer captureStamp].token);
+ puts("PASS actual physical layer factory/subclass, stamp publication/revocation; no NSApplication/window or drawable acquisition");
+}return 0;}

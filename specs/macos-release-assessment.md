@@ -423,3 +423,14 @@ groups/logs/config/geometry/source/SDK8321checks pass; rejection retained/sealed
 Next diagnostic preparation must materialize native changes in a private Core
 copy and verify linked hooks. No unchanged retry or features/defaults/SDK/app/
 gate change; M3–M7 open. Original quiet scope consumed, desktop free.
+
+The [physical native-source repair preparation](../docs/reports/macos-presentation-physical/README.md)
+materializes the known three Core replacements in a fresh6031file private copy.
+Actual linked acquisition calls now include pending hooks plus the original
+observer; a headless factory test verifies subclass and stamp publication/revocation.
+Original Core/SDK8321files remain unchanged. Native reference reused byte-identically,
+framework consumer rebuilt; focused integration/log/source/recipe proofs pass,
+unchanged classifier/pixel/bounds evidence reused. First failure stays sealed and
+is not reclassified. No new live capture; fresh quiet approval pending. Phase
+protocol, features/defaults/SDK/app and33.3ms gate unchanged; M3–M7 open. Review and
+commit precede execution; actual results/rejection receive separate checkpoint.
