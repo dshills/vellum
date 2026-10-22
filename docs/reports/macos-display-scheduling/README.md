@@ -1,66 +1,82 @@
-# Existing-backend display scheduling: preparation
+# Existing-backend display scheduling: off/on result
 
-The source audit confirms the existing backend uses FIFO/vsync, two drawables
-and ordinary earliest-possible nontransactional presentation. It does not set a
-minimum display duration or target presentation time in this path. The separate
-present-command-buffer hypothesis was already tested and found insufficient;
-transaction and supplied-drawable display-link variants are not repeated.
+Both cases of the single approved control pass complete accounting. The existing
+Cogent/WebGPU renderer, allocation/cache policy, FIFO/vsync, two drawables and
+nontransactional presentation stay unchanged. No production fix is adopted.
 
-The next diagnostic observes the existing window's Core Animation display clock
-through `NSView.displayLink(target:selector:)`. It leaves the Cogent/WebGPU
-renderer, allocation/cache and scheduling policies unchanged. It acquires no
-drawable, requests no frame and calls no GPU submit/present method. It records
-only scalar timestamp, target, duration, host observation time and window/display
-identity with fixed, non-evicting storage. Stop invalidates the link and releases
-owned objects before application close. The private diagnostic requires macOS 14;
-it does not change the SDK/application deployment target.
+| Display-clock observer | Receipt-to-shown p50 | p95 | p99 | Maximum | Above 33.3 ms |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Off | 43.409 ms | 51.101 ms | 53.018 ms | 53.094 ms | 120/120 |
+| On | 26.817 ms | 33.947 ms | 36.504 ms | 36.576 ms | 14/120 |
 
-This differs from the earlier supplied-drawable CAMetalDisplayLink experiment:
-the observer does not supply or own the drawable. Apple's view API follows the
-view's display, and its timestamp/target are reported Core Animation clocks.
-They do not establish optical scanout, guaranteed latch opportunities or missed
-vsyncs. Retrospective matching does not imply callback delivery before GPU end.
-[View API](https://developer.apple.com/documentation/appkit/nsview/displaylink%28target%3Aselector%3A%29),
-[timestamp](https://developer.apple.com/documentation/quartzcore/cadisplaylink/timestamp),
-[duration](https://developer.apple.com/documentation/quartzcore/cadisplaylink/duration),
-[command-buffer presentation](https://developer.apple.com/documentation/metal/mtlcommandbuffer/present%28_%3A%29).
-The [source audit](source-audit.json) pins the actual native sources and SDK headers.
+The on-minus-off difference of run p95 values is
+**-17.154 ms**, approximately one refresh period.
+This is one ordered off/on pair, not a distribution of paired input differences,
+a repeated estimate or proof of causation. Process/order and temporal variation
+remain possible explanations. Earlier captures already showed more than one
+latency band. **The display-clock observer cannot be assumed neutral.** Its
+registration/wake behavior is now a concrete scheduling hypothesis to control,
+not an accepted repair. Both cases still fail the unchanged 33.3 ms p95 number.
 
-Eight focused classifier methods and 20 negative cases pass. Missing coverage,
-invalid GPU timing, callback identities/count/order, terminal states and inherited
-backend errors are refused; callback gaps and lateness remain data. The native
-recorder/ownership fixture passes without creating an NSApplication or window,
-compiled warning-free with `-Wall -Wextra -Werror`. The original routed complete
-pixel/state fixture and fresh private consumer build pass. The exact reviewed
-native archive, private Core and source-detail overlays are reused, with no Rust
-or SDK rebuild. Full source/log/owned-process checks, exact consumer/module/overlay
-reproduction and all 8,321 SDK files verify unchanged. Existing AppKit deprecation
-and duplicate-library warnings remain visible in the Go build.
+## Joined display-clock observations
 
-The [protocol](../../../tools/macos-calibration/displayclock/PLAN.md) predeclares
-one observer-off then one observer-on run of the same binary. Each retains 128
-warmup and 120 measured inputs, with a common 50 ms held tail outside the cohort.
-The newly approved quiet window is capped at 100 seconds overall and 40 seconds
-per native case, after review and commit. Stop on first invalidity; no unchanged
-retry. This is an observer-presence control, not repeated qualification, calibrated
-overhead or a pure-cost causal comparison. No native capture has run yet.
+The on case retains all 1,789 callbacks, including startup and the common
+held tail. All 1,788 adjacent reported timestamp intervals are approximately
+16.667 ms; none is discarded for lateness or a gap. Across all callbacks, host
+observation minus reported timestamp has p95
+10.902 ms, while target minus timestamp is approximately
+16.667 ms. Callback observation is not GPU completion, latch time or scanout.
 
-Features, original backend, SDK/app, render/pacing defaults and the 33.3 ms release
-gate remain unchanged. M3–M7 remain open; no production repair or release claim.
+The 120 measured actual presentations lie within
+10.542 microseconds of the nearest reported display timestamp.
+There are 107 measured responses with one reported timestamp strictly between
+final-present GPU end and shown, and 13 with none. These are retrospective
+reported-event counts, not missed-vsync counts or guaranteed latch opportunities.
+No timestamp lattice is fitted to presentation feedback.
 
-Before any desktop run, internal review found numeric JSON booleans in the native
-snapshot. Explicit Boolean boxing and real native JSON-type checks now pass;
-the original implementation is refused by the final fixture with an ordinary
-exit, without a crash or window. The final fixture also exercises the callback
-selector and identity/nil-link start-failure cleanup. The generated worker's
-unconditional cleanup defer precedes startup. Prism's boundary concern led to an
-exact timestamp equality test; key/focus changes remain deliberate refusals.
-All initial sources/build receipts and complete review dispositions are retained;
-only final v2 is eligible for execution.
+Each process has its own p95-ranked input. Off selects accepted revision
+243, scope 1, opaque tag 488, generation
+246, drawable 252; its final-present GPU end to shown is
+46.831 ms. On selects revision 199, scope 1, tag
+400, generation 202, drawable 208; that interval is
+29.497 ms. These are actual individual inputs, not a phase-percentile sum
+or a decomposition of the difference between run p95 values. No compositor-only,
+driver-only, fixed-frame or WebGPU-specific cause is established.
 
-The private consumer commands are `framework timed MATCH.json on off` and
-`framework timed MATCH.json on on`. The fixed third argument keeps CPU-upload
-and GPU-submission observation enabled in both cases; only the final argument
-toggles the display clock. Disabling the other observers would remove the joins
-needed for this experiment. Both complete Prism reviews and their source-backed
-dispositions are retained. No unresolved actionable finding remains.
+## Checks and scope
+
+Execution takes **78.604 seconds** overall, within the 100-second bound.
+Native cases take 31.384 and 30.732 seconds, below their 40-second bounds.
+All 18 owned native/probe groups retire; native stderr is empty. Each case retains
+128 warmup and 120 measured accepted inputs with complete source/raster/upload/
+GPU/drawable joins. Each also retains 50 startup commands and ten startup presents.
+Off records zero display callbacks; on drains/invalidate/releases cleanly. Both
+cases use the same binary/archive and identical 50 ms held tails outside the cohort.
+Configuration, persistent geometry, all source/binary/module/overlay/native pins,
+raw logs and all 8,321 SDK files verify unchanged within and across cases.
+
+Preparation passed eight focused classifier methods with 20 negative cases,
+exact timestamp-boundary and late-callback/gap controls, the original routed
+complete-pixel fixture, native recorder/ownership tests and fresh consumer builds.
+The native JSON Boolean issue was fixed before desktop use; a counterfactual
+with the original implementation is refused by the final native fixture with an
+ordinary exit and no window or crash. The exact reviewed native archive/Core and
+source-detail overlays are reused; no Rust or SDK rebuild occurs.
+
+Prism using Anthropic Claude Sonnet 5.5 reviewed all 15 preparation files and ten
+focused follow-up files. Boundary semantics are tested; source-backed dispositions
+retain strict focus identity, unconditional pre-start cleanup and the fixed-on
+CPU/GPU observer CLI. Complete review records and the unused initial revision
+remain in indexed preparation evidence. Source checkpoint is
+`633d5b9`. The [protocol](../../../tools/macos-calibration/displayclock/PLAN.md),
+[source audit](source-audit.json), [preparation checks](preparation-checks.json) and
+[result summary](result-summary.json) retain the basis.
+
+The next focused control should reverse observer order and test whether the
+latency band follows observer presence before proposing any scheduling change.
+Do not adopt a permanent display link or treat these instrumented results as
+shipping performance. This sparse routed fixture does not establish sustained
+60 Hz cadence, resize/workflow acceptance, physical input, displayed pixels or
+whole-GPU allocation balance. Features, SDK/app, defaults and the release gate
+are unchanged; M3–M7 remain open. The approved desktop scope is consumed, the
+desktop is free and no native job remains active.

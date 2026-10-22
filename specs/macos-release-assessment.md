@@ -354,3 +354,15 @@ opportunities or missed-vsync proof. One approved observer-off/on pair may follo
 review and commit, capped at 100 seconds overall and 40 seconds per native case.
 No native result yet. Features, SDK/app, defaults and 33.3 ms gate remain unchanged;
 M3–M7 stay open.
+
+The [display-clock off/on result](../docs/reports/macos-display-scheduling/README.md)
+passes both cases in 78.604 seconds, with 18 owned groups retired and 248
+joined inputs per case. Same-binary p95 is 51.101 ms off versus
+33.947 ms on; both miss 33.3 ms. The difference of run p95 values is
+-17.154 ms, about one refresh period, without a repeated or causal claim.
+All 1,789 callbacks and full startup/held tails remain retained; actual shown
+feedback is within 10.542 microseconds of the nearest reported timestamp.
+These are reported clocks, not optical scanout or guaranteed latch opportunities.
+Observer neutrality is unsupported; reverse order before proposing a scheduling
+change. No permanent link, backend/default/SDK/app/feature or release-gate change.
+No release qualification; M3–M7 open. Approved live scope consumed.

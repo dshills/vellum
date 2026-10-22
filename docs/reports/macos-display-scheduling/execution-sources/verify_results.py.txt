@@ -1,0 +1,33 @@
+from pathlib import Path
+import json,hashlib,sys,importlib.util,datetime
+sys.dont_write_bytecode=True
+x=Path(__file__).resolve().parent.parent;q=Path(__file__).resolve().parent/'prepared';r=Path('/Users/dshills/Development/projects/Vellum');load=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();result=load(q/'result.json');plan=load(q/'bound-plan.json');assert all(sha(Path(p))==v for p,v in plan['pins'].items());elapsed=(datetime.datetime.fromisoformat(result['finished_utc'])-datetime.datetime.fromisoformat(load(q/'started.json')['utc'])).total_seconds();assert elapsed<=100
+s=importlib.util.spec_from_file_location('display_clock_result',r/'tools/macos-calibration/displayclock/check.py');v=importlib.util.module_from_spec(s);s.loader.exec_module(v);cases=[];groups=0
+for case in result['cases']:
+ mode=case['mode'];run=case['native'];assert run['owned']['terminal'] and run['owned']['group_absent'] and not run['owned']['errors'] and not run['observation_errors'] and run['pins_stable'] and run['logs_complete'] and not run['stop_at_exit'];groups+=1
+ for stream,m in run['logs'].items():p=q/mode/'native'/stream;assert sha(p)==m['sha256'] and p.stat().st_size==m['bytes']
+ for when in ['before','after']:
+  for key,probe in case['configuration_'+when].items():
+   assert probe['exit_code']==0 and probe['error'] is None and probe['owned']['terminal'] and probe['owned']['group_absent'] and not probe['owned']['errors'];groups+=1
+   for stream,m in probe['logs'].items():p=q/mode/when/key/stream;assert sha(p)==m['sha256'] and p.stat().st_size==m['bytes']
+ assert case['geometry_before']==case['geometry_after'] and all(case['configuration_before'][k]['logs']['stdout']['sha256']==case['configuration_after'][k]['logs']['stdout']['sha256'] for k in case['configuration_before'])
+ if 'validation' not in case:
+  cases.append({'mode':mode,'unaccepted':True,'native_exit':run['exit_code'],'native_error':run['error']});continue
+ assert run['exit_code']==0 and run['error'] is None and run['logs']['stderr']['bytes']==0
+ docs=v.base.load(q/mode/'native/stdout');assert len(docs)==1;checked=v.validate(docs[0],load(q/'match.json'),mode);assert checked==case['validation']==load(q/mode/'validation.json');parent=checked['parent_validation'];ticket=parent['p95_rank_ticket'];present=ticket['backend_commands'][-1]
+ summary={'mode':mode,'native_seconds':run['seconds'],'receipt_to_shown_ms':parent['receipt_to_shown_ms'],'over33_3ms':parent['over_33_3_ms_observations'],'joined_inputs':len(parent['joined_rows']),'p95_rank_ticket':{'accepted_revision':ticket['accepted_revision'],'scope':ticket['scope'],'opaque_tag':ticket['opaque_tag'],'generation':ticket['generation'],'drawable_id':ticket['drawable_id'],'receipt_to_shown_ms':ticket['receipt_to_shown_ns']/1e6,'present_gpu_end_to_shown_ms':(ticket['raw_host_clocks']['shown']-present['gpu_end'])*1000},'display_trace_terminal':{k:docs[0]['display_clock_trace'][k] for k in ['configured','enabled','started','stopped','invalid','overflow','count','window','display','start','stop']},'retained_backend_startup_present_count':len(parent['retained_startup_backend_present_ordinals']),'retained_backend_startup_command_count':len(parent['retained_startup_backend_command_ordinals'])}
+ if mode=='on':
+  for k in ['callback_count','callback_timestamp_intervals_ms','callback_observation_minus_timestamp_ms','target_minus_timestamp_ms','measured_clock_ms','reported_timestamp_counts','p95_rank_ticket_clock_join','interpretation']:summary[k]=checked[k]
+  summary['reported_timestamp_between_counts']={str(k):sum(r['reported_timestamps_between_gpu_and_shown']==k for r in checked['joined_rows'][128:]) for k in sorted({r['reported_timestamps_between_gpu_and_shown'] for r in checked['joined_rows'][128:]})}
+  summary['nearest_reported_timestamp_absolute_error_ms']=v.base.stats([abs(r['shown_minus_nearest_reported_timestamp_ms']) for r in checked['joined_rows'][128:]])
+  ticks=docs[0]['display_clock_trace']['records'];summary['callback_target_minus_observed_ms']=v.base.stats([(r['target']-r['observed'])*1000 for r in ticks])
+ cases.append(summary)
+if result['outcome']=='VALID_DISPLAY_CLOCK_OFF_ON_CONTROL':
+ assert [c['mode'] for c in cases]==['off','on'] and all(c['joined_inputs']==248 for c in cases)
+ a,b=result['cases'];assert all(a['configuration_before'][k]['logs']['stdout']['sha256']==b['configuration_before'][k]['logs']['stdout']['sha256'] for k in a['configuration_before']);assert a['geometry_before']==b['geometry_before']
+ summary={'outcome':result['outcome'],'prepared_commit':plan['prepared_commit'],'elapsed_seconds':elapsed,'owned_groups_retired':groups,'cases':cases,'difference_of_run_p95_on_minus_off_ms':cases[1]['receipt_to_shown_ms']['p95']-cases[0]['receipt_to_shown_ms']['p95'],'interpretation':'One same-binary off/on observer-presence control, no repeated estimate, pure-cost cause, overhead calibration or ordinary qualification. Display-link timestamps/targets are reported Core Animation clocks, not guaranteed latch opportunities or optical scanout. Retrospective tick joins do not imply prior callback delivery; retain gaps/lateness. Gate unchanged.'}
+else:summary={'outcome':'REJECT','prepared_commit':plan['prepared_commit'],'elapsed_seconds':elapsed,'owned_groups_retired':groups,'cases':cases,'error':result.get('error'),'attempt_sealed':True,'retry':False}
+sys.path.insert(0,str(r/'scripts'));sp=importlib.util.spec_from_file_location('result_sdk',x/'macos-release-default-assessment/assessment.py');a=importlib.util.module_from_spec(sp);sys.modules[sp.name]=a;sp.loader.exec_module(a);assert a.sdk_vector()==load(x/'macos-release-default-assessment/plan.json')['sdk']
+summary.update(SDK_files_unchanged=8321,release_qualified=False,gate_changed=False,production_repair_adopted=False);(q/'result-summary.json').write_text(json.dumps(summary,indent=2)+'\n');small=json.loads(json.dumps(summary))
+for c in small['cases']:c.pop('p95_rank_ticket_clock_join',None)
+print(json.dumps(small,indent=2))
