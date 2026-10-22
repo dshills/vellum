@@ -366,3 +366,11 @@ These are reported clocks, not optical scanout or guaranteed latch opportunities
 Observer neutrality is unsupported; reverse order before proposing a scheduling
 change. No permanent link, backend/default/SDK/app/feature or release-gate change.
 No release qualification; M3–M7 open. Approved live scope consumed.
+
+The [reversed-order preparation](../docs/reports/macos-display-reversed/README.md)
+reuses the exact final display-clock binary and native archive for a fresh on/off
+pair. Five orchestration methods, seven failure cases, syntax/fresh-scope guards
+and full source/SDK identity checks pass without rebuilding unchanged native code.
+The old off/on scope stays sealed. One newly approved quiet scope may follow
+review and commit, capped at 100 seconds overall and 40 seconds per native case.
+No result yet. Features, SDK/app, defaults and 33.3 ms gate unchanged; M3–M7 open.

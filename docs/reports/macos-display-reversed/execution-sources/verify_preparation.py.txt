@@ -1,0 +1,17 @@
+from pathlib import Path
+import hashlib,json,sys,subprocess,importlib.util,ast,os
+sys.dont_write_bytecode=True
+x=Path(__file__).resolve().parent.parent;q=Path(__file__).resolve().parent/'prepared';r=Path('/Users/dshills/Development/projects/Vellum');code=r/'tools/macos-calibration/displayclock';prior=x/'macos-display-scheduling/prepared';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();load=lambda p:json.loads(p.read_text());identity=load(q/'build-identity.json')
+assert sha(q/'framework')==sha(prior/'framework')==identity['binary_sha256']=='4ea7d61cb26c52405b8222a1fd1ea1c2069bb8f4b32f8932bb6cbb91b9ce3c1d' and os.access(q/'framework',os.X_OK);assert identity['native_archive_sha256']=='10e39953bda1045da3bd9c315dcac0add646fa86e74627b3c896723d31b86a35';assert all(sha(Path(p))==v for p,v in identity['pins'].items())
+for n in ['match.json','framework.mod','framework.sum','overlay.json']:assert (q/n).read_bytes()==(prior/n).read_bytes()
+vec=lambda root:{p.relative_to(root).as_posix():sha(p) for p in root.rglob('*') if p.is_file()};assert vec(q/'consumer')==vec(prior/'consumer')
+assert subprocess.check_output(['git','show','1e99fdd:tools/macos-calibration/displayclock/run.py'],cwd=r)==(code/'run.py').read_bytes()
+for n in ['reverse_run.py','reverse_control.py','reverse_test.py','prepare_reverse.py']:ast.parse((code/n).read_text())
+run=subprocess.run([sys.executable,'-m','unittest','-v','reverse_test'],cwd=code,capture_output=True,text=True);(q/'tests.stdout').write_text(run.stdout);(q/'tests.stderr').write_text(run.stderr);assert run.returncode==0
+sp=importlib.util.spec_from_file_location('reverse_preparation',code/'prepare_reverse.py');m=importlib.util.module_from_spec(sp);sp.loader.exec_module(m)
+try:m.prepare(prior,q)
+except ValueError as e:assert 'existing destination' in str(e)
+else:raise AssertionError('scope overwrite allowed')
+sys.path.insert(0,str(r/'scripts'));sp=importlib.util.spec_from_file_location('reverse_sdk',x/'macos-release-default-assessment/assessment.py');a=importlib.util.module_from_spec(sp);sys.modules[sp.name]=a;sp.loader.exec_module(a);assert a.sdk_vector()==load(x/'macos-release-default-assessment/plan.json')['sdk']
+checks={'outcome':'PREPARED_ONLY_NO_NATIVE_RUN','new_orchestration_methods':5,'failure_subcases':7,'syntax_checks':'PASS4newPythonmodules','literal_order':['on','off'],'exact_command_args':'CPU/GPUobserver fixed on; displayclock finalarg on thenoff','first_failure_stops':'native,stderr,validator,stop,localgeometry/config; crosscasedrift retainsboth','fresh_scope_overwrite_refusal':'PASS','binary_sha256':identity['binary_sha256'],'binary_execute_permission':True,'native_archive_sha256':identity['native_archive_sha256'],'all_compiled_source_module_overlay_consumer_pins':'PASS','SDK_files_unchanged':8321,'prior_native_and_8_classifier_method_checks':'Reused exact unchanged sources, executable and native archive from633d5b9/1e99fdd','old_scope_runner':'Unchanged committed bytes','rebuilds':0,'gate_changed':False,'release_qualified':False}
+(q/'preparation-checks.json').write_text(json.dumps(checks,indent=2)+'\n');print(json.dumps(checks))
