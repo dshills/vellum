@@ -1,0 +1,83 @@
+{
+  "outcome": "VALID_PRIVATE_STAGING_BYTE_PAIR",
+  "elapsed_seconds": 4.654488,
+  "GPU_verified_readbacks": 44,
+  "GPU_verified_bytes": 97912700,
+  "runs": [
+    {
+      "mode": "off",
+      "metrics": {
+        "outcome": "VALID_PRIVATE_STAGING_BYTE_CHECK",
+        "mode": "off",
+        "CPU_writes": 24,
+        "GPU_verified_readbacks": 22,
+        "GPU_verified_bytes": 48956350,
+        "lifecycle": {
+          "fresh": 22,
+          "takes": 0,
+          "evictions": 0,
+          "owners": 2,
+          "peak_idle_count": 0,
+          "peak_idle_bytes": 0
+        },
+        "release_qualified": false,
+        "physical_GPU_overlap_verified": false,
+        "interpretation": "Full original byte/lifetime checks plus actual Metal cache/shared-storage counts bijective with eligible fresh allocations. Excluded texture/write-buffer/mapped staging descriptors preserve original policy. No UI latency, whole allocation/fault/hardware or shipping qualification.",
+        "cache_policy": [
+          2,
+          22,
+          0,
+          22,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "mode": "on",
+      "metrics": {
+        "outcome": "VALID_PRIVATE_STAGING_BYTE_CHECK",
+        "mode": "on",
+        "CPU_writes": 24,
+        "GPU_verified_readbacks": 22,
+        "GPU_verified_bytes": 48956350,
+        "lifecycle": {
+          "fresh": 16,
+          "takes": 6,
+          "evictions": 5,
+          "owners": 2,
+          "peak_idle_count": 8,
+          "peak_idle_bytes": 7692572
+        },
+        "release_qualified": false,
+        "physical_GPU_overlap_verified": false,
+        "interpretation": "Full original byte/lifetime checks plus actual Metal cache/shared-storage counts bijective with eligible fresh allocations. Excluded texture/write-buffer/mapped staging descriptors preserve original policy. No UI latency, whole allocation/fault/hardware or shipping qualification.",
+        "cache_policy": [
+          2,
+          16,
+          0,
+          16,
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "ordinary_latency_qualified": false,
+  "gate_changed": false,
+  "full_raw_detail": "byte-result compressed evidence, original terminal documents and validation results",
+  "owned_groups_retired": 18,
+  "field_guide": {
+    "owned_groups_retired": "Owned native/probe OS process groups, distinct from two GPU device owners per mode",
+    "takes": "Completed-buffer checkouts; count derived from full archived event replay",
+    "cache_policy_fields": [
+      "configuration_mode_1_WC_2_default",
+      "fresh_marked_allocations",
+      "actual_writecombined",
+      "actual_default",
+      "cache_or_storage_mismatch",
+      "unconfigured"
+    ],
+    "cache_storage_requirement": "Metal shared storage=0 for every recorded fresh marked allocation; other storage increments mismatch"
+  }
+}

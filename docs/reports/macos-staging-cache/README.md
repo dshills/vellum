@@ -35,3 +35,22 @@ qualification follows from this private control.
 Internal layout review moved the unchanged probe under testdata before commit,
 so ordinary Go discovery does not build a private CGo ABI fixture. The private
 overlay and focused Go rebuild cover that correction; native sources unchanged.
+
+## Full GPU byte result
+
+Both pool modes pass in 4.654seconds (<90), with18owned groups retired.
+The original24-write matrix passes22full GPU readbacks/mode:44readbacks and
+97,912,700bytes total. Source/native/binary/log, SDK8321,
+configuration and persistent geometry pins hold; eligible/device ledgers close.
+
+Actual Metal default-cache/shared-storage counts equal exactly22fresh texture
+resources off and16on, with zero wrong-cache, unconfigured or malformed records.
+The enabled mode has6checkouts,5evictions,8peak idle entries/7,692,572bytes.
+Queued distinct leases, oversize bypass, separate device, R8exclusion, padded
+source/BGRA and unsent destruction retain the original strict checks. No claim
+of physical GPU overlap, whole allocation balance, fault/unwind or UI latency.
+
+This proves bytes/lifetime and actual cache scope for this private pair. It
+permits preparing one bounded framework cache comparison with reuse enabled in
+both modes; no shipping adoption, ordinary-build equivalence, performance pass
+or release gate change follows. Features/defaults remain frozen, M3–M7 open.

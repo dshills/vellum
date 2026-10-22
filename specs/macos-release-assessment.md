@@ -237,3 +237,10 @@ is prepared privately after the original-WC pool still misses33.3ms. New explici
 HAL marker scopes cache mode to existing texture allowlist; pool/completion/limits
 unchanged. Offline builds and focused tests pass; one44-readback GPU pair required
 before timing. No shipping/SDK/app/default/gate change; M3–M7 open.
+
+The [texture-only cached staging GPU pair](../docs/reports/macos-staging-cache/README.md)
+passes44readbacks/97,912,700bytes, exactly22/16actualdefault-cache
+freshtextureallocations andclosedeligible/deviceledgers,18groups/4.654s.
+No wrongcache/unconfigured/malformed counters; originalqueued/oversize/R8/unsent
+proof retained. Next prepare onecachecomparison withreusefixedon; nogate, app,
+SDK/default/shipping change or UI-latency acceptance. M3–M7 open.
