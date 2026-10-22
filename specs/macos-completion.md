@@ -1699,3 +1699,7 @@ passes after the concrete primary-name fix: 44 full GPU readbacks/97,912,700 byt
 18 groups retire within 4.588 seconds; source/SDK/config/geometry pins hold. The
 original metadata refusal remains rejected. Next one reviewed bounded framework
 timing pair; no shipping/SDK/app, feature/pacing or 33.3 ms gate change.
+
+The [private staging framework timing pair](../tools/macos-calibration/stagingreuse/TIMING.md)
+is prepared after the44-readback/closed-ledger proof. One off/on pair, same library/
+binary and original cache policy,90seconds overall. No gate/shipping change.
