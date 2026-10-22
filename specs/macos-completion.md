@@ -1796,3 +1796,13 @@ pixels, five classifier methods/23refusals, build and exact recipe/pins/SDK chec
 pass. One reviewed/committed40s native case60overall is approved when ready; no
 result or production repair yet. Features/defaults/SDK/app/33.3ms gate unchanged,
 M3–M7 open.
+
+The [joined native result](../docs/reports/macos-joined-timing/README.md) passes248
+same-input joins/9groups in37.695s. Instrumented receipt→shown p95=35.353ms;
+17/120measured observations exceed33.3. On that actual rank ticket, raster0.332ms,
+native upload1.460ms, other before acquisition0.320ms and acquisition→shown33.241ms
+partition the same response. Post-acquisition still includes encode/submit/GPU/
+display phases; no compositor-only attribution, phase-quantile sum or fix follows.
+Full startup/pins/SDK/configuration/geometry/closure retained. Next join backend
+boundaries to the same identifiers. No native retry, production/default/SDK/app/
+feature/gate change; M3–M7 open, no ordinary release qualification.
