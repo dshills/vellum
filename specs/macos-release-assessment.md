@@ -411,3 +411,15 @@ builds, full routed pixels, recipe/source/log/SDK checks pass. No native capture
 yet. One approved100second overall/40second per-process scope may follow review
 and commit. Existing design/features/defaults/SDK/app and33.3ms gate unchanged;
 M3–M7 open. Actual results or rejection receive separate review and commit.
+
+The [first phase-matched control](../docs/reports/macos-presentation-phase/README.md)
+is rejected in52.939seconds. Native completes248joins with30measured
+per phase, p9534.960ms and zero other recorded pending drawables at measured
+receipt/present/GPU points. Framework fails startup before any input or metrics
+sample; no matched comparison exists. Linked-code audit finds pending hooks absent
+from its acquisition method despite the Objective-C overlay. The original acquire
+observer call is linked, so the whole startup failure remains unisolated. All18
+groups/logs/config/geometry/source/SDK8321checks pass; rejection retained/sealed.
+Next diagnostic preparation must materialize native changes in a private Core
+copy and verify linked hooks. No unchanged retry or features/defaults/SDK/app/
+gate change; M3–M7 open. Original quiet scope consumed, desktop free.

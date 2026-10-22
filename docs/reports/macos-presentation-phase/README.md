@@ -1,67 +1,59 @@
-# Phase-matched presentation control — preparation
+# Phase-matched presentation control — first attempt rejected
 
-This prepares one native-reference then framework pair with pending drawable
-feedback state. **No native capture has started.** The existing design, features,
-SDK/app, renderer defaults and33.3ms release gate remain unchanged; M3–M7 open.
+The native reference completed and passed the strict phase/pending-state
+classifier. The framework diagnostic then exited with **initial natural
+presentation deadline**, before any routed input. **No matched pair exists.**
+The complete attempt is retained and sealed; no unchanged retry occurred.
 
-The [protocol](../../../tools/macos-calibration/presentationphase/PLAN.md) fixes
-four reported-period phases (1/8,3/8,5/8,7/8), an eight-callback anchor stride,
-128warmups and120measured requests. Each phase has30measured inputs. Actual
-native receipt error must be0..2ms; each phase's p50/p95 error must match within
-1ms between implementations. A mismatch refuses the comparison without dropping
-or replacing observations. Request spacing is diagnostic input scheduling;
-renderer pacing remains unchanged. The approximate Go/native target bridge is
-recorded separately and cannot substitute for actual native receipt matching.
+Native retains128warmup and120measured joins, with30measured inputs in each
+predeclared phase. Its receipt-to-shown p95 is **34.960ms**;
+30/120responses exceed33.3ms. Per-phase p95 values for1/8,3/8,5/8,7/8 are
+30.933,26.734,22.571,35.105ms. Receipt-error maxima remain below0.862ms.
+These are instrumented sparse-fixture observations, not release qualification,
+a universal native floor or permission to change the gate.
 
-Shared scalar hooks record every acquisition start, success/unavailability,
-receipt and presented callback, with pending IDs and acquiring counts before
-and after. Every transition is replayed. Exact receipt/acquisition/drawable/shown
-joins preserve startup and all248cohort states. Native GPU/submit observations
-are added without changing its command order; the framework keeps its full
-source/raster/upload/backend observer chain. A pending record means acquired and
-awaiting callback, not a claim about Metal pool availability, reference lifetime,
-compositor queue depth or physical scanout. The receipt-hook census has its own
-observation bracket; earlier event-time state is reconstructed separately.
+All251native acquisition attempts (including three startup attempts),
+1001scalar events and1988display callbacks remain accounted for.
+Every measured receipt hook and reconstructed receipt/present-request/final-GPU
+point has zero **other** recorded pending drawables. All callbacks drain to
+pending0/acquiring0. This describes acquisition-awaiting-callback state, not
+Metal pool availability, reference lifetime, drawable credits or compositor queue
+depth. It cannot establish the cause of presentation latency.
 
-The native reference still uses an internal AppKit event and cached-texture blit;
-framework still routes the public command and normal view/paint/upload. That
-algorithm/API difference and extra diagnostic overhead prevent interpreting
-subtraction as pure framework overhead. Both view observers use the same source;
-reported timestamp and actual delivered callback clocks remain separate.
+The framework emits four startup backend present records with zero shown feedback,
+no presentation-metrics samples or input receipts, and an empty pending trace.
+Its observer never starts because startup readiness fails first. This is a
+failed diagnostic startup, not a framework latency observation. There are no
+framework phase buckets and no subtraction from the valid native run.
 
-[Focused checks](preparation-checks.json) pass: six classifier methods plus two
-controller methods, including phase/lifecycle/parent-refusal and fail-first controls;
-headless native bounds/lifecycle/JSON tests, nine-pending overflow refusal and
-four concurrent producers;
-warning-free native reference/observer builds and private Go consumer build;
-full routed pixels; exact recipe reproduction; source/log/process ownership
-pins and all8,321SDK files. The Go build retains existing AppKit deprecation and
-duplicate-objc link warnings. No Rust/native archive or SDK rebuild occurs.
+An [offscreen linked-code audit](linked-source-audit.json) finds that the actual
+framework `VellumPresentationLayer nextDrawable` method lacks the pending hooks
+present in the supplied Objective-C overlay. The original presentation-acquire
+call is linked, so the missing pending hooks do not independently explain the
+whole startup failure. Source/build recipes and offscreen pixels alone were
+insufficient to prove native-overlay integration. The next diagnostic repair is
+to materialize native Core changes in a fresh private copy and require actual
+linked-hook evidence before any new capture. The SDK/original Core remain sealed.
 
-Preparation inspection corrected the receipt hook to the actual measured-input
-recorder path. An initial offscreen link failure is retained; native-only hook
-overlays are excluded from the unchanged pixel fixture. Unused intermediate
-preparations remain local and did not run a native application. The actual
-consumer/core/measurement/observer snapshots are included for source review.
+The attempt takes52.939seconds within100seconds; native takes
+34.075seconds and framework6.001seconds. All18owned native/probe
+groups retire and are observed absent. Configuration/geometry, raw log hashes,
+compiled/runtime pins and all8,321SDK files verify. Framework stderr/error are
+retained, without dropping the failure. The approved quiet scope is consumed;
+desktop free, no native process remains. A corrected attempt needs its own
+preparation, review, commit and fresh bounded desktop authority.
 
-One approved quiet scope may run after tests, internal review, Prism using
-Anthropic Claude Sonnet5.5 and commit: at most100seconds overall and40seconds
-per process, native then framework, fixed80ms held tail, existing exclusive lease,
-configuration/geometry and source/SDK guards. Stop first invalid, seal and retain;
-no unchanged retry. Performance above33.3ms remains an observation. Results,
-including rejection, require separate review and commit. No permanent link,
-production scheduling change or release qualification follows.
+Preparation checkpoint`1f930d4` includes eight focused methods,
+headless concurrency/overflow/JSON/drain tests, both source builds, routed full
+pixels, recipe and SDK checks. Prism using Anthropic Claude Sonnet5.5 covered
+21initial and7follow-up files; its overflow concern was fixed and rejected-prefix
+state continuation was proven to remain visibly refused. The separate six-file actual-result and linked-code audit review completed
+without findings, exclusions or truncation; see the
+[result review receipt](result-review-completion.json).
 
-The initial complete21file Prism review raised one census-overflow concern.
-Recording now stops after overflow and marks the trace invalid, with a headless
-nine-pending negative proving bounded serialization and retained failure prefix.
-An internal correction keeps the receipt probe outside the original clock-read
-bracket. Both consumers and focused checks pass after these changes; a scoped
-follow-up review covers only the changed files. No native capture has started.
-
-Prism follow-up is complete for seven changed files. Its failed-prefix concern
-is dispositioned with an [actual headless audit](failed-prefix-audit.json): scalar
-callbacks drain after recording fails, while invalid/overflow flags remain set
-and the classifier refuses the trace before replay. Failed prefixes are retained
-as rejection evidence, not complete accepted journals. No actionable findings
-remain; see the [review receipt](review-completion.json).
+Original Cogent/WebGPU/Metal design, features, SDK/app, allocation/cache/presentation
+and pacing defaults, and33.3ms release gate are unchanged. M3–M7 remain open;
+no permanent display link or production repair is adopted. See the
+[protocol](../../../tools/macos-calibration/presentationphase/PLAN.md),
+[preparation checks](preparation-checks.json), [result summary](result-summary.json),
+review receipts and indexed evidence.
