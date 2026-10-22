@@ -1,0 +1,58 @@
+--- /Users/dshills/Development/projects/Vellum/tools/macos-calibration/upload/framework/main_darwin.go
++++ /Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-joined-timing/native_main_darwin.go
+@@ -8,0 +9,2 @@
++	"cogentcore.org/core/paint/renderers/rasterx"
++	"cogentcore.org/core/system/driver/desktop"
+@@ -19,0 +22,10 @@
++type requestPhase struct {
++	Sequence                                               int
++	WakeLatenessNS, ForegroundCheckNS, PostCheckLatenessNS int64
++}
++type requestAnchor struct {
++	Sequence                                   int
++	WakeHost, CheckedHost, PostCheckHost       float64
++	TargetFromReceiptStartNS, ReceiptBracketNS int64
++}
++
+@@ -25,4 +37,4 @@
+-		return errors.New("pilot|timed MATCH.json off|on")
+-	}
+-	if os.Args[3] != "off" && os.Args[3] != "on" {
+-		return errors.New("off|on observer required")
++		return errors.New("pilot|timed MATCH.json on")
++	}
++	if os.Args[3] != "on" {
++		return errors.New("on observer required")
+@@ -32,0 +45,8 @@
++	if !rasterx.VellumRasterConfigure(desktop.PresentationHostTime) {
++		return errors.New("raster clock configuration")
++	}
++	defer func() {
++		if !rasterx.VellumRasterReset() {
++			result = errors.Join(result, errors.New("raster clock still pending"))
++		}
++	}()
+@@ -48 +68 @@
+-	out := map[string]any{"kind": "framework", "release_qualified": false, "diagnostic_mode": "source-cost-only"}
++	out := map[string]any{"kind": "framework", "release_qualified": false, "diagnostic_mode": "source-cost-only", "joined_mode": "absolute-raster-upload-schedule-v1"}
+@@ -159,0 +180,2 @@
++		phases := make([]requestPhase, 0, 248)
++		anchors := make([]requestAnchor, 0, 248)
+@@ -171 +193,6 @@
+-			if !good(observe(0)) {
++			wake := time.Now()
++			wakeHost := desktop.PresentationHostTime()
++			state := observe(0)
++			checkedHost := desktop.PresentationHostTime()
++			checked := time.Now()
++			if !good(state) {
+@@ -173,0 +201 @@
++			postCheckHost := desktop.PresentationHostTime()
+@@ -174,0 +203,2 @@
++			phases = append(phases, requestPhase{Sequence: i, WakeLatenessNS: wake.Sub(target).Nanoseconds(), ForegroundCheckNS: checked.Sub(wake).Nanoseconds(), PostCheckLatenessNS: late})
++			out["request_schedule_phases"] = phases
+@@ -189,0 +220,2 @@
++			anchors = append(anchors, requestAnchor{Sequence: i, WakeHost: wakeHost, CheckedHost: checkedHost, PostCheckHost: postCheckHost, TargetFromReceiptStartNS: target.Sub(sample.ReceiptStartedAt).Nanoseconds(), ReceiptBracketNS: sample.ReceiptFinishedAt.Sub(sample.ReceiptStartedAt).Nanoseconds()})
++			out["request_schedule_anchors"] = anchors
+@@ -231,0 +264 @@
++	out["raster_trace"] = rasterx.VellumRasterRead()

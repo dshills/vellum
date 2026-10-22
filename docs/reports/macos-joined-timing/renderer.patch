@@ -1,0 +1,8 @@
+--- /private/tmp/vellum-doclinks-sdk-bd3cbc9/retained SDK/vellum-v0.1.0-alpha.2/drivers/cogent/build/upstream/paint/renderers/rasterx/renderer.go
++++ /private/tmp/vellum-joined-timing-core/paint/renderers/rasterx/renderer.go
+@@ -99,0 +100,3 @@
++	token := vellumRasterBegin(rs.image)
++	returned := false
++	defer func() { vellumRasterEnd(token, returned) }()
+@@ -103,0 +107 @@
++	returned = true

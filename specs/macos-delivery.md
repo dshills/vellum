@@ -1168,3 +1168,13 @@ SDK/log/group checks pass. Hot microbench timing is not native timing; no proven
 cache flush, isolated CPU/scheduling/GC cause, native-p95 or repair/adoption claim.
 Keep future timing joined to surrounding upload/schedule boundaries. No new
 native test; features/defaults/SDK/app/33.3ms gate unchanged, M3–M7 open.
+
+The [joined raster/upload/scheduling diagnostic](../docs/reports/macos-joined-timing/README.md)
+is prepared: private bounded absolute raster brackets plus native wake/check
+stamps, exact same-input source/upload/actual-presentation joins and contiguous
+interval closure. Go timer offsets/nested work remain separate; no guessed clock
+conversion or phase-quantile sum. Five recorder race methods, original routed
+pixels, five classifier methods/23refusals, build and exact recipe/pins/SDK checks
+pass. One reviewed/committed40s native case60overall is approved when ready; no
+result or production repair yet. Features/defaults/SDK/app/33.3ms gate unchanged,
+M3–M7 open.

@@ -1,0 +1,18 @@
+from pathlib import Path
+import json,hashlib,sys,importlib.util,os,subprocess
+sys.dont_write_bytecode=True
+q=Path(__file__).resolve().parent;r=Path('/Users/dshills/Development/projects/Vellum');p=Path('/private/tmp/vellum-joined-timing-core');sdk=Path('/private/tmp/vellum-doclinks-sdk-bd3cbc9/retained SDK/vellum-v0.1.0-alpha.2');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();load=lambda p:json.loads(p.read_text());original=sdk/'drivers/cogent/build/upstream'
+old=load(q.parent/'macos-upload-probe/build-identity.json');lib=Path(old['root'])/'libs-darwin/arm64/libwgpu_native.a';assert sha(lib)==old['archive_sha256'] and all(sha(Path(k))==v for k,v in old['private_source_pins'].items())
+source_vector={x.relative_to(original).as_posix():sha(x) for x in original.rglob('*') if x.is_file()};private_vector={x.relative_to(p).as_posix():sha(x) for x in p.rglob('*') if x.is_file()};assert set(private_vector)-set(source_vector)=={'paint/renderers/rasterx/vellum_raster_clock.go','paint/renderers/rasterx/vellum_raster_clock_test.go'};changes=[k for k,h in source_vector.items() if private_vector[k]!=h];assert changes==['paint/renderers/rasterx/renderer.go']
+for name in ['recorder-v2','pixels-v2','native-build-v2']:
+ d=load(q/(name+'-receipt.json'));run=d['run'];assert run['error'] is None and run['exit_code']==0 and run['owned']['terminal'] and run['owned']['group_absent'] and not run['owned']['errors'] and not run['observation_errors'] and run['pins_stable'] and run['logs_complete'] and not run['stop_at_exit'];assert all(sha(Path(k))==v for k,v in d['inputs'].items())
+ for stream,m in run['logs'].items():assert sha(q/name/stream)==m['sha256'] and (q/name/stream).stat().st_size==m['bytes']
+assert os.access(q/'framework-v2',os.X_OK)
+for n in ['raster_clock.go','raster_clock_test.go','native_main_darwin.go','fixture_test.go']:assert (q/n).read_bytes()==(r/'tools/macos-calibration/joined/testdata'/n).read_bytes()
+for n in ['raster_clock.go','raster_clock_test.go']:assert (q/n).read_bytes()==(p/'paint/renderers/rasterx'/('vellum_'+n)).read_bytes()
+for n in ['desktop_session.go','desktop_measurement.go','frame_trace.go']:assert sha(q/n)==old['overlay_files_sha256']['artifacts/macos-upload-probe/'+n]
+sys.path.insert(0,str(r/'scripts'));s=importlib.util.spec_from_file_location('joined_sdk_verify',q.parent/'macos-release-default-assessment/assessment.py');a=importlib.util.module_from_spec(s);sys.modules[s.name]=a;s.loader.exec_module(a);assert a.sdk_vector()==load(q.parent/'macos-release-default-assessment/plan.json')['sdk']
+identity={'scope':'private absolute raster/upload/scheduling diagnostic; no performance repair or release qualification','binary_sha256':sha(q/'framework-v2'),'native_archive':{'path':str(lib),'sha256':sha(lib),'policy':'reviewed original allocation/cache policy with CPU-upload scalar observer; no pool/cache candidate'},'pins':load(q/'native-build-v2-receipt.json')['inputs'],'original_core_files':source_vector,'private_core_changed_files':changes,'private_core_added_files':sorted(set(private_vector)-set(source_vector)),'sdk_files':8321}
+if (q/'build-identity.json').exists():assert load(q/'build-identity.json')==identity
+else:(q/'build-identity.json').write_text(json.dumps(identity,indent=2)+'\n')
+print('PASS private binary, original-policy native archive, exact3reviewedoverlays, soleCoreRenderbracket+2probe/testfiles, SDK8321 and all3focusedbuild/test/log/ownership receipts.')
