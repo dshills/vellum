@@ -1,0 +1,106 @@
+{
+  "outcome": "REJECT",
+  "reason": "actual receipt phase match/join",
+  "prepared_commit": "acec5a2c02e1e46f261e9617f2508cfd722c3923",
+  "elapsed_seconds": 43.075568,
+  "native_seconds": 34.72370683285408,
+  "native_exit": 0,
+  "native_stderr_bytes": 0,
+  "foreground_losses": 0,
+  "parent_input_backend_display_validation": "PASS",
+  "strict_phase_validation": "REJECT",
+  "first_phase_violation": {
+    "sequence": 4,
+    "cohort": "warmup",
+    "phase": 3,
+    "receipt_phase_error_ms": 2.365380059927702,
+    "within_original_phase_bound": false,
+    "attempt": 14,
+    "drawable": 13,
+    "tag": 10,
+    "pending_at_receipt_hook": [],
+    "pending_observations": {
+      "receipt": {
+        "attempts": [],
+        "other_attempts": []
+      },
+      "present_request": {
+        "attempts": [
+          14
+        ],
+        "other_attempts": []
+      },
+      "final_gpu_end": {
+        "attempts": [
+          14
+        ],
+        "other_attempts": []
+      }
+    },
+    "receipt_to_shown_ms": 49.71725004725158,
+    "schedule_wake_lateness_ms": 1.088881,
+    "foreground_check_ms": 1.013958,
+    "postcheck_to_receipt_ms": 0.2597915008664131
+  },
+  "phase_violations_all": 155,
+  "phase_violations_warmup": 74,
+  "phase_violations_measured": 81,
+  "maximum_phase_error_ms": 4.182765726000071,
+  "completed_warmup": 128,
+  "completed_measured": 120,
+  "all_rows_independently_joined": 248,
+  "attempts": 258,
+  "events": 1022,
+  "display_ticks": 1987,
+  "scoped_metrics_joined": 252,
+  "callbacks_positive": 257,
+  "callbacks_zero": 1,
+  "measured_pending_other_counts": {
+    "receipt": 0,
+    "present_request": 0,
+    "final_gpu_end": 0
+  },
+  "unqualified_measured_descriptive_stats": {
+    "receipt_to_shown_ms": {
+      "count": 120,
+      "p50": 29.570124810561538,
+      "p95": 37.36249986104667,
+      "p99": 37.57370845414698,
+      "max": 40.88162491098046
+    },
+    "over_33_3_ms": 30,
+    "wake_lateness_ms": {
+      "count": 120,
+      "p50": 1.083111,
+      "p95": 1.160672,
+      "p99": 1.589683,
+      "max": 1.795766
+    },
+    "foreground_check_ms": {
+      "count": 120,
+      "p50": 0.995959,
+      "p95": 1.399791,
+      "p99": 1.550625,
+      "max": 2.098459
+    },
+    "postcheck_to_receipt_ms": {
+      "count": 120,
+      "p50": 0.2096665557473898,
+      "p95": 0.5347083788365126,
+      "p99": 1.0344584006816149,
+      "max": 1.118416665121913
+    }
+  },
+  "pending_acquiring_zero": true,
+  "recorder_scope_closed": true,
+  "owned_groups_retired": 9,
+  "raw_logs_verified": 18,
+  "pins_SDK_geometry_configuration_unchanged": true,
+  "SDK_files": 8321,
+  "sealed": true,
+  "retry": false,
+  "features_changed": false,
+  "release_gate_changed": false,
+  "release_qualified": false,
+  "interpretation": "All248 rows retained and joined without phase filtering; overall scope remains rejected. Descriptive statistics are not valid phase-matched calibration, native comparison, ordinary workload or release evidence. No older recorded acquired drawable awaits callback at the three inspected endpoints of120measured inputs; this does not prove Metal pool availability/compositor depth. Existing timer waits until target before dispatching foreground check and snapshot; roughly1ms wake debt plus foreground check contributes to late receipts. Next repair the private scheduling preparation before target while retaining the same actual receipt0..2ms rule, original input route, all identity/clock constraints and release gate."
+}

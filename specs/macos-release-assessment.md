@@ -510,3 +510,15 @@ pass; source-drift refusal fixed and final build passes. A fresh private binary
 retains unchanged Core/backend/match/schedule/validators and 40/60-second caps.
 No live result yet, no extra native observation for valid requests, and no feature
 or release-gate change. Earlier rejected scopes stay sealed.
+
+
+The [complete context-enabled timed journal](../docs/reports/macos-framework-context-result/README.md)
+passes input/backend/display-clock checks with 248 completed inputs and no focus
+loss, but strict phase admission rejects 155 receipts above2ms (74warmup/81measured).
+All248 joins/258attempts/1022events/1987ticks retained, pending/acquiring0, scope
+closed;9groups/18logs/pins/SDK8321/geometry/configuration verify.43.076s total.
+Unqualified descriptive p95 37.362ms,30/120above33.3ms is not release evidence.
+No older recorded pending acquisition at the three inspected endpoints of120
+measured inputs; no compositor/pool-availability inference. Next move private
+scheduling preparation before target, final wait before dispatch, preserve the
+same actual receipt0..2ms and all unchanged gates. Scope sealed; no unchanged retry.

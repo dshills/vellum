@@ -1,0 +1,14 @@
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "complete": true,
+  "files": 5,
+  "findings": 0,
+  "discarded": 1,
+  "discarded_disposition": "0052d39e8cd83f1d inspected: archived execution-source helper records actual local provenance, explicitly not advertised as a portable standalone CLI. README states external pinned workspace is required for full revalidation. All archive member hashes and committed-copy mappings verified independently. No reproducibility claim beyond that scope.",
+  "suppressed": 0,
+  "internal_verification": "46regular archive members and2committed mappings byte-verified;9groups18logs. Strict fullvalidator remainsREJECT, parent input/backend/display validatorsPASS. All248 rows independently joined, no phase exclusions;155 violations retained,257positive+1zero callbacks preserved. No measured percentile qualification or native comparison inferred.",
+  "features_changed": false,
+  "release_gate_changed": false,
+  "release_qualified": false
+}
