@@ -1,0 +1,86 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "ed2e4e81a4edb61420c3c448533153da",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "d67ffc2117c6a21b24577f14c0c55124bc469904",
+    "branch": "codex/macos-preview"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4570,
+    "totalMs": 4597
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 23593,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 12872,
+        "output": 393,
+        "costUSD": 0.029674
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "3ea2517e124a556e",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Public guard refusal is an unhandled traceback, not a clean refusal",
+        "message": "The README says the public export refusal confirms the tooling blocks cleanly, but the retained receipt shows an uncaught ValueError traceback with exit code 1. The guard works, but it surfaces as a crash rather than a handled refusal. Raw tracebacks leak internal paths and make it hard to tell an intentional block from a script bug.",
+        "suggestion": "Catch ValueError in release-sdk.py main(), print a clean message to stderr and exit non-zero. Store a receipt that records the refusal message rather than a traceback.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "docs/reports/macos-preview-lifecycle100/public-guard-refusal.json",
+            "lines": {
+              "start": 6,
+              "end": 8
+            }
+          }
+        ],
+        "tags": [
+          "release",
+          "error-handling"
+        ],
+        "evidence": "\"stderr\": \"Traceback (most recent call last):\\n  File \\\"\u003cUSER_HOME\u003e/Development/projects/Vellum/scripts/release-sdk.py\\\", line 555, in \u003cmodule\u003e",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/macos-preview-lifecycle100/public-guard-refusal.json"
+    }
+  ],
+  "suppressed": []
+}

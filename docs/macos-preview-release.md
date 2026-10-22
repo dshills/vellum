@@ -49,7 +49,10 @@ or gesture, expected/actual behavior, smallest fix and focused retest here.
 - R3: acceptance in progress; full repository check passed and initial packaged
   drawing workflows passed. The first 100-cycle run stopped at 83 cycles; the owner
   subsequently confirmed other desktop activity. Its raw failure remains unchanged
-  and is inconclusive as a controlled run. A fresh quiet run is required before acceptance. The first
+  and is inconclusive as a controlled run. The [fresh quiet run](reports/macos-preview-lifecycle100/README.md) passes
+  100 cycles and 99 same-name replacement checks. The alpha.3 independent native
+  starter and Unicode text/editor/dialog fixture also pass. Hidden-window ownership,
+  packaged-app acceptance, active editing and the two-hour soak remain open. The first
   soak stopped after native close requests at about 152 seconds; no two-hour soak
   pass is claimed. See the [first checkpoint](reports/macos-preview-r3-first/README.md).
 - R4: alpha.3 identity committed at `aaa0a3a`; guarded public native exporter repair

@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "expected_refusal": "Public release blocked: third-party/native binary distribution audit is incomplete",
+  "output_created": false,
+  "real_audit": "pending",
+  "stderr": "Traceback (most recent call last):\n  File \"<USER_HOME>/Development/projects/Vellum/scripts/release-sdk.py\", line 555, in <module>\n    main()\n    ~~~~^^\n  File \"<USER_HOME>/Development/projects/Vellum/scripts/release-sdk.py\", line 549, in main\n    print(json.dumps(package(ROOT, args.output.absolute(), args.public, args.include_untracked,\n                     ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        macos_gpu_library=args.macos_gpu_library, macos_gpu_sha256=args.macos_gpu_sha256,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        macos_gpu_provenance=args.macos_gpu_provenance), indent=2))\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<USER_HOME>/Development/projects/Vellum/scripts/release-sdk.py\", line 440, in package\n    release_gates(root, metadata, public)\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<USER_HOME>/Development/projects/Vellum/scripts/release-sdk.py\", line 85, in release_gates\n    raise ValueError(\"Public release blocked: \" + \"; \".join(failures))\nValueError: Public release blocked: third-party/native binary distribution audit is incomplete\n",
+  "stdout": ""
+}

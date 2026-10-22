@@ -1,0 +1,95 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "6383b6dcd47002ee6902255b0a738daa",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "d67ffc2117c6a21b24577f14c0c55124bc469904",
+    "branch": "codex/macos-preview"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "18c2ed79506c0950",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Elapsed time differs between receipts",
+      "message": "The README states the 100-cycle run took 1,051.84 seconds. That matches run.json (1051.837), but terminal.json's final sample shows 1051.671 and summary.json reports no elapsed time. The spread is small and plausibly sampling-time versus process-exit time, but the report does not say so, and a reader cannot tell which is authoritative.",
+      "suggestion": "Document in the README that run.json is the wall-clock total and the terminal.json samples are in-process timings.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reports/macos-preview-lifecycle100/run.json",
+          "lines": {
+            "start": 11,
+            "end": 11
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "location-corrected"
+      ],
+      "evidence": "\"elapsed_seconds\": 1051.8374674580991,",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 8334,
+    "totalMs": 7001
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 240000,
+    "chunks": 2,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 135918,
+        "output": 311,
+        "costUSD": 0.274946
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 47582,
+    "skipped": [
+      {
+        "target": "diff",
+        "reason": "truncated at maxDiffBytes (47582 bytes not reviewed)"
+      }
+    ],
+    "complete": false
+  },
+  "discarded": [],
+  "suppressed": []
+}
