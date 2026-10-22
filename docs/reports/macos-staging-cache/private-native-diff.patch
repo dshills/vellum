@@ -1,0 +1,60 @@
+--- /private/tmp/vellum-staging-reuse/core/src/resource.rs
++++ /private/tmp/vellum-staging-cache/core/src/resource.rs
+@@ -1127 +1127 @@
+-        let stage_desc = hal::BufferDescriptor {
++        let mut stage_desc = hal::BufferDescriptor {
+@@ -1135,0 +1136 @@
++        if tracked { stage_desc.memory_flags.insert(hal::MemoryFlags::VELLUM_TEXTURE_UPLOAD); }
+--- /private/tmp/vellum-staging-reuse/source/src/lib.rs
++++ /private/tmp/vellum-staging-cache/source/src/lib.rs
+@@ -4896,0 +4897,14 @@
++
++// Private one-shot cache configuration before device creation; no handles.
++#[no_mangle]
++pub extern "C" fn vellumCacheConfigure(default_cache: bool) -> bool {
++    hal::metal::vellum_cache_control::configure(default_cache)
++}
++#[no_mangle]
++pub unsafe extern "C" fn vellumCacheSnapshot(out: *mut u64, capacity: usize) -> usize {
++    let values = hal::metal::vellum_cache_control::snapshot();
++    if !out.is_null() && capacity >= values.len() {
++        core::ptr::copy_nonoverlapping(values.as_ptr(), out, values.len());
++    }
++    values.len()
++}
+--- /private/tmp/vellum-staging-reuse/source/Cargo.lock
++++ /private/tmp/vellum-staging-cache/source/Cargo.lock
+@@ -1109,2 +1108,0 @@
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "31f8e1a9e7a8512f276f7c62e018c7fa8d60954303fed2e5750114332049193f"
+--- /private/tmp/vellum-staging-reuse/source/Cargo.toml
++++ /private/tmp/vellum-staging-cache/source/Cargo.toml
+@@ -138,0 +139 @@
++wgpu-hal = { path = "../hal" }
+--- /private/tmp/vellum-staging-reuse/cargo-home/registry/src/index.crates.io-1949cf8c6b5b557f/wgpu-hal-29.0.3/src/lib.rs
++++ /private/tmp/vellum-staging-cache/hal/src/lib.rs
+@@ -1872,0 +1873 @@
++        const VELLUM_TEXTURE_UPLOAD = 1 << 31;
+--- /private/tmp/vellum-staging-reuse/cargo-home/registry/src/index.crates.io-1949cf8c6b5b557f/wgpu-hal-29.0.3/src/metal/device.rs
++++ /private/tmp/vellum-staging-cache/hal/src/metal/device.rs
+@@ -415 +415,6 @@
+-        options.set(MTLResourceOptions::CPUCacheModeWriteCombined, map_write);
++        let marked = desc.memory_flags.contains(crate::MemoryFlags::VELLUM_TEXTURE_UPLOAD);
++        let controlled = marked
++            && desc.usage == (wgt::BufferUses::MAP_WRITE | wgt::BufferUses::COPY_SRC)
++            && desc.memory_flags == (crate::MemoryFlags::TRANSIENT | crate::MemoryFlags::VELLUM_TEXTURE_UPLOAD);
++        options.set(MTLResourceOptions::CPUCacheModeWriteCombined,
++            map_write && !(controlled && super::vellum_cache_control::default_cache()));
+@@ -426,0 +432,6 @@
++            }
++            if marked {
++                // A malformed marker must be observable as a refusal, never silently broaden scope.
++                super::vellum_cache_control::record(
++                    if controlled { raw.cpuCacheMode().0 as u64 } else { u64::MAX },
++                    raw.storageMode().0 as u64);
+--- /private/tmp/vellum-staging-reuse/cargo-home/registry/src/index.crates.io-1949cf8c6b5b557f/wgpu-hal-29.0.3/src/metal/mod.rs
++++ /private/tmp/vellum-staging-cache/hal/src/metal/mod.rs
+@@ -1167,0 +1168,3 @@
++
++/// Private texture-upload cache diagnostic.
++pub mod vellum_cache_control;

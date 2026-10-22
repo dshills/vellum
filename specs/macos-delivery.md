@@ -1099,3 +1099,9 @@ all120 measured uploads reused on,18groups/closedledgers/SDKpins. Both miss33.3m
 one ordered instrumented pair does not qualify noise/equivalence or shipping.
 Original42.564ms schedule refusal remains unexplained; no unchanged retry, policy
 adoption or gate change. Inspect remaining source/presentation cost; M3–M7 open.
+
+A [texture-only cached completed-staging candidate](../docs/reports/macos-staging-cache/README.md)
+is prepared privately after the original-WC pool still misses33.3ms. New explicit
+HAL marker scopes cache mode to existing texture allowlist; pool/completion/limits
+unchanged. Offline builds and focused tests pass; one44-readback GPU pair required
+before timing. No shipping/SDK/app/default/gate change; M3–M7 open.
