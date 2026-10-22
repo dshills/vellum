@@ -1,0 +1,18 @@
+from pathlib import Path
+import hashlib,json,sys,importlib.util,subprocess,os
+sys.dont_write_bytecode=True
+x=Path(__file__).resolve().parent.parent;q=Path(__file__).resolve().parent/'prepared';r=Path('/Users/dshills/Development/projects/Vellum');code=r/'tools/macos-calibration/displayclock';load=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+identity=load(q/'build-identity.json');assert os.access(q/'framework',os.X_OK) and sha(q/'framework')==identity['binary_sha256'] and identity['native_archive_sha256']=='10e39953bda1045da3bd9c315dcac0add646fa86e74627b3c896723d31b86a35'
+for name in ['fixture-build-v2','fixture-v2','pixels-v2','native-build-v2']:
+ d=load(q/(name+'-receipt.json'));run=d['run'];assert run['exit_code']==0 and run['error'] is None and run['owned']['terminal'] and run['owned']['group_absent'] and not run['owned']['errors'] and not run['observation_errors'] and run['pins_stable'] and run['logs_complete'] and not run['stop_at_exit']
+ assert all(sha(Path(p))==v for p,v in d['pins'].items())
+ for stream,m in run['logs'].items():p=q/name/stream;assert sha(p)==m['sha256'] and p.stat().st_size==m['bytes']
+assert (q/'fixture-build-v2/stderr').stat().st_size==0
+run=subprocess.run([sys.executable,'-m','unittest','-v','check_test'],cwd=code,capture_output=True,text=True);(q/'classifier.stdout').write_text(run.stdout);(q/'classifier.stderr').write_text(run.stderr);assert run.returncode==0
+s=importlib.util.spec_from_file_location('reproduce_display_clock',code/'prepare.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);repro=q.parent/'reproduction-v2';m.prepare(r,x/'macos-joined-backend/prepared',repro)
+vec=lambda p:{f.relative_to(p).as_posix():sha(f) for f in p.rglob('*') if f.is_file()};assert vec(q/'consumer')==vec(repro/'consumer')
+for n in ['framework.mod','framework.sum','overlay.json','desktop_session.go','desktop_measurement.go','frame_trace.go','match.json']:
+ assert (q/n).read_bytes().replace(str(q).encode(),b'ARTIFACTS')==(repro/n).read_bytes().replace(str(repro).encode(),b'ARTIFACTS')
+sys.path.insert(0,str(r/'scripts'));s=importlib.util.spec_from_file_location('display_clock_host',x/'macos-release-default-assessment/assessment.py');a=importlib.util.module_from_spec(s);sys.modules[s.name]=a;s.loader.exec_module(a);assert a.sdk_vector()==load(x/'macos-release-default-assessment/plan.json')['sdk']
+checks={'outcome':'PREPARED_ONLY_NO_NATIVE_CAPTURE','classifier_methods':8,'negative_subcases':20,'late_callback_and_gap_control':'retained rather than discarded','native_recorder_ownership_fixture':'PASS without NSApplication/window; off/on, single-use, overflow/no eviction, bad clocks/order, identity drift, JSON bound, invalidation/release','native_fixture_compile':'warning-free -Wall -Wextra -Werror, macOS14+ diagnostic','original_routed_complete_pixels':'PASS with unchanged raster clock','prior_race_checks':'Reused unchanged joined recorder/Core/source-info native build, no Rust/SDK rebuild','preparation_reproduction':'Exact full consumer, modules and overlays after path normalization','SDK_files_unchanged':8321,'source_log_pin_ownership_checks':'PASS all4ownedgroups','native_archive_sha256':identity['native_archive_sha256'],'binary_sha256':identity['binary_sha256'],'gate_changed':False,'policy_changed':False,'release_qualified':False}
+(q/'preparation-checks.json').write_text(json.dumps(checks,indent=2)+'\n');print(json.dumps(checks))

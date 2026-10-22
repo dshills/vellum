@@ -343,3 +343,14 @@ command, source, SDK, configuration and log accounting is retained. The original
 design, SDK, app, defaults, features and 33.3 ms gate remain unchanged. M3–M7 are
 open; no repair or ordinary-build qualification follows. The approved live scope
 is consumed; this result does not authorize another native attempt.
+
+The [display scheduling preparation](../docs/reports/macos-display-scheduling/README.md)
+adds a private view-linked display-clock observer without GPU work, frame requests
+or layer/presentation policy changes. Eight focused methods and 20 negative cases,
+headless native ownership checks, full routed pixels, private consumer build and
+source/SDK/log/reproduction checks pass. Exact reviewed native/Core bytes are
+reused. Reported timestamps/targets are not optical scanout, guaranteed latch
+opportunities or missed-vsync proof. One approved observer-off/on pair may follow
+review and commit, capped at 100 seconds overall and 40 seconds per native case.
+No native result yet. Features, SDK/app, defaults and 33.3 ms gate remain unchanged;
+M3–M7 stay open.

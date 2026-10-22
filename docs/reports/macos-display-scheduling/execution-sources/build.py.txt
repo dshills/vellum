@@ -1,0 +1,16 @@
+from pathlib import Path
+import json,hashlib,sys,importlib.util
+sys.dont_write_bytecode=True
+x=Path(__file__).resolve().parent.parent;q=Path(__file__).resolve().parent/'prepared';r=Path('/Users/dshills/Development/projects/Vellum');code=r/'tools/macos-calibration/displayclock';consumer=q/'consumer';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+sys.path.insert(0,str(r/'scripts'));sys.path.insert(0,str(x/'macos-grid-capture-repair/preflight-v2'));sp=importlib.util.spec_from_file_location('clock_owned',x/'macos-sdk-native-238b3b6/run.py');g=importlib.util.module_from_spec(sp);sp.loader.exec_module(g)
+pins=json.loads((q/'reused-build-identity.json').read_text())['pins'];assert all(sha(Path(p))==h for p,h in pins.items());pins.update({str(p):sha(p) for root in [code,consumer] for p in root.rglob('*') if p.is_file()});pins.update({str(q/n):sha(q/n) for n in ['framework.mod','framework.sum','overlay.json','desktop_session.go','desktop_measurement.go','frame_trace.go','match.json']})
+name=sys.argv[1];case=name.removesuffix('-v2');base=['/usr/bin/sandbox-exec','-p','(version 1)(allow default)(deny network*)'];cwd=consumer
+if case=='fixture-build':argv=base+['/usr/bin/clang','-fno-objc-arc','-mmacosx-version-min=14.0','-Wall','-Wextra','-Werror','-framework','Cocoa','-framework','QuartzCore',str(code/'testdata/native_fixture.m'),'-o',str(q/'native-fixture')]
+elif case=='fixture':argv=base+[str(q/'native-fixture')];pins[str(q/'native-fixture')]=sha(q/'native-fixture')
+else:
+ argv=base+['/bin/sh',str(x/'macos-app-examples/go-check')]
+ if case=='pixels':argv+=['test','-tags=offscreen','-modfile='+str(q/'framework.mod'),'-overlay='+str(q/'overlay.json'),'-run','^TestRoutedStateAndExactPatchPixels$','-count=1','-v','.']
+ elif case=='native-build':argv+=['build','-modfile='+str(q/'framework.mod'),'-overlay='+str(q/'overlay.json'),'-ldflags=-buildid='+json.loads((q/'reused-build-identity.json').read_text())['native_archive_sha256'],'-o',str(q/'framework'),'.']
+ else:raise ValueError(case)
+run=g.execute(argv,cwd,q/name,lambda:False,lambda:all(sha(Path(p))==v for p,v in pins.items()),timeout=180,limit=4<<20);(q/(name+'-receipt.json')).write_text(json.dumps({'pins':pins,'run':run},indent=2)+'\n');print(json.dumps({case:{k:run[k] for k in ['exit_code','error','seconds']}}),flush=True);assert run['exit_code']==0 and run['error'] is None and run['owned']['group_absent']
+if case=='native-build':(q/'build-identity.json').write_text(json.dumps({'binary_sha256':sha(q/'framework'),'native_archive_sha256':json.loads((q/'reused-build-identity.json').read_text())['native_archive_sha256'],'pins':pins,'SDK_changed':False,'policy_changed':False},indent=2)+'\n')

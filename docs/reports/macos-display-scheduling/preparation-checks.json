@@ -1,0 +1,18 @@
+{
+  "outcome": "PREPARED_ONLY_NO_NATIVE_CAPTURE",
+  "classifier_methods": 8,
+  "negative_subcases": 20,
+  "late_callback_and_gap_control": "retained rather than discarded",
+  "native_recorder_ownership_fixture": "PASS without NSApplication/window; off/on, single-use, overflow/no eviction, bad clocks/order, identity drift, JSON bound, invalidation/release",
+  "native_fixture_compile": "warning-free -Wall -Wextra -Werror, macOS14+ diagnostic",
+  "original_routed_complete_pixels": "PASS with unchanged raster clock",
+  "prior_race_checks": "Reused unchanged joined recorder/Core/source-info native build, no Rust/SDK rebuild",
+  "preparation_reproduction": "Exact full consumer, modules and overlays after path normalization",
+  "SDK_files_unchanged": 8321,
+  "source_log_pin_ownership_checks": "PASS all4ownedgroups",
+  "native_archive_sha256": "10e39953bda1045da3bd9c315dcac0add646fa86e74627b3c896723d31b86a35",
+  "binary_sha256": "4ea7d61cb26c52405b8222a1fd1ea1c2069bb8f4b32f8932bb6cbb91b9ce3c1d",
+  "gate_changed": false,
+  "policy_changed": false,
+  "release_qualified": false
+}
