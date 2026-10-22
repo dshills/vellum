@@ -281,3 +281,13 @@ SDK/source/native/configuration/geometry pins stable. Three transitions are not
 a latency distribution, per-tag source attribution or displayed-byte proof.
 Inspect no-paint path execution/raster boundaries offscreen next; no repair,
 unchanged retry, default/SDK/app/gate change or release acceptance. M3–M7 open.
+
+The [focused offscreen raster cost checkpoint](../docs/reports/macos-raster-offscreen-cost/README.md)
+uses unchanged Core: full warm replay167.693–172.643µs, four no-paint paths
+129.5–130.6ns, last fill163.943–165.436µs, zero allocations. ExplicitCPU2,
+three observations/case, two focused Go methods and nine parser refusals pass.
+Native scalar geometry matches; overwritten colors/full path bytes and temporal
+conditions differ, so no native equivalence, phase sum or latency claim follows.
+No path-elision candidate or new native run is justified. Investigate separated
+replay/cache conditions offscreen next; features/defaults/SDK/app and33.3ms gate
+unchanged. M3–M7 open; no production repair adopted.

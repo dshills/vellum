@@ -1,0 +1,14 @@
+"""Reproduce preparation or verify retained generated output; no Go execution."""
+from pathlib import Path
+import subprocess,json,hashlib,argparse
+p=argparse.ArgumentParser();p.add_argument('--artifacts',type=Path,default=Path(__file__).resolve().parent);p.add_argument('--repo',type=Path,default=Path('/Users/dshills/Development/projects/Vellum'));p.add_argument('--core',type=Path,default=Path('/private/tmp/vellum-raster-cost-repro-core'));p.add_argument('--reference-core',type=Path,default=Path('/private/tmp/vellum-raster-cost-core'));p.add_argument('--sdk',type=Path,default=Path('/private/tmp/vellum-doclinks-sdk-bd3cbc9/retained SDK/vellum-v0.1.0-alpha.2'));p.add_argument('--verify-existing',action='store_true');args=p.parse_args();q=args.artifacts.resolve();r=args.repo.resolve();core=args.core.resolve();ref=args.reference_core.resolve()
+if not args.verify_existing:
+ s=subprocess.run(['python3','-B',str(r/'tools/macos-calibration/rastercost/prepare.py'),'--sdk',str(args.sdk.resolve()),'--core',str(core),'--artifacts',str(q/'repro')],capture_output=True,text=True,timeout=30);assert s.returncode==0,s.stderr
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();assert {str(p.relative_to(ref)):sha(p) for p in ref.rglob('*') if p.is_file()}=={str(p.relative_to(core)):sha(p) for p in core.rglob('*') if p.is_file()}
+assert (q/'framework.mod').read_text()==(q/'repro/framework.mod').read_text().replace(str(core),str(ref));assert (q/'framework.sum').read_bytes()==(q/'repro/framework.sum').read_bytes()
+for n in ['fixture.go','replay_test.go']:assert (q/n).read_bytes()==(q/'repro'/n).read_bytes()
+old=json.loads((q/'overlay.json').read_text())['Replace'];new=json.loads((q/'repro/overlay.json').read_text())['Replace'];probe=str(r/'tools/macos-calibration/stagingreuse/framework/probe_darwin.go');removed=old.pop(probe);assert Path(removed).read_text().splitlines()[0]=='//go:build darwin && !offscreen';assert Path(probe).read_text().splitlines()[0]=='//go:build darwin && !offscreen'
+assert old=={k:v.replace(str(q/'repro'),str(q)) for k,v in new.items()}
+result={'passed':True,'verified_existing':args.verify_existing,'active_overlay_equal':True,'ignored_native_override':probe,'scope':'Exact fixture/test/module/sum/fullCore and normalized active compiler overlay reproduction. No second Go benchmark or native run.'}
+(q/'prepare-overlay-verification.json').write_text(json.dumps(result,indent=2)+'\n')
+print('PASS exact fixture/test/module/sum/fullCore and normalized active overlay; omitted native-only override confirmed excluded by offscreen build tag.')
