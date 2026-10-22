@@ -1,0 +1,45 @@
+{
+  "checkpoint": "R3_FAILED_FIRST_LIFECYCLE_NOT_ACCEPTED",
+  "repository_check": "PASS 923.1146 seconds Go1.25.6 sourceee60649; do not repeat without changed runtime/failure",
+  "package": "/private/tmp/vellum-preview-r2/Vellum Placement Preview.app",
+  "native_pid": 70665,
+  "observations": [
+    "Empty startup",
+    "Keyboard Block Return created block-1 one Undo",
+    "Native Connector drag created connector-2 once at(-220,-60), Undo2",
+    "Empty drag panned; wheel zoom changed100->94->91; nohistoryedit",
+    "Escape canceled Note drag; rejected Note release left2objectsUndo2",
+    "Undo removedconnector, Redo restoredconnector-2 withUndo2",
+    "Layer Addselectionselected2; Group createdgroup-1 Undo3",
+    "Nativecornerresize changedBlock80x50->96x82 andConnector120x16->144x26 Undo4",
+    "Nativegroupmove completedUndo5; transientLayersmenu observed then dismissed; not yet classified/reproduced",
+    "NativeSaveAs /private/tmp/vellum-preview-r2/R3 Drawing.vellum reportedclean2objectsUndo5",
+    "New reset0objects; nativeOpen restored2objects,group-1,dimensions96x82/144x26,zoom91%, Undo0",
+    "Native ExportSVG wrote2rects matching objectcount",
+    "Native ExportPNG 1x transparent wrote360x180 PNG; pixel inspection passed: 7872blue/3888green/53040transparent",
+    "Native SVG export parsed 2 exact component rects with IDs/dimensions/fills",
+    "Native PNG export parsed360x180 transparent PNG; pixels verified:7872blue/3888green/53040transparent",
+    "Native CmdQ closed clean saved app; CUA reported App quit, PID70665 independently observed absent"
+  ],
+  "limitations": [
+    "CUAcoordinate drag producednochange; reusedpriorauthorizednativehelper withonlybundleIDchanged",
+    "getApp initialization took~19minutes unexpectedly; count wall time withinexisting sessionbudget",
+    "HumanVoiceOver/IME/inputsourcechangesnotperformed",
+    "R3 remaining: complete script and resource/lifecycle/idle/activity/twohoursoak; do not markcomplete"
+  ],
+  "no_live_performance_campaign": true,
+  "resource_check": {
+    "session_id": 24973,
+    "command": "window-cycle -composed -same-name -cycles=100 -sample-every=10 -timeout=25m",
+    "state": "FAILED_TERMINAL",
+    "exit_code": 1,
+    "completed_cycles": 83,
+    "requested_cycles": 100
+  },
+  "current_remaining": [
+    "Diagnose unattributed breadcrumb activation; do not relax admission guard",
+    "Remaining required app/native workflow scope",
+    "100cycle acceptance, tenminuteactivity and twohoursoak notpassed",
+    "R4 rights/publiccapsuledecision and R5finalalpha3artifacts"
+  ]
+}
