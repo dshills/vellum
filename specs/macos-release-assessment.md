@@ -217,3 +217,10 @@ timing pair; no shipping/SDK/app, feature/pacing or 33.3 ms gate change.
 The [private staging framework timing pair](../tools/macos-calibration/stagingreuse/TIMING.md)
 is prepared after the44-readback/closed-ledger proof. One off/on pair, same library/
 binary and original cache policy,90seconds overall. No gate/shipping change.
+
+The first staging timing attempt is retained rejected: request five42.563959ms late,
+four warmup receipts/zero measured, enabled mode not run. No timing comparison or
+unchanged retry. [Segmented request telemetry](../tools/macos-calibration/stagingreuse/SEGMENTS.md)
+now separates timer wake and synchronous foreground observation without changing
+20ms validity,33.3ms release gate, source/SDK/app/defaults or M3–M7. One90second
+instrumented pair after review; old cause unproven.

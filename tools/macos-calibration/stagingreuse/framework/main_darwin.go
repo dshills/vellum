@@ -17,6 +17,11 @@ import (
 	"time"
 )
 
+type requestPhase struct {
+	Sequence                                               int
+	WakeLatenessNS, ForegroundCheckNS, PostCheckLatenessNS int64
+}
+
 func good(d map[string]any) bool {
 	return d["active"] == true && d["key"] == true && d["visible"] == true && d["pid"] == d["front_pid"] && d["losses"] == float64(0) && d["drawables"] == float64(2) && d["vsync"] == true && d["transactions"] == false && d["timeout"] == false
 }
@@ -160,6 +165,7 @@ func run() (result error) {
 		}
 		base := time.Now().Add(120 * time.Millisecond)
 		lateness := make([]int64, 0, 248)
+		phases := make([]requestPhase, 0, 248)
 		for i := 1; i <= 248; i++ {
 			target := base.Add(time.Duration(i-1) * 120 * time.Millisecond)
 			if delay := time.Until(target); delay > 0 {
@@ -171,10 +177,15 @@ func run() (result error) {
 				case <-timer.C:
 				}
 			}
-			if !good(observe(0)) {
+			wake := time.Now()
+			state := observe(0)
+			checked := time.Now()
+			if !good(state) {
 				return errors.New("foreground/configuration changed during cohort")
 			}
 			late := time.Since(target).Nanoseconds()
+			phases = append(phases, requestPhase{Sequence: i, WakeLatenessNS: wake.Sub(target).Nanoseconds(), ForegroundCheckNS: checked.Sub(wake).Nanoseconds(), PostCheckLatenessNS: late})
+			out["request_schedule_phases"] = phases
 			lateness = append(lateness, late)
 			out["lateness_ns"] = lateness
 			if late > 20_000_000 {
