@@ -489,3 +489,15 @@ phase/backend/clock/receipt/drawable/callback constraints remain unchanged, with
 No UI or rebuild yet; ownerauthorizedscreenforremainingreleasetests. Review/commit
 preparationthenactualresult. No nativecomparison, representativequalification or
 feature/default/SDK/app/33.3ms/60Hz gatechange; M3–M7 open.
+
+
+The [first corrected framework timed cohort](../docs/reports/macos-framework-pending-result/README.md)
+is rejected during warmup: 32 completed inputs, request 33 foreground/configuration
+loss, invalid display observer, zero measured inputs. All 42 attempts/158 events
+and 259 ticks are retained; independent replay and 36 scoped sample joins pass.
+All nine groups retire, pending/acquiring zero, recorder closed and all pins,
+SDK 8321, geometry/configuration unchanged. Total 12.111 s, native 5.218 s.
+No latency/cadence/native comparison or release qualification follows. Another PID
+was foreground; its identity/cause is unknown. Nil key-window layer does not prove
+window destruction. Record the first failed per-request state before a fresh
+attempt; do not retry this sealed scope. Features and release gate remain unchanged.

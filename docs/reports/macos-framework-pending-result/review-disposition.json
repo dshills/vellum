@@ -1,0 +1,54 @@
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "complete": true,
+  "original_files": 5,
+  "correction_files": 2,
+  "findings": [
+    {
+      "id": "5ca4582018a27e88",
+      "disposition": "Addressed: explicit capture/REL to original prepared/REL mapping and helper portability/external-input limitations added to index and README. Original helper executed and verified against actual local pinned inputs."
+    },
+    {
+      "id": "36d1698d0aafaa2f",
+      "disposition": "Not a defect. Enumerated actual archive and indexed filenames:9 owned.json members (4before+4after+native),18 stdout/stderr members. All44 regular members match hashes/sizes and2 committed mappings match bytes. The review text itself counts8 probes plusnative=9; explicit expected-count metadata is not required to count exact listed members. Power stdout/stderr are included under capture/before/power and capture/after/power."
+    }
+  ],
+  "local_archive_verification": {
+    "members": 44,
+    "owned_groups": [
+      "capture/after/display/owned.json",
+      "capture/after/os/owned.json",
+      "capture/after/power-settings/owned.json",
+      "capture/after/power/owned.json",
+      "capture/before/display/owned.json",
+      "capture/before/os/owned.json",
+      "capture/before/power-settings/owned.json",
+      "capture/before/power/owned.json",
+      "capture/native/owned.json"
+    ],
+    "logs": [
+      "capture/after/display/stderr",
+      "capture/after/display/stdout",
+      "capture/after/os/stderr",
+      "capture/after/os/stdout",
+      "capture/after/power-settings/stderr",
+      "capture/after/power-settings/stdout",
+      "capture/after/power/stderr",
+      "capture/after/power/stdout",
+      "capture/before/display/stderr",
+      "capture/before/display/stdout",
+      "capture/before/os/stderr",
+      "capture/before/os/stdout",
+      "capture/before/power-settings/stderr",
+      "capture/before/power-settings/stdout",
+      "capture/before/power/stderr",
+      "capture/before/power/stdout",
+      "capture/native/stderr",
+      "capture/native/stdout"
+    ],
+    "committed_mappings": 2
+  },
+  "internal_review": "Full actual-data verification passes; strict full validator refuses foreground loss. No measurement exclusion/relabeling; all42 attempts including2zero callbacks retained;0measured inputs.",
+  "gate_changed": false
+}
