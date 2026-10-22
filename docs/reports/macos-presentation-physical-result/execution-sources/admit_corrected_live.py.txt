@@ -1,0 +1,21 @@
+from pathlib import Path
+import datetime,hashlib,json,subprocess,sys
+sys.dont_write_bytecode=True
+X=Path(__file__).resolve().parent;Q=X/'prepared';R=Path('/Users/dshills/Development/projects/Vellum');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def git(*args):return subprocess.check_output(['git',*args],cwd=R,text=True).strip()
+head=git('rev-parse','HEAD');assert head=='340a1bdb3875b7a10ee62ba202d3d97ad3927d8f' and not git('status','--porcelain=v1')
+assert all(n.startswith('docs/reports/macos-presentation-overlay/') or n=='specs/macos-release-assessment.md' for n in git('diff','--name-only','1124f8c..HEAD').splitlines())
+assert not (Q/'started.json').exists() and not (Q/'stop-live').exists() and not (Q/'result.json').exists()
+b=json.loads((Q/'build-identity.json').read_text());assert all(sha(Path(p))==h for p,h in b['pins'].items());assert sha(Q/'framework')==b['framework_sha256']=='6825d90efe89f75ce1361c8bf75542ff2866c2869061b5ae95405a576646466a';assert sha(Q/'native')==b['native_sha256']=='44c85638e4fb3415fd979869cd4d25806d8fe7626660eb9a3b9381505aedb91d'
+i=json.loads((Q/'physical-core-identity.json').read_text())
+for root,key in [('original','original_files'),('physical','physical_files')]:
+ p=Path(i[root]);assert not any(f.is_symlink() for f in p.rglob('*'));assert {f.relative_to(p).as_posix():sha(f) for f in p.rglob('*') if f.is_file()}==i[key]
+assert json.loads((Q/'linked-hook-audit.json').read_text())['binary_sha256']==b['framework_sha256']
+assert (Q/'linked-hook-audit.json').read_bytes()==(R/'docs/reports/macos-presentation-physical/linked-hook-audit.json').read_bytes()
+review=json.loads((R/'docs/reports/macos-presentation-physical/review-completion.json').read_text());assert review['complete'] and review['unresolved_actionable_findings']==0
+old=(Q/'preparation-commit.json').read_bytes();assert json.loads(old)['head']=='1124f8c44df6f2ebf22cbfe51d08db71f7e42d84'
+(X/'preparation-commit-before-live.txt').write_bytes(old)
+auth='Proceed with the corrected live check. You can use the screen for up to three minutes. Keep features and the release gate unchanged, review with Prism using Anthropic Claude Sonnet 5.5, and commit.'
+(Q/'preparation-commit.json').write_text(json.dumps({'head':head,'built_preparation_commit':'1124f8c44df6f2ebf22cbfe51d08db71f7e42d84','review_complete':True,'provider':'anthropic','model':'claude-sonnet-5-5','fresh_desktop_approval':auth,'rebind_reason':'Only reviewed offscreen result documentation since preparation; all compiled pins, binaries and both full Core vectors verified unchanged.'},indent=2)+'\n')
+(X/'corrected-live-admission.json').write_text(json.dumps({'result':'PASS_OFFSCREEN_ADMISSION','head':head,'human_authorization':auth,'utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'pins_verified':len(b['pins']),'Core_files_verified':len(i['physical_files']),'binary_source_review_reused':True,'no_rebuild':True,'maximum_live_seconds':100,'per_case_seconds':40,'allowed_screen_seconds':180,'features_changed':False,'gate_changed':False,'prior_scope_sealed':True},indent=2)+'\n')
+print('PASS offscreen admission:',len(b['pins']),'compiled pins; 6031 original/physical Core files; unchanged binaries; reviewed docs-only HEAD rebind; one100second attempt authorized')

@@ -445,3 +445,15 @@ unchanged. This confirms the materialization rationale, not the separate startup
 feedback failure. The user explicitly deferred the next live attempt; corrected
 capture remains unstarted. No UI launch, feature/default/SDK/app/gate change or
 release qualification; M3–M7 remain open.
+
+
+The [corrected live phase-control attempt](../docs/reports/macos-presentation-physical-result/README.md)
+stops after40.713seconds: native returns normally, but measured request215
+arrives2.143599ms after its target, violating the predeclared2ms diagnostic phase
+bound. All248 raw clock/tag/drawable/callback joins, parent/clock/replay checks,
+9ownedgroups/log/configuration/geometry/source/SDK8321 checks pass; no filtering,
+retry or cutoff change. Fail-first prevents framework launch, so corrected startup
+and a matched latency comparison remain unverified. The attempt is sealed and
+desktop free. A separate startup-only check is the next direct unresolved test;
+none is authorized or executed here. Features/defaults/SDK/app and33.3ms release
+gate unchanged; M3–M7 open. Actual rejection receives review and commit.

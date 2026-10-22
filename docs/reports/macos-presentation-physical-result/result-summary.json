@@ -1,0 +1,43 @@
+{
+  "outcome": "REJECT",
+  "prepared_commit": "340a1bdb3875b7a10ee62ba202d3d97ad3927d8f",
+  "elapsed_seconds": 40.713063,
+  "owned_groups_retired": 9,
+  "cases": [
+    {
+      "kind": "native",
+      "native_seconds": 34.05082341702655,
+      "exit_code": 0,
+      "command_error": null,
+      "validated": false,
+      "classifier_rejection": {
+        "type": "ValueError",
+        "message": "actual receipt phase match/join"
+      },
+      "unaccepted_trace_counts": {
+        "events": 1001,
+        "attempts": 251,
+        "requests": 248
+      },
+      "unaccepted_terminal": {
+        "configured": true,
+        "invalid": false,
+        "overflow": false,
+        "pending": 0,
+        "acquiring": 0
+      }
+    }
+  ],
+  "pair_validation": null,
+  "error": {
+    "type": "ValueError",
+    "message": "actual receipt phase match/join"
+  },
+  "attempt_sealed": true,
+  "native_retry": false,
+  "release_qualified": false,
+  "gate_changed": false,
+  "production_change": false,
+  "interpretation": "Phase acceptance and pending records are diagnostic only. Pending=acquisition awaiting callback, not Metal pool availability/retention/credits/compositor queue. Four phase populations stay separate; no pureframework cost, causal fix or ordinary qualification claim.",
+  "SDK_files_unchanged": 8321
+}

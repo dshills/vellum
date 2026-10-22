@@ -1,0 +1,15 @@
+{
+  "result": "PASS_INTERNAL_OFFSCREEN_RESULT_REVIEW",
+  "archive_members": 50,
+  "archive_sha256": "b9a09e182a970b6aab3d645e413885c3a47ec9e54f0a86b216ce0d9eda911533",
+  "all_manifest_and_committed_copy_hashes": true,
+  "owned_groups_retired": 9,
+  "raw_logs_verified": 18,
+  "full_248_receipt_phase_and_identity_audit": "PASS with sole predeclared phase violation at215 retained; classifier rejection reproduced.",
+  "framework_started": false,
+  "runtime_retried": false,
+  "corrected_startup_verified": false,
+  "scope": "No shipping feature/backend/pacing/SDK/app/gate change. Bounded actual result only, not qualification.",
+  "unresolved_result_interpretation_findings": 0,
+  "next": "Await a separately scoped startup-only check rather than inferring startup from compiled hooks or retrying unchanged native phase pair."
+}
