@@ -1,5 +1,14 @@
 # Local SDK consumption and performance measurements
 
+**Developer-preview policy, approved 22 October 2026:** the
+[first-release plan](macos-first-release-plan.md) governs the macOS preview.
+Numeric latency/cadence qualification and full endurance/platform certification
+below remain future full-qualification work, with historical failures preserved.
+Correctness, bounded resources, required workflows, independent SDK consumption
+and applicable distribution rights remain preview blockers. This does not mark
+M3–M7 complete or authorize public publication/signing.
+
+
 The root framework module stays standard-library-only. The native adapter is a
 separate module, `github.com/dshills/vellum/drivers/cogent`, matching its repository
 directory. The framework namespace is `github.com/dshills/vellum` and its own code

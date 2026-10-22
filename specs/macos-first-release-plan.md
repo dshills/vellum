@@ -1,6 +1,6 @@
-# First macOS release: delivery proposal
+# First macOS developer-preview release plan
 
-Date: 22 October 2026. Status: **proposal awaiting owner approval**.
+Date: 22 October 2026. Status: **approved by the owner; active delivery plan**.
 
 The recommendation is to deliver a **macOS developer preview**, proposed version
 `v0.1.0-alpha.3`, in three working sessions plus one contingency session. This is
@@ -10,11 +10,14 @@ Placement application, a minimal external starter, and accurate release notes.
 It is more than another internal app build. It does not claim the production
 framework, full platform matrix, or existing M3–M7 requirements are complete.
 
-The owner's request for a plan does **not** approve a changed release gate.
-[The current policy](macos-responsiveness.md) remains in force until the owner
-approves the specific preview policy below. No new renderer investigation is
-needed to prepare that decision. No performance experiments ran while preparing
-this proposal.
+The owner approved this plan on 22 October 2026: “Approved. Proceed with the
+macOS developer-preview release plan. Keep features frozen, review each
+checkpoint with Prism using Anthropic Claude Sonnet 5.5, and commit. Stay within
+the agreed session budget.” The preview policy below now governs this release;
+the prior numeric performance requirements remain full-qualification targets.
+See the [execution ledger](../docs/macos-preview-release.md) for candidate,
+budget, blockers and completed checkpoints. No performance experiment is needed
+to adopt this policy.
 
 ## Why delivery stalled
 
@@ -47,9 +50,9 @@ The process failure was allowing diagnostic work to stay on the critical path
 without a product release decision. More instrumentation does not itself make
 the SDK consumable, the application reliable, or the distribution ready.
 
-## Proposed preview policy — explicit approval required
+## Approved preview policy
 
-Approve these changes as one preview-only scope decision. Historical results and
+The owner approved these changes as one preview-only scope decision. Historical results and
 the full qualification ledger stay intact; a failed result is never relabeled.
 
 | Area | Required for this preview | Deferred claim/work |
@@ -251,5 +254,4 @@ honestly labeled. It does not mean every old research target has turned green.
 If the owner instead requires full M3–M7 qualification for this first release,
 retain the existing policy. There is currently no evidence-based completion
 date for its latency blocker; plan the larger backend work separately rather
-than offering another short release promise. The recommended next action is
-approval of this preview policy, followed by R1/R2, not another profiler run.
+than offering another short release promise. The approved next actions are R1/R2. No new profiler run is on the preview critical path.

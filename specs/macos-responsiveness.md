@@ -1,5 +1,14 @@
 # Mac release responsiveness policy
 
+**Developer-preview policy, approved 22 October 2026:** the
+[first-release plan](macos-first-release-plan.md) governs the macOS preview.
+Numeric latency/cadence qualification and full endurance/platform certification
+below remain future full-qualification work, with historical failures preserved.
+Correctness, bounded resources, required workflows, independent SDK consumption
+and applicable distribution rights remain preview blockers. This does not mark
+M3–M7 complete or authorize public publication/signing.
+
+
 The owner selected this policy on 19 October 2026: **“Use measured 60 Hz
 responsiveness as the release gate; keep 4 ms as an optimization target.”**
 This decision supersedes treating the prototype's provisional CPU budgets as

@@ -1,5 +1,14 @@
 # SDK versioning, compatibility and release artifacts
 
+**Developer-preview policy, approved 22 October 2026:** the
+[first-release plan](macos-first-release-plan.md) governs the macOS preview.
+Numeric latency/cadence qualification and full endurance/platform certification
+below remain future full-qualification work, with historical failures preserved.
+Correctness, bounded resources, required workflows, independent SDK consumption
+and applicable distribution rights remain preview blockers. This does not mark
+M3–M7 complete or authorize public publication/signing.
+
+
 `release/version.json` and the public `vellum.Version` constant identify
 `v0.1.0-alpha.2`. This is an alpha packaging/API version; no Git tag or remote
 release is created by these tools. The owner selected `github.com/dshills/vellum`
