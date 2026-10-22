@@ -55,6 +55,10 @@ or gesture, expected/actual behavior, smallest fix and focused retest here.
   packaged-app acceptance, active editing and the two-hour soak remain open. The first
   soak stopped after native close requests at about 152 seconds; no two-hour soak
   pass is claimed. See the [first checkpoint](reports/macos-preview-r3-first/README.md).
+  [Packaged alpha.3 editing/persistence/recovery acceptance](reports/macos-preview-app-acceptance/README.md)
+  now passes for its listed interactions, including an exact-content controlled
+  recovery round trip and normal process retirement. Active editing and the soak
+  remain separate required resource checks; final corrected-notice packaging is pending.
 - R4: alpha.3 identity committed at `aaa0a3a`; guarded public native exporter repair
   at `b0e5106`; stale exported contract version corrected at `412e5b8`. All changes
   have focused tests and Prism reviews. Applicable notice collection and real

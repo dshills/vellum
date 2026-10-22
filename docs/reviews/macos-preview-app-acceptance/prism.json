@@ -1,0 +1,113 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b3f7728103a159aed972a00daea21629",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "282e41741fefee4bd7d9b90f7be315cbb9318cbf",
+    "branch": "codex/macos-preview"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6706,
+    "totalMs": 6728
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 18,
+    "bytes": 28067,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 15197,
+        "output": 669,
+        "costUSD": 0.037084
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "e7aeac56c763005d",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Drag evidence shows app was not frontmost before input",
+        "message": "The 'quiet' drag artifact reports frontmost=false before input was posted, while the README describes it as a success 'with foreground retained'. Foreground was not retained before the drag; it was only true afterward. This weakens the claim and is inconsistent with the other artifacts, which show frontmost=true.",
+        "suggestion": "Correct the README wording to match the artifact, or rerun the drag with the app confirmed frontmost beforehand and replace the artifact.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "docs/reports/macos-preview-app-acceptance/alpha3-native-drag-quiet.json",
+            "lines": {
+              "start": 1,
+              "end": 1
+            }
+          }
+        ],
+        "tags": [
+          "evidence",
+          "consistency"
+        ],
+        "evidence": "\"frontmost\":false,\"frontmost_after\":true",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/macos-preview-app-acceptance/alpha3-native-drag-quiet.json"
+    },
+    {
+      "finding": {
+        "id": "c595faad255d398b",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "",
+        "message": "The zoom evidence file shows status_before and status_after both at zoom 100% with no change, yet the README claims wheel zoom changed the toolbar to 94%. The retained artifact does not support the claim; the 94% value is only visible indirectly in the saved drawing's zoom field. Acceptance evidence that contradicts its own narrative undermines the report.",
+        "suggestion": "Capture the toolbar zoom value in the evidence (a post-zoom toolbar readout), or reword the README to say the 94% value comes from the saved drawing rather than from this artifact.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "docs/reports/macos-preview-app-acceptance/alpha3-native-zoom.json",
+            "lines": {
+              "start": 1,
+              "end": 1
+            }
+          }
+        ],
+        "tags": [
+          "evidence",
+          "consistency"
+        ],
+        "evidence": "\"status_after\":\"Selected:  • zoom 100% • 2 objects • 0 selected • Undo 2 \\/ Redo 0\"",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/macos-preview-app-acceptance/alpha3-native-zoom.json"
+    }
+  ],
+  "suppressed": []
+}
