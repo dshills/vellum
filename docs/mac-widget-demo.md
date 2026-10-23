@@ -28,7 +28,10 @@ sections. The ordinary macOS title bar remains draggable.
   outside it. Keyboard focus returns to the button.
 - **Objects:** click to replace selection, Command-click to toggle, Shift-click
   for a range. Command-Shift adds a range. Shift-Up/Down/Home/End extends by
-  keyboard. Command-A selects all enabled objects. The reject checkbox demonstrates controlled values.
+  keyboard. Command-A selects all enabled objects. Selected rows become inactive
+  gray when keyboard focus leaves the list or the native window loses activation;
+  returning to the window preserves its focused row and selection. The reject
+  checkbox demonstrates controlled values.
 - **Date/time:** type `2026-10-24 14:30` and commit, or choose a calendar day.
   Month arrows browse without changing the accepted value. Tab/Shift-Tab and
   Return/Space reach calendar buttons; Escape cancels. Invalid dates leave the

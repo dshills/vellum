@@ -391,3 +391,35 @@ Focused race tests cover these cases, fixed allocation across Tab, shared-input
 reparent/style removal, queued refresh ownership, numeric fills and Mac field
 geometry. Vet passes. Prism Anthropic claude-sonnet-5-5 completed coverage with no
 findings. Native composite confirmation follows in the private package receipt.
+
+## Native window activation for source lists
+
+The native attachment already receives main-thread Focus(bool), but the driver
+ignored it. Mac multi-selection lists now use that callback and an initial
+main-thread GLFW focus query. Each bridge owns one bounded activation signal.
+Callbacks record only the latest observation; at most one cancelable deferred
+node reaches the originating native FIFO. Publication happens on that window's
+render owner before one subtree restyle. All rows therefore see one published
+state during the pass, even if a later native notification arrives meanwhile.
+
+Inactive selections are gray with no active row outline. Keyboard focus and
+accepted membership are preserved. The originating host holds the signal, so
+new/reparented descendants inherit it without per-control registrations. Other
+controls' native-window activation cues are unchanged. There is no foundation
+patch, polling, new public API or rendering/pacing/release-policy change.
+
+Race tests cover initial observation before binding, bounded bursts, unchanged
+latest state, foreign source/wake rejection, exactly-once consumption, concurrent
+close and bridge retirement. Mounted light/dark tests route the native FIFO
+without draining a saturated application queue, check every selected row, retain
+keyboard focus, mount a new list while inactive and reject foreign/closed signals.
+Vet and adjacent origin routing, ListBox and attachment/window lifetime checks
+are recorded separately. Native activation confirmation follows packaging.
+
+Prism Anthropic claude-sonnet-5-5 completed coverage and reported a hypothetical
+SendDeferred admission failure. In the pinned events/deque.go implementation,
+SendDeferred only returns the error from its prepare callback. This callback
+unconditionally returns a valid event and nil; there is no closed-deque failure
+or capacity-refusal path. The pending marker therefore cannot be stranded by the
+reported error. Queue cancellation and delivery/close races are exercised. No
+production change is needed for this finding.

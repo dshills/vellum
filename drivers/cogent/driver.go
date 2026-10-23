@@ -82,6 +82,7 @@ type nativeWindow struct {
 	lossMu           sync.Mutex
 	input            atomic.Pointer[textWindow]
 	visibility       atomic.Pointer[windowVisibility]
+	activation       atomic.Pointer[windowActivation]
 	metrics          *frameWindowMetrics
 	presentation     *presentationSink
 	desktop          *DesktopSession
@@ -381,6 +382,10 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					return
 				}
 				w.source.Store(w.body.SystemEvents())
+				if err := bindWindowActivation(w); err != nil {
+					failWindow(w, err)
+					return
+				}
 				if err := bindWindowVisibility(w); err != nil {
 					failWindow(w, err)
 					return

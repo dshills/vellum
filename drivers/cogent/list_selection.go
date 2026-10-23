@@ -62,7 +62,7 @@ func styleSourceRow(r *record, id string, s *styles.Style) {
 	s.IconSize.Zero()
 	s.StateLayer = 0
 	s.Border.Width.Zero()
-	if s.Is(states.Focused) {
+	if s.Is(states.Focused) && sourceListHasActiveFocus(r) {
 		s.Border.Width = s.MaxBorder.Width
 		s.Border.Color = s.MaxBorder.Color
 		s.Border.Style = s.MaxBorder.Style
@@ -71,7 +71,7 @@ func styleSourceRow(r *record, id string, s *styles.Style) {
 	s.Padding.Set(units.Dp(4), units.Dp(8))
 	s.Min.Y = units.Dp(24)
 	if ui.ListOptionSelected(r.node, id) {
-		if r.widget.AsWidget().ContainsFocus() {
+		if sourceListHasActiveFocus(r) {
 			s.Background = colors.Uniform(sourceSelectionBackground(true))
 			s.Color = colors.Uniform(color.NRGBA{R: 255, G: 255, B: 255, A: 255})
 		} else {
@@ -112,7 +112,7 @@ func sourceListNeedsFocusRestyle(r *record) bool {
 	if r.node.Kind != ui.ListBox || !r.node.Multiple {
 		return false
 	}
-	want := sourceSelectionBackground(r.widget.AsWidget().ContainsFocus())
+	want := sourceSelectionBackground(sourceListHasActiveFocus(r))
 	for _, id := range r.node.SelectedIDs {
 		row := r.control.choice.buttons[id]
 		if row == nil {

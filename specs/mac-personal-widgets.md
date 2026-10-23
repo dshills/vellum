@@ -118,3 +118,11 @@ Source-list focus appearance uses the existing accessibility focus invalidation.
 The originating window refresh reconciles all selected row colors, including
 rows whose native focus state did not change. Draining the shared application
 model queue must not directly restyle a native list.
+
+Mac multi-selection source lists also mute selected rows when their native window
+loses activation, retaining the keyboard-focused row and accepted selection. The
+existing native attachment focus callback carries only a bounded latest state;
+appearance is published and restyled on that window's render owner. Repeated
+identical notifications do not restyle, and retirement cancels queued work. This
+increment does not change other controls' window-activation cues, rendering,
+pacing or release policy.

@@ -39,6 +39,7 @@ import (
 
 	"cogentcore.org/core/system/driver/desktop"
 	"github.com/dshills/vellum/app"
+	"github.com/go-gl/glfw/v3.4/glfw"
 )
 
 type accessibilityAttachment struct {
@@ -47,7 +48,7 @@ type accessibilityAttachment struct {
 	text    *textWindow
 }
 
-func (n *accessibilityAttachment) Focus(bool) {}
+func (n *accessibilityAttachment) Focus(focused bool) { n.bridge.activation.observe(focused) }
 func (n *accessibilityAttachment) Close() {
 	n.display.close()
 	if n.text != nil {
@@ -67,6 +68,7 @@ func configureAccessibility(a *app.Application) error {
 	}
 	desktop.TheApp.NativeAttach = func(w *desktop.Window) (desktop.NativeAttachment, error) {
 		b := newAccessibilityBridgeWithVisibility(a, newWindowVisibility())
+		b.activation.observe(w.Glw.GetAttrib(glfw.Focused) == glfw.True)
 		if C.vellumAXAttach(C.uint64_t(b.token), w.Glw.GetCocoaView(), w.Glw.GetCocoaWindow()) == 0 {
 			b.closeFrom("native-attach-failed")
 			return nil, fmt.Errorf("cogent: native accessibility attachment failed")
