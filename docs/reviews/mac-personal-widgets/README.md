@@ -234,3 +234,14 @@ reported outside the view callback. Final review suggests additional nil guards
 for every fixed fixture record. Missing controls would already fail the test via
 a panic with a stack location; this affects diagnostics, not false acceptance or
 production behavior. It is not a blocker for this passing coverage checkpoint.
+
+## Long token labels
+
+A valid 240-byte tag allocated a 1916-pixel chip inside a 384-pixel toolbar.
+Clipped hit-test bounds alone hid that defect; the strengthened regression checks
+full allocation too. Visible token labels now abbreviate centrally at 24 runes,
+keeping the remove suffix visible under the compact Mac defaults. Accepted text,
+duplicate checks, removal payloads and full accessible names are unchanged.
+Short/long/Unicode value tests and actual mounted keyboard removal pass, as do UI
+race tests, adjacent token/dark toolbar regressions and vet. Prism Anthropic
+claude-sonnet-5-5 completed coverage with no findings.

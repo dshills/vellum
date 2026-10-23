@@ -23,7 +23,9 @@ type TokenEvent struct {
 // TokenField is owner-held. Return commits one trimmed token; suggestion choice
 // uses the same Change path. Chip buttons remove via click or Tab/Return/Space.
 // The owner accepts by changing Tokens, and controls Draft separately. No token
-// rearrangement or in-place chip editing is implemented. Retain on one owner.
+// rearrangement or in-place chip editing is implemented. Visible chip labels
+// longer than 24 runes abbreviate centrally; values and accessible names stay full.
+// Retain on one owner.
 type TokenField struct {
 	ID, Label, Draft, Placeholder string
 	Tokens                        []Token
@@ -55,6 +57,14 @@ func (f *TokenField) validate() error {
 func validTokenText(s string) bool {
 	return strings.TrimSpace(s) != "" && len(s) <= 256 && utf8.ValidString(s) && !strings.ContainsAny(s, "\x00\r\n")
 }
+func compactTokenLabel(text string) string {
+	runes := []rune(text)
+	if len(runes) <= 24 {
+		return text
+	}
+	return string(runes[:12]) + "…" + string(runes[len(runes)-11:])
+}
+
 func (f *TokenField) View() (Node, error) {
 	if err := f.validate(); err != nil {
 		return Node{}, err
@@ -69,7 +79,7 @@ func (f *TokenField) View() (Node, error) {
 	chips := Node{ID: id + "/tokens/chips", Kind: Toolbar, Style: Style{Background: Some(color.NRGBA{}), Gap: Some(float32(4)), Padding: Some(Insets{})}}
 	for _, t := range f.Tokens {
 		shown := t
-		chips.Children = append(chips.Children, Node{ID: TokenRemoveID(id, t.ID), Kind: Button, Text: t.Text + " ×", Style: chipStyle, Accessibility: Accessibility{Name: "Remove " + t.Text, Help: "Remove this tag with Return or Space"}, Activate: func() {
+		chips.Children = append(chips.Children, Node{ID: TokenRemoveID(id, t.ID), Kind: Button, Text: compactTokenLabel(t.Text) + " ×", Style: chipStyle, Accessibility: Accessibility{Name: "Remove " + t.Text, Help: "Remove this tag with Return or Space"}, Activate: func() {
 			if !available() {
 				return
 			}

@@ -83,3 +83,8 @@ actual Manual pointer routing opens the color well's editor, its popup stays
 inside the viewport, and Escape closes it and restores anchor focus. These are
 deterministic offscreen checks; native display-scale qualification and arbitrary
 narrow/oversized content are not inferred from them.
+
+Long token chip labels abbreviate centrally at 24 runes to keep the trailing
+remove affordance visible in compact Mac forms. Accepted text, duplicate checks,
+removal proposals and accessibility names retain the full value. Multiple chips
+continue to use the existing horizontally scrollable toolbar.

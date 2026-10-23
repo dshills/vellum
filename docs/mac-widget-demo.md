@@ -42,7 +42,8 @@ chosen light/dark appearance. Sample edits are not saved between launches.
 New controls reuse managed components rather than shared system color/font
 panels. Color recents are a caller-supplied palette (maximum 16). Token suggestions
 use the dropdown; there is no per-keystroke completion filtering, comma-triggered
-commit, inline chip editing or rearrangement. Fonts use a caller-supplied catalog,
+commit, inline chip editing or rearrangement. Long chips abbreviate their visible labels;
+accessibility and removal keep the full value. Fonts use a caller-supplied catalog,
 may substitute if unavailable, and support sizes 6–144 logical pixels. Path
 controls describe virtual locations with explicit segment-count truncation, not
 filesystem access or width-responsive collapse. Secure entry holds ordinary Go

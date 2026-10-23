@@ -3,6 +3,7 @@ package ui
 import (
 	"strings"
 	"testing"
+	"unicode/utf8"
 )
 
 func TestTokenFieldControlledEditsAndStaleRemoval(t *testing.T) {
@@ -99,5 +100,31 @@ func TestTokenFieldRevokesUnrenderedSuggestionChanges(t *testing.T) {
 				t.Fatal("obsolete suggestion accepted before next View", change)
 			}
 		})
+	}
+}
+
+func TestTokenFieldCompactLabelsRetainFullNamesAndRemovalValues(t *testing.T) {
+	for _, label := range []string{"Design", strings.Repeat("Wide", 60), strings.Repeat("設計", 30)} {
+		var removed TokenEvent
+		f := &TokenField{ID: "tags", Tokens: []Token{{ID: "stable", Text: label}}, Change: func(e TokenEvent) { removed = e }}
+		n, err := f.View()
+		if err != nil {
+			t.Fatal(err)
+		}
+		chip := helperNode(t, n, TokenRemoveID("tags", "stable"))
+		shown := strings.TrimSuffix(chip.Text, " ×")
+		if utf8.RuneCountInString(shown) > 24 || !utf8.ValidString(shown) || chip.Accessibility.Name != "Remove "+label {
+			t.Fatal("compact tag lost presentation/accessibility contract", chip)
+		}
+		if len([]rune(label)) <= 24 && shown != label {
+			t.Fatal("short tag changed")
+		}
+		if len([]rune(label)) > 24 && !strings.Contains(shown, "…") {
+			t.Fatal("long tag was not abbreviated")
+		}
+		chip.Activate()
+		if removed.TokenID != "stable" || removed.Text != label || !removed.Remove || f.Tokens[0].Text != label {
+			t.Fatal("visible label changed the full removal proposal", removed)
+		}
 	}
 }
