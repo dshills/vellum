@@ -21,3 +21,13 @@ closed description to reach a new editor. No source change made for this finding
 Focused UI race tests, managed committed additions and keyboard chip removal, and
 gallery model tests passed. Prism completed with zero findings. Completion menus
 reuse ComboBox; no claim of per-keystroke filtering or Mail-style inline editing.
+
+## Font picker
+
+Focused UI race tests, managed Up-arrow size changes, committed family changes,
+preview typography and gallery tests passed. Prism's catalog-iteration suggestion
+was applied and retested. Both reviews also flag silent refusal of typeface events
+from a prior family; this is deliberate stale-event protection, covered by UI
+tests. Those actions must not edit a different family's typeface or emit user
+validation errors. Accepted callbacks are followed by owner reconciliation, which
+installs current-family controls. No remaining actionable finding.

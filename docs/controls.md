@@ -400,3 +400,12 @@ accepts by updating Tokens and clears Draft on acceptance. Enter one token with
 Return, or choose a suggestion. Focus a chip with Tab and press Return/Space to
 remove it. Duplicate labels, blank/invalid or >256-byte tokens are refused.
 No in-place chip editing, comma-triggered commit or chip dragging is provided.
+
+### Font picker
+
+`ui.FontPicker.View()` offers family, typeface, compact size stepper and a live
+plain-text preview. Supply a bounded catalog of `FontFamily`/`FontTypeface`, using
+installed font names. Accept with `picker.Value = event.Apply(picker.Value)`. Sizes
+are 6–144 logical pixels. Set FieldStyle from MacTheme TextField for light/dark
+inputs. Typed names must match a catalog entry; unavailable installed fonts may
+substitute. No automatic enumeration, installation or system font panel.

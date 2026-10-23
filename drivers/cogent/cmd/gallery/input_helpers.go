@@ -10,6 +10,8 @@ import (
 )
 
 type inputHelpersGallery struct {
+	fontPicker       *ui.FontPicker
+	fontError        string
 	tokens           *ui.TokenField
 	tokenNext        int
 	tokenError       string
@@ -34,6 +36,9 @@ type inputHelpersGallery struct {
 
 func newInputHelpersGallery() *inputHelpersGallery {
 	m := &inputHelpersGallery{name: "Untitled", quantity: 1}
+	m.fontPicker = &ui.FontPicker{ID: "drawing-font", Label: "Drawing font", Preview: "A drawing starts with an idea.", Value: ui.FontSelection{FamilyID: "helvetica", TypefaceID: "regular", Size: 16}, Families: []ui.FontFamily{{ID: "helvetica", Name: "Helvetica Neue", Typefaces: []ui.FontTypeface{{ID: "regular", Name: "Regular", Weight: 400}, {ID: "bold", Name: "Bold", Weight: 700}, {ID: "italic", Name: "Italic", Weight: 400, Italic: true}}}, {ID: "times", Name: "Times New Roman", Typefaces: []ui.FontTypeface{{ID: "regular", Name: "Regular", Weight: 400}, {ID: "bold", Name: "Bold", Weight: 700}}}, {ID: "menlo", Name: "Menlo", Typefaces: []ui.FontTypeface{{ID: "regular", Name: "Regular", Weight: 400}}}}}
+	m.fontPicker.Change = func(e ui.FontSelectionEvent) { m.fontPicker.Value = e.Apply(m.fontPicker.Value); m.fontError = "" }
+	m.fontPicker.Invalid = func(err error) { m.fontError = err.Error() }
 	m.tokens = &ui.TokenField{ID: "drawing-tags", Label: "Drawing tags", Tokens: []ui.Token{{ID: "tag-1", Text: "Design"}}, Suggestions: []ui.Option{{ID: "work", Label: "Work"}, {ID: "personal", Label: "Personal"}, {ID: "review", Label: "Review"}}}
 	m.tokenNext = 1
 	m.tokens.Change = func(e ui.TokenEvent) {
@@ -76,6 +81,7 @@ func (m *inputHelpersGallery) setDisabled(disabled bool) {
 	m.disabled = disabled
 	m.colorWell.Disabled = disabled
 	m.tokens.Disabled = disabled
+	m.fontPicker.Disabled = disabled
 	m.combo.Disabled = disabled
 	m.datePicker.Disabled = disabled
 	m.search.Disabled = disabled
@@ -85,6 +91,7 @@ func (m *inputHelpersGallery) setAppearance(dark bool) {
 	m.dark = dark
 	theme := ui.MacTheme(m.dark)
 	m.colorWell.PopoverStyle = theme.Kinds[ui.FormGroup]
+	m.fontPicker.FieldStyle = theme.Kinds[ui.TextField]
 	m.tokens.InputStyle = theme.Kinds[ui.TextField]
 	m.tokens.InputStyle.Padding = ui.Some(ui.Insets{})
 	m.tokens.InputStyle.MaxSize = ui.Some(ui.Size{Width: 360})
@@ -105,6 +112,10 @@ func (m *inputHelpersGallery) setAppearance(dark bool) {
 	m.search.ClearStyle = ui.Style{Border: ui.Some(ui.Border{}), Background: ui.Some(color.NRGBA{}), Padding: ui.Some(ui.UniformInsets(2))}
 }
 func (m *inputHelpersGallery) view() ui.Node {
+	font, err := m.fontPicker.View()
+	if err != nil {
+		return ui.Node{ID: "inputs", Kind: ui.Label, Text: err.Error()}
+	}
 	tokens, err := m.tokens.View()
 	if err != nil {
 		return ui.Node{ID: "inputs", Kind: ui.Label, Text: err.Error()}
@@ -160,6 +171,7 @@ func (m *inputHelpersGallery) view() ui.Node {
 	return ui.Node{ID: "inputs", Kind: ui.Scroll, Grow: true, Style: ui.Style{Background: ui.Some(background), Padding: ui.Some(ui.UniformInsets(20)), Gap: ui.Some(float32(16))}, Children: []ui.Node{
 		{ID: "inputs-title", Kind: ui.Label, Text: "Mac input widgets", Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 20, Weight: 600})}},
 		{ID: "inputs-description", Kind: ui.Label, Text: "Editable choices, context menus, popovers, selection and dates through public Go APIs."},
+		{ID: "font-group", Kind: ui.FormGroup, Text: "Font", Children: []ui.Node{font, {ID: "font-feedback", Kind: ui.Label, Text: m.fontError}}},
 		{ID: "tokens-group", Kind: ui.FormGroup, Text: "Tags — Return adds, chip button removes", Children: []ui.Node{tokens, {ID: "token-feedback", Kind: ui.Label, Text: m.tokenError}}},
 		{ID: "color-well-group", Kind: ui.FormGroup, Text: "Drawing color", Children: []ui.Node{well}},
 		search,

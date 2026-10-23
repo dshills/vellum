@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "19cc7016d4eb76b4cfeb786c519fa011",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "95f3c289d80fc5b37005a40ebbac904b8003e242",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "adb96991a65e0692",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Typeface edits silently dropped after family change",
+      "message": "The family-change handler builds the new value from p.Value at event time but the typeface-change handler compares against the captured `family` from View time. When the family is accepted between renders, the guard `p.Value.FamilyID != family.ID` silently drops the event with no feedback, and the preview/combos stay stale until re-render. This is intended but the dropped events never call invalid.",
+      "suggestion": "Acceptable; consider documenting. Ensure View is re-called after each Change.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/font_picker.go",
+          "lines": {
+            "start": 151,
+            "end": 153
+          }
+        }
+      ],
+      "tags": [
+        "stale",
+        "location-corrected"
+      ],
+      "evidence": "if f.ID == p.Value.FamilyID {\n\t\t\tfamily = f\n\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "e4c6bc5ae1374458",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Family handler indexes live catalog",
+      "message": "Family change handler preserves the current typeface ID if the new family has one with the same ID, but the loop over p.Families uses live p.Families rather than the validated catalog snapshot. available() guards DeepEqual so it is mostly safe; however f.Typefaces[0] is indexed without a length check after only validation at View time.",
+      "suggestion": "Iterate over `catalog` (the snapshot) instead of p.Families to avoid reliance on later mutation.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "ui/font_picker.go",
+          "lines": {
+            "start": 172,
+            "end": 172
+          }
+        }
+      ],
+      "tags": [
+        "robustness",
+        "location-corrected"
+      ],
+      "evidence": "if (e.OptionID != \"\" \u0026\u0026 e.OptionID == f.ID) || (e.OptionID == \"\" \u0026\u0026 e.Text == f.Name) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5822,
+    "totalMs": 5847
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 25111,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 14754,
+        "output": 598,
+        "costUSD": 0.035488
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

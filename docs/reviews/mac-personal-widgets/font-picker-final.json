@@ -1,0 +1,118 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "69a5ef30be341c5db09561bfe7de9a06",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "95f3c289d80fc5b37005a40ebbac904b8003e242",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a48fd5df1122f8f6",
+      "severity": "medium",
+      "category": "bug",
+      "title": "x",
+      "message": "The typeface callback is bound to the family captured at View time. When the owner calls View again after accepting, it gets new closures. But a stale family-change event arriving after another family change uses the old p.Value (read at event time), which is fine. However the faceCombo guard `p.Value.FamilyID != family.ID` silently drops events while the family combo in the same render stays enabled, so quick successive edits are lost without feedback.",
+      "suggestion": "Acceptable if intended; otherwise surface an Invalid/refresh signal for dropped obsolete events.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/font_picker.go",
+          "lines": {
+            "start": 174,
+            "end": 176
+          }
+        }
+      ],
+      "tags": [
+        "state",
+        "location-corrected"
+      ],
+      "evidence": "v.FamilyID, v.TypefaceID = f.ID, f.Typefaces[0].ID\n\t\t\t\tfor _, tf := range f.Typefaces {\n\t\t\t\t\tif tf.ID == p.Value.TypefaceID {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6341,
+    "totalMs": 6369
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 25243,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 14799,
+        "output": 622,
+        "costUSD": 0.035818
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "d6a785f5144ac61a",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Expensive availability check repeated",
+        "message": "available() runs reflect.DeepEqual plus a full validate() (map allocations) on every callback and on every Disabled computation (3 times per View), making each View O(catalog) with repeated allocations; with up to MaxMenuOptions families and faces this is wasteful.",
+        "suggestion": "Compute the disabled flag once in View and reuse it; keep the full check only in callbacks.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "ui/font_picker.go",
+            "lines": {
+              "start": 93,
+              "end": 93
+            }
+          }
+        ],
+        "tags": [
+          "performance"
+        ],
+        "evidence": "reflect.DeepEqual(catalog, p.Families) \u0026\u0026 p.validate() == nil",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in ui/font_picker.go"
+    }
+  ],
+  "suppressed": []
+}
