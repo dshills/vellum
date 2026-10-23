@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "8404887aa3e8979b9923dd2ac86da41c",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "320376ec8573a8603f75faaa3b3a7ea8a8ea0366",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "7f42d5ceeddeaf00",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Placeholder set unconditionally on every sync",
+      "message": "SetPlaceholder is called on every sync, even when the placeholder has not changed. This may trigger needless updates or re-layout, and it can also disturb a draft text the user is typing in the retained field.",
+      "suggestion": "Only call SetPlaceholder when the value differs from the current one: if w.Placeholder != r.node.Placeholder { w.SetPlaceholder(...) }.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/controls.go",
+          "lines": {
+            "start": 571,
+            "end": 571
+          }
+        }
+      ],
+      "tags": [
+        "cogent",
+        "retained-widget"
+      ],
+      "evidence": "w.SetPlaceholder(r.node.Placeholder)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3475,
+    "totalMs": 3489
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 14215,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 9242,
+        "output": 272,
+        "costUSD": 0.021204
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

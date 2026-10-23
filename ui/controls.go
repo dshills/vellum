@@ -48,6 +48,12 @@ type Option struct {
 	Checked   bool
 }
 
+// NumberFieldButtons selects a numeric field's pointer affordance.
+// Empty preserves the existing inline minus/plus buttons.
+type NumberFieldButtons string
+
+const NumberButtonsStepper NumberFieldButtons = "stepper"
+
 // Numeric uses finite float32 values supported by the native widgets. Step is
 // the keyboard increment; pointer and typed values need not be step multiples.
 type Numeric struct{ Min, Max, Step float32 }
@@ -128,6 +134,12 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if n.NumberButtons != "" && (n.Kind != NumberField || n.NumberButtons != NumberButtonsStepper) {
+		return fmt.Errorf("ui: NumberButtons requires stepper on NumberField")
+	}
+	if n.Placeholder != "" && n.Kind != TextField {
+		return fmt.Errorf("ui: Placeholder belongs only on TextField")
+	}
 	if n.Kind == ListBox {
 		if err := validateListBox(n); err != nil {
 			return err

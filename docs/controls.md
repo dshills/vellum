@@ -260,3 +260,78 @@ See [the contract](../specs/tab-close.md) for lifetime and accessibility details
 Canvas2D optionally exposes existing scene objects through `CanvasObjects` stable
 IDs and names. Option+Left/Right/Home/End selects visible named objects in paint
 order, with one host focus stop. See the [contract](../specs/canvas-accessibility.md).
+
+
+## Mac input helpers
+
+The post-preview widget branch adds three reusable components. They compose the
+existing managed primitives and work through the public Go API:
+
+| Component | Purpose |
+| --- | --- |
+| ui.SearchBox | Query input, placeholder, search symbol and Clear |
+| ui.FormField | A label, help, required indication and validation text for a control |
+| ui.InlineNotice | Inline feedback with an optional action |
+| ui.MacTheme(dark) | Application-local compact light/dark defaults |
+
+Retain mutable components on the application owner:
+
+~~~go
+search := &ui.SearchBox{ID: "find", Label: "Search objects"}
+search.Change = func(e ui.SearchEvent) { search.Text = e.Text }
+node, err := search.View() // include node in your window's view; handle err
+// Request focus with ui.SearchInputID("find").
+~~~
+
+Clear requests empty Text through the same handler. Leave Text unchanged to reject
+a proposal. Nil Change disables the input. The ordinary single-line field commit
+behavior is retained; there is no new per-keystroke query stream or search worker.
+Use InputStyle and ClearStyle for the private input/action presentation; Style
+applies to the outer row. Placeholder defaults to Label, while Accessibility.Name
+continues to supply the input's name independently of the hint.
+
+~~~go
+field, err := (ui.FormField{
+    ID: "name-field", Label: "Drawing name", Required: true,
+    Help: "Use a unique name.", ValidationMessage: nameError,
+    Content: ui.Node{ID: "name", Kind: ui.TextField, Text: name,
+        Change: func(e ui.ChangeEvent) { name = e.Text }},
+}).View()
+~~~
+
+The application supplies name/nameError and performs validation. Content must be
+a focusable leaf; its stable ID and callbacks are retained. Required is descriptive.
+An explicit accessible name is preserved; label/help/error text otherwise supplies
+the field's name and description. Error labels add no extra focus stop.
+
+~~~go
+notice := &ui.InlineNotice{
+    ID: "save-message", Tone: ui.NoticeWarning, Text: "The drawing has unsaved changes.",
+    ActionLabel: "Save", Activate: save,
+}
+message, err := notice.View()
+~~~
+
+The application supplies save. Omit both action fields for passive feedback.
+Information/success/warning/error tones choose a symbol and accessible description.
+These are ordinary semantic groups, not modal alerts or live-region announcements.
+
+To try the focused gallery after dependency preparation:
+
+~~~sh
+cd drivers/cogent
+go run ./cmd/gallery -mac-widgets
+go run ./cmd/gallery -mac-widgets -mac-dark
+~~~
+
+The regular gallery also has an Input helpers page. Applications opt into the
+same appearance with cogent.Driver{Theme: ui.MacTheme(false)} (true for dark).
+It uses installed Helvetica Neue and fixed light/dark colors. This is Mac-style
+custom rendering with existing native input/window integration, not AppKit
+NSControls or automatic accent/high-contrast tracking. See the
+[post-preview contract](../specs/mac-widget-expansion.md) for behavior and limits.
+
+For a compact Mac-style up/down affordance, set NumberButtons to
+ui.NumberButtonsStepper on a NumberField. The upper/lower arrow halves and normal
+arrow keys use the same value, step and clamped bounds; the field remains directly
+editable. Omitting NumberButtons preserves the existing inline minus/plus style.

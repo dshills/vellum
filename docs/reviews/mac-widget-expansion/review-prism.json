@@ -1,0 +1,113 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "73760d42dd492fd1ae81149f3440e55e",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "320376ec8573a8603f75faaa3b3a7ea8a8ea0366",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "ceea13a4bf130e47",
+      "severity": "medium",
+      "category": "bug",
+      "title": "View mutates retained components",
+      "message": "The gallery builds the search node and the results from different states in the same view. Because view() is called once for the whole gallery and again for the focused view, a model's mutating state is shared, which is fine, but the full gallery's view() calls g.inputHelpers.view() every render, applying style/disabled mutations to retained components as a side effect of the view.",
+      "suggestion": "Keep view construction free of mutation of retained components, or set the fields once when state changes.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/input_helpers.go",
+          "lines": {
+            "start": 55,
+            "end": 119
+          }
+        }
+      ],
+      "tags": [
+        "maintainability"
+      ],
+      "evidence": "matches := []ui.Node{}\n\tfor i, name := range []string{\"Block\", \"Connector\", \"Note\", \"Rounded rectangle\"} {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "84eb00d782ff15eb",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Placeholder check may not cover every kind",
+      "message": "The placeholder validation is added in ValidateControl, but the test expects errors for kinds like Column and Label; this depends on ValidateControl being invoked for containers. If Validate skips ValidateControl for some kinds, the placeholder is silently accepted.",
+      "suggestion": "Verify that Validate calls ValidateControl for every node kind, and add a test through Validate.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "ui/controls.go",
+          "lines": {
+            "start": 131,
+            "end": 4
+          }
+        }
+      ],
+      "tags": [
+        "correctness"
+      ],
+      "evidence": "if n.Placeholder != \"\" \u0026\u0026 n.Kind != TextField {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6687,
+    "totalMs": 6739
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 15,
+    "bytes": 48506,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 24698,
+        "output": 565,
+        "costUSD": 0.055046
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -50,6 +50,7 @@ type controlState struct {
 	disclosure        *disclosureState
 	split             *splitState
 	choice            *choiceState
+	number            *numberFieldState
 	menu              *menuState
 	dialog            *dialogState
 	wake              func(events.Event)
@@ -217,6 +218,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		widget = core.NewSlider(parent)
 	case ui.NumberField:
 		spinner := core.NewSpinner(parent)
+		bindNumberField(r, spinner)
 		bindFieldPointerFocus(&spinner.TextField)
 		widget = spinner
 	case ui.TextField:
@@ -551,17 +553,25 @@ func syncControl(r *record, previous ui.Node) error {
 			w.Type = core.MeterLinear
 		}
 	case *core.Spinner:
+		if err := syncFieldOutline(r, &w.TextField); err != nil {
+			return err
+		}
 		w.Precision = 9 // round-trip every float32 without crossing tight bounds
 		n := r.node.Numeric
 		w.SetMin(n.Min).SetMax(n.Max)
 		w.Step = n.Step
 		w.EnforceStep = false
+		syncNumberField(r, w)
 		if previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || committed {
 			w.SetValue(r.node.Number)
 		}
 	case *textcore.Editor:
 		syncEditor(r)
 	case *core.TextField:
+		if err := syncFieldOutline(r, w); err != nil {
+			return err
+		}
+		w.SetPlaceholder(r.node.Placeholder)
 		if previous.Text != r.node.Text {
 			r.control.textEpoch++
 		}
@@ -940,4 +950,23 @@ func focusWidget(r *record) (core.Widget, error) {
 		return first, nil
 	}
 	return nil, fmt.Errorf("cogent: focus target %q has no enabled tab", r.node.ID)
+}
+
+// syncFieldOutline keeps a caller's full border consistent with the backend's
+// layout/focus border. Filled fields reserve only a bottom focus border; using
+// that allocation with an all-sided custom border clips the resting outline.
+func syncFieldOutline(r *record, field *core.TextField) error {
+	style, err := ui.ResolveStyle(r.node, r.theme)
+	if err != nil {
+		return err
+	}
+	wanted := core.TextFieldFilled
+	if style.Border.Set && style.Border.Value.Width > 0 {
+		wanted = core.TextFieldOutlined
+	}
+	if field.Type != wanted {
+		field.Type = wanted
+		field.Update()
+	}
+	return nil
 }

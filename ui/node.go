@@ -35,6 +35,8 @@ type Node struct {
 	ID   string
 	Kind Kind
 	Text string
+	// Placeholder is a non-value hint on TextField; Accessibility.Name remains its label.
+	Placeholder string
 	// Icon is bundled artwork for Icon/Button/ToggleButton. Text is alternate
 	// text for an Icon. Icon-only actions require Accessibility.Name.
 	Icon Symbol
@@ -78,6 +80,8 @@ type Node struct {
 	Checked         bool
 	Number          float32
 	Numeric         Numeric
+	// NumberButtons optionally selects compact up/down arrows on NumberField.
+	NumberButtons NumberFieldButtons
 	// Orientation applies to display/choice/toolbar/split controls; RadioGroup defaults vertical.
 	Orientation   Orientation
 	Options       []Option

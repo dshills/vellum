@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "425cebf3dd87fa0730d3f87f0e20dfba",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "320376ec8573a8603f75faaa3b3a7ea8a8ea0366",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "1f9d4cdef8aa673f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "panic in view callback",
+      "message": "The gallery's view() panics on View() errors, which in a render callback crashes the whole app on any validation error. Separately, the notice Reset action only clears name and search text but not other state, so behaviour may be surprising; the panic is the main risk.",
+      "suggestion": "Return an error Label node instead of panicking, e.g. render a Node{Kind: ui.Label, Text: err.Error()}.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/input_helpers.go",
+          "lines": {
+            "start": 69,
+            "end": 69
+          }
+        }
+      ],
+      "tags": [
+        "panic",
+        "location-corrected"
+      ],
+      "evidence": "if strings.Contains(strings.ToLower(name), strings.ToLower(m.search.Text)) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4046,
+    "totalMs": 4061
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 19556,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 12188,
+        "output": 281,
+        "costUSD": 0.027186
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

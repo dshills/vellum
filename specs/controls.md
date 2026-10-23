@@ -534,3 +534,7 @@ An accepted NumberField Enter completes editing and follows normal focus
 traversal. A later numeric key step requires actual focus to be routed back to
 the field. The native check's remaining focus guard reflects that consumer
 sequence requirement, not a request to keep the Spinner focused artificially.
+
+Post-preview reusable input helpers and Mac appearance are specified in
+[mac-widget-expansion.md](mac-widget-expansion.md). They compose existing controls;
+TextField additionally accepts a literal Placeholder hint.

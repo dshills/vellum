@@ -1,0 +1,43 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "Test(MacField|MacInputHelpers|InputHelpers|MacWidgetExecutable|NativeControl)",
+      ".",
+      "./cmd/gallery"
+    ],
+    "exit_code": 0,
+    "seconds": 19.84583174996078
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      ".",
+      "./cmd/gallery"
+    ],
+    "exit_code": 0,
+    "seconds": 5.813438750104979
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "build",
+      "-o",
+      "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-expansion/gallery",
+      "./cmd/gallery"
+    ],
+    "exit_code": 0,
+    "seconds": 8.036345249973238
+  }
+]
