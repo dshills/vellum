@@ -34,6 +34,7 @@ type accessibilityNode struct {
 	DomainID             string      `json:"domain_id"`
 	Parent               string      `json:"parent"`
 	Role                 string      `json:"role"`
+	Secure               bool        `json:"secure,omitempty"`
 	Name                 string      `json:"name"`
 	Help                 string      `json:"help"`
 	Value                any         `json:"value,omitempty"`
@@ -665,7 +666,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			if n.Kind == ui.MultilineText {
 				x.Actions = append(x.Actions, "set", "selection")
 			}
-			if n.Kind == ui.TextField && n.Change != nil {
+			if n.Kind == ui.TextField && n.Change != nil && !n.Secure {
 				x.Actions = append(x.Actions, "selection")
 			}
 			if (n.Kind == ui.TextField || n.Kind == ui.Slider || n.Kind == ui.NumberField) && n.Change != nil {
@@ -684,6 +685,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 		if n.Kind == ui.Button && r.control != nil {
 			x.activationGuard = placementActivationGuard(r)
 		}
+		protectSecureAccessibility(n, &x)
 		nodes = append(nodes, x)
 		if len(x.Actions) > 0 {
 			allowed := append([]string(nil), x.Actions...)
@@ -1484,4 +1486,30 @@ func accessibilityTreeNil(node tree.Node) bool {
 		return true
 	}
 	return tree.IsNil(node)
+}
+
+// All ordinary semantic and wire outputs share this final projection boundary.
+// Never derive the label from a protected value; explicit app labels remain labels.
+func protectSecureAccessibility(n ui.Node, x *accessibilityNode) {
+	if !n.Secure {
+		return
+	}
+	x.Secure = true
+	x.Value = ""
+	x.TextClient = 0
+	x.TextSelection = nil
+	x.TextFocus = 0
+	if n.Accessibility.Name == "" {
+		x.Name = "Password"
+	}
+	var actions []string
+	if x.Actions != nil {
+		actions = make([]string, 0, len(x.Actions))
+	}
+	for _, a := range x.Actions {
+		if a != "selection" {
+			actions = append(actions, a)
+		}
+	}
+	x.Actions = actions
 }

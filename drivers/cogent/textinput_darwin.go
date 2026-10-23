@@ -93,13 +93,22 @@ func nativeTextMainAlive() bool {
 	return desktop.TheApp != nil && !desktop.TheApp.MainStopped()
 }
 
-func publishTextOnMain(t *textWindow, client uint64, s core.TextFieldEditingState, start, end int, active bool, ack uint64, rect [4]float64, g textinput.Geometry, maximum int) (bool, error) {
+func publishTextOnMain(t *textWindow, client uint64, s core.TextFieldEditingState, start, end int, active bool, ack uint64, rect [4]float64, g textinput.Geometry, maximum int, secure bool) (bool, error) {
 	if !t.nativeReady.Load() {
 		return false, nil
 	}
 	var accepted bool
 	var err error
-	if !desktop.TheApp.RunOnMainIfOpen(func() { accepted, err = t.native.Publish(client, s, start, end, active, ack, rect, g, maximum) }) {
+	if !desktop.TheApp.RunOnMainIfOpen(func() {
+		if native, ok := t.native.(*cocoaTextInput); ok {
+			if secure {
+				native.input.SetSecureClient(client)
+			} else {
+				native.input.SetSecureClient(0)
+			}
+		}
+		accepted, err = t.native.Publish(client, s, start, end, active, ack, rect, g, maximum)
+	}) {
 		return false, app.ErrClosed
 	}
 	return accepted, err

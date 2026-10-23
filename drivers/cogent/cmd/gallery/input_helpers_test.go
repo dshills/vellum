@@ -82,3 +82,41 @@ func TestMacWidgetExecutableDefaults(t *testing.T) {
 		}
 	}
 }
+
+func TestPersonalWidgetGalleryModelsAndDisabled(t *testing.T) {
+	m := newInputHelpersGallery()
+	node := func(id string) ui.Node { return findGalleryDocumentNode(m.view(), id) }
+	node(ui.TokenInputID("drawing-tags")).Change(ui.ChangeEvent{Text: "Review"})
+	if len(m.tokens.Tokens) != 2 || m.tokens.Tokens[1].Text != "Review" {
+		t.Fatal("token addition")
+	}
+	node(ui.TokenRemoveID("drawing-tags", "tag-1")).Activate()
+	if len(m.tokens.Tokens) != 1 {
+		t.Fatal("remove")
+	}
+	node(ui.FontSizeID("drawing-font")).Change(ui.ChangeEvent{Number: 21})
+	if m.fontPicker.Value.Size != 21 {
+		t.Fatal("size")
+	}
+	node(ui.PathSegmentID("drawing-path", "root")).Activate()
+	if len(m.pathControl.Items) != 1 {
+		t.Fatal("path navigation")
+	}
+	node(ui.SecureInputID("demo-password")).Change(ui.ChangeEvent{Text: "test-only"})
+	if m.secureField.Text != "test-only" {
+		t.Fatal("secure commit")
+	}
+	for _, dark := range []bool{false, true} {
+		m.setAppearance(dark)
+		if err := ui.Validate(m.view()); err != nil {
+			t.Fatal(err)
+		}
+	}
+	m.setDisabled(true)
+	if !m.tokens.Disabled || !m.fontPicker.Disabled || !m.pathControl.Disabled || !m.secureField.Disabled || !m.colorWell.Disabled {
+		t.Fatal("missing disable propagation")
+	}
+	if err := ui.Validate(m.view()); err != nil {
+		t.Fatal(err)
+	}
+}

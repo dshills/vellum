@@ -419,3 +419,15 @@ items; MaxVisible defaults to four, configurable 3–8, plus an overflow menu. R
 parent and current location remain visible. Full labels remain in accessibility
 and menu text. Truncation is explicit rather than window-width responsive. No
 filesystem access, URL resolution, permission grants or drag-and-drop is implied.
+
+### Secure text field
+
+`ui.SecureField.View()` composes a native-backed masked TextField and optional
+Show/Hide button (`AllowReveal`). Nil Change disables entry and reveal. Accept Text through Change; `SecureInputID` is
+the managed focus target. `Node.Secure` and `Node.Reveal` are available directly
+on TextField. Reveal requires Secure and only changes visible glyphs: AX values,
+selection/geometry text and native surrounding-text/diagnostic queries remain
+protected, with the macOS secure text subrole. Masked core fields disallow copy
+and cut; explicit reveal permits ordinary text copying. Disabling remasks the
+composite. Values remain ordinary Go strings; no secret store, memory erasure or
+OS secure-event-input guarantee is provided.

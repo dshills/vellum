@@ -1,7 +1,7 @@
 # Mac widget demo
 
-This private personal-use gallery includes the five desktop widget additions and the personal-use color well, plus
-the earlier search, validation and compact up/down counter controls.
+This private personal-use gallery includes color wells, token fields, font and
+path pickers, protected text entry, and the earlier Mac input controls.
 
 After native source preparation, from `drivers/cogent` run:
 
@@ -14,6 +14,7 @@ The packaged **Vellum Mac Widgets.app** starts the focused light gallery directl
 **Vellum Mac Widgets Dark.app** starts the dark version. Scroll to reach all
 sections. The ordinary macOS title bar remains draggable.
 
+- **Secure entry:** the synthetic `Vellum-demo` value is masked. Show/Hide changes visible glyphs; accessibility and native surrounding-text queries stay protected. Enter demo text and press Return to commit.
 - **Location:** use the ellipsis or segment menus to choose an ancestor. This changes the displayed virtual path only; relaunch to restore the sample.
 - **Font:** choose Helvetica Neue, Times New Roman or Menlo, choose a typeface, and adjust size. The sample previews the accepted selection.
 - **Tags:** enter a tag and press Return, or choose a suggestion. Click a chip (or Tab to it and press Return) to remove it.
@@ -34,6 +35,17 @@ sections. The ordinary macOS title bar remains draggable.
 
 ## Current limits
 
+New controls reuse managed components rather than shared system color/font
+panels. Color recents are a caller-supplied palette (maximum 16). Token suggestions
+use the dropdown; there is no per-keystroke completion filtering, comma-triggered
+commit, inline chip editing or rearrangement. Fonts use a caller-supplied catalog,
+may substitute if unavailable, and support sizes 6–144 logical pixels. Path
+controls describe virtual locations with explicit segment-count truncation, not
+filesystem access or width-responsive collapse. Secure entry holds ordinary Go
+strings and does not enable OS secure-event-input mode or erase secret memory;
+use only synthetic text in this demo.
+
+
 These are custom-rendered controls using existing macOS window, text and
 accessibility integration, not AppKit NSControl wrappers or pixel-exact replicas.
 Appearance is an explicit light/dark theme with fixed colors and Helvetica Neue;
@@ -49,4 +61,4 @@ keyboard-focusable button; Down inside the text entry does not open it.
 The private package is ad-hoc signed and unnotarized. It uses this development
 machine's prepared native dependencies; it is not a new public release artifact.
 Automated offscreen event/geometry checks and live macOS observations are
-recorded separately in [checkpoint reviews](reviews/mac-desktop-widgets/README.md).
+recorded separately in [checkpoint reviews](reviews/mac-personal-widgets/README.md).

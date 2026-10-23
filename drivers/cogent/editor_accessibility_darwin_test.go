@@ -136,3 +136,15 @@ func TestNativeAccessibilityEditorSetRejectsNULWithoutTruncatingDocument(t *test
 		t.Fatal("valid NSString lost exact bytes or history")
 	}
 }
+
+func TestNativeSecureFieldSelectorsNeverExposeValue(t *testing.T) {
+	node := `{"id":"secure","role":"text-field","secure":true,"actions":["set"],"value":"synthetic","text_client":1,"text_selection":[0,9]}`
+	geometry := `{"client":1,"text":"synthetic","geometry":{"viewport":[0,0,100,20],"focus_line":0,"cells":[],"carets":[]}}`
+	var out map[string]any
+	if err := json.Unmarshal([]byte(nativeAccessibilityTextFixture(node, geometry, 0, 9, 0)), &out); err != nil {
+		t.Fatal(err)
+	}
+	if out["subrole"] != "AXSecureTextField" || out["value"] != "" || out["substring"] != "" || out["available"] != false || out["selected_start"] != float64(-1) {
+		t.Fatal("secure native selector exposure", out)
+	}
+}

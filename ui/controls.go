@@ -169,6 +169,12 @@ func ValidateControl(n Node) error {
 	if n.NumberButtons != "" && (n.Kind != NumberField || n.NumberButtons != NumberButtonsStepper) {
 		return fmt.Errorf("ui: NumberButtons requires stepper on NumberField")
 	}
+	if (n.Secure || n.Reveal) && n.Kind != TextField {
+		return fmt.Errorf("ui: secure/reveal belong only on TextField")
+	}
+	if n.Reveal && !n.Secure {
+		return fmt.Errorf("ui: reveal requires secure TextField")
+	}
 	if n.Placeholder != "" && n.Kind != TextField {
 		return fmt.Errorf("ui: Placeholder belongs only on TextField")
 	}

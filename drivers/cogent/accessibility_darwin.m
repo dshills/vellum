@@ -136,6 +136,7 @@ static NSRect vellumAXClipRect(NSRect r,NSRect viewport){if(r.size.width==0){if(
 @implementation VellumAXElement
 - (instancetype)init{self=[super init];if(self){self.objectIdentity=vellumAXIdentity();if(!self.objectIdentity)return nil;}return self;}
 - (NSString *)managedText {
+ if([self.node[@"secure"] boolValue])return nil;
  if(![self isAccessibilityEnabled]||![self.node[@"text_client"] unsignedLongLongValue]||![self.node[@"value"] isKindOfClass:NSString.class])return nil;
  return self.node[@"value"];
 }
@@ -205,11 +206,11 @@ static NSRect vellumAXClipRect(NSRect r,NSRect viewport){if(r.size.width==0){if(
  if([self.node[@"orientation"] isEqual:@"vertical"])return NSAccessibilityOrientationVertical;
  return NSAccessibilityOrientationUnknown;
 }
-- (NSString *)accessibilitySubrole{return [self.node[@"role"] isEqual:@"dialog"]?NSAccessibilityDialogSubrole:nil;}
+- (NSString *)accessibilitySubrole{if([self.node[@"secure"] boolValue])return NSAccessibilitySecureTextFieldSubrole;return [self.node[@"role"] isEqual:@"dialog"]?NSAccessibilityDialogSubrole:nil;}
 - (NSString *)accessibilityLabel{return self.node[@"name"];}
 - (NSString *)accessibilityTitle{return self.node[@"name"];}
 - (NSString *)accessibilityHelp{return self.node[@"help"];}
-- (id)accessibilityValue {id value=self.node[@"value"];return value==NSNull.null?nil:value;}
+- (id)accessibilityValue {if([self.node[@"secure"] boolValue])return @"";id value=self.node[@"value"];return value==NSNull.null?nil:value;}
 - (NSString *)accessibilityValueDescription {
  id value=self.node[@"value"];
  if([self.node[@"role"] isEqual:@"menu-item"]&&[value isKindOfClass:NSNumber.class]&&CFGetTypeID((__bridge CFTypeRef)value)==CFBooleanGetTypeID())return [value boolValue]?@"Checked":@"Unchecked";
@@ -778,7 +779,7 @@ char *vellumAXTextFixture(const char *nodeJSON,const char *geometryJSON,int star
  if(![node isKindOfClass:NSDictionary.class]||!vellumAXTextEntryValid(entry))return strdup("{}");
  VellumAXState *state=[VellumAXState new];VellumAXTextFixtureElement *e=[VellumAXTextFixtureElement new];e.state=state;e.node=node;e.live=YES;e.textGeometry=entry;
  NSRange range=start<0||length<0?NSMakeRange(NSNotFound,0):NSMakeRange(start,length),selected=e.accessibilitySelectedTextRange,lines=[e accessibilityRangeForLine:line];NSRect frame=[e accessibilityFrameForRange:range];
- NSDictionary *out=@{@"available":@((BOOL)([e managedGeometry]!=nil)),@"substring":[e accessibilityStringForRange:range]?:@"",@"selected_start":selected.location==NSNotFound?@(-1):@(selected.location),@"selected_length":@(selected.length),@"insertion_line":@([e accessibilityInsertionPointLineNumber]),@"line_start":lines.location==NSNotFound?@(-1):@(lines.location),@"line_length":@(lines.length),@"frame":@[@(frame.origin.x),@(frame.origin.y),@(frame.size.width),@(frame.size.height)]};
+ NSDictionary *out=@{@"subrole":e.accessibilitySubrole?:@"",@"value":e.accessibilityValue?:NSNull.null,@"available":@((BOOL)([e managedGeometry]!=nil)),@"substring":[e accessibilityStringForRange:range]?:@"",@"selected_start":selected.location==NSNotFound?@(-1):@(selected.location),@"selected_length":@(selected.length),@"insertion_line":@([e accessibilityInsertionPointLineNumber]),@"line_start":lines.location==NSNotFound?@(-1):@(lines.location),@"line_length":@(lines.length),@"frame":@[@(frame.origin.x),@(frame.origin.y),@(frame.size.width),@(frame.size.height)]};
  NSData *data=[NSJSONSerialization dataWithJSONObject:out options:0 error:nil];NSString *json=[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];return strdup(json.UTF8String);
  }
 }

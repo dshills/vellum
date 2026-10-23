@@ -858,6 +858,11 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 				offsets := utf16Selection(state.Text, state.Anchor, state.Focus)
 				selection, focus = offsets.rangeValue, offsets.focus
 			}
+			if r.node.Secure {
+				value = ""
+				selection = [2]int{-1, 0}
+				focus = 0
+			}
 			b := bounds[axID]
 			rect := image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))
 			focused := r.widget.AsWidget().StateIs(states.Focused)

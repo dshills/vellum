@@ -1,0 +1,140 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "36bafbb92fd7aaeff7cadec7ade68be1",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "a3ab8b5279d57b558addd9a4940c8f25c4595af4",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "5c13184b5ff8b4bf",
+      "severity": "medium",
+      "category": "security",
+      "title": "Secure redaction scattered, easy to bypass",
+      "message": "The Secure flag and value clearing are applied only inside the text-field case. Other consumers of the snapshot, such as live/semantic diffs, may still see n.Text through the accessibility name fallback. The name is replaced by \"Password\" only when Accessibility.Name is empty, so this is partially covered, but the protection is spread across several places, and any new path that reads r.node.Text bypasses it.",
+      "suggestion": "Centralize secure redaction in one place, for example a helper that builds a redacted accessibilityNode, and add tests covering every wire output.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility.go",
+          "lines": {
+            "start": 603,
+            "end": 600
+          }
+        }
+      ],
+      "tags": [
+        "security",
+        "accessibility"
+      ],
+      "evidence": "if n.Secure {\n\t\t\t\tx.Secure = true\n\t\t\t\tx.Value = \"\"",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "ea692e0c49a6c9ea",
+      "severity": "medium",
+      "category": "security",
+      "title": "Protection window on client switch",
+      "message": "Protection depends on secureClient being set by requestedSecureClient, which is only copied on a successful publish. Between the focus change and the next accepted publication, the previous protection state applies to a new secure client, so surrounding text can be exposed via attributedSubstring. The Go-side SetSecureClient is also called with 0 for a non-secure client, which clears protection even if the publish is then refused.",
+      "suggestion": "Make the secure flag part of the publish call arguments and apply it atomically with the client switch, so no window exists where the new client is unprotected.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/internal/textinput/input_darwin.m",
+          "lines": {
+            "start": 211,
+            "end": 209
+          }
+        }
+      ],
+      "tags": [
+        "security",
+        "race"
+      ],
+      "evidence": "if(protectedText(s))return nil;",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "6c909999096dec15",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Nil Change silently disables the field",
+      "message": "SecureField without a Change handler becomes Disabled (Disabled: !available()) so the field is silently unusable. The reveal button is also disabled. This is surprising for a display-only use and is not documented.",
+      "suggestion": "Document that Change is required, or return an error from View when Change is nil.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "ui/secure_field.go",
+          "lines": {
+            "start": 30,
+            "end": 30
+          }
+        }
+      ],
+      "tags": [
+        "api",
+        "location-corrected"
+      ],
+      "evidence": "available := func() bool { return s.ID == id \u0026\u0026 !s.Disabled \u0026\u0026 s.Change != nil }",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7979,
+    "totalMs": 8020
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 23,
+    "bytes": 53988,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 27845,
+        "output": 869,
+        "costUSD": 0.06438
+      }
+    ],
+    "widenedFiles": 5,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

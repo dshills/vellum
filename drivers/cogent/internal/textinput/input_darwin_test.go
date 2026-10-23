@@ -202,6 +202,35 @@ func runInputNativeFixtures() map[string]error {
 			fixtureAssert(inputObserve(i) == before && len(updates) == count, "oversized incoming/prospective text reached admission or mutated state")
 		}
 	})
+	run("secure-query", func() {
+		view := fixtureInputView()
+		defer fixtureReleaseInputView(view)
+		edits := 0
+		i := Attach(view, func(Update) bool { edits++; return true }, func() {})
+		fixtureAssert(i != nil, "secure attachment failed")
+		defer i.Close()
+		i.SetSecureClient(7)
+		fixtureAssert(i.UpdateClient(7, "secret😀", 8, 8, -1, -1, true, 0, rect), "secure publication failed")
+		var query struct {
+			Substring string `json:"substring"`
+			Range     [2]int `json:"substring_range"`
+		}
+		fixtureAssert(json.Unmarshal([]byte(fixtureInputSubstring(i, 0, 8)), &query) == nil && query.Substring == "" && query.Range[0] == -1, "secure substring exposed")
+		fixtureAssert(inputObserve(i).Text == "", "secure fixture snapshot exposed")
+		i.SetSecureClient(0)
+		fixtureAssert(!i.UpdateClient(9, "bad", 99, 99, -1, -1, true, 0, rect), "invalid publication accepted")
+		fixtureAssert(inputObserve(i).Text == "", "refused switch cleared protection")
+		// Native editing still reaches the application with correct UTF-16 semantics.
+		fixtureInputEdit(i, "X", 0, 1, 0)
+		fixtureAssert(edits == 1, "secure editing blocked")
+		fixtureAssert(i.UpdateClient(9, "public", 0, 0, -1, -1, true, 1, rect), "public switch failed")
+		fixtureAssert(inputObserve(i).Text == "public", "protection leaked into next client")
+		i.SetSecureClient(7)
+		fixtureAssert(i.UpdateClient(7, "next-secret", 0, 0, -1, -1, true, 1, rect), "public-to-secure switch failed")
+		fixtureAssert(inputObserve(i).Text == "", "new secure client was exposed")
+		fixtureAssert(i.UpdateClient(7, "next-secret", 0, 0, -1, -1, false, 1, rect), "secure deactivation failed")
+		fixtureAssert(json.Unmarshal([]byte(fixtureInputSubstring(i, 0, 11)), &query) == nil && query.Substring == "" && query.Range[0] == -1, "new secure substring exposed")
+	})
 	return results
 }
 func TestNativeInputPublicationValidationAndClosedMethods(t *testing.T) {
@@ -231,6 +260,12 @@ func TestNativeInputObserverOverlaySurvivesClose(t *testing.T) {
 }
 func TestNativeInputKnownRangeBulkCancelAndAtomicRefusal(t *testing.T) {
 	if err := nativeFixtureResults["deltas"]; err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestNativeInputSecureSubstringAndClientSwitch(t *testing.T) {
+	if err := nativeFixtureResults["secure-query"]; err != nil {
 		t.Fatal(err)
 	}
 }

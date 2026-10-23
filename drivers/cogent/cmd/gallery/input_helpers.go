@@ -10,6 +10,7 @@ import (
 )
 
 type inputHelpersGallery struct {
+	secureField      *ui.SecureField
 	pathControl      *ui.PathControl
 	fontPicker       *ui.FontPicker
 	fontError        string
@@ -37,6 +38,8 @@ type inputHelpersGallery struct {
 
 func newInputHelpersGallery() *inputHelpersGallery {
 	m := &inputHelpersGallery{name: "Untitled", quantity: 1}
+	m.secureField = &ui.SecureField{ID: "demo-password", Label: "Demo password", Text: "Vellum-demo", Placeholder: "Enter demo text", AllowReveal: true}
+	m.secureField.Change = func(e ui.ChangeEvent) { m.secureField.Text = e.Text }
 	m.pathControl = &ui.PathControl{ID: "drawing-path", Label: "Drawing location", MaxVisible: 3, MaxLabelRunes: 12, Items: []ui.PathItem{{ID: "root", Label: "Home"}, {ID: "documents", Label: "Documents"}, {ID: "projects", Label: "Projects"}, {ID: "drawings", Label: "Drawings"}, {ID: "drawing", Label: "Untitled.vellum", Kind: ui.PathFile}}}
 	m.pathControl.Navigate = func(e ui.PathEvent) {
 		for i, item := range m.pathControl.Items {
@@ -93,6 +96,7 @@ func (m *inputHelpersGallery) setDisabled(disabled bool) {
 	m.tokens.Disabled = disabled
 	m.fontPicker.Disabled = disabled
 	m.pathControl.Disabled = disabled
+	m.secureField.Disabled = disabled
 	m.combo.Disabled = disabled
 	m.datePicker.Disabled = disabled
 	m.search.Disabled = disabled
@@ -102,6 +106,9 @@ func (m *inputHelpersGallery) setAppearance(dark bool) {
 	m.dark = dark
 	theme := ui.MacTheme(m.dark)
 	m.colorWell.PopoverStyle = theme.Kinds[ui.FormGroup]
+	m.secureField.Style = theme.Kinds[ui.TextField]
+	m.secureField.Style.Padding = ui.Some(ui.Insets{})
+	m.secureField.Style.MaxSize = ui.Some(ui.Size{Width: 360})
 	m.fontPicker.FieldStyle = theme.Kinds[ui.TextField]
 	m.tokens.InputStyle = theme.Kinds[ui.TextField]
 	m.tokens.InputStyle.Padding = ui.Some(ui.Insets{})
@@ -123,6 +130,10 @@ func (m *inputHelpersGallery) setAppearance(dark bool) {
 	m.search.ClearStyle = ui.Style{Border: ui.Some(ui.Border{}), Background: ui.Some(color.NRGBA{}), Padding: ui.Some(ui.UniformInsets(2))}
 }
 func (m *inputHelpersGallery) view() ui.Node {
+	secure, err := m.secureField.View()
+	if err != nil {
+		return ui.Node{ID: "inputs", Kind: ui.Label, Text: err.Error()}
+	}
 	path, err := m.pathControl.View()
 	if err != nil {
 		return ui.Node{ID: "inputs", Kind: ui.Label, Text: err.Error()}
@@ -185,7 +196,8 @@ func (m *inputHelpersGallery) view() ui.Node {
 	}
 	return ui.Node{ID: "inputs", Kind: ui.Scroll, Grow: true, Style: ui.Style{Background: ui.Some(background), Padding: ui.Some(ui.UniformInsets(20)), Gap: ui.Some(float32(16))}, Children: []ui.Node{
 		{ID: "inputs-title", Kind: ui.Label, Text: "Mac input widgets", Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 20, Weight: 600})}},
-		{ID: "inputs-description", Kind: ui.Label, Text: "Editable choices, context menus, popovers, selection and dates through public Go APIs."},
+		{ID: "inputs-description", Kind: ui.Label, Text: "Mac-style colors, tags, fonts, paths and protected text through public Go APIs."},
+		{ID: "secure-group", Kind: ui.FormGroup, Text: "Secure entry — synthetic demo text", Children: []ui.Node{secure}},
 		{ID: "path-group", Kind: ui.FormGroup, Text: "Location — ancestor menus and overflow", Children: []ui.Node{path}},
 		{ID: "font-group", Kind: ui.FormGroup, Text: "Font", Children: []ui.Node{font, {ID: "font-feedback", Kind: ui.Label, Text: m.fontError}}},
 		{ID: "tokens-group", Kind: ui.FormGroup, Text: "Tags — Return adds, chip button removes", Children: []ui.Node{tokens, {ID: "token-feedback", Kind: ui.Label, Text: m.tokenError}}},

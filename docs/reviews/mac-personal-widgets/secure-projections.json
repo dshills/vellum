@@ -1,0 +1,147 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "c35b2e85756fee1b9adde7279eaf91b4",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "a3ab8b5279d57b558addd9a4940c8f25c4595af4",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a171120daa957724",
+      "severity": "medium",
+      "category": "bug",
+      "title": "In-place filter turns nil Actions into empty slice",
+      "message": "Filtering in place with x.Actions[:0] mutates the backing array shared with the original slice. Callers that copy later (allowed := append(...)) are fine, but a nil Actions becomes a non-nil empty slice, which changes the wire comparison (a.Actions == nil) != (b.Actions == nil) and can produce spurious diffs. In-place filtering also corrupts any aliasing slice.",
+      "suggestion": "Allocate a new slice, and keep nil when there are no actions.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility.go",
+          "lines": {
+            "start": 1505,
+            "end": 1505
+          }
+        }
+      ],
+      "tags": [
+        "aliasing",
+        "location-corrected"
+      ],
+      "evidence": "actions := x.Actions[:0]",
+      "fix": {
+        "before": "actions := x.Actions[:0]",
+        "after": "actions := make([]string, 0, len(x.Actions))"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "459477d0e63ce840",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Secure check bypassed when state unusable",
+      "message": "This check runs after the usable(s) branch. When the state is not usable it falls through to the parent class implementation, which can return the real underlying view text for a secure field. It is also not applied to the firstRectForCharacterRange or other text-returning selectors.",
+      "suggestion": "Check protectedText(s) before the usable(s) fallback to the parent, so protected clients never delegate to the parent.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/internal/textinput/input_darwin.m",
+          "lines": {
+            "start": 211,
+            "end": 211
+          }
+        }
+      ],
+      "tags": [
+        "privacy",
+        "native",
+        "location-corrected"
+      ],
+      "evidence": "if(protectedText(s))return nil;",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "1631b4381cc6b3ee",
+      "severity": "medium",
+      "category": "security",
+      "title": "Secure protection lags behind client switch",
+      "message": "secureClient is only updated after a publish is accepted, and the native text state stays unprotected until then. Early returns in publish (for example when acknowledged\u003cs-\u003esequence or finish fails) leave the previous secureClient in place, so a switch to a secure client may not take effect. The old (public) text can also be exposed for a different client id, and the reverse transition retains protection incorrectly.",
+      "suggestion": "Make the protection check use the requested client directly for the incoming client, or apply the secure flag atomically with the client switch so it cannot lag behind.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/internal/textinput/input_darwin.m",
+          "lines": {
+            "start": 336,
+            "end": 336
+          }
+        }
+      ],
+      "tags": [
+        "privacy",
+        "native",
+        "location-corrected"
+      ],
+      "evidence": "s-\u003eclientID=clientID;s-\u003eactive=active;s-\u003esecureClient=s-\u003erequestedSecureClient;",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 8278,
+    "totalMs": 8327
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 23,
+    "bytes": 55736,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 28673,
+        "output": 908,
+        "cachedInput": 2358,
+        "costUSD": 0.066426
+      }
+    ],
+    "widenedFiles": 5,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

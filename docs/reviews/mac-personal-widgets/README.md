@@ -43,3 +43,26 @@ Final review flags redundant navigation in a two-item path. Retained deliberatel
 the current segment consistently offers its ancestor menu, even when that sole
 ancestor also has a direct button. This is optional UX preference, not a failure
 of controlled navigation or lifecycle. No remaining actionable finding.
+
+## Secure field
+
+UI race tests and vet passed. Focused managed/native checks cover accepted text,
+visual reveal/remask, blank AX values/default names, protected secure subrole,
+reflection and fast semantic JSON, manual snapshots, omitted text geometry,
+Cocoa substring denial, native editing, refused switches, both accepted switch
+directions, and inactive secure queries. Gallery model tests and driver vet pass.
+Initial fixtures needed isolated manual lifetimes and a substring-only Cocoa
+probe because inert views intentionally do not implement window geometry; fixed.
+
+Prism prompted centralized semantic redaction, detached action filtering, explicit
+nil-handler docs and protection before native unusable-state delegation. Applied
+and retested. Final review repeats a protection-lag concern; rejected based on the
+actual transaction invariant: native clientID, active state and secureClient change
+together only in accepted publish, before replacing text. SetSecureClient changes
+only a pending request. Refusal retains old client/text/protection together; no
+incoming secure text exists in native state until acceptance. Attachment starts
+with empty text and no active client. Pure Cocoa tests exercise refused and both
+accepted switch directions and prove the old/new protected snapshots and substring
+queries stay redacted. Immediate clearing on a refused public switch would break
+this invariant. No remaining demonstrated privacy defect; no memory-erasure or OS
+secure-event-input guarantee is made.
