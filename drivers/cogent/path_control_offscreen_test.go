@@ -69,3 +69,22 @@ func TestPathControlDisabledReadOnlyChildren(t *testing.T) {
 		}
 	}
 }
+
+func TestPathControlInsideMacFormHasVisibleWidth(t *testing.T) {
+	p := &ui.PathControl{ID: "path", MaxVisible: 3, Items: []ui.PathItem{{ID: "home", Label: "Home"}, {ID: "docs", Label: "Documents"}, {ID: "projects", Label: "Projects"}, {ID: "drawings", Label: "Drawings"}, {ID: "file", Label: "Draft.vellum", Kind: ui.PathFile}}, Navigate: func(ui.PathEvent) {}}
+	view := func() ui.Node {
+		n, err := p.View()
+		if err != nil {
+			panic(err)
+		}
+		return ui.Node{ID: "root", Kind: ui.Scroll, Grow: true, Children: []ui.Node{{ID: "group", Kind: ui.FormGroup, Text: "Location", Children: []ui.Node{n}}}}
+	}
+	m, _ := simpleManual(t, manualConfig(t, 928), view)
+	unitSettle(t, m)
+	root := m.implementation.find("one").state.root
+	path := findRecord(root, p.ID).widget.AsWidget()
+	home := findRecord(root, ui.PathSegmentID(p.ID, "home")).widget.AsWidget()
+	if path.Geom.ContentBBox.Dx() < 100 || home.Geom.TotalBBox.Empty() || !home.Geom.TotalBBox.In(path.Geom.ContentBBox) {
+		t.Fatal("path toolbar collapsed inside form", path.Geom, home.Geom)
+	}
+}

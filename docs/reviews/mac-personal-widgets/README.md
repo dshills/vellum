@@ -66,3 +66,23 @@ accepted switch directions and prove the old/new protected snapshots and substri
 queries stay redacted. Immediate clearing on a refused public switch would break
 this invariant. No remaining demonstrated privacy defect; no memory-erasure or OS
 secure-event-input guarantee is made.
+
+## Native packaging follow-up
+
+The first packaged light check exposed a blank path strip inside its form group.
+Exact Scroll/FormGroup reproduction confirmed the toolbar had zero content width.
+PathControl now grows horizontally within the allocated group; the failing
+regression passes alongside path routing/UI tests. Secure widget SemanticsProperty
+metadata now also redacts Text/default Name, covered in masked/revealed raw-node
+checks. Prism's remaining suggestion concerns Number/SelectedID on secure nodes
+and Icon handling: Secure is valid only on TextField, whose accepted secret is
+Text; unrelated descriptor fields do not derive from that value. An explicit
+application label is not replaced by a password value. No demonstrated additional
+secret exposure; the concrete text/label paths are protected and tested.
+
+Native pre-rebuild observations: light ColorWell opens a readable compact panel,
+recent-color selection updates RGB/hex, Escape restores its focus; native typed
+token commit creates one chip and keyboard Return removes it. Secure Show changes
+its action label while AX remains a secure field without a value. Final package
+checks are kept with the local delivery receipt rather than presented as physical
+pointer or human VoiceOver qualification.

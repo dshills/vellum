@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "87a61af7622675b8292fdc54d0938605",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "4969acdd1a9ebd5d4333c86b02e03f6470c4a4e8",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "890442297bd83df9",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Secure masking incomplete for other fields",
+      "message": "When a secure node has no Accessibility.Name, name falls back to r.node.Text (the secret). The code overrides it with \"Password\" for the empty case, which is correct. However, if the Accessibility.Name is whitespace or the node is an Icon, behavior is unchanged. More importantly, Number and SelectedID are still exposed for secure nodes, and the Secure check only applies to this semantics path.",
+      "suggestion": "Also clear other value-bearing fields (e.g., Number, SelectedID) for secure nodes, and guard any other paths that copy r.node.Text.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/controls.go",
+          "lines": {
+            "start": 440,
+            "end": 444
+          }
+        }
+      ],
+      "tags": [
+        "privacy"
+      ],
+      "evidence": "if r.node.Accessibility.Name == \"\" {\n\t\t\tsem.Name = \"Password\"",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4261,
+    "totalMs": 4273
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 5121,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 4874,
+        "output": 345,
+        "costUSD": 0.013198
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

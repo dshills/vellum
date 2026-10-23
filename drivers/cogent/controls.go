@@ -435,6 +435,12 @@ func syncSemantics(r *record) {
 	}
 	disabled := controlDisabled(r)
 	sem := Semantics{ID: r.node.ID, Role: r.node.Kind, Name: name, Help: r.node.Accessibility.Help, Disabled: disabled, Checked: r.node.Checked, Number: r.node.Number, Text: r.node.Text, SelectedID: r.node.SelectedID}
+	if r.node.Secure {
+		sem.Text = ""
+		if r.node.Accessibility.Name == "" {
+			sem.Name = "Password"
+		}
+	}
 	r.widget.AsTree().SetProperty(SemanticsProperty, sem)
 	r.widget.AsTree().SetProperty(disabledProperty, r.node.Disabled)
 	r.widget.AsWidget().Tooltip = html.EscapeString(r.node.Accessibility.Help)

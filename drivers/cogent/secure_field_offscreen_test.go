@@ -102,6 +102,10 @@ func TestSecureFieldRawNodeWireProjections(t *testing.T) {
 			m, _ := simpleManual(t, manualConfig(t, 927), view)
 			unitSettle(t, m)
 			root := m.implementation.find("one").state.root
+			sem := root.widget.AsTree().Property(SemanticsProperty).(Semantics)
+			if sem.Text != "" || sem.Name != "Password" {
+				t.Fatal("widget metadata exposure")
+			}
 			nodes, _ := accessibilitySnapshot(root, nil)
 			if len(nodes) != 1 || nodes[0].Name != "Password" || !nodes[0].Secure {
 				t.Fatal("default label protection")
