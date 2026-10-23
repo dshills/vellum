@@ -120,3 +120,86 @@ func TestPersonalWidgetGalleryModelsAndDisabled(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestInputHelpersResetRestoresWholeDemoAndRevokesOldEditors(t *testing.T) {
+	for _, dark := range []bool{false, true} {
+		m := newInputHelpersGallery()
+		m.setAppearance(dark)
+		old := m.view()
+		secure := findGalleryDocumentNode(old, ui.SecureInputID("demo-password"))
+		token := findGalleryDocumentNode(old, ui.TokenInputID("drawing-tags"))
+		font := findGalleryDocumentNode(old, ui.FontSizeID("drawing-font"))
+		path := findGalleryDocumentNode(old, ui.PathSegmentID("drawing-path", "root"))
+		combo := findGalleryDocumentNode(old, ui.ComboInputID("unit-combo"))
+		date := findGalleryDocumentNode(old, ui.DateTimeInputID("reminder-date"))
+		reveal := findGalleryDocumentNode(old, "demo-password/secure/reveal")
+		oldReset := findGalleryDocumentNode(old, "input-notice/notice/action")
+		findGalleryDocumentNode(old, "demo-password/secure/reveal").Activate()
+		m.secureField.Text = "changed-demo-text"
+		m.pathControl.Items = m.pathControl.Items[:1]
+		m.fontPicker.Value.Size = 30
+		m.tokens.Tokens = nil
+		m.tokens.Draft = "draft"
+		m.colorWell.Color.R = 99
+		m.combo.Text = "Inches"
+		m.datePicker.Value = m.datePicker.Value.AddDate(0, 1, 0)
+		m.selectedObjects = []string{"block"}
+		m.rejectSelection = true
+		m.reject = true
+		m.requests = 7
+		m.contextAction, m.contextChecked, m.popoverOpen = "grid", true, true
+		m.fontError, m.tokenError, m.colorError, m.dateError = "font", "tags", "color", "date"
+		findGalleryDocumentNode(m.view(), "input-notice/notice/action").Activate()
+		fresh := newInputHelpersGallery()
+		if m.dark != dark || m.disabled || m.name != fresh.name || m.quantity != fresh.quantity || m.search.Text != "" || m.requests != 0 || m.reject || m.rejectSelection || len(m.selectedObjects) != 0 || m.contextAction != "" || m.contextChecked || m.popoverOpen {
+			t.Fatal("reset left edited gallery state", dark)
+		}
+		if m.secureField.Text != fresh.secureField.Text || len(m.pathControl.Items) != 5 || m.fontPicker.Value != fresh.fontPicker.Value || len(m.tokens.Tokens) != 1 || m.tokens.Tokens[0].Text != "Design" || m.tokens.Draft != "" || m.colorWell.Color != fresh.colorWell.Color || m.combo.Text != "Millimeters" || !m.datePicker.Value.Equal(fresh.datePicker.Value) || m.fontError+m.tokenError+m.colorError+m.dateError != "" {
+			t.Fatal("reset left edited widget state", dark)
+		}
+		if findGalleryDocumentNode(m.view(), ui.SecureInputID("demo-password")).Reveal {
+			t.Fatal("reset kept password revealed")
+		}
+		// Old controlled editor proposals must not update the fresh demo.
+		secure.Change(ui.ChangeEvent{Text: "stale"})
+		token.Change(ui.ChangeEvent{Text: "stale"})
+		font.Change(ui.ChangeEvent{Number: 99})
+		path.Activate()
+		combo.Change(ui.ChangeEvent{Text: "stale"})
+		date.Change(ui.ChangeEvent{Text: "2030-01-01 00:00"})
+		reveal.Activate()
+		if m.secureField.Text != fresh.secureField.Text || findGalleryDocumentNode(m.view(), ui.SecureInputID("demo-password")).Reveal || !m.datePicker.Value.Equal(fresh.datePicker.Value) || len(m.pathControl.Items) != 5 || m.fontPicker.Value.Size != 16 || len(m.tokens.Tokens) != 1 || m.combo.Text != "Millimeters" {
+			t.Fatal("old editor modified reset demo")
+		}
+		m.name = "Keep current edits"
+		oldReset.Activate()
+		if m.name != "Keep current edits" {
+			t.Fatal("old reset action remained live")
+		}
+		// New callbacks must be bound to the same owner, rather than a copied model.
+		now := m.view()
+		findGalleryDocumentNode(now, ui.SecureInputID("demo-password")).Change(ui.ChangeEvent{Text: "fresh-demo-text"})
+		findGalleryDocumentNode(now, ui.TokenInputID("drawing-tags")).Change(ui.ChangeEvent{Text: "Review"})
+		findGalleryDocumentNode(now, ui.FontSizeID("drawing-font")).Change(ui.ChangeEvent{Number: 21})
+		if m.secureField.Text != "fresh-demo-text" || len(m.tokens.Tokens) != 2 || m.tokens.Tokens[1].Text != "Review" || m.fontPicker.Value.Size != 21 {
+			t.Fatal("fresh callback lost original gallery owner")
+		}
+		if err := ui.Validate(m.view()); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestInputHelpersProgrammaticResetPreservesDisabledAppearance(t *testing.T) {
+	m := newInputHelpersGallery()
+	m.setAppearance(true)
+	m.setDisabled(true)
+	m.name = "Changed"
+	m.resetFields()
+	if !m.dark || !m.disabled || !m.secureField.Disabled || !m.tokens.Disabled || !m.fontPicker.Disabled || !m.pathControl.Disabled || !m.colorWell.Disabled || !m.notice.Disabled || m.name != "Untitled" {
+		t.Fatal("programmatic reset changed appearance/availability")
+	}
+	if err := ui.Validate(m.view()); err != nil {
+		t.Fatal(err)
+	}
+}

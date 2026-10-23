@@ -33,6 +33,10 @@ sections. The ordinary macOS title bar remains draggable.
   Return/Space reach calendar buttons; Escape cancels. Invalid dates leave the
   accepted value in place and display feedback.
 
+**Reset fields** restores every sample value, selection, validation message and
+rejection toggle, closes editors, and masks secure entry again. It preserves the
+chosen light/dark appearance. Sample edits are not saved between launches.
+
 ## Current limits
 
 New controls reuse managed components rather than shared system color/font

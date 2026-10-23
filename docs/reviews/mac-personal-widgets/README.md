@@ -194,3 +194,25 @@ lifetimes, so replacement does not accumulate them on an existing label. The fin
 RenderBox restoration concern is explicitly covered by retained single→multiple
 mode assertions; core resetStyleWidget clears/defaults the entire Style on every
 style pass. Both restored single-mode box and suppressed multi-mode box pass.
+
+## Whole-demo reset
+
+Reset fields previously reset only name/search/copies. The new failing-before test
+shows edited selections, values, errors and panels survived. Reset now recreates
+all sample components on the existing gallery owner, restoring the initial values,
+masked secure entry and closed editors while preserving dark/disabled state. Old
+components are permanently disabled before replacement. New closures are created
+against the same receiver; no initialized model with foreign callbacks is copied.
+
+The entire gallery race suite and vet pass, plus strengthened light/dark tests for
+old secure/reveal/date/token/font/path/combo/reset action refusal, new callback
+ownership, and programmatic reset of a disabled dark gallery.
+
+Prism Anthropic claude-sonnet-5-5 reviewed initial and final patches. Its concern
+about dropping non-demo handles/caches is hypothetical: the full struct contains
+only sample values, component pointers, errors/toggles and the two explicitly
+preserved flags. Clearing the rest is the reset contract. Its final named concern
+about combo/date/search not being disabled is contradicted by the existing
+setDisabled assignments, which include those three plus all five new components
+and the notice. Passing stale-proposal tests cover these paths. No extra framework
+generation API or state is introduced for this gallery-only action.

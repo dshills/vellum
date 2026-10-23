@@ -37,7 +37,19 @@ type inputHelpersGallery struct {
 }
 
 func newInputHelpersGallery() *inputHelpersGallery {
-	m := &inputHelpersGallery{name: "Untitled", quantity: 1}
+	m := &inputHelpersGallery{}
+	m.resetFields()
+	return m
+}
+
+// Rebuild sample components on this owner so reset also closes private editor
+// state. Revoke the old components first; queued callbacks must stay inert.
+func (m *inputHelpersGallery) resetFields() {
+	dark, disabled := m.dark, m.disabled
+	if m.search != nil {
+		m.setDisabled(true)
+	}
+	*m = inputHelpersGallery{name: "Untitled", quantity: 1}
 	m.secureField = &ui.SecureField{ID: "demo-password", Label: "Demo password", Text: "Vellum-demo", Placeholder: "Enter demo text", AllowReveal: true}
 	m.secureField.Change = func(e ui.ChangeEvent) { m.secureField.Text = e.Text }
 	m.pathControl = &ui.PathControl{ID: "drawing-path", Label: "Drawing location", MaxVisible: 3, MaxLabelRunes: 12, Items: []ui.PathItem{{ID: "root", Label: "Home"}, {ID: "documents", Label: "Documents"}, {ID: "projects", Label: "Projects"}, {ID: "drawings", Label: "Drawings"}, {ID: "drawing", Label: "Untitled.vellum", Kind: ui.PathFile}}}
@@ -86,9 +98,9 @@ func newInputHelpersGallery() *inputHelpersGallery {
 			m.search.Text = e.Text
 		}
 	}
-	m.notice = &ui.InlineNotice{ID: "input-notice", Tone: ui.NoticeInformation, Text: "These widgets use application-owned values.", ActionLabel: "Reset fields", Activate: func() { m.name = "Untitled"; m.search.Text = ""; m.quantity = 1 }}
-	m.setAppearance(false)
-	return m
+	m.notice = &ui.InlineNotice{ID: "input-notice", Tone: ui.NoticeInformation, Text: "These widgets use application-owned values.", ActionLabel: "Reset fields", Activate: m.resetFields}
+	m.setAppearance(dark)
+	m.setDisabled(disabled)
 }
 func (m *inputHelpersGallery) setDisabled(disabled bool) {
 	m.disabled = disabled
