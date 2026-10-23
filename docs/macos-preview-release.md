@@ -31,14 +31,14 @@ reproduction uses the tracked preparation contract, not those machine paths.
 | ID | Required outcome / reproduction | Owner and smallest next action | Checkpoint |
 | --- | --- | --- | --- |
 | P1 | A new external Go module must build/run using the extracted candidate SDK without checkout/private-tree dependencies; R2 passes for SDK source d8de4fc; final alpha.3 delivered-byte renewal also passes at R5. | Implementation agent: export private SDK, verify relocation, generate/build/run starter. | R2 |
-| P2 | Matching packaged Placement app must pass listed editing, Save/Open/history, text/window and shutdown workflows; earlier app24 evidence is scoped, not final artifact acceptance. | Implementation agent: build from frozen candidate, reuse applicable tests, run the written acceptance script. | R2/R3/R5 |
-| P3 | Native idle/activity/lifecycle/soak must establish bounded retained work/resources; historical hidden TUINS window ownership and accumulation remain unclassified. | Implementation agent: use existing lifecycle harness and prescribed samples; classify stable owner/count or report exact growth/cleanup defect. | R3 |
+| P2 | Matching alpha.3 Placement app passes the listed editing, Save/Open/history and shutdown workflows; native text/window checks pass within their recorded scopes. Earlier app24 evidence remains separately scoped. | Private candidate acceptance complete; retain final artifact and native automation limits. | R2/R3/R5 |
+| P3 | Bounded idle/activity/lifecycle and two-hour soak checks now pass. Apple TUINS base class origin/stable count are known; native retaining reference and full native/GPU heap remain unqualified. | Bounded preview resource check complete; retain the disclosed native-heap limits and historical failures. | R3 |
 | P4 | Public SDK/app rights and notices remain pending; presence inventories alone do not approve redistribution. Upstream objc2 notice explicitly raises Apple-SDK-derived binding terms. | Implementation agent: review actual shipped component applicability; seek a concrete rights-holder/owner decision only for the unresolved component. | R4 |
 | P5 | Guarded public native route implemented at b0e5106; actual public packaging remains blocked by pending rights approval. | Implementation agent: retain release-audit and exact-archive notice gates; no further tooling repair required for this route. | R4 |
 | P6 | Alpha.3 private artifacts, checksums and ad-hoc signing/notarization disclosure are complete; public artifact/publication approval remains pending. | Implementation agent: prepare exact reviewed artifacts and release text, then owner publication decision. | R4/R5 |
 
-These are uncompleted acceptance tasks and known distribution questions, not six
-newly discovered runtime defects. A new reproducible defect must name its command
+This ledger tracks completed acceptance checks and remaining distribution
+questions, not six newly discovered runtime defects. A new reproducible defect must name its command
 or gesture, expected/actual behavior, smallest fix and focused retest here.
 
 ## Checkpoints
@@ -46,23 +46,19 @@ or gesture, expected/actual behavior, smallest fix and focused retest here.
 - R1: policy approved, branch/source selected, pinned dependencies prepared and
   bound; Prism review is clean and checkpoint commit is `578cf74`.
 - R2: complete for private candidate source `d8de4fc`; [external SDK/app result](reports/macos-preview-r2/README.md).
-- R3: acceptance in progress; full repository check passed and initial packaged
-  drawing workflows passed. The first 100-cycle run stopped at 83 cycles; the owner
-  subsequently confirmed other desktop activity. Its raw failure remains unchanged
-  and is inconclusive as a controlled run. The [fresh quiet run](reports/macos-preview-lifecycle100/README.md) passes
-  100 cycles and 99 same-name replacement checks. The alpha.3 independent native
-  starter and Unicode text/editor/dialog fixture also pass. Hidden-window ownership,
-  packaged-app acceptance, active editing and the two-hour soak remain open. The first
-  soak stopped after native close requests at about 152 seconds; no two-hour soak
-  pass is claimed. See the [first checkpoint](reports/macos-preview-r3-first/README.md).
-  [Packaged alpha.3 editing/persistence/recovery acceptance](reports/macos-preview-app-acceptance/README.md)
-  now passes for its listed interactions, including an exact-content controlled
-  recovery round trip and normal process retirement. The [resource checkpoint](reports/macos-preview-resource-check/README.md) passes ten-minute
-  active editing and document safety. A new two-hour attempt stopped at 30 minutes
-  because native occlusion never became false under a containing cover; a short
-  pilot reproduces the setup refusal. The soak remains blocked. Apple TUINS base
-  class origin and stable count are known; its retaining reference remains unknown.
-  Final corrected-notice packaging is prepared; delivered-byte renewal is separate.
+- R3: the recorded functional and bounded resource checks pass within their
+  stated scopes. Full repository check passed; [packaged app acceptance](reports/macos-preview-app-acceptance/README.md)
+  covers editing/persistence/recovery, with [final delivered-byte renewal](reports/macos-preview-final-private/README.md).
+  The [quiet lifecycle run](reports/macos-preview-lifecycle100/README.md) passes
+  100 cycles and 99 same-name replacements; native starter and Unicode/editor/dialog
+  fixtures pass. The [activity/document checkpoint](reports/macos-preview-resource-check/README.md)
+  passes ten-minute activity and document safety. After fixture-only cover inset
+  correction `627a3bc`, the [matched two-hour soak](reports/macos-preview-soak-two-hour/README.md)
+  passes four phases, 24 eligible samples, worker retirement, tracked native cleanup
+  and normal exit. Earlier 83-cycle, close-request and occlusion-setup failures
+  remain unchanged in their historical reports. Apple TUINS base class origin and
+  stable observed count are known; the retaining reference and native/GPU heap
+  deallocation remain unqualified. No full P11 or blanket native-safety claim is made.
 - R4: alpha.3 identity committed at `aaa0a3a`; guarded public native exporter repair
   at `b0e5106`; stale exported contract version corrected at `412e5b8`. All changes
   have focused tests and Prism reviews. Applicable notice collection and real
@@ -71,7 +67,7 @@ or gesture, expected/actual behavior, smallest fix and focused retest here.
   passes for the alpha.3 SDK and build-28 app. Fresh external SDK starter, strict
   extracted app signature, place/pan/zoom/history/Save/Open/normal quit pass.
   Public distribution rights, candidate CI and final publication decision remain
-  pending; the two-hour soak remains blocked. No public preview release or full
+  pending; the bounded two-hour soak now passes. No public preview release or full
   Mac qualification is claimed.
 
 ## Disclosed performance
