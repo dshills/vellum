@@ -175,3 +175,22 @@ passing retained-row transition test verifies these fields and configured icon
 size; syncChoice also Updates children when Multiple changes. No redundant second
 default-icon table was added. Raw findings are retained for traceability; this is
 a documented false positive, not a claim that Prism returned zero findings.
+
+## Inactive source-list label painting
+
+A new completed-frame test reproduced darker label-sized rectangles inside the
+inactive gray selection in both themes (light label 195 versus row 217; dark
+label 113 versus row 83). The core text child's box was repainting the inherited
+translucent row background. Only multiple-list text children now skip their own
+box; glyph rendering and the parent selection/focus remain unchanged. No upstream
+rendering patch is needed. Light/dark pixels now match at the label's empty corner
+and row interior. Adjacent list race tests, retained mode tests and vet pass.
+
+Prism Anthropic claude-sonnet-5-5 reviewed both versions. Its child timing concern
+is not reproducible: NewSwitch registers Makers in Init and creates children on
+later Update, after this hook is installed; newly created children invoke the
+same hook. The prior hook is preserved. Stylers belong to individual child
+lifetimes, so replacement does not accumulate them on an existing label. The final
+RenderBox restoration concern is explicitly covered by retained single→multiple
+mode assertions; core resetStyleWidget clears/defaults the entire Style on every
+style pass. Both restored single-mode box and suppressed multi-mode box pass.

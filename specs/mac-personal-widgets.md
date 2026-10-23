@@ -69,3 +69,6 @@ push-button outlines. The keyboard-focused row retains its focus outline. Select
 rows change together between active blue and inactive gray when keyboard focus
 enters or leaves the list. Retained rows restore their original single-selection
 presentation when the owner changes modes. No new public API or theme tracking.
+
+Source-row text paints its glyphs over the row selection once. Inactive translucent
+selection must remain uniform beneath labels, including on dark surfaces.

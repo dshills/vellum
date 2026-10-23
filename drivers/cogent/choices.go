@@ -130,6 +130,21 @@ func prepareChoice(r *record, n ui.Node) error {
 		button.SetName("choice:" + id)
 		if n.Kind == ui.ListBox {
 			bindContextMenu(r, button)
+			priorChildAdded := button.OnChildAdded
+			button.OnChildAdded = func(child tree.Node) {
+				if priorChildAdded != nil {
+					priorChildAdded(child)
+				}
+				if label, ok := child.(*core.Text); ok {
+					label.Styler(func(s *styles.Style) {
+						// The row already paints the selection. Repainting its
+						// inherited translucent background darkens a label-sized box.
+						if r.node.Kind == ui.ListBox && r.node.Multiple {
+							s.RenderBox = false
+						}
+					})
+				}
+			}
 			for _, typ := range []events.Types{events.Focus, events.FocusLost} {
 				button.On(typ, func(events.Event) { requestSourceListFocusStyle(r) })
 			}

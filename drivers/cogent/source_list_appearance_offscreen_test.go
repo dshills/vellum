@@ -3,6 +3,7 @@
 package cogent
 
 import (
+	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
 	"cogentcore.org/core/icons"
@@ -87,6 +88,17 @@ func TestMacSourceListFlatRowsAndFocusAppearance(t *testing.T) {
 				box := list.control.choice.buttons[id].Geom.ContentBBox
 				got := frame.RGBAAt(box.Max.X-12, (box.Min.Y+box.Max.Y)/2)
 				close := func(a, b uint8) bool { return int(a)-int(b) >= -1 && int(a)-int(b) <= 1 }
+				label, ok := list.control.choice.buttons[id].ChildByName("text", 0).(*core.Text)
+				if !ok {
+					t.Fatal("source row has no text label", id)
+				}
+				// The empty top corner of the label must match the rest of the row,
+				// even when the row background is translucent.
+				corner := label.Geom.ContentBBox.Min
+				labelPixel := frame.RGBAAt(corner.X, corner.Y)
+				if labelPixel != got {
+					t.Fatal("inactive label repaints row background", id, labelPixel, got, label.Geom.ContentBBox)
+				}
 				if !close(got.R, expected.R) || !close(got.G, expected.G) || !close(got.B, expected.B) || got.A != 255 {
 					t.Fatal("inactive selection raster", id, got, expected)
 				}
@@ -130,7 +142,7 @@ func TestSourceListModeChangesRestoreSingleChoiceAppearance(t *testing.T) {
 	}
 	unitSettle(t, m)
 	row := m.implementation.find("one").state.root.control.choice.buttons["b"]
-	if row != original || row.IconOn != icons.Check || row.Styles.Border.Width.Top.Dots == 0 {
+	if row != original || row.IconOn != icons.Check || row.Styles.Border.Width.Top.Dots == 0 || !row.ChildByName("text", 0).(*core.Text).Styles.RenderBox {
 		t.Fatal("single choice lost original native presentation")
 	}
 	if m.implementation.find("one").state.root.control.choice.buttons["a"].Styles.IconSize.X.Value == 0 {
@@ -141,7 +153,7 @@ func TestSourceListModeChangesRestoreSingleChoiceAppearance(t *testing.T) {
 	}
 	unitSettle(t, m)
 	row = m.implementation.find("one").state.root.control.choice.buttons["b"]
-	if row != original || row.IconOn != icons.None || row.Styles.Border.Width.Top.Dots != 0 {
+	if row != original || row.IconOn != icons.None || row.Styles.Border.Width.Top.Dots != 0 || row.ChildByName("text", 0).(*core.Text).Styles.RenderBox {
 		t.Fatal("multiple choice did not regain flat source presentation")
 	}
 }
