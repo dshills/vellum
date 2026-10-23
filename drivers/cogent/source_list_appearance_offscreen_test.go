@@ -7,6 +7,7 @@ import (
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
 	"cogentcore.org/core/icons"
+	"cogentcore.org/core/styles"
 	"github.com/dshills/vellum/ui"
 	"image/color"
 	"testing"
@@ -36,6 +37,9 @@ func TestMacSourceListFlatRowsAndFocusAppearance(t *testing.T) {
 			root := m.implementation.find("one").state.root
 			list := findRecord(root, "list")
 			a, b, c := list.control.choice.buttons["a"], list.control.choice.buttons["b"], list.control.choice.buttons["c"]
+			if sourceListNeedsFocusRestyle(list) {
+				t.Fatal("settled active list still requests appearance work")
+			}
 			for _, row := range list.control.choice.buttons {
 				if row.IconOn != icons.None || row.IconOff != icons.None {
 					t.Fatal("source row retains checkbox/segment indicator")
@@ -76,6 +80,9 @@ func TestMacSourceListFlatRowsAndFocusAppearance(t *testing.T) {
 				if got != want {
 					t.Fatal("selected row did not become inactive on focus departure", id, got)
 				}
+			}
+			if sourceListNeedsFocusRestyle(list) {
+				t.Fatal("settled inactive list still requests appearance work")
 			}
 			frame, err = m.Capture(testContext, "one")
 			if err != nil {
@@ -155,5 +162,34 @@ func TestSourceListModeChangesRestoreSingleChoiceAppearance(t *testing.T) {
 	row = m.implementation.find("one").state.root.control.choice.buttons["b"]
 	if row != original || row.IconOn != icons.None || row.Styles.Border.Width.Top.Dots != 0 || row.ChildByName("text", 0).(*core.Text).Styles.RenderBox {
 		t.Fatal("multiple choice did not regain flat source presentation")
+	}
+}
+
+func TestSourceListFocusStyleWaitsForOriginRefresh(t *testing.T) {
+	view := func() ui.Node {
+		return ui.Node{ID: "root", Kind: ui.Column, Focus: ui.FocusRequest{ID: "after", Sequence: 1}, Children: []ui.Node{
+			{ID: "list", Kind: ui.ListBox, Multiple: true, SelectedIDs: []string{"a", "b"}, Options: []ui.Option{{ID: "a", Label: "Alpha"}, {ID: "b", Label: "Beta"}}, SelectionChange: func(ui.ListSelectionEvent) {}},
+			{ID: "after", Kind: ui.Button, Text: "After", Activate: func() {}},
+		}}
+	}
+	m, a := simpleManual(t, manualConfig(t, 956), view)
+	unitSettle(t, m)
+	list := findRecord(m.implementation.find("one").state.root, "list")
+	passes := 0
+	list.widget.AsWidget().FinalStyler(func(*styles.Style) { passes++ })
+	list.control.choice.buttons["a"].SetFocus()
+	originPasses := passes
+	if err := a.Drain(); err != nil {
+		t.Fatal(err)
+	}
+	if passes != originPasses {
+		t.Fatal("model queue directly restyled the native list", originPasses, passes)
+	}
+	unitSettle(t, m)
+	for _, id := range []string{"a", "b"} {
+		got := color.NRGBAModel.Convert(list.control.choice.buttons[id].Styles.Background.At(0, 0)).(color.NRGBA)
+		if got != (color.NRGBA{G: 112, B: 235, A: 255}) {
+			t.Fatal("origin refresh left stale selected row", id, got)
+		}
 	}
 }

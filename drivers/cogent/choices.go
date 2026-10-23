@@ -19,14 +19,13 @@ import (
 )
 
 type choiceState struct {
-	listAnchor       string
-	listStylePending atomic.Bool
-	buttons          map[string]*core.Switch
-	order            []string
-	listRows         map[string]*listBoxRowEpoch
-	listScope        atomic.Pointer[workbenchInputScope]
-	listCatalog      *listBoxCatalogEpoch
-	listContext      tabCloseContext // originating reconciliation, before global modal projection
+	listAnchor  string
+	buttons     map[string]*core.Switch
+	order       []string
+	listRows    map[string]*listBoxRowEpoch
+	listScope   atomic.Pointer[workbenchInputScope]
+	listCatalog *listBoxCatalogEpoch
+	listContext tabCloseContext // originating reconciliation, before global modal projection
 }
 
 func choiceVertical(n ui.Node) bool {
@@ -145,9 +144,6 @@ func prepareChoice(r *record, n ui.Node) error {
 					})
 				}
 			}
-			for _, typ := range []events.Types{events.Focus, events.FocusLost} {
-				button.On(typ, func(events.Event) { requestSourceListFocusStyle(r) })
-			}
 		}
 		c.buttons[id] = button
 		button.OnChange(func(e events.Event) {
@@ -257,7 +253,7 @@ func syncChoice(r *record, previous ui.Node) error {
 		}
 	}
 	syncSemantics(r)
-	if listCatalogChanged || previous.Multiple != r.node.Multiple || !slices.Equal(previous.SelectedIDs, r.node.SelectedIDs) || previous.Orientation != r.node.Orientation || !reflect.DeepEqual(previous.Options, r.node.Options) || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility {
+	if sourceListNeedsFocusRestyle(r) || listCatalogChanged || previous.Multiple != r.node.Multiple || !slices.Equal(previous.SelectedIDs, r.node.SelectedIDs) || previous.Orientation != r.node.Orientation || !reflect.DeepEqual(previous.Options, r.node.Options) || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility {
 		r.widget.AsWidget().Update()
 	}
 	return nil

@@ -109,3 +109,8 @@ rendering backend or release policy.
 Numeric fields also retain an explicit theme background under focus in both
 compact-stepper and plus/minus modes. Their existing border, hit geometry, numeric
 validation and stepping policy remain owned by the Spinner adapter.
+
+Source-list focus appearance uses the existing accessibility focus invalidation.
+The originating window refresh reconciles all selected row colors, including
+rows whose native focus state did not change. Draining the shared application
+model queue must not directly restyle a native list.

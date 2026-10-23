@@ -72,10 +72,10 @@ func styleSourceRow(r *record, id string, s *styles.Style) {
 	s.Min.Y = units.Dp(24)
 	if ui.ListOptionSelected(r.node, id) {
 		if r.widget.AsWidget().ContainsFocus() {
-			s.Background = colors.Uniform(color.NRGBA{R: 0, G: 112, B: 235, A: 255})
+			s.Background = colors.Uniform(sourceSelectionBackground(true))
 			s.Color = colors.Uniform(color.NRGBA{R: 255, G: 255, B: 255, A: 255})
 		} else {
-			s.Background = colors.Uniform(color.NRGBA{R: 160, G: 160, B: 165, A: 100})
+			s.Background = colors.Uniform(sourceSelectionBackground(false))
 		}
 	} else {
 		s.Background = colors.Uniform(color.NRGBA{})
@@ -105,19 +105,30 @@ func queueListSelectAll(r *record, id string, button *core.Switch) {
 	})
 }
 
-// A list's other selected rows need restyling too when focus enters or leaves.
-// Coalesce the row focus notifications and style only on the window owner.
-func requestSourceListFocusStyle(r *record) {
-	c := r.control.choice
-	if !c.listStylePending.CompareAndSwap(false, true) {
-		return
+// Focus already invalidates the originating window through the accessibility
+// bridge. Reconcile all selected rows there, never in a shared model callback.
+// Inspect actual row styles: native focus may have restyled only its own row.
+func sourceListNeedsFocusRestyle(r *record) bool {
+	if r.node.Kind != ui.ListBox || !r.node.Multiple {
+		return false
 	}
-	if !postControl(r, func() {
-		c.listStylePending.Store(false)
-		if r.node.Kind == ui.ListBox && r.node.Multiple && r.control.choice == c {
-			r.widget.AsWidget().Restyle()
+	want := sourceSelectionBackground(r.widget.AsWidget().ContainsFocus())
+	for _, id := range r.node.SelectedIDs {
+		row := r.control.choice.buttons[id]
+		if row == nil {
+			continue
 		}
-	}) {
-		c.listStylePending.Store(false)
+		bg := row.Styles.Background
+		if bg == nil || color.NRGBAModel.Convert(bg.At(0, 0)).(color.NRGBA) != want {
+			return true
+		}
 	}
+	return false
+}
+
+func sourceSelectionBackground(focused bool) color.NRGBA {
+	if focused {
+		return color.NRGBA{G: 112, B: 235, A: 255}
+	}
+	return color.NRGBA{R: 160, G: 160, B: 165, A: 100}
 }

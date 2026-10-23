@@ -330,3 +330,26 @@ allocation remains fixed, and the existing pointer half-step, held gesture,
 clamping/rejection, re-enable and font-picker checks pass with the race detector.
 Driver/gallery vet passes. Prism Anthropic claude-sonnet-5-5 completed coverage
 with no findings. Native light/dark confirmation follows in the private receipt.
+
+## Source-list focus ownership
+
+The native-origin regression failed before this change: application Drain ran
+one list style pass directly. Row focus hooks and their pending flag are removed.
+The existing AX focus notification invalidates the window; originating syncChoice
+compares selected rows' actual backgrounds against their active/inactive color
+and updates the list if needed. This handles native styling of only the focused
+row without treating that as proof that its siblings were styled too.
+
+Focused race checks cover the new boundary, both-theme active/inactive pixels,
+single/multiple mode restoration, ListBox lifetime/routing/queue cases and adjacent
+input focus. Vet passes. Settled active and inactive lists explicitly report no
+further appearance work.
+
+Prism Anthropic claude-sonnet-5-5 reported a speculative perpetual-update concern.
+Every valid SelectedIDs entry is selected by ui.ListOptionSelected, and the final
+styleSourceRow always installs one of these uniform backgrounds for selected rows,
+including disabled rows. No application-supplied image reaches this comparison.
+Nil represents an unstyled row and must request the initial update, rather than
+skip it. Settled-state tests demonstrate the comparison converges. No change is
+needed for the proposed nonuniform-image or disabled-selection scenarios.
+Native light/dark checks follow packaging in the private delivery receipt.
