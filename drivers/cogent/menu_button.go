@@ -1,12 +1,16 @@
 package cogent
 
 import (
+	"cogentcore.org/core/math32"
+	"cogentcore.org/core/styles/units"
 	"encoding/base64"
 	"html"
 	"image"
+	"image/color"
 	"slices"
 	"sync/atomic"
 
+	"cogentcore.org/core/colors"
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
@@ -146,7 +150,7 @@ func mountMenuButton(parent tree.Node, r *record) core.Widget {
 func syncMenuButton(r *record, previous ui.Node) {
 	s := r.control.menu
 	flushMenuClose(r)
-	changed := !slices.Equal(s.options, menuDescriptor(r).Options) || previous.Text != r.node.Text || previous.Icon != r.node.Icon || previous.Appearance != r.node.Appearance || previous.Style != r.node.Style || previous.Grow != r.node.Grow || previous.Disabled != r.node.Disabled || previous.MinWidth != r.node.MinWidth || previous.MinHeight != r.node.MinHeight
+	changed := !slices.Equal(s.options, menuDescriptor(r).Options) || previous.MenuAnchorID != r.node.MenuAnchorID || previous.Text != r.node.Text || previous.Icon != r.node.Icon || previous.Appearance != r.node.Appearance || previous.Style != r.node.Style || previous.Grow != r.node.Grow || previous.Disabled != r.node.Disabled || previous.MinWidth != r.node.MinWidth || previous.MinHeight != r.node.MinHeight
 	if changed {
 		requestMenuClose(r)
 		s.epoch = &menuEpoch{}
@@ -191,6 +195,11 @@ func openManagedMenu(r *record) {
 	p := &menuPopup{owner: r, epoch: s.epoch, items: map[string]*menuItem{}}
 	scene := core.NewScene("vellum-action-menu")
 	core.StyleMenuScene(scene)
+	scene.FinalStyler(func(style *styles.Style) {
+		if background := r.theme.Kinds[ui.FormGroup].Background; background.Set {
+			style.Background = colors.Uniform(background.Value)
+		}
+	})
 	p.scene = scene
 	p.context = context
 	scene.OnFirst(events.Custom, func(e events.Event) {
@@ -205,7 +214,8 @@ func openManagedMenu(r *record) {
 			break
 		}
 	}
-	itemStyle, _ := ui.ResolveStyle(ui.Node{Kind: ui.Button}, r.theme)
+	// Menu rows inherit typography/ink, not ordinary push-button borders/fills.
+	itemStyle := ui.Style{Typography: r.theme.Default.Typography, Foreground: r.theme.Default.Foreground}
 	var first core.Widget
 	for _, o := range s.options {
 		o := o
@@ -220,7 +230,21 @@ func openManagedMenu(r *record) {
 		if o.Checkable && o.Checked {
 			item.SetIcon(nativeSymbol(ui.SymbolCheck))
 		}
-		item.FinalStyler(func(style *styles.Style) { applyStyle(style, ui.Node{Kind: ui.Button, Style: itemStyle}, ui.Theme{}) })
+		item.FinalStyler(func(style *styles.Style) {
+			applyStyle(style, ui.Node{Kind: ui.Label, Style: itemStyle}, ui.Theme{})
+			style.Grow.Set(1, 0)
+			style.Justify.Content = styles.Start
+			style.Border.Width.Zero()
+			style.MaxBorder.Width.Zero()
+			style.Border.Radius.Set(units.Dp(4))
+			style.Padding.Set(units.Dp(4), units.Dp(10))
+			style.Min.Y = units.Dp(24)
+			style.Background = colors.Uniform(color.NRGBA{})
+			if style.Is(states.Focused) || style.Is(states.Hovered) || style.Is(states.Active) {
+				style.Background = colors.Uniform(color.NRGBA{R: 0, G: 112, B: 235, A: 255})
+				style.Color = colors.Uniform(color.NRGBA{R: 255, G: 255, B: 255, A: 255})
+			}
+		})
 		item.SetState(o.Disabled, states.Disabled)
 		p.items[o.ID] = item
 		if first == nil && !o.Disabled {
@@ -248,7 +272,37 @@ func openManagedMenu(r *record) {
 	if first != nil {
 		scene.Events.SetStartFocus(first)
 	}
+	menuWidth := 0
 	pos := r.widget.AsWidget().ContextMenuPos(nil)
+	if r.node.Kind == ui.MenuButton {
+		anchor := r.widget
+		if r.node.MenuAnchorID != "" {
+			anchor = nil
+			if sc := r.widget.AsWidget().Scene; sc != nil {
+				sc.WidgetWalkDown(func(w core.Widget, b *core.WidgetBase) bool {
+					if sem, ok := b.Property(SemanticsProperty).(Semantics); ok && sem.ID == r.node.MenuAnchorID && !sem.Disabled && b.IsVisible() {
+						anchor = w
+						return false
+					}
+					return true
+				})
+			}
+		}
+		if anchor == nil {
+			scene.DeleteChildren()
+			s.popup = nil
+			return
+		}
+		box := anchor.AsWidget().Geom.TotalBBox
+		if r.node.MenuAnchorID != "" {
+			menuWidth = box.Dx()
+		}
+		offset := image.Point{}
+		if anchor.AsWidget().Scene != nil {
+			offset = anchor.AsWidget().Scene.SceneGeom.Pos
+		}
+		pos = image.Pt(box.Min.X, box.Max.Y+2).Add(offset)
+	}
 	if s.position != nil {
 		pos = *s.position
 	}
@@ -264,6 +318,14 @@ func openManagedMenu(r *record) {
 	s.popup = p
 	r.widget.AsWidget().SetFocus()
 	p.stage.Run()
+	if menuWidth > 0 && context != nil {
+		geom := scene.SceneGeom
+		bounds := context.SceneGeom.Bounds()
+		geom.Size.X = min(menuWidth, bounds.Dx())
+		geom.Pos.X = max(bounds.Min.X, min(geom.Pos.X, bounds.Max.X-geom.Size.X))
+		scene.Resize(math32.Geom2DInt{Pos: geom.Pos, Size: geom.Size})
+		scene.LayoutScene()
+	}
 }
 func queueMenuAction(r *record, p *menuPopup, id string) {
 	if p == nil || p.dead.Load() {

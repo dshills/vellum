@@ -70,3 +70,9 @@ navigation and ordinary Tab/Return/Space keyboard buttons. Automatic OS locale,
 calendar arrow-key grid navigation, alternate calendars and time zones are not
 provided. Read-only/disabled and stale component identities refuse proposals.
 Navigation state is owner-held, bounded and creates no timers/background work.
+
+MenuButton supports optional same-window MenuAnchorID. ComboBox anchors its menu
+below the complete field's left edge, including the containing scene offset.
+Options use one popup surface with full-width, borderless rows and blue focus/
+hover feedback, rather than inheriting push-button appearance. Context menus
+continue to anchor at the pointer (or the host for keyboard opening).

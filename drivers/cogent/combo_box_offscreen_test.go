@@ -48,6 +48,22 @@ func TestComboBoxRoutedSuggestionsAndDraftRetention(t *testing.T) {
 	if !menuOpen(menu) {
 		t.Fatal("suggestions did not open")
 	}
+
+	popup := menu.control.menu.popup
+	outer := findRecord(m.implementation.find("one").state.root, "units").widget.AsWidget().Geom.TotalBBox
+	if popup.scene.SceneGeom.Pos.X != outer.Min.X || popup.scene.SceneGeom.Pos.Y < outer.Max.Y || popup.scene.SceneGeom.Size.X != outer.Dx() {
+		t.Fatal("combo menu not aligned to full field", popup.scene.SceneGeom, outer)
+	}
+	widths := map[int]bool{}
+	for _, row := range popup.items {
+		widths[row.Geom.TotalBBox.Dx()] = true
+		if row.Styles.Border.Width.Top.Dots != 0 {
+			t.Fatal("menu row has button border")
+		}
+	}
+	if len(widths) != 1 {
+		t.Fatal("unequal popup rows", widths)
+	}
 	if field.Text() != "draft" {
 		t.Fatal("opening menu destroyed draft")
 	}

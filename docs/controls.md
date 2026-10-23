@@ -376,3 +376,8 @@ Retain `ui.DateTimePicker` with a `time.Time` Value, optional inclusive Min/Max,
 month navigation does not change Value until a day is selected. A caller-supplied
 Go `Layout` controls formatting. Default ISO/24-hour formatting and English
 Sunday-first calendar are explicit; system-locale discovery is not implemented.
+
+Combo suggestions align below the full field's left edge and match its width.
+`MenuButton.MenuAnchorID` optionally names a same-window visible managed anchor;
+without it, action menus open below their own button. Popup options are full-width
+menu rows on one surface, not separately outlined push buttons.

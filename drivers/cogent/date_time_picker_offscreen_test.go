@@ -46,15 +46,21 @@ func TestDateTimePickerRoutedCalendarAndNativeCommit(t *testing.T) {
 	click := func(target ManualElement) {
 		t.Helper()
 		for _, typ := range []events.Types{events.MouseDown, events.MouseUp} {
-			if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: typ, Target: target.ID, TargetIncarnation: target.Incarnation, Button: events.Left}); err != nil {
+			if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: typ, Position: target.Bounds.Min.Add(target.Bounds.Size().Div(2)), Button: events.Left}); err != nil {
 				t.Fatal(err)
 			}
 		}
 		unitSettle(t, m)
 	}
 	click(button)
+	// Complete the popover's independent resize frame before resolving its rows.
+	if _, err := m.Frame(testContext, "one"); err != nil {
+		t.Fatal(err)
+	}
+	unitSettle(t, m)
 	// February 2024 starts Thursday; day 29 occupies cell 32.
 	_, day := imageManualElement(t, m, "due/date-time/cell/32")
+
 	click(day)
 	if p.Value.Day() != 29 || calls != 1 || p.Value.Hour() != 9 {
 		t.Fatal("calendar selection", p.Value, calls)

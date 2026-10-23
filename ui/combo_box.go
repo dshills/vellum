@@ -59,7 +59,7 @@ func (c *ComboBox) View() (Node, error) {
 		}
 	}}}
 	if len(c.Options) > 0 {
-		root.Children = append(root.Children, Node{ID: ComboMenuID(id), Kind: MenuButton, Icon: SymbolDown, Appearance: ButtonTool, Options: options, Style: Style{Border: Some(Border{}), Background: Some(color.NRGBA{}), Padding: Some(UniformInsets(3)), MinSize: Some(Size{Width: 24, Height: 26}), MaxSize: Some(Size{Width: 28}), GrowX: Some(float32(0))}, Accessibility: Accessibility{Name: label + " suggestions"}, Change: func(e ChangeEvent) {
+		root.Children = append(root.Children, Node{ID: ComboMenuID(id), Kind: MenuButton, MenuAnchorID: id, Icon: SymbolDown, Appearance: ButtonTool, Options: options, Style: Style{Border: Some(Border{}), Background: Some(color.NRGBA{}), Padding: Some(UniformInsets(3)), MinSize: Some(Size{Width: 24, Height: 26}), MaxSize: Some(Size{Width: 28}), GrowX: Some(float32(0))}, Accessibility: Accessibility{Name: label + " suggestions"}, Change: func(e ChangeEvent) {
 			if !available() {
 				return
 			}

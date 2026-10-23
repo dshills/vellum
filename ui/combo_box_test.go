@@ -58,3 +58,17 @@ func TestComboBoxValidation(t *testing.T) {
 		t.Fatal(n, err)
 	}
 }
+
+func TestComboMenuUsesOuterFieldAnchor(t *testing.T) {
+	c := &ComboBox{ID: "combo", Options: []Option{{ID: "a", Label: "A"}}, Change: func(ComboEvent) {}}
+	n, err := c.View()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if helperNode(t, n, ComboMenuID(c.ID)).MenuAnchorID != c.ID {
+		t.Fatal("menu anchor is not full field")
+	}
+	if Validate(Node{ID: "label", Kind: Label, MenuAnchorID: "other"}) == nil {
+		t.Fatal("anchor accepted outside menu")
+	}
+}

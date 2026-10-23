@@ -117,3 +117,25 @@ empty, single and multiple selections, rather than only inspecting Go snapshots.
 Native follow-up Prism f1466a0a3b586dec: changed the scalar count to neutral
 “1 selected”/“2 selected” phrasing. Existing native payload and menu/selection
 routing tests pass. This is fixed English wording, not OS localization.
+
+Live inspector follow-up: generic native Dialog defaults added a move handle,
+24dp scene padding, a 50px sizing allowance and a narrow wrapping body. The
+popover-only surface now has 240dp default content width (caller style wins),
+zero outer scene/body padding, no move parts or title side effect, and scene
+size clamped to the measured retained host. Existing Dialog behavior is unchanged.
+Menu surfaces follow the application-local form surface in dark appearance.
+
+Popup appearance review dispositions:
+
+- a671d0650f6a5833: added explicit dialog/host guard before measuring the retained
+  host. Host is normally created at mount, but defensive early return is harmless.
+- 5fac631b1494c058: removed temporary geometry diagnostic logging from the test.
+- User screenshot additionally showed outlined unequal rows offset at the arrow.
+  Popup rows no longer inherit push-button fills/borders; they fill one shared
+  surface. Combo MenuAnchorID names its outer field; native menu origin includes
+  scene offset and matches the full field width. Tests assert exact anchor, width,
+  equal rows and zero border.
+- Calendar geometry regression exposed zero child hit boxes when scene/body
+  shrink-wrapped after resize. Scene/body now fill the explicitly measured host
+  allocation, complete originating layout, and retain compact host growth. The
+  full popup/date/menu/context/combo race suite and portable ui race tests pass.

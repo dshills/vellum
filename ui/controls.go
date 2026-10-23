@@ -134,6 +134,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if n.MenuAnchorID != "" && n.Kind != MenuButton {
+		return fmt.Errorf("ui: MenuAnchorID belongs only on MenuButton")
+	}
 	if (n.Multiple || len(n.SelectedIDs) > 0 || n.SelectionChange != nil) && n.Kind != ListBox {
 		return fmt.Errorf("ui: multiple selection belongs only on ListBox")
 	}

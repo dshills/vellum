@@ -90,6 +90,7 @@ type Node struct {
 	Multiple        bool
 	SelectedIDs     []string
 	SelectionChange func(ListSelectionEvent)
+	MenuAnchorID    string // optional same-window managed anchor for MenuButton
 	SelectedID      string
 	TabClose        func(TabCloseEvent)
 	Change          func(ChangeEvent)

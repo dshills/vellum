@@ -60,10 +60,14 @@ func TestPopoverAnchoringEscapeRetentionAndRemoval(t *testing.T) {
 		t.Fatal("popover not active")
 	}
 	stage := r.control.dialog.body.Scene.Stage
-	if stage.Scrim || stage.DisplayTitle || stage.Resizable || stage.NewWindow {
+	if stage.Scrim || stage.DisplayTitle || stage.Resizable || stage.NewWindow || stage.Title != "" || stage.Scene.Parts != nil {
 		t.Fatal("popover has window/dialog chrome")
 	}
 	rect := r.control.dialog.body.Scene.SceneGeom.Bounds()
+	hostSize := r.control.dialog.host.Geom.Size.Actual.Total.ToPointCeil()
+	if rect.Size() != hostSize {
+		t.Fatal("popover retains generic dialog outer allowance", rect.Size(), hostSize)
+	}
 	if rect.Min.Y < anchor.Bounds.Max.Y {
 		t.Fatal("not anchored below", rect, anchor.Bounds)
 	}

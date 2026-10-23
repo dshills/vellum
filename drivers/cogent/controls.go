@@ -808,8 +808,10 @@ func syncDialog(r *record) {
 			closeDialog(r)
 			return
 		}
-		stage := body.NewDialog(anchor).SetScrim(false).SetDisplayTitle(false).SetResizable(false).SetUseMinSize(false)
+		stage := body.NewDialog(anchor).SetScrim(false).SetDisplayTitle(false).SetResizable(false).SetUseMinSize(false).SetTitle("")
+		preparePopoverSurface(r, body)
 		stage.Run()
+		finishPopoverSurface(body)
 		positionPopover(r, anchor)
 	} else {
 		body.NewDialog(r.widget).Run()
