@@ -6,6 +6,8 @@ import (
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
 	"github.com/dshills/vellum/ui"
+	"image"
+	"image/color"
 	"testing"
 )
 
@@ -86,5 +88,41 @@ func TestPathControlInsideMacFormHasVisibleWidth(t *testing.T) {
 	home := findRecord(root, ui.PathSegmentID(p.ID, "home")).widget.AsWidget()
 	if path.Geom.ContentBBox.Dx() < 100 || home.Geom.TotalBBox.Empty() || !home.Geom.TotalBBox.In(path.Geom.ContentBBox) {
 		t.Fatal("path toolbar collapsed inside form", path.Geom, home.Geom)
+	}
+}
+
+func TestPersonalToolbarsUseDarkFormBackground(t *testing.T) {
+	path := &ui.PathControl{ID: "path", Items: []ui.PathItem{{ID: "home", Label: "Home"}}}
+	tokens := &ui.TokenField{ID: "tags", Tokens: []ui.Token{{ID: "design", Text: "Design"}}, Change: func(ui.TokenEvent) {}}
+	view := func() ui.Node {
+		p, err := path.View()
+		if err != nil {
+			panic(err)
+		}
+		tags, err := tokens.View()
+		if err != nil {
+			panic(err)
+		}
+		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "group", Kind: ui.FormGroup, Text: "Dark controls", Children: []ui.Node{p, tags}}}}
+	}
+	config := manualConfig(t, 929)
+	config.Theme = ui.MacTheme(true)
+	config.Theme.Default.Background = ui.Some(color.NRGBA{R: 29, G: 29, B: 31, A: 255})
+	config.Theme.Default.Typography = ui.Some(ui.Typography{Family: "Noto Sans", Size: 13})
+	m, _ := simpleManual(t, config, view)
+	unitSettle(t, m)
+	frame, err := m.Capture(testContext, "one")
+	if err != nil {
+		t.Fatal(err)
+	}
+	root := m.implementation.find("one").state.root
+	for _, id := range []string{"path", "tags/tokens/chips"} {
+		box := findRecord(root, id).widget.AsWidget().Geom.ContentBBox
+		point := image.Pt(box.Max.X-3, box.Min.Y+2)
+		got := frame.RGBAAt(point.X, point.Y)
+		expected := color.RGBA{R: 65, G: 65, B: 68, A: 255}
+		if got != expected {
+			t.Fatal("toolbar does not inherit dark form surface", id, point, got, box)
+		}
 	}
 }

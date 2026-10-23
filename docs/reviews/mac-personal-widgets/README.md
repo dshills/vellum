@@ -86,3 +86,15 @@ token commit creates one chip and keyboard Return removes it. Secure Show change
 its action label while AX remains a secure field without a value. Final package
 checks are kept with the local delivery receipt rather than presented as physical
 pointer or human VoiceOver qualification.
+
+## Dark surfaces
+
+Native dark check found the upstream toolbar's light default background behind
+path segments and token chips. Both composites now explicitly inherit their
+containing surface. TokenField's root also fills its allocated width so its
+overflow toolbar cannot collapse with the default entry. Race/routing tests pass;
+a completed software frame verifies empty pixels in both toolbars equal the dark
+form surface. Prism requests confirmation of GrowX1: intentional, included in the
+review context and this rendered containment test. Caller Style still overrides
+GrowX and max size. This is the same overflow-container sizing constraint proven
+by the path regression, not an unrelated change.

@@ -3,6 +3,7 @@ package ui
 import (
 	"encoding/base64"
 	"fmt"
+	"image/color"
 	"strings"
 	"unicode/utf8"
 )
@@ -104,7 +105,7 @@ func (p *PathControl) View() (Node, error) {
 	if limit == 0 {
 		limit = 24
 	}
-	style := Style{Gap: Some(float32(2)), Align: Some(AlignCenter), GrowX: Some(float32(1)), GrowY: Some(float32(0))}.Overlay(p.Style)
+	style := Style{Background: Some(color.NRGBA{}), Gap: Some(float32(2)), Align: Some(AlignCenter), GrowX: Some(float32(1)), GrowY: Some(float32(0))}.Overlay(p.Style)
 	root := Node{ID: id, Kind: Toolbar, Disabled: p.Disabled, Style: style, Accessibility: Accessibility{Name: label}}
 	propose := func(target string) {
 		if p.validate() != nil || p.ID != id || p.Disabled || p.Navigate == nil || len(p.Items) != len(shown) {

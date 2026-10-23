@@ -66,7 +66,7 @@ func (f *TokenField) View() (Node, error) {
 	}
 	available := func() bool { return f.ID == id && !f.Disabled && f.Change != nil && f.validate() == nil }
 	chipStyle := Style{Background: Some(color.NRGBA{R: 218, G: 233, B: 251, A: 255}), Foreground: Some(color.NRGBA{R: 25, G: 57, B: 96, A: 255}), Border: Some(Border{}), CornerRadius: Some(float32(6)), Padding: Some(Insets{Top: 3, Bottom: 3, Left: 8, Right: 8}), MinSize: Some(Size{Height: 24}), GrowX: Some(float32(0))}.Overlay(f.ChipStyle)
-	chips := Node{ID: id + "/tokens/chips", Kind: Toolbar, Style: Style{Gap: Some(float32(4)), Padding: Some(Insets{})}}
+	chips := Node{ID: id + "/tokens/chips", Kind: Toolbar, Style: Style{Background: Some(color.NRGBA{}), Gap: Some(float32(4)), Padding: Some(Insets{})}}
 	for _, t := range f.Tokens {
 		shown := t
 		chips.Children = append(chips.Children, Node{ID: TokenRemoveID(id, t.ID), Kind: Button, Text: t.Text + " ×", Style: chipStyle, Accessibility: Accessibility{Name: "Remove " + t.Text, Help: "Remove this tag with Return or Space"}, Activate: func() {
@@ -116,7 +116,7 @@ func (f *TokenField) View() (Node, error) {
 		children = append(children, chips)
 	}
 	children = append(children, input)
-	style := Style{Gap: Some(float32(6)), GrowY: Some(float32(0))}.Overlay(f.Style)
+	style := Style{Background: Some(color.NRGBA{}), Gap: Some(float32(6)), GrowX: Some(float32(1)), GrowY: Some(float32(0))}.Overlay(f.Style)
 	n := Node{ID: id, Kind: Column, Disabled: !available(), Style: style, Accessibility: Accessibility{Name: label}, Children: children}
 	if err := Validate(n); err != nil {
 		return Node{}, err
