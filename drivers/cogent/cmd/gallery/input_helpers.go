@@ -10,6 +10,8 @@ import (
 )
 
 type inputHelpersGallery struct {
+	colorWell        *ui.ColorWell
+	colorError       string
 	datePicker       *ui.DateTimePicker
 	dateError        string
 	selectedObjects  []string
@@ -29,6 +31,10 @@ type inputHelpersGallery struct {
 
 func newInputHelpersGallery() *inputHelpersGallery {
 	m := &inputHelpersGallery{name: "Untitled", quantity: 1}
+	m.colorWell = &ui.ColorWell{ID: "drawing-color", Label: "Drawing color", Color: color.NRGBA{R: 52, G: 120, B: 246, A: 255}, Recent: []color.NRGBA{{R: 52, G: 120, B: 246, A: 255}, {R: 237, G: 90, B: 80, A: 255}, {R: 64, G: 180, B: 110, A: 255}}}
+	m.colorWell.Change = func(e ui.ColorEdit) { m.colorWell.Color = e.Apply(m.colorWell.Color); m.colorError = "" }
+	m.colorWell.Invalid = func(err error) { m.colorError = err.Error() }
+
 	m.datePicker = &ui.DateTimePicker{ID: "reminder-date", Label: "Reminder date and time", Mode: ui.DateAndTime, Value: time.Date(2026, 10, 23, 9, 0, 0, 0, time.Local)}
 	m.datePicker.Change = func(e ui.DateTimeEvent) { m.datePicker.Value = e.Value; m.dateError = "" }
 	m.datePicker.Invalid = func(err error) { m.dateError = err.Error() }
@@ -47,6 +53,7 @@ func newInputHelpersGallery() *inputHelpersGallery {
 }
 func (m *inputHelpersGallery) setDisabled(disabled bool) {
 	m.disabled = disabled
+	m.colorWell.Disabled = disabled
 	m.combo.Disabled = disabled
 	m.datePicker.Disabled = disabled
 	m.search.Disabled = disabled
@@ -55,6 +62,7 @@ func (m *inputHelpersGallery) setDisabled(disabled bool) {
 func (m *inputHelpersGallery) setAppearance(dark bool) {
 	m.dark = dark
 	theme := ui.MacTheme(m.dark)
+	m.colorWell.PopoverStyle = theme.Kinds[ui.FormGroup]
 	m.datePicker.Style = theme.Kinds[ui.TextField]
 	m.datePicker.Style.MinSize = ui.Some(ui.Size{Width: 180, Height: 28})
 	m.datePicker.Style.MaxSize = ui.Some(ui.Size{Width: 240})
@@ -72,6 +80,12 @@ func (m *inputHelpersGallery) setAppearance(dark bool) {
 	m.search.ClearStyle = ui.Style{Border: ui.Some(ui.Border{}), Background: ui.Some(color.NRGBA{}), Padding: ui.Some(ui.UniformInsets(2))}
 }
 func (m *inputHelpersGallery) view() ui.Node {
+	m.colorWell.ValidationMessage = m.colorError
+	well, err := m.colorWell.View()
+	if err != nil {
+		return ui.Node{ID: "inputs", Kind: ui.Label, Text: err.Error()}
+	}
+
 	date, err := m.datePicker.View()
 	if err != nil {
 		return ui.Node{ID: "inputs", Kind: ui.Label, Text: err.Error()}
@@ -117,6 +131,7 @@ func (m *inputHelpersGallery) view() ui.Node {
 	return ui.Node{ID: "inputs", Kind: ui.Scroll, Grow: true, Style: ui.Style{Background: ui.Some(background), Padding: ui.Some(ui.UniformInsets(20)), Gap: ui.Some(float32(16))}, Children: []ui.Node{
 		{ID: "inputs-title", Kind: ui.Label, Text: "Mac input widgets", Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 20, Weight: 600})}},
 		{ID: "inputs-description", Kind: ui.Label, Text: "Editable choices, context menus, popovers, selection and dates through public Go APIs."},
+		{ID: "color-well-group", Kind: ui.FormGroup, Text: "Drawing color", Children: []ui.Node{well}},
 		search,
 		{ID: "combo-group", Kind: ui.FormGroup, Text: "Drawing units — type a value or choose", Children: []ui.Node{combo}},
 		{ID: "search-results", Kind: ui.FormGroup, Text: "Components", Children: matches},

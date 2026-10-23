@@ -381,3 +381,12 @@ Combo suggestions align below the full field's left edge and match its width.
 `MenuButton.MenuAnchorID` optionally names a same-window visible managed anchor;
 without it, action menus open below their own button. Popup options are full-width
 menu rows on one surface, not separately outlined push buttons.
+
+### Color well
+
+`ui.ColorWell.View()` returns a compact swatch and same-window anchored editor.
+Retain the component; accept `ColorEdit` with `well.Color = edit.Apply(well.Color)`.
+Optional `Recent` contains at most 16 caller-owned colors; rejected edits never
+mutate it. RGBA/opacity and hex editing reuse ColorPicker validation. Set
+`PopoverStyle` from MacTheme's FormGroup style. `ColorWellButtonID` is the focus
+target. This is a managed panel, not the shared system color panel.
