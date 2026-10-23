@@ -42,6 +42,9 @@ func TestComboBoxRoutedSuggestionsAndDraftRetention(t *testing.T) {
 	field.SetText("draft")
 	input(key.CodeDownArrow)
 	menu := findRecord(m.implementation.find("one").state.root, ui.ComboMenuID(c.ID))
+	if menu.widget.(*core.Button).Indicator != "" {
+		t.Fatal("icon-only combo contains duplicate disclosure indicator")
+	}
 	if !menuOpen(menu) {
 		t.Fatal("suggestions did not open")
 	}

@@ -100,3 +100,20 @@ release publication. Focused ui race/vet and affected native driver/gallery
 race/vet pass; native executable builds. Private light/dark packages retain
 standard OS window chrome. Live appearance observations are recorded separately
 after packaging.
+
+## Packaged native follow-up
+
+Live light-window inspection showed a clipped duplicate combo chevron. Icon-only
+MenuButtons now omit the redundant indicator; labeled buttons retain/restore it.
+Live keyboard/AX activation selected Inches and changed the field correctly.
+
+The same native check exposed an invalid full AX snapshot: multi-list host Value
+used []string, but the existing Objective-C validator admits scalar strings or
+numbers only. Host Value now summarizes the selection count as a string; row
+Selected flags retain the authoritative membership. A focused Darwin/offscreen
+fixture runs actual produced nodes through the production native validator for
+empty, single and multiple selections, rather than only inspecting Go snapshots.
+
+Native follow-up Prism f1466a0a3b586dec: changed the scalar count to neutral
+“1 selected”/“2 selected” phrasing. Existing native payload and menu/selection
+routing tests pass. This is fixed English wording, not OS localization.

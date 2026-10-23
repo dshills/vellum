@@ -629,7 +629,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 				}
 			}
 			if n.Multiple {
-				x.Value = append([]string(nil), n.SelectedIDs...)
+				x.Value = fmt.Sprintf("%d selected", len(n.SelectedIDs))
 			}
 			_, x.Focusable = ui.FocusTarget(n, n.ID)
 			// Keyboard focus belongs to one option; group focus is a managed proxy.

@@ -157,6 +157,16 @@ func syncMenuButton(r *record, previous ui.Node) {
 	}
 	flushMenuClose(r)
 	if r.node.Kind == ui.MenuButton {
+		// An icon-only affordance is already the disclosure indicator (e.g. combo).
+		// A second indicator clips in a compact Mac field. Restore it with a label.
+		b := r.widget.(*core.Button)
+		indicator := nativeSymbol(ui.SymbolDown)
+		if r.node.Text == "" {
+			indicator = ""
+		}
+		if b.Indicator != indicator {
+			b.SetIndicator(indicator).Update()
+		}
 		r.widget.AsWidget().SetState(!menuAvailable(r), states.Disabled)
 	}
 	if s.request {
