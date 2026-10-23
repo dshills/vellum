@@ -82,10 +82,10 @@ func TestContextMenuListRowConsumesSharedEventOnce(t *testing.T) {
 	m, _ := simpleManual(t, manualConfig(t, 916), view)
 	unitSettle(t, m)
 	r := m.implementation.find("one").state.root
-	e := events.NewMouse(events.MouseUp, events.Right, r.widget.AsWidget().Geom.TotalBBox.Min, 0)
+	e := events.NewMouse(events.ContextMenu, events.Right, r.widget.AsWidget().Geom.TotalBBox.Min, 0)
 	row := r.control.choice.buttons["a"]
-	row.Send(events.ContextMenu, e)
-	r.widget.AsWidget().Send(events.ContextMenu, e)
+	row.HandleEvent(e)
+	r.widget.AsWidget().HandleEvent(e)
 	unitSettle(t, m)
 	if !e.IsHandled() || !menuOpen(r) {
 		t.Fatal("row context request missing")
