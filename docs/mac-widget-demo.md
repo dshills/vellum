@@ -14,6 +14,7 @@ The packaged **Vellum Mac Widgets.app** starts the focused light gallery directl
 **Vellum Mac Widgets Dark.app** starts the dark version. Scroll to reach all
 sections. The ordinary macOS title bar remains draggable.
 
+- **Tags:** enter a tag and press Return, or choose a suggestion. Click a chip (or Tab to it and press Return) to remove it.
 - **Drawing color:** open the swatch; edit RGBA, opacity or hex, choose a recent color, and close with Done or Escape.
 - **Drawing units:** type a custom value and commit with Return, or use the
   dropdown. Tab to the dropdown then Down/Return opens its keyboard menu.

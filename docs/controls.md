@@ -390,3 +390,13 @@ Optional `Recent` contains at most 16 caller-owned colors; rejected edits never
 mutate it. RGBA/opacity and hex editing reuse ColorPicker validation. Set
 `PopoverStyle` from MacTheme's FormGroup style. `ColorWellButtonID` is the focus
 target. This is a managed panel, not the shared system color panel.
+
+### Token field
+
+`ui.TokenField.View()` composes removable chips and a controlled entry with
+suggestions. Supply at most 32 `Token{ID, Text}` values and at most 64 suggestions.
+`TokenEvent` requests one addition or removal; the application assigns new IDs,
+accepts by updating Tokens and clears Draft on acceptance. Enter one token with
+Return, or choose a suggestion. Focus a chip with Tab and press Return/Space to
+remove it. Duplicate labels, blank/invalid or >256-byte tokens are refused.
+No in-place chip editing, comma-triggered commit or chip dragging is provided.

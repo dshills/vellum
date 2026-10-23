@@ -15,3 +15,9 @@ routing regression opens through Return, commits hex through the live field, and
 closes through Escape; component tests cover old sessions and read-only state.
 The suggested removal of the opening epoch would permit callbacks from a prior
 closed description to reach a new editor. No source change made for this finding.
+
+## Token field
+
+Focused UI race tests, managed committed additions and keyboard chip removal, and
+gallery model tests passed. Prism completed with zero findings. Completion menus
+reuse ComboBox; no claim of per-keystroke filtering or Mail-style inline editing.

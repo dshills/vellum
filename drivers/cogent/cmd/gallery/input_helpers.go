@@ -10,6 +10,9 @@ import (
 )
 
 type inputHelpersGallery struct {
+	tokens           *ui.TokenField
+	tokenNext        int
+	tokenError       string
 	colorWell        *ui.ColorWell
 	colorError       string
 	datePicker       *ui.DateTimePicker
@@ -31,6 +34,24 @@ type inputHelpersGallery struct {
 
 func newInputHelpersGallery() *inputHelpersGallery {
 	m := &inputHelpersGallery{name: "Untitled", quantity: 1}
+	m.tokens = &ui.TokenField{ID: "drawing-tags", Label: "Drawing tags", Tokens: []ui.Token{{ID: "tag-1", Text: "Design"}}, Suggestions: []ui.Option{{ID: "work", Label: "Work"}, {ID: "personal", Label: "Personal"}, {ID: "review", Label: "Review"}}}
+	m.tokenNext = 1
+	m.tokens.Change = func(e ui.TokenEvent) {
+		if e.Remove {
+			for i, t := range m.tokens.Tokens {
+				if t.ID == e.TokenID {
+					m.tokens.Tokens = append(m.tokens.Tokens[:i], m.tokens.Tokens[i+1:]...)
+					break
+				}
+			}
+		} else {
+			m.tokenNext++
+			m.tokens.Tokens = append(m.tokens.Tokens, ui.Token{ID: fmt.Sprintf("tag-%d", m.tokenNext), Text: e.Text})
+			m.tokens.Draft = ""
+		}
+		m.tokenError = ""
+	}
+	m.tokens.Invalid = func(err error) { m.tokenError = err.Error() }
 	m.colorWell = &ui.ColorWell{ID: "drawing-color", Label: "Drawing color", Color: color.NRGBA{R: 52, G: 120, B: 246, A: 255}, Recent: []color.NRGBA{{R: 52, G: 120, B: 246, A: 255}, {R: 237, G: 90, B: 80, A: 255}, {R: 64, G: 180, B: 110, A: 255}}}
 	m.colorWell.Change = func(e ui.ColorEdit) { m.colorWell.Color = e.Apply(m.colorWell.Color); m.colorError = "" }
 	m.colorWell.Invalid = func(err error) { m.colorError = err.Error() }
@@ -54,6 +75,7 @@ func newInputHelpersGallery() *inputHelpersGallery {
 func (m *inputHelpersGallery) setDisabled(disabled bool) {
 	m.disabled = disabled
 	m.colorWell.Disabled = disabled
+	m.tokens.Disabled = disabled
 	m.combo.Disabled = disabled
 	m.datePicker.Disabled = disabled
 	m.search.Disabled = disabled
@@ -63,6 +85,9 @@ func (m *inputHelpersGallery) setAppearance(dark bool) {
 	m.dark = dark
 	theme := ui.MacTheme(m.dark)
 	m.colorWell.PopoverStyle = theme.Kinds[ui.FormGroup]
+	m.tokens.InputStyle = theme.Kinds[ui.TextField]
+	m.tokens.InputStyle.Padding = ui.Some(ui.Insets{})
+	m.tokens.InputStyle.MaxSize = ui.Some(ui.Size{Width: 360})
 	m.datePicker.Style = theme.Kinds[ui.TextField]
 	m.datePicker.Style.MinSize = ui.Some(ui.Size{Width: 180, Height: 28})
 	m.datePicker.Style.MaxSize = ui.Some(ui.Size{Width: 240})
@@ -80,6 +105,10 @@ func (m *inputHelpersGallery) setAppearance(dark bool) {
 	m.search.ClearStyle = ui.Style{Border: ui.Some(ui.Border{}), Background: ui.Some(color.NRGBA{}), Padding: ui.Some(ui.UniformInsets(2))}
 }
 func (m *inputHelpersGallery) view() ui.Node {
+	tokens, err := m.tokens.View()
+	if err != nil {
+		return ui.Node{ID: "inputs", Kind: ui.Label, Text: err.Error()}
+	}
 	m.colorWell.ValidationMessage = m.colorError
 	well, err := m.colorWell.View()
 	if err != nil {
@@ -131,6 +160,7 @@ func (m *inputHelpersGallery) view() ui.Node {
 	return ui.Node{ID: "inputs", Kind: ui.Scroll, Grow: true, Style: ui.Style{Background: ui.Some(background), Padding: ui.Some(ui.UniformInsets(20)), Gap: ui.Some(float32(16))}, Children: []ui.Node{
 		{ID: "inputs-title", Kind: ui.Label, Text: "Mac input widgets", Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 20, Weight: 600})}},
 		{ID: "inputs-description", Kind: ui.Label, Text: "Editable choices, context menus, popovers, selection and dates through public Go APIs."},
+		{ID: "tokens-group", Kind: ui.FormGroup, Text: "Tags — Return adds, chip button removes", Children: []ui.Node{tokens, {ID: "token-feedback", Kind: ui.Label, Text: m.tokenError}}},
 		{ID: "color-well-group", Kind: ui.FormGroup, Text: "Drawing color", Children: []ui.Node{well}},
 		search,
 		{ID: "combo-group", Kind: ui.FormGroup, Text: "Drawing units — type a value or choose", Children: []ui.Node{combo}},
