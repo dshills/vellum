@@ -33,8 +33,8 @@ reproduction uses the tracked preparation contract, not those machine paths.
 | P1 | A new external Go module must build/run using the extracted candidate SDK without checkout/private-tree dependencies; R2 passes for SDK source d8de4fc; final alpha.3 delivered-byte renewal also passes at R5. | Implementation agent: export private SDK, verify relocation, generate/build/run starter. | R2 |
 | P2 | Matching alpha.3 Placement app passes the listed editing, Save/Open/history and shutdown workflows; native text/window checks pass within their recorded scopes. Earlier app24 evidence remains separately scoped. | Private candidate acceptance complete; retain final artifact and native automation limits. | R2/R3/R5 |
 | P3 | Bounded idle/activity/lifecycle and two-hour soak checks now pass. Apple TUINS base class origin/stable count are known; native retaining reference and full native/GPU heap remain unqualified. | Bounded preview resource check complete; retain the disclosed native-heap limits and historical failures. | R3 |
-| P4 | Public SDK/app rights and notices remain pending; presence inventories alone do not approve redistribution. Upstream objc2 notice explicitly raises Apple-SDK-derived binding terms. | Implementation agent: review actual shipped component applicability; seek a concrete rights-holder/owner decision only for the unresolved component. | R4 |
-| P5 | Guarded public native route implemented at b0e5106; actual public packaging remains blocked by pending rights approval. | Implementation agent: retain release-audit and exact-archive notice gates; no further tooling repair required for this route. | R4 |
+| P4 | Owner approved the exact decision-packet payload and corrected 418-file notice bundle on 23 October; release/macos-preview-audit.json binds the decision. Future changed payloads require a new audit. | Produce and verify guarded public candidates for the approved payload; retain historical declarations and separate publication approval. | R4 |
+| P5 | Guarded public native route implemented at b0e5106; owner-approved exact payload may now pass the existing public packaging gates. | Implementation agent: retain release-audit and exact-archive notice gates; no further tooling repair required for this route. | R4 |
 | P6 | Alpha.3 private artifacts, checksums and ad-hoc signing/notarization disclosure are complete; public artifact/publication approval remains pending. | Implementation agent: prepare exact reviewed artifacts and release text, then owner publication decision. | R4/R5 |
 
 This ledger tracks completed acceptance checks and remaining distribution
@@ -61,13 +61,15 @@ or gesture, expected/actual behavior, smallest fix and focused retest here.
   deallocation remain unqualified. No full P11 or blanket native-safety claim is made.
 - R4: alpha.3 identity committed at `aaa0a3a`; guarded public native exporter repair
   at `b0e5106`; stale exported contract version corrected at `412e5b8`. All changes
-  have focused tests and Prism reviews. Applicable notice collection and real
-  distribution-rights approval remain separate and pending.
+  have focused tests and Prism reviews. The owner approved the exact payload and
+  corrected notices on 23 October; [the audit record](../release/macos-preview-audit.json)
+  binds that decision. Historical declaration-collection labels are unchanged.
 - R5: [final private delivered-byte acceptance](reports/macos-preview-final-private/README.md)
   passes for the alpha.3 SDK and build-28 app. Fresh external SDK starter, strict
   extracted app signature, place/pan/zoom/history/Save/Open/normal quit pass.
-  Public distribution rights, candidate CI and final publication decision remain
-  pending; the bounded two-hour soak now passes. No public preview release or full
+  Exact-payload audit and source push/draft PR for CI are now owner-approved.
+  Public candidate verification, candidate CI and final publication decision
+  remain pending; the bounded two-hour soak passes. No public preview release or full
   Mac qualification is claimed.
 
 ## Disclosed performance

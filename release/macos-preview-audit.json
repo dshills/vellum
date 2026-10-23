@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "status": "approved",
+  "release": "v0.1.0-alpha.3",
+  "approved_on": "2026-10-23",
+  "authority": "Repository owner, explicit conversation reply to the concrete distribution decision packet",
+  "owner_decision": "The distribution audit is approved for this payload",
+  "decision_inputs": {
+    "path": "docs/reports/macos-preview-distribution/decision-inputs.json",
+    "sha256": "efba279ad36e2707f276a6c04708ab8c00c45ba92b935789046148318d488752"
+  },
+  "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "app_source_binary_sha256": "0d7539594ad742844f629ea1ab6080edb0a86ddb8ffbffe8192d3b53d636a16a",
+  "notice_inventory_sha256": "0efc1c58677130fcdbf937ac3fcafed162cc0a8c08467ed68f781245fc4eab74",
+  "notice_files": 418,
+  "notice_component_entries": 175,
+  "scope": "The exact selected native archive, matching app source binary, SDK dependency contents and corrected original notices in the decision packet. Product inputs remain frozen. Other payloads/future dependency changes require a new audit.",
+  "historical_declarations": "Original native/app notice inventories retain their recorded pending/review-required collection labels; this owner decision supplies the existing release-level approval.",
+  "publication_authorized": false,
+  "source_ci_authorization": {
+    "owner_decision": "Yes, push the reviewed branch and use a draft PR for CI",
+    "scope": "Reviewed macOS-preview source branch and reviewed checkpoint reports; no release tags or downloadable assets."
+  },
+  "signing_route": "Ad-hoc signed developer preview; not notarized. No new signing identity or terms acceptance authorized."
+}

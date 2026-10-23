@@ -1,0 +1,37 @@
+[
+  {
+    "argv": [
+      "/opt/homebrew/opt/python@3.15/bin/python3.15",
+      "-B",
+      "scripts/release-sdk_test.py",
+      "ReleaseChecks.test_selected_owner_choices_leave_distribution_audit_gated",
+      "ReleaseChecks.test_public_release_refuses_dirty_source",
+      "ReleaseChecks.test_public_gate_rejects_changes_hidden_by_real_git_index_flags"
+    ],
+    "exit_code": 0,
+    "seconds": 0.28249366697855294
+  },
+  {
+    "argv": [
+      "/opt/homebrew/opt/python@3.15/bin/python3.15",
+      "-B",
+      "scripts/package-app_test.py",
+      "AppChecks.test_public_requires_both_release_approval_and_binary_bound_notices",
+      "AppChecks.test_public_keeps_source_index_and_publication_rechecks",
+      "AppChecks.test_public_authorization_drift_during_output_move_removes_owned_bundle"
+    ],
+    "exit_code": 0,
+    "seconds": 0.11323858285322785
+  },
+  {
+    "argv": [
+      "/opt/homebrew/opt/python@3.15/bin/python3.15",
+      "-B",
+      "scripts/native_gpu_test.py",
+      "NativeGPUChecks.test_public_native_requires_both_release_approval_and_exact_notices",
+      "NativeGPUChecks.test_manifest_record_cannot_drop_capsule_or_claim_public_approval"
+    ],
+    "exit_code": 0,
+    "seconds": 0.12146487482823431
+  }
+]
