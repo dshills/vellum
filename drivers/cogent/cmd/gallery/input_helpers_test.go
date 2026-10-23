@@ -203,3 +203,43 @@ func TestInputHelpersProgrammaticResetPreservesDisabledAppearance(t *testing.T) 
 		t.Fatal(err)
 	}
 }
+
+func TestInputHelpersStandaloneTokenRemovalFocusContinuity(t *testing.T) {
+	m := newInputHelpersGallery()
+	n := m.windowView()
+	if n.Focus.ID != "" {
+		t.Fatal("initial demo stole focus")
+	}
+	m.tokens.Change(ui.TokenEvent{TokenID: "missing", Remove: true})
+	if m.windowView().Focus.ID != "" {
+		t.Fatal("missing token requested focus")
+	}
+	m.tokens.Change(ui.TokenEvent{Text: "Review"})
+	priorTokens := m.tokens.Tokens
+	m.tokens.Change(ui.TokenEvent{TokenID: "tag-1", Remove: true})
+	if len(priorTokens) != 2 || priorTokens[0].ID != "tag-1" || priorTokens[1].Text != "Review" {
+		t.Fatal("removal mutated prior accepted token slice")
+	}
+	first := m.windowView().Focus
+	if first.ID != ui.TokenInputID("drawing-tags") || first.Sequence == 0 {
+		t.Fatal("accepted removal did not request entry focus", first)
+	}
+	if m.view().Focus.ID != "" {
+		t.Fatal("nested gallery view emitted a root-only focus request")
+	}
+	m.resetFields()
+	if m.windowView().Focus.ID != "" {
+		t.Fatal("reset retained an obsolete focus target")
+	}
+	m.tokens.Change(ui.TokenEvent{TokenID: "tag-1", Remove: true})
+	second := m.windowView().Focus
+	if second.ID != first.ID || second.Sequence <= first.Sequence {
+		t.Fatal("removal after reset reused old focus request", first, second)
+	}
+	if err := ui.Validate(m.windowView()); err != nil {
+		t.Fatal(err)
+	}
+	if err := ui.Validate(newGallery().view()); err != nil {
+		t.Fatal("ordinary gallery invalid", err)
+	}
+}

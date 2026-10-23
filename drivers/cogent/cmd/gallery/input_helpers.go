@@ -34,6 +34,7 @@ type inputHelpersGallery struct {
 	quantity         float32
 	reject, disabled bool
 	dark             bool
+	focus            ui.FocusRequest
 }
 
 func newInputHelpersGallery() *inputHelpersGallery {
@@ -45,11 +46,11 @@ func newInputHelpersGallery() *inputHelpersGallery {
 // Rebuild sample components on this owner so reset also closes private editor
 // state. Revoke the old components first; queued callbacks must stay inert.
 func (m *inputHelpersGallery) resetFields() {
-	dark, disabled := m.dark, m.disabled
+	dark, disabled, focusSequence := m.dark, m.disabled, m.focus.Sequence
 	if m.search != nil {
 		m.setDisabled(true)
 	}
-	*m = inputHelpersGallery{name: "Untitled", quantity: 1}
+	*m = inputHelpersGallery{name: "Untitled", quantity: 1, focus: ui.FocusRequest{Sequence: focusSequence}}
 	m.secureField = &ui.SecureField{ID: "demo-password", Label: "Demo password", Text: "Vellum-demo", Placeholder: "Enter demo text", AllowReveal: true}
 	m.secureField.Change = func(e ui.ChangeEvent) { m.secureField.Text = e.Text }
 	m.pathControl = &ui.PathControl{ID: "drawing-path", Label: "Drawing location", MaxVisible: 3, MaxLabelRunes: 12, Items: []ui.PathItem{{ID: "root", Label: "Home"}, {ID: "documents", Label: "Documents"}, {ID: "projects", Label: "Projects"}, {ID: "drawings", Label: "Drawings"}, {ID: "drawing", Label: "Untitled.vellum", Kind: ui.PathFile}}}
@@ -70,7 +71,9 @@ func (m *inputHelpersGallery) resetFields() {
 		if e.Remove {
 			for i, t := range m.tokens.Tokens {
 				if t.ID == e.TokenID {
-					m.tokens.Tokens = append(m.tokens.Tokens[:i], m.tokens.Tokens[i+1:]...)
+					remaining := append([]ui.Token(nil), m.tokens.Tokens...)
+					m.tokens.Tokens = append(remaining[:i], remaining[i+1:]...)
+					m.focus = ui.FocusRequest{ID: ui.TokenInputID(m.tokens.ID), Sequence: m.focus.Sequence + 1}
 					break
 				}
 			}
@@ -141,6 +144,17 @@ func (m *inputHelpersGallery) setAppearance(dark bool) {
 	m.notice.Style = ui.Style{GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(0)), Padding: ui.Some(ui.UniformInsets(12)), Gap: ui.Some(float32(8)), Background: theme.Kinds[ui.FormGroup].Background, CornerRadius: ui.Some(float32(8))}
 	m.search.ClearStyle = ui.Style{Border: ui.Some(ui.Border{}), Background: ui.Some(color.NRGBA{}), Padding: ui.Some(ui.UniformInsets(2))}
 }
+
+// Only the standalone window may emit a root-level focus request. The normal
+// gallery embeds view beneath Tabs, where FocusRequest is intentionally absent.
+func (m *inputHelpersGallery) windowView() ui.Node {
+	n := m.view()
+	if n.Kind == ui.Scroll {
+		n.Focus = m.focus
+	}
+	return n
+}
+
 func (m *inputHelpersGallery) view() ui.Node {
 	secure, err := m.secureField.View()
 	if err != nil {

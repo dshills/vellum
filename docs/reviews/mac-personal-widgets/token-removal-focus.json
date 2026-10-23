@@ -1,0 +1,95 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "323ca44b2bb05f75db0b737944cbc509",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "5b2af0162e51fc7c8b10c54615cfa23d57b95e15",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "c1c6a1172fb3696d",
+      "severity": "medium",
+      "category": "bug",
+      "title": "In-place slice removal aliases backing array",
+      "message": "The removal appends in place over the component's own slice, mutating the backing array that the component may still reference (for example in a prior view). This can corrupt a previously rendered snapshot. Only one findable line was changed nearby, so confidence is moderate.",
+      "suggestion": "Build a fresh slice when removing a token so earlier views are not mutated.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/input_helpers.go",
+          "lines": {
+            "start": 74,
+            "end": 74
+          }
+        }
+      ],
+      "tags": [
+        "slice",
+        "aliasing",
+        "location-corrected"
+      ],
+      "evidence": "m.tokens.Tokens = append(m.tokens.Tokens[:i], m.tokens.Tokens[i+1:]...)",
+      "fix": {
+        "before": "m.tokens.Tokens = append(m.tokens.Tokens[:i], m.tokens.Tokens[i+1:]...)",
+        "after": "m.tokens.Tokens = append(append([]ui.Token(nil), m.tokens.Tokens[:i]...), m.tokens.Tokens[i+1:]...)"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3984,
+    "totalMs": 4003
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 10982,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 7910,
+        "output": 389,
+        "costUSD": 0.01971
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -245,3 +245,19 @@ duplicate checks, removal payloads and full accessible names are unchanged.
 Short/long/Unicode value tests and actual mounted keyboard removal pass, as do UI
 race tests, adjacent token/dark toolbar regressions and vet. Prism Anthropic
 claude-sonnet-5-5 completed coverage with no findings.
+
+## Standalone token-removal focus continuity
+
+Native keyboard removal of a chip left no focused control reported by AX. The
+standalone demo now uses the existing application-owned root FocusRequest to move
+to tag entry after it accepts a removal. The ordinary gallery still embeds view
+without a nested focus request; main selects windowView only for -mac-widgets.
+Missing removals do not request focus. Reset clears the target while retaining the
+sequence, so another removal after reset is a new request. This is example owner
+policy; TokenField does not emit an invalid nested root focus request.
+
+Focused gallery model race tests and vet pass. Prism's initial suggestion about
+in-place token-slice mutation was addressed by constructing a fresh bounded slice,
+with a regression retaining the prior accepted slice. Final Anthropic
+claude-sonnet-5-5 review completed with no findings. Native focus verification
+follows packaging and is kept in the private delivery receipt.
