@@ -335,3 +335,12 @@ For a compact Mac-style up/down affordance, set NumberButtons to
 ui.NumberButtonsStepper on a NumberField. The upper/lower arrow halves and normal
 arrow keys use the same value, step and clamped bounds; the field remains directly
 editable. Omitting NumberButtons preserves the existing inline minus/plus style.
+
+### Editable combo box
+
+`ui.ComboBox` provides controlled free text plus up to 64 predefined suggestions.
+Use `ComboInputID(root)` for field focus. `ComboEvent.OptionID` is empty for typing
+and identifies a stable choice for menu selection. Retain one component per owner;
+update `Text` in `Change` to accept. Apply `MacTheme(dark).Kinds[ui.TextField]` to
+its outer `Style`, with zero padding, for a single compact field outline. Tab to
+the suggestions button and press Down/Return to choose; Escape dismisses.

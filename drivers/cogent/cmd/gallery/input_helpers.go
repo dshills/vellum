@@ -9,6 +9,7 @@ import (
 )
 
 type inputHelpersGallery struct {
+	combo            *ui.ComboBox
 	search           *ui.SearchBox
 	notice           *ui.InlineNotice
 	name             string
@@ -20,6 +21,8 @@ type inputHelpersGallery struct {
 
 func newInputHelpersGallery() *inputHelpersGallery {
 	m := &inputHelpersGallery{name: "Untitled", quantity: 1}
+	m.combo = &ui.ComboBox{ID: "unit-combo", Label: "Drawing units", Text: "Millimeters", Options: []ui.Option{{ID: "mm", Label: "Millimeters"}, {ID: "cm", Label: "Centimeters"}, {ID: "in", Label: "Inches"}}}
+	m.combo.Change = func(e ui.ComboEvent) { m.combo.Text = e.Text }
 	m.search = &ui.SearchBox{ID: "object-search", Label: "Search objects", Help: "Filter the component names below"}
 	m.search.Change = func(e ui.SearchEvent) {
 		m.requests++
@@ -33,12 +36,16 @@ func newInputHelpersGallery() *inputHelpersGallery {
 }
 func (m *inputHelpersGallery) setDisabled(disabled bool) {
 	m.disabled = disabled
+	m.combo.Disabled = disabled
 	m.search.Disabled = disabled
 	m.notice.Disabled = disabled
 }
 func (m *inputHelpersGallery) setAppearance(dark bool) {
 	m.dark = dark
 	theme := ui.MacTheme(m.dark)
+	m.combo.Style = theme.Kinds[ui.TextField]
+	m.combo.Style.Padding = ui.Some(ui.Insets{})
+	m.combo.Style.MaxSize = ui.Some(ui.Size{Width: 360})
 	m.search.Style = theme.Kinds[ui.TextField]
 	m.search.Style.MaxSize = ui.Some(ui.Size{Width: 360})
 	m.search.Style.CornerRadius = ui.Some(float32(8))
@@ -49,6 +56,10 @@ func (m *inputHelpersGallery) setAppearance(dark bool) {
 	m.search.ClearStyle = ui.Style{Border: ui.Some(ui.Border{}), Background: ui.Some(color.NRGBA{}), Padding: ui.Some(ui.UniformInsets(2))}
 }
 func (m *inputHelpersGallery) view() ui.Node {
+	combo, err := m.combo.View()
+	if err != nil {
+		return ui.Node{ID: "inputs", Kind: ui.Label, Text: err.Error()}
+	}
 	search, err := m.search.View()
 	if err != nil {
 		return ui.Node{ID: "inputs", Kind: ui.Label, Text: "Cannot render widgets: " + err.Error()}
@@ -83,6 +94,7 @@ func (m *inputHelpersGallery) view() ui.Node {
 		{ID: "inputs-title", Kind: ui.Label, Text: "Mac input widgets", Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 20, Weight: 600})}},
 		{ID: "inputs-description", Kind: ui.Label, Text: "Search, validation and inline feedback through public Go APIs."},
 		search,
+		{ID: "combo-group", Kind: ui.FormGroup, Text: "Drawing units — type a value or choose", Children: []ui.Node{combo}},
 		{ID: "search-results", Kind: ui.FormGroup, Text: "Components", Children: matches},
 		field,
 		{ID: "quantity-field", Kind: ui.FormGroup, Text: "Copies", Children: []ui.Node{
