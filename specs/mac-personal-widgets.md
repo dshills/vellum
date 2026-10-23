@@ -59,3 +59,7 @@ disabled, relabeled or otherwise changed options revoke queued menu actions.
 Changing a SecureField's ID resets private reveal state: a different field starts
 masked and requires a new explicit reveal action. This changes no public API,
 rendering option or release gate.
+
+ColorWell cancels its private open session when View observes a different ID,
+Disabled, or a removed Change handler. Re-enabling/restoring the handler leaves
+it closed until explicit activation. Old editor callbacks remain revoked.

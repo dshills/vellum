@@ -122,3 +122,84 @@ func TestColorWellBoundsFocusAndPreviewReuse(t *testing.T) {
 		t.Fatal("component namespace collision accepted")
 	}
 }
+
+func TestColorWellReplacementAndReadOnlyRequireNewOpen(t *testing.T) {
+	for _, mode := range []string{"identity", "disabled", "read-only"} {
+		t.Run(mode, func(t *testing.T) {
+			p := &ColorWell{ID: "ink", Color: color.NRGBA{R: 20, A: 255}, Change: func(ColorEdit) {}}
+			n, err := p.View()
+			if err != nil {
+				t.Fatal(err)
+			}
+			colorNode(n, ColorWellButtonID(p.ID)).Activate()
+			n, _ = p.View()
+			if !n.Children[1].Open {
+				t.Fatal("open failed")
+			}
+			switch mode {
+			case "identity":
+				p.ID = "other-ink"
+			case "disabled":
+				p.Disabled = true
+			case "read-only":
+				p.Change = nil
+			}
+			n, err = p.View()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if n.Children[1].Open {
+				t.Fatal("obsolete color editor retained open state", mode)
+			}
+			p.Disabled = false
+			p.Change = func(ColorEdit) {}
+			n, _ = p.View()
+			if n.Children[1].Open {
+				t.Fatal("editor reopened without activation", mode)
+			}
+		})
+	}
+}
+
+func TestColorWellInvalidDescriptionCancelsSession(t *testing.T) {
+	for _, mode := range []string{"empty-id", "reserved-id", "recent-bound", "style"} {
+		t.Run(mode, func(t *testing.T) {
+			calls := 0
+			p := &ColorWell{ID: "ink", Change: func(ColorEdit) { calls++ }}
+			n, _ := p.View()
+			colorNode(n, ColorWellButtonID(p.ID)).Activate()
+			n, _ = p.View()
+			oldEdit := colorNode(n, ColorFieldID(ColorWellPickerID(p.ID), ColorRed))
+			switch mode {
+			case "empty-id":
+				p.ID = ""
+			case "reserved-id":
+				p.ID = "menu:invalid"
+			case "recent-bound":
+				p.Recent = make([]color.NRGBA, 17)
+			case "style":
+				p.PopoverStyle.Gap = Some(float32(-1))
+			}
+			if _, err := p.View(); err == nil {
+				t.Fatal("invalid description accepted")
+			}
+			if p.open {
+				t.Fatal("invalid description retained popup")
+			}
+			p.ID = "ink"
+			p.Recent = nil
+			p.PopoverStyle = Style{}
+			n, err := p.View()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if n.Children[1].Open {
+				t.Fatal("repair reopened old session")
+			}
+			oldEdit.Change(ChangeEvent{Number: 1})
+			if calls != 0 {
+				t.Fatal("old editor survived invalid configuration")
+			}
+		})
+	}
+}

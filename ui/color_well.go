@@ -26,6 +26,7 @@ type ColorWell struct {
 	picker              ColorPicker
 	open                bool
 	session             uint64
+	identity            string
 }
 
 func ColorWellButtonID(root string) string { return root + "/color-well/button" }
@@ -36,11 +37,30 @@ func (p *ColorWell) close() {
 	p.session++
 }
 
-func (p *ColorWell) View() (Node, error) {
-	if p == nil || strings.TrimSpace(p.ID) == "" || len(p.Recent) > 16 {
+func (p *ColorWell) View() (result Node, err error) {
+	if p == nil {
+		return Node{}, fmt.Errorf("ui: color well requires an ID and at most 16 recent colors")
+	}
+	// A rejected replacement description must not leave a private popup ready to
+	// reopen when the application repairs its configuration.
+	defer func() {
+		if err != nil && p.open {
+			p.close()
+		}
+	}()
+	if p.identity != p.ID {
+		if p.identity != "" || p.open {
+			p.close()
+		}
+		p.identity = p.ID
+	}
+	if strings.TrimSpace(p.ID) == "" || len(p.Recent) > 16 {
 		return Node{}, fmt.Errorf("ui: color well requires an ID and at most 16 recent colors")
 	}
 	id := p.ID
+	if p.open && (p.Disabled || p.Change == nil) {
+		p.close()
+	}
 	label := p.Label
 	if strings.TrimSpace(label) == "" {
 		label = "Color"

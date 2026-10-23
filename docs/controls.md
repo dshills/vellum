@@ -436,3 +436,6 @@ TokenField also revokes queued suggestions immediately when the application
 changes their catalog entry, without requiring an intermediate View. SecureField
 starts masked when its ID changes; reveal state is never inherited by a different
 field identity.
+
+ColorWell closes its private editor on observed identity, disabled or read-only
+transitions. Restoring editing does not reopen the panel automatically.

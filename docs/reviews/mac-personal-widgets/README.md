@@ -117,3 +117,20 @@ cannot be observed retrospectively by a component, and a generation incremented
 in View has the same observation boundary. Retained components belong to one
 owner, and callbacks capture their original receiver; copying an immutable lease
 does not redirect callbacks to a copy. No additional API/setter contract is added.
+
+## Overnight color-editor lifecycle
+
+Public regressions reproduced retained private open state after observed ID,
+disabled and read-only transitions. These now cancel/revoke the private session.
+Prism identified the invalid-description path; all View errors now close it too.
+Tests cover open→empty/reserved ID/oversized recents/invalid style→repair with no
+automatic reopen and no admitted old editor action. Identity is observed before
+validation deliberately: a rejected replacement still invalidates the old private
+panel. Session capture for returned callbacks occurs only after this observation.
+Final review requests an empty-to-valid open-state test; that exact sequence is
+already covered by TestColorWellInvalidDescriptionCancelsSession/empty-id.
+
+Focused race tests pass, including actual managed replacement/disable/read-only
+cancellation and 12 keyboard open/Escape cycles. Every cycle retains the keyed
+editor, clears the transient dialog body/active state and restores anchor focus.
+This is automated routing/lifecycle evidence, not a physical-pointer soak claim.
