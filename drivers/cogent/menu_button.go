@@ -321,7 +321,10 @@ func openManagedMenu(r *record) {
 	if menuWidth > 0 && context != nil {
 		geom := scene.SceneGeom
 		bounds := context.SceneGeom.Bounds()
-		geom.Size.X = min(menuWidth, bounds.Dx())
+		margin := scene.Styles.TotalMargin()
+		geom.Size.X = min(menuWidth+int(margin.Left+margin.Right), bounds.Dx())
+		geom.Pos.X -= int(margin.Left)
+		geom.Pos.Y -= int(margin.Top)
 		geom.Pos.X = max(bounds.Min.X, min(geom.Pos.X, bounds.Max.X-geom.Size.X))
 		scene.Resize(math32.Geom2DInt{Pos: geom.Pos, Size: geom.Size})
 		scene.LayoutScene()

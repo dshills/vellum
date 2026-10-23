@@ -55,10 +55,11 @@ func styleSourceRow(r *record, id string, s *styles.Style) {
 	if r.node.Kind != ui.ListBox || !r.node.Multiple {
 		return
 	}
+	applyStyle(s, ui.Node{Kind: ui.Label, Style: ui.Style{Typography: r.theme.Default.Typography, Foreground: r.theme.Default.Foreground}}, ui.Theme{})
+	s.Grow.Set(1, 0)
 	s.Border.Radius.Set(units.Dp(4))
 	s.Padding.Set(units.Dp(4), units.Dp(8))
 	s.Min.Y = units.Dp(24)
-	applyStyle(s, ui.Node{Kind: ui.Label, Style: ui.Style{Typography: r.theme.Default.Typography, Foreground: r.theme.Default.Foreground}}, ui.Theme{})
 	if ui.ListOptionSelected(r.node, id) {
 		if r.widget.AsWidget().ContainsFocus() {
 			s.Background = colors.Uniform(color.NRGBA{R: 0, G: 112, B: 235, A: 255})

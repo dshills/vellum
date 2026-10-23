@@ -39,11 +39,12 @@ func positionPopover(r *record, anchor core.Widget) {
 	bounds := parent.SceneGeom.Bounds()
 	a := anchor.AsWidget().Geom.TotalBBox
 	size := scene.SceneGeom.Size
-	desired := d.host.Geom.Size.Actual.Total.ToPointCeil()
+	desired := d.host.Geom.Size.Actual.Total.Add(scene.Geom.Size.Space).Add(d.body.Geom.Size.Space).ToPointCeil()
 	if desired.X > 0 && desired.Y > 0 {
 		size = image.Pt(min(desired.X, bounds.Dx()), min(desired.Y, bounds.Dy()))
 	}
-	pos := image.Pt(a.Min.X, a.Max.Y+4)
+	margin := scene.Styles.TotalMargin()
+	pos := image.Pt(a.Min.X-int(margin.Left), a.Max.Y+4-int(margin.Top))
 	pos.X = max(bounds.Min.X, min(pos.X, bounds.Max.X-size.X))
 	pos.Y = max(bounds.Min.Y, min(pos.Y, bounds.Max.Y-size.Y))
 	if scene.SceneGeom.Pos != pos || scene.SceneGeom.Size != size {

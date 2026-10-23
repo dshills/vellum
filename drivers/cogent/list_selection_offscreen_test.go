@@ -25,6 +25,13 @@ func TestMultipleListRoutedModifiersKeyboardRejectionAndAX(t *testing.T) {
 	m, a := simpleManual(t, manualConfig(t, 919), view)
 	unitSettle(t, m)
 	r := m.implementation.find("one").state.root
+	widths := map[int]bool{}
+	for _, row := range r.control.choice.buttons {
+		widths[row.Geom.TotalBBox.Dx()] = true
+	}
+	if len(widths) != 1 {
+		t.Fatal("source list rows must fill list width", widths)
+	}
 	snap, err := m.Snapshot(testContext)
 	if err != nil {
 		t.Fatal(err)

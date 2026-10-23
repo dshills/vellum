@@ -139,3 +139,14 @@ Popup appearance review dispositions:
   shrink-wrapped after resize. Scene/body now fill the explicitly measured host
   allocation, complete originating layout, and retain compact host growth. The
   full popup/date/menu/context/combo race suite and portable ui race tests pass.
+
+Painted-edge correction: native shadows reserve space outside the popup surface.
+Menu origin/width now include those margins so the visible surface aligns with
+the full combo field, rather than aligning only the shadow canvas. Popover size
+includes scene/body outer space and a regression refuses spurious scrollbars.
+The precise space/coordinate follow-up has a complete zero-finding Prism result.
+Source list row growth is applied after text style inheritance so labels of
+different widths still fill one consistent list width.
+
+Final popup/list geometry checkpoint: complete Prism review with no findings;
+affected multi-list, popover, date, combo, menu and context race tests pass.

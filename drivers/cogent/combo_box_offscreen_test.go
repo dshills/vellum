@@ -51,7 +51,8 @@ func TestComboBoxRoutedSuggestionsAndDraftRetention(t *testing.T) {
 
 	popup := menu.control.menu.popup
 	outer := findRecord(m.implementation.find("one").state.root, "units").widget.AsWidget().Geom.TotalBBox
-	if popup.scene.SceneGeom.Pos.X != outer.Min.X || popup.scene.SceneGeom.Pos.Y < outer.Max.Y || popup.scene.SceneGeom.Size.X != outer.Dx() {
+	margin := popup.scene.Styles.TotalMargin()
+	if popup.scene.SceneGeom.Pos.X+int(margin.Left) != outer.Min.X || popup.scene.SceneGeom.Pos.Y+int(margin.Top) < outer.Max.Y || popup.scene.SceneGeom.Size.X-int(margin.Left+margin.Right) != outer.Dx() {
 		t.Fatal("combo menu not aligned to full field", popup.scene.SceneGeom, outer)
 	}
 	widths := map[int]bool{}

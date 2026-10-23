@@ -64,11 +64,14 @@ func TestPopoverAnchoringEscapeRetentionAndRemoval(t *testing.T) {
 		t.Fatal("popover has window/dialog chrome")
 	}
 	rect := r.control.dialog.body.Scene.SceneGeom.Bounds()
-	hostSize := r.control.dialog.host.Geom.Size.Actual.Total.ToPointCeil()
+	hostSize := r.control.dialog.host.Geom.Size.Actual.Total.Add(stage.Scene.Geom.Size.Space).Add(r.control.dialog.body.Geom.Size.Space).ToPointCeil()
 	if rect.Size() != hostSize {
 		t.Fatal("popover retains generic dialog outer allowance", rect.Size(), hostSize)
 	}
-	if rect.Min.Y < anchor.Bounds.Max.Y {
+	if stage.Scene.HasScroll[0] || stage.Scene.HasScroll[1] || r.control.dialog.body.HasScroll[0] || r.control.dialog.body.HasScroll[1] {
+		t.Fatal("compact popover has spurious scrollbars")
+	}
+	if rect.Min.Y+int(stage.Scene.Styles.TotalMargin().Top) < anchor.Bounds.Max.Y {
 		t.Fatal("not anchored below", rect, anchor.Bounds)
 	}
 	if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: events.KeyChord, Code: key.CodeEscape}); err != nil {
