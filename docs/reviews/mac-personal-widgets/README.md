@@ -216,3 +216,21 @@ about combo/date/search not being disabled is contradicted by the existing
 setDisabled assignments, which include those three plus all five new components
 and the notice. Passing stale-proposal tests cover these paths. No extra framework
 generation API or state is introduced for this gallery-only action.
+
+## Bounded viewport and logical-DPI matrix
+
+All five public composites now have geometry coverage in twelve software cases:
+logical widths 480/660/960 × scales 1/2 (160/320 logical DPI, proportionate pixel
+viewports) × light/dark. Checks require nonempty contained form/control bounds,
+interactive child containment and nonoverlapping typeface/size fields. At each
+combination, actual target-resolved pointer events open the color editor; its
+surface stays in the viewport, and Escape closes it and restores well focus.
+All twelve pass with the race detector; vet passes. This adds test coverage only,
+not a native Retina/display-change claim or a general minimum-width guarantee.
+
+Prism Anthropic claude-sonnet-5-5 suggested refreshing the popup record after
+closure; applied, with explicit retained-record checks. View errors are also
+reported outside the view callback. Final review suggests additional nil guards
+for every fixed fixture record. Missing controls would already fail the test via
+a panic with a stack location; this affects diagnostics, not false acceptance or
+production behavior. It is not a blocker for this passing coverage checkpoint.

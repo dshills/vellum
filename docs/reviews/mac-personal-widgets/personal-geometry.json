@@ -1,0 +1,120 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a2e8b37dcf7e827d32a08ce385f03d7c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "b54aba04a020ab55e5c5d8d1ddfd4feff7ab6898",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "042a6a9453d1fd40",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Stale/possibly nil panel record used after close",
+      "message": "The test holds `panel` from a record lookup before pressing Escape, then asserts on panel.control.dialog.active and panel.node.Open afterwards. If the tree is rebuilt on close, the stale record would show old values, so the cleanup assertion could pass or fail incorrectly. Also findRecord may return nil if the popup is absent, causing a nil dereference rather than a clear failure.",
+      "suggestion": "Check panel for nil before dereferencing, and re-look up the record from the current root after Escape and settle before asserting cleanup.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/mac_personal_geometry_offscreen_test.go",
+          "lines": {
+            "start": 105,
+            "end": 105
+          }
+        }
+      ],
+      "tags": [
+        "testing",
+        "nil",
+        "stale",
+        "location-corrected"
+      ],
+      "evidence": "panel := findRecord(m.implementation.find(\"one\").state.root, \"well/color-well/popup\")",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6092,
+    "totalMs": 6099
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 2,
+    "bytes": 7934,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5974,
+        "output": 672,
+        "costUSD": 0.018668
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "fd22eed5e1986ea4",
+        "severity": "medium",
+        "category": "bug",
+        "title": "t.Fatal called inside view callback",
+        "message": "The view closure calls t.Fatal from a function that the app/manual driver may invoke on a different goroutine (UI/render loop). FailNow must only be called from the test goroutine; otherwise it calls runtime.Goexit on the wrong goroutine, which can hang or skip cleanup.",
+        "suggestion": "Use t.Error(err) and return a fallback node (or record the error in a variable and check it after settle) instead of t.Fatal inside the view callback.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "drivers/cogent/mac_personal_geometry_offscreen_test.go",
+            "lines": {
+              "start": 52,
+              "end": 55
+            }
+          }
+        ],
+        "tags": [
+          "testing",
+          "goroutine"
+        ],
+        "evidence": "t.Fatal(err)\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\troot.Children = append(",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/mac_personal_geometry_offscreen_test.go"
+    }
+  ],
+  "suppressed": []
+}

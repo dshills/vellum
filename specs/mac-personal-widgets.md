@@ -72,3 +72,14 @@ presentation when the owner changes modes. No new public API or theme tracking.
 
 Source-row text paints its glyphs over the row selection once. Inactive translucent
 selection must remain uniform beneath labels, including on dark surfaces.
+
+## Bounded geometry and routing checks
+
+The five composites are checked inside Mac-themed forms at logical widths 480,
+660 and 960, each at 160 and 320 logical DPI with a proportionally sized software
+viewport, in both themes. Checks require nonempty contained composites, contained
+interactive children and no typeface/size-stepper overlap. At every combination,
+actual Manual pointer routing opens the color well's editor, its popup stays
+inside the viewport, and Escape closes it and restores anchor focus. These are
+deterministic offscreen checks; native display-scale qualification and arbitrary
+narrow/oversized content are not inferred from them.
