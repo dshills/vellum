@@ -61,3 +61,42 @@ the enabled target enforced by the row guard, so a disabled-only empty range
 cannot be generated. Public Apply with empty replacement IDs intentionally clears
 selection; an app rejects by ignoring the edit, not by calling Apply. Both
 representations of modifiers are the backend's documented bit-flag API.
+
+## Date/time picker
+
+- 656d06494c764e10: opening already resets the displayed month, and normal managed
+  activation invalidates the app. Added reset on Dismiss and day selection too,
+  bounding navigation state to the open calendar lifetime.
+- 0ab5e2adc496f842: fixed. Parse civil fields in UTC then construct/compare in the
+  accepted location, catching DST gaps without rejecting parser-supported month
+  case/padding variants. Layouts with zone tokens are refused: this picker edits
+  local fields and does not select time zones. Added variant/stale-layout tests.
+- The discarded location-pointer suggestion would admit old callbacks after a
+  real zone-rule change. Keeping identity deliberately revokes that older view;
+  newly rendered callbacks accept the current location.
+- Focused ui and actual offscreen date/popup/input checks pass. Calendar selection
+  commits once, invalid text restores accepted value, Escape changes nothing and
+  disabling/re-enabling cancels rather than reopens a calendar.
+
+Date follow-ups:
+
+- 8e4e93a58ba666b1: fixed with civil sentinel round-trip validation for each mode,
+  rejecting layouts missing required date/hour/minute fields or mixing date and
+  time in single-mode inputs. Seconds remain optional precision.
+- 656d06494c764e10 follow-up: actual anchor down/up test exposed missing outside
+  dismissal in the backend main-stage Dialog policy. Popovers now chain the
+  originating scene EventBoundary, consume outside MouseUp and close through
+  the existing dialog lifecycle. The routed test proves no reopen/change.
+- Final concrete-fix review returned no retained findings (complete coverage).
+  Earlier raw findings and the discarded location-identity suggestion remain
+  recorded. No claim that all intermediate reviews were zero-finding.
+
+## Internal review and packaging checks
+
+Reviewed lifetime guards, current-handler delivery, bounded option/cell counts,
+accepted-state restoration, modifier mask representation, coordinate units and
+originating native context for teardown. No rendering/pacing changes or public
+release publication. Focused ui race/vet and affected native driver/gallery
+race/vet pass; native executable builds. Private light/dark packages retain
+standard OS window chrome. Live appearance observations are recorded separately
+after packaging.

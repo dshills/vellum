@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"image/color"
 	"strings"
+	"time"
 
 	"github.com/dshills/vellum/ui"
 )
 
 type inputHelpersGallery struct {
+	datePicker       *ui.DateTimePicker
+	dateError        string
 	selectedObjects  []string
 	rejectSelection  bool
 	combo            *ui.ComboBox
@@ -26,6 +29,9 @@ type inputHelpersGallery struct {
 
 func newInputHelpersGallery() *inputHelpersGallery {
 	m := &inputHelpersGallery{name: "Untitled", quantity: 1}
+	m.datePicker = &ui.DateTimePicker{ID: "reminder-date", Label: "Reminder date and time", Mode: ui.DateAndTime, Value: time.Date(2026, 10, 23, 9, 0, 0, 0, time.Local)}
+	m.datePicker.Change = func(e ui.DateTimeEvent) { m.datePicker.Value = e.Value; m.dateError = "" }
+	m.datePicker.Invalid = func(err error) { m.dateError = err.Error() }
 	m.combo = &ui.ComboBox{ID: "unit-combo", Label: "Drawing units", Text: "Millimeters", Options: []ui.Option{{ID: "mm", Label: "Millimeters"}, {ID: "cm", Label: "Centimeters"}, {ID: "in", Label: "Inches"}}}
 	m.combo.Change = func(e ui.ComboEvent) { m.combo.Text = e.Text }
 	m.search = &ui.SearchBox{ID: "object-search", Label: "Search objects", Help: "Filter the component names below"}
@@ -42,12 +48,17 @@ func newInputHelpersGallery() *inputHelpersGallery {
 func (m *inputHelpersGallery) setDisabled(disabled bool) {
 	m.disabled = disabled
 	m.combo.Disabled = disabled
+	m.datePicker.Disabled = disabled
 	m.search.Disabled = disabled
 	m.notice.Disabled = disabled
 }
 func (m *inputHelpersGallery) setAppearance(dark bool) {
 	m.dark = dark
 	theme := ui.MacTheme(m.dark)
+	m.datePicker.Style = theme.Kinds[ui.TextField]
+	m.datePicker.Style.MinSize = ui.Some(ui.Size{Width: 180, Height: 28})
+	m.datePicker.Style.MaxSize = ui.Some(ui.Size{Width: 240})
+	m.datePicker.PopoverStyle = theme.Kinds[ui.FormGroup]
 	m.combo.Style = theme.Kinds[ui.TextField]
 	m.combo.Style.Padding = ui.Some(ui.Insets{})
 	m.combo.Style.MaxSize = ui.Some(ui.Size{Width: 360})
@@ -61,11 +72,15 @@ func (m *inputHelpersGallery) setAppearance(dark bool) {
 	m.search.ClearStyle = ui.Style{Border: ui.Some(ui.Border{}), Background: ui.Some(color.NRGBA{}), Padding: ui.Some(ui.UniformInsets(2))}
 }
 func (m *inputHelpersGallery) view() ui.Node {
+	date, err := m.datePicker.View()
+	if err != nil {
+		return ui.Node{ID: "inputs", Kind: ui.Label, Text: err.Error()}
+	}
 	combo, err := m.combo.View()
 	if err != nil {
 		return ui.Node{ID: "inputs", Kind: ui.Label, Text: err.Error()}
 	}
-	popover, err := (ui.Popover{ID: "quick-inspector", AnchorID: "inspector-anchor", Label: "Quick inspector", Open: m.popoverOpen, Dismiss: func() { m.popoverOpen = false }, Style: ui.MacTheme(m.dark).Kinds[ui.FormGroup], Children: []ui.Node{{ID: "inspector-label", Kind: ui.Label, Text: "Drawing inspector"}, {ID: "inspector-close", Kind: ui.Button, Text: "Done", Activate: func() { m.popoverOpen = false }}}}).View()
+	popover, err := (ui.Popover{ID: "quick-inspector", AnchorID: "inspector-anchor", Label: "Quick inspector", Open: m.popoverOpen, Disabled: m.disabled, Dismiss: func() { m.popoverOpen = false }, Style: ui.MacTheme(m.dark).Kinds[ui.FormGroup], Children: []ui.Node{{ID: "inspector-label", Kind: ui.Label, Text: "Drawing inspector"}, {ID: "inspector-close", Kind: ui.Button, Text: "Done", Activate: func() { m.popoverOpen = false }}}}).View()
 	if err != nil {
 		return ui.Node{ID: "inputs", Kind: ui.Label, Text: err.Error()}
 	}
@@ -101,7 +116,7 @@ func (m *inputHelpersGallery) view() ui.Node {
 	}
 	return ui.Node{ID: "inputs", Kind: ui.Scroll, Grow: true, Style: ui.Style{Background: ui.Some(background), Padding: ui.Some(ui.UniformInsets(20)), Gap: ui.Some(float32(16))}, Children: []ui.Node{
 		{ID: "inputs-title", Kind: ui.Label, Text: "Mac input widgets", Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 20, Weight: 600})}},
-		{ID: "inputs-description", Kind: ui.Label, Text: "Search, validation and inline feedback through public Go APIs."},
+		{ID: "inputs-description", Kind: ui.Label, Text: "Editable choices, context menus, popovers, selection and dates through public Go APIs."},
 		search,
 		{ID: "combo-group", Kind: ui.FormGroup, Text: "Drawing units — type a value or choose", Children: []ui.Node{combo}},
 		{ID: "search-results", Kind: ui.FormGroup, Text: "Components", Children: matches},
@@ -109,16 +124,16 @@ func (m *inputHelpersGallery) view() ui.Node {
 		{ID: "quantity-field", Kind: ui.FormGroup, Text: "Copies", Children: []ui.Node{
 			{ID: "quantity", Kind: ui.NumberField, NumberButtons: ui.NumberButtonsStepper, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 88, Height: 28}), MaxSize: ui.Some(ui.Size{Width: 104})}, Number: m.quantity, Numeric: ui.Numeric{Min: 0, Max: 1000, Step: 1}, Accessibility: ui.Accessibility{Name: "Copies"}, Disabled: m.disabled, Change: func(e ui.ChangeEvent) { m.quantity = e.Number }},
 		}},
-		{ID: "context-demo", Kind: ui.Button, Text: "Right-click or Control-click for actions", Accessibility: ui.Accessibility{Name: "Context menu demo", Help: "Shift-F10 also opens the menu"}, ContextMenu: &ui.ContextMenu{Options: []ui.Option{{ID: "inspect", Label: "Inspect"}, {ID: "sep", Separator: true}, {ID: "grid", Label: "Show grid", Checkable: true, Checked: m.contextChecked}}, Change: func(e ui.ChangeEvent) {
+		{ID: "context-demo", Kind: ui.Button, Text: "Right-click or Control-click for actions", Disabled: m.disabled, Accessibility: ui.Accessibility{Name: "Context menu demo", Help: "Shift-F10 also opens the menu"}, ContextMenu: &ui.ContextMenu{Options: []ui.Option{{ID: "inspect", Label: "Inspect"}, {ID: "sep", Separator: true}, {ID: "grid", Label: "Show grid", Checkable: true, Checked: m.contextChecked}}, Change: func(e ui.ChangeEvent) {
 			m.contextAction = e.SelectedID
 			if e.SelectedID == "grid" {
 				m.contextChecked = e.Checked
 			}
 		}}},
 		{ID: "context-result", Kind: ui.Label, Text: "Context action: " + m.contextAction},
-		{ID: "inspector-anchor", Kind: ui.Button, Text: "Quick inspector…", Activate: func() { m.popoverOpen = !m.popoverOpen }},
+		{ID: "inspector-anchor", Kind: ui.Button, Text: "Quick inspector…", Disabled: m.disabled, Activate: func() { m.popoverOpen = !m.popoverOpen }},
 		popover,
-		{ID: "source-group", Kind: ui.FormGroup, Text: "Objects — Command-click / Shift-click", Children: []ui.Node{
+		{ID: "source-group", Kind: ui.FormGroup, Text: "Objects — Command-click / Shift-click", Disabled: m.disabled, Children: []ui.Node{
 			{ID: "object-list", Kind: ui.ListBox, Multiple: true, SelectedIDs: m.selectedObjects, Options: []ui.Option{{ID: "block", Label: "Block"}, {ID: "connector", Label: "Connector"}, {ID: "note", Label: "Note"}, {ID: "round", Label: "Rounded rectangle"}}, SelectionChange: func(e ui.ListSelectionEvent) {
 				if !m.rejectSelection {
 					m.selectedObjects = e.Apply(m.selectedObjects)
@@ -127,6 +142,7 @@ func (m *inputHelpersGallery) view() ui.Node {
 			{ID: "selected-objects", Kind: ui.Label, Text: "Selected: " + strings.Join(m.selectedObjects, ", ")},
 			{ID: "reject-selection", Kind: ui.Checkbox, Text: "Reject selection edits", Checked: m.rejectSelection, Change: func(e ui.ChangeEvent) { m.rejectSelection = e.Checked }},
 		}},
+		{ID: "date-group", Kind: ui.FormGroup, Text: "Date and time", Children: []ui.Node{date, {ID: "date-error", Kind: ui.Label, Text: m.dateError}}},
 		notice,
 		{ID: "input-requests", Kind: ui.Label, Text: fmt.Sprintf("Search requests: %d", m.requests)},
 		{ID: "input-options", Kind: ui.Row, Children: []ui.Node{

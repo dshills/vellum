@@ -367,3 +367,12 @@ Use `ListBox` with `Multiple:true`, `SelectedIDs` and `SelectionChange`; accept 
 click toggles, Shift selects a range and Command-Shift adds a range. Shift with
 Up/Down/Home/End extends by keyboard. Apply to your current model so queued edits
 compose; ignore the event to reject. Keep accepted IDs present in Options.
+
+### Date/time picker
+
+Retain `ui.DateTimePicker` with a `time.Time` Value, optional inclusive Min/Max,
+`Mode` and `Change`. Accept by updating Value; Invalid reports refused text.
+`DateTimeInputID(root)` targets the field. Date modes offer an anchored calendar;
+month navigation does not change Value until a day is selected. A caller-supplied
+Go `Layout` controls formatting. Default ISO/24-hour formatting and English
+Sunday-first calendar are explicit; system-locale discovery is not implemented.

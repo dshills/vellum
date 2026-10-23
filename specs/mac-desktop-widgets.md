@@ -58,3 +58,15 @@ virtualization. AX row press replaces selection; individual rows publish accepte
 membership. Compact rounded rows use blue active and gray unfocused selection.
 System accent/whole-application activation tracking and row accessories remain
 outside this increment.
+
+## 5. Date/time picker
+
+ui.DateTimePicker provides DateOnly, TimeOnly and DateAndTime controlled input,
+inclusive Min/Max, Invalid callback and a six-week calendar in an anchored
+popover. Value retains its location. Parsing refuses invalid dates and DST gaps using civil-field comparison; date-only and calendar edits preserve accepted time.
+Custom Go Layout without zone tokens lets applications choose locale formatting; default ISO date
+and 24-hour time. Calendar is English/Sunday-first in this increment, with month
+navigation and ordinary Tab/Return/Space keyboard buttons. Automatic OS locale,
+calendar arrow-key grid navigation, alternate calendars and time zones are not
+provided. Read-only/disabled and stale component identities refuse proposals.
+Navigation state is owner-held, bounded and creates no timers/background work.

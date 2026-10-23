@@ -1,0 +1,143 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "40d7743493107580c5ab255e94d289d4",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "b1ee3a918dc4e63454060889e45ff167862a497e",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "656d06494c764e10",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Stale month after dismiss or selection",
+      "message": "Month navigation sets p.month but nothing re-renders explicitly from the callbacks, and the calendar popover's month is reset on every toggle. More importantly, after selecting a day, p.month is not reset, so reopening later by Dismiss (which only sets calendarOpen=false) can show a stale navigated month instead of the Value's month.",
+      "suggestion": "Reset p.month = time.Time{} in Dismiss and after day selection.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "ui/date_time_picker.go",
+          "lines": {
+            "start": 141,
+            "end": 142
+          }
+        }
+      ],
+      "tags": [
+        "correctness",
+        "location-corrected"
+      ],
+      "evidence": "p.calendarOpen = !p.calendarOpen\n\t\t\t\tp.month = time.Time{}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "0ab5e2adc496f842",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Strict textual round-trip rejects valid input",
+      "message": "The round-trip check compares a formatted value against trimmed input. Layouts with non-padded or case-variant elements (e.g. 'Jan' vs 'jan', or '3:04 PM' accepting 'pm') or where TimeOnly drops fields will reject valid user input. Layouts like '2006-1-2' also reject '2024-02-29'. Users typing legitimate variants get Invalid errors.",
+      "suggestion": "Detect DST normalization by comparing the hour/minute of v to parsed instead of requiring textual equality.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "ui/date_time_picker.go",
+          "lines": {
+            "start": 93,
+            "end": 93
+          }
+        }
+      ],
+      "tags": [
+        "correctness",
+        "location-corrected"
+      ],
+      "evidence": "if err == nil \u0026\u0026 v.Format(p.layout()) != strings.TrimSpace(text) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 9113,
+    "totalMs": 9136
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 7,
+    "bytes": 28818,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 16780,
+        "output": 894,
+        "costUSD": 0.0425
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "85e1fb614e0ed453",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Location pointer comparison is fragile",
+        "message": "The available() closure compares *time.Location pointers with ==. A time.Time whose location is UTC may carry a nil loc pointer in some forms, and Local vs UTC pointer identity can differ between values returned by Date/Format paths; any Change callback setting Value to a time with an equivalent but differently-pointed location will mark the picker unavailable and silently drop edits.",
+        "suggestion": "Compare location by name (p.Value.Location().String() == location.String()) or drop the location check, since the callback itself would normally preserve the location.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "ui/date_time_picker.go",
+            "lines": {
+              "start": 1,
+              "end": 1
+            }
+          }
+        ],
+        "tags": [
+          "correctness"
+        ],
+        "evidence": "p.Value.Location() == location",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in ui/date_time_picker.go"
+    }
+  ],
+  "suppressed": []
+}

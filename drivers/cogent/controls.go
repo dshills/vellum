@@ -755,12 +755,24 @@ func selectTabButtons(r *record, selected string) {
 
 func syncDialog(r *record) {
 	d := r.control.dialog
-	if !r.node.Open || controlDisabled(r) || !accessibilityDialogVisible(r) {
+	if !r.node.Open {
 		d.dismissed = false
 		closeDialog(r)
 		return
 	}
-
+	if controlDisabled(r) || !accessibilityDialogVisible(r) {
+		closeDialog(r)
+		if r.node.PopoverAnchor != "" && !d.dismissed {
+			d.dismissed = true
+			postControl(r, func() {
+				if r.node.Dismiss != nil {
+					r.node.Dismiss()
+				}
+				_ = r.control.a.Invalidate(r.control.window)
+			})
+		}
+		return
+	}
 	scene := r.widget.AsWidget().Scene
 	if scene == nil || scene.RenderWindow() == nil {
 		return
@@ -811,6 +823,18 @@ func prepareDialogBody(r *record) *core.Body {
 	d.tabScope.Store(scope)
 	d.body = core.NewBody(r.node.Text)
 	body := d.body
+	if r.node.PopoverAnchor != "" {
+		previous := body.Scene.EventBoundary
+		body.Scene.EventBoundary = func(e events.Event) {
+			if previous != nil {
+				previous(e)
+			}
+			if e.Type() == events.MouseUp && e.HasPos() && !e.WindowPos().In(body.Scene.SceneGeom.Bounds()) {
+				e.SetHandled() // same native event must not activate an underlying control
+				body.Close()
+			}
+		}
+	}
 	bindAccessibilityDialogKeyboard(r, body)
 	body.Scene.OnFirst(events.Custom, func(e events.Event) {
 		if r.control.wake != nil {
