@@ -14,6 +14,7 @@ The packaged **Vellum Mac Widgets.app** starts the focused light gallery directl
 **Vellum Mac Widgets Dark.app** starts the dark version. Scroll to reach all
 sections. The ordinary macOS title bar remains draggable.
 
+- **Location:** use the ellipsis or segment menus to choose an ancestor. This changes the displayed virtual path only; relaunch to restore the sample.
 - **Font:** choose Helvetica Neue, Times New Roman or Menlo, choose a typeface, and adjust size. The sample previews the accepted selection.
 - **Tags:** enter a tag and press Return, or choose a suggestion. Click a chip (or Tab to it and press Return) to remove it.
 - **Drawing color:** open the swatch; edit RGBA, opacity or hex, choose a recent color, and close with Done or Escape.

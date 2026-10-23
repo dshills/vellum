@@ -17,6 +17,8 @@ const (
 	SymbolSettings     Symbol = "settings"
 	SymbolSave         Symbol = "save"
 	SymbolOpen         Symbol = "open"
+	SymbolFolder       Symbol = "folder"
+	SymbolDocument     Symbol = "document"
 	SymbolUndo         Symbol = "undo"
 	SymbolRedo         Symbol = "redo"
 	SymbolCopy         Symbol = "copy"
@@ -46,7 +48,7 @@ const (
 )
 
 var symbols = [...]Symbol{SymbolAdd, SymbolRemove, SymbolCheck, SymbolClose,
-	SymbolSearch, SymbolSettings, SymbolSave, SymbolOpen, SymbolUndo, SymbolRedo,
+	SymbolSearch, SymbolSettings, SymbolSave, SymbolOpen, SymbolFolder, SymbolDocument, SymbolUndo, SymbolRedo,
 	SymbolCopy, SymbolCut, SymbolPaste, SymbolInfo, SymbolWarning, SymbolDelete,
 	SymbolLeft, SymbolRight, SymbolUp, SymbolDown, SymbolMenu, SymbolExpand, SymbolCollapse,
 	SymbolBackspace, SymbolSidebar, SymbolCalculator, SymbolSun, SymbolCloud,

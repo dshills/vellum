@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "cbc539d4e16429c45bd0796a729c8d7c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "8b7a86b129de8236fe4455024ed9ff48a1cb9bf4",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "2cd04bd3c35ada92",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Current segment menu duplicates root navigation",
+      "message": "Segment nodes are created with Kind Label and later reassigned to Button or MenuButton. The i==0 root becomes a Button, but a non-root first segment in the overflow case (i==1) is skipped correctly. The current (last) item is rendered as a MenuButton whose options exclude itself only via last--, which leaves a two-item path with the last item's menu containing only the root. This works, but the last-item menu for a 2-item path duplicates the root button. Minor UX redundancy, not a crash.",
+      "suggestion": "Consider rendering the current item as non-interactive when its menu only duplicates the root button.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "ui/path_control.go",
+          "lines": {
+            "start": 184,
+            "end": 184
+          }
+        }
+      ],
+      "tags": [
+        "ux",
+        "location-corrected"
+      ],
+      "evidence": "if p.Navigate != nil \u0026\u0026 len(shown) \u003e 1 {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3994,
+    "totalMs": 4026
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 32462,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 18652,
+        "output": 330,
+        "costUSD": 0.040604
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

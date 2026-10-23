@@ -36,6 +36,10 @@ func nativeSymbol(symbol ui.Symbol) icons.Icon {
 		return icons.Save
 	case ui.SymbolOpen:
 		return icons.Open
+	case ui.SymbolFolder:
+		return icons.Folder
+	case ui.SymbolDocument:
+		return icons.Description
 	case ui.SymbolUndo:
 		return icons.Undo
 	case ui.SymbolRedo:

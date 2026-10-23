@@ -31,3 +31,15 @@ from a prior family; this is deliberate stale-event protection, covered by UI
 tests. Those actions must not edit a different family's typeface or emit user
 validation errors. Accepted callbacks are followed by owner reconciliation, which
 installs current-family controls. No remaining actionable finding.
+
+## Path control
+
+UI race tests, icon artwork tests, managed overflow-menu navigation and gallery
+model tests passed. A focused managed test confirms disabled read-only rows
+propagate Disabled to both icon and label; explicit child flags are redundant.
+Prism then identified misleading read-only overflow help: corrected to expose
+the omitted ancestor labels without an action hint, with a new UI regression.
+Final review flags redundant navigation in a two-item path. Retained deliberately:
+the current segment consistently offers its ancestor menu, even when that sole
+ancestor also has a direct button. This is optional UX preference, not a failure
+of controlled navigation or lifecycle. No remaining actionable finding.

@@ -409,3 +409,13 @@ installed font names. Accept with `picker.Value = event.Apply(picker.Value)`. Si
 are 6–144 logical pixels. Set FieldStyle from MacTheme TextField for light/dark
 inputs. Typed names must match a catalog entry; unavailable installed fonts may
 substitute. No automatic enumeration, installation or system font panel.
+
+### Path control
+
+`ui.PathControl.View()` extends breadcrumb navigation with folder/document icons,
+ancestor menus, bounded visible segments and central label truncation. Supply
+`PathItem` values with stable IDs; accept `PathEvent` by updating Items. At most 64
+items; MaxVisible defaults to four, configurable 3–8, plus an overflow menu. Root,
+parent and current location remain visible. Full labels remain in accessibility
+and menu text. Truncation is explicit rather than window-width responsive. No
+filesystem access, URL resolution, permission grants or drag-and-drop is implied.

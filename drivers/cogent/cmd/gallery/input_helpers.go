@@ -10,6 +10,7 @@ import (
 )
 
 type inputHelpersGallery struct {
+	pathControl      *ui.PathControl
 	fontPicker       *ui.FontPicker
 	fontError        string
 	tokens           *ui.TokenField
@@ -36,6 +37,15 @@ type inputHelpersGallery struct {
 
 func newInputHelpersGallery() *inputHelpersGallery {
 	m := &inputHelpersGallery{name: "Untitled", quantity: 1}
+	m.pathControl = &ui.PathControl{ID: "drawing-path", Label: "Drawing location", MaxVisible: 3, MaxLabelRunes: 12, Items: []ui.PathItem{{ID: "root", Label: "Home"}, {ID: "documents", Label: "Documents"}, {ID: "projects", Label: "Projects"}, {ID: "drawings", Label: "Drawings"}, {ID: "drawing", Label: "Untitled.vellum", Kind: ui.PathFile}}}
+	m.pathControl.Navigate = func(e ui.PathEvent) {
+		for i, item := range m.pathControl.Items {
+			if item.ID == e.ItemID {
+				m.pathControl.Items = append([]ui.PathItem(nil), m.pathControl.Items[:i+1]...)
+				break
+			}
+		}
+	}
 	m.fontPicker = &ui.FontPicker{ID: "drawing-font", Label: "Drawing font", Preview: "A drawing starts with an idea.", Value: ui.FontSelection{FamilyID: "helvetica", TypefaceID: "regular", Size: 16}, Families: []ui.FontFamily{{ID: "helvetica", Name: "Helvetica Neue", Typefaces: []ui.FontTypeface{{ID: "regular", Name: "Regular", Weight: 400}, {ID: "bold", Name: "Bold", Weight: 700}, {ID: "italic", Name: "Italic", Weight: 400, Italic: true}}}, {ID: "times", Name: "Times New Roman", Typefaces: []ui.FontTypeface{{ID: "regular", Name: "Regular", Weight: 400}, {ID: "bold", Name: "Bold", Weight: 700}}}, {ID: "menlo", Name: "Menlo", Typefaces: []ui.FontTypeface{{ID: "regular", Name: "Regular", Weight: 400}}}}}
 	m.fontPicker.Change = func(e ui.FontSelectionEvent) { m.fontPicker.Value = e.Apply(m.fontPicker.Value); m.fontError = "" }
 	m.fontPicker.Invalid = func(err error) { m.fontError = err.Error() }
@@ -82,6 +92,7 @@ func (m *inputHelpersGallery) setDisabled(disabled bool) {
 	m.colorWell.Disabled = disabled
 	m.tokens.Disabled = disabled
 	m.fontPicker.Disabled = disabled
+	m.pathControl.Disabled = disabled
 	m.combo.Disabled = disabled
 	m.datePicker.Disabled = disabled
 	m.search.Disabled = disabled
@@ -112,6 +123,10 @@ func (m *inputHelpersGallery) setAppearance(dark bool) {
 	m.search.ClearStyle = ui.Style{Border: ui.Some(ui.Border{}), Background: ui.Some(color.NRGBA{}), Padding: ui.Some(ui.UniformInsets(2))}
 }
 func (m *inputHelpersGallery) view() ui.Node {
+	path, err := m.pathControl.View()
+	if err != nil {
+		return ui.Node{ID: "inputs", Kind: ui.Label, Text: err.Error()}
+	}
 	font, err := m.fontPicker.View()
 	if err != nil {
 		return ui.Node{ID: "inputs", Kind: ui.Label, Text: err.Error()}
@@ -171,6 +186,7 @@ func (m *inputHelpersGallery) view() ui.Node {
 	return ui.Node{ID: "inputs", Kind: ui.Scroll, Grow: true, Style: ui.Style{Background: ui.Some(background), Padding: ui.Some(ui.UniformInsets(20)), Gap: ui.Some(float32(16))}, Children: []ui.Node{
 		{ID: "inputs-title", Kind: ui.Label, Text: "Mac input widgets", Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 20, Weight: 600})}},
 		{ID: "inputs-description", Kind: ui.Label, Text: "Editable choices, context menus, popovers, selection and dates through public Go APIs."},
+		{ID: "path-group", Kind: ui.FormGroup, Text: "Location — ancestor menus and overflow", Children: []ui.Node{path}},
 		{ID: "font-group", Kind: ui.FormGroup, Text: "Font", Children: []ui.Node{font, {ID: "font-feedback", Kind: ui.Label, Text: m.fontError}}},
 		{ID: "tokens-group", Kind: ui.FormGroup, Text: "Tags — Return adds, chip button removes", Children: []ui.Node{tokens, {ID: "token-feedback", Kind: ui.Label, Text: m.tokenError}}},
 		{ID: "color-well-group", Kind: ui.FormGroup, Text: "Drawing color", Children: []ui.Node{well}},
