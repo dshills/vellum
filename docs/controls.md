@@ -351,3 +351,11 @@ Set `Node.ContextMenu` on Button, Canvas2D or ListBox with `Options` and `Change
 The event identifies the host and stable action; checked actions propose `Checked`.
 Right/Control-click and Shift-F10 open it; Escape closes. Existing MenuButton
 check/separator rules apply. This does not replace text-editing context menus.
+
+### Anchored popover
+
+`ui.Popover{ID, AnchorID, Open, Dismiss, Children}.View()` supplies a compact
+managed panel below a same-window Button. Set `Open=false` in `Dismiss`. Apply a
+Mac FormGroup style for an inset neutral surface. Escape/outside release closes;
+focus returns to the anchor. Children retain keyed identity. Missing/hidden anchors
+close the panel. Edge clamping is supported; detachable panels are not.

@@ -28,3 +28,13 @@ Raw results are retained; findings below are dispositions, not claims of zero fi
   uses actual native widget events in software tests because the public Manual
   harness deliberately refuses OS-context gestures. Popup item clicks use actual
   manual routing. Physical right/Control-click verification remains separate.
+
+## Popover
+
+- d6402637ae16f709: fixed. Once the originating native scene is ready, a missing
+  anchor cancels even a not-yet-active Open panel. Dismissed state bounds callback
+  delivery. Added initially-open valid/missing anchor cases.
+- Focused geometry, Escape, focus return, keyed content retention/reopen and
+  anchor-removal tests pass. Edge placement uses clamping; small-window fixture
+  originally clamped to the top, so below-anchor assertion now uses a larger
+  window. This is a test setup correction, not a claim of edge reversal.

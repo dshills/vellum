@@ -33,3 +33,15 @@ using the existing modal popup lifecycle. Removal, disable, option changes and
 window retirement revoke old actions. Nil Change leaves normal host use enabled.
 No submenus or shortcut-label metadata in this increment. Text fields retain
 their native editing context menus.
+
+## 3. Anchored popover
+
+ui.Popover returns a Dialog descriptor with PopoverAnchor. Reuses retained
+children, native editing, focus scope, Escape and outside dismissal. Its compact
+modal surface has no title, scrim, resize affordance or appended Close bar. It
+anchors below a visible enabled same-window managed Button, clamped inside the
+window, and returns focus there after closing. Anchor removal/hiding/disabling
+closes and proposes Dismiss. Dismiss must set Open false. A small directional
+marker leads content; automatic edge switching, detachable panels and cross-window
+anchors are not supported. At cramped edges the surface clamps rather than
+reversing the marker. Existing Dialog lifecycle owns parking/cleanup.

@@ -134,6 +134,29 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if n.PopoverAnchor != "" {
+		if n.Kind != Dialog || n.PopoverAnchor == n.ID || n.Dismiss == nil {
+			return fmt.Errorf("ui: popover anchor requires a dismissible Dialog")
+		}
+		var descendant func(Node) bool
+		descendant = func(c Node) bool {
+			if c.ID == n.PopoverAnchor {
+				return true
+			}
+			for _, child := range c.Children {
+				if descendant(child) {
+					return true
+				}
+			}
+			return false
+		}
+		for _, c := range n.Children {
+			if descendant(c) {
+				return fmt.Errorf("ui: popover anchor cannot be its own descendant")
+			}
+		}
+	}
+
 	if err := validateContextMenu(n); err != nil {
 		return err
 	}

@@ -16,6 +16,7 @@ type inputHelpersGallery struct {
 	requests         int
 	contextAction    string
 	contextChecked   bool
+	popoverOpen      bool
 	quantity         float32
 	reject, disabled bool
 	dark             bool
@@ -59,6 +60,10 @@ func (m *inputHelpersGallery) setAppearance(dark bool) {
 }
 func (m *inputHelpersGallery) view() ui.Node {
 	combo, err := m.combo.View()
+	if err != nil {
+		return ui.Node{ID: "inputs", Kind: ui.Label, Text: err.Error()}
+	}
+	popover, err := (ui.Popover{ID: "quick-inspector", AnchorID: "inspector-anchor", Label: "Quick inspector", Open: m.popoverOpen, Dismiss: func() { m.popoverOpen = false }, Style: ui.MacTheme(m.dark).Kinds[ui.FormGroup], Children: []ui.Node{{ID: "inspector-label", Kind: ui.Label, Text: "Drawing inspector"}, {ID: "inspector-close", Kind: ui.Button, Text: "Done", Activate: func() { m.popoverOpen = false }}}}).View()
 	if err != nil {
 		return ui.Node{ID: "inputs", Kind: ui.Label, Text: err.Error()}
 	}
@@ -109,6 +114,8 @@ func (m *inputHelpersGallery) view() ui.Node {
 			}
 		}}},
 		{ID: "context-result", Kind: ui.Label, Text: "Context action: " + m.contextAction},
+		{ID: "inspector-anchor", Kind: ui.Button, Text: "Quick inspector…", Activate: func() { m.popoverOpen = !m.popoverOpen }},
+		popover,
 		notice,
 		{ID: "input-requests", Kind: ui.Label, Text: fmt.Sprintf("Search requests: %d", m.requests)},
 		{ID: "input-options", Kind: ui.Row, Children: []ui.Node{

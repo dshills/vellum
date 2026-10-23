@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "6302f436339c6dd36c13976fd9e1f7ef",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "310853d53cdc644b8265f4852b23207af9fbd8ea",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "d6402637ae16f709",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Missing anchor with inactive popover never dismisses",
+      "message": "For popovers, when the anchor is missing and the dialog is active, closeDialog is called and Dismiss is posted. But when the Open prop becomes false earlier code path (closeDialog) is fine; however when the anchor is absent and the popover is not active (Open=true while anchor hidden), nothing is dismissed, so the app's Open state stays true and the popover pops up as soon as the anchor reappears. This contradicts the documented 'missing anchors close the panel' semantics.",
+      "suggestion": "When Open is true and the anchor is missing, also propose Dismiss regardless of d.active (guarding against repeated posting with d.dismissed).",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/controls.go",
+          "lines": {
+            "start": 764,
+            "end": 790
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle"
+      ],
+      "evidence": "if d.active {\n\t\t\tpositionPopover(r, anchor)\n\t\t\treturn\n\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4507,
+    "totalMs": 4522
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 18353,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 11088,
+        "output": 375,
+        "costUSD": 0.025926
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

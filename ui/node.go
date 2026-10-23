@@ -91,6 +91,8 @@ type Node struct {
 	Change        func(ChangeEvent)
 	Accessibility Accessibility
 	Focus         FocusRequest
+	// PopoverAnchor makes a Dialog an anchored panel; prefer Popover.View.
+	PopoverAnchor string
 	Open          bool
 	Dismiss       func()
 }

@@ -268,6 +268,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		widget = w
 		c.dialog = &dialogState{host: newAccessibilityDialogHost(w, r)}
 		c.dialog.host.Styler(func(s *styles.Style) { s.Direction = styles.Column; s.Grow.Set(1, 1) })
+		c.dialog.host.FinalStyler(func(s *styles.Style) { stylePopoverHost(r, s) })
 	default:
 		r.control = nil
 		return nil, false, nil
@@ -759,16 +760,48 @@ func syncDialog(r *record) {
 		closeDialog(r)
 		return
 	}
-	if d.active || d.dismissed {
-		return
-	}
+
 	scene := r.widget.AsWidget().Scene
 	if scene == nil || scene.RenderWindow() == nil {
 		return
 	}
+	if r.node.PopoverAnchor != "" {
+		anchor := popoverAnchor(r)
+		if anchor == nil {
+			if !d.dismissed {
+				closeDialog(r)
+				d.dismissed = true
+				postControl(r, func() {
+					if r.node.Dismiss != nil {
+						r.node.Dismiss()
+					}
+					_ = r.control.a.Invalidate(r.control.window)
+				})
+			}
+			return
+		}
+		if d.active {
+			positionPopover(r, anchor)
+			return
+		}
+	}
+	if d.active || d.dismissed {
+		return
+	}
 	body := prepareDialogBody(r)
 	d.active = true
-	body.NewDialog(r.widget).Run()
+	if r.node.PopoverAnchor != "" {
+		anchor := popoverAnchor(r)
+		if anchor == nil {
+			closeDialog(r)
+			return
+		}
+		stage := body.NewDialog(anchor).SetScrim(false).SetDisplayTitle(false).SetResizable(false).SetUseMinSize(false)
+		stage.Run()
+		positionPopover(r, anchor)
+	} else {
+		body.NewDialog(r.widget).Run()
+	}
 }
 
 // prepareDialogBody keeps one stable child host across native modal scenes.
@@ -796,6 +829,11 @@ func prepareDialogBody(r *record) *core.Body {
 		d.host.SetScene(r.widget.AsWidget().Scene)
 		d.active = false
 		d.body = nil
+		if r.node.PopoverAnchor != "" {
+			if anchor := popoverAnchor(r); anchor != nil {
+				anchor.AsWidget().SetFocus()
+			}
+		}
 		if d.closing {
 			return
 		}
@@ -807,7 +845,9 @@ func prepareDialogBody(r *record) *core.Body {
 			r.control.a.Invalidate(r.control.window)
 		})
 	})
-	body.AddBottomBar(func(bar *core.Frame) { body.AddCancel(bar).SetText("Close") })
+	if r.node.PopoverAnchor == "" {
+		body.AddBottomBar(func(bar *core.Frame) { body.AddCancel(bar).SetText("Close") })
+	}
 	return body
 }
 
@@ -825,6 +865,11 @@ func closeDialog(r *record) {
 	d.body = nil
 	d.active = false
 	d.closing = false
+	if r.node.PopoverAnchor != "" {
+		if anchor := popoverAnchor(r); anchor != nil {
+			anchor.AsWidget().SetFocus()
+		}
+	}
 }
 func flushDialogs(r *record) {
 	if r == nil {
