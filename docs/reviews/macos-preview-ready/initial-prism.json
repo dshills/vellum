@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "c2707130e53a26d694e4b11c8170f5b7",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "e9907d922faa8816ea79882f472bac6313b91072",
+    "branch": "codex/macos-preview"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "05a44939e565239b",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "High-severity alerts left open on unverifiable exclusion claim",
+      "message": "The triage records alerts #1–#3 (including a high-severity x/image alert) as open. Their dispositions rely on the claim that prototypes/p0/gio/go.mod is excluded from the SDK, but that exclusion is asserted only through the self-reported \"prototype_files_shipped\": 0, with no verifiable evidence. The alerts remain open in the repository, which carries a security risk if the prototype manifest is ever shipped or built.",
+      "suggestion": "Bump the prototype go.mod dependencies to patched versions, or remove the prototype manifest, so the alerts close. Alternatively, dismiss them with a documented reason (for example, \"not used\") and add a script-verifiable check that the SDK archive excludes prototypes/.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reports/macos-preview-ready/alert-triage.json",
+          "lines": {
+            "start": 43,
+            "end": 45
+          }
+        }
+      ],
+      "tags": [
+        "security",
+        "dependencies",
+        "location-corrected"
+      ],
+      "evidence": "\"candidate_disposition\": {\n        \"selected_version\": \"v0.44.0\",\n        \"status\": \"outside reported vulnerable range; alert manifest is excluded historical prototype\"",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5521,
+    "totalMs": 5549
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 21057,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 10305,
+        "output": 453,
+        "costUSD": 0.02514
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

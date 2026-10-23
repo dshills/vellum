@@ -1,0 +1,87 @@
+{
+  "checked_utc": "2026-10-23T09:57:48.621979+00:00",
+  "scope": "four concrete alerts surfaced by GitHub push; not a general security audit or advisory dismissal",
+  "sdk_sha256": "28a95b5c2354673d97161df30e828008a5aa18465ce18545a42e8caf0a82f269",
+  "selected_go_versions": {
+    "golang.org/x/image": "v0.44.0",
+    "golang.org/x/net": "v0.57.0"
+  },
+  "prototype_files_shipped": 0,
+  "native_component_count": 82,
+  "native_rand_records": 0,
+  "alerts": [
+    {
+      "number": 4,
+      "state": "open",
+      "module": "rand",
+      "manifest": "release/native-components/wgpu-darwin-arm64/NOTICES/itertools-0.13.0/Cargo.toml",
+      "dependency_scope": "development",
+      "severity": "low",
+      "advisory": "GHSA-cq8v-f236-94qc",
+      "url": "https://github.com/advisories/GHSA-cq8v-f236-94qc",
+      "vulnerable_range": ">= 0.7.0, < 0.8.6",
+      "first_patched": {
+        "identifier": "0.8.6"
+      },
+      "candidate_disposition": {
+        "status": "copied original itertools dev-dependency declaration; rand absent from 82 selected compiled native components"
+      }
+    },
+    {
+      "number": 3,
+      "state": "open",
+      "module": "golang.org/x/image",
+      "manifest": "prototypes/p0/gio/go.mod",
+      "dependency_scope": "runtime",
+      "severity": "high",
+      "advisory": "GHSA-q675-qj96-32m9",
+      "url": "https://github.com/advisories/GHSA-q675-qj96-32m9",
+      "vulnerable_range": "< 0.41.0",
+      "first_patched": {
+        "identifier": "0.41.0"
+      },
+      "candidate_disposition": {
+        "selected_version": "v0.44.0",
+        "status": "outside reported vulnerable range; alert manifest is excluded historical prototype"
+      }
+    },
+    {
+      "number": 2,
+      "state": "open",
+      "module": "golang.org/x/net",
+      "manifest": "prototypes/p0/gio/go.mod",
+      "dependency_scope": "runtime",
+      "severity": "medium",
+      "advisory": "GHSA-5cv4-jp36-h3mw",
+      "url": "https://github.com/advisories/GHSA-5cv4-jp36-h3mw",
+      "vulnerable_range": "< 0.55.0",
+      "first_patched": {
+        "identifier": "0.55.0"
+      },
+      "candidate_disposition": {
+        "selected_version": "v0.57.0",
+        "status": "outside reported vulnerable range; alert manifest is excluded historical prototype"
+      }
+    },
+    {
+      "number": 1,
+      "state": "open",
+      "module": "golang.org/x/image",
+      "manifest": "prototypes/p0/gio/go.mod",
+      "dependency_scope": "runtime",
+      "severity": "medium",
+      "advisory": "GHSA-44p7-9xx4-hf2g",
+      "url": "https://github.com/advisories/GHSA-44p7-9xx4-hf2g",
+      "vulnerable_range": "< 0.38.0",
+      "first_patched": {
+        "identifier": "0.38.0"
+      },
+      "candidate_disposition": {
+        "selected_version": "v0.44.0",
+        "status": "outside reported vulnerable range; alert manifest is excluded historical prototype"
+      }
+    }
+  ],
+  "dependency_changes": false,
+  "alerts_dismissed": false
+}

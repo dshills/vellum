@@ -1,0 +1,113 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "ed29aa4d6f8f3fad04abb5e07bf984fb",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "e9907d922faa8816ea79882f472bac6313b91072",
+    "branch": "codex/macos-preview"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "ef185a54dc95ee0f",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Prototype exclusion check is narrow",
+      "message": "The check matches a path component exactly equal to \"prototypes\". The README says the alert concerns prototypes/p0/gio/go.mod, so the check should also verify that no go.mod from that prototype tree is in the archive. A differently named or nested path would pass silently, and the exclusion claim would then be unreliable.",
+      "suggestion": "Also reject any member whose path contains 'prototypes/' as a substring, and reject any go.mod that mentions gio. Alternatively, assert the exact set of expected top-level directories.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "docs/reports/macos-preview-ready/verify-sdk-alert-scope.py",
+          "lines": {
+            "start": 17,
+            "end": 17
+          }
+        }
+      ],
+      "tags": [
+        "verification",
+        "location-corrected"
+      ],
+      "evidence": "prototype_paths = [name for name in names if \"prototypes\" in PurePosixPath(name).parts]",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "f7b9c62c604100d3",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unhandled missing modules or members crash with a traceback",
+      "message": "If a module is missing from the inventory, versions[name] raises KeyError and the script exits with a traceback. Likewise, sdk.extractfile returns None for a missing or non-file member, which makes json.load fail with an unclear error. The verification tool should fail with a clear message.",
+      "suggestion": "Use versions.get(name) and check that extractfile did not return None, then raise SystemExit with a descriptive message.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reports/macos-preview-ready/verify-sdk-alert-scope.py",
+          "lines": {
+            "start": 22,
+            "end": 22
+          }
+        }
+      ],
+      "tags": [
+        "error-handling"
+      ],
+      "evidence": "selected = {name: versions[name] for name in (\"golang.org/x/image\", \"golang.org/x/net\")}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5176,
+    "totalMs": 5190
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 7779,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5227,
+        "output": 640,
+        "costUSD": 0.016854
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

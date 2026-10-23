@@ -35,7 +35,7 @@ reproduction uses the tracked preparation contract, not those machine paths.
 | P3 | Bounded idle/activity/lifecycle and two-hour soak checks now pass. Apple TUINS base class origin/stable count are known; native retaining reference and full native/GPU heap remain unqualified. | Bounded preview resource check complete; retain the disclosed native-heap limits and historical failures. | R3 |
 | P4 | Owner approved the exact decision-packet payload and corrected 418-file notice bundle on 23 October; release/macos-preview-audit.json binds the decision. Future changed payloads require a new audit. | Guarded public candidates now produced and verified locally; retain historical declarations and separate publication approval. | R4 |
 | P5 | Guarded public native route implemented at b0e5106; owner-approved exact payload may now pass the existing public packaging gates. | Implementation agent: retain release-audit and exact-archive notice gates; no further tooling repair required for this route. | R4 |
-| P6 | Alpha.3 private artifacts, checksums and ad-hoc signing/notarization disclosure are complete; public artifact/publication approval remains pending. | Implementation agent: prepare exact reviewed artifacts and release text, then owner publication decision. | R4/R5 |
+| P6 | Alpha.3 private artifacts, checksums and ad-hoc signing/notarization disclosure are complete; public-mode artifacts and checksums pass; final publication approval remains pending. | Implementation agent: prepare exact reviewed artifacts and release text, then owner publication decision. | R4/R5 |
 
 This ledger tracks completed acceptance checks and remaining distribution
 questions, not six newly discovered runtime defects. A new reproducible defect must name its command
@@ -69,10 +69,14 @@ or gesture, expected/actual behavior, smallest fix and focused retest here.
   extracted app signature, place/pan/zoom/history/Save/Open/normal quit pass.
   Exact-payload audit and source push/draft PR for CI are now owner-approved.
   [Guarded public candidates](reports/macos-preview-public-candidate/README.md) now
-  pass extraction, external/native SDK and app checks. Source push/draft PR waits
-  for the historical-path decision after automatic approval rejection; applicable
-  candidate CI and final publication remain pending. The bounded two-hour soak passes. No public preview release or full
-  Mac qualification is claimed.
+  pass extraction, external/native SDK and app checks. The owner additionally
+  approved historical local paths/metadata; source publication succeeded and
+  [draft PR #1](https://github.com/dshills/vellum/pull/1) is open. All four applicable
+  push/PR CI runs pass at e9907d9; optional self-hosted qualification is skipped.
+  The [final publication packet](reports/macos-preview-ready/README.md) records
+  proposed assets, release text and identical non-documentation code tree.
+  Final tag/assets publication remains owner-controlled. No public preview
+  release or full Mac qualification is claimed.
 
 ## Disclosed performance
 
