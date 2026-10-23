@@ -1,0 +1,23 @@
+{
+  "sdk": "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/alpha3-retained SDK/vellum-v0.1.0-alpha.3",
+  "sdk_sha256": "ad48d9c9c6112c48db4e4e7d1fb32eb19f31d734891f15761b864d5c2e61b391",
+  "source": {
+    "clean": true,
+    "commit": "412e5b8266fb8655935bcdad203b73887923c9db"
+  },
+  "version": "v0.1.0-alpha.3",
+  "argv": [
+    "go",
+    "build",
+    "-ldflags=-linkmode=external -extldflags=-Wl,-map,/private/tmp/vellum-preview-alpha3/placement.map",
+    "-o",
+    "/private/tmp/vellum-preview-alpha3/placement",
+    "."
+  ],
+  "cwd": "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/alpha3-retained SDK/vellum-v0.1.0-alpha.3/examples/placement",
+  "binary": "/private/tmp/vellum-preview-alpha3/placement",
+  "binary_sha256": "0d7539594ad742844f629ea1ab6080edb0a86ddb8ffbffe8192d3b53d636a16a",
+  "link_map": "/private/tmp/vellum-preview-alpha3/placement.map",
+  "link_map_sha256": "220f4d0983ef5049e407011493d29ddb2c7de3b4a061699201e7579341811150",
+  "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883"
+}

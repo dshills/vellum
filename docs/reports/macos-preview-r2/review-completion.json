@@ -1,0 +1,36 @@
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "coverage_files": 11,
+  "coverage_complete": true,
+  "retained_findings": 1,
+  "discarded": 0,
+  "unresolved": 0,
+  "disposition": "b37b6dd5793e2c40 addressed: committed report/review log paths normalize user home to <USER_HOME>. Exact original exporter/runtime/review records remain in local session artifacts. No runtime or numeric outcome changed. Final normalization checked internally; no redundant provider review.",
+  "path_normalization": {
+    "sdk-export-v2.json": {
+      "original_sha256": "3883f8081cc7b7aae3b36bd23ca936ea1bc81e9e2d1533a4cd7d81898fb622a3",
+      "normalized_sha256": "da9e9014c2a5bc763faade869e183eb5d9309f5b6699a66920d8c04202bd4bb7"
+    },
+    "app-package-go125.stderr": {
+      "original_sha256": "22dd3458490737d74f2146817f2ea0994744f5adbf5d1589b63ea1a5bf263647",
+      "normalized_sha256": "23824c3b837d3e0b9429a1ce89c161a91fefadf6c4c5418aa95e89201163aac6"
+    },
+    "sdk-export.stderr": {
+      "original_sha256": "5d42f6207f274fd98ad901c54a95a5312f242fa1ca138960a1f992f51e7dc138",
+      "normalized_sha256": "52f2cbf5c8166e6e3591c0f42e6b111e63cb6d74b47cd42eeb63d4d77e1fc9a6"
+    },
+    "review-prism.json": {
+      "original_sha256": "27cfb8fb8ecce4582dd519a0d51212ff37fd3038c99b49dc0dc70e0b71c54cfb",
+      "normalized_sha256": "7bb3474254bd9065a93f0c9d3e39941531d8001192d4e1f55de1f08f9ce13d87"
+    },
+    "review-receipt.json": {
+      "original_sha256": "797635afa62039d997d5bacc9ecb35313758efaf3e107fb3a6de4efec553e1f2",
+      "normalized_sha256": "299e7b14c84596632447227212133d40af74f2d9bb30c97a3180ffe70c3ddc01"
+    },
+    "review-rules.json": {
+      "original_sha256": "7bab6c33026eef555bc274dd2565ee4280ae4e02d09c16a96921ba342c9b703a",
+      "normalized_sha256": "7bab6c33026eef555bc274dd2565ee4280ae4e02d09c16a96921ba342c9b703a"
+    }
+  }
+}

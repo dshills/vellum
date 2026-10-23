@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "<USER_HOME>/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "docs/macos-preview-release.md,docs/reports/macos-preview-alpha3-candidate/README.md,docs/reports/macos-preview-alpha3-candidate/app-build.json,docs/reports/macos-preview-alpha3-candidate/app-package.json,docs/reports/macos-preview-alpha3-candidate/delivery-integrity.json,docs/reports/macos-preview-alpha3-candidate/rights-triage.json,docs/reports/macos-preview-alpha3-candidate/sdk-relocation.json,specs/sdk.md",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "4",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/alpha3-package-review/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/alpha3-package-review/prism.json"
+  ],
+  "cwd": "<USER_HOME>/Development/projects/Vellum",
+  "started_utc": "2026-10-22T19:33:45.211515+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 1,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 10908,
+  "group": 10908,
+  "owned": {
+    "created": true,
+    "pid": 10908,
+    "group": 10908,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 1,
+    "errors": [],
+    "observation": {
+      "group": 10908,
+      "members": [],
+      "observation_sha256": "6b29085429c92477643ad0ef47686b76c6f54ec7ded8cf5084660c4c249eb93b"
+    }
+  },
+  "seconds": 6.510793583001941,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

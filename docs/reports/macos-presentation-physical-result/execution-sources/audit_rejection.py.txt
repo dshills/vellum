@@ -1,0 +1,32 @@
+"""Offscreen audit of all raw receipts in the rejected corrected control."""
+from pathlib import Path
+import importlib.util,json,sys
+sys.dont_write_bytecode=True
+X=Path(__file__).resolve().parent;Q=X/'prepared';R=Path('/Users/dshills/Development/projects/Vellum')
+s=importlib.util.spec_from_file_location('physical_result_classifier',R/'tools/macos-calibration/presentationphase/check.py');v=importlib.util.module_from_spec(s);s.loader.exec_module(v)
+read=lambda p:json.loads(p.read_text())
+d=v.base.native_doc(v.base.load(Q/'native-case/native/stdout'))
+parent=v.base.validate(d,read(Q/'match.json'));ticks=v.clock(d);receipts,seen,observed,snapshots=v.replay(d['pending_trace'])
+requests=d['pending_trace']['requests'];source=[(i,r) for i,r in enumerate(d['records']) if r['phase']]
+assert len(source)==len(requests)==len(receipts)==248
+violations=[];rows=[];used=set()
+for (tag,r),req,e in zip(source,requests,receipts):
+ i=req['sequence']-1;assert i==len(rows) and req['phase']==i%4 and req['anchor']==requests[0]['anchor']+8*i
+ anchor=ticks[req['anchor']];target=anchor['timestamp']+(3+(req['phase']+.5)/4)*anchor['duration'];assert req['target']==target and anchor['observed']<target
+ error=(r['receipt']-target)*1000
+ row={'sequence':i+1,'phase':req['phase'],'cohort':'warmup' if r['phase']==1 else 'measured','target':target,'receipt':r['receipt'],'error_ms':error,'tag':tag,'receipt_hook_tag':e['tag'],'receipt_clock_join':e['at']==r['receipt'],'tag_join':e['tag']==tag,'planned_lateness_ns':d['lateness_ns'][i]}
+ assert row['receipt_clock_join'] and row['tag_join']
+ hits=[a for a,x in seen.items() if 3 in x and x[3]['at']==r['acquired'] and d['pending_trace']['attempts'][a-1]['drawable']==r['drawable_id']]
+ assert len(hits)==1 and hits[0] not in used;attempt=hits[0];used.add(attempt);events=seen[attempt];a=d['pending_trace']['attempts'][attempt-1]
+ assert a['tag']==tag and a['generation']==r['accepted'] and 5 in events and events[5]['shown']==r['shown'] and r['receipt']<=events[2]['at']<=r['acquired']<=r['shown']
+ rows.append(row)
+ if not 0<=error<=2:violations.append(row)
+first=source[0][1]['receipt'];assert all(a in used or (x[2]['at']<first and (3 not in x or x[3]['at']<first)) for a,x in seen.items())
+assert len(violations)==1 and violations[0]['sequence']==215 and violations[0]['phase']==2 and violations[0]['cohort']=='measured'
+assert 2.1435<violations[0]['error_ms']<2.1437
+try:v.validate(d,read(Q/'match.json'),'native')
+except ValueError as error:assert str(error)=='actual receipt phase match/join'
+else:raise AssertionError('rejected trace unexpectedly admitted')
+assert not (Q/'framework-case').exists() and read(Q/'result.json')['outcome']=='REJECT' and (Q/'stop-live').exists()
+summary={'result':'REJECTION_INDEPENDENTLY_REPRODUCED','population':248,'warmup':128,'measured':120,'violation_count':1,'violations':violations,'maximum_receipt_error_ms':max(r['error_ms'] for r in rows),'all_receipt_clock_joins':True,'all_tag_joins':True,'all_target_anchor_checks':True,'all_acquisition_drawable_callback_joins':True,'parent_native_validator_passed':True,'display_clock_checks_passed':True,'pending_replay_passed':True,'attempts':len(d['pending_trace']['attempts']),'events':len(d['pending_trace']['events']),'display_callbacks':len(ticks),'terminal_pending':0,'terminal_acquiring':0,'framework_started':False,'corrected_framework_startup_verified':False,'release_qualified':False,'gate_changed':False,'interpretation':'One receipt exceeded the predeclared diagnostic phase bound of2ms; no missing identity join. Full pair refused, no filtering/retry/threshold change. No accepted latency comparison or startup claim.'}
+(Q/'raw-phase-audit.json').write_text(json.dumps({**summary,'rows':rows},indent=2)+'\n');(Q/'phase-rejection.json').write_text(json.dumps(summary,indent=2)+'\n');print(json.dumps(summary,indent=2))

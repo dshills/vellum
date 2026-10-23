@@ -1,0 +1,23 @@
+Traceback (most recent call last):
+  File "<USER_HOME>/Development/projects/Vellum/scripts/release-sdk.py", line 549, in <module>
+    main()
+    ~~~~^^
+  File "<USER_HOME>/Development/projects/Vellum/scripts/release-sdk.py", line 543, in main
+    print(json.dumps(package(ROOT, args.output.absolute(), args.public, args.include_untracked,
+                     ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        macos_gpu_library=args.macos_gpu_library, macos_gpu_sha256=args.macos_gpu_sha256,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        macos_gpu_provenance=args.macos_gpu_provenance), indent=2))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Development/projects/Vellum/scripts/release-sdk.py", line 478, in package
+    data, derived = sdk_documentation(root, name, data, exported, tracked_names)
+                    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Development/projects/Vellum/scripts/release-sdk.py", line 231, in sdk_documentation
+    pieces.append(inline("".join(block)))
+                  ~~~~~~^^^^^^^^^^^^^^^^
+  File "<USER_HOME>/Development/projects/Vellum/scripts/release-sdk.py", line 174, in inline
+    output.append(replace(match))
+                  ~~~~~~~^^^^^^^
+  File "<USER_HOME>/Development/projects/Vellum/scripts/release-sdk.py", line 131, in replace
+    raise ValueError(f"unknown missing SDK documentation target: {name}: {target}")
+ValueError: unknown missing SDK documentation target: specs/macos-completion.md: ../tools/macos-calibration/stagingreuse/TIMING.md

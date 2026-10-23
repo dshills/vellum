@@ -1,0 +1,16 @@
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "complete": true,
+  "files": 13,
+  "findings": [
+    {
+      "id": "077abbcc9848bfd6",
+      "disposition": "Not a reachable defect in this exact-source preparation. prepare.py validates every predecessor input hash before copying/patching, permits only the explicitly extended PLAN difference, and Q.mkdir refuses an existing output. It then applies each patch once to the copied exact predecessor source. Independent checks prove both resulting full files equal the declared transformation; no whitespace drift is admitted. Six focused regressions refuse missing/repeated/exact already-patched sources. A generic whitespace-tolerant patch API is not advertised or used. Keeping the hash-locked recipe avoids speculative change or unnecessary native rebuild."
+    }
+  ],
+  "internal_verification": "28regular archive members and5committed mappings match bytes/hashes. Go race2pass; Python3methods/13negative subcases pass; final build exit0 and retired, full logs; exact compiled consumer delta independently checked. Existing strict runner/validators/Core/archive unchanged.",
+  "release_qualified": false,
+  "features_changed": false,
+  "gate_changed": false
+}

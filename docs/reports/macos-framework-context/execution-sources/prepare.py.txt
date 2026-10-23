@@ -1,0 +1,17 @@
+from pathlib import Path
+import hashlib,importlib.util,json,shutil,sys
+sys.dont_write_bytecode=True
+X=Path(__file__).resolve().parent;A=X.parent;Q=X/'prepared';Q.mkdir();R=Path('/Users/dshills/Development/projects/Vellum');C=R/'tools/macos-calibration/frameworkpending';P=A/'macos-presentation-physical/prepared';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text());prior=read(A/'macos-framework-pending/prepared/bound-plan.json')
+# The prior canonical PLAN is deliberately extended; all other old inputs stay exact.
+changed=[]
+for n,h in prior['pins'].items():
+ if sha(Path(n))!=h:
+  assert n==str(C/'PLAN.md');changed.append(n)
+assert changed==[str(C/'PLAN.md')]
+shutil.copytree(P/'consumer',Q/'consumer')
+for n in ['framework.mod','framework.sum','overlay.json','match.json']:shutil.copyfile(P/n,Q/n)
+s=importlib.util.spec_from_file_location('failure_patch',C/'context.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m)
+p=Q/'consumer/main_darwin.go';p.write_text(m.patch_main(p.read_text()));p=Q/'consumer/observe_darwin.m';p.write_text(m.patch_observer(p.read_text()))
+for n in ['failure_context.go','failure_context_test.go']:shutil.copyfile(C/'testdata'/n,Q/'consumer'/n)
+pins=dict(prior['pins']);pins.update({str(p):sha(p) for root in [C,Q/'consumer'] for p in root.rglob('*') if p.is_file()});pins.update({str(Q/n):sha(Q/n) for n in ['framework.mod','framework.sum','overlay.json','match.json']});(Q/'build-inputs.json').write_text(json.dumps(pins,indent=2)+'\n')
+print(json.dumps({'copied_consumer':str(Q/'consumer'),'changed_prior_pin':changed,'new_native_context':'phase3 only; all other observations unchanged','new_go_context':'first invalid request only; exact state retained, original rejection preserved','build_pins':len(pins)}))

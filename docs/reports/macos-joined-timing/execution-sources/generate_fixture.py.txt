@@ -1,0 +1,43 @@
+from pathlib import Path
+import json
+q=Path(__file__).resolve().parent;r=Path('/Users/dshills/Development/projects/Vellum');f=r/'tools/macos-calibration/upload/framework';p=Path('/private/tmp/vellum-joined-timing-core');sdk=Path('/private/tmp/vellum-doclinks-sdk-bd3cbc9/retained SDK/vellum-v0.1.0-alpha.2')
+s=(f/'main_darwin.go').read_text();s=s.replace('"cogentcore.org/core/core"','"cogentcore.org/core/core"\n "cogentcore.org/core/paint/renderers/rasterx"\n "cogentcore.org/core/system/driver/desktop"',1)
+s=s.replace('func good(','''type requestPhase struct {Sequence int; WakeLatenessNS, ForegroundCheckNS, PostCheckLatenessNS int64}
+type requestAnchor struct {Sequence int; WakeHost, CheckedHost, PostCheckHost float64; TargetFromReceiptStartNS, ReceiptBracketNS int64}
+
+func good(''',1)
+s=s.replace('if os.Args[3] != "off" && os.Args[3] != "on" {','if os.Args[3] != "on" {',1)
+needle='\tpilot := os.Args[1] == "pilot"';assert s.count(needle)==1;s=s.replace(needle,''' if !rasterx.VellumRasterConfigure(desktop.PresentationHostTime) {return errors.New("raster clock configuration")}
+ defer func(){if !rasterx.VellumRasterReset(){result=errors.Join(result,errors.New("raster clock still pending"))}}()
+'''+needle)
+s=s.replace('"diagnostic_mode": "source-cost-only"','"diagnostic_mode": "source-cost-only", "joined_mode":"absolute-raster-upload-schedule-v1"',1)
+needle='\t\tlateness := make([]int64, 0, 248)';assert s.count(needle)==1;s=s.replace(needle,needle+'\n phases:=make([]requestPhase,0,248)\n anchors:=make([]requestAnchor,0,248)')
+needle='\t\t\tif !good(observe(0)) {';assert s.count(needle)==1;s=s.replace(needle,'''   wake:=time.Now()
+   wakeHost:=desktop.PresentationHostTime()
+   state:=observe(0)
+   checkedHost:=desktop.PresentationHostTime()
+   checked:=time.Now()
+   if !good(state) {''')
+needle='\t\t\tlate := time.Since(target).Nanoseconds()';assert s.count(needle)==1;s=s.replace(needle,'''   postCheckHost:=desktop.PresentationHostTime()
+'''+needle+'''
+   phases=append(phases,requestPhase{Sequence:i,WakeLatenessNS:wake.Sub(target).Nanoseconds(),ForegroundCheckNS:checked.Sub(wake).Nanoseconds(),PostCheckLatenessNS:late})
+   out["request_schedule_phases"]=phases''')
+needle='\t\t\tout["receipt_lateness_ns"] = append(receiptOffsets, sample.ReceiptStartedAt.Sub(target).Nanoseconds())';assert s.count(needle)==1;s=s.replace(needle,needle+'''
+   anchors=append(anchors,requestAnchor{Sequence:i,WakeHost:wakeHost,CheckedHost:checkedHost,PostCheckHost:postCheckHost,TargetFromReceiptStartNS:target.Sub(sample.ReceiptStartedAt).Nanoseconds(),ReceiptBracketNS:sample.ReceiptFinishedAt.Sub(sample.ReceiptStartedAt).Nanoseconds()})
+   out["request_schedule_anchors"]=anchors''')
+needle='\tout["after_close"] = metrics.Snapshot()';assert s.count(needle)==1;s=s.replace(needle,needle+'\n out["raster_trace"]=rasterx.VellumRasterRead()')
+s=s.replace('pilot|timed MATCH.json off|on','pilot|timed MATCH.json on').replace('off|on observer required','on observer required')
+(q/'native_main_darwin.go').write_text(s)
+s=(f/'fixture_test.go').read_text().replace('import (','import (\n "sync/atomic"\n "cogentcore.org/core/paint/renderers/rasterx"',1)
+needle='func TestRoutedStateAndExactPatchPixels(t *testing.T) {';assert s.count(needle)==1;s=s.replace(needle,needle+'''
+ var ticks atomic.Uint64
+ if !rasterx.VellumRasterConfigure(func()float64{return float64(ticks.Add(1))}){t.Fatal("raster clock configure")}
+ defer func(){if !rasterx.VellumRasterReset(){t.Error("unretired raster clock")}}()
+''')
+# Insert final snapshot verification at the function end, retaining original pixel/state assertions.
+pos=s.rfind('}');s=s[:pos]+''' snapshot:=rasterx.VellumRasterRead()
+ if snapshot.Pending!=0 || snapshot.Invalid || snapshot.Overflow || len(snapshot.Records)==0 {t.Fatalf("bad raster clock %+v",snapshot)}
+ for _,record:=range snapshot.Records {if !record.Begun || !record.Complete || !record.Returned || record.End<=record.Begin {t.Fatal("incomplete raster bracket")}}
+'''+s[pos:];(q/'fixture_test.go').write_text(s)
+(q/'overlay.json').write_text(json.dumps({'Replace':{str(sdk/'drivers/cogent/desktop_session.go'):str(q/'desktop_session.go'),str(sdk/'drivers/cogent/desktop_measurement.go'):str(q/'desktop_measurement.go'),str(p/'core/frame_trace.go'):str(q/'frame_trace.go'),str(f/'main_darwin.go'):str(q/'native_main_darwin.go'),str(f/'fixture_test.go'):str(q/'fixture_test.go')}},indent=2)+'\n')
+(q/'match.json').write_bytes((q.parent/'macos-upload-probe/match.json').read_bytes())

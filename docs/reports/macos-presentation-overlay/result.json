@@ -1,0 +1,59 @@
+{
+  "result": "REPRODUCED_OBJECTIVE_C_OVERLAY_OMISSION",
+  "toolchain": "go version go1.25.6 darwin/arm64",
+  "markers": [
+    "C",
+    "Objective-C",
+    "Go"
+  ],
+  "observed": {
+    "baseline": "11 31 41",
+    "overlay": "22 31 42",
+    "physical": "22 32 42"
+  },
+  "original_overlay_inputs_unchanged": true,
+  "protected_pins": {
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-app-examples/go-check": "92e78a5901ade06bee48b655c3b2fc07e435b9b9110af9a6fee8d9c065bd93df",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe.py": "35a9600d5848cdc2ba51008ff5b2001ab0440b57137c940303dad28d6e350985",
+    "/Users/dshills/Development/Go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.6.darwin-arm64/bin/go": "9c35eaeb87fd3df884c3540b25f3556902c164d88afe8a88e62ceb819d0da211",
+    "/Users/dshills/Development/Go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.6.darwin-arm64/src/cmd/go/internal/work/exec.go": "ebf1f50b76c7498d587040f67832bf97ed0ebf9c9562fca395040115a6e690c0",
+    "/Users/dshills/Development/projects/Vellum/scripts/child_process.py": "f907c7c6ce54871c9693be9fd8a9088cf09bd22cabc4e48d3abc7191f75bc7e6",
+    "/Users/dshills/Development/projects/Vellum/scripts/sdk_environment.py": "e100d93ed7ca190725c8e10d1b721cb56f2d86a5f12643b53b4ee198a79b4311",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/run.py": "e76238012be63f58cbc5923e27f6fc227a3aca8443d85d64f466c0675382c7ac",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-phase/prepared/framework": "a0252048e60d33a13c98c344c6e255f66ddc81c569cf9e6716a71292e16bbbfe",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-phase/prepared/native": "44c85638e4fb3415fd979869cd4d25806d8fe7626660eb9a3b9381505aedb91d",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-phase/prepared/overlay.json": "da1505fa55351553ad4c1e26554f43d8065e83d768505c4d4d0ebbc4b42183f7",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-phase/prepared/framework.mod": "6f1c502a186cf2820ed5ff3183eb280d0cc7703ab3674207fd4ea317254adc76",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-phase/prepared/build-identity.json": "f9111c6776712e7f3d0ccc29929d22e36a95fd69eb34655cd765abd7fdaedec5",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-physical/prepared/framework": "6825d90efe89f75ce1361c8bf75542ff2866c2869061b5ae95405a576646466a",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-physical/prepared/native": "44c85638e4fb3415fd979869cd4d25806d8fe7626660eb9a3b9381505aedb91d",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-physical/prepared/overlay.json": "8374f378aa86e96a4bba3f5f9be8df03b87120129b95bdfd7dc99280f22132e8",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-physical/prepared/framework.mod": "5b5fd2463c973b34397ca5185082e3d957ef57d8f94c6e69952ab14bc357616b",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-physical/prepared/build-identity.json": "1065bf8667b94962dd22d52b7f36a261dc6169ced3f8a32bf55d63333c3dda40",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe/overlay.json": "7d93a9abfb517e6d2f886690a8fe5423c41b4e63940d5530ded35ef02264a683",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe/replacements/marker.m": "a059af25a031ee0ba9acbac5fe3f67f76e7d781c9426223e88a5f6e41d956eb3",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe/replacements/marker.c": "a79d4e83ada5891df226bbd84f8f3ed4d88ea082f93cb3a2338ee54ca2ebc96b",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe/replacements/main.go": "229e2a59f6fbd9bdd26b38c0f7abae2958d885193dd859249a1c77166e687489",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe/physical/go.mod": "e5c24f3a69c7585798a68cfcc4adb11e9dc02b33566eca4bde689eab595b42c0",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe/physical/marker.m": "a059af25a031ee0ba9acbac5fe3f67f76e7d781c9426223e88a5f6e41d956eb3",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe/physical/marker.c": "a79d4e83ada5891df226bbd84f8f3ed4d88ea082f93cb3a2338ee54ca2ebc96b",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe/physical/main.go": "229e2a59f6fbd9bdd26b38c0f7abae2958d885193dd859249a1c77166e687489",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe/baseline/go.mod": "e5c24f3a69c7585798a68cfcc4adb11e9dc02b33566eca4bde689eab595b42c0",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe/baseline/marker.m": "65b8de7a47d7bea184c3328dfbd452b45c1ba892b4ae28cbc0270af348233a31",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe/baseline/marker.c": "8b4600b3e920a6deaf75f9871a249c8764ca2012e3de08937236ab0eeb4a3e7a",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe/baseline/main.go": "f6d70ba84f332d26496324f8ad400aef592578a5add18223cb3cbc9210e82245",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe/baseline-binary": "f5c54a3eaa75ed68b1bfffe761a7b4b3a17643f7a240aab871da37e299ec6180",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe/overlay-binary": "de47ece7dc78d6aa1f7e9777adfd3af01f7b2493c811712debe5bebbd63244f3",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-presentation-overlay/probe/physical-binary": "0c6ac440e4e9017e1f38e168f8326db895038887a6e283d84b3dcee6d40f3979"
+  },
+  "owned_commands": 7,
+  "all_owned_groups_retired": true,
+  "native_application_executed": false,
+  "desktop_used": false,
+  "limitation": "Explains missing pending hooks, not the separate absence of original presentation metrics/startup feedback. No window or presentation test.",
+  "compiler_source": {
+    "path": "/Users/dshills/Development/Go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.6.darwin-arm64/src/cmd/go/internal/work/exec.go",
+    "sha256": "ebf1f50b76c7498d587040f67832bf97ed0ebf9c9562fca395040115a6e690c0",
+    "omitted_list": "nonGoFileLists := [][]string{p.CFiles, p.SFiles, p.CXXFiles, p.HFiles, p.FFiles}"
+  }
+}

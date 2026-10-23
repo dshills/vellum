@@ -1,0 +1,38 @@
+{
+  "scope": "Proposed macOS developer-preview delivery policy; no gate/runtime/metadata changes",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "initial_retained": 1,
+  "initial_discarded": 1,
+  "followup_retained": 1,
+  "followup_discarded": 1,
+  "unresolved": 0,
+  "dispositions": [
+    {
+      "id": "539cbd746d7d6394",
+      "action": "Added explicit R1 0.5, R2 0.5, R3 1, R4 0.5, R5 0.5 allocation totaling three sessions, plus one contingency."
+    },
+    {
+      "id": "b75127a16444b290",
+      "action": "Despite discard for quoted-evidence mismatch, addressed substantive concern: any runtime fix after soak starts invalidates soak; repeat it and affected lifecycle checks in contingency."
+    },
+    {
+      "id": "96a43af4bdf5655c",
+      "action": "Added session-by-session ordering and clarified early rights triage belongs to R1. R4/R5 occupy session 3; overlap is optional benefit."
+    },
+    {
+      "id": "46f08603a3014739",
+      "action": "Despite discard, clarified two-hour restart cost and explicit no-go if remaining contingency cannot fit repair plus full rerun. Existing no-shortcut rule retained."
+    }
+  ],
+  "final_internal_checks": [
+    "All relative plan links resolve",
+    "Explicit allocation sums to three sessions plus one maximum contingency",
+    "No change to existing responsiveness gate or version metadata",
+    "Final calendar/no-go clarification checked internally; no third provider review or new policy change"
+  ],
+  "final_files": {
+    "specs/macos-first-release-plan.md": "8c1c403c16aff36cb89751a1457d1f6a6a7f29af8486f0a2793bcc506f56a93e",
+    "specs/README.md": "61a9a60e82f95a78e91995a127fafc7ecc25b2479adc4cf93de816960677e16e"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "expected_refusal": "third-party/native binary distribution audit is incomplete",
+  "output_created": false,
+  "real_audit": "pending",
+  "source_commit": "6f24200",
+  "stderr": "Traceback (most recent call last):\n  File \"<USER_HOME>/Development/projects/Vellum/scripts/package-app.py\", line 293, in <module>\n    if __name__==\"__main__\":main()\n                            ~~~~^^\n  File \"<USER_HOME>/Development/projects/Vellum/scripts/package-app.py\", line 290, in main\n    print(json.dumps(package(args.binary.absolute(),args.output.absolute(),args.name,args.identifier,args.version,args.target,args.sign_identity,args.build_version,args.notice_bundle,public=args.public),indent=2))\n                     ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<USER_HOME>/Development/projects/Vellum/scripts/package-app.py\", line 178, in package\n    release_policy.release_gates(ROOT, metadata, True)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"<USER_HOME>/Development/projects/Vellum/scripts/release-sdk.py\", line 85, in release_gates\n    raise ValueError(\"Public release blocked: \" + \"; \".join(failures))\nValueError: Public release blocked: third-party/native binary distribution audit is incomplete\n"
+}

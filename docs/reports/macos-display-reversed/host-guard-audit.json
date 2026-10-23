@@ -1,0 +1,21 @@
+{
+  "result": "PASS",
+  "actual_host_expired_command": "Refuses before executor invocation",
+  "actual_host_expired_probe": "Refuses before executor invocation",
+  "actual_executor_global_stop": "0.2s overall stop interrupts5s child/percase5s; actual finally retires owned group",
+  "owned_stop_seconds": 0.23361929203383625,
+  "owned_stop_group_absent": true,
+  "Host_finish_role": "Integrity assertion only; no child, lease or native resource cleanup. Calling it in finally would not add cleanup and could mask the original failure.",
+  "lifetime": "Host.command invokes check before all launches/probes; actual executor checks stopping before/during launch and polling, and retires in finally. LiveLease exits through outer with, and runner seals attempt in finally.",
+  "pins": {
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-release-default-assessment/assessment.py": "a7c5a9d900a615339bef1d5c4c7a20293bf5142b422c9d95945ae1acbfda89c2",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/run.py": "e76238012be63f58cbc5923e27f6fc227a3aca8443d85d64f466c0675382c7ac",
+    "/Users/dshills/Development/projects/Vellum/scripts/child_process.py": "f907c7c6ce54871c9693be9fd8a9088cf09bd22cabc4e48d3abc7191f75bc7e6"
+  },
+  "source": {
+    "finish": "    def finish(self):\n        need(self.lease.held() and self.stable() and (sdk_vector() == self.plan['sdk']), 'final source/native/binary integrity')\n",
+    "command": "    def command(self, argv, cwd, out, timeout):\n        self.check()\n        out.parent.mkdir(parents=True, exist_ok=True)\n        tmp = out.parent / 'tmp'\n        tmp.mkdir(exist_ok=True, mode=448)\n        profile = '(version 1)(allow default)(deny network* (remote ip) (local ip))' + ''.join(('(deny file-write* (subpath ' + json.dumps(str(p)) + '))' for p in [C, T, SDK, c.CORE_DATA]))\n        env = {'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'HOME': str(Path.home()), 'TMPDIR': str(tmp), 'GOMAXPROCS': '2', 'LANG': 'C.UTF-8'}\n        argv = ['/usr/bin/sandbox-exec', '-p', profile, '/usr/bin/env', '-i', *[k + '=' + v for k, v in env.items()], *argv]\n        r = g.execute(argv, cwd, out, self.stopping, lambda: self.stable() and (not self.stopping()), timeout=timeout, limit=16 << 20)\n        r['owned_tmp_empty'] = not list(tmp.iterdir())\n        write(out.parent / (out.name + '-command.json'), r)\n        return r\n",
+    "stopping": "    def stopping(self):\n        return self.stopped[0] or (P / 'stop-live').exists() or datetime.datetime.now(datetime.timezone.utc) >= self.deadline or (not self.lease.held())\n"
+  },
+  "no_native_application_or_settings_changed": true
+}

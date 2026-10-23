@@ -1,0 +1,20 @@
+{
+  "app_build_sdk_source": {
+    "clean": true,
+    "commit": "412e5b8266fb8655935bcdad203b73887923c9db"
+  },
+  "final_sdk_source": {
+    "clean": true,
+    "commit": "10beef424c532395802065b2be45119bec88efe2"
+  },
+  "manifest_changed_files": [
+    "SDK_DOCUMENTATION.md",
+    "docs/macos-preview-release.md",
+    "scripts/package-app.py",
+    "scripts/package-app_test.py",
+    "specs/release.md",
+    "specs/sdk.md"
+  ],
+  "runtime_native_dependency_changes": [],
+  "interpretation": "App binary remains built from source 412e5b8; all Go/native/link/dependency inputs in the two SDK manifests match. Tooling changes do not change product code."
+}

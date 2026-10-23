@@ -1,0 +1,22 @@
+{
+  "outcome": "PREPARED_ONLY_NO_NATIVE_RESULT",
+  "Go_race_methods": 5,
+  "original_routed_full_pixel_fixture_with_clock": "PASS",
+  "classifier_methods": 5,
+  "negative_subcases": 23,
+  "native_build": "PASS",
+  "preparation_reproduction": "PASS fullCore/fixture/modules/overlays",
+  "native_archive_sha256": "2bece763dbe7d2ec088fa8c69bd6af8944a6633ba4ef4d805f8af9eee7ae359f",
+  "native_policy": "original allocation/WC/shared options, scalar CPU observer only; no pool or texture-cache experiment",
+  "changed_Core_files": [
+    "paint/renderers/rasterx/renderer.go"
+  ],
+  "new_Core_files": [
+    "paint/renderers/rasterx/vellum_raster_clock.go",
+    "paint/renderers/rasterx/vellum_raster_clock_test.go"
+  ],
+  "full_frozen_sdk_files": 8321,
+  "release_qualified": false,
+  "gate_changed": false,
+  "selected_build": "v2 after review publication guard/internal usage correction; v1 source/build receipts retained, never run natively"
+}

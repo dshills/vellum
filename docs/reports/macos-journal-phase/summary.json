@@ -1,0 +1,2724 @@
+{
+  "scope": "Existing immutable journals only; offscreen, no native execution",
+  "pairs": [
+    {
+      "pair": "macos-display-scheduling",
+      "order": [
+        "off",
+        "on"
+      ],
+      "cases": [
+        {
+          "mode": "off",
+          "joined_inputs": 248,
+          "warmup": 128,
+          "measured": 120,
+          "receipt_to_shown_ms": {
+            "count": 120,
+            "p50": 43.409333331510425,
+            "p95": 51.101124845445156,
+            "p99": 53.01783327013254,
+            "max": 53.09420824050903
+          },
+          "partition_ms": {
+            "receipt_to_acquire": {
+              "count": 120,
+              "p50": 3.132208250463009,
+              "p95": 6.508833263069391,
+              "p99": 7.582958322018385,
+              "max": 8.378041675314307
+            },
+            "acquire_to_first_submit": {
+              "count": 120,
+              "p50": 0.19691651687026024,
+              "p95": 0.25862501934170723,
+              "p99": 0.27683330699801445,
+              "max": 0.5115000531077385
+            },
+            "first_submit_to_first_gpu": {
+              "count": 120,
+              "p50": 0.7073748856782913,
+              "p95": 0.8399579674005508,
+              "p99": 0.879333121702075,
+              "max": 0.8850833401083946
+            },
+            "render_gpu_span": {
+              "count": 120,
+              "p50": 0.2564166206866503,
+              "p95": 0.35675009712576866,
+              "p99": 0.4912500735372305,
+              "max": 1.009125029668212
+            },
+            "render_gpu_end_to_shown": {
+              "count": 120,
+              "p50": 38.040000246837735,
+              "p95": 47.36504191532731,
+              "p99": 48.82875015027821,
+              "max": 48.848208505660295
+            }
+          },
+          "present_gpu_split_ms": {
+            "receipt_to_present_gpu_end": {
+              "count": 120,
+              "p50": 4.249499877914786,
+              "p95": 7.640249794349074,
+              "p99": 8.76458315178752,
+              "max": 9.731999831274152
+            },
+            "present_gpu_end_to_shown": {
+              "count": 120,
+              "p50": 38.0371252540499,
+              "p95": 47.3626668099314,
+              "p99": 48.82700019516051,
+              "max": 48.845708603039384
+            }
+          },
+          "receipt_lateness_go_ms": {
+            "count": 120,
+            "p50": 1.881,
+            "p95": 3.189208,
+            "p99": 3.828708,
+            "max": 5.268416
+          },
+          "receipt_clock_bracket_go_ms": {
+            "count": 120,
+            "p50": 0.000958,
+            "p95": 0.001666,
+            "p99": 0.001792,
+            "max": 0.001875
+          },
+          "p95_rank_ticket": {
+            "accepted_revision": 243,
+            "scope": 1,
+            "opaque_tag": 488,
+            "generation": 246,
+            "drawable_id": 252,
+            "phase": "measured",
+            "receipt_to_shown_ms": 51.101124845445156,
+            "partition_ms": {
+              "receipt_to_acquire": 3.1933332793414593,
+              "acquire_to_first_submit": 0.22024987265467644,
+              "first_submit_to_first_gpu": 0.5947081372141838,
+              "render_gpu_span": 0.25949999690055847,
+              "render_gpu_end_to_shown": 46.83333355933428
+            },
+            "present_gpu_split_ms": {
+              "receipt_to_present_gpu_end": 4.270291421562433,
+              "present_gpu_end_to_shown": 46.83083342388272
+            },
+            "receipt_lateness_go_ms": 3.651833,
+            "receipt_clock_bracket_go_ms": 0.001375
+          },
+          "p95_ticket_post_present_gpu_fraction_pct": 91.64344926950652,
+          "display_clock_phase": null
+        },
+        {
+          "mode": "on",
+          "joined_inputs": 248,
+          "warmup": 128,
+          "measured": 120,
+          "receipt_to_shown_ms": {
+            "count": 120,
+            "p50": 26.81741677224636,
+            "p95": 33.94712507724762,
+            "p99": 36.504166666418314,
+            "max": 36.57608339563012
+          },
+          "partition_ms": {
+            "receipt_to_acquire": {
+              "count": 120,
+              "p50": 2.68575013615191,
+              "p95": 4.306166665628552,
+              "p99": 4.59837494418025,
+              "max": 5.489041563123465
+            },
+            "acquire_to_first_submit": {
+              "count": 120,
+              "p50": 0.1988750882446766,
+              "p95": 0.28512487187981606,
+              "p99": 0.7250835187733173,
+              "max": 1.6937083564698696
+            },
+            "first_submit_to_first_gpu": {
+              "count": 120,
+              "p50": 0.70191640406847,
+              "p95": 0.8254579734057188,
+              "p99": 0.8461663965135813,
+              "max": 0.8806665427982807
+            },
+            "render_gpu_span": {
+              "count": 120,
+              "p50": 0.25637494400143623,
+              "p95": 0.31658331863582134,
+              "p99": 0.3601249773055315,
+              "max": 0.36025000736117363
+            },
+            "render_gpu_end_to_shown": {
+              "count": 120,
+              "p50": 21.855291910469532,
+              "p95": 31.125000212341547,
+              "p99": 32.03633357770741,
+              "max": 32.145000295713544
+            }
+          },
+          "present_gpu_split_ms": {
+            "receipt_to_present_gpu_end": {
+              "count": 120,
+              "p50": 3.925666445866227,
+              "p95": 5.4406663402915,
+              "p99": 5.793249700218439,
+              "max": 6.648833164945245
+            },
+            "present_gpu_end_to_shown": {
+              "count": 120,
+              "p50": 21.8534586019814,
+              "p95": 31.12204186618328,
+              "p99": 32.03433356247842,
+              "max": 32.14350016787648
+            }
+          },
+          "receipt_lateness_go_ms": {
+            "count": 120,
+            "p50": 1.647375,
+            "p95": 2.775917,
+            "p99": 3.128125,
+            "max": 3.157542
+          },
+          "receipt_clock_bracket_go_ms": {
+            "count": 120,
+            "p50": 0.000792,
+            "p95": 0.001417,
+            "p99": 0.001666,
+            "max": 0.002208
+          },
+          "p95_rank_ticket": {
+            "accepted_revision": 199,
+            "scope": 1,
+            "opaque_tag": 400,
+            "generation": 202,
+            "drawable_id": 208,
+            "phase": "measured",
+            "receipt_to_shown_ms": 33.94712507724762,
+            "partition_ms": {
+              "receipt_to_acquire": 3.294125199317932,
+              "acquire_to_first_submit": 0.20058313384652138,
+              "first_submit_to_first_gpu": 0.6757082883268595,
+              "render_gpu_span": 0.278000021353364,
+              "render_gpu_end_to_shown": 29.498708434402943
+            },
+            "present_gpu_split_ms": {
+              "receipt_to_present_gpu_end": 4.4501665979623795,
+              "present_gpu_end_to_shown": 29.49695847928524
+            },
+            "receipt_lateness_go_ms": 0.876375,
+            "receipt_clock_bracket_go_ms": 0.000667,
+            "clock_phases": {
+              "wake": {
+                "preceding_reported_ordinal": 1431,
+                "next_reported_ordinal": 1432,
+                "nearest_reported_ordinal": 1432,
+                "event_minus_nearest_reported_ms": -1.1739167384803295,
+                "nearest_reported_delivery_minus_event_ms": 11.943000135943294,
+                "preceding_delivered_ordinal": 1431,
+                "next_delivered_ordinal": 1432,
+                "event_minus_preceding_reported_ms": 15.492749866098166,
+                "next_reported_minus_event_ms": 1.1739167384803295,
+                "event_minus_preceding_delivered_ms": 4.7137916553765535,
+                "next_delivered_minus_event_ms": 11.943000135943294,
+                "preceding_reported_delivery_minus_event_ms": -4.7137916553765535,
+                "preceding_reported_already_delivered": true
+              },
+              "checked": {
+                "preceding_reported_ordinal": 1431,
+                "next_reported_ordinal": 1432,
+                "nearest_reported_ordinal": 1432,
+                "event_minus_nearest_reported_ms": -0.7094165775924921,
+                "nearest_reported_delivery_minus_event_ms": 11.478499975055456,
+                "preceding_delivered_ordinal": 1431,
+                "next_delivered_ordinal": 1432,
+                "event_minus_preceding_reported_ms": 15.957250026986003,
+                "next_reported_minus_event_ms": 0.7094165775924921,
+                "event_minus_preceding_delivered_ms": 5.178291816264391,
+                "next_delivered_minus_event_ms": 11.478499975055456,
+                "preceding_reported_delivery_minus_event_ms": -5.178291816264391,
+                "preceding_reported_already_delivered": true
+              },
+              "postcheck": {
+                "preceding_reported_ordinal": 1431,
+                "next_reported_ordinal": 1432,
+                "nearest_reported_ordinal": 1432,
+                "event_minus_nearest_reported_ms": -0.7074582390487194,
+                "nearest_reported_delivery_minus_event_ms": 11.476541636511683,
+                "preceding_delivered_ordinal": 1431,
+                "next_delivered_ordinal": 1432,
+                "event_minus_preceding_reported_ms": 15.959208365529776,
+                "next_reported_minus_event_ms": 0.7074582390487194,
+                "event_minus_preceding_delivered_ms": 5.180250154808164,
+                "next_delivered_minus_event_ms": 11.476541636511683,
+                "preceding_reported_delivery_minus_event_ms": -5.180250154808164,
+                "preceding_reported_already_delivered": true
+              },
+              "receipt": {
+                "preceding_reported_ordinal": 1431,
+                "next_reported_ordinal": 1432,
+                "nearest_reported_ordinal": 1432,
+                "event_minus_nearest_reported_ms": -0.6229167338460684,
+                "nearest_reported_delivery_minus_event_ms": 11.392000131309032,
+                "preceding_delivered_ordinal": 1431,
+                "next_delivered_ordinal": 1432,
+                "event_minus_preceding_reported_ms": 16.043749870732427,
+                "next_reported_minus_event_ms": 0.6229167338460684,
+                "event_minus_preceding_delivered_ms": 5.264791660010815,
+                "next_delivered_minus_event_ms": 11.392000131309032,
+                "preceding_reported_delivery_minus_event_ms": -5.264791660010815,
+                "preceding_reported_already_delivered": true
+              },
+              "raster_begin": {
+                "preceding_reported_ordinal": 1431,
+                "next_reported_ordinal": 1432,
+                "nearest_reported_ordinal": 1432,
+                "event_minus_nearest_reported_ms": -0.4491666331887245,
+                "nearest_reported_delivery_minus_event_ms": 11.218250030651689,
+                "preceding_delivered_ordinal": 1431,
+                "next_delivered_ordinal": 1432,
+                "event_minus_preceding_reported_ms": 16.21749997138977,
+                "next_reported_minus_event_ms": 0.4491666331887245,
+                "event_minus_preceding_delivered_ms": 5.4385417606681585,
+                "next_delivered_minus_event_ms": 11.218250030651689,
+                "preceding_reported_delivery_minus_event_ms": -5.4385417606681585,
+                "preceding_reported_already_delivered": true
+              },
+              "raster_end": {
+                "preceding_reported_ordinal": 1432,
+                "next_reported_ordinal": 1433,
+                "nearest_reported_ordinal": 1432,
+                "event_minus_nearest_reported_ms": 0.21383329294621944,
+                "nearest_reported_delivery_minus_event_ms": 10.555250104516745,
+                "preceding_delivered_ordinal": 1431,
+                "next_delivered_ordinal": 1432,
+                "event_minus_preceding_reported_ms": 0.21383329294621944,
+                "next_reported_minus_event_ms": 16.452833311632276,
+                "event_minus_preceding_delivered_ms": 6.1015416868031025,
+                "next_delivered_minus_event_ms": 10.555250104516745,
+                "preceding_reported_delivery_minus_event_ms": 10.555250104516745,
+                "preceding_reported_already_delivered": false
+              },
+              "upload_begin": {
+                "preceding_reported_ordinal": 1432,
+                "next_reported_ordinal": 1433,
+                "nearest_reported_ordinal": 1432,
+                "event_minus_nearest_reported_ms": 0.24837511591613293,
+                "nearest_reported_delivery_minus_event_ms": 10.520708281546831,
+                "preceding_delivered_ordinal": 1431,
+                "next_delivered_ordinal": 1432,
+                "event_minus_preceding_reported_ms": 0.24837511591613293,
+                "next_reported_minus_event_ms": 16.418291488662362,
+                "event_minus_preceding_delivered_ms": 6.136083509773016,
+                "next_delivered_minus_event_ms": 10.520708281546831,
+                "preceding_reported_delivery_minus_event_ms": 10.520708281546831,
+                "preceding_reported_already_delivered": false
+              },
+              "upload_end": {
+                "preceding_reported_ordinal": 1432,
+                "next_reported_ordinal": 1433,
+                "nearest_reported_ordinal": 1432,
+                "event_minus_nearest_reported_ms": 2.5249167811125517,
+                "nearest_reported_delivery_minus_event_ms": 8.244166616350412,
+                "preceding_delivered_ordinal": 1431,
+                "next_delivered_ordinal": 1432,
+                "event_minus_preceding_reported_ms": 2.5249167811125517,
+                "next_reported_minus_event_ms": 14.141749823465943,
+                "event_minus_preceding_delivered_ms": 8.412625174969435,
+                "next_delivered_minus_event_ms": 8.244166616350412,
+                "preceding_reported_delivery_minus_event_ms": 8.244166616350412,
+                "preceding_reported_already_delivered": false
+              },
+              "acquired": {
+                "preceding_reported_ordinal": 1432,
+                "next_reported_ordinal": 1433,
+                "nearest_reported_ordinal": 1432,
+                "event_minus_nearest_reported_ms": 2.6712084654718637,
+                "nearest_reported_delivery_minus_event_ms": 8.0978749319911,
+                "preceding_delivered_ordinal": 1431,
+                "next_delivered_ordinal": 1432,
+                "event_minus_preceding_reported_ms": 2.6712084654718637,
+                "next_reported_minus_event_ms": 13.995458139106631,
+                "event_minus_preceding_delivered_ms": 8.558916859328747,
+                "next_delivered_minus_event_ms": 8.0978749319911,
+                "preceding_reported_delivery_minus_event_ms": 8.0978749319911,
+                "preceding_reported_already_delivered": false
+              },
+              "shown": {
+                "preceding_reported_ordinal": 1433,
+                "next_reported_ordinal": 1434,
+                "nearest_reported_ordinal": 1434,
+                "event_minus_nearest_reported_ms": -0.009125098586082458,
+                "nearest_reported_delivery_minus_event_ms": 10.811500018462539,
+                "preceding_delivered_ordinal": 1433,
+                "next_delivered_ordinal": 1434,
+                "event_minus_preceding_reported_ms": 16.657541738823056,
+                "next_reported_minus_event_ms": 0.009125098586082458,
+                "event_minus_preceding_delivered_ms": 5.85058331489563,
+                "next_delivered_minus_event_ms": 10.811500018462539,
+                "preceding_reported_delivery_minus_event_ms": -5.85058331489563,
+                "preceding_reported_already_delivered": true
+              },
+              "first_submit": {
+                "preceding_reported_ordinal": 1432,
+                "next_reported_ordinal": 1433,
+                "nearest_reported_ordinal": 1432,
+                "event_minus_nearest_reported_ms": 2.871791599318385,
+                "nearest_reported_delivery_minus_event_ms": 7.897291798144579,
+                "preceding_delivered_ordinal": 1431,
+                "next_delivered_ordinal": 1432,
+                "event_minus_preceding_reported_ms": 2.871791599318385,
+                "next_reported_minus_event_ms": 13.79487500526011,
+                "event_minus_preceding_delivered_ms": 8.759499993175268,
+                "next_delivered_minus_event_ms": 7.897291798144579,
+                "preceding_reported_delivery_minus_event_ms": 7.897291798144579,
+                "preceding_reported_already_delivered": false
+              },
+              "first_gpu": {
+                "preceding_reported_ordinal": 1432,
+                "next_reported_ordinal": 1433,
+                "nearest_reported_ordinal": 1432,
+                "event_minus_nearest_reported_ms": 3.5474998876452446,
+                "nearest_reported_delivery_minus_event_ms": 7.2215835098177195,
+                "preceding_delivered_ordinal": 1431,
+                "next_delivered_ordinal": 1432,
+                "event_minus_preceding_reported_ms": 3.5474998876452446,
+                "next_reported_minus_event_ms": 13.11916671693325,
+                "event_minus_preceding_delivered_ms": 9.435208281502128,
+                "next_delivered_minus_event_ms": 7.2215835098177195,
+                "preceding_reported_delivery_minus_event_ms": 7.2215835098177195,
+                "preceding_reported_already_delivered": false
+              },
+              "render_gpu_end": {
+                "preceding_reported_ordinal": 1432,
+                "next_reported_ordinal": 1433,
+                "nearest_reported_ordinal": 1432,
+                "event_minus_nearest_reported_ms": 3.8254999089986086,
+                "nearest_reported_delivery_minus_event_ms": 6.9435834884643555,
+                "preceding_delivered_ordinal": 1431,
+                "next_delivered_ordinal": 1432,
+                "event_minus_preceding_reported_ms": 3.8254999089986086,
+                "next_reported_minus_event_ms": 12.841166695579886,
+                "event_minus_preceding_delivered_ms": 9.713208302855492,
+                "next_delivered_minus_event_ms": 6.9435834884643555,
+                "preceding_reported_delivery_minus_event_ms": 6.9435834884643555,
+                "preceding_reported_already_delivered": false
+              },
+              "present_request": {
+                "preceding_reported_ordinal": 1432,
+                "next_reported_ordinal": 1433,
+                "nearest_reported_ordinal": 1432,
+                "event_minus_nearest_reported_ms": 2.9838751070201397,
+                "nearest_reported_delivery_minus_event_ms": 7.785208290442824,
+                "preceding_delivered_ordinal": 1431,
+                "next_delivered_ordinal": 1432,
+                "event_minus_preceding_reported_ms": 2.9838751070201397,
+                "next_reported_minus_event_ms": 13.682791497558355,
+                "event_minus_preceding_delivered_ms": 8.871583500877023,
+                "next_delivered_minus_event_ms": 7.785208290442824,
+                "preceding_reported_delivery_minus_event_ms": 7.785208290442824,
+                "preceding_reported_already_delivered": false
+              },
+              "present_commit": {
+                "preceding_reported_ordinal": 1432,
+                "next_reported_ordinal": 1433,
+                "nearest_reported_ordinal": 1432,
+                "event_minus_nearest_reported_ms": 2.990500070154667,
+                "nearest_reported_delivery_minus_event_ms": 7.778583327308297,
+                "preceding_delivered_ordinal": 1431,
+                "next_delivered_ordinal": 1432,
+                "event_minus_preceding_reported_ms": 2.990500070154667,
+                "next_reported_minus_event_ms": 13.676166534423828,
+                "event_minus_preceding_delivered_ms": 8.87820846401155,
+                "next_delivered_minus_event_ms": 7.778583327308297,
+                "preceding_reported_delivery_minus_event_ms": 7.778583327308297,
+                "preceding_reported_already_delivered": false
+              },
+              "present_gpu_end": {
+                "preceding_reported_ordinal": 1432,
+                "next_reported_ordinal": 1433,
+                "nearest_reported_ordinal": 1432,
+                "event_minus_nearest_reported_ms": 3.827249864116311,
+                "nearest_reported_delivery_minus_event_ms": 6.941833533346653,
+                "preceding_delivered_ordinal": 1431,
+                "next_delivered_ordinal": 1432,
+                "event_minus_preceding_reported_ms": 3.827249864116311,
+                "next_reported_minus_event_ms": 12.839416740462184,
+                "event_minus_preceding_delivered_ms": 9.714958257973194,
+                "next_delivered_minus_event_ms": 6.941833533346653,
+                "preceding_reported_delivery_minus_event_ms": 6.941833533346653,
+                "preceding_reported_already_delivered": false
+              }
+            },
+            "reported_timestamps_gpu_to_shown": 1,
+            "callbacks_delivered_gpu_to_shown": 2
+          },
+          "p95_ticket_post_present_gpu_fraction_pct": 86.89088814491387,
+          "display_clock_phase": {
+            "wake": {
+              "preceding_reported_callback_not_yet_delivered": 70,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.4580416716635227,
+                "p95": 6.219625007361174,
+                "p99": 6.22537499293685,
+                "max": 6.303749978542328
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 11.22837490402162,
+                "p95": 17.999833449721336,
+                "p99": 18.666333286091685,
+                "max": 18.859416712075472
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 10.007083415985107,
+                "p95": 16.21995843015611,
+                "p99": 16.22795849107206,
+                "max": 16.231999965384603
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 6.570666562765837,
+                "p95": 13.809541705995798,
+                "p99": 14.217999996617436,
+                "max": 14.575208304449916
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 8.766791550442576,
+                "p95": 16.135166632011533,
+                "p99": 16.4836251642555,
+                "max": 16.567625105381012
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 7.892083376646042,
+                "p95": 14.710958348587155,
+                "p99": 16.355916624888778,
+                "max": 16.59625000320375
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 0.87162503041327,
+                "p95": 7.900083437561989,
+                "p99": 8.304208517074585,
+                "max": 8.674833225086331
+              }
+            },
+            "checked": {
+              "preceding_reported_callback_not_yet_delivered": 77,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": 0.01733331009745598,
+                "p95": 6.780375028029084,
+                "p99": 6.961875129491091,
+                "max": 6.975208409130573
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 10.7400834094733,
+                "p95": 17.518625129014254,
+                "p99": 17.764874966815114,
+                "max": 17.779166577383876
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 6.961833219975233,
+                "p95": 16.16762508638203,
+                "p99": 16.474166652187705,
+                "max": 16.554458299651742
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 9.704791475087404,
+                "p95": 16.56120829284191,
+                "p99": 16.649333527311683,
+                "max": 16.657333122566342
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 9.01883328333497,
+                "p95": 16.190291615203023,
+                "p99": 17.045291839167476,
+                "max": 17.066458240151405
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 7.65012507326901,
+                "p95": 16.06325013563037,
+                "p99": 16.493249917402864,
+                "max": 16.67241659015417
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 3.7887082435190678,
+                "p95": 10.654958197847009,
+                "p99": 10.770375141873956,
+                "max": 10.772708337754011
+              }
+            },
+            "postcheck": {
+              "preceding_reported_callback_not_yet_delivered": 77,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": 0.019416678696870804,
+                "p95": 6.782999960705638,
+                "p99": 6.965500069782138,
+                "max": 6.978791672736406
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 10.737708304077387,
+                "p95": 17.515333369374275,
+                "p99": 17.763500101864338,
+                "max": 17.777999863028526
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 6.964083295315504,
+                "p95": 16.16870821453631,
+                "p99": 16.47562487050891,
+                "max": 16.555875074118376
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 9.701166534796357,
+                "p95": 16.5584166534245,
+                "p99": 16.647250158712268,
+                "max": 16.655416460707784
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 9.020291501656175,
+                "p95": 16.192458337172866,
+                "p99": 17.047958448529243,
+                "max": 17.06925011239946
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 7.6484582386910915,
+                "p95": 16.017124988138676,
+                "p99": 16.489416593685746,
+                "max": 16.669875010848045
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 3.7865000776946545,
+                "p95": 10.652166558429599,
+                "p99": 10.768291773274541,
+                "max": 10.770791675895452
+              }
+            },
+            "receipt": {
+              "preceding_reported_callback_not_yet_delivered": 73,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": 0.11625001206994057,
+                "p95": 6.895374972373247,
+                "p99": 7.1091665886342525,
+                "max": 7.1315832901746035
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 10.652833385393023,
+                "p95": 17.280083382502198,
+                "p99": 17.703666584566236,
+                "max": 17.72783324122429
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 7.09745823405683,
+                "p95": 16.212833346799016,
+                "p99": 16.524374950677156,
+                "max": 16.6039583273232
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 9.557500015944242,
+                "p95": 16.45404170267284,
+                "p99": 16.550416825339198,
+                "max": 16.556000104174018
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 6.323791807517409,
+                "p95": 15.842500142753124,
+                "p99": 16.485541593283415,
+                "max": 16.50304184295237
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 10.308000026270747,
+                "p95": 16.1809166893363,
+                "p99": 16.483333194628358,
+                "max": 16.570874955505133
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 3.641416784375906,
+                "p95": 10.547791607677937,
+                "p99": 10.653916746377945,
+                "max": 10.677041718736291
+              }
+            },
+            "raster_begin": {
+              "preceding_reported_callback_not_yet_delivered": 74,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": 0.321416649967432,
+                "p95": 7.170833181589842,
+                "p99": 7.412791717797518,
+                "max": 7.452541729435325
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 10.436250129714608,
+                "p95": 16.85662497766316,
+                "p99": 17.581916647031903,
+                "max": 17.623208230361342
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 7.170833181589842,
+                "p95": 14.058999950066209,
+                "p99": 16.60062512382865,
+                "max": 16.619374975562096
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 9.421875001862645,
+                "p95": 16.32087491452694,
+                "p99": 16.617666697129607,
+                "max": 16.66466658934951
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 6.596999941393733,
+                "p95": 15.75241656973958,
+                "p99": 16.465041553601623,
+                "max": 16.469124937430024
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 10.033291531726718,
+                "p95": 15.97449998371303,
+                "p99": 16.60870830528438,
+                "max": 16.62704162299633
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 3.5432500299066305,
+                "p95": 10.436250129714608,
+                "p99": 10.703083360567689,
+                "max": 10.757124982774258
+              }
+            },
+            "raster_end": {
+              "preceding_reported_callback_not_yet_delivered": 74,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": 0.808625016361475,
+                "p95": 7.846916792914271,
+                "p99": 8.166291750967503,
+                "max": 8.205958409234881
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 9.917291812598705,
+                "p95": 16.337291803210974,
+                "p99": 17.339125042781234,
+                "max": 17.395166447386146
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 7.677166489884257,
+                "p95": 14.25437512807548,
+                "p99": 16.417208360508084,
+                "max": 16.53554174117744
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 8.966541616246104,
+                "p95": 16.093166545033455,
+                "p99": 16.452833311632276,
+                "max": 16.637125052511692
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 6.789583479985595,
+                "p95": 14.032375067472458,
+                "p99": 16.105166636407375,
+                "max": 16.198666766285896
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 9.838166646659374,
+                "p95": 15.966208186000586,
+                "p99": 16.368291806429625,
+                "max": 16.44162484444678
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 3.0840833205729723,
+                "p95": 10.189458262175322,
+                "p99": 10.555250104516745,
+                "max": 10.740250116214156
+              }
+            },
+            "upload_begin": {
+              "preceding_reported_callback_not_yet_delivered": 74,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": 0.826041679829359,
+                "p95": 7.866666652262211,
+                "p99": 8.186375023797154,
+                "max": 8.225791621953249
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 9.900375036522746,
+                "p95": 16.31316659040749,
+                "p99": 17.330250004306436,
+                "max": 17.386208288371563
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 7.693124935030937,
+                "p95": 14.280083356425166,
+                "p99": 16.433874843642116,
+                "max": 16.541833290830255
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 8.951083291321993,
+                "p95": 16.07645838521421,
+                "p99": 16.430083196610212,
+                "max": 16.614291816949844
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 6.8080835044384,
+                "p95": 14.051958452910185,
+                "p99": 16.114083351567388,
+                "max": 16.212708316743374
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 9.819999802857637,
+                "p95": 15.95133333466947,
+                "p99": 16.31966675631702,
+                "max": 16.425208188593388
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 3.0681248754262924,
+                "p95": 10.172750102356076,
+                "p99": 10.522541590034962,
+                "max": 10.717416880652308
+              }
+            },
+            "upload_end": {
+              "preceding_reported_callback_not_yet_delivered": 65,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.5714583676308393,
+                "p95": 7.426208350807428,
+                "p99": 7.9322499223053455,
+                "max": 7.9932501539587975
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 11.387458303943276,
+                "p95": 17.308166483417153,
+                "p99": 18.313083332031965,
+                "max": 18.98616668768227
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 10.073833167552948,
+                "p95": 16.095208236947656,
+                "p99": 16.505041858181357,
+                "max": 16.608375124633312
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 6.52649998664856,
+                "p95": 14.880166621878743,
+                "p99": 15.911624999716878,
+                "max": 16.060791676864028
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 7.249874994158745,
+                "p95": 15.785791678354144,
+                "p99": 16.285416670143604,
+                "max": 16.34241663850844
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 8.99145845323801,
+                "p95": 16.26137481071055,
+                "p99": 16.503583174198866,
+                "max": 16.65512495674193
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 0.6129583343863487,
+                "p95": 8.983291685581207,
+                "p99": 10.004041716456413,
+                "max": 10.186916682869196
+              }
+            },
+            "acquired": {
+              "preceding_reported_callback_not_yet_delivered": 66,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.4282915033400059,
+                "p95": 7.560125086456537,
+                "p99": 7.99804157577455,
+                "max": 8.048791671171784
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 11.21675013564527,
+                "p95": 17.159708309918642,
+                "p99": 18.194250063970685,
+                "max": 18.864083336666226
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 10.22174977697432,
+                "p95": 16.166458372026682,
+                "p99": 16.54262514784932,
+                "max": 16.63966686464846
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 6.42866687849164,
+                "p95": 14.800333185121417,
+                "p99": 15.935374889522791,
+                "max": 16.539874952286482
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 7.299958262592554,
+                "p95": 16.09495817683637,
+                "p99": 16.472874907776713,
+                "max": 16.47808332927525
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 8.873708313331008,
+                "p95": 16.203291481360793,
+                "p99": 16.363708302378654,
+                "max": 16.520916717126966
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 0.5422085523605347,
+                "p95": 8.873708313331008,
+                "p99": 10.061499895527959,
+                "max": 10.659291641786695
+              }
+            },
+            "shown": {
+              "preceding_reported_callback_not_yet_delivered": 0,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.009041745215654373,
+                "p95": -0.007208436727523804,
+                "p99": -0.006791669875383377,
+                "max": -0.006749993190169334
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 10.790125001221895,
+                "p95": 10.912083322182298,
+                "p99": 11.001833248883486,
+                "max": 11.287708301097155
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 16.65762485936284,
+                "p95": 16.65945816785097,
+                "p99": 16.65987493470311,
+                "max": 16.659916611388326
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 0.009041745215654373,
+                "p95": 0.01037493348121643,
+                "p99": 0.010541640222072601,
+                "max": 0.010541873052716255
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 5.882499972358346,
+                "p95": 5.9160415548831224,
+                "p99": 5.922916810959578,
+                "max": 5.923124961555004
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 10.790125001221895,
+                "p95": 10.912083322182298,
+                "p99": 11.001833248883486,
+                "max": 11.287708301097155
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": -5.882708355784416,
+                "p95": -5.802125204354525,
+                "p99": -5.776083329692483,
+                "max": -5.732041550800204
+              }
+            },
+            "first_submit": {
+              "preceding_reported_callback_not_yet_delivered": 63,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.1994166523218155,
+                "p95": 7.79233337379992,
+                "p99": 8.115791715681553,
+                "max": 8.158291690051556
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 11.004458414390683,
+                "p95": 16.64141658693552,
+                "p99": 17.62812491506338,
+                "max": 18.553958274424076
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 10.303999995812774,
+                "p95": 16.180958366021514,
+                "p99": 16.5867917239666,
+                "max": 16.631624894216657
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 6.223875097930431,
+                "p95": 15.232083387672901,
+                "p99": 16.473291674628854,
+                "max": 16.57104166224599
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 6.2789584044367075,
+                "p95": 14.092458179220557,
+                "p99": 16.38908335007727,
+                "max": 16.592999920248985
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 9.854624979197979,
+                "p95": 16.211666632443666,
+                "p99": 16.583583317697048,
+                "max": 16.64141658693552
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 0.3211668226867914,
+                "p95": 9.321458404883742,
+                "p99": 10.619499953463674,
+                "max": 10.697624878957868
+              }
+            },
+            "first_gpu": {
+              "preceding_reported_callback_not_yet_delivered": 70,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.010708346962928772,
+                "p95": 8.053583092987537,
+                "p99": 8.282124763354659,
+                "max": 8.331291377544403
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 10.66083344630897,
+                "p95": 18.739958526566625,
+                "p99": 18.98066676221788,
+                "max": 19.172791857272387
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 8.331291377544403,
+                "p95": 15.46204136684537,
+                "p99": 16.438083024695516,
+                "max": 16.655958257615566
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 8.332333527505398,
+                "p95": 16.073000384494662,
+                "p99": 16.43900014460087,
+                "max": 16.558875096961856
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 6.678999634459615,
+                "p95": 14.428916620090604,
+                "p99": 16.414333367720246,
+                "max": 16.88024983741343
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 9.86608350649476,
+                "p95": 16.010791761800647,
+                "p99": 16.093625221401453,
+                "max": 16.233458649367094
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 2.4234584998339415,
+                "p95": 10.205083526670933,
+                "p99": 10.572250001132488,
+                "max": 10.66083344630897
+              }
+            },
+            "render_gpu_end": {
+              "preceding_reported_callback_not_yet_delivered": 71,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -1.2628750409930944,
+                "p95": 7.196999853476882,
+                "p99": 8.198583265766501,
+                "max": 8.313208119943738
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 11.735375039279461,
+                "p95": 18.902541836723685,
+                "p99": 19.06675030477345,
+                "max": 19.148041727021337
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 8.465458173304796,
+                "p95": 15.275832964107394,
+                "p99": 16.0669581964612,
+                "max": 16.44045813009143
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 8.182458579540253,
+                "p95": 16.114375088363886,
+                "p99": 16.636375105008483,
+                "max": 16.658750362694263
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 6.750124739482999,
+                "p95": 14.612208120524883,
+                "p99": 14.875082997605205,
+                "max": 15.741916373372078
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 9.90404188632965,
+                "p95": 15.755625208839774,
+                "p99": 16.194416908547282,
+                "max": 16.658791806548834
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 2.2861252073198557,
+                "p95": 10.235666763037443,
+                "p99": 10.748083470389247,
+                "max": 10.764250298961997
+              }
+            },
+            "present_request": {
+              "preceding_reported_callback_not_yet_delivered": 64,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.09037484414875507,
+                "p95": 7.891666609793901,
+                "p99": 8.16295831464231,
+                "max": 8.20904178544879
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 10.898666689172387,
+                "p95": 16.55058329924941,
+                "p99": 17.515874933451414,
+                "max": 18.449625000357628
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 8.970541646704078,
+                "p95": 16.195833450183272,
+                "p99": 16.57629176042974,
+                "max": 16.594291664659977
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 6.73658330924809,
+                "p95": 15.61524998396635,
+                "p99": 16.56774990260601,
+                "max": 16.64074999280274
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 6.170250009745359,
+                "p95": 14.083208283409476,
+                "p99": 16.4275832939893,
+                "max": 16.547000035643578
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 10.257499990984797,
+                "p95": 16.159083228558302,
+                "p99": 16.55058329924941,
+                "max": 16.632125014439225
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 0.8525832090526819,
+                "p95": 9.741374989971519,
+                "p99": 10.669708251953125,
+                "max": 10.898666689172387
+              }
+            },
+            "present_commit": {
+              "preceding_reported_callback_not_yet_delivered": 64,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.07699988782405853,
+                "p95": 7.898374926298857,
+                "p99": 8.165833307430148,
+                "max": 8.211916778236628
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 10.891791665926576,
+                "p95": 16.544916667044163,
+                "p99": 17.509958241134882,
+                "max": 18.443250097334385
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 8.97691654972732,
+                "p95": 16.203250037506223,
+                "p99": 16.589666716754436,
+                "max": 16.60066656768322
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 6.730666616931558,
+                "p95": 15.608499990776181,
+                "p99": 16.562625067308545,
+                "max": 16.633874969556928
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 6.176958326250315,
+                "p95": 14.086083276197314,
+                "p99": 16.434708377346396,
+                "max": 16.55366667546332
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 10.251416824758053,
+                "p95": 16.155666671693325,
+                "p99": 16.544916667044163,
+                "max": 16.626333352178335
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 0.8466665167361498,
+                "p95": 9.73462499678135,
+                "p99": 10.66458341665566,
+                "max": 10.891791665926576
+              }
+            },
+            "present_gpu_end": {
+              "preceding_reported_callback_not_yet_delivered": 71,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -1.2620417401194572,
+                "p95": 7.198083214461803,
+                "p99": 8.199583273380995,
+                "max": 8.314708014950156
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 11.734250234439969,
+                "p95": 18.901250325143337,
+                "p99": 19.06566694378853,
+                "max": 19.14279186166823
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 8.466749917715788,
+                "p95": 15.278249746188521,
+                "p99": 16.06845809146762,
+                "max": 16.441832995042205
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 8.180958684533834,
+                "p95": 16.11312502063811,
+                "p99": 16.635333420708776,
+                "max": 16.657625325024128
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 6.751916371285915,
+                "p95": 14.622458256781101,
+                "p99": 14.87920805811882,
+                "max": 15.74408309534192
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 9.902250254526734,
+                "p95": 15.752875246107578,
+                "p99": 16.192333539947867,
+                "max": 16.656875144690275
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 2.2846253123134375,
+                "p95": 10.234541725367308,
+                "p99": 10.74704178608954,
+                "max": 10.763125261291862
+              }
+            }
+          },
+          "clock_event_counts": {
+            "reported_timestamps_gpu_to_shown": {
+              "0": 13,
+              "1": 107
+            },
+            "callbacks_delivered_gpu_to_shown": {
+              "1": 62,
+              "2": 58
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pair": "macos-display-reversed",
+      "order": [
+        "on",
+        "off"
+      ],
+      "cases": [
+        {
+          "mode": "on",
+          "joined_inputs": 248,
+          "warmup": 128,
+          "measured": 120,
+          "receipt_to_shown_ms": {
+            "count": 120,
+            "p50": 28.16112502478063,
+            "p95": 37.88216668181121,
+            "p99": 39.37658341601491,
+            "max": 41.28833347931504
+          },
+          "partition_ms": {
+            "receipt_to_acquire": {
+              "count": 120,
+              "p50": 4.610999953001738,
+              "p95": 5.97379170358181,
+              "p99": 6.1587500385940075,
+              "max": 6.227958481758833
+            },
+            "acquire_to_first_submit": {
+              "count": 120,
+              "p50": 0.28712511993944645,
+              "p95": 0.5464167334139347,
+              "p99": 0.6259167566895485,
+              "max": 0.6763334386050701
+            },
+            "first_submit_to_first_gpu": {
+              "count": 120,
+              "p50": 0.8012079633772373,
+              "p95": 1.1939581017941236,
+              "p99": 1.2889998033642769,
+              "max": 1.328082988038659
+            },
+            "render_gpu_span": {
+              "count": 120,
+              "p50": 0.3149998374283314,
+              "p95": 0.4186667501926422,
+              "p99": 0.518416753038764,
+              "max": 0.5263332277536392
+            },
+            "render_gpu_end_to_shown": {
+              "count": 120,
+              "p50": 23.522000294178724,
+              "p95": 30.813458608463407,
+              "p99": 31.626458512619138,
+              "max": 33.250083681195974
+            }
+          },
+          "present_gpu_split_ms": {
+            "receipt_to_present_gpu_end": {
+              "count": 120,
+              "p50": 6.0826248954981565,
+              "p95": 7.752249715849757,
+              "p99": 8.131416514515877,
+              "max": 8.18895804695785
+            },
+            "present_gpu_end_to_shown": {
+              "count": 120,
+              "p50": 23.516125278547406,
+              "p95": 30.811708653345704,
+              "p99": 31.624333700165153,
+              "max": 33.247083658352494
+            }
+          },
+          "receipt_lateness_go_ms": {
+            "count": 120,
+            "p50": 3.236084,
+            "p95": 3.745125,
+            "p99": 3.804834,
+            "max": 3.807917
+          },
+          "receipt_clock_bracket_go_ms": {
+            "count": 120,
+            "p50": 0.00175,
+            "p95": 0.002417,
+            "p99": 0.002792,
+            "max": 0.003125
+          },
+          "p95_rank_ticket": {
+            "accepted_revision": 167,
+            "scope": 1,
+            "opaque_tag": 336,
+            "generation": 170,
+            "drawable_id": 176,
+            "phase": "measured",
+            "receipt_to_shown_ms": 37.88216668181121,
+            "partition_ms": {
+              "receipt_to_acquire": 5.0531665328890085,
+              "acquire_to_first_submit": 0.6259167566895485,
+              "first_submit_to_first_gpu": 1.0687082540243864,
+              "render_gpu_span": 0.3209165297448635,
+              "render_gpu_end_to_shown": 30.813458608463407
+            },
+            "present_gpu_split_ms": {
+              "receipt_to_present_gpu_end": 7.070458028465509,
+              "present_gpu_end_to_shown": 30.811708653345704
+            },
+            "receipt_lateness_go_ms": 3.580334,
+            "receipt_clock_bracket_go_ms": 0.00175,
+            "clock_phases": {
+              "wake": {
+                "preceding_reported_ordinal": 1201,
+                "next_reported_ordinal": 1202,
+                "nearest_reported_ordinal": 1202,
+                "event_minus_nearest_reported_ms": -6.085541797801852,
+                "nearest_reported_delivery_minus_event_ms": 22.291375091299415,
+                "preceding_delivered_ordinal": 1200,
+                "next_delivered_ordinal": 1201,
+                "event_minus_preceding_reported_ms": 10.581125039607286,
+                "next_reported_minus_event_ms": 6.085541797801852,
+                "event_minus_preceding_delivered_ms": 10.987416608259082,
+                "next_delivered_minus_event_ms": 5.609458312392235,
+                "preceding_reported_delivery_minus_event_ms": 5.609458312392235,
+                "preceding_reported_already_delivered": false
+              },
+              "checked": {
+                "preceding_reported_ordinal": 1201,
+                "next_reported_ordinal": 1202,
+                "nearest_reported_ordinal": 1202,
+                "event_minus_nearest_reported_ms": -4.831666825339198,
+                "nearest_reported_delivery_minus_event_ms": 21.03750011883676,
+                "preceding_delivered_ordinal": 1200,
+                "next_delivered_ordinal": 1201,
+                "event_minus_preceding_reported_ms": 11.83500001206994,
+                "next_reported_minus_event_ms": 4.831666825339198,
+                "event_minus_preceding_delivered_ms": 12.241291580721736,
+                "next_delivered_minus_event_ms": 4.355583339929581,
+                "preceding_reported_delivery_minus_event_ms": 4.355583339929581,
+                "preceding_reported_already_delivered": false
+              },
+              "postcheck": {
+                "preceding_reported_ordinal": 1201,
+                "next_reported_ordinal": 1202,
+                "nearest_reported_ordinal": 1202,
+                "event_minus_nearest_reported_ms": -4.825458396226168,
+                "nearest_reported_delivery_minus_event_ms": 21.03129168972373,
+                "preceding_delivered_ordinal": 1200,
+                "next_delivered_ordinal": 1201,
+                "event_minus_preceding_reported_ms": 11.841208441182971,
+                "next_reported_minus_event_ms": 4.825458396226168,
+                "event_minus_preceding_delivered_ms": 12.247500009834766,
+                "next_delivered_minus_event_ms": 4.34937491081655,
+                "preceding_reported_delivery_minus_event_ms": 4.34937491081655,
+                "preceding_reported_already_delivered": false
+              },
+              "receipt": {
+                "preceding_reported_ordinal": 1201,
+                "next_reported_ordinal": 1202,
+                "nearest_reported_ordinal": 1202,
+                "event_minus_nearest_reported_ms": -4.607666749507189,
+                "nearest_reported_delivery_minus_event_ms": 20.81350004300475,
+                "preceding_delivered_ordinal": 1200,
+                "next_delivered_ordinal": 1201,
+                "event_minus_preceding_reported_ms": 12.05900008790195,
+                "next_reported_minus_event_ms": 4.607666749507189,
+                "event_minus_preceding_delivered_ms": 12.465291656553745,
+                "next_delivered_minus_event_ms": 4.131583264097571,
+                "preceding_reported_delivery_minus_event_ms": 4.131583264097571,
+                "preceding_reported_already_delivered": false
+              },
+              "raster_begin": {
+                "preceding_reported_ordinal": 1201,
+                "next_reported_ordinal": 1202,
+                "nearest_reported_ordinal": 1202,
+                "event_minus_nearest_reported_ms": -4.062750143930316,
+                "nearest_reported_delivery_minus_event_ms": 20.26858343742788,
+                "preceding_delivered_ordinal": 1200,
+                "next_delivered_ordinal": 1201,
+                "event_minus_preceding_reported_ms": 12.603916693478823,
+                "next_reported_minus_event_ms": 4.062750143930316,
+                "event_minus_preceding_delivered_ms": 13.010208262130618,
+                "next_delivered_minus_event_ms": 3.5866666585206985,
+                "preceding_reported_delivery_minus_event_ms": 3.5866666585206985,
+                "preceding_reported_already_delivered": false
+              },
+              "raster_end": {
+                "preceding_reported_ordinal": 1201,
+                "next_reported_ordinal": 1202,
+                "nearest_reported_ordinal": 1202,
+                "event_minus_nearest_reported_ms": -3.1091251876205206,
+                "nearest_reported_delivery_minus_event_ms": 19.314958481118083,
+                "preceding_delivered_ordinal": 1200,
+                "next_delivered_ordinal": 1201,
+                "event_minus_preceding_reported_ms": 13.557541649788618,
+                "next_reported_minus_event_ms": 3.1091251876205206,
+                "event_minus_preceding_delivered_ms": 13.963833218440413,
+                "next_delivered_minus_event_ms": 2.633041702210903,
+                "preceding_reported_delivery_minus_event_ms": 2.633041702210903,
+                "preceding_reported_already_delivered": false
+              },
+              "upload_begin": {
+                "preceding_reported_ordinal": 1201,
+                "next_reported_ordinal": 1202,
+                "nearest_reported_ordinal": 1202,
+                "event_minus_nearest_reported_ms": -3.0787501018494368,
+                "nearest_reported_delivery_minus_event_ms": 19.284583395347,
+                "preceding_delivered_ordinal": 1200,
+                "next_delivered_ordinal": 1201,
+                "event_minus_preceding_reported_ms": 13.587916735559702,
+                "next_reported_minus_event_ms": 3.0787501018494368,
+                "event_minus_preceding_delivered_ms": 13.994208304211497,
+                "next_delivered_minus_event_ms": 2.6026666164398193,
+                "preceding_reported_delivery_minus_event_ms": 2.6026666164398193,
+                "preceding_reported_already_delivered": false
+              },
+              "upload_end": {
+                "preceding_reported_ordinal": 1202,
+                "next_reported_ordinal": 1203,
+                "nearest_reported_ordinal": 1202,
+                "event_minus_nearest_reported_ms": 0.18266658298671246,
+                "nearest_reported_delivery_minus_event_ms": 16.02316671051085,
+                "preceding_delivered_ordinal": 1201,
+                "next_delivered_ordinal": 1202,
+                "event_minus_preceding_reported_ms": 0.18266658298671246,
+                "next_reported_minus_event_ms": 16.484000021591783,
+                "event_minus_preceding_delivered_ms": 0.6587500683963299,
+                "next_delivered_minus_event_ms": 16.02316671051085,
+                "preceding_reported_delivery_minus_event_ms": 16.02316671051085,
+                "preceding_reported_already_delivered": false
+              },
+              "acquired": {
+                "preceding_reported_ordinal": 1202,
+                "next_reported_ordinal": 1203,
+                "nearest_reported_ordinal": 1202,
+                "event_minus_nearest_reported_ms": 0.4454997833818197,
+                "nearest_reported_delivery_minus_event_ms": 15.760333510115743,
+                "preceding_delivered_ordinal": 1201,
+                "next_delivered_ordinal": 1202,
+                "event_minus_preceding_reported_ms": 0.4454997833818197,
+                "next_reported_minus_event_ms": 16.221166821196675,
+                "event_minus_preceding_delivered_ms": 0.9215832687914371,
+                "next_delivered_minus_event_ms": 15.760333510115743,
+                "preceding_reported_delivery_minus_event_ms": 15.760333510115743,
+                "preceding_reported_already_delivered": false
+              },
+              "shown": {
+                "preceding_reported_ordinal": 1203,
+                "next_reported_ordinal": 1204,
+                "nearest_reported_ordinal": 1204,
+                "event_minus_nearest_reported_ms": -0.058833276852965355,
+                "nearest_reported_delivery_minus_event_ms": 16.32504165172577,
+                "preceding_delivered_ordinal": 1203,
+                "next_delivered_ordinal": 1204,
+                "event_minus_preceding_reported_ms": 16.60783332772553,
+                "next_reported_minus_event_ms": 0.058833276852965355,
+                "event_minus_preceding_delivered_ms": 0.4726666957139969,
+                "next_delivered_minus_event_ms": 16.32504165172577,
+                "preceding_reported_delivery_minus_event_ms": -0.4726666957139969,
+                "preceding_reported_already_delivered": true
+              },
+              "first_submit": {
+                "preceding_reported_ordinal": 1202,
+                "next_reported_ordinal": 1203,
+                "nearest_reported_ordinal": 1202,
+                "event_minus_nearest_reported_ms": 1.0714165400713682,
+                "nearest_reported_delivery_minus_event_ms": 15.134416753426194,
+                "preceding_delivered_ordinal": 1201,
+                "next_delivered_ordinal": 1202,
+                "event_minus_preceding_reported_ms": 1.0714165400713682,
+                "next_reported_minus_event_ms": 15.595250064507127,
+                "event_minus_preceding_delivered_ms": 1.5475000254809856,
+                "next_delivered_minus_event_ms": 15.134416753426194,
+                "preceding_reported_delivery_minus_event_ms": 15.134416753426194,
+                "preceding_reported_already_delivered": false
+              },
+              "first_gpu": {
+                "preceding_reported_ordinal": 1202,
+                "next_reported_ordinal": 1203,
+                "nearest_reported_ordinal": 1202,
+                "event_minus_nearest_reported_ms": 2.1401247940957546,
+                "nearest_reported_delivery_minus_event_ms": 14.065708499401808,
+                "preceding_delivered_ordinal": 1201,
+                "next_delivered_ordinal": 1202,
+                "event_minus_preceding_reported_ms": 2.1401247940957546,
+                "next_reported_minus_event_ms": 14.52654181048274,
+                "event_minus_preceding_delivered_ms": 2.616208279505372,
+                "next_delivered_minus_event_ms": 14.065708499401808,
+                "preceding_reported_delivery_minus_event_ms": 14.065708499401808,
+                "preceding_reported_already_delivered": false
+              },
+              "render_gpu_end": {
+                "preceding_reported_ordinal": 1202,
+                "next_reported_ordinal": 1203,
+                "nearest_reported_ordinal": 1202,
+                "event_minus_nearest_reported_ms": 2.461041323840618,
+                "nearest_reported_delivery_minus_event_ms": 13.744791969656944,
+                "preceding_delivered_ordinal": 1201,
+                "next_delivered_ordinal": 1202,
+                "event_minus_preceding_reported_ms": 2.461041323840618,
+                "next_reported_minus_event_ms": 14.205625280737877,
+                "event_minus_preceding_delivered_ms": 2.9371248092502356,
+                "next_delivered_minus_event_ms": 13.744791969656944,
+                "preceding_reported_delivery_minus_event_ms": 13.744791969656944,
+                "preceding_reported_already_delivered": false
+              },
+              "present_request": {
+                "preceding_reported_ordinal": 1202,
+                "next_reported_ordinal": 1203,
+                "nearest_reported_ordinal": 1202,
+                "event_minus_nearest_reported_ms": 1.2455414980649948,
+                "nearest_reported_delivery_minus_event_ms": 14.960291795432568,
+                "preceding_delivered_ordinal": 1201,
+                "next_delivered_ordinal": 1202,
+                "event_minus_preceding_reported_ms": 1.2455414980649948,
+                "next_reported_minus_event_ms": 15.4211251065135,
+                "event_minus_preceding_delivered_ms": 1.7216249834746122,
+                "next_delivered_minus_event_ms": 14.960291795432568,
+                "preceding_reported_delivery_minus_event_ms": 14.960291795432568,
+                "preceding_reported_already_delivered": false
+              },
+              "present_commit": {
+                "preceding_reported_ordinal": 1202,
+                "next_reported_ordinal": 1203,
+                "nearest_reported_ordinal": 1202,
+                "event_minus_nearest_reported_ms": 1.2559581082314253,
+                "nearest_reported_delivery_minus_event_ms": 14.949875185266137,
+                "preceding_delivered_ordinal": 1201,
+                "next_delivered_ordinal": 1202,
+                "event_minus_preceding_reported_ms": 1.2559581082314253,
+                "next_reported_minus_event_ms": 15.41070849634707,
+                "event_minus_preceding_delivered_ms": 1.7320415936410427,
+                "next_delivered_minus_event_ms": 14.949875185266137,
+                "preceding_reported_delivery_minus_event_ms": 14.949875185266137,
+                "preceding_reported_already_delivered": false
+              },
+              "present_gpu_end": {
+                "preceding_reported_ordinal": 1202,
+                "next_reported_ordinal": 1203,
+                "nearest_reported_ordinal": 1202,
+                "event_minus_nearest_reported_ms": 2.4627912789583206,
+                "nearest_reported_delivery_minus_event_ms": 13.743042014539242,
+                "preceding_delivered_ordinal": 1201,
+                "next_delivered_ordinal": 1202,
+                "event_minus_preceding_reported_ms": 2.4627912789583206,
+                "next_reported_minus_event_ms": 14.203875325620174,
+                "event_minus_preceding_delivered_ms": 2.938874764367938,
+                "next_delivered_minus_event_ms": 13.743042014539242,
+                "preceding_reported_delivery_minus_event_ms": 13.743042014539242,
+                "preceding_reported_already_delivered": false
+              }
+            },
+            "reported_timestamps_gpu_to_shown": 1,
+            "callbacks_delivered_gpu_to_shown": 2
+          },
+          "p95_ticket_post_present_gpu_fraction_pct": 81.33565567182744,
+          "display_clock_phase": {
+            "wake": {
+              "preceding_reported_callback_not_yet_delivered": 119,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": 0.5157082341611385,
+                "p95": 7.269999943673611,
+                "p99": 7.284875027835369,
+                "max": 7.318416843190789
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 15.589416725561023,
+                "p95": 22.713375044986606,
+                "p99": 24.134791688993573,
+                "max": 24.19600007124245
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 7.268875138834119,
+                "p95": 13.967166654765606,
+                "p99": 16.081666573882103,
+                "max": 16.464499989524484
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 9.396666660904884,
+                "p95": 16.150958370417356,
+                "p99": 16.168749891221523,
+                "max": 16.17116667330265
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 7.769791642203927,
+                "p95": 14.443000080063939,
+                "p99": 16.263874946162105,
+                "max": 16.537374816834927
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 8.861124981194735,
+                "p95": 15.590666560456157,
+                "p99": 15.642041806131601,
+                "max": 16.35349984280765
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 8.857416454702616,
+                "p95": 15.590624883770943,
+                "p99": 15.629249857738614,
+                "max": 15.642041806131601
+              }
+            },
+            "checked": {
+              "preceding_reported_callback_not_yet_delivered": 118,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": 0.7840832695364952,
+                "p95": 8.162999991327524,
+                "p99": 8.318708511069417,
+                "max": 8.3318748511374
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 15.311791561543941,
+                "p95": 23.491166764870286,
+                "p99": 24.481625063344836,
+                "max": 24.517250014469028
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 8.299041772261262,
+                "p95": 15.24579175747931,
+                "p99": 16.539583448320627,
+                "max": 16.616708366200328
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 8.350333198904991,
+                "p95": 15.59120835736394,
+                "p99": 15.921791549772024,
+                "max": 16.429666662588716
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 8.7524582631886,
+                "p95": 15.586041612550616,
+                "p99": 15.810375101864338,
+                "max": 16.583958407863975
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 7.861583260819316,
+                "p95": 15.270458301529288,
+                "p99": 16.18724991567433,
+                "max": 16.260666539892554
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 7.827333407476544,
+                "p95": 15.032208291813731,
+                "p99": 15.402458375319839,
+                "max": 15.94749977812171
+              }
+            },
+            "postcheck": {
+              "preceding_reported_callback_not_yet_delivered": 118,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": 0.746291596442461,
+                "p95": 8.111583534628153,
+                "p99": 8.320416556671262,
+                "max": 8.323625195771456
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 15.345833264291286,
+                "p95": 24.230291601270437,
+                "p99": 24.47683340869844,
+                "max": 24.513541720807552
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 8.303916780278087,
+                "p95": 15.25095826946199,
+                "p99": 16.54179161414504,
+                "max": 16.62058336660266
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 8.346250047907233,
+                "p95": 15.589250018820167,
+                "p99": 15.920375008136034,
+                "max": 16.42433344386518
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 8.756291586905718,
+                "p95": 15.591458417475224,
+                "p99": 15.816541854292154,
+                "max": 16.586750047281384
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 7.856958312913775,
+                "p95": 15.265124849975109,
+                "p99": 16.183374915271997,
+                "max": 16.25845837406814
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 7.822750136256218,
+                "p95": 15.029583359137177,
+                "p99": 15.401041833683848,
+                "max": 15.942166559398174
+              }
+            },
+            "receipt": {
+              "preceding_reported_callback_not_yet_delivered": 118,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -1.1088750325143337,
+                "p95": 7.622541626915336,
+                "p99": 8.290708530694246,
+                "max": 8.319833315908909
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 17.21841678954661,
+                "p95": 24.21537507325411,
+                "p99": 24.288041749969125,
+                "max": 24.458166677504778
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 8.512124884873629,
+                "p95": 15.459708170965314,
+                "p99": 16.189791494980454,
+                "max": 16.62983326241374
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 8.137333439663053,
+                "p95": 15.532458433881402,
+                "p99": 16.19495847262442,
+                "max": 16.493250150233507
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 8.828374790027738,
+                "p95": 15.811208402737975,
+                "p99": 16.001958400011063,
+                "max": 16.058500157669187
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 7.634749868884683,
+                "p95": 15.255666570737958,
+                "p99": 16.17041672579944,
+                "max": 16.616958426311612
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 7.57087511010468,
+                "p95": 14.9896249640733,
+                "p99": 15.712791588157415,
+                "max": 15.96387499012053
+              }
+            },
+            "raster_begin": {
+              "preceding_reported_callback_not_yet_delivered": 116,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.7377916481345892,
+                "p95": 7.500041741877794,
+                "p99": 8.205750025808811,
+                "max": 8.215583395212889
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 16.77112514153123,
+                "p95": 23.831875063478947,
+                "p99": 24.239041609689593,
+                "max": 24.47449997998774
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 8.972416631877422,
+                "p95": 15.92887518927455,
+                "p99": 16.39379165135324,
+                "max": 16.45399979315698
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 7.645208388566971,
+                "p95": 15.304708387702703,
+                "p99": 16.246166778728366,
+                "max": 16.491083428263664
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 9.120499948039651,
+                "p95": 16.265999991446733,
+                "p99": 16.46349998190999,
+                "max": 16.50241669267416
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 7.430416764691472,
+                "p95": 15.236416831612587,
+                "p99": 16.49087481200695,
+                "max": 16.684666741639376
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 7.11599993519485,
+                "p95": 14.78391676209867,
+                "p99": 15.716791618615389,
+                "max": 15.957999974489212
+              }
+            },
+            "raster_end": {
+              "preceding_reported_callback_not_yet_delivered": 116,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": 0.034708296880126,
+                "p95": 6.925666471943259,
+                "p99": 7.95129151083529,
+                "max": 8.042624918743968
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 16.101291636005044,
+                "p95": 23.310208460316062,
+                "p99": 24.024750106036663,
+                "max": 24.56745831295848
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 7.92812486179173,
+                "p95": 15.609541675075889,
+                "p99": 16.543291741982102,
+                "max": 16.560749849304557
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 8.715375093743205,
+                "p95": 16.385624883696437,
+                "p99": 16.63195830769837,
+                "max": 16.64529158733785
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 7.387416670098901,
+                "p95": 15.208958182483912,
+                "p99": 16.274458495900035,
+                "max": 16.368833370506763
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 9.242083178833127,
+                "p95": 16.101291636005044,
+                "p99": 16.268916660919785,
+                "max": 16.30049990490079
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 8.130916859954596,
+                "p95": 15.859041595831513,
+                "p99": 16.103124944493175,
+                "max": 16.115916660055518
+              }
+            },
+            "upload_begin": {
+              "preceding_reported_callback_not_yet_delivered": 116,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": 0.06708339788019657,
+                "p95": 6.977666635066271,
+                "p99": 7.960333256050944,
+                "max": 8.054833393543959
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 16.070749843493104,
+                "p95": 23.26537505723536,
+                "p99": 24.000958539545536,
+                "max": 24.532458279281855
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 7.936999900266528,
+                "p95": 15.640208264812827,
+                "p99": 16.574000008404255,
+                "max": 16.589874867349863
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 8.70633334852755,
+                "p95": 16.352124977856874,
+                "p99": 16.5995832066983,
+                "max": 16.617666464298964
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 7.4305001180619,
+                "p95": 15.219333348795772,
+                "p99": 16.294625122100115,
+                "max": 16.390624921768904
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 9.204583242535591,
+                "p95": 16.070749843493104,
+                "p99": 16.237041680142283,
+                "max": 16.269791638478637
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 8.121875114738941,
+                "p95": 15.840500127524137,
+                "p99": 16.073666512966156,
+                "max": 16.0819583106786
+              }
+            },
+            "upload_end": {
+              "preceding_reported_callback_not_yet_delivered": 119,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.6741250399500132,
+                "p95": 6.2888748943805695,
+                "p99": 7.716374937444925,
+                "max": 8.079708321020007
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 16.8186251539737,
+                "p95": 23.060708306729794,
+                "p99": 23.886416805908084,
+                "max": 24.02633335441351
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 8.845374919474125,
+                "p95": 15.790666686370969,
+                "p99": 16.022041672840714,
+                "max": 16.505791805684566
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 7.765624905005097,
+                "p95": 15.930916648358107,
+                "p99": 16.484000021591783,
+                "max": 16.615333268418908
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 9.300583275035024,
+                "p95": 15.976666705682874,
+                "p99": 16.449583461508155,
+                "max": 16.525625018402934
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 7.236833451315761,
+                "p95": 15.75100002810359,
+                "p99": 16.10941649414599,
+                "max": 16.36087498627603
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 7.214041659608483,
+                "p95": 15.526666538789868,
+                "p99": 16.02316671051085,
+                "max": 16.10941649414599
+              }
+            },
+            "acquired": {
+              "preceding_reported_callback_not_yet_delivered": 116,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.41970820166170597,
+                "p95": 6.373041775077581,
+                "p99": 7.848124951124191,
+                "max": 8.107541594654322
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 16.537333372980356,
+                "p95": 23.36566662415862,
+                "p99": 23.962166626006365,
+                "max": 24.455833481624722
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 8.836708264425397,
+                "p95": 15.548458555713296,
+                "p99": 16.277875052765012,
+                "max": 16.31345832720399
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 7.7615834306925535,
+                "p95": 15.836749924346805,
+                "p99": 16.375791747123003,
+                "max": 16.538291703909636
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 7.981916656717658,
+                "p95": 15.217749867588282,
+                "p99": 16.385083319619298,
+                "max": 16.548333456739783
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 8.39158333837986,
+                "p95": 15.82208345644176,
+                "p99": 16.5627917740494,
+                "max": 16.608666628599167
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 7.177125196903944,
+                "p95": 15.408041654154658,
+                "p99": 15.849374933168292,
+                "max": 16.0716250538826
+              }
+            },
+            "shown": {
+              "preceding_reported_callback_not_yet_delivered": 0,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.067166518419981,
+                "p95": -0.04687486216425896,
+                "p99": -0.045166583731770515,
+                "max": -0.044791726395487785
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 16.225708182901144,
+                "p95": 16.340333269909024,
+                "p99": 16.357666812837124,
+                "max": 16.36362518183887
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 16.599500086158514,
+                "p95": 16.619791742414236,
+                "p99": 16.621500020846725,
+                "max": 16.621874878183007
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 0.06679166108369827,
+                "p95": 0.08741673082113266,
+                "p99": 0.08933339267969131,
+                "max": 0.08958321996033192
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 0.46845851466059685,
+                "p95": 0.5168749485164881,
+                "p99": 0.5300831981003284,
+                "max": 0.5465832073241472
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 16.225708182901144,
+                "p95": 16.340333269909024,
+                "p99": 16.357666812837124,
+                "max": 16.36362518183887
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": -0.46916655264794827,
+                "p95": -0.35233329981565475,
+                "p99": -0.3312083426862955,
+                "max": -0.3279165830463171
+              }
+            },
+            "first_submit": {
+              "preceding_reported_callback_not_yet_delivered": 117,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.18620840273797512,
+                "p95": 5.979875102639198,
+                "p99": 7.576500065624714,
+                "max": 7.707208162173629
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 16.28170837648213,
+                "p95": 23.16862507723272,
+                "p99": 24.20583344064653,
+                "max": 24.479583371430635
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 8.61166650429368,
+                "p95": 15.559500083327293,
+                "p99": 16.558958450332284,
+                "max": 16.653791768476367
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 7.98162491992116,
+                "p95": 15.601666644215584,
+                "p99": 16.494458308443427,
+                "max": 16.600541537627578
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 8.09487490914762,
+                "p95": 15.411083353683352,
+                "p99": 16.294458182528615,
+                "max": 16.52195816859603
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 8.469750173389912,
+                "p95": 15.640083467587829,
+                "p99": 16.28170837648213,
+                "max": 16.398000065237284
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 7.511624833568931,
+                "p95": 15.141499927267432,
+                "p99": 16.01191656664014,
+                "max": 16.026458237320185
+              }
+            },
+            "first_gpu": {
+              "preceding_reported_callback_not_yet_delivered": 116,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.2992916852235794,
+                "p95": 6.473166402429342,
+                "p99": 7.096791407093406,
+                "max": 7.6416663359850645
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 16.229291912168264,
+                "p95": 23.371166782453656,
+                "p99": 24.423583410680294,
+                "max": 24.457541992887855
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 8.392416406422853,
+                "p95": 15.733541455119848,
+                "p99": 16.367374919354916,
+                "max": 16.512916423380375
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 8.210250409319997,
+                "p95": 15.346875181421638,
+                "p99": 16.009875340387225,
+                "max": 16.400791704654694
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 7.063999772071838,
+                "p95": 15.789249911904335,
+                "p99": 16.240499913692474,
+                "max": 16.577916452661157
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 9.226125199347734,
+                "p95": 15.254875179380178,
+                "p99": 16.518500167876482,
+                "max": 16.536000184714794
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 7.619666866958141,
+                "p95": 14.864333439618349,
+                "p99": 15.517208725214005,
+                "max": 15.854666708037257
+              }
+            },
+            "render_gpu_end": {
+              "preceding_reported_callback_not_yet_delivered": 116,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": 0.147499842569232,
+                "p95": 6.747249746695161,
+                "p99": 7.401958107948303,
+                "max": 7.972916355356574
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 15.928041888400912,
+                "p95": 23.06383359245956,
+                "p99": 24.087166879326105,
+                "max": 24.1584584582597
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 7.159416563808918,
+                "p95": 15.848499722778797,
+                "p99": 16.305416356772184,
+                "max": 16.66095806285739
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 9.264708496630192,
+                "p95": 15.186875127255917,
+                "p99": 16.519166762009263,
+                "max": 16.62291679531336
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 7.167166564613581,
+                "p95": 15.952874906361103,
+                "p99": 16.38845819979906,
+                "max": 16.594791552051902
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 9.385125245898962,
+                "p95": 15.928041888400912,
+                "p99": 16.66304189711809,
+                "max": 16.821041936054826
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 8.722958620637655,
+                "p95": 14.642833499237895,
+                "p99": 16.038000117987394,
+                "max": 16.16879180073738
+              }
+            },
+            "present_request": {
+              "preceding_reported_callback_not_yet_delivered": 118,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.018541701138019562,
+                "p95": 6.043958477675915,
+                "p99": 7.8090832103043795,
+                "max": 7.816833443939686
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 16.177541809156537,
+                "p95": 23.062833352014422,
+                "p99": 24.081833427771926,
+                "max": 24.27104185335338
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 8.557999972254038,
+                "p95": 15.602208208292723,
+                "p99": 16.648124903440475,
+                "max": 16.663125017657876
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 7.881500059738755,
+                "p95": 15.500708483159542,
+                "p99": 16.333249863237143,
+                "max": 16.462208470329642
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 8.31191660836339,
+                "p95": 15.509499935433269,
+                "p99": 16.52837498113513,
+                "max": 16.58070832490921
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 8.273583138361573,
+                "p95": 15.423333272337914,
+                "p99": 16.177541809156537,
+                "max": 16.230333363637328
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 7.411499973386526,
+                "p95": 15.096458373591304,
+                "p99": 15.79937501810491,
+                "max": 15.980916796252131
+              }
+            },
+            "present_commit": {
+              "preceding_reported_callback_not_yet_delivered": 119,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": -0.007708324119448662,
+                "p95": 6.047583417966962,
+                "p99": 7.815124932676554,
+                "max": 7.828625151887536
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 16.171124996617436,
+                "p95": 23.059333208948374,
+                "p99": 24.07566667534411,
+                "max": 24.262958439067006
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 7.828625151887536,
+                "p95": 15.449125086888671,
+                "p99": 16.086708288639784,
+                "max": 16.658958280459046
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 8.100583450868726,
+                "p95": 15.713583445176482,
+                "p99": 16.451625153422356,
+                "max": 16.663791611790657
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 8.317958330735564,
+                "p95": 15.516458312049508,
+                "p99": 16.53650007210672,
+                "max": 16.584708355367184
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 8.262083400040865,
+                "p95": 15.413333429023623,
+                "p99": 16.171124996617436,
+                "max": 16.219499986618757
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 7.673624902963638,
+                "p95": 15.207666670903563,
+                "p99": 15.970333479344845,
+                "max": 16.171124996617436
+              }
+            },
+            "present_gpu_end": {
+              "preceding_reported_callback_not_yet_delivered": 116,
+              "event_minus_nearest_reported_ms": {
+                "count": 120,
+                "p50": 0.1513331662863493,
+                "p95": 6.751541513949633,
+                "p99": 7.40654137916863,
+                "max": 7.977416506037116
+              },
+              "nearest_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 15.924208564683795,
+                "p95": 23.05795857682824,
+                "p99": 24.07979196868837,
+                "max": 24.154500104486942
+              },
+              "event_minus_preceding_reported_ms": {
+                "count": 120,
+                "p50": 7.162041496485472,
+                "p95": 15.851208008825779,
+                "p99": 16.30987459793687,
+                "max": 16.66395808570087
+              },
+              "next_reported_minus_event_ms": {
+                "count": 120,
+                "p50": 9.260125225409865,
+                "p95": 15.182416653260589,
+                "p99": 16.515333438292146,
+                "max": 16.618166817352176
+              },
+              "event_minus_preceding_delivered_ms": {
+                "count": 120,
+                "p50": 7.171666482463479,
+                "p95": 15.964249847456813,
+                "p99": 16.39479142613709,
+                "max": 16.599249793216586
+              },
+              "next_delivered_minus_event_ms": {
+                "count": 120,
+                "p50": 9.38083347864449,
+                "p95": 15.924208564683795,
+                "p99": 16.659041866660118,
+                "max": 16.815916867926717
+              },
+              "preceding_reported_delivery_minus_event_ms": {
+                "count": 120,
+                "p50": 8.718375349417329,
+                "p95": 14.641250250861049,
+                "p99": 16.03379170410335,
+                "max": 16.1640418227762
+              }
+            }
+          },
+          "clock_event_counts": {
+            "reported_timestamps_gpu_to_shown": {
+              "0": 9,
+              "1": 110,
+              "2": 1
+            },
+            "callbacks_delivered_gpu_to_shown": {
+              "1": 12,
+              "2": 108
+            }
+          }
+        },
+        {
+          "mode": "off",
+          "joined_inputs": 248,
+          "warmup": 128,
+          "measured": 120,
+          "receipt_to_shown_ms": {
+            "count": 120,
+            "p50": 30.895750038325787,
+            "p95": 37.92266664095223,
+            "p99": 39.41487497650087,
+            "max": 39.700208231806755
+          },
+          "partition_ms": {
+            "receipt_to_acquire": {
+              "count": 120,
+              "p50": 4.984874976798892,
+              "p95": 5.746208131313324,
+              "p99": 6.544333416968584,
+              "max": 7.56049994379282
+            },
+            "acquire_to_first_submit": {
+              "count": 120,
+              "p50": 0.3972083795815706,
+              "p95": 0.5486251320689917,
+              "p99": 0.6750833708792925,
+              "max": 0.6831248756498098
+            },
+            "first_submit_to_first_gpu": {
+              "count": 120,
+              "p50": 0.8232498075813055,
+              "p95": 1.1705413926392794,
+              "p99": 1.228458248078823,
+              "max": 1.2307080905884504
+            },
+            "render_gpu_span": {
+              "count": 120,
+              "p50": 0.3269582521170378,
+              "p95": 0.419083284214139,
+              "p99": 0.464125070720911,
+              "max": 0.5757501348853111
+            },
+            "render_gpu_end_to_shown": {
+              "count": 120,
+              "p50": 24.089333601295948,
+              "p95": 31.332791782915592,
+              "p99": 32.413417007774115,
+              "max": 32.93341677635908
+            }
+          },
+          "present_gpu_split_ms": {
+            "receipt_to_present_gpu_end": {
+              "count": 120,
+              "p50": 6.62079150788486,
+              "p95": 7.764499634504318,
+              "p99": 8.539083180949092,
+              "max": 8.962457999587059
+            },
+            "present_gpu_end_to_shown": {
+              "count": 120,
+              "p50": 24.085000390186906,
+              "p95": 31.328833429142833,
+              "p99": 32.409791834652424,
+              "max": 32.930000219494104
+            }
+          },
+          "receipt_lateness_go_ms": {
+            "count": 120,
+            "p50": 3.419916,
+            "p95": 3.746083,
+            "p99": 4.041708,
+            "max": 4.942
+          },
+          "receipt_clock_bracket_go_ms": {
+            "count": 120,
+            "p50": 0.001917,
+            "p95": 0.002916,
+            "p99": 0.003208,
+            "max": 0.00325
+          },
+          "p95_rank_ticket": {
+            "accepted_revision": 147,
+            "scope": 1,
+            "opaque_tag": 296,
+            "generation": 150,
+            "drawable_id": 156,
+            "phase": "measured",
+            "receipt_to_shown_ms": 37.92266664095223,
+            "partition_ms": {
+              "receipt_to_acquire": 5.309208296239376,
+              "acquire_to_first_submit": 0.5016250070184469,
+              "first_submit_to_first_gpu": 0.7850416004657745,
+              "render_gpu_span": 0.2527916803956032,
+              "render_gpu_end_to_shown": 31.07400005683303
+            },
+            "present_gpu_split_ms": {
+              "receipt_to_present_gpu_end": 6.853166501969099,
+              "present_gpu_end_to_shown": 31.06950013898313
+            },
+            "receipt_lateness_go_ms": 3.300791,
+            "receipt_clock_bracket_go_ms": 0.002042
+          },
+          "p95_ticket_post_present_gpu_fraction_pct": 81.92857436199266,
+          "display_clock_phase": null
+        }
+      ]
+    }
+  ],
+  "input_archives": [
+    {
+      "archive": "docs/reports/macos-display-scheduling/result-evidence.tar.xz",
+      "archive_sha256": "bdabf97d8833d2f235096522345b74cad6e34af100a68ccc494080aeac8f590f",
+      "index_sha256": "7fd1cd7953ed7c884ceb929dfb6284c1fc3253518ef040741daa1ac8bd55c145",
+      "read_members": {
+        "result/artifacts/result.json": {
+          "bytes": 5708388,
+          "sha256": "2c736e50e0537410c617cd4e0a7753a97db46d8c164c7506f3f002dfda99539b"
+        },
+        "result/artifacts/bound-plan.json": {
+          "bytes": 917618,
+          "sha256": "e27baf80f896c59289642c1d403144285ba9c684426fc9c6aafdef55003e1d2d"
+        },
+        "result/artifacts/off/native/stdout": {
+          "bytes": 1115663,
+          "sha256": "484c6b123f282b463a99b89506aa1d74b32bb11861f749e4b41d0a88e27b2b95"
+        },
+        "result/artifacts/off/validation.json": {
+          "bytes": 2211251,
+          "sha256": "1c29e93a3e55fe9dea23ee0f8545b1fda099108c091ac1fa6f267242a37ec4b3"
+        },
+        "result/artifacts/on/native/stdout": {
+          "bytes": 1360188,
+          "sha256": "38bdbd5fbdf80772de25bbaa3054c8ef834f570ebba4c0b0484a93fadc38043c"
+        },
+        "result/artifacts/on/validation.json": {
+          "bytes": 2616153,
+          "sha256": "a1afc18ea2463fc2fd0895afb1e942c886600201a7c6bf0cb1ee64057231b459"
+        }
+      },
+      "unchanged_classifiers": {
+        "tools/macos-calibration/check.py": "4e1ca4340e5168e3d13513e467d6a5c82b5b8ec26e9d038072fdb8fe3c0e2662",
+        "tools/macos-calibration/sourcecost/check.py": "259fcefa785faf1660ac750cd8ed659c0c8f774db363dd813b74a18ca22ce130",
+        "tools/macos-calibration/upload/check.py": "a7d8e3963a06c2cac22d0c584b823dfe12f5256ba7e2752aae0943107d35aa65",
+        "tools/macos-calibration/joined/check.py": "dff79e48b194f2de754bbae637ec1259c93f2f85500d5dbe13d690c145311141",
+        "tools/macos-calibration/backend/check.py": "2d824c94070bcd013b97b0b120f874b89ecef0c5010364c2cc278bb81fbe4d74",
+        "tools/macos-calibration/joinedbackend/check.py": "99b5ac6305f1c1cbc1b8edb25749b4a589f80c7d7eb7280bcf83666fb9ebf849",
+        "tools/macos-calibration/displayclock/check.py": "2dacd367d7ddecf3024c07fc0b6c7dd83b1e02287fd8ccba3358e734c22fedd0",
+        "scripts/benchmark-grid.py": "13f689f97e462f3af41f06cb9360bd44644583bde54adae4839970fc22ead74d"
+      }
+    },
+    {
+      "archive": "docs/reports/macos-display-scheduling/preparation-evidence.tar.xz",
+      "archive_sha256": "02155f923cbcf9ee3e53848a683f03a971b04406d87092b614c99dc8b4d70552",
+      "index_sha256": "03fd75194cb2d59ff94eee5ed1709d098f8e43ded11f6aae15e23173007d77ef",
+      "read_members": {
+        "preparation/artifacts/match.json": {
+          "bytes": 144,
+          "sha256": "a32146e115c07abb79557b2aec6ad43de12fa657d7d144390fc842e81b72420a"
+        }
+      }
+    },
+    {
+      "archive": "docs/reports/macos-display-reversed/result-evidence.tar.xz",
+      "archive_sha256": "937bfee0d2de09e9a0782e6de1a256d3e34e0cbb067f9a724aded509fea84895",
+      "index_sha256": "ff66e75614e3a64457e4e791d5c171d7fc4e9845e0ee9f6400771a0df7a6dc5e",
+      "read_members": {
+        "result/artifacts/result.json": {
+          "bytes": 5712143,
+          "sha256": "3f44febc07a93d8659552318cc24d1cd3d3318cf73ef01be163a45a783ce1895"
+        },
+        "result/artifacts/bound-plan.json": {
+          "bytes": 921428,
+          "sha256": "332f840ec06593a1a9c431250fe18b8011510789c96b5bc1f64b3da5d5056fbc"
+        },
+        "result/artifacts/on/native/stdout": {
+          "bytes": 1361169,
+          "sha256": "2cf44520b0701fc38f154eed5528db4c440948d86edb8ba2339571566043fed5"
+        },
+        "result/artifacts/on/validation.json": {
+          "bytes": 2617755,
+          "sha256": "e0a82b98bc6e82ed23030fe9ada55e8485be3eafd4cbb93ab840e613e2a0754d"
+        },
+        "result/artifacts/off/native/stdout": {
+          "bytes": 1116665,
+          "sha256": "bb5b6581449919cfe77e80ab0d78030a3aabb4abff4452525a38bae35da364e9"
+        },
+        "result/artifacts/off/validation.json": {
+          "bytes": 2213444,
+          "sha256": "08d381710c2b4af901ae881cf02ab3c8bd969a4a6ae69fdbd0d3fa1adecb442f"
+        }
+      },
+      "unchanged_classifiers": {
+        "tools/macos-calibration/check.py": "4e1ca4340e5168e3d13513e467d6a5c82b5b8ec26e9d038072fdb8fe3c0e2662",
+        "tools/macos-calibration/sourcecost/check.py": "259fcefa785faf1660ac750cd8ed659c0c8f774db363dd813b74a18ca22ce130",
+        "tools/macos-calibration/upload/check.py": "a7d8e3963a06c2cac22d0c584b823dfe12f5256ba7e2752aae0943107d35aa65",
+        "tools/macos-calibration/joined/check.py": "dff79e48b194f2de754bbae637ec1259c93f2f85500d5dbe13d690c145311141",
+        "tools/macos-calibration/backend/check.py": "2d824c94070bcd013b97b0b120f874b89ecef0c5010364c2cc278bb81fbe4d74",
+        "tools/macos-calibration/joinedbackend/check.py": "99b5ac6305f1c1cbc1b8edb25749b4a589f80c7d7eb7280bcf83666fb9ebf849",
+        "tools/macos-calibration/displayclock/check.py": "2dacd367d7ddecf3024c07fc0b6c7dd83b1e02287fd8ccba3358e734c22fedd0",
+        "scripts/benchmark-grid.py": "13f689f97e462f3af41f06cb9360bd44644583bde54adae4839970fc22ead74d"
+      }
+    },
+    {
+      "archive": "docs/reports/macos-display-reversed/preparation-evidence.tar.xz",
+      "archive_sha256": "cef6cc5e9bb242c96f2f85bb0f1d0a19b6c83bd4c51b4b3f064a4c1f397391d2",
+      "index_sha256": "2179310a316e3eafd86ea5c02b2c997fcebf57fc9bcb6a26c003637547867985",
+      "read_members": {
+        "preparation/artifacts/match.json": {
+          "bytes": 144,
+          "sha256": "a32146e115c07abb79557b2aec6ad43de12fa657d7d144390fc842e81b72420a"
+        }
+      }
+    }
+  ],
+  "release_qualified": false,
+  "gate_changed": false,
+  "production_change": false,
+  "interpretation": "Each run separate. On cases join independent reported and actual-delivery clocks; off cases have no display-clock inference. Same-input partitions close; their marginal quantiles must not be added. Go lateness is not converted to native target time. Reported events are not latch/scanout evidence; no calibrated overhead, causal or ordinary-equivalence claim."
+}

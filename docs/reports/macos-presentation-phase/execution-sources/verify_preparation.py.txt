@@ -1,0 +1,22 @@
+from pathlib import Path
+import json,hashlib,importlib.util,sys,subprocess,os,ast
+sys.dont_write_bytecode=True
+x=Path(__file__).resolve().parent;q=x/'prepared';r=Path('/Users/dshills/Development/projects/Vellum');code=r/'tools/macos-calibration/presentationphase';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();pins={}
+for name in ['fixture-build','fixture','native-object','native-build','framework-build','pixels']:
+ d=json.loads((q/(name+'-receipt.json')).read_text());run=d['run'];assert run['exit_code']==0 and run['error'] is None and run['owned']['terminal'] and run['owned']['group_absent'] and not run['owned']['errors'] and run['logs_complete'] and run['pins_stable'] and not run['observation_errors']
+ assert all(sha(Path(p))==h for p,h in d['pins'].items());pins.update(d['pins'])
+ for stream,m in run['logs'].items():p=q/name/stream;assert sha(p)==m['sha256'] and p.stat().st_size==m['bytes']
+for p in code.glob('*.py'):ast.parse(p.read_text())
+run=subprocess.run([sys.executable,'-B','-m','unittest','discover','-s',str(code),'-p','*test.py','-v'],cwd=r,capture_output=True,timeout=15);(q/'classifier.stdout').write_bytes(run.stdout);(q/'classifier.stderr').write_bytes(run.stderr);assert run.returncode==0 and b'Ran 8 tests' in run.stderr
+s=importlib.util.spec_from_file_location('phase_recipe',code/'prepare.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);repro=x/'reproduction-v4';m.prepare(r,x.parent/'macos-display-scheduling/prepared',repro)
+for root in [q/'consumer']:
+ for f in root.rglob('*'):
+  if f.is_file():assert f.read_bytes().replace(str(q).encode(),b'ARTIFACTS')==(repro/'consumer'/f.relative_to(root)).read_bytes().replace(str(repro).encode(),b'ARTIFACTS')
+for name in ['framework.mod','framework.sum','overlay.json','presentation_darwin.m','presentation_darwin.go','desktop_measurement.go','native.m','match.json']:assert (q/name).read_bytes().replace(str(q).encode(),b'ARTIFACTS')==(repro/name).read_bytes().replace(str(repro).encode(),b'ARTIFACTS')
+try:m.prepare(r,x.parent/'macos-display-scheduling/prepared',repro)
+except ValueError:pass
+else:raise AssertionError('overwrite allowed')
+sys.path.insert(0,str(r/'scripts'));s=importlib.util.spec_from_file_location('phase_sdk',x.parent/'macos-release-default-assessment/assessment.py');a=importlib.util.module_from_spec(s);sys.modules[s.name]=a;s.loader.exec_module(a);assert a.sdk_vector()==json.loads((x.parent/'macos-release-default-assessment/plan.json').read_text())['sdk']
+for name in ['framework','native']:assert os.access(q/name,os.X_OK)
+identity={'pins':pins,'framework_sha256':sha(q/'framework'),'native_sha256':sha(q/'native'),'native_archive_sha256':'10e39953bda1045da3bd9c315dcac0add646fa86e74627b3c896723d31b86a35','SDK_changed':False,'policy_changed':False};(q/'build-identity.json').write_text(json.dumps(identity,indent=2)+'\n')
+checks={'outcome':'PREPARED_NO_NATIVE_CAPTURE','classifier_methods':6,'orchestration_methods':2,'headless_native':'PASS census, transitions, phase anchor/order, bounds/no eviction,4concurrent producers/160attempts/480events, native JSON booleans; no NSApplication/window','native_build':'Both shared-observer object and ARC reference compile Werror; framework privateconsumer compiles with existing AppKit/duplicateobjc link warnings','pixels':'PASS unchanged full-pixel routed fixture with native-only overlay excluded; initial offscreen link failure retained','recipe_reproduction':'Full consumer and module/overlay/core-native source snapshot exact after path normalization; overwrite refused','source_log_pin_ownership_checks':'PASS six owned build/test commands, original compiled inputs unchanged','SDK_files_unchanged':8321,'native_archive_rebuilt':False,'framework_sha256':identity['framework_sha256'],'native_sha256':identity['native_sha256'],'gate_changed':False,'features_changed':False};(q/'preparation-checks.json').write_text(json.dumps(checks,indent=2)+'\n');print(json.dumps(checks,indent=2))

@@ -1,0 +1,19 @@
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "complete": true,
+  "files": 12,
+  "findings": [
+    {
+      "id": "05b4f877f9de1352",
+      "disposition": "Not a defect. assessment.py Host.finish lines92-93 asserts final source/SDK integrity only; Host.command delegates to owned execute whose finally at106-107 retires/reaps children. The outer lease context releases on exception. Requiring stderr empty is the unchanged strict diagnostic acceptance rule; weakening it is out of scope. Exceptions still seal REJECT and exit1."
+    },
+    {
+      "id": "62210988538e44e3",
+      "disposition": "Not a defect. preparation-commit.json and plan.json are in the separately writable research artifacts directory, outside the canonical repository. After this reviewed preparation is committed, the exact clean HEAD is bound there with review_complete true. No circular self-commit or dirty canonical tree results. Runtime binds both metadata and plan hashes."
+    }
+  ],
+  "discarded_inspected": "6fb1ed0b19053120: archived execution helpers intentionally record local absolute provenance; public runner derives repo root and accepts artifacts/reuse paths. No universal portability claim.",
+  "suppressed": [],
+  "internal_verification": "21 indexed regular archive members and all5 committed-copy mappings verified;2 focused methods/7 negatives and actual unauthorized CLI refusal pass. All source/binary pins unchanged."
+}

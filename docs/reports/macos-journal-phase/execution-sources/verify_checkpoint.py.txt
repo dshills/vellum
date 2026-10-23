@@ -1,0 +1,62 @@
+"""Portable offscreen checkpoint verification; use a fresh artifact directory."""
+from pathlib import Path
+import argparse
+import ast
+import hashlib
+import json
+import subprocess
+import sys
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--repo', type=Path, default=Path.cwd())
+parser.add_argument('--artifacts', type=Path, required=True)
+args = parser.parse_args()
+r = args.repo.resolve()
+x = args.artifacts.resolve()
+x.mkdir(parents=True, exist_ok=False)
+code = r/'tools/macos-calibration/displayclock'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+relative_sources = ['tools/macos-calibration/displayclock/'+name
+                    for name in ['phase_analysis.py', 'phase_test.py']]
+source = {name: sha(r/name) for name in relative_sources}
+for name in source:
+    ast.parse((r/name).read_text())
+
+
+def execute(argv, name):
+    run = subprocess.run(argv, cwd=r, capture_output=True, timeout=30)
+    (x/(name+'.stdout')).write_bytes(run.stdout)
+    (x/(name+'.stderr')).write_bytes(run.stderr)
+    return run
+
+
+tests = execute([sys.executable, '-B', '-m', 'unittest', 'discover', '-s',
+                 str(code), '-p', 'phase_test.py', '-v'], 'tests')
+assert tests.returncode == 0 and b'Ran 7 tests' in tests.stderr
+base = [sys.executable, '-B', str(code/'phase_analysis.py'), '--reports', 'docs/reports']
+for name in ['analysis', 'reproduction']:
+    run = execute(base+['--output', str(x/name)], name)
+    assert run.returncode == 0 and not run.stderr
+for name in ['summary.json', 'rows.json']:
+    assert (x/'analysis'/name).read_bytes() == (x/'reproduction'/name).read_bytes()
+refusal = execute(base+['--output', str(x/'reproduction')], 'overwrite-refusal')
+assert refusal.returncode != 0 and b'FileExistsError' in refusal.stderr
+for name in ['summary.json', 'rows.json']:
+    assert (x/'analysis'/name).read_bytes() == (x/'reproduction'/name).read_bytes()
+assert all(sha(r/name) == digest for name, digest in source.items())
+rows = json.loads((x/'analysis/rows.json').read_text())
+assert len(rows) == 4 and all(len(rs) == 248 for rs in rows.values())
+assert sum(sum(row['phase'] == 'measured' for row in rs) for rs in rows.values()) == 480
+summary = json.loads((x/'analysis/summary.json').read_text())
+assert [pair['order'] for pair in summary['pairs']] == [['off', 'on'], ['on', 'off']]
+checks = {'result': 'PASS', 'focused_unit_methods': 7, 'syntax': True,
+          'four_raw_journals_reclassified': True, 'original_classifier_files_per_pair': 8,
+          'pinned_archives': 4, 'joined_inputs': 992, 'measured_inputs': 480,
+          'warmup_inputs': 512, 'byte_identical_reproduction': {
+              name: sha(x/'analysis'/name) for name in ['summary.json', 'rows.json']},
+          'existing_output_refused_without_mutation': True, 'source_sha256': source,
+          'native_executions': 0, 'no_SDK_app_framework_rebuild': True,
+          'release_gate_changed': False,
+          'scope': 'Offscreen only; prior native/SDK evidence reused as retained, no new physical/cadence/resize/ordinary qualification.'}
+(x/'checks.json').write_text(json.dumps(checks, indent=2)+'\n')
+print(json.dumps(checks, indent=2))

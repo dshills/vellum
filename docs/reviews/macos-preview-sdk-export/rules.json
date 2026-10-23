@@ -1,0 +1,8 @@
+{
+  "rules": [
+    {
+      "id": "r2-actual-export-blocker",
+      "text": "Actual SDK export from clean R1 578cf74 refused existing specs links to tracked tools/macos-calibration/stagingreuse/TIMING.md. Tools are excluded by exporter source whitelist. This repair classifies tools/ as repository documentation so links use existing tracked/existing/non-symlink reference rewriting. Preserve refusal for unknown missing/untracked/escaping/symlink targets and no tools payload export. Focus real correctness/regression errors; no renderer or API change."
+    }
+  ]
+}

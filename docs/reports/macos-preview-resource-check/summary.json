@@ -1,0 +1,199 @@
+{
+  "source": "d8de4fc SDK native fixtures; runtime input equivalence to final alpha.3 SDK verified separately",
+  "activity_result": {
+    "elapsed_seconds": 600.144186375,
+    "event": "vellum.endurance.result",
+    "full_p11_qualified": false,
+    "native_edits": 600,
+    "pending": {
+      "DirtyWindows": 0,
+      "Ordinary": 0,
+      "Reserved": 0,
+      "ReadyCompletions": 0,
+      "Dispatching": 1,
+      "Cleanup": 0,
+      "Closed": false
+    },
+    "resizes": 200,
+    "result": "PASS_COMPOSED_ACTIVITY",
+    "steps": 2400,
+    "workers": 0,
+    "workers_committed": 600,
+    "workers_stale_discarded": 1200,
+    "workers_started": 1800
+  },
+  "soak_result": "FAILED_NATIVE_WINDOW_SOAK",
+  "soak_elapsed_seconds": 1815.9365909998305,
+  "eligible_visible_samples": 6,
+  "all_visible_samples_60s_eligible": true,
+  "one_cpu_percent_range": [
+    0.036727078491486494,
+    0.09078688758642274
+  ],
+  "post_gc_heap_range_bytes": [
+    59384608,
+    59388096
+  ],
+  "rss_range_bytes": [
+    294633472,
+    294666240
+  ],
+  "quiet_deltas": [
+    {
+      "sample": 1,
+      "primary_paint_wakes": 0,
+      "empty_event_posts": 0,
+      "surface_present_attempts": 0
+    },
+    {
+      "sample": 2,
+      "primary_paint_wakes": 0,
+      "empty_event_posts": 0,
+      "surface_present_attempts": 0
+    },
+    {
+      "sample": 3,
+      "primary_paint_wakes": 0,
+      "empty_event_posts": 0,
+      "surface_present_attempts": 0
+    },
+    {
+      "sample": 4,
+      "primary_paint_wakes": 0,
+      "empty_event_posts": 0,
+      "surface_present_attempts": 0
+    },
+    {
+      "sample": 5,
+      "primary_paint_wakes": 0,
+      "empty_event_posts": 0,
+      "surface_present_attempts": 0
+    },
+    {
+      "sample": 6,
+      "primary_paint_wakes": 0,
+      "empty_event_posts": 0,
+      "surface_present_attempts": 0
+    }
+  ],
+  "failed_transition": [
+    {
+      "cover": {
+        "Title": "Vellum cycle survivor",
+        "Visible": true,
+        "Miniaturized": false,
+        "Key": true,
+        "OcclusionVisible": true,
+        "Frame": [
+          2771,
+          -32,
+          2008,
+          1190
+        ],
+        "OrderedIndex": 0,
+        "Opaque": true,
+        "Alpha": 1,
+        "Level": 0,
+        "IdentityAvailable": true,
+        "WindowClass": "NSKVONotifying_GLFWWindow",
+        "ContentViewClass": "VellumManagedInput_VellumAXView_GLFWContentView",
+        "WindowNumber": 175015
+      },
+      "cover_contains_target": true,
+      "event": "vellum.soak.transition",
+      "last_query_error": "",
+      "observed": true,
+      "observed_utc": "2026-10-22T21:54:32.734435Z",
+      "phase": "occluded",
+      "state_accepted": false,
+      "target": {
+        "Title": "Vellum composed idle soak",
+        "Visible": true,
+        "Miniaturized": false,
+        "Key": false,
+        "OcclusionVisible": true,
+        "Frame": [
+          2803,
+          0,
+          1944,
+          1126
+        ],
+        "OrderedIndex": 1,
+        "Opaque": true,
+        "Alpha": 1,
+        "Level": 0,
+        "IdentityAvailable": true,
+        "WindowClass": "NSKVONotifying_GLFWWindow",
+        "ContentViewClass": "VellumManagedInput_VellumAXView_GLFWContentView",
+        "WindowNumber": 175022
+      }
+    }
+  ],
+  "terminal_native_cleanup": {
+    "Windows": [
+      {
+        "Title": "",
+        "Visible": false,
+        "Miniaturized": false,
+        "Key": false,
+        "OcclusionVisible": false,
+        "Frame": [
+          0,
+          0,
+          500,
+          500
+        ],
+        "OrderedIndex": -1,
+        "Opaque": false,
+        "Alpha": 1,
+        "Level": 0,
+        "IdentityAvailable": true,
+        "WindowClass": "NSKVONotifying_TUINSWindow",
+        "ContentViewClass": "NSView",
+        "WindowNumber": 175020
+      }
+    ],
+    "MainThread": true,
+    "CleanupObserved": true,
+    "WindowTitles": [],
+    "FilePanels": {
+      "Tracked": 0,
+      "Visible": 0,
+      "Open": 0,
+      "Save": 0
+    },
+    "NativeOutstanding": 0,
+    "AccessibilityWindows": 0,
+    "Menu": {
+      "Owned": false,
+      "OriginalRestored": false,
+      "TargetRetired": true,
+      "OriginalCaptured": false,
+      "Items": []
+    },
+    "Tray": {
+      "Present": false,
+      "Visible": false,
+      "Template": false,
+      "TargetRetired": true,
+      "Identity": 0,
+      "Title": "",
+      "Tooltip": "",
+      "AccessibilityLabel": "",
+      "ImageWidth": 0,
+      "ImageHeight": 0,
+      "PixelWidth": 0,
+      "PixelHeight": 0,
+      "Items": []
+    },
+    "CallbacksStopped": true,
+    "PendingCallbacks": 0,
+    "MenuCallbacks": 0,
+    "TrayCallbacks": 0
+  },
+  "two_hour_soak_pass": false,
+  "native_heap_qualified": false,
+  "gpu_heap_qualified": false,
+  "full_framework_qualified": false,
+  "activity_observation_scope": "PASS_COMPOSED_ACTIVITY only; mid-owner-callback observation, not a post-close quiescence or deallocation claim. Document safety comes from its separate native fixture."
+}

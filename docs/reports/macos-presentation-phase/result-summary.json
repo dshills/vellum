@@ -1,0 +1,233 @@
+{
+  "outcome": "REJECT",
+  "prepared_commit": "1f930d440f069db2ed94573014eec89c681f272b",
+  "elapsed_seconds": 52.938797,
+  "owned_groups_retired": 18,
+  "cases": [
+    {
+      "kind": "native",
+      "native_seconds": 34.07524795806967,
+      "exit_code": 0,
+      "command_error": null,
+      "validated": true,
+      "joined_inputs": 248,
+      "receipt_to_shown_ms": {
+        "count": 120,
+        "p50": 26.830666698515415,
+        "p95": 34.95991649106145,
+        "p99": 35.10508337058127,
+        "max": 35.11466667987406
+      },
+      "over33_3ms": 30,
+      "phase_buckets": {
+        "0": {
+          "count": 30,
+          "receipt_phase_error_ms": {
+            "count": 30,
+            "p50": 0.4524530377238989,
+            "p95": 0.776161439716816,
+            "p99": 0.8248698431998491,
+            "max": 0.8248698431998491
+          },
+          "receipt_to_shown_ms": {
+            "count": 30,
+            "p50": 30.716458335518837,
+            "p95": 30.933249974623322,
+            "p99": 30.98745853640139,
+            "max": 30.98745853640139
+          }
+        },
+        "1": {
+          "count": 30,
+          "receipt_phase_error_ms": {
+            "count": 30,
+            "p50": 0.4035260062664747,
+            "p95": 0.6713178008794785,
+            "p99": 0.6717343349009752,
+            "max": 0.6717343349009752
+          },
+          "receipt_to_shown_ms": {
+            "count": 30,
+            "p50": 26.59654151648283,
+            "p95": 26.734041748568416,
+            "p99": 26.830666698515415,
+            "max": 26.830666698515415
+          }
+        },
+        "2": {
+          "count": 30,
+          "receipt_phase_error_ms": {
+            "count": 30,
+            "p50": 0.4086822737008333,
+            "p95": 0.8428073488175869,
+            "p99": 0.8612240198999643,
+            "max": 0.8612240198999643
+          },
+          "receipt_to_shown_ms": {
+            "count": 30,
+            "p50": 22.41754182614386,
+            "p95": 22.5705832708627,
+            "p99": 22.61100010946393,
+            "max": 22.61100010946393
+          }
+        },
+        "3": {
+          "count": 30,
+          "receipt_phase_error_ms": {
+            "count": 30,
+            "p50": 0.4110049922019243,
+            "p95": 0.8399635553359985,
+            "p99": 0.8433801122009754,
+            "max": 0.8433801122009754
+          },
+          "receipt_to_shown_ms": {
+            "count": 30,
+            "p50": 34.92233343422413,
+            "p95": 35.10508337058127,
+            "p99": 35.11466667987406,
+            "max": 35.11466667987406
+          }
+        }
+      },
+      "p95_rank_ticket": {
+        "sequence": 152,
+        "phase": 3,
+        "cohort": "measured",
+        "attempt": 155,
+        "tag": 154,
+        "drawable": 154,
+        "target": 1210884.2256297034,
+        "receipt": 1210884.2260266254,
+        "receipt_phase_error_ms": 0.39692199788987637,
+        "receipt_to_shown_ms": 34.95991649106145,
+        "receipt_to_gpu_end_ms": 15.201291302219033,
+        "gpu_end_to_shown_ms": 19.758625188842416,
+        "render_gpu_end_to_shown_ms": 19.758625188842416,
+        "pending_at_receipt_hook": [],
+        "acquiring_at_receipt_hook": 0,
+        "receipt_hook_observed": 1210884.226027417,
+        "receipt_hook_delay_ms": 0.0007916241884231567,
+        "acquire_begin": {
+          "acquiring_after": 1,
+          "acquiring_before": 0,
+          "at": 1210884.2405832086,
+          "attempt": 155,
+          "kind": 2,
+          "observed": 1210884.2405839586,
+          "ordinal": 614,
+          "pending_after": [],
+          "pending_before": [],
+          "request": 152,
+          "shown": 0,
+          "tag": 154
+        },
+        "acquired": {
+          "acquiring_after": 0,
+          "acquiring_before": 1,
+          "at": 1210884.2406211253,
+          "attempt": 155,
+          "kind": 3,
+          "observed": 1210884.2406218336,
+          "ordinal": 615,
+          "pending_after": [
+            155
+          ],
+          "pending_before": [],
+          "request": 152,
+          "shown": 0,
+          "tag": 154
+        },
+        "presented": {
+          "acquiring_after": 0,
+          "acquiring_before": 0,
+          "at": 1210884.2616493336,
+          "attempt": 155,
+          "kind": 5,
+          "observed": 1210884.2616502086,
+          "ordinal": 616,
+          "pending_after": [],
+          "pending_before": [
+            155
+          ],
+          "request": 152,
+          "shown": 1210884.2609865419,
+          "tag": 154
+        },
+        "pending_observations": {
+          "receipt": {
+            "basis": "last recorded transition observed at or before event",
+            "attempts": [],
+            "other_attempts": []
+          },
+          "present_request": {
+            "basis": "last recorded transition observed at or before event",
+            "attempts": [
+              155
+            ],
+            "other_attempts": []
+          },
+          "final_gpu_end": {
+            "basis": "last recorded transition observed at or before event",
+            "attempts": [
+              155
+            ],
+            "other_attempts": []
+          }
+        },
+        "reported_ticks_gpu_to_shown": 1
+      },
+      "attempts": 251,
+      "events": 1001,
+      "callbacks": 1988,
+      "terminal_pending": 0,
+      "terminal_acquiring": 0,
+      "receipt_hook_pending_counts": {
+        "0": 120
+      },
+      "receipt_hook_delay_ms": {
+        "count": 120,
+        "p50": 0.00100000761449337,
+        "p95": 0.00162515789270401,
+        "p99": 0.0017499551177024841,
+        "max": 0.013708369806408882
+      },
+      "other_pending_counts": {
+        "receipt": {
+          "0": 120
+        },
+        "present_request": {
+          "0": 120
+        },
+        "final_gpu_end": {
+          "0": 120
+        }
+      },
+      "gpu_end_to_shown_ms": {
+        "count": 120,
+        "p50": 19.711125176399946,
+        "p95": 19.942000275477767,
+        "p99": 20.08391683921218,
+        "max": 20.18229174427688
+      }
+    },
+    {
+      "kind": "framework",
+      "native_seconds": 6.001250790897757,
+      "exit_code": 1,
+      "command_error": null,
+      "validated": false
+    }
+  ],
+  "pair_validation": null,
+  "error": {
+    "type": "ValueError",
+    "message": "native command failure"
+  },
+  "attempt_sealed": true,
+  "native_retry": false,
+  "release_qualified": false,
+  "gate_changed": false,
+  "production_change": false,
+  "interpretation": "Phase acceptance and pending records are diagnostic only. Pending=acquisition awaiting callback, not Metal pool availability/retention/credits/compositor queue. Four phase populations stay separate; no pureframework cost, causal fix or ordinary qualification claim.",
+  "SDK_files_unchanged": 8321
+}

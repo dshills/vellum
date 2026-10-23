@@ -1,0 +1,177 @@
+{
+  "outcome": "VALID_JOINED_TIMING_CAPTURE",
+  "source_checkpoint": "ffb7aea56a58638f8513bc1d5c96fae296789259",
+  "elapsed_seconds": 37.694546,
+  "native_seconds": 31.272779209073633,
+  "owned_groups_retired": 9,
+  "warmup": 128,
+  "measured": 120,
+  "joined_inputs": 248,
+  "raster_records": 256,
+  "startup_raster_records": 8,
+  "native_upload_records": 254,
+  "startup_native_uploads": 6,
+  "interval_ms": {
+    "wake_to_checked": {
+      "count": 120,
+      "p50": 0.6918748840689659,
+      "p95": 0.9867500048130751,
+      "p99": 1.3910415582358837,
+      "max": 1.4294167049229145
+    },
+    "checked_to_postcheck": {
+      "count": 120,
+      "p50": 0.00300002284348011,
+      "p95": 0.004666857421398163,
+      "p99": 0.020458130165934563,
+      "max": 0.03116670995950699
+    },
+    "postcheck_to_receipt": {
+      "count": 120,
+      "p50": 0.13729161582887173,
+      "p95": 0.2038334496319294,
+      "p99": 0.29850006103515625,
+      "max": 0.6262916140258312
+    },
+    "receipt_to_raster": {
+      "count": 120,
+      "p50": 0.3255833871662617,
+      "p95": 0.478583388030529,
+      "p99": 0.8642915636301041,
+      "max": 1.5107500366866589
+    },
+    "raster": {
+      "count": 120,
+      "p50": 0.6811665371060371,
+      "p95": 0.8436250500380993,
+      "p99": 1.035208348184824,
+      "max": 1.155458390712738
+    },
+    "raster_to_upload": {
+      "count": 120,
+      "p50": 0.01774984411895275,
+      "p95": 0.03691669553518295,
+      "p99": 0.05591660737991333,
+      "max": 0.09287497960031033
+    },
+    "upload": {
+      "count": 120,
+      "p50": 1.8433749210089445,
+      "p95": 3.1037917360663414,
+      "p99": 3.7017918657511473,
+      "max": 4.086999921128154
+    },
+    "upload_to_acquire": {
+      "count": 120,
+      "p50": 0.12179161421954632,
+      "p95": 0.28729159384965897,
+      "p99": 0.4089584108442068,
+      "max": 0.5116667598485947
+    },
+    "acquire_to_shown": {
+      "count": 120,
+      "p50": 23.980541620403528,
+      "p95": 32.91720827110112,
+      "p99": 33.37416658177972,
+      "max": 33.403499983251095
+    }
+  },
+  "receipt_to_shown_ms": {
+    "count": 120,
+    "p50": 27.970666764304042,
+    "p95": 35.353333223611116,
+    "p99": 36.54775000177324,
+    "max": 36.689416505396366
+  },
+  "observations_over33_3ms": 17,
+  "actual_p95_rank_ticket": {
+    "accepted_revision": 228,
+    "phase": "measured",
+    "scope": 1,
+    "opaque_tag": 458,
+    "generation": 231,
+    "presentation_sequence": 232,
+    "drawable_id": 237,
+    "raster_ordinal": 235,
+    "upload_ordinal": 233,
+    "raw_host_clocks": {
+      "wake": 1198605.289023792,
+      "checked": 1198605.2894867086,
+      "postcheck": 1198605.289489042,
+      "receipt": 1198605.2895705004,
+      "raster_begin": 1198605.2897555002,
+      "raster_end": 1198605.2900873336,
+      "upload_begin": 1198605.2901018336,
+      "upload_end": 1198605.2915622087,
+      "acquired": 1198605.2916832087,
+      "shown": 1198605.3249238336
+    },
+    "schedule_go_ns": {
+      "Sequence": 228,
+      "WakeLatenessNS": 1927292,
+      "ForegroundCheckNS": 467916,
+      "PostCheckLatenessNS": 2397125
+    },
+    "receipt_lateness_go_ns": 2478000,
+    "receipt_clock_bracket_go_ns": 625,
+    "intervals_ns": {
+      "wake_to_checked": 462916.67968034744,
+      "checked_to_postcheck": 2333.4287106990814,
+      "postcheck_to_receipt": 81458.36181938648,
+      "receipt_to_raster": 184999.77886676788,
+      "raster": 331833.49296450615,
+      "raster_to_upload": 14499.993994832039,
+      "upload": 1460375.0314563513,
+      "upload_to_acquire": 120999.99003112316,
+      "acquire_to_shown": 33240624.936297536
+    },
+    "receipt_to_shown_ns": 35353333.22361112,
+    "wake_to_shown_ns": 35900041.69382155,
+    "frame_work_ns": {
+      "InputNS": 16291,
+      "OwnerNS": 209,
+      "ReconcileNS": 56875,
+      "LayoutPaintNS": 52250,
+      "GatherNS": 2667,
+      "RasterUploadNS": 1821375,
+      "EncodeSubmitNS": 302834,
+      "QueuedNS": 7542,
+      "AcquireNS": 78000,
+      "PresentCallNS": 16250,
+      "TotalUIWorkNS": 2252501
+    },
+    "source_nested_ns": {
+      "DrawNS": 1817125,
+      "RasterNS": 333041,
+      "CopyNS": 1481958,
+      "SetFromGoImageNS": 1475125
+    },
+    "native_upload_stages_ns": {
+      "create_ns": 82166.63263738155,
+      "map_ns": 1291.7444109916687,
+      "copy_ns": 1267958.4324359894,
+      "flush_ns": 708.5036486387253,
+      "encode_ns": 59708.2544118166
+    }
+  },
+  "actual_p95_rank_ticket_grouped_ms": {
+    "raster": 0.33183349296450615,
+    "native_upload": 1.4603750314563513,
+    "other_before_acquire": 0.3204997628927231,
+    "acquire_to_shown": 33.240624936297536,
+    "total_receipt_to_shown": 35.353333223611116
+  },
+  "maximum_wake_partition_closure_error_ns": 0.0,
+  "receipt_clock_read_bracket_go_ns": {
+    "min": 209,
+    "max": 15042
+  },
+  "SDK_files_unchanged": 8321,
+  "native_policy": "Original fresh allocation/WC/shared policy with existing private CPU-upload observer; no pool/cache experiment.",
+  "native_stdout_sha256": "01b7835e347d853501e3b4c16e502ab4dd58ecfb90904b456a1c67004fc82a4f",
+  "interpretation": "Largest interval on the actual p95-ranked input is after drawable acquisition, not CPU raster. Acquisition-to-shown includes encoding, submission, GPU and compositor phases; this capture cannot separate them. Go work/queue/lateness stay nested/separate, not added to native clock partitions. Instrumented routed Go input observation is not ordinary-build, physical input or displayed-pixel qualification. One case does not establish repeatability, calibrated overhead or a performance repair.",
+  "next": "Keep renderer and allocation policy frozen. Any further diagnosis should join backend render submit/GPU/scheduling/presentation boundaries to these same input/drawable identities, preserving full startup accounting, before proposing a pacing or backend change.",
+  "release_qualified": false,
+  "gate_changed": false,
+  "production_repair_adopted": false
+}

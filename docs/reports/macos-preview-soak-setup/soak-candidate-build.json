@@ -1,0 +1,29 @@
+{
+  "sdk_archive_sha256": "bb5bbba8161efb88a102b3189e189da8038a5c18063beaedbae230d5e5b23887",
+  "sdk_source": {
+    "clean": true,
+    "commit": "10beef424c532395802065b2be45119bec88efe2"
+  },
+  "sdk_file_changes": [
+    "drivers/cogent/cmd/window-cycle-smoke/soak.go"
+  ],
+  "fixture_sha256": "5ea83321f2e697e8b36aaf722d273c04e341c0b2a393313b9391703d551f20f8",
+  "candidate_binary_sha256": "7a73d546aedb6b04e7dde6b8e7edf526d16794249742e38a5fd11c4ceab74f8e",
+  "selected_native_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "selected_archive_path_in_link_map": true,
+  "link_map_sha256": "df43ff985dd49104ee4ff5aabf57e1ee252f542acea7b43a51ca1911d06080f4",
+  "root_preflight_native_sha256": "7d8b688a6b55f0728c847e1c3b028d07ccb1009d8cea4833a6186a5775384248",
+  "root_pilot_qualifies_candidate": false,
+  "argv": [
+    "go",
+    "build",
+    "-tags",
+    "vellum_native_checks",
+    "-ldflags=-linkmode=external -extldflags=-Wl,-map,/private/tmp/vellum-soak-candidate.map",
+    "-o",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/window-cycle-candidate",
+    "./cmd/window-cycle-smoke"
+  ],
+  "seconds": 26.29495449992828,
+  "exit_code": 0
+}

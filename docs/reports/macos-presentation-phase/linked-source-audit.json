@@ -1,0 +1,12 @@
+{
+  "binary_sha256": "a0252048e60d33a13c98c344c6e255f66ddc81c569cf9e6716a71292e16bbbfe",
+  "source_snapshot": "docs/reports/macos-presentation-phase/execution-sources/core-presentation.m.txt",
+  "expected_pending_hooks": {
+    "_pc_acquire_begin": false,
+    "_pc_acquired": false,
+    "_pc_unavailable": false
+  },
+  "original_presentation_acquire_call_present": true,
+  "observed": "Linked method lacks the pending hooks present in supplied Objective-C overlay. Runtime pending trace empty; existing presentation-metrics samples also empty. This establishes an uninstrumented diagnostic build, but does not independently isolate why startup presentation feedback is absent.",
+  "next": "Use a fresh physical private Core copy for native-source changes and verify actual linked hook calls before another attempt; no shipping source/default/gate change."
+}

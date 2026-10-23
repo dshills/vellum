@@ -1,0 +1,40 @@
+{
+  "result": "REJECTION_INDEPENDENTLY_REPRODUCED",
+  "population": 248,
+  "warmup": 128,
+  "measured": 120,
+  "violation_count": 1,
+  "violations": [
+    {
+      "sequence": 215,
+      "phase": 2,
+      "cohort": "measured",
+      "target": 1212895.7174344845,
+      "receipt": 1212895.7195780836,
+      "error_ms": 2.1435990929603577,
+      "tag": 217,
+      "receipt_hook_tag": 217,
+      "receipt_clock_join": true,
+      "tag_join": true,
+      "planned_lateness_ns": 2135807.415470481
+    }
+  ],
+  "maximum_receipt_error_ms": 2.1435990929603577,
+  "all_receipt_clock_joins": true,
+  "all_tag_joins": true,
+  "all_target_anchor_checks": true,
+  "all_acquisition_drawable_callback_joins": true,
+  "parent_native_validator_passed": true,
+  "display_clock_checks_passed": true,
+  "pending_replay_passed": true,
+  "attempts": 251,
+  "events": 1001,
+  "display_callbacks": 1986,
+  "terminal_pending": 0,
+  "terminal_acquiring": 0,
+  "framework_started": false,
+  "corrected_framework_startup_verified": false,
+  "release_qualified": false,
+  "gate_changed": false,
+  "interpretation": "One receipt exceeded the predeclared diagnostic phase bound of2ms; no missing identity join. Full pair refused, no filtering/retry/threshold change. No accepted latency comparison or startup claim."
+}

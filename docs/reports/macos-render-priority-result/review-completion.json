@@ -1,0 +1,24 @@
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "run_id": "8bd87eb578636e4133cc2bf68992896c",
+  "text_files": 6,
+  "coverage_complete": true,
+  "retained_findings": 0,
+  "discarded_findings": 1,
+  "suppressed_findings": 0,
+  "archive_verification": {
+    "members": 32,
+    "committed_mappings": 2,
+    "sha256": "1bd0cbfc5fa2fdb4bf0008e8e55a85f7e92600ed15564027b112dd10ab0be98a",
+    "result": "pass"
+  },
+  "dispositions": [
+    {
+      "id": "b688450c27702cae",
+      "result": "accepted limitation of archived execution source; no runtime change",
+      "reason": "The archived script is local provenance, not a portable CLI. evidence-index.json layout explicitly requires external pinned local inputs. Independent refers to rechecking the original journal and checksums separately from its execution, not execution on any machine. The archive members and committed mappings have also been checked directly."
+    }
+  ],
+  "decision": "Candidate rejected on valid 48.286 ms p95 versus unchanged 33.3 ms gate. No production adoption or more performance trials."
+}

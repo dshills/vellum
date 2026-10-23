@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "<USER_HOME>/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "docs/reports/macos-preview-app-acceptance/README.md,docs/reports/macos-preview-app-acceptance/alpha3-asset-notice-check.json,docs/reports/macos-preview-app-acceptance/alpha3-native-cancel.json,docs/reports/macos-preview-app-acceptance/alpha3-native-drag-quiet.json,docs/reports/macos-preview-app-acceptance/alpha3-native-group-move.json,docs/reports/macos-preview-app-acceptance/alpha3-native-group-resize.json,docs/reports/macos-preview-app-acceptance/alpha3-native-marquee.json,docs/reports/macos-preview-app-acceptance/alpha3-native-pan.json,docs/reports/macos-preview-app-acceptance/alpha3-native-rejected.json,docs/reports/macos-preview-app-acceptance/alpha3-native-zoom.json,docs/reports/macos-preview-app-acceptance/alpha3-recovery-roundtrip.json,docs/reports/macos-preview-app-acceptance/alpha3-recovery-termination.json,docs/reports/macos-preview-app-acceptance/alpha3-save-panel-entry-correction.json,docs/reports/macos-preview-app-acceptance/evidence.json,docs/reports/macos-preview-app-acceptance/recovered-saved-drawing.vellum,docs/reports/macos-preview-app-acceptance/recovery-before-termination.vellum,docs/reports/macos-preview-app-acceptance/saved-drawing.vellum,docs/reports/macos-preview-app-acceptance/tuins-class-origin.json",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "4",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/app-acceptance-review/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/app-acceptance-review/prism.json"
+  ],
+  "cwd": "<USER_HOME>/Development/projects/Vellum",
+  "started_utc": "2026-10-22T21:20:25.641389+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 0,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 43558,
+  "group": 43558,
+  "owned": {
+    "created": true,
+    "pid": 43558,
+    "group": 43558,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 0,
+    "errors": [],
+    "observation": {
+      "group": 43558,
+      "members": [],
+      "observation_sha256": "e518b945401478d4d11757e5b14d7c2e1ff6663f018613608585287cc630313c"
+    }
+  },
+  "seconds": 6.807556207990274,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

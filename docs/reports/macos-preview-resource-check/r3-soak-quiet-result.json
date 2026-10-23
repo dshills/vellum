@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/window-cycle",
+    "-composed",
+    "-cycles=1",
+    "-sample-every=1",
+    "-soak=2h",
+    "-soak-quiet=60s",
+    "-soak-settle=10s",
+    "-soak-interval=5m",
+    "-timeout=2h2m"
+  ],
+  "started_utc": "2026-10-22T21:24:16.882379+00:00",
+  "exit_code": 1,
+  "elapsed_seconds": 1815.9365909998305,
+  "scope": "bounded native regression; not full endurance qualification or latency benchmark"
+}

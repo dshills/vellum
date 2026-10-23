@@ -1,5 +1,14 @@
 # macOS framework completion
 
+**Developer-preview policy, approved 22 October 2026:** the
+[first-release plan](macos-first-release-plan.md) governs the macOS preview.
+Numeric latency/cadence qualification and full endurance/platform certification
+below remain future full-qualification work, with historical failures preserved.
+Correctness, bounded resources, required workflows, independent SDK consumption
+and applicable distribution rights remain preview blockers. This does not mark
+M3–M7 complete or authorize public publication/signing.
+
+
 **Current Mac release policy (19 October 2026):** the owner selected measured
 60 Hz responsiveness as the release gate and retained 4 ms as an optimization
 target. The [release policy](macos-responsiveness.md) supersedes treating the
@@ -1767,3 +1776,42 @@ SDK/source/native/configuration/geometry pins stable. Three transitions are not
 a latency distribution, per-tag source attribution or displayed-byte proof.
 Inspect no-paint path execution/raster boundaries offscreen next; no repair,
 unchanged retry, default/SDK/app/gate change or release acceptance. M3–M7 open.
+
+The [focused offscreen raster cost checkpoint](../docs/reports/macos-raster-offscreen-cost/README.md)
+uses unchanged Core: full warm replay167.693–172.643µs, four no-paint paths
+129.5–130.6ns, last fill163.943–165.436µs, zero allocations. ExplicitCPU2,
+three observations/case, two focused Go methods and nine parser refusals pass.
+Native scalar geometry matches; overwritten colors/full path bytes and temporal
+conditions differ, so no native equivalence, phase sum or latency claim follows.
+No path-elision candidate or new native run is justified. Investigate separated
+replay/cache conditions offscreen next; features/defaults/SDK/app and33.3ms gate
+unchanged. M3–M7 open; no production repair adopted.
+
+The [separated offscreen replay control](../docs/reports/macos-raster-separated-cost/README.md)
+retains32samples/eightpercondition in1.998s with unchanged renderer. Immediate,
+120ms pause and32MiB scratch-footprint conditions overlap; observed replay ranges
+0.178–0.902ms. Final legacy pixels/focused method/nine parser refusals and source/
+SDK/log/group checks pass. Hot microbench timing is not native timing; no proven
+cache flush, isolated CPU/scheduling/GC cause, native-p95 or repair/adoption claim.
+Keep future timing joined to surrounding upload/schedule boundaries. No new
+native test; features/defaults/SDK/app/33.3ms gate unchanged, M3–M7 open.
+
+The [joined raster/upload/scheduling diagnostic](../docs/reports/macos-joined-timing/README.md)
+is prepared: private bounded absolute raster brackets plus native wake/check
+stamps, exact same-input source/upload/actual-presentation joins and contiguous
+interval closure. Go timer offsets/nested work remain separate; no guessed clock
+conversion or phase-quantile sum. Five recorder race methods, original routed
+pixels, five classifier methods/23refusals, build and exact recipe/pins/SDK checks
+pass. One reviewed/committed40s native case60overall is approved when ready; no
+result or production repair yet. Features/defaults/SDK/app/33.3ms gate unchanged,
+M3–M7 open.
+
+The [joined native result](../docs/reports/macos-joined-timing/README.md) passes248
+same-input joins/9groups in37.695s. Instrumented receipt→shown p95=35.353ms;
+17/120measured observations exceed33.3. On that actual rank ticket, raster0.332ms,
+native upload1.460ms, other before acquisition0.320ms and acquisition→shown33.241ms
+partition the same response. Post-acquisition still includes encode/submit/GPU/
+display phases; no compositor-only attribution, phase-quantile sum or fix follows.
+Full startup/pins/SDK/configuration/geometry/closure retained. Next join backend
+boundaries to the same identifiers. No native retry, production/default/SDK/app/
+feature/gate change; M3–M7 open, no ordinary release qualification.

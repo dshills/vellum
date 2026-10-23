@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "cb4abd1302373a44979e42714ae3a028",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "aaa0a3aa16aff4a4cd263708d2829c5427d3ddc0",
+    "branch": "codex/macos-preview"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "f91717ead6236a3d",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Progress file contradicts final results",
+      "message": "r3-progress.json is a stale snapshot. It still shows the resource check as \"running\" and has pending items (PNG pixel count pending, PID exit awaiting observation). These contradict the README and evidence.json, which report the cycle run as failed at 83/100 and the PNG pixels and PID exit as observed. Readers of the evidence bundle could be misled.",
+      "suggestion": "Update the state to \"failed\" (exit 1, 83/100 cycles) and resolve or remove the pending notes, or mark the file as a historical snapshot.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reports/macos-preview-r3-first/r3-progress.json",
+          "lines": {
+            "start": 2,
+            "end": 2
+          }
+        }
+      ],
+      "tags": [
+        "evidence-consistency",
+        "location-corrected"
+      ],
+      "evidence": "\"checkpoint\": \"R3_IN_PROGRESS_NOT_ACCEPTED\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4061,
+    "totalMs": 4113
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 17,
+    "bytes": 20946,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 11657,
+        "output": 346,
+        "costUSD": 0.026774
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

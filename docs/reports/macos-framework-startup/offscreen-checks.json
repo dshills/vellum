@@ -1,0 +1,31 @@
+{
+  "result": "PASS_STARTUP_OFFSCREEN_PREPARATION",
+  "focused_methods": 8,
+  "negative_subcases": 23,
+  "actual_no_authorization_control": "exit1 startup authorization/fresh scope, no startup/stop/native/pilot-match markers",
+  "owned_successful_commands": 2,
+  "first_wrapper_refusals": "Both exit71 sandbox_apply before Python; originalfailedreceipts preserved. Originalps observations denied; bothknownownedgroups now separately observed absent. Environment-only escalation; no test/product failure hidden.",
+  "original_refused_groups_absence": [
+    {
+      "group": 82250,
+      "members": [],
+      "observation_sha256": "699df97aa71895f3bf0cfad59cccd356e49bde7986bd12f56c26dc0f8425b066"
+    },
+    {
+      "group": 82252,
+      "members": [],
+      "observation_sha256": "56b4b590aab4ee12022fb90b1669e83f40ab0ab6eeb7c576b26a7c45f9f711a4"
+    }
+  ],
+  "compiled_pins_verified": 6403,
+  "SDK_files_unchanged": 8321,
+  "binary_sha256": "6825d90efe89f75ce1361c8bf75542ff2866c2869061b5ae95405a576646466a",
+  "fresh_plan_sha256": "3373aeb803b178087f3c490c399d80d857bd2e19797705e2c72713bc784ffb36",
+  "fresh_plan_pins": 6420,
+  "shipping_changes": false,
+  "features_changed": false,
+  "release_gate_changed": false,
+  "native_UI_execution": false,
+  "live_approval": "Pending fresh up to1minute quietwindow afterreview/commit",
+  "internal_review": "Singlepilot literalargv/20s watchdog/45s outerdeadline, existingHost/executor/lease reuse, original setup validator and shared replay retained, exact source/binary/SDK/fixturematch, no input/phase/p95 or qualification claim. No unresolved source findings."
+}

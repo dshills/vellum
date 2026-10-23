@@ -1,0 +1,59 @@
+{
+  "outcome": "VALID_CORRECTED_FRAMEWORK_STARTUP_ONLY",
+  "prepared_commit": "e002c0e9cdab82826bb175b186958066fad00c41",
+  "elapsed_seconds": 8.111038,
+  "native_seconds": 1.4624582091346383,
+  "owned_groups_retired": 9,
+  "raw_logs_verified": 18,
+  "validation": {
+    "outcome": "VALID_CORRECTED_FRAMEWORK_STARTUP_ONLY",
+    "parent_setup": {
+      "outcome": "VALID_SETUP_ONLY",
+      "setup_losses": 0,
+      "release_qualified": false
+    },
+    "presentation_samples": 4,
+    "positive_presentations": 4,
+    "attempts": 10,
+    "events": 30,
+    "terminal_pending": 0,
+    "terminal_acquiring": 0,
+    "layer_class": "VellumPresentationLayer",
+    "display_callbacks": 0,
+    "scope_closed": true,
+    "routed_inputs": 0,
+    "phase_pair_qualified": false,
+    "release_qualified": false,
+    "gate_changed": false
+  },
+  "joined_attempt_ids": [
+    7,
+    8,
+    9,
+    10
+  ],
+  "pre_observer_attempts": 6,
+  "all_callback_count": 10,
+  "all_positive_callback_count": 8,
+  "all_zero_callback_count": 2,
+  "zero_callbacks": "Both belong to retained scope0 pre-observer attempts; original scoped recorder has fourpositive samples and zero skips. No raw event removed.",
+  "actual_layer_classes": {
+    "begin": {
+      "layer_class": "VellumPresentationLayer",
+      "view_layer_class": "VellumPresentationLayer"
+    },
+    "end": {
+      "layer_class": "VellumPresentationLayer",
+      "view_layer_class": "VellumPresentationLayer"
+    }
+  },
+  "SDK_files_unchanged": 8321,
+  "all_bound_pins_unchanged": true,
+  "attempt_sealed": true,
+  "retry": false,
+  "phase_pair_qualified": false,
+  "release_qualified": false,
+  "features_changed": false,
+  "release_gate_changed": false,
+  "interpretation": "Closes only corrected-binary startup/native hook/metrics joins and recorder-scope shutdown. Zero display callbacks in brief observer lifetime do not qualify cadence. Source observer overhead, responsiveness, physical input, native object deallocation, resource/endurance, finalSDK/rights and fullMacrelease remain separate."
+}

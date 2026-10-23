@@ -1,0 +1,23 @@
+{
+  "result": "REVIEW_COMPLETE_NO_UNRESOLVED_FINDINGS",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "files": 9,
+  "complete": true,
+  "excluded": [],
+  "truncated_bytes": 0,
+  "skipped": [],
+  "findings": 1,
+  "refuted_findings": 1,
+  "unresolved_actionable_findings": 0,
+  "disposition": "cd3c1eb4b90d9b02 alleged unequal hashes that are textually identical. Actual archive member, working file and staged Git blob recompute to the same hash as both index records. No change warranted. See reviews/hash-finding-proof.json.",
+  "report_sha256": "a78c2482a3b5db3e89b5abf55480cfefd0f211c34d103610cb081a6e4530f38d",
+  "finding_proof_sha256": "be7fb5b99229582b6005f299dbb3bb3b8e843ecc50f6bf7e43efd24389482911",
+  "binary_archive_provider_reviewed": false,
+  "archive_verified_locally": "50 regular relative members, full hashes/6 committed-copy mappings,9ownedgroups/18logs verified.",
+  "live_outcome": "REJECT native seq215 phase2 error2.143599ms>2ms. Framework not launched; corrected startup unverified.",
+  "features_changed": false,
+  "release_gate_changed": false,
+  "retry": false,
+  "public_push": false
+}

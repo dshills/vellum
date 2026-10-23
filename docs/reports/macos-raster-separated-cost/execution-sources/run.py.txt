@@ -1,0 +1,13 @@
+from pathlib import Path
+import json,sys,importlib.util,hashlib
+sys.dont_write_bytecode=True
+q=Path(__file__).resolve().parent;r=Path('/Users/dshills/Development/projects/Vellum');p=Path('/private/tmp/vellum-raster-cost-core');f=r/'tools/macos-calibration/stagingreuse/framework';sdk=Path('/private/tmp/vellum-doclinks-sdk-bd3cbc9/retained SDK/vellum-v0.1.0-alpha.2');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+sys.path.insert(0,str(r/'scripts'));sys.path.insert(0,str(q.parent/'macos-grid-capture-repair/preflight-v2'))
+s=importlib.util.spec_from_file_location('raster_cost_owned',q.parent/'macos-sdk-native-238b3b6/run.py');g=importlib.util.module_from_spec(s);s.loader.exec_module(g)
+s=importlib.util.spec_from_file_location('raster_cost_sdk',q.parent/'macos-release-default-assessment/assessment.py');a=importlib.util.module_from_spec(s);sys.modules[s.name]=a;s.loader.exec_module(a);expected=json.loads((q.parent/'macos-release-default-assessment/plan.json').read_text())['sdk'];assert a.sdk_vector()==expected
+upstream=sdk/'drivers/cogent/build/upstream';vector={x.relative_to(upstream).as_posix():sha(x) for x in upstream.rglob('*') if x.is_file()};assert vector=={x.relative_to(p).as_posix():sha(x) for x in p.rglob('*') if x.is_file()}
+pins={str(x):sha(x) for root in [p,f] for x in root.rglob('*') if x.is_file()};pins.update({str(q/n):sha(q/n) for n in ['framework.mod','framework.sum','fixture.go','replay_test.go','overlay.json','run.py']})
+base=['/usr/bin/sandbox-exec','-p','(version 1)(allow default)(deny network*)','/bin/sh',str(q.parent/'macos-app-examples/go-check'),'test','-tags=offscreen','-modfile='+str(q/'framework.mod'),'-overlay='+str(q/'overlay.json')]
+name='separated';extra=['-run','^TestRasterReplaySeparatedConditions$','-count=1','-cpu=2','-parallel=1','-timeout=15s','-v']
+run=g.execute(base+extra+['.'],f,q/name,lambda:False,lambda:all(sha(Path(k))==v for k,v in pins.items()),timeout=45,limit=2<<20)
+(q/(name+'-receipt.json')).write_text(json.dumps({'inputs':pins,'private_core_file_vector':vector,'run':run},indent=2)+'\n');print(json.dumps({name:{k:run[k] for k in ['exit_code','error','seconds']}}));assert run['error'] is None and run['exit_code']==0 and run['owned']['terminal'] and run['owned']['group_absent'];assert a.sdk_vector()==expected

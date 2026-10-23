@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f0891754d8230afbfede230078813fe9",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "45fe99fda6b7799bb7275c3f89d8a470c12a1ac0",
+    "branch": "codex/macos-preview"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "dbfc80758c737254",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Public record validation only checks notices key presence, not binding",
+      "message": "The public path only checks that a component_notices key exists in the record. It does not verify that the notices are bound to the archive's own SHA-256. A manifest can therefore pass validation with arbitrary or other-archive notices, which contradicts the spec's claim that both the audit approval and the exact-archive notices are required. The check is also done only by key presence, not by value validity.",
+      "suggestion": "Validate that record['component_notices'] is a dict whose artifact_sha256 equals record['files'][LIBRARY], and reuse component_notice_record for the check.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "scripts/native_gpu.py",
+          "lines": {
+            "start": 224,
+            "end": 225
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "provenance"
+      ],
+      "evidence": "if not private_build and (type(release_metadata) is not dict or release_metadata.get(\"third_party_distribution_audit\") != \"approved\" or \"component_notices\" not in record):",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4272,
+    "totalMs": 4292
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 26522,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 11599,
+        "output": 362,
+        "costUSD": 0.026818
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

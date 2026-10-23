@@ -1,0 +1,117 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a86e5de546e79103787737a3422c58c4",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "183fdb090fff248a858184f935bfdcca9792280a",
+    "branch": "codex/macos-preview"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "10f8252c166878d7",
+      "severity": "medium",
+      "category": "security",
+      "title": "Executing release policy module without integrity verification",
+      "message": "The release policy script is executed in-process by path. It only checks for symlinks and does not verify the file's integrity or that it belongs to the git-tracked source. A modified or untracked release-sdk.py can approve public output, since the public gate relies entirely on it.",
+      "suggestion": "Verify that release-sdk.py is tracked and unmodified in the checked-out commit (for example via git diff/ls-files) before executing it, or invoke it as a subprocess from a trusted location.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "scripts/package-app.py",
+          "lines": {
+            "start": 46,
+            "end": 46
+          }
+        }
+      ],
+      "tags": [
+        "security",
+        "trust-boundary",
+        "location-corrected"
+      ],
+      "evidence": "spec.loader.exec_module(policy)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "0bf5db4c0fb6d3e0",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Source state sampled after gates, not atomic with them",
+      "message": "The release gates and the source_state snapshot are taken at separate times. The source can change between them, so the recorded release_source may not match the state that was approved. A TOCTOU gap remains in the authorization recorded in the manifest.",
+      "suggestion": "Capture source_state before release_gates and compare it afterward, refusing if the two differ, so the recorded state is the one that was gated.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "scripts/package-app.py",
+          "lines": {
+            "start": 177,
+            "end": 178
+          }
+        }
+      ],
+      "tags": [
+        "toctou",
+        "release",
+        "location-corrected"
+      ],
+      "evidence": "        release_policy.release_gates(ROOT, metadata, True)\n    release_source = release_policy.source_state(ROOT) if public else None",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5619,
+    "totalMs": 5638
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 24873,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 11738,
+        "output": 559,
+        "costUSD": 0.029066
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

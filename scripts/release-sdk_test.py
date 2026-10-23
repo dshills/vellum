@@ -49,6 +49,26 @@ class ReleaseChecks(unittest.TestCase):
                 "repository_reference": "docs/reports/check/README.md#scope"}])
             self.assertEqual((root / "README.md").read_bytes(), data)
 
+    def test_sdk_documentation_excluded_tools_reference_and_refusal(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / "tools/calibration/TIMING.md"
+            target.parent.mkdir(parents=True)
+            target.write_text("# Timing archive\n")
+            tracked = {"specs/completion.md", "tools/calibration/TIMING.md"}
+            derived, record = release.sdk_documentation(root, "specs/completion.md",
+                b"[timing](../tools/calibration/TIMING.md#result)",
+                {"specs/completion.md"}, tracked)
+            self.assertIn(b"full-repository reference: `tools/calibration/TIMING.md#result`", derived)
+            self.assertEqual(len(record["references"]), 1)
+            self.assertTrue(release.repository_documentation("tools/calibration/TIMING.md"))
+            with self.assertRaisesRegex(ValueError, "unknown missing"):
+                release.sdk_documentation(root, "specs/completion.md",
+                    b"[missing](../tools/calibration/MISSING.md)", {"specs/completion.md"}, tracked)
+            with self.assertRaisesRegex(ValueError, "unknown missing"):
+                release.sdk_documentation(root, "specs/completion.md",
+                    b"[untracked](../tools/calibration/TIMING.md)", {"specs/completion.md"}, set())
+
     def test_sdk_documentation_multiline_label_directory_and_qualification(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "<USER_HOME>/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "docs/reports/macos-preview-distribution/README.md,docs/reports/macos-preview-distribution/decision-inputs.json,docs/reports/macos-preview-distribution/public-app-refusal.json",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "4",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/distribution-packet-review/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/distribution-packet-review/prism.json"
+  ],
+  "cwd": "<USER_HOME>/Development/projects/Vellum",
+  "started_utc": "2026-10-22T21:41:36.282794+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 0,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 49404,
+  "group": 49404,
+  "owned": {
+    "created": true,
+    "pid": 49404,
+    "group": 49404,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 0,
+    "errors": [],
+    "observation": {
+      "group": 49404,
+      "members": [],
+      "observation_sha256": "c2ee002d4eb9224a49274adeb81cf91f6f7c74d6fce478f3930b2345d7b222ad"
+    }
+  },
+  "seconds": 3.156073208199814,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

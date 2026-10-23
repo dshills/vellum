@@ -1,5 +1,6 @@
 """Private native SDK selection, tamper refusal and actual relocated module graph."""
 import copy
+from contextlib import nullcontext
 import hashlib
 import importlib.util
 import io
@@ -268,15 +269,91 @@ class NativeGPUChecks(unittest.TestCase):
             checker.check(Path("fixture"), "a" * 64)
         child.assert_not_called()
 
-    def test_all_or_none_and_public_refusal_precede_inventory_or_output(self):
+    def test_public_native_requires_both_release_approval_and_exact_notices(self):
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
+            root, files = source(base)
             options = inputs(base)
-            for public, kwargs in [(True, options), (False, dict(macos_gpu_library=options["macos_gpu_library"]))]:
-                with mock.patch.object(release, "license_inventory") as inventory, self.assertRaisesRegex(ValueError, "private SDK"):
-                    release.package(base, base / "not-created/sdk.tar.gz", public=public, **kwargs)
+            output = base / "not-created/sdk.tar.gz"
+            for public in [False, True]:
+                with mock.patch.object(release, "license_inventory") as inventory, self.assertRaisesRegex(ValueError, "all three"):
+                    release.package(root, output, public=public, macos_gpu_library=options["macos_gpu_library"])
                 inventory.assert_not_called()
-                self.assertFalse((base / "not-created").exists())
+                self.assertFalse(output.parent.exists())
+            metadata = json.loads((root / "release/version.json").read_text())
+            metadata.update(namespace_status="selected", license_status="selected", third_party_distribution_audit="pending")
+            (root / "release/version.json").write_text(json.dumps(metadata))
+            (root / "LICENSE").write_text("framework license fixture")
+            files["LICENSE"] = root / "LICENSE"
+            with self.assertRaisesRegex(ValueError, "audit is incomplete"):
+                package(root, files, output, public=True, **options)
+            self.assertFalse(output.parent.exists())
+            metadata["third_party_distribution_audit"] = "approved"
+            (root / "release/version.json").write_text(json.dumps(metadata))
+            with mock.patch.object(release, "hidden_index_paths", return_value=[]):
+                for notice_hash in [None, "b" * 64]:
+                    if notice_hash:
+                        notice_bundle(root, files, notice_hash)
+                    with self.assertRaisesRegex(ValueError, "notices matching the exact archive"):
+                        package(root, files, output, public=True, **options)
+                    self.assertFalse(output.parent.exists())
+                # Rebind the fixture inventory to the selected archive, leaving
+                # its declaration audit pending, just as in the real source.
+                inventory_path = root / gpu.COMPONENT_INVENTORY
+                inventory = json.loads(inventory_path.read_text())
+                inventory["artifact_sha256"] = options["macos_gpu_sha256"]
+                inventory_path.write_text(json.dumps(inventory))
+                metadata["third_party_distribution_audit"] = "pending"
+                (root / "release/version.json").write_text(json.dumps(metadata))
+                with self.assertRaisesRegex(ValueError, "audit is incomplete"):
+                    package(root, files, output, public=True, **options)
+                self.assertFalse(output.parent.exists())
+                metadata["third_party_distribution_audit"] = "approved"
+                (root / "release/version.json").write_text(json.dumps(metadata))
+                with mock.patch.object(release, "public_dependencies", return_value=nullcontext(None)):
+                    result = package(root, files, output, public=True, **options)
+            verified = checker.verify_archive(output, result["sha256"])
+            manifest = verified["manifest"]
+            self.assertFalse(manifest["private_build"])
+            self.assertEqual(manifest["native_gpu"]["distribution_audit"], "approved")
+            self.assertEqual(manifest["native_gpu"]["component_notices"]["distribution_audit"], "pending")
+            sdk = checker.extract_verified(output, base / "relocated", verified)
+            self.assertIsNotNone(gpu.sdk_candidate(sdk))
+            # Rehash both manifest maps after substituting a different archive
+            # identity in the copied inventory: archive verification must refuse.
+            with tarfile.open(output) as archive:
+                bodies = {m.name: archive.extractfile(m).read() for m in archive.getmembers()}
+            prefix = verified["prefix"]
+            name = prefix + "/" + gpu.COMPONENT_INVENTORY
+            changed = json.loads(bodies[name])
+            changed["artifact_sha256"] = "b" * 64
+            bodies[name] = json.dumps(changed).encode()
+            forged = copy.deepcopy(manifest)
+            checksum = gpu.digest(bodies[name])
+            forged["files"][gpu.COMPONENT_INVENTORY] = checksum
+            forged["native_gpu"]["component_notices"]["files"][gpu.COMPONENT_INVENTORY] = checksum
+            bodies[prefix + "/SDK_MANIFEST.json"] = json.dumps(forged).encode()
+            invalid = base / "forged.tar.gz"
+            with tarfile.open(invalid, "w:gz") as archive:
+                for name, body in bodies.items():
+                    member = tarfile.TarInfo(name)
+                    member.size = len(body)
+                    archive.addfile(member, io.BytesIO(body))
+            with self.assertRaisesRegex(ValueError, "does not match selected archive"):
+                checker.verify_archive(invalid)
+            for alteration in ["release", "record", "notices"]:
+                bad = copy.deepcopy(manifest)
+                if alteration == "release":
+                    bad["release"]["third_party_distribution_audit"] = "pending"
+                elif alteration == "record":
+                    bad["native_gpu"]["distribution_audit"] = "pending"
+                else:
+                    del bad["native_gpu"]["component_notices"]
+                (sdk / "SDK_MANIFEST.json").write_text(json.dumps(bad))
+                with self.assertRaises(ValueError):
+                    gpu.sdk_candidate(sdk)
+                with self.assertRaises(ValueError):
+                    gpu.validate_record(bad["native_gpu"], bad["files"], False, bad["release"])
 
     def test_exact_bytes_hash_and_declared_provenance_are_separate(self):
         with tempfile.TemporaryDirectory() as tmp:

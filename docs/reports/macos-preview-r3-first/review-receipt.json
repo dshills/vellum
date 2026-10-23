@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "<USER_HOME>/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "docs/reports/macos-preview-r3-first/README.md,docs/reports/macos-preview-r3-first/evidence.json,docs/reports/macos-preview-r3-first/native-cancel.json,docs/reports/macos-preview-r3-first/native-drag.json,docs/reports/macos-preview-r3-first/native-group-move.json,docs/reports/macos-preview-r3-first/native-group-resize.json,docs/reports/macos-preview-r3-first/native-pan.json,docs/reports/macos-preview-r3-first/native-rejected.json,docs/reports/macos-preview-r3-first/native-zoom.json,docs/reports/macos-preview-r3-first/r3-cycle100-result.json,docs/reports/macos-preview-r3-first/r3-cycle100.stderr,docs/reports/macos-preview-r3-first/r3-export.svg,docs/reports/macos-preview-r3-first/r3-png-pixels.json,docs/reports/macos-preview-r3-first/r3-progress.json,docs/reports/macos-preview-r3-first/r3-repository-check.json,docs/reports/macos-preview-r3-first/r3-saved-drawing.vellum,docs/reports/macos-preview-r3-first/resource-terminal.json",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "4",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/r3-first-review/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/r3-first-review/prism.json"
+  ],
+  "cwd": "<USER_HOME>/Development/projects/Vellum",
+  "started_utc": "2026-10-22T19:17:22.432968+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 1,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 91917,
+  "group": 91917,
+  "owned": {
+    "created": true,
+    "pid": 91917,
+    "group": 91917,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 1,
+    "errors": [],
+    "observation": {
+      "group": 91917,
+      "members": [],
+      "observation_sha256": "1ac3af7f198d84e534ef27f499a70b8e89eb7a53e3294755c0f50d971f8f51aa"
+    }
+  },
+  "seconds": 4.253473958931863,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

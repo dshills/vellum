@@ -1,0 +1,25 @@
+{
+  "result": "PASS",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "initial": {
+    "files": 6,
+    "complete": true,
+    "report": "reviews/initial.json",
+    "sha256": "ff70cdb36455c58813a8a5d33da974e8a1daa34df42b3b81784e036a08b243b0",
+    "findings": 1
+  },
+  "followup": {
+    "files": 2,
+    "complete": true,
+    "report": "reviews/followup.json",
+    "sha256": "bdc4880a6c6d7a9722914ec9d9b3f264644e65db24e858f08944dece04368515",
+    "findings": 0
+  },
+  "disposition": "Evidence member/committed name ambiguity resolved by explicit files_scope and 3 committed_copies mappings with equal hashes, and README clarifies unpublished external provenance dependencies. All mappings independently verified.",
+  "unresolved_actionable_findings": 0,
+  "archive_provider_reviewed": false,
+  "archive_local_verification": "43 regular relative members, full index hashes, exact source/result, 7 complete owned receipts and 14 raw logs; 3 archive/committed mappings verified. No executables/SDK/Core/cache bundled.",
+  "scope": "Offscreen scalar compiler counterfactual only; no UI app/window/screen use, no corrected live capture. Features/backend/defaults/gate unchanged.",
+  "live_status": "Explicitly deferred by user."
+}

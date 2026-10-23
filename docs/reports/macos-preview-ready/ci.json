@@ -1,0 +1,81 @@
+{
+  "checked_utc": "2026-10-23T10:33:20.778558+00:00",
+  "qualified_head": "e9907d922faa8816ea79882f472bac6313b91072",
+  "pull_request": "https://github.com/dshills/vellum/pull/1",
+  "draft": true,
+  "non_docs_tree_sha256": "f3d758f27685572638283ed7aa1f0b6d8fd73b510973024388b8bc2339934b10",
+  "non_docs_entries": 2841,
+  "algorithm": "SHA-256 of git ls-tree -r --full-tree entries outside docs/, preserving Git output ordering and newlines",
+  "runs": [
+    {
+      "id": 39935157912,
+      "event": "pull_request",
+      "workflow": "Framework",
+      "conclusion": "success",
+      "url": "https://github.com/dshills/vellum/actions/runs/39935157912",
+      "jobs": [
+        {
+          "name": "framework",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 39935157883,
+      "event": "pull_request",
+      "workflow": "Platform adapters",
+      "conclusion": "success",
+      "url": "https://github.com/dshills/vellum/actions/runs/39935157883",
+      "jobs": [
+        {
+          "name": "linux-x11",
+          "conclusion": "success"
+        },
+        {
+          "name": "windows-build",
+          "conclusion": "success"
+        },
+        {
+          "name": "qualification",
+          "conclusion": "skipped"
+        }
+      ]
+    },
+    {
+      "id": 39935152651,
+      "event": "push",
+      "workflow": "Framework",
+      "conclusion": "success",
+      "url": "https://github.com/dshills/vellum/actions/runs/39935152651",
+      "jobs": [
+        {
+          "name": "framework",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 39935152514,
+      "event": "push",
+      "workflow": "Platform adapters",
+      "conclusion": "success",
+      "url": "https://github.com/dshills/vellum/actions/runs/39935152514",
+      "jobs": [
+        {
+          "name": "linux-x11",
+          "conclusion": "success"
+        },
+        {
+          "name": "windows-build",
+          "conclusion": "success"
+        },
+        {
+          "name": "qualification",
+          "conclusion": "skipped"
+        }
+      ]
+    }
+  ],
+  "limits": "Optional self-hosted qualification skipped as configured; no full platform or physical-input qualification.",
+  "tags_or_assets_published": false
+}

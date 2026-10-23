@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "<USER_HOME>/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "drivers/cogent/cmd/window-cycle-smoke/soak.go,specs/workbench-endurance.md,docs/reports/macos-preview-soak-setup/INDEX.json,docs/reports/macos-preview-soak-setup/README.md,docs/reports/macos-preview-soak-setup/soak-candidate-build.json,docs/reports/macos-preview-soak-setup/soak-candidate-pilot-result.json,docs/reports/macos-preview-soak-setup/soak-candidate-pilot.stderr,docs/reports/macos-preview-soak-setup/soak-inset-build.json,docs/reports/macos-preview-soak-setup/soak-inset-pilot-result.json,docs/reports/macos-preview-soak-setup/soak-inset-pilot.stderr",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "4",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/soak-setup-final-review/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/soak-setup-final-review/prism.json"
+  ],
+  "cwd": "<USER_HOME>/Development/projects/Vellum",
+  "started_utc": "2026-10-22T22:10:54.614052+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 0,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 61773,
+  "group": 61773,
+  "owned": {
+    "created": true,
+    "pid": 61773,
+    "group": 61773,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 0,
+    "errors": [],
+    "observation": {
+      "group": 61773,
+      "members": [],
+      "observation_sha256": "60fcfae174b786f6886627e5dfeb69ccfad5310c0a97fea948f0fd347acb6704"
+    }
+  },
+  "seconds": 2.3084992500953376,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+from pathlib import Path
+import hashlib,json,sys,importlib.util,os,tomllib
+sys.dont_write_bytecode=True
+x=Path(__file__).resolve().parent.parent;q=Path(__file__).resolve().parent/'prepared';r=Path('/Users/dshills/Development/projects/Vellum');core=Path('/private/tmp/vellum-joined-backend-core');native=Path('/private/tmp/vellum-joined-backend-native');sdk=Path('/private/tmp/vellum-doclinks-sdk-bd3cbc9/retained SDK/vellum-v0.1.0-alpha.2');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();load=lambda p:json.loads(p.read_text());vec=lambda root:{p.relative_to(root).as_posix():sha(p) for p in root.rglob('*') if p.is_file() and '.git' not in p.relative_to(root).parts}
+identity=load(q/'build-identity.json');assert os.access(q/'framework',os.X_OK) and sha(q/'framework')==identity['binary_sha256'];assert all(sha(Path(k))==v for k,v in identity['pins'].items())
+assert (q/'native_main_darwin.go').read_bytes()==(r/'tools/macos-calibration/joinedbackend/testdata/native_main_darwin.go').read_bytes();assert (q/'backend_probe_darwin.go').read_bytes()==(r/'tools/macos-calibration/joinedbackend/testdata/backend_probe_darwin.go').read_bytes()
+c=load(q/'composition.json');original=c['copied_before_composition']
+assert vec(native/'core')==original['core'] and vec(native/'hal')==original['hal']
+changed=[k for k,v in original['source'].items() if sha(native/'source'/k)!=v];assert sorted(changed)==['Cargo.lock','Cargo.toml','src/lib.rs']
+a=tomllib.loads((Path(c['reviewed_upload_identity']['root'])/'source/Cargo.lock').read_text());b=tomllib.loads((native/'source/Cargo.lock').read_text());assert len(a['package'])==len(b['package'])
+for old,new in zip(a['package'],b['package']):assert ({k:v for k,v in old.items() if k not in ['source','checksum']}==new if old['name']=='wgpu-hal' else old==new)
+base=vec(sdk/'drivers/cogent/build/upstream');private=vec(core);assert sorted(set(private)-set(base))==['paint/renderers/rasterx/vellum_raster_clock.go','paint/renderers/rasterx/vellum_raster_clock_test.go'];assert [k for k,v in base.items() if private[k]!=v]==['paint/renderers/rasterx/renderer.go']
+for name in ['go-build','go-pixels','rust-build-v2']:
+ d=load(q/(name+'-receipt.json'));run=d['run'];assert run['exit_code']==0 and run['error'] is None and run['owned']['terminal'] and run['owned']['group_absent'] and not run['owned']['errors'] and not run['observation_errors'] and run['pins_stable'] and run['logs_complete'] and not run['stop_at_exit']
+ assert all(sha(Path(k))==v for k,v in d['pins'].items())
+ for stream,m in run['logs'].items():p=q/name/stream;assert sha(p)==m['sha256'] and p.stat().st_size==m['bytes']
+sys.path.insert(0,str(r/'scripts'));s=importlib.util.spec_from_file_location('verify_sdk',x/'macos-release-default-assessment/assessment.py');a=importlib.util.module_from_spec(s);sys.modules[s.name]=a;s.loader.exec_module(a);assert a.sdk_vector()==load(x/'macos-release-default-assessment/plan.json')['sdk']
+checks={'outcome':'PREPARED_NO_NATIVE_CAPTURE','classifier_methods':6,'negative_mutations':19,'original_routing_full_pixel_fixture':'PASS with unchanged raster clock','prior_5_race_recorder_methods':'Reused byte-identical renderer/journal/tests','fresh_native_and_Go_build':'PASS','only_native_source_changes_from_reviewed_copies':changed,'same_native_package_versions':True,'exact_observer_composition':True,'SDK_files_unchanged':8321,'source_pin_and_log_ownership_replay':'PASS','binary_sha256':identity['binary_sha256'],'native_archive_sha256':identity['native_archive_sha256'],'retained_build_failure':'rust-build: incomplete offline cache; fixed cache path, no native attempt','release_qualified':False,'gate_changed':False}
+(q/'preparation-checks.json').write_text(json.dumps(checks,indent=2)+'\n');print(json.dumps(checks))

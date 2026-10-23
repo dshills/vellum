@@ -1,0 +1,85 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "c906e7386ec5576516d17ca70cf7dff9",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "e002c0e9cdab82826bb175b186958066fad00c41",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3719,
+    "totalMs": 3745
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 20392,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 11195,
+        "output": 328,
+        "costUSD": 0.02567
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "87c8e3db36997dcb",
+        "severity": "medium",
+        "category": "maintainability",
+        "title": "Verifier hardcodes a developer-specific absolute path",
+        "message": "The verifier hardcodes an absolute path under a developer's home directory and expects a 'prepared' directory that is not committed. The committed copy can therefore not be run by anyone else, which undermines the claim that the result is independently verifiable.",
+        "suggestion": "Derive the repo root from __file__ or an environment variable or CLI argument, and document or ship the captured inputs the script reads.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "docs/reports/macos-framework-startup-result/execution-sources/verify_result.py.txt",
+            "lines": {
+              "start": 4,
+              "end": 4
+            }
+          }
+        ],
+        "tags": [
+          "reproducibility",
+          "hardcoded-path"
+        ],
+        "evidence": "X=Path(__file__).resolve().parent;Q=X/'prepared';R=Path('/Users/dshills/Development/projects/Vellum')",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/macos-framework-startup-result/execution-sources/verify_result.py.txt"
+    }
+  ],
+  "suppressed": []
+}

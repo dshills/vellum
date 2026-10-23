@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "15b1e750b866802f46cb03d839bdfd27",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "10beef424c532395802065b2be45119bec88efe2",
+    "branch": "codex/macos-preview"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "e9af7e162296f9f1",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Terminal worker count taken while dispatching, not closed",
+      "message": "The README says the 10-minute run PASSed with zero workers remaining, and the summary reports workers=0 while \"Dispatching\": 1 and \"Closed\": false. The terminal snapshot was taken mid-callback, so it is not a quiescent state. The PASS claim for zero outstanding workers and \"document safety\" therefore rests on a non-terminal observation. The docs do disclose this, but the PASS label is still stronger than the evidence.",
+      "suggestion": "Add a post-close snapshot, or qualify the result as PASS_COMPOSED_ACTIVITY only with a non-quiescent terminal observation.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reports/macos-preview-resource-check/summary.json",
+          "lines": {
+            "start": 20,
+            "end": 20
+          }
+        }
+      ],
+      "tags": [
+        "evidence",
+        "reporting",
+        "location-corrected"
+      ],
+      "evidence": "\"workers\": 0,",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4380,
+    "totalMs": 4396
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 20701,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 11145,
+        "output": 351,
+        "costUSD": 0.0258
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

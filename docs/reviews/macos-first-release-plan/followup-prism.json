@@ -1,0 +1,118 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "88ae8e6452747e2e176d7100371e373e",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "88fc75d36352335c512208a123b4e7fa1a7de73f",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "96a43af4bdf5655c",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Allocation table ambiguity with parallel checkpoint",
+      "message": "The checkpoint headings say 'Five checkpoints' and R1/R2/R4 sections describe overlapping timing ('first half-session', 'second half-session', 'parallel with R2/R3'), but R3 is a full session and R5 is the 'final half-session'. Sum is 3.0, yet parallelism claims mean R4's 0.5 is counted while overlapping, making calendar ordering ambiguous and the 'three working sessions' non-verifiable.",
+      "suggestion": "Add an explicit session-by-session mapping (session 1: R1+R2, session 2: R3+R4 start, session 3: R4 finish+R5).",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "specs/macos-first-release-plan.md",
+          "lines": {
+            "start": 219,
+            "end": 219
+          }
+        }
+      ],
+      "tags": [
+        "planning",
+        "location-corrected"
+      ],
+      "evidence": "| R4 contents/rights/distribution preparation | 0.5 |",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6551,
+    "totalMs": 6574
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 2,
+    "bytes": 17464,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 7775,
+        "output": 698,
+        "costUSD": 0.02253
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "46f08603a3014739",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Soak rerun can exhaust contingency budget",
+        "message": "The plan allocates R3 1.0 session including the first soak, but requires a two-hour soak, 100 lifecycle cycles and ten minutes of editing, and then requires a full rerun of the soak on any runtime fix. The schedule only budgets 1.0 contingency, so one reproduced runtime fix may consume it. The 'Calendar' budget is internally unrealistic and can force the exact schedule-driven shortcuts the document prohibits.",
+        "suggestion": "State explicitly that each runtime fix after the soak starts consumes a defined slice of contingency, and define the no-go rule when contingency is exhausted by soak reruns.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "specs/macos-first-release-plan.md",
+            "lines": {
+              "start": 139,
+              "end": 139
+            }
+          }
+        ],
+        "tags": [
+          "planning",
+          "schedule"
+        ],
+        "evidence": "The soak can run unattended alongside documentation work.",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in specs/macos-first-release-plan.md"
+    }
+  ],
+  "suppressed": []
+}

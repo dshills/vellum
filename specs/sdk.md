@@ -1,5 +1,14 @@
 # Local SDK consumption and performance measurements
 
+**Developer-preview policy, approved 22 October 2026:** the
+[first-release plan](macos-first-release-plan.md) governs the macOS preview.
+Numeric latency/cadence qualification and full endurance/platform certification
+below remain future full-qualification work, with historical failures preserved.
+Correctness, bounded resources, required workflows, independent SDK consumption
+and applicable distribution rights remain preview blockers. This does not mark
+M3–M7 complete or authorize public publication/signing.
+
+
 The root framework module stays standard-library-only. The native adapter is a
 separate module, `github.com/dshills/vellum/drivers/cogent`, matching its repository
 directory. The framework namespace is `github.com/dshills/vellum` and its own code
@@ -9,7 +18,7 @@ and target qualification.
 ## Documentation in the SDK archive
 
 Consumer guides and contracts retain their links to other packaged files.
-Repository-only reports, reviews, research, artwork and prototypes remain excluded.
+Repository-only reports, reviews, research, artwork, prototypes and repository diagnostic tools remain excluded.
 For first-party inline Markdown links into those known existing source trees,
 the exporter retains the label and exact repository path/fragment as an explicit
 nonlinked full-repository reference. It adds a link to `SDK_DOCUMENTATION.md`,
@@ -138,8 +147,9 @@ python3 scripts/release-sdk.py --output /private/tmp/candidate-sdk.tar.gz \
   --macos-gpu-provenance /absolute/path/provenance.json
 ```
 
-All three options are required together. `--public` rejects them before inventory,
-download or output creation, including when other public gates are approved.
+All three options are required together. Private candidates retain pending audit
+status. The approved public route below additionally requires the existing release
+approval gates and notices bound to the selected archive before output creation.
 Ordinary packaging does not discover or reuse an ignored candidate directory.
 The root framework module and portable example modules remain unchanged.
 
@@ -233,3 +243,28 @@ controls qualify the bounded test harness. This is a private consumption checkpo
 with internal reviews and no unchanged implementation Prism rerun. Physical/human
 workflows, presentation, ordinary/sustained latency, native/GPU memory, endurance,
 component/rights closure, public release and full Mac acceptance remain open.
+
+## Approved public native-library route
+
+The same three native-library options may be used with `--public` only after the
+existing release gates pass, including `third_party_distribution_audit=approved`,
+a clean committed source tree, selected namespace/license and index checks. Public
+prepared dependencies still regenerate and verify through the existing path.
+The selected archive must additionally have a component inventory and notice files
+bound to its exact SHA-256; absent or other-archive notices refuse packaging.
+
+The public manifest and generated third-party inventory record the release audit
+as approved. The copied component declarations retain their historical pending
+audit status: collecting notices does not grant distribution rights or approve a
+release. Relocated consumers and archive verification require both the public
+release approval record and the native notice record for consistency. These
+manifest fields are declarations, not signatures or independent rights approval;
+a consumer must obtain the expected archive SHA-256 through a trusted channel to
+bind checks to the intended producer artifact. The producer alone enforces the
+existing source release-audit gate. Consumers also check the
+notice inventory against the selected archive bytes. Private candidates retain
+pending status and may carry an unknown archive without matched declarations.
+
+This route changes tooling only. The repository's current release audit remains
+pending, so public packaging is still blocked. No public artifact is authorized
+or produced by this checkpoint; caller-declared provenance remains unattested.

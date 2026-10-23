@@ -5,10 +5,12 @@ Applications compose UI descriptions from Go values and stable widget IDs, then
 handle changes through explicit commands, cancellable tasks, and Undo/Redo history.
 A separate native driver uses Cogent Core for windowing and WebGPU rendering.
 
-**Status:** experimental, `v0.1.0-alpha.2`. The macOS drawing test application is
-usable for internal testing. Full framework qualification and production release
-remain in progress; Windows and Linux adapters are unqualified. Framework scope
-is currently frozen while the internal application is developed and tested.
+**Status:** `v0.1.0-alpha.3` macOS developer-preview candidate, not yet published.
+Features are frozen under the [approved release plan](specs/macos-first-release-plan.md).
+The private SDK and drawing application pass independent consumption/build checks;
+native acceptance, final distribution clearance and delivered-artifact checks are
+still in progress. Windows and Linux remain unqualified. Full production and
+numeric performance qualification are separate from this developer preview.
 
 ## What is available
 

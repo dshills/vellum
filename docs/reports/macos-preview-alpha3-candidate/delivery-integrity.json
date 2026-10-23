@@ -1,0 +1,35 @@
+{
+  "archive": "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/Vellum-alpha.3-private-macos-arm64.zip",
+  "archive_sha256": "963cde49cc4b9d934ebc9d2ae4a0c14c5d4110e76b8ff3fab393462123b883b5",
+  "bytes": 28357594,
+  "extracted_app": "/private/tmp/vellum-preview-alpha3/delivered-extraction/Vellum-alpha.3-private/Vellum Placement Preview.app",
+  "signature_after_extraction": "PASS strict ad-hoc",
+  "manifest": {
+    "schema": 1,
+    "name": "Vellum Placement Preview",
+    "identifier": "com.dshills.vellum.placement.preview",
+    "version": "0.1.0",
+    "build_version": "27",
+    "sdk_release": "v0.1.0-alpha.3",
+    "target": "darwin",
+    "source_binary_sha256": "0d7539594ad742844f629ea1ab6080edb0a86ddb8ffbffe8192d3b53d636a16a",
+    "private_build": true,
+    "signed_identity": "-",
+    "notarized": false,
+    "native_distribution_audit": "pending",
+    "target_runtime": "unverified",
+    "component_notices": {
+      "directory": "THIRD_PARTY_NOTICES",
+      "inventory_sha256": "bc1aba2bec218eb53ef87eb89e7e396621729a0231a4b026c5fd68f12e5a1d6b",
+      "artifact_sha256": "0d7539594ad742844f629ea1ab6080edb0a86ddb8ffbffe8192d3b53d636a16a",
+      "files": 416,
+      "components": 174,
+      "bytes": 3126097,
+      "applicability": "review-required",
+      "distribution_audit": "pending",
+      "trust": "caller-selected-not-attested"
+    }
+  },
+  "packaged_binary_sha256": "557761aa1368ac312605ee540adb8ada77a8ccd36024a8b81421f8b7783cd7c3",
+  "native_runtime": "not yet executed on extracted alpha.3 package"
+}

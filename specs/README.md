@@ -34,6 +34,7 @@
 - [Native dispatch](native-dispatch.md): synchronous callback failure and desktop event termination.
 - [Native activity observations](native-activity.md): bounded process-scoped API-attempt counters for diagnostic idle runs.
 - [Local semantic automation](automation.md): opt-in Mac socket, typed domain queries/actions, owner dispatch and revision/cancellation checks.
+- [First macOS release plan](macos-first-release-plan.md): approved developer-preview delivery plan and fixed session budget.
 - [Mac delivery plan](macos-delivery.md): ordered completion milestones, fixed exit criteria, next commits and testing/review limits.
 - [macOS completion](macos-completion.md): remaining framework and target acceptance work.
 - [Retained GPU drawing](drawing.md): immutable meshes, strokes, waveform reduction, indexed culling and resource accounting.

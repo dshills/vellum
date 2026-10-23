@@ -1,0 +1,15 @@
+{
+  "pins": {
+    "/private/tmp/vellum-joined-backend-native/hal/src/metal/surface.rs": "748c5349bb68319d433ed2d7c2c27055e632f27196acfdfa857b279d8ed7bae2",
+    "/private/tmp/vellum-joined-backend-native/hal/src/metal/mod.rs": "340f6ebb509cd2bb86a83adba4308791be92e87c12fa59d2a8d4032d41528408",
+    "/private/tmp/vellum-joined-backend-native/hal/src/metal/probe.rs": "972cce716850aadf748c525f1ece7b8d9f56e040e6e42e94abd20b6656319570",
+    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AppKit.framework/Headers/NSView.h": "af91fb647759eccbc205c2db73a20f7d73cd3850b90ae13d4a211745abeb372c",
+    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/QuartzCore.framework/Headers/CADisplayLink.h": "2635ee47f7d5d80a7525de009c819c89076e95f603e07213edc007e41674c9a4"
+  },
+  "backend": "Original FIFO/vsync, maximum_frame_latency+1=2 drawables, presentDrawable before commit, nontransactional branch. No atTime or afterMinimumDuration in executed queue present path.",
+  "prior_hypotheses": "Separate present submission insufficient in completed native paired control; transaction and supplied-drawable link candidates previously rejected, not repeated.",
+  "new_boundary": "View-linked CADisplayLink observes Core Animation reported timestamp/target/duration without providing or acquiring GPU drawables. Callback does not request a frame or call renderer/presentation methods.",
+  "clock_contract": "SDK CADisplayLink.h declares normal Core Animation conventions: Mach host time converted to seconds. Duration read only inside callback, not before first callback.",
+  "lifecycle": "Main-thread runloop callback, fixed8192scalar slots. Stop invalidates before owned link/target release, before application close. Native fixture uses fake link + actual recorder/stop code, no NSApplication/window; does not prove real callbacks.",
+  "limits": "CADisplayLink timestamps are reported display clocks; no optical scanout, missed-vsync/latch guarantee or compositor cause inferred. Registering observer can perturb wake/scheduling; off/on control and all gaps retained."
+}

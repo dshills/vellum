@@ -1,0 +1,119 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "3259b2025def685973bf4b90428efc95",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "88fc75d36352335c512208a123b4e7fa1a7de73f",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "539cbd746d7d6394",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Session budget does not reconcile with checkpoint allocation",
+      "message": "R1–R5 are described as five checkpoints but the budget is three sessions plus one contingency, and R4 runs in parallel with R2/R3. R1 is a half-session, R2 a half-session, R3 a full session, and R5 a half-session. That sums to 2.5 sessions without R4, which has no allocation. The estimate is therefore not clearly derived and the 'bounded' claim is weak.",
+      "suggestion": "Add an explicit session allocation per checkpoint, including R4 effort, and show how it totals to the stated budget.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "specs/macos-first-release-plan.md",
+          "lines": {
+            "start": 73,
+            "end": 73
+          }
+        }
+      ],
+      "tags": [
+        "planning",
+        "consistency",
+        "location-corrected"
+      ],
+      "evidence": "## Five checkpoints and stop conditions",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 10005,
+    "totalMs": 10029
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 2,
+    "bytes": 16381,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 7363,
+        "output": 626,
+        "costUSD": 0.020986
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "b75127a16444b290",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Two-hour soak conflicts with fix-and-retest within one session",
+        "message": "R3 requires 100 lifecycle cycles, ten minutes of active editing, idle samples, and a two-hour soak. The soak must come after a frozen stable candidate, yet R3 is a single session that also includes the full workflow script, scripts/check.sh, and fixes. A defect fix during R3 would invalidate the soak and force a rerun, which the plan does not account for.",
+        "suggestion": "State that any runtime fix restarts the soak and lifecycle checks, and reserve contingency budget for that rerun.",
+        "confidence": 0.55,
+        "locations": [
+          {
+            "path": "specs/macos-first-release-plan.md",
+            "lines": {
+              "start": 181,
+              "end": 182
+            }
+          }
+        ],
+        "tags": [
+          "planning",
+          "risk"
+        ],
+        "evidence": "The soak\ncan run unattended alongside documentation work.",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in specs/macos-first-release-plan.md"
+    }
+  ],
+  "suppressed": []
+}

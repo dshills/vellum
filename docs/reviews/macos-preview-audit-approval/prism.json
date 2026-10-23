@@ -1,0 +1,57 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "fdfc0372d9c23587d64342416a39f507",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "ffba3dc321c5a1a057987e4e168d211b4597c2e0",
+    "branch": "codex/macos-preview"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 2253,
+    "totalMs": 2263
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 10711,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5824,
+        "output": 110,
+        "costUSD": 0.012748
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

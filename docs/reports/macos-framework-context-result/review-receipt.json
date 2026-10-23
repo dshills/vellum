@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "docs/reports/macos-framework-context-result/README.md,docs/reports/macos-framework-context-result/evidence-index.json,docs/reports/macos-framework-context-result/execution-sources/verify_result.py.txt,docs/reports/macos-framework-context-result/result-summary.json,specs/macos-release-assessment.md",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "4",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-framework-context/prepared/result-review/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-framework-context/prepared/result-review/prism.json"
+  ],
+  "cwd": "/Users/dshills/Development/projects/Vellum",
+  "started_utc": "2026-10-22T17:32:30.982926+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 0,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 23507,
+  "group": 23507,
+  "owned": {
+    "created": true,
+    "pid": 23507,
+    "group": 23507,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 0,
+    "errors": [],
+    "observation": {
+      "group": 23507,
+      "members": [],
+      "observation_sha256": "143a52c6e0ab2438534d2718b520cc0d95feaaf18edbe7dd79e249a43ed90bde"
+    }
+  },
+  "seconds": 4.124222000129521,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

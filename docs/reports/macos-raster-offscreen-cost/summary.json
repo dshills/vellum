@@ -1,0 +1,183 @@
+{
+  "outcome": "VALID_OFFSCREEN_WARM_REPLAY_BREAKDOWN",
+  "renderer": "unchanged original frozen SDK; no metadata hooks or candidate rendering changes",
+  "sdk_files": 8321,
+  "cpu": 2,
+  "target": [
+    1519,
+    1266
+  ],
+  "patch_rect": [
+    8,
+    8,
+    1511,
+    1258
+  ],
+  "logical_dpi": 160,
+  "benchmark_seconds": 9.098603500053287,
+  "per_case_observations": 3,
+  "benchtime": "200ms",
+  "observations": {
+    "full_replay": {
+      "ns_per_op": [
+        167693.0,
+        168515.0,
+        172643.0
+      ],
+      "min_ns": 167693.0,
+      "median_ns": 168515.0,
+      "max_ns": 172643.0,
+      "bytes_per_op": 0,
+      "allocs_per_op": 0
+    },
+    "image_commands": {
+      "ns_per_op": [
+        173629.0,
+        174005.0,
+        172054.0
+      ],
+      "min_ns": 172054.0,
+      "median_ns": 173629.0,
+      "max_ns": 174005.0,
+      "bytes_per_op": 0,
+      "allocs_per_op": 0
+    },
+    "no_paint_paths": {
+      "ns_per_op": [
+        130.6,
+        129.5,
+        129.9
+      ],
+      "min_ns": 129.5,
+      "median_ns": 129.9,
+      "max_ns": 130.6,
+      "bytes_per_op": 0,
+      "allocs_per_op": 0
+    },
+    "last_solid_fill": {
+      "ns_per_op": [
+        165176.0,
+        163943.0,
+        165436.0
+      ],
+      "min_ns": 163943.0,
+      "median_ns": 165176.0,
+      "max_ns": 165436.0,
+      "bytes_per_op": 0,
+      "allocs_per_op": 0
+    },
+    "empty_replay": {
+      "ns_per_op": [
+        3.612,
+        3.653,
+        3.663
+      ],
+      "min_ns": 3.612,
+      "median_ns": 3.653,
+      "max_ns": 3.663,
+      "bytes_per_op": 0,
+      "allocs_per_op": 0
+    }
+  },
+  "native_metadata_comparison": {
+    "same": "20 command indices/types; all image rects, positions, operations, commands, color types; path lengths/transforms/no-fill/no-stroke flags",
+    "different_uniform_values": [
+      {
+        "index": 6,
+        "field": "UniformRGBA",
+        "offscreen": [
+          0,
+          0,
+          0,
+          65535
+        ],
+        "native": [
+          65535,
+          65535,
+          65535,
+          65535
+        ]
+      },
+      {
+        "index": 9,
+        "field": "UniformRGBA",
+        "offscreen": [
+          0,
+          0,
+          0,
+          65535
+        ],
+        "native": [
+          65535,
+          65535,
+          65535,
+          65535
+        ]
+      },
+      {
+        "index": 10,
+        "field": "UniformRGBA",
+        "offscreen": [
+          0,
+          0,
+          0,
+          65535
+        ],
+        "native": [
+          65535,
+          65535,
+          65535,
+          65535
+        ]
+      },
+      {
+        "index": 13,
+        "field": "UniformRGBA",
+        "offscreen": [
+          0,
+          0,
+          0,
+          65535
+        ],
+        "native": [
+          65535,
+          65535,
+          65535,
+          65535
+        ]
+      },
+      {
+        "index": 14,
+        "field": "UniformRGBA",
+        "offscreen": [
+          0,
+          65535,
+          0,
+          65535
+        ],
+        "native": [
+          65535,
+          0,
+          0,
+          65535
+        ]
+      }
+    ],
+    "limits": "Four overridden opaque backgrounds differ black versus white; final phase differs green versus red. Native scalar capture did not retain full path coordinates. This is not byte-identical native replay or native timing equivalence."
+  },
+  "tests": [
+    "Two focused Go methods: original routed pixel/state oracle plus full legacy/image-only replay parity for red/green/red; no-paint paths preserve full image; command state restored; source/path capture detached.",
+    "One Python method with nine malformed/incomplete/wrong CPU/allocation refusals."
+  ],
+  "retained_setup_failures": [
+    "Initial 96 DPI fixture produced 5px padding; explicit geometry assertion refused it.",
+    "Diagnostic rerun retained exact mismatch (5,5)-(1514,1261); switch to 160 DPI gives captured 8px inset.",
+    "Test bookkeeping initially restored mutated uniform pointer instead of original color; corrected before successful tests/timing."
+  ],
+  "interpretation": "Four no-paint paths cost about130ns in this warm offscreen fixture, while full replay costs168-173us. Image-only replay overlaps/full can be slightly faster, so no speedup claim from removing paths. The final solid fill alone is164-165us. These separately timed cases are not additive phases or a measured native cost share. Do not extrapolate steady hot replay to native120ms cadence/cache/scheduling or presentation p95. No no-paint-path optimization is justified by this evidence.",
+  "next": "Investigate warm-versus-separated replay/cache conditions offscreen before attributing the native ~0.74ms raster interval to renderer algorithms. No new native timing run or speculative path-elision candidate.",
+  "native_processes": 0,
+  "release_qualified": false,
+  "gate_changed": false,
+  "production_change_adopted": false
+}

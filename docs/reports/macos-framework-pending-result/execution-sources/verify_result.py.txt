@@ -1,0 +1,27 @@
+"""Verify a rejected partial cohort without qualifying its timings."""
+from pathlib import Path
+import datetime,hashlib,importlib.util,json,sys
+sys.dont_write_bytecode=True
+X=Path(__file__).resolve().parent;Q=X/'prepared';R=Path('/Users/dshills/Development/projects/Vellum');read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();result=read(Q/'result.json');plan=read(Q/'bound-plan.json');elapsed=(datetime.datetime.fromisoformat(result['finished_utc'])-datetime.datetime.fromisoformat(read(Q/'started.json')['utc'])).total_seconds()
+assert 0<elapsed<=60 and (Q/'stop-live').exists() and result['outcome']=='REJECT' and not result['release_qualified'] and not result['gate_changed'];assert all(sha(Path(p))==h for p,h in plan['pins'].items());assert sha(Path(plan['binary']))==plan['binary_sha256']
+runs=[(Q/'native',result['native'])]
+for when in ['before','after']:runs.extend((Q/when/name,run) for name,run in result['configuration_'+when].items())
+assert len(runs)==9
+for root,run in runs:
+ assert run['exit_code']==(1 if root==Q/'native' else 0) and run['error'] is None and run['owned']['terminal'] and run['owned']['group_absent'] and not run['owned']['errors'] and run['logs_complete'] and run['pins_stable'] and not run['observation_errors'] and run['owned_tmp_empty']
+ for stream,m in run['logs'].items():p=root/stream;assert sha(p)==m['sha256'] and p.stat().st_size==m['bytes']
+assert result['native']['seconds']<=40 and result['geometry_before']==result['geometry_after'];a,b=result['configuration_before'],result['configuration_after'];assert set(a)==set(b) and all(a[k]['logs']['stdout']['sha256']==b[k]['logs']['stdout']['sha256'] for k in a)
+s=importlib.util.spec_from_file_location('pending_result_validator',R/'tools/macos-calibration/presentationphase/check.py');v=importlib.util.module_from_spec(s);sys.modules[s.name]=v;s.loader.exec_module(v);docs=v.base.load(Q/'native/stdout');assert len(docs)==1;doc=docs[0];assert doc['match']==read(Q/'match.json')==plan['expected_match'];assert doc['runtime_returned'] is True
+expected='foreground/configuration changed during cohort\ndisplay clock invalid or overflow';assert doc['error']==expected and (Q/'native/stderr').read_text()==expected+'\n';assert doc['begin']['active'] and doc['begin']['key'] and doc['begin']['visible'] and doc['begin']['losses']==0 and doc['begin']['front_pid']==doc['begin']['pid'];assert not doc['end']['active'] and not doc['end']['key'] and doc['end']['losses']==3 and doc['end']['front_pid']!=doc['end']['pid'];assert doc['display_clock_trace']['invalid'] is True and doc['display_clock_trace']['count']==259
+receipts,seen,_,_=v.replay(doc['pending_trace']);assert len(receipts)==len(doc['measurements']['Samples'])==32 and len(doc['pending_trace']['requests'])==len(doc['phase_bridges'])==33;assert len(seen)==42 and len(doc['pending_trace']['events'])==158
+joined=[]
+for sample in doc['after_close']['Samples']:
+ hits=[a for a,e in seen.items() if e.get(3,{}).get('at')==sample['Acquired'] and doc['pending_trace']['attempts'][a-1]['drawable']==sample['DrawableID'] and e.get(5,{}).get('shown')==sample['Presented']];assert len(hits)==1;joined.append(hits[0])
+assert len(joined)==len(set(joined))==36 and doc['after_close']['Scopes']==[{'ID':1,'Window':'calibration','Closed':True}]
+assert sum(e[5]['shown']==0 for e in seen.values() if 5 in e)==2
+try:v.validate(doc,plan['expected_match'],'framework')
+except (ValueError,AssertionError) as e:strict_error=str(e)
+else:raise AssertionError('incomplete cohort incorrectly admitted')
+sys.path.insert(0,str(R/'scripts'));s=importlib.util.spec_from_file_location('pending_result_sdk',X.parent/'macos-release-default-assessment/assessment.py');a=importlib.util.module_from_spec(s);sys.modules[s.name]=a;s.loader.exec_module(a);assert a.sdk_vector()==plan['sdk']
+summary={'outcome':'REJECT','reason':expected,'strict_validator_reject':strict_error,'prepared_commit':read(Q/'preparation-commit.json')['head'],'elapsed_seconds':elapsed,'native_seconds':result['native']['seconds'],'owned_groups_retired':9,'raw_logs_verified':18,'completed_warmup_inputs':32,'scheduled_requests':33,'measured_inputs':0,'attempts':42,'events':158,'scoped_samples_joined':36,'all_callbacks_positive':40,'all_callbacks_zero':2,'pending_and_acquiring_zero':True,'scope_closed':True,'display_ticks_retained':259,'foreground_begin_pid':doc['begin']['front_pid'],'foreground_end_pid':doc['end']['front_pid'],'foreground_loss_count':3,'configuration_geometry_source_binary_SDK_unchanged':True,'SDK_files':len(plan['sdk']),'sealed':True,'retry':False,'release_qualified':False,'features_changed':False,'release_gate_changed':False,'interpretation':'Rejected during warmup at request33; no measured cohort or latency/cadence/pending occupancy comparison is qualified. Exact attempt replay and36 scoped sample joins independently verified; all42 callbacks retained including2zero pre-observer callbacks. End observation queries NSApp.keyWindow, so nil layer/zero dimensions establish absence of key window, not destruction of the app window. Another PID was foreground; its identity and cause of transition are not established. No renderer fault or user interference is inferred. Process exit/cleanup and configuration integrity pass. First invalid per-request observation was not serialized by existing diagnostic; add that failure context before another live attempt.'}
+(Q/'result-summary.json').write_text(json.dumps(summary,indent=2)+'\n');print(json.dumps(summary,indent=2))

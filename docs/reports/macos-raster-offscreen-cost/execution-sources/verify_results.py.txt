@@ -1,0 +1,28 @@
+from pathlib import Path
+import hashlib,json,sys,importlib.util
+sys.dont_write_bytecode=True
+q=Path(__file__).resolve().parent;r=Path('/Users/dshills/Development/projects/Vellum');p=Path('/private/tmp/vellum-raster-cost-core');sdk=Path('/private/tmp/vellum-doclinks-sdk-bd3cbc9/retained SDK/vellum-v0.1.0-alpha.2');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();load=lambda p:json.loads(p.read_text())
+sys.path.insert(0,str(r/'scripts'));s=importlib.util.spec_from_file_location('raster_cost_sdk_verify',q.parent/'macos-release-default-assessment/assessment.py');a=importlib.util.module_from_spec(s);sys.modules[s.name]=a;s.loader.exec_module(a);assert a.sdk_vector()==load(q.parent/'macos-release-default-assessment/plan.json')['sdk']
+s=importlib.util.spec_from_file_location('raster_cost_classify',r/'tools/macos-calibration/rastercost/check.py');v=importlib.util.module_from_spec(s);s.loader.exec_module(v)
+for name in ['tests-final','bench']:
+ receipt=load(q/(name+'-receipt.json'));run=receipt['run'];assert run['error'] is None and run['exit_code']==0 and run['owned']['terminal'] and run['owned']['group_absent'] and not run['owned']['errors'] and not run['observation_errors'] and run['pins_stable'] and run['logs_complete'] and not run['stop_at_exit'];assert all(sha(Path(k))==h for k,h in receipt['inputs'].items())
+ assert receipt['private_core_file_vector']=={x.relative_to(p).as_posix():sha(x) for x in p.rglob('*') if x.is_file()}=={x.relative_to(sdk/'drivers/cogent/build/upstream').as_posix():sha(x) for x in (sdk/'drivers/cogent/build/upstream').rglob('*') if x.is_file()}
+ for stream,metadata in run['logs'].items():assert (q/name/stream).stat().st_size==metadata['bytes'] and sha(q/name/stream)==metadata['sha256']
+for name in ['tests','tests-v2','tests-v3']:
+ run=load(q/(name+'-receipt.json'))['run'];assert run['exit_code']==1 and run['error'] is None and run['owned']['terminal'] and run['owned']['group_absent']
+raw=(q/'tests-final/stdout').read_text();assert raw.count('--- PASS: TestRasterReplay')==2 and '\nPASS\n' in raw
+rows=[json.loads(line.split('OFFSCREEN_REPLAY_SHAPE=',1)[1]) for line in raw.splitlines() if 'OFFSCREEN_REPLAY_SHAPE=' in line];assert len(rows)==1 and len(rows[0])==20
+native=load(q.parent/'macos-raster-native/capture/native/stdout')['raster_commands']['Frames'][-1]['Items'];differences=[]
+for off,nat in zip(rows[0],native):
+ for key,value in off.items():
+  if key=='Path':continue # Native scalar capture intentionally did not retain the full path.
+  expected=0 if key=='Command' and value=='Draw' else value
+  if expected!=nat[key]:
+   assert key=='UniformRGBA' and off['Index'] in [6,9,10,13,14],(off['Index'],key,value,nat[key])
+   differences.append({'index':off['Index'],'field':key,'offscreen':expected,'native':nat[key]})
+assert [d['index'] for d in differences]==[6,9,10,13,14]
+values=v.parse((q/'bench/stdout').read_text())
+summary={'outcome':'VALID_OFFSCREEN_WARM_REPLAY_BREAKDOWN','renderer':'unchanged original frozen SDK; no metadata hooks or candidate rendering changes','sdk_files':8321,'cpu':2,'target':[1519,1266],'patch_rect':[8,8,1511,1258],'logical_dpi':160,'benchmark_seconds':load(q/'bench-receipt.json')['run']['seconds'],'per_case_observations':3,'benchtime':'200ms','observations':values,'native_metadata_comparison':{'same':'20 command indices/types; all image rects, positions, operations, commands, color types; path lengths/transforms/no-fill/no-stroke flags','different_uniform_values':differences,'limits':'Four overridden opaque backgrounds differ black versus white; final phase differs green versus red. Native scalar capture did not retain full path coordinates. This is not byte-identical native replay or native timing equivalence.'},'tests':['Two focused Go methods: original routed pixel/state oracle plus full legacy/image-only replay parity for red/green/red; no-paint paths preserve full image; command state restored; source/path capture detached.','One Python method with nine malformed/incomplete/wrong CPU/allocation refusals.'],'retained_setup_failures':['Initial 96 DPI fixture produced 5px padding; explicit geometry assertion refused it.','Diagnostic rerun retained exact mismatch (5,5)-(1514,1261); switch to 160 DPI gives captured 8px inset.','Test bookkeeping initially restored mutated uniform pointer instead of original color; corrected before successful tests/timing.'],'interpretation':'Four no-paint paths cost about130ns in this warm offscreen fixture, while full replay costs168-173us. Image-only replay overlaps/full can be slightly faster, so no speedup claim from removing paths. The final solid fill alone is164-165us. These separately timed cases are not additive phases or a measured native cost share. Do not extrapolate steady hot replay to native120ms cadence/cache/scheduling or presentation p95. No no-paint-path optimization is justified by this evidence.','next':'Investigate warm-versus-separated replay/cache conditions offscreen before attributing the native ~0.74ms raster interval to renderer algorithms. No new native timing run or speculative path-elision candidate.','native_processes':0,'release_qualified':False,'gate_changed':False,'production_change_adopted':False}
+if (q/'summary.json').exists():assert load(q/'summary.json')==summary
+else:(q/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+print(json.dumps({'outcome':summary['outcome'],'medians_ns':{k:v['median_ns'] for k,v in values.items()},'native_uniform_differences':len(differences),'release_qualified':False}))

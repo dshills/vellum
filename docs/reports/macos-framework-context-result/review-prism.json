@@ -1,0 +1,85 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a0cd44bfc85fb2c8f1c9b26921f4ad9c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "acec5a2c02e1e46f261e9617f2508cfd722c3923",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4031,
+    "totalMs": 4063
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 25902,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 13708,
+        "output": 273,
+        "costUSD": 0.030146
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "0052d39e8cd83f1d",
+        "severity": "medium",
+        "category": "maintainability",
+        "title": "Hardcoded absolute developer path in verifier",
+        "message": "The committed verifier hardcodes an absolute path under a specific user's home directory. It cannot run on any other machine, so the committed evidence cannot be independently re-verified. The README acknowledges this only partially.",
+        "suggestion": "Take the repository root from an environment variable or CLI argument, or derive it relative to __file__.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "docs/reports/macos-framework-context-result/execution-sources/verify_result.py.txt",
+            "lines": {
+              "start": 5,
+              "end": 1
+            }
+          }
+        ],
+        "tags": [
+          "portability",
+          "reproducibility"
+        ],
+        "evidence": "R=Path('/Users/dshills/Development/projects/Vellum')",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/macos-framework-context-result/execution-sources/verify_result.py.txt"
+    }
+  ],
+  "suppressed": []
+}

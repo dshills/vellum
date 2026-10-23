@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "<USER_HOME>/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "docs/macos-preview-release.md,docs/reports/macos-preview-lifecycle100/README.md,docs/reports/macos-preview-lifecycle100/candidate-code-delta.json,docs/reports/macos-preview-lifecycle100/host-configuration.json,docs/reports/macos-preview-lifecycle100/public-guard-refusal.json,docs/reports/macos-preview-lifecycle100/run.json,docs/reports/macos-preview-lifecycle100/starter-native-run.json,docs/reports/macos-preview-lifecycle100/starter-native.stdout,docs/reports/macos-preview-lifecycle100/summary.json,docs/reports/macos-preview-lifecycle100/terminal.json,docs/reports/macos-preview-lifecycle100/text-native-run.json,docs/reports/macos-preview-lifecycle100/text-native-summary.json",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "4",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/lifecycle100-review-v2/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/lifecycle100-review-v2/prism.json"
+  ],
+  "cwd": "<USER_HOME>/Development/projects/Vellum",
+  "started_utc": "2026-10-22T19:49:12.032327+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 0,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 18188,
+  "group": 18188,
+  "owned": {
+    "created": true,
+    "pid": 18188,
+    "group": 18188,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 0,
+    "errors": [],
+    "observation": {
+      "group": 18188,
+      "members": [],
+      "observation_sha256": "cef0025c5a7a529f696e83ddd78258d02fcd2a191ba547c17a4853909f319413"
+    }
+  },
+  "seconds": 4.655268250033259,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

@@ -1,0 +1,75 @@
+"""Scalar-only cgo counterfactual; no Cocoa, window, Metal, or app startup."""
+from pathlib import Path
+import hashlib, importlib.util, json, shutil, sys
+sys.dont_write_bytecode = True
+X = Path(__file__).resolve().parent
+R = Path('/Users/dshills/Development/projects/Vellum')
+A = X.parent
+GO = A/'macos-app-examples/go-check'
+TOOLCHAIN = Path('/Users/dshills/Development/Go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.6.darwin-arm64')
+sys.path.insert(0, str(R/'scripts'))
+sys.path.insert(0, str(A/'macos-grid-capture-repair/preflight-v2'))
+spec = importlib.util.spec_from_file_location('owned_overlay', A/'macos-sdk-native-238b3b6/run.py')
+g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+Q = X/'probe'
+Q.mkdir()  # Refuse overwrite; no mutation of prior captures/preparation.
+main = '''package main
+/*
+#cgo CFLAGS: -x objective-c
+int c_marker(void);
+int m_marker(void);
+*/
+import "C"
+import "fmt"
+func main() { fmt.Printf("%d %d %d\\n", int(C.c_marker()), int(C.m_marker()), 41) }
+'''
+base = Q/'baseline'; base.mkdir()
+(base/'go.mod').write_text('module example.test/native-overlay\n\ngo 1.25.6\n')
+(base/'main.go').write_text(main)
+(base/'marker.c').write_text('int c_marker(void) { return 11; }\n')
+(base/'marker.m').write_text('int m_marker(void) { return 31; }\n')
+over = Q/'replacements'; over.mkdir()
+(over/'main.go').write_text(main.replace(', 41)', ', 42)'))
+(over/'marker.c').write_text('int c_marker(void) { return 22; }\n')
+(over/'marker.m').write_text('int m_marker(void) { return 32; }\n')
+config = Q/'overlay.json'
+config.write_text(json.dumps({'Replace': {str(base/n): str(over/n) for n in ['main.go','marker.c','marker.m']}}, indent=2)+'\n')
+physical = Q/'physical'; shutil.copytree(base, physical)
+for n in ['main.go', 'marker.c', 'marker.m']: shutil.copyfile(over/n, physical/n)
+protected = [GO, Path(__file__), TOOLCHAIN/'bin/go', TOOLCHAIN/'src/cmd/go/internal/work/exec.go', R/'scripts/child_process.py', R/'scripts/sdk_environment.py', A/'macos-sdk-native-238b3b6/run.py']
+for root in ['macos-presentation-phase/prepared', 'macos-presentation-physical/prepared']:
+    protected.extend(A/root/n for n in ['framework', 'native', 'overlay.json', 'framework.mod', 'build-identity.json'])
+pins = {str(p): sha(p) for p in protected + [p for p in Q.rglob('*') if p.is_file()]}
+receipts = {}
+def command(name, argv, cwd):
+    run = g.execute(['/usr/bin/sandbox-exec', '-p', '(version 1)(allow default)(deny network*)']+argv, cwd, Q/name,
+                    lambda: False, lambda: all(sha(Path(p)) == h for p,h in pins.items()), timeout=45, limit=2<<20)
+    receipts[name] = run
+    (Q/(name+'-receipt.json')).write_text(json.dumps(run, indent=2)+'\n')
+    if not (run['exit_code'] == 0 and run['error'] is None and run['owned']['terminal'] and run['owned']['group_absent'] and run['logs_complete'] and run['pins_stable'] and not run['observation_errors']):
+        raise ValueError('command failed: '+name)
+    return (Q/name/'stdout').read_text()
+version = command('version', ['/bin/sh', str(GO), 'version'], base).strip()
+if version != 'go version go1.25.6 darwin/arm64': raise ValueError('diagnostic toolchain mismatch')
+observed = {}
+for name, cwd, extra in [('baseline', base, []), ('overlay', base, ['-overlay='+str(config)]), ('physical', physical, [])]:
+    binary = Q/(name+'-binary')
+    command(name+'-build', ['/bin/sh', str(GO), 'build', '-x', *extra, '-o', str(binary), '.'], cwd)
+    pins[str(binary)] = sha(binary)
+    observed[name] = command(name+'-run', [str(binary)], cwd).strip()
+if observed['baseline'] != '11 31 41' or observed['physical'] != '22 32 42': raise ValueError('counterfactual controls failed')
+if observed['overlay'] != '22 31 42': raise ValueError('native omission not reproduced; retain output without asserting it')
+source = (TOOLCHAIN/'src/cmd/go/internal/work/exec.go').read_text()
+line = 'nonGoFileLists := [][]string{p.CFiles, p.SFiles, p.CXXFiles, p.HFiles, p.FFiles}'
+if source.count(line) != 1: raise ValueError('toolchain source context changed')
+result = dict(result='REPRODUCED_OBJECTIVE_C_OVERLAY_OMISSION', toolchain=version,
+              markers=['C', 'Objective-C', 'Go'], observed=observed,
+              original_overlay_inputs_unchanged=True, protected_pins=pins,
+              owned_commands=len(receipts), all_owned_groups_retired=True,
+              native_application_executed=False, desktop_used=False,
+              limitation='Explains missing pending hooks, not the separate absence of original presentation metrics/startup feedback. No window or presentation test.',
+              compiler_source={'path': str(TOOLCHAIN/'src/cmd/go/internal/work/exec.go'), 'sha256': sha(TOOLCHAIN/'src/cmd/go/internal/work/exec.go'), 'omitted_list': line})
+if not all(sha(Path(p)) == h for p,h in pins.items()): raise ValueError('final input drift')
+(Q/'result.json').write_text(json.dumps(result, indent=2)+'\n')
+print(json.dumps({k:result[k] for k in ['result','toolchain','observed','owned_commands','desktop_used']}))

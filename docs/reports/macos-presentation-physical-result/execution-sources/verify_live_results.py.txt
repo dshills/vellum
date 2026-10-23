@@ -1,0 +1,32 @@
+from pathlib import Path
+import datetime,hashlib,importlib.util,json,sys
+sys.dont_write_bytecode=True
+x=Path(__file__).resolve().parent;q=x/'prepared';r=Path('/Users/dshills/Development/projects/Vellum');load=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();result=load(q/'result.json');plan=load(q/'bound-plan.json');assert all(sha(Path(p))==h for p,h in plan['pins'].items());elapsed=(datetime.datetime.fromisoformat(result['finished_utc'])-datetime.datetime.fromisoformat(load(q/'started.json')['utc'])).total_seconds();assert elapsed<=100
+s=importlib.util.spec_from_file_location('result_phase',r/'tools/macos-calibration/presentationphase/check.py');v=importlib.util.module_from_spec(s);s.loader.exec_module(v);groups=0;cases=[];checked=[]
+for case in result['cases']:
+ kind=case['kind'];out=q/(kind+'-case');run=case['native'];groups+=1
+ assert run['owned']['terminal'] and run['owned']['group_absent'] and not run['owned']['errors'] and run['logs_complete'] and run['pins_stable']
+ for stream,m in run['logs'].items():p=out/'native'/stream;assert sha(p)==m['sha256'] and p.stat().st_size==m['bytes']
+ for when in ['before','after']:
+  for name,probe in case.get('configuration_'+when,{}).items():
+   groups+=1;assert probe['owned']['terminal'] and probe['owned']['group_absent'] and not probe['owned']['errors'] and probe['exit_code']==0 and probe['error'] is None and probe['logs_complete'] and probe['pins_stable'] and not probe['observation_errors'] and probe['logs']['stderr']['bytes']==0
+   for stream,m in probe['logs'].items():p=out/when/name/stream;assert sha(p)==m['sha256'] and p.stat().st_size==m['bytes']
+ if 'configuration_after' in case:
+  assert case['geometry_before']==case['geometry_after'] and set(case['configuration_before'])==set(case['configuration_after'])
+  assert all(case['configuration_before'][k]['logs']['stdout']['sha256']==case['configuration_after'][k]['logs']['stdout']['sha256'] for k in case['configuration_before'])
+ summary={'kind':kind,'native_seconds':run['seconds'],'exit_code':run['exit_code'],'command_error':run['error'],'validated':False}
+ if run['exit_code']==0 and run['error'] is None and run['logs']['stderr']['bytes']==0:
+  docs=v.base.load(out/'native/stdout');doc=v.base.native_doc(docs) if kind=='native' else docs[0]
+  try:value=v.validate(doc,load(q/'match.json'),kind)
+  except (ValueError,KeyError,TypeError,IndexError) as error:
+   assert 'validation' not in case;summary['classifier_rejection']={'type':type(error).__name__,'message':str(error)}
+   if 'pending_trace' in doc:summary['unaccepted_trace_counts']={k:len(doc['pending_trace'][k]) for k in ['events','attempts','requests']};summary['unaccepted_terminal']={k:doc['pending_trace'][k] for k in ['configured','invalid','overflow','pending','acquiring']}
+  else:
+   assert value==case['validation']==load(out/'validation.json');checked.append(value);rows=value['rows'];measured=rows[128:];summary.update(validated=True,joined_inputs=len(rows),receipt_to_shown_ms=value['receipt_to_shown_ms'],over33_3ms=sum(row['receipt_to_shown_ms']>33.3 for row in measured),phase_buckets=value['phase_buckets'],p95_rank_ticket=value['p95_rank_ticket'],attempts=len(doc['pending_trace']['attempts']),events=len(doc['pending_trace']['events']),callbacks=doc['display_clock_trace']['count'],terminal_pending=doc['pending_trace']['pending'],terminal_acquiring=doc['pending_trace']['acquiring'],receipt_hook_pending_counts={str(n):sum(len(row['pending_at_receipt_hook'])==n for row in measured) for n in sorted({len(row['pending_at_receipt_hook']) for row in measured})},receipt_hook_delay_ms=v.base.stats([row['receipt_hook_delay_ms'] for row in measured]),other_pending_counts={key:{str(n):sum(len(row['pending_observations'][key]['other_attempts'])==n for row in measured) for n in sorted({len(row['pending_observations'][key]['other_attempts']) for row in measured})} for key in ['receipt','present_request','final_gpu_end']},gpu_end_to_shown_ms=v.base.stats([row['gpu_end_to_shown_ms'] for row in measured]))
+ cases.append(summary)
+if result['outcome']=='VALID_PHASE_MATCHED_PRESENTATION_CONTROL':
+ assert [c['kind'] for c in cases]==['native','framework'] and all(c['validated'] for c in cases);pair=v.compare(*checked);assert pair==result['pair_validation']==load(q/'pair-validation.json')
+ a,b=result['cases'];assert a['geometry_before']==b['geometry_before'] and all(a['configuration_before'][k]['logs']['stdout']['sha256']==b['configuration_before'][k]['logs']['stdout']['sha256'] for k in a['configuration_before'])
+else:pair=None
+summary={'outcome':result['outcome'],'prepared_commit':plan['prepared_commit'],'elapsed_seconds':elapsed,'owned_groups_retired':groups,'cases':cases,'pair_validation':pair,'error':result.get('error'),'attempt_sealed':(q/'stop-live').exists(),'native_retry':False,'release_qualified':False,'gate_changed':False,'production_change':False,'interpretation':'Phase acceptance and pending records are diagnostic only. Pending=acquisition awaiting callback, not Metal pool availability/retention/credits/compositor queue. Four phase populations stay separate; no pureframework cost, causal fix or ordinary qualification claim.'}
+sys.path.insert(0,str(r/'scripts'));s=importlib.util.spec_from_file_location('result_sdk',x.parent/'macos-release-default-assessment/assessment.py');a=importlib.util.module_from_spec(s);sys.modules[s.name]=a;s.loader.exec_module(a);assert a.sdk_vector()==load(x.parent/'macos-release-default-assessment/plan.json')['sdk'];summary['SDK_files_unchanged']=8321;(q/'result-summary.json').write_text(json.dumps(summary,indent=2)+'\n');print(json.dumps(summary,indent=2))

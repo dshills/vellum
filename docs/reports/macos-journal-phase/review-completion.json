@@ -1,0 +1,26 @@
+{
+  "result": "PASS",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "reviews": {
+    "result-review": {
+      "files": 8,
+      "bytes": 155498,
+      "complete": true,
+      "findings": 2,
+      "sha256": "0e21f2a47514234a46e4599232d269a66ea9ec09dd5c9f5cb60983ac466a041f"
+    },
+    "followup-review": {
+      "files": 3,
+      "bytes": 20277,
+      "complete": true,
+      "findings": 1,
+      "sha256": "5c2035d8f966ba59b0ddc8c23c9737061ab894d624bb829a0a3c3a160bdacbcc"
+    }
+  },
+  "initial_disposition": "Two findings fixed: parameterized portable verifier and relative source keys; population-derived p95 rank.",
+  "followup_disposition": "Fixed-corpus archive concern not actionable: four exact hashes checked before tar scanning, retained expanded inventory; arbitrary/tampered hashes rejected.",
+  "unresolved_actionable_findings": 0,
+  "final_reproduction": "Summary and992derivedrows remain byte-identical after fixes;7focusedtests pass.",
+  "post_review_changes": "Review-completion wording, archive inventory and evidence packaging only; no analysis, measurement or production change."
+}

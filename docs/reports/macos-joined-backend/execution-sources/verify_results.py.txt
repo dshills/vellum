@@ -1,0 +1,31 @@
+from pathlib import Path
+import hashlib,json,sys,importlib.util,datetime
+sys.dont_write_bytecode=True
+x=Path(__file__).resolve().parent;q=x/'prepared';r=Path('/Users/dshills/Development/projects/Vellum');load=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();result=load(q/'result.json');plan=load(q/'bound-plan.json');assert all(sha(Path(k))==v for k,v in plan['pins'].items())
+assert result['release_qualified'] is False and result['gate_changed'] is False
+elapsed=(datetime.datetime.fromisoformat(result['finished_utc'])-datetime.datetime.fromisoformat(load(q/'started.json')['utc'])).total_seconds();assert elapsed<=60
+run=result['native'];assert run['owned']['terminal'] and run['owned']['group_absent'] and not run['owned']['errors'] and not run['observation_errors'] and run['pins_stable'] and run['logs_complete'] and not run['stop_at_exit']
+for stream,m in run['logs'].items():p=q/'capture/native'/stream;assert sha(p)==m['sha256'] and p.stat().st_size==m['bytes']
+assert result['configuration_before'].keys()==result['configuration_after'].keys()
+for k in result['configuration_before']:
+ for when in ['before','after']:
+  case=result['configuration_'+when][k];assert case['owned']['terminal'] and case['owned']['group_absent'] and case['error'] is None and case['exit_code']==0 and not case['owned']['errors']
+  for stream,m in case['logs'].items():p=q/'capture'/when/k/stream;assert sha(p)==m['sha256'] and p.stat().st_size==m['bytes']
+ assert result['configuration_before'][k]['logs']['stdout']['sha256']==result['configuration_after'][k]['logs']['stdout']['sha256']
+assert result['geometry_before']==result['geometry_after']
+s=importlib.util.spec_from_file_location('results_validator',r/'tools/macos-calibration/joinedbackend/check.py');v=importlib.util.module_from_spec(s);s.loader.exec_module(v)
+docs=v.base.load(q/'capture/native/stdout');assert len(docs)==1
+if result['outcome']=='VALID_JOINED_CPU_BACKEND_TIMING_CAPTURE':
+ assert run['error'] is None and run['exit_code']==0 and run['logs']['stderr']['bytes']==0
+ checked=v.validate(docs[0],load(q/'match.json'));assert checked==result['validation']==load(q/'validation.json')
+ ticket=checked['p95_rank_ticket'];post=ticket['post_acquire_ns'];cpu=ticket['intervals_ns'];parts={**{k:cpu[k]/1e6 for k in ['receipt_to_raster','raster','raster_to_upload','upload','upload_to_acquire']},**{k:v/1e6 for k,v in post.items()}};assert abs(sum(parts.values())-ticket['receipt_to_shown_ns']/1e6)<.001
+ summary={'outcome':result['outcome'],'source_checkpoint':plan['prepared_commit'],'elapsed_seconds':elapsed,'native_seconds':run['seconds'],'owned_groups_retired':9,'joined_inputs':len(checked['joined_rows']),'warmup':128,'measured':120,'receipt_to_shown_ms':checked['receipt_to_shown_ms'],'post_acquire_ms':checked['post_acquire_ms'],'observations_over33_3ms':checked['over_33_3_ms_observations'],'p95_rank_ticket':ticket,'p95_ticket_disjoint_ms':parts,'p95_ticket_total_ms':ticket['receipt_to_shown_ns']/1e6,'p95_ticket_present_request_minus_render_gpu_end_ms':ticket['present_request_minus_render_gpu_end_ns']/1e6,'backend_records':checked['backend_validation']['trace_records'],'startup_present_ordinals':checked['retained_startup_backend_present_ordinals'],'startup_command_ordinals':checked['retained_startup_backend_command_ordinals'],'raster_records':len(docs[0]['raster_trace']['Records']),'native_upload_records':len(docs[0]['native_upload_trace']['records']),'SDK_files_unchanged':8321,'native_archive_sha256':load(q/'build-identity.json')['native_archive_sha256'],'release_qualified':False,'gate_changed':False,'production_repair_adopted':False,'interpretation':checked['interpretation']}
+else:
+ summary={'outcome':'REJECT','source_checkpoint':plan['prepared_commit'],'elapsed_seconds':elapsed,'error':result.get('error'),'native_exit':run['exit_code'],'native_error':run['error'],'attempt_sealed':True,'retry':False,'gate_changed':False,'release_qualified':False}
+if result['outcome']=='VALID_JOINED_CPU_BACKEND_TIMING_CAPTURE':
+ present=ticket['backend_commands'][-1];shown=ticket['raw_host_clocks']['shown'];render_end=max(c['gpu_end'] for c in ticket['backend_commands'] if c['kind']==0)
+ assert present['kind']==2 and render_end<=present['gpu_end']<=shown
+ summary['p95_ticket_final_present_command']={'ordinal':present['ordinal'],'render_gpu_end_to_present_gpu_end_ms':(present['gpu_end']-render_end)*1000,'present_gpu_end_to_shown_ms':(shown-present['gpu_end'])*1000,'completion_callback_observed_to_shown_ms':(shown-present['complete_observed'])*1000,'note':'Actual GPU clocks and CPU callback-observation clock kept distinct; presentedTime is actual presentation feedback, not photons.'}
+ summary['startup_backend_presents']=len(summary['startup_present_ordinals']);summary['startup_backend_commands']=len(summary['startup_command_ordinals'])
+ sys.path.insert(0,str(r/'scripts'));sp=importlib.util.spec_from_file_location('joined_results_host',x.parent/'macos-release-default-assessment/assessment.py');a=importlib.util.module_from_spec(sp);sys.modules[sp.name]=a;sp.loader.exec_module(a);assert a.sdk_vector()==load(x.parent/'macos-release-default-assessment/plan.json')['sdk']
+(q/'result-summary.json').write_text(json.dumps(summary,indent=2)+'\n');print(json.dumps({k:summary[k] for k in summary if k not in ['p95_rank_ticket','startup_command_ordinals','startup_present_ordinals']},indent=2))

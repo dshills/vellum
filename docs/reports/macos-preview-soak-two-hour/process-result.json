@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/macos-preview-release/window-cycle-candidate",
+    "-composed",
+    "-cycles=1",
+    "-sample-every=1",
+    "-soak=2h",
+    "-soak-quiet=60s",
+    "-soak-settle=10s",
+    "-soak-interval=5m",
+    "-timeout=2h2m"
+  ],
+  "pid": 61926,
+  "started_utc": "2026-10-22T22:11:19.558289+00:00",
+  "expected_end_utc": "2026-10-23T00:12:19.558289+00:00",
+  "outer_timeout_seconds": 7500,
+  "session_deadline_utc": "2026-10-23T02:17:48.173078+00:00",
+  "binary_sha256": "7a73d546aedb6b04e7dde6b8e7edf526d16794249742e38a5fd11c4ceab74f8e",
+  "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "product_runtime_changes": false,
+  "native_predicate_unchanged": true,
+  "elapsed_seconds": 7211.704625208862,
+  "ended_utc": "2026-10-23T00:11:31.213512+00:00",
+  "exit_code": 0,
+  "outer_timeout": false,
+  "owned_group_absent": true,
+  "scope": "bounded preview resource regression, not full P11/native/GPU heap certification"
+}

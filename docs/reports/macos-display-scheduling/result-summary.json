@@ -1,0 +1,208 @@
+{
+  "outcome": "VALID_DISPLAY_CLOCK_OFF_ON_CONTROL",
+  "prepared_commit": "633d5b92b5b51e9c21151e4df775646aa56ca012",
+  "elapsed_seconds": 78.603884,
+  "owned_groups_retired": 18,
+  "cases": [
+    {
+      "mode": "off",
+      "native_seconds": 31.38434154097922,
+      "receipt_to_shown_ms": {
+        "count": 120,
+        "p50": 43.409333331510425,
+        "p95": 51.101124845445156,
+        "p99": 53.01783327013254,
+        "max": 53.09420824050903
+      },
+      "over33_3ms": 120,
+      "joined_inputs": 248,
+      "p95_rank_ticket": {
+        "accepted_revision": 243,
+        "scope": 1,
+        "opaque_tag": 488,
+        "generation": 246,
+        "drawable_id": 252,
+        "receipt_to_shown_ms": 51.101124845445156,
+        "present_gpu_end_to_shown_ms": 46.83083342388272
+      },
+      "display_trace_terminal": {
+        "configured": true,
+        "enabled": false,
+        "started": true,
+        "stopped": true,
+        "invalid": false,
+        "overflow": false,
+        "count": 0,
+        "window": 172462,
+        "display": 3,
+        "start": 1203655.7967413752,
+        "stop": 1203685.6475916253
+      },
+      "retained_backend_startup_present_count": 10,
+      "retained_backend_startup_command_count": 50
+    },
+    {
+      "mode": "on",
+      "native_seconds": 30.7316211250145,
+      "receipt_to_shown_ms": {
+        "count": 120,
+        "p50": 26.81741677224636,
+        "p95": 33.94712507724762,
+        "p99": 36.504166666418314,
+        "max": 36.57608339563012
+      },
+      "over33_3ms": 14,
+      "joined_inputs": 248,
+      "p95_rank_ticket": {
+        "accepted_revision": 199,
+        "scope": 1,
+        "opaque_tag": 400,
+        "generation": 202,
+        "drawable_id": 208,
+        "receipt_to_shown_ms": 33.94712507724762,
+        "present_gpu_end_to_shown_ms": 29.49695847928524
+      },
+      "display_trace_terminal": {
+        "configured": true,
+        "enabled": true,
+        "started": true,
+        "stopped": true,
+        "invalid": false,
+        "overflow": false,
+        "count": 1789,
+        "window": 172470,
+        "display": 3,
+        "start": 1203694.696606292,
+        "stop": 1203724.531196042
+      },
+      "retained_backend_startup_present_count": 10,
+      "retained_backend_startup_command_count": 50,
+      "callback_count": 1789,
+      "callback_timestamp_intervals_ms": {
+        "count": 1788,
+        "p50": 16.666666604578495,
+        "p95": 16.66666683740914,
+        "p99": 16.66666683740914,
+        "max": 16.66666683740914
+      },
+      "callback_observation_minus_timestamp_ms": {
+        "count": 1789,
+        "p50": 10.803291574120522,
+        "p95": 10.901875095441937,
+        "p99": 11.09774992801249,
+        "max": 11.560708284378052
+      },
+      "target_minus_timestamp_ms": {
+        "count": 1789,
+        "p50": 16.66670828126371,
+        "p95": 16.666708514094353,
+        "p99": 16.666708514094353,
+        "max": 16.666708514094353
+      },
+      "measured_clock_ms": {
+        "gpu_to_next_reported_timestamp_ms": {
+          "count": 120,
+          "p50": 8.180958684533834,
+          "p95": 16.11312502063811,
+          "p99": 16.635333420708776,
+          "max": 16.657625325024128
+        },
+        "shown_minus_nearest_reported_timestamp_ms": {
+          "count": 120,
+          "p50": -0.009041745215654373,
+          "p95": -0.007208436727523804,
+          "p99": -0.006791669875383377,
+          "max": -0.006749993190169334
+        },
+        "present_gpu_end_to_shown_ms": {
+          "count": 120,
+          "p50": 21.8534586019814,
+          "p95": 31.12204186618328,
+          "p99": 32.03433356247842,
+          "max": 32.14350016787648
+        }
+      },
+      "reported_timestamp_counts": {
+        "count": 120,
+        "p50": 1,
+        "p95": 1,
+        "p99": 1,
+        "max": 1
+      },
+      "p95_rank_ticket_clock_join": {
+        "accepted_revision": 199,
+        "scope": 1,
+        "opaque_tag": 400,
+        "generation": 202,
+        "drawable_id": 208,
+        "phase": "measured",
+        "present_gpu_end": 1203718.582138125,
+        "shown": 1203718.6116350836,
+        "gpu_preceding_tick": {
+          "duration": 0.016666708333333335,
+          "observed": 1203718.5890799586,
+          "ordinal": 1432,
+          "target": 1203718.5949775835,
+          "timestamp": 1203718.5783108752
+        },
+        "gpu_following_tick": {
+          "duration": 0.016666708333333335,
+          "observed": 1203718.6057845003,
+          "ordinal": 1433,
+          "target": 1203718.6116442503,
+          "timestamp": 1203718.5949775418
+        },
+        "shown_preceding_tick": {
+          "duration": 0.016666708333333335,
+          "observed": 1203718.6057845003,
+          "ordinal": 1433,
+          "target": 1203718.6116442503,
+          "timestamp": 1203718.5949775418
+        },
+        "shown_following_tick": {
+          "duration": 0.016666708333333335,
+          "observed": 1203718.6224465836,
+          "ordinal": 1434,
+          "target": 1203718.628310917,
+          "timestamp": 1203718.6116442087
+        },
+        "nearest_reported_tick_to_shown": {
+          "duration": 0.016666708333333335,
+          "observed": 1203718.6224465836,
+          "ordinal": 1434,
+          "target": 1203718.628310917,
+          "timestamp": 1203718.6116442087
+        },
+        "reported_timestamps_between_gpu_and_shown": 1,
+        "gpu_to_next_reported_timestamp_ms": 12.839416740462184,
+        "shown_minus_nearest_reported_timestamp_ms": -0.009125098586082458,
+        "present_gpu_end_to_shown_ms": 29.49695847928524
+      },
+      "interpretation": "View-linked Core Animation timestamps/targets are reported clocks, not independent optical scanout, guaranteed latch opportunities or missed-vsync proof. Callback gaps and lateness retained; retrospective joins do not mean the callback was already delivered. One off/on observer-presence control, no calibrated overhead, pure-cost causal comparison or ordinary qualification.",
+      "reported_timestamp_between_counts": {
+        "0": 13,
+        "1": 107
+      },
+      "nearest_reported_timestamp_absolute_error_ms": {
+        "count": 120,
+        "p50": 0.009041745215654373,
+        "p95": 0.01037493348121643,
+        "p99": 0.010541640222072601,
+        "max": 0.010541873052716255
+      },
+      "callback_target_minus_observed_ms": {
+        "count": 1789,
+        "p50": 5.8634167071431875,
+        "p95": 5.919750081375241,
+        "p99": 5.932791857048869,
+        "max": 16.600708477199078
+      }
+    }
+  ],
+  "difference_of_run_p95_on_minus_off_ms": -17.153999768197536,
+  "interpretation": "One same-binary off/on observer-presence control, no repeated estimate, pure-cost cause, overhead calibration or ordinary qualification. Display-link timestamps/targets are reported Core Animation clocks, not guaranteed latch opportunities or optical scanout. Retrospective tick joins do not imply prior callback delivery; retain gaps/lateness. Gate unchanged.",
+  "SDK_files_unchanged": 8321,
+  "release_qualified": false,
+  "gate_changed": false,
+  "production_repair_adopted": false
+}

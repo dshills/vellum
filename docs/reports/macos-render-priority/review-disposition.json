@@ -1,0 +1,25 @@
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "complete": true,
+  "files": 16,
+  "findings": [
+    {
+      "id": "29f3d6b78f8a65a3",
+      "disposition": "Not a defect. The owned command gives go test an explicit list of three .go files; Go ignores build constraints for named source files. The exact actual native race test command compiles and passes both methods, including currentPriorityState. Neither this helper tag nor an unapplied canonical Core patch prevents the real private candidate build, which also passes. Candidate is intentionally private; copied Core is byte-bound."
+    },
+    {
+      "id": "1eeefc32e2c08b28",
+      "disposition": "Intentional private-candidate rejection policy, not production fallback behavior. Start failure unlocks before panic; stderr/invalid journal/watchdog rejects this evaluation. Quietly continuing without the requested candidate would make a passing performance result ambiguous. This is not adopted in shipping framework or user drawing app. Actual native start/end tests all succeed. Any adoption needs separate error-policy and release acceptance."
+    },
+    {
+      "id": "5d46441a0bcd43a8",
+      "disposition": "Intentional private-candidate failure/quarantine. End/owner mismatch must reject the trial; an elevated or uncertain native thread must not be unlocked into the shared Go pool. Panics or timeout fail the existing owned-process/strict-journal checks; the executor finally retires the process group. This is not successful cleanup and is never recorded as qualification. All1000+200+panic native cleanup test scopes return success with stable requested QoS/owner. No production robustness claim or adoption follows."
+    }
+  ],
+  "internal_review": "29regular archive members/5committed mappings verified. Common measured/ordinary owner checked; SDK/native archive unchanged; native helper tests pass and helper bytes reused exactly. Candidate hypothesis remains lowconfidence (testthreadbaseclass33). One bounded actual-gate check only; no causal speedup or release claim.",
+  "release_gate_changed": false,
+  "features_changed": false,
+  "shipping_adopted": false,
+  "post_review_format_only": "Report patch uses zero context to avoid Git whitespace-check warnings from context-prefix space followed by Go tabs. Exact added/removed lines unchanged; actual source/binary/plan unchanged."
+}

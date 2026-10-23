@@ -1,0 +1,119 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "3768c24ced709a01d6f083307df27880",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "412e5b8266fb8655935bcdad203b73887923c9db",
+    "branch": "codex/macos-preview"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "9d6ea26f3fec9426",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "README mislabels native archive hash as the binary hash",
+      "message": "The README says the Placement binary's SHA-256 \"remains\" 786aaad8..., but that hash is the native archive hash in app-build.json. The actual Placement binary hash is 0d7539594ad7..., and the packaged binary hash is 557761aa.... The report therefore misidentifies the artifact, and a reader verifying the binary against the README will get a mismatch.",
+      "suggestion": "Fix the README to say 786aaad8... is the native archive hash and cite 0d753959... as the binary hash.",
+      "confidence": 0.8,
+      "locations": [
+        {
+          "path": "docs/reports/macos-preview-alpha3-candidate/app-package.json",
+          "lines": {
+            "start": 8,
+            "end": 8
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "hash-mismatch",
+        "location-corrected"
+      ],
+      "evidence": "\"packaged_binary_sha256\": \"557761aa1368ac312605ee540adb8ada77a8ccd36024a8b81421f8b7783cd7c3\"",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6439,
+    "totalMs": 6453
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 8,
+    "bytes": 17357,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 9117,
+        "output": 618,
+        "costUSD": 0.024414
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "250a4b3fd67ed050",
+        "severity": "medium",
+        "category": "docs",
+        "title": "Transient status asserted in release doc",
+        "message": "The R3 checkpoint text says \"A fresh quiet run is underway\" and the first soak stopped at ~152s. This is a transient status in a release doc, and it will go stale and mislead readers.",
+        "suggestion": "Record the status with a date or a commit reference, or link to the report instead of narrating the in-progress state.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "docs/reports/macos-preview-alpha3-candidate/rights-triage.json",
+            "lines": {
+              "start": 58,
+              "end": 58
+            }
+          }
+        ],
+        "tags": [
+          "docs"
+        ],
+        "evidence": "\"smallest_next_action\": \"Finish exact final payload and conservative notices;",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/macos-preview-alpha3-candidate/rights-triage.json"
+    }
+  ],
+  "suppressed": []
+}

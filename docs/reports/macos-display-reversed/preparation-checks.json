@@ -1,0 +1,23 @@
+{
+  "outcome": "PREPARED_ONLY_NO_NATIVE_RUN",
+  "new_orchestration_methods": 5,
+  "failure_subcases": 7,
+  "syntax_checks": "PASS4newPythonmodules",
+  "literal_order": [
+    "on",
+    "off"
+  ],
+  "exact_command_args": "CPU/GPUobserver fixed on; displayclock finalarg on thenoff",
+  "first_failure_stops": "native,stderr,validator,stop,localgeometry/config; crosscasedrift retainsboth",
+  "fresh_scope_overwrite_refusal": "PASS",
+  "binary_sha256": "4ea7d61cb26c52405b8222a1fd1ea1c2069bb8f4b32f8932bb6cbb91b9ce3c1d",
+  "binary_execute_permission": true,
+  "native_archive_sha256": "10e39953bda1045da3bd9c315dcac0add646fa86e74627b3c896723d31b86a35",
+  "all_compiled_source_module_overlay_consumer_pins": "PASS",
+  "SDK_files_unchanged": 8321,
+  "prior_native_and_8_classifier_method_checks": "Reused exact unchanged sources, executable and native archive from633d5b9/1e99fdd",
+  "old_scope_runner": "Unchanged committed bytes",
+  "rebuilds": 0,
+  "gate_changed": false,
+  "release_qualified": false
+}

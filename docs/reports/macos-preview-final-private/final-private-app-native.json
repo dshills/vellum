@@ -1,0 +1,44 @@
+{
+  "utc": "2026-10-22T21:58:57.906425+00:00",
+  "method": "CUA native accessibility/keyboard + owner-authorized app-only CGEvent helper; not physical hardware input",
+  "app_pid": 56101,
+  "extracted_zip_sha256": "acd90220d2a27f386d48e7277c620fd555357c54a87cfe96b8057e72f95c6e74",
+  "binary_sha256": "144e76be8a84654a45baab46f721d38b1f740a16b00950bf46f79823ab3d6f5e",
+  "observed_steps": [
+    "launch empty 0 objects",
+    "native drag Block -> block-1 (-140,-40), exactly 1 object and Undo1",
+    "empty-space pan; history remains Undo1",
+    "native scroll -> toolbar94%; saved zoom0.9417645335842487",
+    "Undo -> 0 objects; Redo -> same block-1",
+    "native Save As to own temporary drawing; New -> 0",
+    "native Open -> block-1 80x50, toolbar94%, Undo0/Redo0",
+    "normal CmdQ; exact owned PID absent",
+    "strict extracted app signature still valid"
+  ],
+  "drawing_sha256": "9c5a86eb1ea98362b53255a66710796abc8e5955515618125fd37e3ebfeb022d",
+  "saved_document": {
+    "format": "vellum-placement",
+    "version": 2,
+    "objects": [
+      {
+        "id": "block-1",
+        "kind": "block",
+        "x": -140,
+        "y": -40,
+        "width": 80,
+        "height": 50
+      }
+    ],
+    "center": {
+      "X": -50.95646672089994,
+      "Y": -40.02437653785136
+    },
+    "zoom": 0.9417645335842487,
+    "selected": "block-1",
+    "snap": true,
+    "next_id": 1
+  },
+  "process_absent": true,
+  "strict_signature_after_native_check": true,
+  "full_resource_qualification": false
+}

@@ -1,0 +1,16 @@
+{
+  "outcome": "PREPARED_NO_NATIVE_CAPTURE",
+  "classifier_methods": 6,
+  "orchestration_methods": 2,
+  "headless_native": "PASS census, transitions, phase anchor/order, bounds/no eviction,4concurrent producers/160attempts/480events, native JSON booleans; no NSApplication/window",
+  "native_build": "Both shared-observer object and ARC reference compile Werror; framework privateconsumer compiles with existing AppKit/duplicateobjc link warnings",
+  "pixels": "PASS unchanged full-pixel routed fixture with native-only overlay excluded; initial offscreen link failure retained",
+  "recipe_reproduction": "Full consumer and module/overlay/core-native source snapshot exact after path normalization; overwrite refused",
+  "source_log_pin_ownership_checks": "PASS six owned build/test commands, original compiled inputs unchanged",
+  "SDK_files_unchanged": 8321,
+  "native_archive_rebuilt": false,
+  "framework_sha256": "a0252048e60d33a13c98c344c6e255f66ddc81c569cf9e6716a71292e16bbbfe",
+  "native_sha256": "44c85638e4fb3415fd979869cd4d25806d8fe7626660eb9a3b9381505aedb91d",
+  "gate_changed": false,
+  "features_changed": false
+}

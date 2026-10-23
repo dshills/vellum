@@ -281,3 +281,266 @@ SDK/source/native/configuration/geometry pins stable. Three transitions are not
 a latency distribution, per-tag source attribution or displayed-byte proof.
 Inspect no-paint path execution/raster boundaries offscreen next; no repair,
 unchanged retry, default/SDK/app/gate change or release acceptance. M3–M7 open.
+
+The [focused offscreen raster cost checkpoint](../docs/reports/macos-raster-offscreen-cost/README.md)
+uses unchanged Core: full warm replay167.693–172.643µs, four no-paint paths
+129.5–130.6ns, last fill163.943–165.436µs, zero allocations. ExplicitCPU2,
+three observations/case, two focused Go methods and nine parser refusals pass.
+Native scalar geometry matches; overwritten colors/full path bytes and temporal
+conditions differ, so no native equivalence, phase sum or latency claim follows.
+No path-elision candidate or new native run is justified. Investigate separated
+replay/cache conditions offscreen next; features/defaults/SDK/app and33.3ms gate
+unchanged. M3–M7 open; no production repair adopted.
+
+The [separated offscreen replay control](../docs/reports/macos-raster-separated-cost/README.md)
+retains32samples/eightpercondition in1.998s with unchanged renderer. Immediate,
+120ms pause and32MiB scratch-footprint conditions overlap; observed replay ranges
+0.178–0.902ms. Final legacy pixels/focused method/nine parser refusals and source/
+SDK/log/group checks pass. Hot microbench timing is not native timing; no proven
+cache flush, isolated CPU/scheduling/GC cause, native-p95 or repair/adoption claim.
+Keep future timing joined to surrounding upload/schedule boundaries. No new
+native test; features/defaults/SDK/app/33.3ms gate unchanged, M3–M7 open.
+
+The [joined raster/upload/scheduling diagnostic](../docs/reports/macos-joined-timing/README.md)
+is prepared: private bounded absolute raster brackets plus native wake/check
+stamps, exact same-input source/upload/actual-presentation joins and contiguous
+interval closure. Go timer offsets/nested work remain separate; no guessed clock
+conversion or phase-quantile sum. Five recorder race methods, original routed
+pixels, five classifier methods/23refusals, build and exact recipe/pins/SDK checks
+pass. One reviewed/committed40s native case60overall is approved when ready; no
+result or production repair yet. Features/defaults/SDK/app/33.3ms gate unchanged,
+M3–M7 open.
+
+The [joined native result](../docs/reports/macos-joined-timing/README.md) passes248
+same-input joins/9groups in37.695s. Instrumented receipt→shown p95=35.353ms;
+17/120measured observations exceed33.3. On that actual rank ticket, raster0.332ms,
+native upload1.460ms, other before acquisition0.320ms and acquisition→shown33.241ms
+partition the same response. Post-acquisition still includes encode/submit/GPU/
+display phases; no compositor-only attribution, phase-quantile sum or fix follows.
+Full startup/pins/SDK/configuration/geometry/closure retained. Next join backend
+boundaries to the same identifiers. No native retry, production/default/SDK/app/
+feature/gate change; M3–M7 open, no ordinary release qualification.
+
+The [joined CPU/backend preparation](../docs/reports/macos-joined-backend/README.md)
+continues the original Cogent/WebGPU design. Exact reviewed upload and backend
+observers compose privately with the unchanged raster clock. Six focused methods/
+19 negative mutations, original routed full pixels, fresh native/Go builds and
+full source/log/SDK/reproduction checks pass; prior recorder race checks are
+reused by exact source comparison. One newly approved 40s native/60s overall
+capture may follow review and commit. GPU span includes gaps; final-render-GPU-end
+to shown is not exclusively compositor cost. No native result, repair, feature,
+default, SDK/app or 33.3ms gate change. M3–M7 remain open.
+
+The [same-input backend result](../docs/reports/macos-joined-backend/README.md)
+passes 248 joins in 37.509 s, with nine owned command groups retired. Instrumented
+p95 is 36.329 ms; 34 of 120 measured observations exceed 33.3 ms. On that actual
+ranked input, the render GPU span is 0.289 ms and final render GPU end to shown
+is 30.933 ms. Presentation was requested 1.138 ms before final render GPU end.
+Separate present-command GPU end to shown is 30.929 ms. This localizes the
+remainder beyond the recorded commands without isolating compositor cost,
+proving a fixed frame penalty or attributing the cause to WebGPU. All startup,
+command, source, SDK, configuration and log accounting is retained. The original
+design, SDK, app, defaults, features and 33.3 ms gate remain unchanged. M3–M7 are
+open; no repair or ordinary-build qualification follows. The approved live scope
+is consumed; this result does not authorize another native attempt.
+
+The [display scheduling preparation](../docs/reports/macos-display-scheduling/README.md)
+adds a private view-linked display-clock observer without GPU work, frame requests
+or layer/presentation policy changes. Eight focused methods and 20 negative cases,
+headless native ownership checks, full routed pixels, private consumer build and
+source/SDK/log/reproduction checks pass. Exact reviewed native/Core bytes are
+reused. Reported timestamps/targets are not optical scanout, guaranteed latch
+opportunities or missed-vsync proof. One approved observer-off/on pair may follow
+review and commit, capped at 100 seconds overall and 40 seconds per native case.
+No native result yet. Features, SDK/app, defaults and 33.3 ms gate remain unchanged;
+M3–M7 stay open.
+
+The [display-clock off/on result](../docs/reports/macos-display-scheduling/README.md)
+passes both cases in 78.604 seconds, with 18 owned groups retired and 248
+joined inputs per case. Same-binary p95 is 51.101 ms off versus
+33.947 ms on; both miss 33.3 ms. The difference of run p95 values is
+-17.154 ms, about one refresh period, without a repeated or causal claim.
+All 1,789 callbacks and full startup/held tails remain retained; actual shown
+feedback is within 10.542 microseconds of the nearest reported timestamp.
+These are reported clocks, not optical scanout or guaranteed latch opportunities.
+Observer neutrality is unsupported; reverse order before proposing a scheduling
+change. No permanent link, backend/default/SDK/app/feature or release-gate change.
+No release qualification; M3–M7 open. Approved live scope consumed.
+
+The [reversed-order preparation](../docs/reports/macos-display-reversed/README.md)
+reuses the exact final display-clock binary and native archive for a fresh on/off
+pair. Five orchestration methods, seven failure cases, syntax/fresh-scope guards
+and full source/SDK identity checks pass without rebuilding unchanged native code.
+The old off/on scope stays sealed. One newly approved quiet scope may follow
+review and commit, capped at 100 seconds overall and 40 seconds per native case.
+No result yet. Features, SDK/app, defaults and 33.3 ms gate unchanged; M3–M7 open.
+
+The [reversed-order observer result](../docs/reports/macos-display-reversed/README.md)
+passes the fresh on/off pair in 74.272 seconds with
+18 owned groups retired and 248 joined inputs per case.
+Receipt-to-shown p95 is 37.882 ms on and
+37.923 ms off; on-minus-off run p95 is
+-0.040 ms. The previous off/on pair remains
+separate (33.947 ms on / 51.101 ms off).
+No pooling, causal claim, observer overhead calibration or ordinary qualification.
+Complete callbacks/startup/held tails and source/native/SDK identity are retained.
+No permanent link or production/default/feature/SDK/app/gate change. M3–M7 open;
+approved scope consumed, desktop free, no native job active.
+
+The [offscreen journal phase analysis](../docs/reports/macos-journal-phase/README.md)
+reclassifies all four immutable journals through the original pinned validators:
+992 joins, 512 warmup and 480 measured, without native execution or rebuilding.
+Seven focused methods and byte-identical independent reproduction pass. Actual
+p95 inputs retain 81–92% of latency after final-present GPU end. Reported timestamp
+and callback observation are independent event series: the preceding reported
+callback is still pending at 118/120 reversed-on receipts. Earlier on versus
+reversed on nearest-shown-timestamp callback observation lag has p95 10.912 versus
+16.340 ms. These are descriptive clock relations, not optical/latch/causal proof.
+No observer scheduling fix, ordinary qualification, feature/default/SDK/app/gate
+change follows; M3–M7 open. Future controls should match request phase and record
+pending presentation/drawable state before changing scheduling policy. No new
+native scope is prepared or authorized by this offscreen checkpoint.
+
+The [phase-matched pending-state preparation](../docs/reports/macos-presentation-phase/README.md)
+adds private native/framework consumers with four predeclared request phases,
+30measured inputs per phase and complete scalar acquisition/receipt/callback
+censuses. Actual native receipt matching is required before comparing latency;
+recorded pending feedback does not establish Metal pool availability or ownership.
+Eight focused methods, headless native concurrency/lifecycle/bounds/JSON, both
+builds, full routed pixels, recipe/source/log/SDK checks pass. No native capture
+yet. One approved100second overall/40second per-process scope may follow review
+and commit. Existing design/features/defaults/SDK/app and33.3ms gate unchanged;
+M3–M7 open. Actual results or rejection receive separate review and commit.
+
+The [first phase-matched control](../docs/reports/macos-presentation-phase/README.md)
+is rejected in52.939seconds. Native completes248joins with30measured
+per phase, p9534.960ms and zero other recorded pending drawables at measured
+receipt/present/GPU points. Framework fails startup before any input or metrics
+sample; no matched comparison exists. Linked-code audit finds pending hooks absent
+from its acquisition method despite the Objective-C overlay. The original acquire
+observer call is linked, so the whole startup failure remains unisolated. All18
+groups/logs/config/geometry/source/SDK8321checks pass; rejection retained/sealed.
+Next diagnostic preparation must materialize native changes in a private Core
+copy and verify linked hooks. No unchanged retry or features/defaults/SDK/app/
+gate change; M3–M7 open. Original quiet scope consumed, desktop free.
+
+The [physical native-source repair preparation](../docs/reports/macos-presentation-physical/README.md)
+materializes the known three Core replacements in a fresh6031file private copy.
+Actual linked acquisition calls now include pending hooks plus the original
+observer; a headless factory test verifies subclass and stamp publication/revocation.
+Original Core/SDK8321files remain unchanged. Native reference reused byte-identically,
+framework consumer rebuilt; focused integration/log/source/recipe proofs pass,
+unchanged classifier/pixel/bounds evidence reused. First failure stays sealed and
+is not reclassified. No new live capture; fresh quiet approval pending. Phase
+protocol, features/defaults/SDK/app and33.3ms gate unchanged; M3–M7 open. Review and
+commit precede execution; actual results/rejection receive separate checkpoint.
+
+
+The [offscreen Objective-C overlay control](../docs/reports/macos-presentation-overlay/README.md)
+reproduces the missing instrumentation with the diagnostic's exact Go 1.25.6:
+Go/C replacements apply while `.m` compiles original bytes; a physical copy
+applies all replacements. Three scalar fixture builds/runs plus the version
+check pass, with seven bounded owned groups retired and prior build/capture pins
+unchanged. This confirms the materialization rationale, not the separate startup
+feedback failure. The user explicitly deferred the next live attempt; corrected
+capture remains unstarted. No UI launch, feature/default/SDK/app/gate change or
+release qualification; M3–M7 remain open.
+
+
+The [corrected live phase-control attempt](../docs/reports/macos-presentation-physical-result/README.md)
+stops after40.713seconds: native returns normally, but measured request215
+arrives2.143599ms after its target, violating the predeclared2ms diagnostic phase
+bound. All248 raw clock/tag/drawable/callback joins, parent/clock/replay checks,
+9ownedgroups/log/configuration/geometry/source/SDK8321 checks pass; no filtering,
+retry or cutoff change. Fail-first prevents framework launch, so corrected startup
+and a matched latency comparison remain unverified. The attempt is sealed and
+desktop free. A separate startup-only check is the next direct unresolved test;
+none is authorized or executed here. Features/defaults/SDK/app and33.3ms release
+gate unchanged; M3–M7 open. Actual rejection receives review and commit.
+
+
+The [startup-only preparation](../docs/reports/macos-framework-startup/README.md)
+reuses the corrected framework's existing pilot mode, original setup validator,
+pending replay and owned Host, independently of native phase matching. One20s
+process/45s total, no rebuild or routed cohort. Eight focused methods/23negative
+subcases plus actual unauthorized-CLI refusal pass; source/compiled/SDK pins verify.
+No UI has run and no release gate closes. Fresh up-to1minute quiet approval is
+needed; features/defaults/SDK/app and33.3ms/60Hz gate unchanged, M3–M7 open.
+
+
+The [isolated corrected-framework startup](../docs/reports/macos-framework-startup-result/README.md)
+passes in8.111seconds (native1.462seconds):4positive scoped samples exactly join
+attempts7–10, scope closes, pending/acquiring0. All10attempts/30events are retained,
+including2zero callbacks among6pre-observer scope0attempts.9ownedgroups/18logs,
+source/binary/geometry/configuration andSDK8321verify. This closes only the
+corrected-binary startup prerequisite. Observer lifecycle passes with0ticks;
+no phase pair, cadence, latency or release qualification follows. Earlier scopes
+stay rejected/sealed; no unchanged retry or feature/gate/default/SDK/app change.
+Next measure corrected-framework input/presentation/pending state under a separate
+reviewed scope and fresh quiet approval. M3–M7 remain open.
+
+
+The [corrected-framework cohort preparation](../docs/reports/macos-framework-pending/README.md)
+reuses startup-qualified binary6825d90e for its first timed cohort independently
+of the failed native-reference phase pair. Originalstrict128warm/120measured,
+phase/backend/clock/receipt/drawable/callback constraints remain unchanged, with
+40s process/60s overall caps andfail-firstsealing. Twofocusedrouting methods/
+7negativecases andactualunauthorizedCLIrefusalpass, allcompiled/SDK8321pinsverify.
+No UI or rebuild yet; ownerauthorizedscreenforremainingreleasetests. Review/commit
+preparationthenactualresult. No nativecomparison, representativequalification or
+feature/default/SDK/app/33.3ms/60Hz gatechange; M3–M7 open.
+
+
+The [first corrected framework timed cohort](../docs/reports/macos-framework-pending-result/README.md)
+is rejected during warmup: 32 completed inputs, request 33 foreground/configuration
+loss, invalid display observer, zero measured inputs. All 42 attempts/158 events
+and 259 ticks are retained; independent replay and 36 scoped sample joins pass.
+All nine groups retire, pending/acquiring zero, recorder closed and all pins,
+SDK 8321, geometry/configuration unchanged. Total 12.111 s, native 5.218 s.
+No latency/cadence/native comparison or release qualification follows. Another PID
+was foreground; its identity/cause is unknown. Nil key-window layer does not prove
+window destruction. Record the first failed per-request state before a fresh
+attempt; do not retry this sealed scope. Features and release gate remain unchanged.
+
+
+The [foreground-context diagnostic](../docs/reports/macos-framework-context/README.md)
+adds first-invalid-state retention and failure-only foreground bundle/name/window
+count after the rejected warmup. Two Go race tests and three routing/patch methods
+pass; source-drift refusal fixed and final build passes. A fresh private binary
+retains unchanged Core/backend/match/schedule/validators and 40/60-second caps.
+No live result yet, no extra native observation for valid requests, and no feature
+or release-gate change. Earlier rejected scopes stay sealed.
+
+
+The [complete context-enabled timed journal](../docs/reports/macos-framework-context-result/README.md)
+passes input/backend/display-clock checks with 248 completed inputs and no focus
+loss, but strict phase admission rejects 155 receipts above2ms (74warmup/81measured).
+All248 joins/258attempts/1022events/1987ticks retained, pending/acquiring0, scope
+closed;9groups/18logs/pins/SDK8321/geometry/configuration verify.43.076s total.
+Unqualified descriptive p95 37.362ms,30/120above33.3ms is not release evidence.
+No older recorded pending acquisition at the three inspected endpoints of120
+measured inputs; no compositor/pool-availability inference. Next move private
+scheduling preparation before target, final wait before dispatch, preserve the
+same actual receipt0..2ms and all unchanged gates. Scope sealed; no unchanged retry.
+
+
+A [single scoped render-priority candidate](../docs/reports/macos-render-priority/README.md)
+is prepared for one bounded session ending22October19:05:33UTC. Two native race
+methods verify scoped override retirement/owner/base-QoS and panic cleanup; final
+representative loadedgrid build and actual unauthorized-CLI refusal pass. Test
+thread already requestedUSER_INTERACTIVE, so actual worker priority deficit and
+benefit remain unproven. Only private common composition owner/helper differs;
+SDK8321/nativearchive/rendering/pacing/defaults unchanged. One serial120 case,
+only ifpassing one paced600 case;60s/process150s/overall, unchanged strict journal
+and33.3ms/60Hz criteria. No native run or shipping adoption yet; no feature/gatechange.
+
+
+The [one render-worker priority candidate](../docs/reports/macos-render-priority-result/README.md)
+is rejected by a valid representative serial grid result:120inputs/253positive
+presentations, p9548.286ms>33.3ms, nativeexit0/normalshutdown/pending0.5groups/10logs,
+SDK8321/pins/geometry verify. Stop-on-failure leaves paced case and after probes
+unrun; no after-configuration equality claim. No shipping adoption or newvariant
+this session. Existing small native reference passes33.3ms, so no OS-floor claim
+or gate change follows. Recommended larger frame-production/drawable-ownership
+integration remains unproven and risks windowed target lead; record that backend
+versus explicitly approved preview-policy decision. M3–M7 remain open.

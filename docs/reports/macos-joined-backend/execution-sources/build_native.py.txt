@@ -1,0 +1,16 @@
+from pathlib import Path
+import json,hashlib,importlib.util,sys,shutil,tomllib
+sys.dont_write_bytecode=True
+x=Path(__file__).resolve().parent.parent;q=Path(__file__).resolve().parent/'prepared';r=Path('/Users/dshills/Development/projects/Vellum');p=Path('/private/tmp/vellum-joined-backend-native');old='/private/tmp/vellum-source-built-gpu-276a654'
+sys.path.insert(0,str(r/'scripts'));sys.path.insert(0,str(x/'macos-grid-capture-repair/preflight-v2'));s=importlib.util.spec_from_file_location('owned',x/'macos-sdk-native-238b3b6/run.py');g=importlib.util.module_from_spec(s);s.loader.exec_module(g)
+argv=json.loads((x/'macos-source-built-gpu-276a654/build-plan.json').read_text())['build_argv'];argv=[v.replace(old+'/build-target-v1',str(p/'target')).replace(old+'/source',str(p/'source')).replace(old+'/cargo-home','/private/tmp/vellum-upload-probe/cargo-home') for v in argv if v!='--locked']
+profile='(version 1)(allow default)(deny network*)'+''.join('(deny file-write* (subpath '+json.dumps(str(v))+'))' for v in [r,Path('/private/tmp/vellum-doclinks-sdk-bd3cbc9'),Path('/private/tmp/vellum-upload-probe/source'),Path('/private/tmp/vellum-upload-probe/core'),Path('/private/tmp/vellum-backend-timing-v2/hal')]);argv[argv.index('-p')+1]=profile
+sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest();pins={str(f):sha(f) for root in [p/'source',p/'core',p/'hal'] for f in root.rglob('*') if f.is_file() and f.name!='Cargo.lock'}
+run=g.execute(argv,p/'source',q/'rust-build-v2',lambda:False,lambda:all(sha(Path(f))==v for f,v in pins.items()),timeout=600,limit=16<<20)
+(q/'rust-build-v2-receipt.json').write_text(json.dumps({'argv':argv,'pins':pins,'run':run},indent=2)+'\n');print(json.dumps({k:run[k] for k in ['exit_code','error','seconds']}),flush=True);assert run['exit_code']==0 and run['error'] is None and run['owned']['group_absent']
+lock=tomllib.loads((p/'source/Cargo.lock').read_text());orig=tomllib.loads((Path('/private/tmp/vellum-upload-probe/source/Cargo.lock')).read_text());assert [(k['name'],k['version']) for k in lock['package']]==[(k['name'],k['version']) for k in orig['package']]
+for a,b in zip(orig['package'],lock['package']):
+ if a['name']=='wgpu-hal':assert {k:v for k,v in a.items() if k not in ['source','checksum']}==b
+ else:assert a==b
+lib=p/'libs-darwin/arm64/libwgpu_native.a';lib.parent.mkdir(exist_ok=True);shutil.copy2(p/'target/aarch64-apple-darwin/release/libwgpu_native.a',lib)
+(q/'native-identity.json').write_text(json.dumps({'pins':pins,'lock_sha256':sha(p/'source/Cargo.lock'),'archive':str(lib),'archive_sha256':sha(lib),'package_name_versions_unchanged':True,'allocation_and_pacing_unchanged':True},indent=2)+'\n');print(json.dumps({'archive_sha256':sha(lib),'bytes':lib.stat().st_size}))

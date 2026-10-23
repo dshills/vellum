@@ -1,0 +1,33 @@
+{
+  "event": "vellum.sdk.relocated",
+  "digest_verified_against_expected": true,
+  "trust_basis": "caller-supplied expected digest",
+  "independent_authenticity_verified": false,
+  "archive_sha256": "ad48d9c9c6112c48db4e4e7d1fb32eb19f31d734891f15761b864d5c2e61b391",
+  "version": "v0.1.0-alpha.3",
+  "source": {
+    "clean": true,
+    "commit": "412e5b8266fb8655935bcdad203b73887923c9db"
+  },
+  "verified_files": 8468,
+  "replacements_within_sdk": {
+    "cogentcore.org/core": "drivers/cogent/build/upstream",
+    "github.com/dshills/vellum": ".",
+    "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+    "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+    "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+    "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+    "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+    "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+    "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+  },
+  "path_contains_spaces": true,
+  "checks": [
+    "manifest all-file integrity",
+    "external Go module cache verification",
+    "standalone consumer race/vet/build",
+    "public API scenarios race/vet"
+  ],
+  "native_runtime": "not executed",
+  "public_distribution_audit": "not certified"
+}

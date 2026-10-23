@@ -1,0 +1,12 @@
+{
+  "class": "TUINSWindow",
+  "observed_snapshot_class": "NSKVONotifying_TUINSWindow",
+  "class_image": "/System/Library/PrivateFrameworks/TextInputUIMacHelper.framework/Versions/A/TextInputUIMacHelper",
+  "method": "separate no-window process; load installed TextInputUI image with public dlopen, NSClassFromString and class_getImageName; no private methods or settings/input changes",
+  "prior_no_load_probe": "class absent before loading TextInputUI in separate process",
+  "establishes": "implementation origin of base class in Apple system image",
+  "does_not_establish": "identity of retaining reference or native/GPU allocation deallocation",
+  "terminal_window_multiplicity": "one in prior83cycle, failed152secondsoak, passing100cycleprocess snapshots; no accumulation observed in terminal count",
+  "source_changed": false,
+  "native_input_testing": "deferred pending desktop availability answer"
+}

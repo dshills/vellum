@@ -1,0 +1,7 @@
+{
+  "result": "PASS",
+  "actual_shared_code": "9simultaneouspending -> overflow/invalid flags, no additional events; subsequent callbacks drain states to pending0/acquiring0. No native references retained.",
+  "classifier": "Actual replay rejects at terminal flags before attempting incomplete prefix.",
+  "meaning": "Failed capture keeps explicit refusal plus bounded historical prefix and terminal scalar state. It is not complete accepted replay evidence.",
+  "native_application_started": false
+}

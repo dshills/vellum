@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "de659855deabd3169408f20dea3e2721",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "1124f8c44df6f2ebf22cbfe51d08db71f7e42d84",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "7a6c30364302b568",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Evidence index names a file that is not committed under that name",
+      "message": "The evidence index lists \"probe.py\" at 5066 bytes with a specific hash, and result.json pins a probe.py hash under an absolute path. The committed copy is named probe.py.txt, so a reader cannot verify its hash against the committed file. The README's claim that all pins are verifiable therefore depends on files outside the repo.",
+      "suggestion": "Record the hash of the committed probe.py.txt, or state explicitly that the indexed probe.py is the archive's copy and map it to the committed file.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "docs/reports/macos-presentation-overlay/evidence-index.json",
+          "lines": {
+            "start": 2,
+            "end": 8
+          }
+        }
+      ],
+      "tags": [
+        "reproducibility",
+        "evidence"
+      ],
+      "evidence": "\"archive_sha256\": \"0d09bc5744bf7fd502329a79dd84f0060165845c2fcabc275465debd9cc1cd5c\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4958,
+    "totalMs": 4988
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 24524,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 13977,
+        "output": 359,
+        "costUSD": 0.031544
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

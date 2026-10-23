@@ -1,0 +1,139 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "0f57c3781011ae5a84a5095e711eda85",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "011caa75fa2e39bc20083fbc35ce9ea31f9166de",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "29f3d6b78f8a65a3",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Test hook file requires build tag the test run never sets",
+      "message": "The candidate patch is not applied to the repository. prepare.py patches via exact string replacement and the test files are built with a build tag (vellum_priority_test) that the test command never passes, so currentPriorityState is undefined and the tests fail to compile. The cited test run is thus unreproducible.",
+      "suggestion": "Pass -tags vellum_priority_test in checks.py's go test invocation, or remove the tag from priority_testhooks.go.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reports/macos-render-priority/candidate.patch",
+          "lines": {
+            "start": 1,
+            "end": 2
+          }
+        }
+      ],
+      "tags": [
+        "testing",
+        "build-tags"
+      ],
+      "evidence": "+++ core/display_backpressure.go",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "1eeefc32e2c08b28",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Panic on override failure crashes rendering",
+      "message": "If the QoS override cannot be obtained, the render path panics. That crashes the application's composition worker instead of degrading gracefully, even though the override is only an optimization.",
+      "suggestion": "Return a no-op priority object (unlocking the thread) when the override fails, and optionally log the failure, rather than panicking.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "tools/macos-render-priority/testdata/frame_priority_darwin.go",
+          "lines": {
+            "start": 25,
+            "end": 28
+          }
+        }
+      ],
+      "tags": [
+        "robustness",
+        "panic"
+      ],
+      "evidence": "if token == nil {\n\t\truntime.UnlockOSThread()\n\t\tpanic(\"frame priority override unavailable\")\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "5d46441a0bcd43a8",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Panic in deferred cleanup masks errors and leaks locked thread",
+      "message": "If override end fails, end() panics from a deferred call and leaves the OS thread locked. If a render panic is already unwinding, this replaces it and hides the original error. Rendering would also crash on a non-critical failure.",
+      "suggestion": "Do not panic in cleanup. Record the error and unlock the thread, or intentionally leave it locked but avoid masking the original panic.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "tools/macos-render-priority/testdata/frame_priority_darwin.go",
+          "lines": {
+            "start": 43,
+            "end": 46
+          }
+        }
+      ],
+      "tags": [
+        "panic",
+        "cleanup"
+      ],
+      "evidence": "panic(\"frame priority override retirement failed\")",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7938,
+    "totalMs": 7985
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 16,
+    "bytes": 38966,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 20313,
+        "output": 834,
+        "costUSD": 0.048966
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
