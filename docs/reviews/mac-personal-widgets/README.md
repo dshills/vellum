@@ -261,3 +261,22 @@ in-place token-slice mutation was addressed by constructing a fresh bounded slic
 with a regression retaining the prior accepted slice. Final Anthropic
 claude-sonnet-5-5 review completed with no findings. Native focus verification
 follows packaging and is kept in the private delivery receipt.
+
+## Five-widget disabled/re-enabled routing
+
+Mounted Manual tests cover secure entry, path navigation, font size, tag removal
+and the color well. A disabled target is not enabled in inspection and refuses
+actual targeted MouseDown with ErrManualDisabled; keyboard Return causes no
+accepted edit. Re-enabling plus an explicit new focus request retains the native
+widget and restores activation. Non-color cases propose exactly one edit; color
+opens and Escape cancels without a color edit. Race tests and vet pass.
+
+Prism Anthropic claude-sonnet-5-5 asked for stronger secure input semantics. The
+test now checks zero commits after the typed chord, exactly one after Return,
+and exact accepted synthetic text from insertion into the prior selection. The
+fixture is ASCII, so its UTF-16 offsets equal byte offsets; Unicode native-input
+semantics are covered separately. Final review's call-count concern is internally
+contradictory (it acknowledges the non-color branch runs for secure): calls==1 is
+asserted for secure there. Only non-secure fixtures have a nil secure-value getter.
+No further change is warranted by that finding. This is software event-routing
+coverage, not physical pointer or native text-input/IME qualification.

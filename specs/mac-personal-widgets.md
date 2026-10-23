@@ -88,3 +88,8 @@ Long token chip labels abbreviate centrally at 24 runes to keep the trailing
 remove affordance visible in compact Mac forms. Accepted text, duplicate checks,
 removal proposals and accessibility names retain the full value. Multiple chips
 continue to use the existing horizontally scrollable toolbar.
+
+Each composite also has a mounted disable/re-enable routing check: disabled
+targeted pointer input is refused, keyboard input produces no accepted edit, and
+re-enabling retains the native control and permits explicit refocus/activation.
+The color well reopens and Escape cancels without creating a color edit.
