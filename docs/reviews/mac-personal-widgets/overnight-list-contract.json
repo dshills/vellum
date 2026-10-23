@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "253c8dc2e190644a729fbfb6328e69d2",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "fcce658e73684a2a1c72b6ed82c04673db41ceb6",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "47c5dc235e17f04e",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Command-A exact modifier equality is fragile",
+      "message": "The default branch now returns early for Meta/Control/Alt without handling the event. Plain Control or Alt combos pass through unhandled, which is probably intended, but the Command-A check uses exact equality (Modifiers() == 1\u003c\u003ckey.Meta). Caps Lock or Fn modifier bits, if reported, would defeat select-all and fall into the default branch, silently doing nothing.",
+      "suggestion": "Mask the modifiers to Meta/Control/Alt/Shift before comparing, so unrelated modifier bits do not defeat Command-A.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/list_box.go",
+          "lines": {
+            "start": 166,
+            "end": 166
+          }
+        }
+      ],
+      "tags": [
+        "keyboard",
+        "modifiers",
+        "location-corrected"
+      ],
+      "evidence": "if key.HasAnyModifier(e.Modifiers(), key.Meta, key.Control, key.Alt) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3799,
+    "totalMs": 3815
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 7,
+    "bytes": 12749,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 8297,
+        "output": 346,
+        "costUSD": 0.020054
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

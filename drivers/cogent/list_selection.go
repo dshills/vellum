@@ -71,3 +71,26 @@ func styleSourceRow(r *record, id string, s *styles.Style) {
 		s.Background = colors.Uniform(color.NRGBA{})
 	}
 }
+
+// Select-all uses the same bounded owner queue and rendered eligibility lease as
+// range selection, without moving focus or treating Command as a toggle.
+func queueListSelectAll(r *record, id string, button *core.Switch) {
+	guard := listBoxActionGuard(r, id, button)
+	catalog := r.control.choice.listCatalog
+	postControl(r, func() {
+		if !guard() || r.control.choice.listCatalog != catalog || !r.node.Multiple || r.node.SelectionChange == nil {
+			return
+		}
+		ids := make([]string, 0, len(r.node.Options))
+		for _, o := range r.node.Options {
+			if !o.Disabled {
+				ids = append(ids, o.ID)
+			}
+		}
+		if len(ids) == 0 {
+			return
+		}
+		r.node.SelectionChange(ui.ListSelectionEvent{ID: r.node.ID, TargetID: id, IDs: ids})
+		requestControlRestore(r)
+	})
+}

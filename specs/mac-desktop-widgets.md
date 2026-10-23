@@ -52,7 +52,8 @@ ListBox.Multiple uses SelectedIDs and SelectionChange instead of SelectedID/Chan
 Each ListSelectionEvent.Apply edits the application's current selection: ordinary
 click replaces, Command-click toggles, Shift-click replaces with an enabled range,
 Command-Shift unions the range. Shift-arrow/Home/End extend with normal keyboard
-navigation. Focus/anchor are independent from accepted selection. Row/catalog/
+navigation. Command-A proposes all enabled rows without moving focus. Unsupported
+Command/Control/Option letter shortcuts do not become typeahead. Focus/anchor are independent from accepted selection. Row/catalog/
 scope guards revoke stale actions and disabled/removed rows. Up to 256 rows, no
 virtualization. AX row press replaces selection; individual rows publish accepted
 membership. Compact rounded rows use blue active and gray unfocused selection.

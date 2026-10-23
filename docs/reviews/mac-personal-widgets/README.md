@@ -134,3 +134,21 @@ Focused race tests pass, including actual managed replacement/disable/read-only
 cancellation and 12 keyboard open/Escape cycles. Every cycle retains the keyed
 editor, clears the transient dialog body/active state and restores anchor focus.
 This is automated routing/lifecycle evidence, not a physical-pointer soak claim.
+
+## Overnight Mac list commands
+
+Reproduced Command-C erroneously toggling Charlie via typeahead in a multi-list.
+Unsupported command letters now stay available to application routing. Command-A
+proposes all enabled rows through the existing controlled selection callback,
+without moving focus. The public Manual OS-service guard still refuses clipboard
+shortcuts; Command-C isolation uses retained-row chord dispatch and is labeled as
+such. Command-A/rejection/Shift-range/lock tests use normal Manual routing.
+
+Prism's rejected-anchor concern was reproduced through Shift navigation and
+fixed by leaving the prior anchor alone. The public Apply replacement contract is
+explicitly tested with a different TargetID and with empty IDs. Source row/catalog
+eligibility normally prevents empty select-all; a defensive empty-set no-op also
+keeps it from clearing selection. Caps/Num flags are ignored at both outer choice
+admission and inner Command-A matching, tested without changing OS lock settings.
+Final review explicitly reports no functional issue/no change needed. Full list
+race tests pass; native Command-A verification follows packaging.

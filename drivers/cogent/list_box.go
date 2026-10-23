@@ -128,6 +128,14 @@ func listBoxKey(r *record, id string, button *core.Switch, e events.Event) {
 	if !listBoxActionGuard(r, id, button)() {
 		return
 	}
+	shortcutMods := e.Modifiers() & (1<<key.Meta | 1<<key.Control | 1<<key.Alt | 1<<key.Shift)
+	if e.KeyCode() == key.CodeA && shortcutMods == 1<<key.Meta {
+		if r.node.Multiple && r.node.SelectionChange != nil {
+			e.SetHandled()
+			queueListSelectAll(r, id, button)
+		}
+		return
+	}
 	target := ""
 	activate := false
 	switch e.KeyCode() {
@@ -154,6 +162,11 @@ func listBoxKey(r *record, id string, button *core.Switch, e events.Event) {
 		target = id
 		activate = true
 	default:
+		// Application shortcuts and VoiceOver modifier chords are not typeahead.
+		// Keep Shift available for ordinary uppercase letter cycling.
+		if key.HasAnyModifier(e.Modifiers(), key.Meta, key.Control, key.Alt) {
+			return
+		}
 		// Single initial-letter cycling is deterministic: no timer, hidden
 		// accumulated search buffer or background state is retained.
 		runeValue := unicode.ToLower(e.KeyRune())

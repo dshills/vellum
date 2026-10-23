@@ -63,7 +63,8 @@ func choiceKey(r *record, id string, button *core.Switch, e events.Event) {
 		return
 	}
 	if r.node.Kind == ui.ListBox {
-		if (!r.node.Multiple && e.Modifiers() != 0) || e.Modifiers() & ^((1<<key.Shift)|(1<<key.Meta)) != 0 {
+		modifiers := e.Modifiers() & ^((1 << key.CapsLock) | (1 << key.NumLock))
+		if (!r.node.Multiple && modifiers != 0) || modifiers & ^((1<<key.Shift)|(1<<key.Meta)) != 0 {
 			return
 		}
 		listBoxKey(r, id, button, e)

@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "5799ab665bd73f52f16015b7f6272e83",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "fcce658e73684a2a1c72b6ed82c04673db41ceb6",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "8b1af285163220a8",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Select-all with no enabled rows clears selection",
+      "message": "The Command-A path only dispatches when Multiple \u0026\u0026 SelectionChange != nil, and when the select-all list is empty (all rows disabled) it sends an empty IDs slice, which per the new ui test means 'clear selection'. Pressing Command-A with no enabled rows would therefore clear the existing selection instead of being a no-op.",
+      "suggestion": "Return early without calling SelectionChange when len(ids)==0.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/list_selection.go",
+          "lines": {
+            "start": 90,
+            "end": 90
+          }
+        }
+      ],
+      "tags": [
+        "edge-case",
+        "location-corrected"
+      ],
+      "evidence": "r.node.SelectionChange(ui.ListSelectionEvent{ID: r.node.ID, TargetID: id, IDs: ids})",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3865,
+    "totalMs": 3881
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 7,
+    "bytes": 14105,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 9013,
+        "output": 305,
+        "costUSD": 0.021076
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

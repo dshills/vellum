@@ -439,3 +439,8 @@ field identity.
 
 ColorWell closes its private editor on observed identity, disabled or read-only
 transitions. Restoring editing does not reopen the panel automatically.
+
+Multi-selection ListBox supports Command-A to propose all enabled rows in catalog
+order, preserving focus. The existing SelectionChange callback accepts or rejects
+it through Apply. Command/Control/Option letter shortcuts do not act as list
+initial-letter navigation; ordinary letters and Shift-uppercase retain cycling.

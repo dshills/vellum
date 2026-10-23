@@ -43,3 +43,18 @@ func TestListSelectionRepeatedProposalIDOnlyTogglesOnce(t *testing.T) {
 		t.Fatal(got)
 	}
 }
+
+func TestListSelectionReplacementUsesIDsNotFocusTarget(t *testing.T) {
+	current := []string{"prior"}
+	e := ListSelectionEvent{ID: "list", TargetID: "b", IDs: []string{"a", "b", "c"}}
+	if got := e.Apply(current); !slices.Equal(got, []string{"a", "b", "c"}) {
+		t.Fatal("focus target replaced explicit selection", got)
+	}
+	e.IDs = nil
+	if got := e.Apply(current); len(got) != 0 {
+		t.Fatal("empty replacement did not clear selection", got)
+	}
+	if !slices.Equal(current, []string{"prior"}) {
+		t.Fatal("proposal mutated accepted input")
+	}
+}
