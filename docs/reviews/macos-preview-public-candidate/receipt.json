@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "<PRISM>",
+    "review",
+    "staged",
+    "--paths",
+    "docs/reports/macos-preview-public-candidate/INDEX.json,docs/reports/macos-preview-public-candidate/MACOS-PREVIEW-RELEASE-NOTES.md,docs/reports/macos-preview-public-candidate/README.md,docs/reports/macos-preview-public-candidate/SHA256SUMS,docs/reports/macos-preview-public-candidate/public-app-bundle-files.json,docs/reports/macos-preview-public-candidate/public-app-delivery.json,docs/reports/macos-preview-public-candidate/public-app-native.json,docs/reports/macos-preview-public-candidate/public-candidate-app.json,docs/reports/macos-preview-public-candidate/public-candidate-production.json,docs/reports/macos-preview-public-candidate/public-product-equivalence.json,docs/reports/macos-preview-public-candidate/public-sdk-check-process.json,docs/reports/macos-preview-public-candidate/public-sdk-check.json,docs/macos-preview-release.md",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "4",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "<RELEASE_ARTIFACTS>/public-candidate-review/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "<RELEASE_ARTIFACTS>/public-candidate-review/prism.json"
+  ],
+  "cwd": "<REPOSITORY>",
+  "started_utc": "2026-10-23T08:48:52.520896+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 1,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 57623,
+  "group": 57623,
+  "owned": {
+    "created": true,
+    "pid": 57623,
+    "group": 57623,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 1,
+    "errors": [],
+    "observation": {
+      "group": 57623,
+      "members": [],
+      "observation_sha256": "95549cd9e9b1abaf84795d52d6811be54eb7871acdc206c441435f6f830ffb57"
+    }
+  },
+  "seconds": 5.5126621669624,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

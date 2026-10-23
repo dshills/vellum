@@ -33,7 +33,7 @@ reproduction uses the tracked preparation contract, not those machine paths.
 | P1 | A new external Go module must build/run using the extracted candidate SDK without checkout/private-tree dependencies; R2 passes for SDK source d8de4fc; final alpha.3 delivered-byte renewal also passes at R5. | Implementation agent: export private SDK, verify relocation, generate/build/run starter. | R2 |
 | P2 | Matching alpha.3 Placement app passes the listed editing, Save/Open/history and shutdown workflows; native text/window checks pass within their recorded scopes. Earlier app24 evidence remains separately scoped. | Private candidate acceptance complete; retain final artifact and native automation limits. | R2/R3/R5 |
 | P3 | Bounded idle/activity/lifecycle and two-hour soak checks now pass. Apple TUINS base class origin/stable count are known; native retaining reference and full native/GPU heap remain unqualified. | Bounded preview resource check complete; retain the disclosed native-heap limits and historical failures. | R3 |
-| P4 | Owner approved the exact decision-packet payload and corrected 418-file notice bundle on 23 October; release/macos-preview-audit.json binds the decision. Future changed payloads require a new audit. | Produce and verify guarded public candidates for the approved payload; retain historical declarations and separate publication approval. | R4 |
+| P4 | Owner approved the exact decision-packet payload and corrected 418-file notice bundle on 23 October; release/macos-preview-audit.json binds the decision. Future changed payloads require a new audit. | Guarded public candidates now produced and verified locally; retain historical declarations and separate publication approval. | R4 |
 | P5 | Guarded public native route implemented at b0e5106; owner-approved exact payload may now pass the existing public packaging gates. | Implementation agent: retain release-audit and exact-archive notice gates; no further tooling repair required for this route. | R4 |
 | P6 | Alpha.3 private artifacts, checksums and ad-hoc signing/notarization disclosure are complete; public artifact/publication approval remains pending. | Implementation agent: prepare exact reviewed artifacts and release text, then owner publication decision. | R4/R5 |
 
@@ -68,8 +68,10 @@ or gesture, expected/actual behavior, smallest fix and focused retest here.
   passes for the alpha.3 SDK and build-28 app. Fresh external SDK starter, strict
   extracted app signature, place/pan/zoom/history/Save/Open/normal quit pass.
   Exact-payload audit and source push/draft PR for CI are now owner-approved.
-  Public candidate verification, candidate CI and final publication decision
-  remain pending; the bounded two-hour soak passes. No public preview release or full
+  [Guarded public candidates](reports/macos-preview-public-candidate/README.md) now
+  pass extraction, external/native SDK and app checks. Source push/draft PR waits
+  for the historical-path decision after automatic approval rejection; applicable
+  candidate CI and final publication remain pending. The bounded two-hour soak passes. No public preview release or full
   Mac qualification is claimed.
 
 ## Disclosed performance

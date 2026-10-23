@@ -1,0 +1,43 @@
+{
+  "utc": "2026-10-23T08:44:43.049603+00:00",
+  "method": "CUA native accessibility/keyboard and previously authorized app-only CGEvent helper; no human physical input qualification",
+  "app_pid": 53731,
+  "tested_app_extraction": "<TESTED_APP_EXTRACTION>/Vellum-v0.1.0-alpha.3-macos-arm64/Vellum Placement Preview.app",
+  "tested_binary_sha256": "32e00cd8f249c9d175a30a42ab5d0b3d57a9f86d393831aa7b9c26366230d342",
+  "initial_zip_sha256": "c41d7784126421b12e8c39a785d5737d32030cb5906cb8d593f960307b84f0d0",
+  "observed_steps": [
+    "launch empty 0objects",
+    "Block drag -> block-1(-140,-40), one object Undo1",
+    "empty-canvas pan and wheel zoom -> toolbar94%; no history change",
+    "Undo ->0 objects; Redo ->same block-1",
+    "native Save As own temporary drawing; New ->0",
+    "native Open ->same block-1 geometry/snap/camera, Undo0Redo0",
+    "normal CmdQ; exact owned PID absent",
+    "strict signature after native check valid"
+  ],
+  "saved_document": {
+    "format": "vellum-placement",
+    "version": 2,
+    "objects": [
+      {
+        "id": "block-1",
+        "kind": "block",
+        "x": -140,
+        "y": -40,
+        "width": 80,
+        "height": 50
+      }
+    ],
+    "center": {
+      "X": -50.95646672089994,
+      "Y": -40.02437653785136
+    },
+    "zoom": 0.9417645335842487,
+    "selected": "block-1",
+    "snap": true,
+    "next_id": 1
+  },
+  "drawing_sha256": "9c5a86eb1ea98362b53255a66710796abc8e5955515618125fd37e3ebfeb022d",
+  "normal_shutdown": true,
+  "strict_signature_after_native_check": true
+}

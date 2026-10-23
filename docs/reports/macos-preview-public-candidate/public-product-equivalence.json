@@ -1,0 +1,43 @@
+{
+  "private_sdk_source": {
+    "clean": true,
+    "commit": "10beef424c532395802065b2be45119bec88efe2"
+  },
+  "public_sdk_source": {
+    "clean": true,
+    "commit": "ed359484a5be720948e92430f7496b36ec5cd352"
+  },
+  "public_sdk_sha256": "28a95b5c2354673d97161df30e828008a5aa18465ce18545a42e8caf0a82f269",
+  "manifest_changes": [
+    "PRIVATE_BUILD.txt",
+    "SDK_DOCUMENTATION.md",
+    "THIRD_PARTY_INVENTORY.json",
+    "docs/macos-preview-release.md",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/grad.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/roundRect.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/shapeD0.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/shapeD1.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/shapeD2.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/shapeD3.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/shapeD4.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/shapeD5.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/shapeD6.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/shapeF.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/shapeS1.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/shapeS2.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/shapeS3.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/shapeT1.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/shapeT2.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/shapeT3.png",
+    "drivers/cogent/build/upstream/paint/renderers/rasterx/testdata/tmf.png",
+    "drivers/cogent/cmd/window-cycle-smoke/soak.go",
+    "release/macos-preview-audit.json",
+    "release/version.json",
+    "specs/workbench-endurance.md"
+  ],
+  "code_changes": [
+    "drivers/cogent/cmd/window-cycle-smoke/soak.go"
+  ],
+  "placement_runtime_changes": [],
+  "interpretation": "Only the reviewed soak test fixture changes among Go/native/dependency inputs; app product code and approved native archive are unchanged."
+}
