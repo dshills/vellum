@@ -93,3 +93,15 @@ Each composite also has a mounted disable/re-enable routing check: disabled
 targeted pointer input is refused, keyboard input produces no accepted edit, and
 re-enabling retains the native control and permits explicit refocus/activation.
 The color well reopens and Escape cancels without creating a color edit.
+
+## Managed input focus appearance
+
+Explicit TextField backgrounds stay flat while focused instead of gaining a
+backend state-layer fill. An explicit nonzero border receives a full focus outline;
+an explicit zero border suppresses the backend's private bottom underline. Bordered
+rows with a directly contained transparent borderless TextField share one outer
+focus outline across the editor and accessory controls, including combo boxes and
+secure entry. The outline allowance stays fixed between focus states. Unstyled
+fields retain backend defaults; removing the explicit styles restores them.
+This uses existing managed styles and focus routing, without changing public APIs,
+rendering backend or release policy.

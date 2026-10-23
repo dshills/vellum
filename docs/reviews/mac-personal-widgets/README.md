@@ -280,3 +280,39 @@ contradictory (it acknowledges the non-color branch runs for secure): calls==1 i
 asserted for secure there. Only non-secure fixtures have a nil secure-value getter.
 No further change is warranted by that finding. This is software event-routing
 coverage, not physical pointer or native text-input/IME qualification.
+
+## Mac input focus surfaces
+
+Six completed-frame repros failed before this checkpoint: a focused white input
+painted 233-gray; a dark input (35/35/37) painted 54/54/56. Explicit field backgrounds
+now remain flat, nonzero borders use full focus outlines, and transparent
+borderless editors do not paint a private box/underline. Bordered rows containing
+such an editor share an outer outline across the editor and accessory controls.
+The maximum outline allowance is fixed, so focus does not change allocation.
+
+A retained reparent/style-removal regression found stale parent eligibility;
+shared state is now synchronized from the current descriptor and theme before
+native updates. Reparenting retains the editor, leaving restores the old parent's
+appearance, removing explicit style restores filled-field defaults, and edits
+still commit once. Initial Prism reports prompted origin-ownership checks too.
+The final implementation reuses accessibilityBindFocusInvalidation: it adds no
+focus event handlers, owner callbacks, pending wake flags or property-map writes.
+Only originating reconciliation updates a changed shared focus cue. Tests prove
+a.Drain does not style the native parent, ordinary focus keeps its single existing
+AX refresh, and a full model queue cannot fail this passive appearance work.
+
+Focused race checks pass for these transitions, all twelve widget geometry cases,
+adjacent combo/search/token/color/font/secure controls, native text composition/
+retirement, pointer re-enable and secure selectors. The full gallery race suite
+and driver/gallery vet pass. No rendering backend, pacing option, public API or
+release gate changes.
+
+All four Prism Anthropic claude-sonnet-5-5 reports are retained. Earlier callback,
+property-map and pending-flag concerns refer to superseded implementations; those
+paths have been removed. The final theme-order concern is contradicted by the
+actual reconcile order: attach(next) installs every record's new theme before
+syncRecord(next.r,n); syncInputOutline sees that installed theme and new n.Children.
+Parent updates before descendant sync already belong to the native locked
+reconciliation structure; no intermediate frame is published. The unit-width
+observation also does not apply: public Border.Width is a logical scalar and
+applyStyle has already assigned Dp units before this final styler.

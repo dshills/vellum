@@ -59,12 +59,13 @@ type Driver struct {
 	PresentationMetrics *PresentationMetrics
 }
 type record struct {
-	scope    app.WindowRef
-	widget   core.Widget
-	node     ui.Node
-	children []*record
-	theme    ui.Theme
-	control  *controlState
+	scope        app.WindowRef
+	widget       core.Widget
+	node         ui.Node
+	children     []*record
+	theme        ui.Theme
+	control      *controlState
+	inputOutline *inputOutlineState
 }
 
 var processRun atomic.Bool
@@ -618,6 +619,7 @@ func mountShallowScoped(parent tree.Node, n ui.Node, a *app.Application, scope a
 		}
 		return nil, fmt.Errorf("cogent: extension %q returned nil widget", n.ID)
 	}
+	mountInputOutline(r)
 	bindWindowScope(r.widget, a, scope)
 	r.widget.AsWidget().SetName(n.ID)
 	syncSemantics(r)
@@ -629,6 +631,9 @@ func mountShallowScoped(parent tree.Node, n ui.Node, a *app.Application, scope a
 			r.widget.(*core.Text).AllocationLayout = err == nil && (value.TextAlign.Set || value.GrowX.Set || value.GrowY.Set)
 		}
 	})
+	if r.node.Kind == ui.Row || r.node.Kind == ui.TextField {
+		r.widget.AsWidget().FinalStyler(func(s *styles.Style) { styleManagedInputFocus(r, s) })
+	}
 	return r, nil
 }
 func syncRecord(r *record, n ui.Node) error {
@@ -651,6 +656,7 @@ func syncRecordVisible(r *record, n ui.Node, visible bool, scopes []*tabCloseSco
 	}
 	previous := r.node
 	r.node = n
+	syncInputOutline(r)
 	disabledChanged := r.widget.AsWidget().IsDisabled() != controlDisabled(r)
 	if previous.Style != n.Style || previous.Grow != n.Grow || previous.MinWidth != n.MinWidth || previous.MinHeight != n.MinHeight {
 		if r.control != nil && r.control.grid != nil {
