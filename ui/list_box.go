@@ -6,13 +6,21 @@ import (
 	"unicode/utf8"
 )
 
-// MaxListBoxOptions bounds an always-visible, single-selection list. Larger
-// collections use virtual data views; Grid supports multi-selection.
+// MaxListBoxOptions bounds an always-visible single- or multi-selection list.
+// Larger collections use virtual data views.
 const MaxListBoxOptions = 256
 
 func validateListBox(n Node) error {
 	if len(n.Options) > MaxListBoxOptions || n.Activate != nil {
 		return fmt.Errorf("ui: list box requires at most %d options and uses Change for selection", MaxListBoxOptions)
+	}
+
+	if n.Multiple {
+		if n.SelectedID != "" || n.Change != nil {
+			return fmt.Errorf("ui: multiple ListBox uses SelectedIDs and SelectionChange")
+		}
+	} else if len(n.SelectedIDs) > 0 || n.SelectionChange != nil {
+		return fmt.Errorf("ui: SelectedIDs/SelectionChange require Multiple")
 	}
 	seen := make(map[string]bool, len(n.Options))
 	selected := n.SelectedID == ""
@@ -22,6 +30,13 @@ func validateListBox(n Node) error {
 		}
 		seen[o.ID] = true
 		selected = selected || o.ID == n.SelectedID
+	}
+	selectedSet := map[string]bool{}
+	for _, id := range n.SelectedIDs {
+		if !seen[id] || selectedSet[id] {
+			return fmt.Errorf("ui: multiple list selection contains missing or duplicate ID")
+		}
+		selectedSet[id] = true
 	}
 	if !selected {
 		return fmt.Errorf("ui: list box selected ID %q is absent", n.SelectedID)

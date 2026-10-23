@@ -134,6 +134,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if (n.Multiple || len(n.SelectedIDs) > 0 || n.SelectionChange != nil) && n.Kind != ListBox {
+		return fmt.Errorf("ui: multiple selection belongs only on ListBox")
+	}
 	if n.PopoverAnchor != "" {
 		if n.Kind != Dialog || n.PopoverAnchor == n.ID || n.Dismiss == nil {
 			return fmt.Errorf("ui: popover anchor requires a dismissible Dialog")

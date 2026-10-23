@@ -84,13 +84,17 @@ type Node struct {
 	// NumberButtons optionally selects compact up/down arrows on NumberField.
 	NumberButtons NumberFieldButtons
 	// Orientation applies to display/choice/toolbar/split controls; RadioGroup defaults vertical.
-	Orientation   Orientation
-	Options       []Option
-	SelectedID    string
-	TabClose      func(TabCloseEvent)
-	Change        func(ChangeEvent)
-	Accessibility Accessibility
-	Focus         FocusRequest
+	Orientation Orientation
+	Options     []Option
+	// Multiple/SelectedIDs/SelectionChange belong only on ListBox.
+	Multiple        bool
+	SelectedIDs     []string
+	SelectionChange func(ListSelectionEvent)
+	SelectedID      string
+	TabClose        func(TabCloseEvent)
+	Change          func(ChangeEvent)
+	Accessibility   Accessibility
+	Focus           FocusRequest
 	// PopoverAnchor makes a Dialog an anchored panel; prefer Popover.View.
 	PopoverAnchor string
 	Open          bool

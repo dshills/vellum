@@ -38,5 +38,6 @@ func MacTheme(dark bool) Theme {
 		Label:     {Padding: Some(Insets{})},
 		Button:    buttonStyle, MenuButton: buttonStyle,
 		TextField: input, NumberField: number,
+		ListBox: {Background: Some(field), Border: Some(Border{Width: 1, Color: line}), CornerRadius: Some(float32(6)), Padding: Some(UniformInsets(4))},
 	}}
 }

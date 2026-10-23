@@ -45,3 +45,16 @@ closes and proposes Dismiss. Dismiss must set Open false. A small directional
 marker leads content; automatic edge switching, detachable panels and cross-window
 anchors are not supported. At cramped edges the surface clamps rather than
 reversing the marker. Existing Dialog lifecycle owns parking/cleanup.
+
+## 4. Multiple-selection source list
+
+ListBox.Multiple uses SelectedIDs and SelectionChange instead of SelectedID/Change.
+Each ListSelectionEvent.Apply edits the application's current selection: ordinary
+click replaces, Command-click toggles, Shift-click replaces with an enabled range,
+Command-Shift unions the range. Shift-arrow/Home/End extend with normal keyboard
+navigation. Focus/anchor are independent from accepted selection. Row/catalog/
+scope guards revoke stale actions and disabled/removed rows. Up to 256 rows, no
+virtualization. AX row press replaces selection; individual rows publish accepted
+membership. Compact rounded rows use blue active and gray unfocused selection.
+System accent/whole-application activation tracking and row accessories remain
+outside this increment.

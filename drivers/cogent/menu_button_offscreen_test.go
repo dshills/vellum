@@ -87,19 +87,19 @@ func TestMenuButtonRealPopupRoutingAndRetirement(t *testing.T) {
 	if menuOpen(r) || accessibilityFocusedID(root) != accessibilityManagedID("after") {
 		t.Fatal("popup Tab did not advance", accessibilityFocusedID(root))
 	}
-	if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: events.KeyChord, Code: key.CodeTab, Modifiers: key.Shift}); err != nil {
+	if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: events.KeyChord, Code: key.CodeTab, Modifiers: 1 << key.Shift}); err != nil {
 		t.Fatal(err)
 	}
 	unitSettle(t, m)
 	input(key.CodeReturnEnter)
-	if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: events.KeyChord, Code: key.CodeTab, Modifiers: key.Shift}); err != nil {
+	if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: events.KeyChord, Code: key.CodeTab, Modifiers: 1 << key.Shift}); err != nil {
 		t.Fatal(err)
 	}
 	unitSettle(t, m)
 	if menuOpen(r) || accessibilityFocusedID(root) != accessibilityManagedID("after") {
 		t.Fatal("popup Shift-Tab did not advance backward", accessibilityFocusedID(root))
 	}
-	if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: events.KeyChord, Code: key.CodeTab, Modifiers: key.Shift}); err != nil {
+	if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: events.KeyChord, Code: key.CodeTab, Modifiers: 1 << key.Shift}); err != nil {
 		t.Fatal(err)
 	}
 	unitSettle(t, m)

@@ -97,7 +97,7 @@ func bindContextMenu(r *record, w core.Widget) {
 	}
 	w.AsWidget().OnFirst(events.ContextMenu, request)
 	w.AsWidget().OnFirst(events.KeyChord, func(e events.Event) {
-		if e.KeyCode() == key.CodeF10 && e.Modifiers() == key.Shift {
+		if e.KeyCode() == key.CodeF10 && e.Modifiers() == 1<<key.Shift {
 			request(e)
 		}
 	})
@@ -225,7 +225,7 @@ func openManagedMenu(r *record) {
 		item.OnFocus(func(events.Event) { postControl(r, func() { _ = r.control.a.Invalidate(r.control.window) }) })
 	}
 	scene.OnFirst(events.KeyChord, func(e events.Event) {
-		if e.KeyCode() == key.CodeEscape || (e.KeyCode() == key.CodeTab && (e.Modifiers() == 0 || e.Modifiers() == key.Shift)) {
+		if e.KeyCode() == key.CodeEscape || (e.KeyCode() == key.CodeTab && (e.Modifiers() == 0 || e.Modifiers() == 1<<key.Shift)) {
 			if p.stage != nil {
 				p.stage.ClosePopup() // native event owns this window's render context
 			}

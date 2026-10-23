@@ -47,7 +47,7 @@ func TestContextMenuRoutedPointerKeyboardAndRetirement(t *testing.T) {
 	// Menu chords. Open through actual native widget events; popup row selection
 	// above is routed through the bounded manual harness. Reconciliation supplies a fresh ContextMenu value each time. That must not
 	// reopen or invalidate an otherwise unchanged popup solely by pointer identity.
-	r.widget.AsWidget().Send(events.KeyChord, events.NewKey(events.KeyChord, 0, key.CodeF10, key.Shift))
+	r.widget.AsWidget().Send(events.KeyChord, events.NewKey(events.KeyChord, 0, key.CodeF10, 1<<key.Shift))
 	unitSettle(t, m)
 	if !menuOpen(r) {
 		t.Fatal("keyboard menu did not open")

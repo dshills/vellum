@@ -359,3 +359,11 @@ managed panel below a same-window Button. Set `Open=false` in `Dismiss`. Apply a
 Mac FormGroup style for an inset neutral surface. Escape/outside release closes;
 focus returns to the anchor. Children retain keyed identity. Missing/hidden anchors
 close the panel. Edge clamping is supported; detachable panels are not.
+
+### Multiple-selection source list
+
+Use `ListBox` with `Multiple:true`, `SelectedIDs` and `SelectionChange`; accept via
+`selected = e.Apply(selected)`. Single-selection APIs remain unchanged. Command
+click toggles, Shift selects a range and Command-Shift adds a range. Shift with
+Up/Down/Home/End extends by keyboard. Apply to your current model so queued edits
+compose; ignore the event to reject. Keep accepted IDs present in Options.

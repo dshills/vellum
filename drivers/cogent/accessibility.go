@@ -628,6 +628,9 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 					break
 				}
 			}
+			if n.Multiple {
+				x.Value = append([]string(nil), n.SelectedIDs...)
+			}
 			_, x.Focusable = ui.FocusTarget(n, n.ID)
 			// Keyboard focus belongs to one option; group focus is a managed proxy.
 			x.Focused = false
@@ -671,7 +674,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			if (n.Kind == ui.Slider || n.Kind == ui.NumberField) && n.Change != nil {
 				x.Actions = append(x.Actions, "increment", "decrement")
 			}
-			if (n.Kind == ui.Selector || n.Kind == ui.Tabs || n.Kind == ui.RadioGroup || n.Kind == ui.SegmentedControl || n.Kind == ui.ListBox) && n.Change != nil {
+			if (n.Kind == ui.Selector || n.Kind == ui.Tabs || n.Kind == ui.RadioGroup || n.Kind == ui.SegmentedControl || n.Kind == ui.ListBox) && (n.Change != nil || n.Multiple && n.SelectionChange != nil) {
 				x.Actions = append(x.Actions, "set")
 			}
 			if n.Kind == ui.Dialog && n.Dismiss != nil {
@@ -900,6 +903,20 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 			}
 			committedEditorChange(r)
 			return true
+		}
+		return false
+	}
+
+	if n.Kind == ui.ListBox && n.Multiple && action.Kind == "set" {
+		if n.SelectionChange == nil {
+			return false
+		}
+		for _, o := range n.Options {
+			if o.ID == action.Value && !o.Disabled {
+				n.SelectionChange(ui.ListSelectionEvent{ID: n.ID, TargetID: o.ID, IDs: []string{o.ID}})
+				requestControlRestore(r)
+				return true
+			}
 		}
 		return false
 	}

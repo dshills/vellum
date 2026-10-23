@@ -178,6 +178,10 @@ func listBoxKey(r *record, id string, button *core.Switch, e events.Event) {
 	next.SetFocus()
 	next.ScrollToThis()
 	if target != id || activate {
-		queueListBox(r, target, next)
+		if r.node.Multiple {
+			queueListSelection(r, target, next, e.Modifiers(), id)
+		} else {
+			queueListBox(r, target, next)
+		}
 	}
 }

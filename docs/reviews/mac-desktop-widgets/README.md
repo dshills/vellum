@@ -38,3 +38,26 @@ Raw results are retained; findings below are dispositions, not claims of zero fi
   anchor-removal tests pass. Edge placement uses clamping; small-window fixture
   originally clamped to the top, so below-anchor assertion now uses a larger
   window. This is a test setup correction, not a claim of edge reversal.
+
+## Multiple-selection list
+
+- 52f538d1681befb6: clarified contract. Focus/range anchor are input navigation
+  state, independent of accepted selection; rejecting a value does not reject
+  native focus movement. This is intentional and specified. Removed/disabled
+  anchor rows now clear the anchor on reconciliation; future ranges start at
+  the focused row. No acceptance acknowledgment can be inferred from a void
+  controlled callback.
+- 015d8dfd381a5af1: fixed the fragile name slicing by capturing the stable option
+  ID in each row styler. Styling follows existing originating render/owner locks.
+- 5a1609a957e76a25: driver ranges already contain unique validated option IDs;
+  hardened public Apply to deduplicate manually constructed edit IDs as well,
+  with a regression for a repeated toggle ID.
+
+Final modifier follow-up: native modifiers use bit indices with HasFlag or
+1<<index masks. Actual Command/Shift routing now passes; corrected Shift-F10
+and existing Shift-Tab comparisons and fixtures. Follow-up findings
+48b1761424eb2694 / c2d58101b20e0063 do not reproduce: every admitted range includes
+the enabled target enforced by the row guard, so a disabled-only empty range
+cannot be generated. Public Apply with empty replacement IDs intentionally clears
+selection; an app rejects by ignoring the edit, not by calling Apply. Both
+representations of modifiers are the backend's documented bit-flag API.

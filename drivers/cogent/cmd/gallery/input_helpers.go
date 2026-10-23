@@ -9,6 +9,8 @@ import (
 )
 
 type inputHelpersGallery struct {
+	selectedObjects  []string
+	rejectSelection  bool
 	combo            *ui.ComboBox
 	search           *ui.SearchBox
 	notice           *ui.InlineNotice
@@ -116,6 +118,15 @@ func (m *inputHelpersGallery) view() ui.Node {
 		{ID: "context-result", Kind: ui.Label, Text: "Context action: " + m.contextAction},
 		{ID: "inspector-anchor", Kind: ui.Button, Text: "Quick inspector…", Activate: func() { m.popoverOpen = !m.popoverOpen }},
 		popover,
+		{ID: "source-group", Kind: ui.FormGroup, Text: "Objects — Command-click / Shift-click", Children: []ui.Node{
+			{ID: "object-list", Kind: ui.ListBox, Multiple: true, SelectedIDs: m.selectedObjects, Options: []ui.Option{{ID: "block", Label: "Block"}, {ID: "connector", Label: "Connector"}, {ID: "note", Label: "Note"}, {ID: "round", Label: "Rounded rectangle"}}, SelectionChange: func(e ui.ListSelectionEvent) {
+				if !m.rejectSelection {
+					m.selectedObjects = e.Apply(m.selectedObjects)
+				}
+			}, Style: ui.Style{MaxSize: ui.Some(ui.Size{Height: 140})}},
+			{ID: "selected-objects", Kind: ui.Label, Text: "Selected: " + strings.Join(m.selectedObjects, ", ")},
+			{ID: "reject-selection", Kind: ui.Checkbox, Text: "Reject selection edits", Checked: m.rejectSelection, Change: func(e ui.ChangeEvent) { m.rejectSelection = e.Checked }},
+		}},
 		notice,
 		{ID: "input-requests", Kind: ui.Label, Text: fmt.Sprintf("Search requests: %d", m.requests)},
 		{ID: "input-options", Kind: ui.Row, Children: []ui.Node{
