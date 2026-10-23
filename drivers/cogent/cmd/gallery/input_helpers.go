@@ -14,6 +14,8 @@ type inputHelpersGallery struct {
 	notice           *ui.InlineNotice
 	name             string
 	requests         int
+	contextAction    string
+	contextChecked   bool
 	quantity         float32
 	reject, disabled bool
 	dark             bool
@@ -100,6 +102,13 @@ func (m *inputHelpersGallery) view() ui.Node {
 		{ID: "quantity-field", Kind: ui.FormGroup, Text: "Copies", Children: []ui.Node{
 			{ID: "quantity", Kind: ui.NumberField, NumberButtons: ui.NumberButtonsStepper, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 88, Height: 28}), MaxSize: ui.Some(ui.Size{Width: 104})}, Number: m.quantity, Numeric: ui.Numeric{Min: 0, Max: 1000, Step: 1}, Accessibility: ui.Accessibility{Name: "Copies"}, Disabled: m.disabled, Change: func(e ui.ChangeEvent) { m.quantity = e.Number }},
 		}},
+		{ID: "context-demo", Kind: ui.Button, Text: "Right-click or Control-click for actions", Accessibility: ui.Accessibility{Name: "Context menu demo", Help: "Shift-F10 also opens the menu"}, ContextMenu: &ui.ContextMenu{Options: []ui.Option{{ID: "inspect", Label: "Inspect"}, {ID: "sep", Separator: true}, {ID: "grid", Label: "Show grid", Checkable: true, Checked: m.contextChecked}}, Change: func(e ui.ChangeEvent) {
+			m.contextAction = e.SelectedID
+			if e.SelectedID == "grid" {
+				m.contextChecked = e.Checked
+			}
+		}}},
+		{ID: "context-result", Kind: ui.Label, Text: "Context action: " + m.contextAction},
 		notice,
 		{ID: "input-requests", Kind: ui.Label, Text: fmt.Sprintf("Search requests: %d", m.requests)},
 		{ID: "input-options", Kind: ui.Row, Children: []ui.Node{

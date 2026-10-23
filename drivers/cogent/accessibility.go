@@ -641,6 +641,9 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			}
 		}
 		if !disabled {
+			if n.ContextMenu != nil && menuAvailable(r) {
+				x.Actions = append(x.Actions, "show-menu")
+			}
 			if x.Focusable {
 				x.Actions = append(x.Actions, "focus")
 			}
@@ -741,7 +744,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 				handlers[id] = handler
 			}
 		}
-		if n.Kind == ui.MenuButton {
+		if r.control != nil && r.control.menu != nil {
 			extra, actions := menuAccessibility(r, x.ID, b)
 			nodes = append(nodes, extra...)
 			for id, handler := range actions {
@@ -826,6 +829,15 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 	n := r.node
 	if n.Disabled || (r.control != nil && (r.control.disabled || r.control.retired)) {
 		return false
+	}
+	if n.ContextMenu != nil && action.Kind == "show-menu" {
+		if r.control == nil || r.control.menu == nil || !menuAvailable(r) {
+			return false
+		}
+		r.control.menu.position = nil
+		r.control.menu.request = true
+		_ = r.control.a.Invalidate(r.control.window)
+		return true
 	}
 	if n.Kind == ui.MenuButton {
 		if !menuAvailable(r) {

@@ -21,3 +21,15 @@ open suggestions in this initial composite. No live filtering or completion.
 All controls are custom-rendered, not AppKit wrappers. Fixed MacTheme colors and
 Helvetica Neue are retained; automatic system appearance/accent tracking and
 pixel-identical AppKit claims are outside scope.
+
+## 2. Context menus
+
+Node.ContextMenu supports Button, Canvas2D and ListBox, including list rows. Flat
+actions, checkmarks and separators reuse MenuButton contracts and bounds. Menus
+open on right/Control-click or Shift-F10; the host also exposes AX show-menu.
+Context actions do not activate the host. Pointer menus anchor at the event
+position; keyboard menus anchor at the host. Escape/Tab/outside release dismiss
+using the existing modal popup lifecycle. Removal, disable, option changes and
+window retirement revoke old actions. Nil Change leaves normal host use enabled.
+No submenus or shortcut-label metadata in this increment. Text fields retain
+their native editing context menus.

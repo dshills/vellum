@@ -134,6 +134,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if err := validateContextMenu(n); err != nil {
+		return err
+	}
 	if n.NumberButtons != "" && (n.Kind != NumberField || n.NumberButtons != NumberButtonsStepper) {
 		return fmt.Errorf("ui: NumberButtons requires stepper on NumberField")
 	}

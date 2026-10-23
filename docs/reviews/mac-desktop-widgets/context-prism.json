@@ -1,0 +1,140 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f8a5cb1cef97186e7c0f5bf81dc4fab0",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "7b939c67e1e84298c2ed4f51f73fec12dd20947c",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "ccbbb9e90d2b8a65",
+      "severity": "medium",
+      "category": "bug",
+      "title": "AX show-menu does not reset pointer position or nil-check menu",
+      "message": "The show-menu accessibility action sets request without checking that a menu is not already open or clearing a stale pointer position. A prior position (not cleared if a request was queued then canceled) may anchor keyboard/AX-opened menus at a stale pointer location.",
+      "suggestion": "Set r.control.menu.position = nil before setting request in the AX path, and guard r.control.menu != nil.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility.go",
+          "lines": {
+            "start": 838,
+            "end": 851
+          }
+        }
+      ],
+      "tags": [
+        "accessibility"
+      ],
+      "evidence": "\t\tr.control.menu.request = true\n\t\t_ = r.control.a.Invalidate(r.control.window)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "9eaf29f3b0b17839",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Stale menu state after removing ContextMenu",
+      "message": "Context-menu sync now runs before the choice/widget handling, but ListBox rows and the host set up in mountControl create menuState without flushing/closing when ContextMenu is removed; also if the host kind is not a core.Button the menu state may remain stale. When ContextMenu becomes nil, the open popup is only closed because menuAvailable returns false, but s.options/s.source are never reset, so a re-added identical menu is considered unchanged and the epoch is not renewed.",
+      "suggestion": "In syncMenuButton, compare s.source (or its presence) with r.node.ContextMenu and treat a change as 'changed' so the epoch rotates and the popup closes.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/controls.go",
+          "lines": {
+            "start": 498,
+            "end": 501
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle",
+        "menu"
+      ],
+      "evidence": "\t\tif r.node.Kind == ui.MenuButton {\n\t\t\tsyncMenuButton(r, previous)\n\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "fd7fb5cc72f1f190",
+      "severity": "medium",
+      "category": "bug",
+      "title": "ListBox rows and host both bind the context menu",
+      "message": "menuState for Button/Canvas2D/ListBox hosts is created in mountControl, but openManagedMenu is reached when ContextMenu is set. For ListBox, bindContextMenu is bound for both the list widget and every row button, so one right-click on a row fires both handlers; the first sets handled so it is OK, but position is taken from the row event only if handled order holds. If the ListBox row handler is not first, position may come from the host.",
+      "suggestion": "Add a test for right-clicking a ListBox row to ensure single open and correct anchor.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/menu_button.go",
+          "lines": {
+            "start": 254,
+            "end": 254
+          }
+        }
+      ],
+      "tags": [
+        "listbox",
+        "events",
+        "location-corrected"
+      ],
+      "evidence": "\t\tcontext.SetProperty(\"vellum.menu.active\", p)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 9462,
+    "totalMs": 9497
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 13,
+    "bytes": 34561,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 18909,
+        "output": 991,
+        "costUSD": 0.047728
+      }
+    ],
+    "widenedFiles": 5,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

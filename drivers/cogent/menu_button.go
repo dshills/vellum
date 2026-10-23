@@ -3,6 +3,7 @@ package cogent
 import (
 	"encoding/base64"
 	"html"
+	"image"
 	"slices"
 	"sync/atomic"
 
@@ -17,11 +18,12 @@ import (
 
 type menuEpoch struct{ marker byte }
 type menuState struct {
-	epoch   *menuEpoch
-	options []ui.Option
-	popup   *menuPopup
-	closing *menuPopup // owner revokes first; originating reconciliation destroys native scene
-	request bool
+	epoch    *menuEpoch
+	options  []ui.Option
+	popup    *menuPopup
+	closing  *menuPopup // owner revokes first; originating reconciliation destroys native scene
+	request  bool
+	position *image.Point
 }
 type menuPopup struct {
 	owner             *record
@@ -62,11 +64,49 @@ func (w *menuItem) Render() {
 		})
 	}
 }
+func menuDescriptor(r *record) ui.Node {
+	if r.node.Kind == ui.MenuButton {
+		return r.node
+	}
+	n := ui.Node{ID: r.node.ID, Kind: ui.MenuButton, Text: "Context actions", Disabled: r.node.Disabled}
+	if r.node.ContextMenu != nil {
+		n.Options = r.node.ContextMenu.Options
+		n.Change = r.node.ContextMenu.Change
+	}
+	return n
+}
+func bindContextMenu(r *record, w core.Widget) {
+	request := func(e events.Event) {
+		if e.IsHandled() || r.node.ContextMenu == nil {
+			return
+		}
+		e.SetHandled()
+		var position *image.Point
+		if e.HasPos() {
+			p := e.WindowPos()
+			position = &p
+		}
+		epoch := r.control.menu.epoch
+		postControl(r, func() {
+			if menuAvailable(r) && r.control.menu.epoch == epoch {
+				r.control.menu.position = position
+				r.control.menu.request = true
+				_ = r.control.a.Invalidate(r.control.window)
+			}
+		})
+	}
+	w.AsWidget().OnFirst(events.ContextMenu, request)
+	w.AsWidget().OnFirst(events.KeyChord, func(e events.Event) {
+		if e.KeyCode() == key.CodeF10 && e.Modifiers() == key.Shift {
+			request(e)
+		}
+	})
+}
 func menuAvailable(r *record) bool {
-	if r.control == nil || r.control.retired || r.control.disabled || r.node.Change == nil {
+	if r.control == nil || r.control.retired || r.control.disabled || menuDescriptor(r).Change == nil {
 		return false
 	}
-	for _, o := range r.node.Options {
+	for _, o := range menuDescriptor(r).Options {
 		if !o.Disabled && !o.Separator {
 			return true
 		}
@@ -106,17 +146,19 @@ func mountMenuButton(parent tree.Node, r *record) core.Widget {
 func syncMenuButton(r *record, previous ui.Node) {
 	s := r.control.menu
 	flushMenuClose(r)
-	changed := !slices.Equal(s.options, r.node.Options) || previous.Text != r.node.Text || previous.Icon != r.node.Icon || previous.Appearance != r.node.Appearance || previous.Style != r.node.Style || previous.Grow != r.node.Grow || previous.Disabled != r.node.Disabled || previous.MinWidth != r.node.MinWidth || previous.MinHeight != r.node.MinHeight
+	changed := !slices.Equal(s.options, menuDescriptor(r).Options) || previous.Text != r.node.Text || previous.Icon != r.node.Icon || previous.Appearance != r.node.Appearance || previous.Style != r.node.Style || previous.Grow != r.node.Grow || previous.Disabled != r.node.Disabled || previous.MinWidth != r.node.MinWidth || previous.MinHeight != r.node.MinHeight
 	if changed {
 		requestMenuClose(r)
 		s.epoch = &menuEpoch{}
-		s.options = slices.Clone(r.node.Options)
+		s.options = slices.Clone(menuDescriptor(r).Options)
 	}
 	if !menuAvailable(r) {
 		requestMenuClose(r)
 	}
 	flushMenuClose(r)
-	r.widget.AsWidget().SetState(!menuAvailable(r), states.Disabled)
+	if r.node.Kind == ui.MenuButton {
+		r.widget.AsWidget().SetState(!menuAvailable(r), states.Disabled)
+	}
 	if s.request {
 		s.request = false
 		if menuAvailable(r) && !menuOpen(r) {
@@ -196,7 +238,12 @@ func openManagedMenu(r *record) {
 	if first != nil {
 		scene.Events.SetStartFocus(first)
 	}
-	p.stage = core.NewMenuStage(scene, r.widget, r.widget.AsWidget().ContextMenuPos(nil))
+	pos := r.widget.AsWidget().ContextMenuPos(nil)
+	if s.position != nil {
+		pos = *s.position
+	}
+	s.position = nil
+	p.stage = core.NewMenuStage(scene, r.widget, pos)
 	if p.stage == nil {
 		scene.DeleteChildren()
 		return
@@ -216,10 +263,10 @@ func queueMenuAction(r *record, p *menuPopup, id string) {
 		if r.control.menu.popup != p || r.control.menu.epoch != p.epoch || !menuAvailable(r) {
 			return
 		}
-		for _, o := range r.node.Options {
+		for _, o := range menuDescriptor(r).Options {
 			if o.ID == id && !o.Disabled && !o.Separator {
 				requestMenuClose(r)
-				r.node.Change(ui.ChangeEvent{ID: r.node.ID, Kind: ui.MenuButton, SelectedID: id, Checked: o.Checkable && !o.Checked})
+				menuDescriptor(r).Change(ui.ChangeEvent{ID: r.node.ID, Kind: ui.MenuButton, SelectedID: id, Checked: o.Checkable && !o.Checked})
 				_ = r.control.a.Invalidate(r.control.window)
 				return
 			}
@@ -234,6 +281,7 @@ func requestMenuClose(r *record) {
 	p := s.popup
 	s.popup = nil
 	s.request = false
+	s.position = nil
 	if p != nil {
 		p.dead.Store(true)
 		s.closing = p

@@ -273,6 +273,10 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		return nil, false, nil
 	}
 	r.widget = widget
+	if r.node.Kind == ui.Button || r.node.Kind == ui.Canvas2D || r.node.Kind == ui.ListBox {
+		c.menu = &menuState{epoch: &menuEpoch{}}
+		bindContextMenu(r, widget)
+	}
 	if r.node.Kind == ui.ProgressBar || r.node.Kind == ui.ProgressRing || r.node.Kind == ui.ProgressGauge || r.node.Kind == ui.Separator || r.node.Kind == ui.Slider {
 		if r.node.Kind != ui.Slider {
 			widget.AsWidget().Styler(func(s *styles.Style) {
@@ -469,6 +473,9 @@ func syncControl(r *record, previous ui.Node) error {
 		}
 		return syncGrid(r)
 	}
+	if r.control.menu != nil && r.node.Kind != ui.MenuButton {
+		syncMenuButton(r, previous)
+	}
 	nativeValueChanged := false
 	if r.control.choice != nil {
 		err := syncChoice(r, previous)
@@ -491,7 +498,7 @@ func syncControl(r *record, previous ui.Node) error {
 	}
 	switch w := r.widget.(type) {
 	case *core.Button:
-		if r.control.menu != nil {
+		if r.node.Kind == ui.MenuButton {
 			syncMenuButton(r, previous)
 		}
 		w.SetText(html.EscapeString(r.node.Text)).SetIcon(nativeSymbol(r.node.Icon)).SetType(nativeButtonAppearance(r.node.Appearance))

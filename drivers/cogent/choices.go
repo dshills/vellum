@@ -117,6 +117,9 @@ func prepareChoice(r *record, n ui.Node) error {
 		id := o.ID
 		button := core.NewSwitch(r.widget)
 		button.SetName("choice:" + id)
+		if n.Kind == ui.ListBox {
+			bindContextMenu(r, button)
+		}
 		c.buttons[id] = button
 		button.OnChange(func(events.Event) { queueChoice(r, id, button); restoreChoiceSelection(r) })
 		button.OnFirst(events.KeyChord, func(e events.Event) { choiceKey(r, id, button, e) })

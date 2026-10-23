@@ -344,3 +344,10 @@ and identifies a stable choice for menu selection. Retain one component per owne
 update `Text` in `Change` to accept. Apply `MacTheme(dark).Kinds[ui.TextField]` to
 its outer `Style`, with zero padding, for a single compact field outline. Tab to
 the suggestions button and press Down/Return to choose; Escape dismisses.
+
+### Context menus
+
+Set `Node.ContextMenu` on Button, Canvas2D or ListBox with `Options` and `Change`.
+The event identifies the host and stable action; checked actions propose `Checked`.
+Right/Control-click and Shift-F10 open it; Escape closes. Existing MenuButton
+check/separator rules apply. This does not replace text-editing context menus.

@@ -68,6 +68,7 @@ type Node struct {
 	Activate            func()
 	FileDrop            func(FileDropEvent) bool
 	Children            []Node
+	ContextMenu         *ContextMenu
 	Custom              any
 	// Canvas2D uses logical canvas units and the existing canvas navigation model.
 	Canvas *canvas.Scene
