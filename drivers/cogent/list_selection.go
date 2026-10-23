@@ -5,6 +5,7 @@ import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events/key"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/styles/units"
 	"github.com/dshills/vellum/ui"
 	"image/color"
@@ -57,6 +58,15 @@ func styleSourceRow(r *record, id string, s *styles.Style) {
 	}
 	applyStyle(s, ui.Node{Kind: ui.Label, Style: ui.Style{Typography: r.theme.Default.Typography, Foreground: r.theme.Default.Foreground}}, ui.Theme{})
 	s.Grow.Set(1, 0)
+	// Source-list membership is painted as a row selection, not a checked segment.
+	s.IconSize.Zero()
+	s.StateLayer = 0
+	s.Border.Width.Zero()
+	if s.Is(states.Focused) {
+		s.Border.Width = s.MaxBorder.Width
+		s.Border.Color = s.MaxBorder.Color
+		s.Border.Style = s.MaxBorder.Style
+	}
 	s.Border.Radius.Set(units.Dp(4))
 	s.Padding.Set(units.Dp(4), units.Dp(8))
 	s.Min.Y = units.Dp(24)
@@ -93,4 +103,21 @@ func queueListSelectAll(r *record, id string, button *core.Switch) {
 		r.node.SelectionChange(ui.ListSelectionEvent{ID: r.node.ID, TargetID: id, IDs: ids})
 		requestControlRestore(r)
 	})
+}
+
+// A list's other selected rows need restyling too when focus enters or leaves.
+// Coalesce the row focus notifications and style only on the window owner.
+func requestSourceListFocusStyle(r *record) {
+	c := r.control.choice
+	if !c.listStylePending.CompareAndSwap(false, true) {
+		return
+	}
+	if !postControl(r, func() {
+		c.listStylePending.Store(false)
+		if r.node.Kind == ui.ListBox && r.node.Multiple && r.control.choice == c {
+			r.widget.AsWidget().Restyle()
+		}
+	}) {
+		c.listStylePending.Store(false)
+	}
 }

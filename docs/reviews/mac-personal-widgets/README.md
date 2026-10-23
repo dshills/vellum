@@ -152,3 +152,26 @@ keeps it from clearing selection. Caps/Num flags are ignored at both outer choic
 admission and inner Command-A matching, tested without changing OS lock settings.
 Final review explicitly reports no functional issue/no change needed. Full list
 race tests pass; native Command-A verification follows packaging.
+
+## Flat Mac source-list rows
+
+Native inspection found outlined segmented-button rows and checkmarks rather than
+flat source-list membership. Multi-list rows now suppress those decorations,
+retain the focused-row outline, and fill the allocated Mac form width. A focus
+regression reproduced selected rows staying blue after Tab left the list; a
+coalesced window-owner restyle updates all selected rows on departure/return.
+No timers, unbounded queues or new public API are introduced. Retired records
+remain protected by postControl's existing lifetime check.
+
+Focused UI race tests, native list/choice race regressions and driver/gallery vet
+pass. Completed light/dark software frames assert active and inactive row pixels,
+form containment and focused versus unfocused borders. Mode transitions retain the
+row and restore the original single-selection icon and border presentation.
+
+Both Prism reviews (Anthropic claude-sonnet-5-5, complete coverage) assert that
+SetType does not restore icons. This is contradicted by pinned core/switch.go:
+SetType unconditionally assigns Check/None/None for SwitchSegmentedButton. The
+passing retained-row transition test verifies these fields and configured icon
+size; syncChoice also Updates children when Multiple changes. No redundant second
+default-icon table was added. Raw findings are retained for traceability; this is
+a documented false positive, not a claim that Prism returned zero findings.

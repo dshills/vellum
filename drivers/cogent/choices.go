@@ -10,6 +10,7 @@ import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
+	"cogentcore.org/core/icons"
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/styles/units"
@@ -18,13 +19,14 @@ import (
 )
 
 type choiceState struct {
-	listAnchor  string
-	buttons     map[string]*core.Switch
-	order       []string
-	listRows    map[string]*listBoxRowEpoch
-	listScope   atomic.Pointer[workbenchInputScope]
-	listCatalog *listBoxCatalogEpoch
-	listContext tabCloseContext // originating reconciliation, before global modal projection
+	listAnchor       string
+	listStylePending atomic.Bool
+	buttons          map[string]*core.Switch
+	order            []string
+	listRows         map[string]*listBoxRowEpoch
+	listScope        atomic.Pointer[workbenchInputScope]
+	listCatalog      *listBoxCatalogEpoch
+	listContext      tabCloseContext // originating reconciliation, before global modal projection
 }
 
 func choiceVertical(n ui.Node) bool {
@@ -128,6 +130,9 @@ func prepareChoice(r *record, n ui.Node) error {
 		button.SetName("choice:" + id)
 		if n.Kind == ui.ListBox {
 			bindContextMenu(r, button)
+			for _, typ := range []events.Types{events.Focus, events.FocusLost} {
+				button.On(typ, func(events.Event) { requestSourceListFocusStyle(r) })
+			}
 		}
 		c.buttons[id] = button
 		button.OnChange(func(e events.Event) {
@@ -225,8 +230,13 @@ func syncChoice(r *record, previous ui.Node) error {
 		text := html.EscapeString(o.Label)
 		disabled := r.control.disabled || o.Disabled
 		checked := ui.ListOptionSelected(r.node, o.ID)
-		dirty := b.Text != text || b.Type != typ || b.IsChecked() != checked || b.StateIs(states.Disabled) != disabled
+		dirty := b.Text != text || b.Type != typ || b.IsChecked() != checked || b.StateIs(states.Disabled) != disabled || previous.Multiple != r.node.Multiple
 		b.SetType(typ).SetText(text).SetChecked(checked).SetState(disabled, states.Disabled)
+		if r.node.Kind == ui.ListBox && r.node.Multiple {
+			b.IconOn = icons.None
+			b.IconOff = icons.None
+			b.IconIndeterminate = icons.None
+		}
 		if dirty || previous.Orientation != r.node.Orientation || !reflect.DeepEqual(previous.Options, r.node.Options) {
 			b.Update()
 		}

@@ -63,3 +63,9 @@ rendering option or release gate.
 ColorWell cancels its private open session when View observes a different ID,
 Disabled, or a removed Change handler. Re-enabling/restoring the handler leaves
 it closed until explicit activation. Old editor callbacks remain revoked.
+
+Mac multiple-selection lists use flat full-width rows with no checkbox glyphs or
+push-button outlines. The keyboard-focused row retains its focus outline. Selected
+rows change together between active blue and inactive gray when keyboard focus
+enters or leaves the list. Retained rows restore their original single-selection
+presentation when the owner changes modes. No new public API or theme tracking.
