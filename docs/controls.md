@@ -382,6 +382,9 @@ Combo suggestions align below the full field's left edge and match its width.
 without it, action menus open below their own button. Popup options are full-width
 menu rows on one surface, not separately outlined push buttons.
 
+For retained component setup, themes, focus IDs and owner acceptance examples,
+see [Integrating the Mac input widgets](mac-widget-integration.md).
+
 ### Color well
 
 `ui.ColorWell.View()` returns a compact swatch and same-window anchored editor.

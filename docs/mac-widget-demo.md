@@ -2,6 +2,7 @@
 
 This private personal-use gallery includes color wells, token fields, font and
 path pickers, protected text entry, and the earlier Mac input controls.
+For application code, see the [public-API integration guide](mac-widget-integration.md).
 
 After native source preparation, from `drivers/cogent` run:
 

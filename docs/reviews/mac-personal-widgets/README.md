@@ -353,3 +353,20 @@ Nil represents an unstyled row and must request the initial update, rather than
 skip it. Settled-state tests demonstrate the comparison converges. No change is
 needed for the proposed nonuniform-image or disabled-selection scenarios.
 Native light/dark checks follow packaging in the private delivery receipt.
+
+## Public consumer integration
+
+The independent sdk-contract module composes all five widgets with no native
+driver dependency. It validates the tree, checks exported focus helpers, invokes
+public descriptor proposals and verifies owner acceptance, channel merging and
+stable token removal. This establishes public API integration only; mounted/native
+routing and visual evidence remain separate. Focused race checks and vet pass.
+The linked guide covers retention, theme styles, owner dispatch, stable IDs,
+acceptance, focus targeting and existing limits, with all five setup patterns.
+
+Prism Anthropic claude-sonnet-5-5 completed coverage. Its sole finding explicitly
+says no action is needed and suggests optional nil-callback diagnostics in the
+test. These descriptors are required to expose the invoked callbacks; a missing
+callback already fails the test at the exact invocation. Fatalf terminates a
+missing-node lookup. No production or integration correctness issue was found.
+No runtime changes or repeated native campaign are required for this checkpoint.
