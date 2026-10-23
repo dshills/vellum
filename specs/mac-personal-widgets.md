@@ -50,3 +50,12 @@ Reuse normal managed text input, selection and lifecycle. Values remain ordinary
 application-owned Go strings, not zeroizable secrets or a credential store. This
 increment does not claim OS secure-event-input mode or protection from other
 processes with debugging permissions. Test fixtures use synthetic values only.
+
+## Overnight interaction hardening
+
+Suggestion proposals are checked against the current TokenField catalog before
+owner delivery, even when catalog changes have not yet reached View. Removed,
+disabled, relabeled or otherwise changed options revoke queued menu actions.
+Changing a SecureField's ID resets private reveal state: a different field starts
+masked and requires a new explicit reveal action. This changes no public API,
+rendering option or release gate.

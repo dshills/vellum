@@ -133,3 +133,39 @@ func TestSecureFieldRawNodeWireProjections(t *testing.T) {
 		})
 	}
 }
+
+func TestSecureFieldManagedIdentityRemasksReplacement(t *testing.T) {
+	p := &ui.SecureField{ID: "first-password", Text: "first-synthetic", AllowReveal: true, Change: func(ui.ChangeEvent) {}}
+	view := func() ui.Node {
+		n, err := p.View()
+		if err != nil {
+			panic(err)
+		}
+		return ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{n}}
+	}
+	m, a := simpleManual(t, manualConfig(t, 930), view)
+	unitSettle(t, m)
+	root := m.implementation.find("one").state.root
+	findRecord(root, "first-password/secure/reveal").widget.AsWidget().Send(events.Click)
+	a.Drain()
+	unitSettle(t, m)
+	first := findRecord(root, ui.SecureInputID(p.ID)).widget.(*core.TextField)
+	if first.NoEcho {
+		t.Fatal("initial reveal failed")
+	}
+	if err := a.Do(func() { p.ID = "second-password"; p.Text = "second-synthetic"; _ = a.Invalidate("one") }); err != nil {
+		t.Fatal(err)
+	}
+	unitSettle(t, m)
+	root = m.implementation.find("one").state.root
+	second := findRecord(root, ui.SecureInputID(p.ID)).widget.(*core.TextField)
+	if !second.NoEcho {
+		t.Fatal("replacement was visible without a new reveal")
+	}
+	nodes, _ := accessibilitySnapshot(root, nil)
+	for _, n := range nodes {
+		if n.DomainID == ui.SecureInputID(p.ID) && (!n.Secure || n.Value != "") {
+			t.Fatal("replacement semantics exposed")
+		}
+	}
+}

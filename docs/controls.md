@@ -431,3 +431,8 @@ protected, with the macOS secure text subrole. Masked core fields disallow copy
 and cut; explicit reveal permits ordinary text copying. Disabling remasks the
 composite. Values remain ordinary Go strings; no secret store, memory erasure or
 OS secure-event-input guarantee is provided.
+
+TokenField also revokes queued suggestions immediately when the application
+changes their catalog entry, without requiring an intermediate View. SecureField
+starts masked when its ID changes; reveal state is never inherited by a different
+field identity.

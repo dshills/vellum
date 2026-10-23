@@ -43,3 +43,62 @@ func TestSecureFieldControlledRevealAndDisabled(t *testing.T) {
 		t.Fatal("invalid secure flags")
 	}
 }
+
+func TestSecureFieldIdentityChangeRequiresNewReveal(t *testing.T) {
+	p := &SecureField{ID: "first", Text: "first-synthetic", AllowReveal: true, Change: func(ChangeEvent) {}}
+	n, err := p.View()
+	if err != nil {
+		t.Fatal(err)
+	}
+	oldReveal := helperNode(t, n, "first/secure/reveal")
+	oldReveal.Activate()
+	n, _ = p.View()
+	if !helperNode(t, n, SecureInputID("first")).Reveal {
+		t.Fatal("initial reveal failed")
+	}
+	p.ID = "second"
+	p.Text = "second-synthetic"
+	n, err = p.View()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if helperNode(t, n, SecureInputID("second")).Reveal {
+		t.Fatal("new identity inherited reveal consent")
+	}
+	oldReveal.Activate()
+	n, _ = p.View()
+	if helperNode(t, n, SecureInputID("second")).Reveal {
+		t.Fatal("obsolete reveal action changed new identity")
+	}
+}
+
+func TestSecureFieldIdentityRoundTripRevokesOldCallbacks(t *testing.T) {
+	calls := 0
+	p := &SecureField{ID: "first", Text: "synthetic", AllowReveal: true, Change: func(ChangeEvent) { calls++ }}
+	n, err := p.View()
+	if err != nil {
+		t.Fatal(err)
+	}
+	oldReveal := helperNode(t, n, "first/secure/reveal")
+	oldInput := helperNode(t, n, SecureInputID("first"))
+	p.ID = "second"
+	if _, err = p.View(); err != nil {
+		t.Fatal(err)
+	}
+	p.ID = "first"
+	n, err = p.View()
+	if err != nil {
+		t.Fatal(err)
+	}
+	oldReveal.Activate()
+	oldInput.Change(ChangeEvent{Text: "old queued proposal"})
+	n, _ = p.View()
+	if helperNode(t, n, SecureInputID("first")).Reveal || calls != 0 {
+		t.Fatal("original identity callbacks survived replacement", calls)
+	}
+	helperNode(t, n, "first/secure/reveal").Activate()
+	n, _ = p.View()
+	if !helperNode(t, n, SecureInputID("first")).Reveal {
+		t.Fatal("current identity cannot reveal")
+	}
+}

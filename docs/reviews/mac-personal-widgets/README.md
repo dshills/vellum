@@ -98,3 +98,22 @@ form surface. Prism requests confirmation of GrowX1: intentional, included in th
 review context and this rendered containment test. Caller Style still overrides
 GrowX and max size. This is the same overflow-container sizing constraint proven
 by the path regression, not an unrelated change.
+
+## Overnight identity and queued catalog actions
+
+New regressions failed on the preceding checkpoint: removed/disabled/renamed
+TokenField suggestions were still delivered between owner data mutation and the
+next View; an observed SecureField ID replacement inherited visual reveal state.
+Token actions now match the current entry against the rendered snapshot; live
+suggestions also retain the 64-entry bound. SecureField resets reveal and issues a
+private identity lease at each observed ID replacement, revoking old input/reveal
+callbacks even across an A→B→A render sequence. API and mounted-driver regressions
+pass, as do the adjacent widget routing/Cocoa privacy suite and vet.
+
+Prism's first identity-round-trip finding was reproduced and addressed by the
+lease. Its final finding concerns changing ID away and back without a View. Such
+writes do not create or replace a rendered control; direct public Go-field writes
+cannot be observed retrospectively by a component, and a generation incremented
+in View has the same observation boundary. Retained components belong to one
+owner, and callbacks capture their original receiver; copying an immutable lease
+does not redirect callbacks to a copy. No additional API/setter contract is added.

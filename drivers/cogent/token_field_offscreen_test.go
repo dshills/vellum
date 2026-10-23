@@ -52,3 +52,33 @@ func TestTokenFieldManagedCommitAndKeyboardRemoval(t *testing.T) {
 		t.Fatal("keyboard chip action", calls, p.Tokens)
 	}
 }
+
+func TestTokenFieldManagedQueuedSuggestionRevocation(t *testing.T) {
+	p := &ui.TokenField{ID: "tags", Suggestions: []ui.Option{{ID: "work", Label: "Work"}}}
+	calls := 0
+	p.Change = func(ui.TokenEvent) { calls++ }
+	view := func() ui.Node {
+		n, err := p.View()
+		if err != nil {
+			panic(err)
+		}
+		return ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{n}}
+	}
+	m, a := simpleManual(t, manualConfig(t, 931), view)
+	unitSettle(t, m)
+	root := m.implementation.find("one").state.root
+	menu := findRecord(root, ui.ComboMenuID("tags/tokens/entry"))
+	// Capture the actual mounted descriptor's owner callback, then change the
+	// application catalog in the same owner transaction before reconciliation.
+	if err := a.Do(func() {
+		p.Suggestions = nil
+		menu.node.Change(ui.ChangeEvent{ID: menu.node.ID, SelectedID: "work"})
+		_ = a.Invalidate("one")
+	}); err != nil {
+		t.Fatal(err)
+	}
+	unitSettle(t, m)
+	if calls != 0 {
+		t.Fatal("revoked suggestion added a token")
+	}
+}

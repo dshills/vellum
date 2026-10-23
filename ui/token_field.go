@@ -40,8 +40,8 @@ func TokenRemoveID(root, token string) string {
 	return root + "/tokens/remove/" + base64.RawURLEncoding.EncodeToString([]byte(token))
 }
 func (f *TokenField) validate() error {
-	if f == nil || f.ID == "" || len(f.Tokens) > MaxTokens {
-		return fmt.Errorf("ui: token field requires ID and at most %d tokens", MaxTokens)
+	if f == nil || f.ID == "" || len(f.Tokens) > MaxTokens || len(f.Suggestions) > MaxMenuOptions {
+		return fmt.Errorf("ui: token field requires ID, at most %d tokens and %d suggestions", MaxTokens, MaxMenuOptions)
 	}
 	seen := map[string]bool{}
 	for _, t := range f.Tokens {
@@ -81,13 +81,33 @@ func (f *TokenField) View() (Node, error) {
 			}
 		}})
 	}
-	f.input = ComboBox{ID: id + "/tokens/entry", Label: label, Text: f.Draft, Placeholder: f.Placeholder, Options: append([]Option(nil), f.Suggestions...), Disabled: !available() || len(f.Tokens) == MaxTokens, Style: f.InputStyle}
+	shownSuggestions := append([]Option(nil), f.Suggestions...)
+	f.input = ComboBox{ID: id + "/tokens/entry", Label: label, Text: f.Draft, Placeholder: f.Placeholder, Options: shownSuggestions, Disabled: !available() || len(f.Tokens) == MaxTokens, Style: f.InputStyle}
 	if f.input.Placeholder == "" {
 		f.input.Placeholder = "Add a tag…"
 	}
 	f.input.Change = func(e ComboEvent) {
 		if !available() || len(f.Tokens) == MaxTokens {
 			return
+		}
+		// The embedded combo sees its last rendered catalog; the owner may already
+		// have changed Suggestions before the next reconciliation.
+		if e.OptionID != "" {
+			valid := false
+			for _, shown := range shownSuggestions {
+				if shown.ID != e.OptionID || shown.Label != e.Text || shown.Disabled {
+					continue
+				}
+				for _, current := range f.Suggestions {
+					if current == shown {
+						valid = true
+						break
+					}
+				}
+			}
+			if !valid {
+				return
+			}
 		}
 		text := strings.TrimSpace(e.Text)
 		if !validTokenText(text) {

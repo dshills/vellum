@@ -5,6 +5,8 @@ import (
 	"image/color"
 )
 
+type secureFieldIdentity struct{ id string }
+
 // SecureField composes a protected TextField and optional explicit reveal action.
 // Retain on one owner. Nil Change disables entry and reveal.
 // Text is an ordinary Go string; it is not zeroizable storage
@@ -16,6 +18,7 @@ type SecureField struct {
 	Change                       func(ChangeEvent)
 	Style                        Style
 	revealed                     bool
+	identity                     *secureFieldIdentity
 }
 
 func SecureInputID(root string) string { return root + "/secure/input" }
@@ -24,11 +27,16 @@ func (s *SecureField) View() (Node, error) {
 		return Node{}, fmt.Errorf("ui: secure field requires ID")
 	}
 	id := s.ID
+	if s.identity == nil || s.identity.id != id {
+		s.revealed = false
+		s.identity = &secureFieldIdentity{id: id}
+	}
+	identity := s.identity
 	label := s.Label
 	if label == "" {
 		label = "Password"
 	}
-	available := func() bool { return s.ID == id && !s.Disabled && s.Change != nil }
+	available := func() bool { return s.ID == id && s.identity == identity && !s.Disabled && s.Change != nil }
 	if !s.AllowReveal || !available() {
 		s.revealed = false
 	}

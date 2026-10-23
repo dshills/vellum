@@ -70,3 +70,34 @@ func TestTokenFieldValidationAndCompletionRevocation(t *testing.T) {
 		t.Fatal("unbounded")
 	}
 }
+
+func TestTokenFieldRevokesUnrenderedSuggestionChanges(t *testing.T) {
+	for _, change := range []string{"removed", "disabled", "renamed", "metadata", "over-limit"} {
+		t.Run(change, func(t *testing.T) {
+			calls := 0
+			f := &TokenField{ID: "tags", Suggestions: []Option{{ID: "work", Label: "Work"}}, Change: func(TokenEvent) { calls++ }}
+			n, err := f.View()
+			if err != nil {
+				t.Fatal(err)
+			}
+			menu := helperNode(t, n, ComboMenuID("tags/tokens/entry"))
+			switch change {
+			case "removed":
+				f.Suggestions = nil
+			case "disabled":
+				f.Suggestions[0].Disabled = true
+			case "renamed":
+				f.Suggestions[0].Label = "Different"
+			case "metadata":
+				f.Suggestions[0].Checkable = true
+			case "over-limit":
+				f.Suggestions = append(f.Suggestions, make([]Option, MaxMenuOptions)...)
+			}
+			// Owner data changed, but the old rendered action is still queued.
+			menu.Change(ChangeEvent{SelectedID: "work"})
+			if calls != 0 {
+				t.Fatal("obsolete suggestion accepted before next View", change)
+			}
+		})
+	}
+}
