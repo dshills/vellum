@@ -98,7 +98,11 @@ The color well reopens and Escape cancels without creating a color edit.
 
 Explicit TextField backgrounds stay flat while focused instead of gaining a
 backend state-layer fill. An explicit nonzero border receives a full focus outline;
-an explicit zero border suppresses the backend's private bottom underline. Bordered
+an explicitly transparent, zero-border embedded editor suppresses its private
+bottom underline only when its direct enclosing row actually owns a shared
+outline. Ordinary fields, including transparent borderless fields, retain their
+native keyboard focus indicator. Removing a composite's border restores its
+editor's own indicator without replacing the editor or its selection. Bordered
 rows with a directly contained transparent borderless TextField share one outer
 focus outline across the editor and accessory controls, including combo boxes and
 secure entry. The outline allowance stays fixed between focus states. Unstyled

@@ -10,6 +10,7 @@ import (
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/styles/states"
 	"github.com/dshills/vellum/ui"
 )
 
@@ -284,6 +285,102 @@ func TestMacNumberFieldFocusKeepsThemeFill(t *testing.T) {
 					t.Fatal("focus styling changed number field allocation")
 				}
 			})
+		}
+	}
+}
+
+func TestBorderlessOrdinaryFieldRetainsNativeFocusIndicator(t *testing.T) {
+	for _, fill := range []string{"theme-fill", "explicit-fill", "transparent"} {
+		t.Run(fill, func(t *testing.T) {
+			cfg := manualConfig(t, 957)
+			style := ui.Style{Border: ui.Some(ui.Border{}), MinSize: ui.Some(ui.Size{Width: 220, Height: 28})}
+			if fill == "explicit-fill" {
+				style.Background = ui.Some(color.NRGBA{R: 255, G: 255, B: 255, A: 255})
+			} else if fill == "transparent" {
+				style.Background = ui.Some(color.NRGBA{})
+			}
+			view := func() ui.Node {
+				return ui.Node{ID: "root", Kind: ui.Column, Focus: ui.FocusRequest{ID: "field", Sequence: 1}, Children: []ui.Node{{ID: "field", Kind: ui.TextField, Text: "Synthetic", Style: style}, {ID: "after", Kind: ui.Button, Text: "After", Activate: func() {}}}}
+			}
+			m, _ := simpleManual(t, cfg, view)
+			unitSettle(t, m)
+			field := findRecord(m.implementation.find("one").state.root, "field").widget.AsWidget()
+			if field.Styles.Border.Width.Bottom.Value != 2 || field.Styles.MaxBorder.Width.Bottom.Value != 2 || !field.Styles.RenderBox {
+				t.Fatal("zero resting border removed ordinary field focus cue", field.Styles.Border.Width, field.Styles.MaxBorder.Width, field.Styles.RenderBox)
+			}
+			bounds := field.Geom.TotalBBox
+			w, _ := imageManualElement(t, m, "field")
+			for _, mods := range []key.Modifiers{0, 1 << key.Shift} {
+				if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: events.KeyChord, Code: key.CodeTab, Modifiers: mods}); err != nil {
+					t.Fatal(err)
+				}
+				unitSettle(t, m)
+				focused := mods != 0
+				if field.ContainsFocus() != focused || field.Geom.TotalBBox != bounds {
+					t.Fatal("focus/allocation changed unexpectedly")
+				}
+				want := float32(0)
+				if focused {
+					want = 2
+				}
+				if field.Styles.Border.Width.Bottom.Value != want {
+					t.Fatal("focus cue did not follow Tab", field.Styles.Border.Width)
+				}
+			}
+		})
+	}
+}
+
+func TestBorderlessUnthemedFieldRetainsNativeFocusIndicator(t *testing.T) {
+	a, _ := newAXTest(t, 958)
+	host := core.NewFrame(core.NewBody("Borderless focus"))
+	r, err := reconcile(host, nil, ui.Node{ID: "field", Kind: ui.TextField, Text: "Synthetic", Style: ui.Style{Border: ui.Some(ui.Border{})}}, a, "ax")
+	if err != nil {
+		t.Fatal(err)
+	}
+	field := r.widget.AsWidget()
+	field.SetState(true, states.Focused)
+	field.Style()
+	if field.Styles.Border.Width.Bottom.Value != 2 || field.Styles.MaxBorder.Width.Bottom.Value != 2 || !field.Styles.RenderBox {
+		t.Fatal("unthemed focus cue lost", field.Styles.Border.Width)
+	}
+	field.SetState(false, states.Focused)
+	field.Style()
+	if field.Styles.Border.Width.Bottom.Value != 0 {
+		t.Fatal("unthemed resting border did not clear")
+	}
+}
+
+func TestRemovingSharedInputBorderRestoresEditorFocusCue(t *testing.T) {
+	bordered := true
+	view := func() ui.Node {
+		style := ui.Style{}
+		if bordered {
+			style.Border = ui.Some(ui.Border{Width: 1, Color: color.NRGBA{A: 255}})
+		}
+		return ui.Node{ID: "root", Kind: ui.Column, Focus: ui.FocusRequest{ID: "field", Sequence: 1}, Children: []ui.Node{{ID: "composite", Kind: ui.Row, Style: style, Children: []ui.Node{{ID: "field", Kind: ui.TextField, Text: "Synthetic", Style: ui.Style{Border: ui.Some(ui.Border{}), Background: ui.Some(color.NRGBA{})}}}}}}
+	}
+	m, a := simpleManual(t, manualConfig(t, 959), view)
+	unitSettle(t, m)
+	root := m.implementation.find("one").state.root
+	original := findRecord(root, "field").widget
+	for _, next := range []bool{false, true} {
+		if err := a.Do(func() { bordered = next; _ = a.Invalidate("one") }); err != nil {
+			t.Fatal(err)
+		}
+		unitSettle(t, m)
+		root = m.implementation.find("one").state.root
+		field := findRecord(root, "field").widget.AsWidget()
+		outer := findRecord(root, "composite").widget.AsWidget()
+		if field.This != original || !field.ContainsFocus() {
+			t.Fatal("border change replaced editor or lost focus")
+		}
+		if next {
+			if field.Styles.RenderBox || field.Styles.Border.Width.Bottom.Value != 0 || outer.Styles.Border.Width.Top.Value != 2 {
+				t.Fatal("restored composite did not own exactly one focus outline")
+			}
+		} else if !field.Styles.RenderBox || field.Styles.Border.Width.Bottom.Value != 2 {
+			t.Fatal("removing composite border removed all keyboard focus cues")
 		}
 	}
 }

@@ -370,3 +370,24 @@ test. These descriptors are required to expose the invoked callbacks; a missing
 callback already fails the test at the exact invocation. Fatalf terminates a
 missing-node lookup. No production or integration correctness issue was found.
 No runtime changes or repeated native campaign are required for this checkpoint.
+
+## Ordinary borderless field focus compatibility
+
+The prior input-focus change also suppressed focus cues on ordinary TextFields
+with zero resting borders. Corrected-theme Manual repros failed for inherited
+and explicit opaque fills; an unthemed native-style repro failed too. The first
+attempt used an invalid empty Manual theme and is not counted as reproduction.
+
+An editor now suppresses its private box/underline only when it is explicitly
+transparent and borderless, and its direct parent actually supplies the shared
+outline. A row publishes its stable state once at mount; originating stylers read
+that state through the current native parent, so reparenting does not retain an
+old owner. No focus handlers, model callbacks, polling or backend policy changes
+are introduced. Ordinary opaque, inherited-fill, transparent and unthemed fields
+retain their native focus cue. Removing/restoring a shared parent's border moves
+the cue to/from the same retained editor without losing focus.
+
+Focused race tests cover these cases, fixed allocation across Tab, shared-input
+reparent/style removal, queued refresh ownership, numeric fills and Mac field
+geometry. Vet passes. Prism Anthropic claude-sonnet-5-5 completed coverage with no
+findings. Native composite confirmation follows in the private package receipt.

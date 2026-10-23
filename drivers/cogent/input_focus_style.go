@@ -8,8 +8,11 @@ import (
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/styles/units"
+	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/ui"
 )
+
+const inputOutlineProperty = "vellum.input-outline"
 
 type inputOutlineState struct{ shared, focused atomic.Bool }
 
@@ -19,6 +22,9 @@ func mountInputOutline(r *record) {
 	}
 	r.inputOutline = &inputOutlineState{}
 	r.inputOutline.shared.Store(sharesInputOutline(r.node, r.theme))
+	// Install once, before publication. Stylers read this parent's stable state
+	// under their native window owner; no model callback mutates the property.
+	r.widget.AsTree().SetProperty(inputOutlineProperty, r.inputOutline)
 }
 
 func syncInputOutline(r *record) {
@@ -90,6 +96,17 @@ func styleManagedInputFocus(r *record, s *styles.Style) {
 		return
 	}
 	border := style.Border.Value
+	// A zero resting border still permits the native focus cue unless a direct
+	// shared-outline parent actually owns it. This also covers transparent
+	// standalone fields and composites whose outer border has been removed.
+	shared := false
+	if parent := r.widget.AsTree().Parent; !tree.IsNil(parent) {
+		outline, _ := parent.AsTree().Property(inputOutlineProperty).(*inputOutlineState)
+		shared = outline != nil && outline.shared.Load()
+	}
+	if border.Width == 0 && (!shared || !style.Background.Set || style.Background.Value.A != 0) {
+		return
+	}
 	// Native filled-field MaxBorder is a bottom underline. An explicit managed
 	// border also owns its focus shape; zero means no private editor outline.
 	s.Border.Width.Set(units.Dp(border.Width))
