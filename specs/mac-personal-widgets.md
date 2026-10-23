@@ -105,3 +105,7 @@ secure entry. The outline allowance stays fixed between focus states. Unstyled
 fields retain backend defaults; removing the explicit styles restores them.
 This uses existing managed styles and focus routing, without changing public APIs,
 rendering backend or release policy.
+
+Numeric fields also retain an explicit theme background under focus in both
+compact-stepper and plus/minus modes. Their existing border, hit geometry, numeric
+validation and stepping policy remain owned by the Spinner adapter.

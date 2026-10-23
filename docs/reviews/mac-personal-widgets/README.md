@@ -316,3 +316,17 @@ Parent updates before descendant sync already belong to the native locked
 reconciliation structure; no intermediate frame is published. The unit-width
 observation also does not apply: public Border.Width is a logical scalar and
 applyStyle has already assigned Dp units before this final styler.
+
+## Numeric focus fill consistency
+
+The native Copies stepper still showed a gray focused fill after the text-field
+checkpoint. Four completed-frame regressions reproduced it in inline plus/minus
+and compact-stepper modes, light and dark. NumberField now uses the same explicit
+background/state-layer rule; it returns before managed text border handling, so
+Spinner keeps its existing outlined border, arrow geometry and numeric behavior.
+
+All four rendered fills now match the theme. Actual Up/Down commits remain exact,
+allocation remains fixed, and the existing pointer half-step, held gesture,
+clamping/rejection, re-enable and font-picker checks pass with the race detector.
+Driver/gallery vet passes. Prism Anthropic claude-sonnet-5-5 completed coverage
+with no findings. Native light/dark confirmation follows in the private receipt.

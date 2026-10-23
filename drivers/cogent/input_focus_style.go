@@ -75,7 +75,7 @@ func styleManagedInputFocus(r *record, s *styles.Style) {
 		}
 		return
 	}
-	if r.node.Kind != ui.TextField {
+	if r.node.Kind != ui.TextField && r.node.Kind != ui.NumberField {
 		return
 	}
 	style, err := ui.ResolveStyle(r.node, r.theme)
@@ -85,7 +85,8 @@ func styleManagedInputFocus(r *record, s *styles.Style) {
 	if style.Background.Set {
 		s.StateLayer = 0
 	}
-	if !style.Border.Set {
+	// Spinner already owns its outlined border and compact arrow geometry.
+	if r.node.Kind == ui.NumberField || !style.Border.Set {
 		return
 	}
 	border := style.Border.Value

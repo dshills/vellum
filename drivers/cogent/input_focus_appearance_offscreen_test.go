@@ -231,3 +231,59 @@ func TestInputOutlineQueueRefusalStillRefreshes(t *testing.T) {
 		t.Fatal("full owner queue stranded focus styling")
 	}
 }
+
+func TestMacNumberFieldFocusKeepsThemeFill(t *testing.T) {
+	for _, dark := range []bool{false, true} {
+		for _, buttons := range []ui.NumberFieldButtons{"", ui.NumberButtonsStepper} {
+			mode := "inline"
+			if buttons == ui.NumberButtonsStepper {
+				mode = "stepper"
+			}
+			t.Run(mode+map[bool]string{false: "/light", true: "/dark"}[dark], func(t *testing.T) {
+				cfg := manualConfig(t, 955)
+				cfg.Theme = ui.MacTheme(dark)
+				cfg.Theme.Default.Typography = ui.Some(ui.Typography{Family: "Noto Sans", Size: 13})
+				cfg.Theme.Default.Background = ui.Some(color.NRGBA{R: 246, G: 246, B: 248, A: 255})
+				if dark {
+					cfg.Theme.Default.Background = ui.Some(color.NRGBA{R: 29, G: 29, B: 31, A: 255})
+				}
+				value := float32(1)
+				calls := 0
+				width := float32(160)
+				if buttons == ui.NumberButtonsStepper {
+					width = 104
+				}
+				view := func() ui.Node {
+					return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Focus: ui.FocusRequest{ID: "number", Sequence: 1}, Style: ui.Style{Padding: ui.Some(ui.UniformInsets(12))}, Children: []ui.Node{{ID: "number", Kind: ui.NumberField, Number: value, NumberButtons: buttons, Numeric: ui.Numeric{Min: 0, Max: 3, Step: 1}, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: width, Height: 28}), MaxSize: ui.Some(ui.Size{Width: width})}, Change: func(e ui.ChangeEvent) { calls++; value = e.Number }}, {ID: "after", Kind: ui.Button, Text: "After", Activate: func() {}}}}
+				}
+				m, _ := simpleManual(t, cfg, view)
+				unitSettle(t, m)
+				field := findRecord(m.implementation.find("one").state.root, "number").widget.AsWidget()
+				original := field.Geom.TotalBBox
+				frame, err := m.Capture(testContext, "one")
+				if err != nil {
+					t.Fatal(err)
+				}
+				inside := field.Geom.ContentBBox
+				got := frame.RGBAAt((inside.Min.X+inside.Max.X)/2, (inside.Min.Y+inside.Max.Y)/2)
+				want := color.RGBAModel.Convert(cfg.Theme.Kinds[ui.NumberField].Background.Value).(color.RGBA)
+				if got != want {
+					t.Fatal("focused number field changed its theme fill", got, want)
+				}
+				w, _ := imageManualElement(t, m, "number")
+				for _, code := range []key.Codes{key.CodeUpArrow, key.CodeDownArrow} {
+					if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: events.KeyChord, Code: code}); err != nil {
+						t.Fatal(err)
+					}
+					unitSettle(t, m)
+				}
+				if calls != 2 || value != 1 {
+					t.Fatal("focus styling changed numeric stepping", calls, value)
+				}
+				if field.Geom.TotalBBox != original {
+					t.Fatal("focus styling changed number field allocation")
+				}
+			})
+		}
+	}
+}
