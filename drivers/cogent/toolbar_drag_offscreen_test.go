@@ -11,8 +11,10 @@ import (
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/ui"
 	"image"
+	"math"
 	"slices"
 	"testing"
+	"time"
 )
 
 func TestToolbarCustomizationDragRouting(t *testing.T) {
@@ -104,7 +106,41 @@ func TestToolbarCustomizationDragRouting(t *testing.T) {
 				if g := grip("item-2").active; g == nil || !g.dragging || g.stage == nil {
 					t.Fatal("missing threshold/preview")
 				}
+				animated := grip("item-2").active
+				if animated.animation == nil {
+					t.Fatal("drag lacks bounded scene animation")
+				}
+				if _, e := cfg.Clock.Advance(50 * time.Millisecond); e != nil {
+					t.Fatal(e)
+				}
+				if _, e := m.Frame(testContext, "one"); e != nil {
+					t.Fatal(e)
+				}
+				if animated.alpha <= .4 || animated.alpha >= 1 {
+					t.Fatal("insertion fade did not interpolate", animated.alpha)
+				}
+				beforeAlpha := animated.alpha
+				input(events.MouseMove, rowBefore("item-1"))
+				if _, e := cfg.Clock.Advance(30 * time.Millisecond); e != nil {
+					t.Fatal(e)
+				}
+				if _, e := m.Frame(testContext, "one"); e != nil {
+					t.Fatal(e)
+				}
+				if animated.alpha < beforeAlpha || animated.lineY == animated.fromY || animated.lineY == animated.targetY || math.IsNaN(float64(animated.lineY)) {
+					t.Fatal("insertion motion did not interpolate continuously", animated.lineY, animated.fromY, animated.targetY, animated.alpha)
+				}
+				input(events.MouseMove, end)
+				animation, animationScene := animated.animation, animated.animationScene
+				lateFrame := animation.Func
 				input(events.MouseUp, end)
+				if animated.animation != nil || (animation != nil && (!animation.Done || animation.Func != nil || animation.Widget != nil)) || (animationScene != nil && len(animationScene.Animations) != 0) {
+					t.Fatal("release retained animation references")
+				}
+				lateFrame(animation)
+				if animated.hasLine || animated.stage != nil || (animationScene != nil && len(animationScene.Animations) != 0) {
+					t.Fatal("late frame recreated a completed preview")
+				}
 				input(events.MouseUp, end)
 				if changes != 1 || c.Value.Order[0] != "item-2" || !slices.Equal(c.Value.Hidden, []string{"item-2"}) || calls != 0 {
 					t.Fatal("drag commit incorrect", c.Value, changes, calls)
@@ -177,11 +213,12 @@ func TestToolbarCustomizationDragRouting(t *testing.T) {
 				input(events.MouseMove, at.Add(image.Pt(20, 0)))
 				bLost := grip(first)
 				lost := bLost.active
+				lostStage := lost.stage
 				lost.scroll.Scene.Events.CancelPointerCapture()
 				if bLost.active != nil {
 					t.Fatal("capture loss retained gesture")
 				}
-				if _, ok := lost.stage.Sprites.SpriteByName(lost.sprite); ok {
+				if _, ok := lostStage.Sprites.SpriteByName(lost.sprite); ok {
 					t.Fatal("capture loss retained preview")
 				}
 				input(events.MouseUp, rowBefore(c.Value.Order[2]))

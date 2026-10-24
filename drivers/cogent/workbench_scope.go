@@ -88,6 +88,15 @@ func bindWorkbenchInputScopes(root *record) {
 		if r == nil {
 			return
 		}
+		if r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton || r.node.Kind == ui.Checkbox {
+			next := uint32(2)
+			if allowed[prefix+accessibilityManagedID(r.node.ID)] {
+				next = 1
+			}
+			if r.focusVisibility.Swap(next) != next {
+				r.widget.AsWidget().Restyle()
+			}
+		}
 		if r.control != nil && r.control.placement != nil {
 			visible, scopes := tabCloseInheritedContext(r)
 			setPlacementScope(r.control.placement, visible && allowed[prefix+accessibilityManagedID(r.node.ID)], controlDisabled(r), scopes)

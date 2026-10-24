@@ -93,7 +93,7 @@ tools := ui.WithToolbarOverflow(ui.Node{ID: "drawing-tools", Kind: ui.Toolbar,
 })
 ```
 
-The menu supports 1..64 horizontal Buttons/Separators. Do not reuse the reserved
+The menu supports 1..64 horizontal Buttons, Separators or toolbar spaces. Spaces never become menu entries. Do not reuse the reserved
 chevron child ID; call the helper once, after per-item presentation changes.
 Editors, nested toolbars, placement sources, context-menu hosts and vertical bars
 keep ordinary scrolling. Allow at least the chevron's intrinsic width plus bar
@@ -191,8 +191,8 @@ latest accepted configuration. Reject by leaving Value unchanged. Keep View
 updated on close/disable/configuration changes so old sessions are revoked.
 The driver also guards removed/closed native controls. The generated control ID
 helpers support independent consumers and automation. The complete catalogue
-supports 1..64 ordinary horizontal Buttons/Separators, with at least one action;
-editors, nested controls, placement sources and context-menu hosts are refused.
+supports 1..64 ordinary horizontal Buttons, Separators or toolbar spaces, with at least one action;
+editors, nested controls, placement sources and action-level context-menu hosts are refused in the customizable catalogue. The Toolbar itself can own its context menu.
 Apply customization before adding overflow, so hidden actions never reappear in
 More actions. Reordering preserves retained visible control identity; hiding
 removes an action, and showing it mounts a new native control with the same public
@@ -203,9 +203,9 @@ Order is a partial ID list, with omitted items appended in catalogue order.
 Hidden is also a list of IDs. Unknown/duplicate IDs produce an error rather than
 silently changing a different action. The value has JSON fields `order`/`hidden`;
 applications may store it and handle catalogue migrations themselves. The gallery
-does not write settings to disk. Customization uses an explicit content sheet,
-with arrow controls for order; drag reordering, cross-window customization and
-NSToolbar's native customization palette are not supplied.
+persists these values in its application-owned preference files. Customization
+uses an explicit content sheet with drag grips and keyboard-accessible arrow
+controls. Cross-window customization and NSToolbar's system palette are not supplied.
 
 
 Customization dragging is confined to the open panel in the same native window.
@@ -250,3 +250,10 @@ examples reset overrides and apply their common mode. Layout order/hidden settin
 are preserved when switching display. A child's explicit context menu takes
 precedence over the containing toolbar. Applications attach `ui.ContextMenu` to
 the public Toolbar node; existing menu options, callbacks and lifecycle apply.
+
+The customization grip now uses six dots and a grab cursor. The blue insertion
+marker eases to its new slot over 100 ms; it fades in without moving the rows or
+changing drop validation. Completion/cancellation removes the scene animation and
+preview immediately. Focus outlines follow the current enabled control and modal
+scope, including after repeated opening/closing; changing focus does not resize
+controls. Animation uses the existing native scene clock, with no drag timers.

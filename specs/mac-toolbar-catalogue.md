@@ -129,3 +129,14 @@ Mixed also offers its original mixed presentation. Per-toolbar display overrides
 and the common display choice are persisted in the version-1 preference document.
 Common gallery display buttons clear overrides. Opening customization from a menu
 uses the same retained customizer and external return-focus target.
+
+Customization polish uses bundled SymbolGrip (six dots), a native grab cursor,
+and a clipped blue insertion marker with a 100 ms ease-out/fade transition. A
+capture retains at most one core scene Animation; retargeting reuses it and every
+completion/cancellation synchronously removes animation, sprite and captured
+references. Animation reads native scene time, never goroutine timers or model
+callbacks. No backend pacing/rendering policy changes. Scoped, explicitly bordered
+buttons/checkboxes paint focus only when they own actual focus, are enabled and
+belong to the current modal/tab input projection. Resting/focused border allowance
+is stable. Background openers and stale native Focused flags cannot paint extra
+focus cues. Reduced-motion system preferences are not queried by this demo.

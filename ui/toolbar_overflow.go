@@ -12,7 +12,7 @@ func ToolbarOverflowID(id string) string { return id + "/overflow" }
 // WithToolbarOverflow returns a detached child list with a managed More actions
 // menu. The native adapter fits a prefix and moves the remaining actions into
 // this menu as available width changes. Supply a horizontal Toolbar containing
-// 1..64 Buttons/Separators, with a caption or accessible name on each action.
+// 1..64 Buttons/Separators/toolbar spaces, with a caption or accessible name on each action.
 // No editors, nested controls, placement sources or context menus are supported.
 // Call once per fresh toolbar description, after applying per-item presentation.
 // Validation rejects unsupported descriptions; ordinary Toolbar keeps scrolling.

@@ -277,7 +277,7 @@ func (c *ToolbarCustomizer) View() (result Node, err error) {
 			art.Kind = Icon
 			art.Icon = item.Icon
 		}
-		show := Node{ID: ToolbarCustomizationVisibilityID(id, itemID), Kind: Checkbox, Text: label, Checked: !hidden[itemID], Style: Style{GrowX: Some(float32(1)), Justify: Some(AlignStart)}, Accessibility: Accessibility{Name: "Show " + label, Help: "Include this item in the toolbar"}, Change: func(e ChangeEvent) {
+		show := Node{ID: ToolbarCustomizationVisibilityID(id, itemID), Kind: Checkbox, Text: label, Checked: !hidden[itemID], Style: Style{GrowX: Some(float32(1)), Justify: Some(AlignStart), Border: Some(Border{})}, Accessibility: Accessibility{Name: "Show " + label, Help: "Include this item in the toolbar"}, Change: func(e ChangeEvent) {
 			emit(func(value *ToolbarLayout) bool {
 				if slices.Index(value.Order, itemID) < 0 {
 					return false
@@ -302,7 +302,7 @@ func (c *ToolbarCustomizer) View() (result Node, err error) {
 				})
 			}
 		}
-		arrowStyle := Style{GrowX: Some(float32(0)), MinSize: Some(Size{Width: 22, Height: 22}), MaxSize: Some(Size{Width: 22, Height: 22}), Padding: Some(UniformInsets(2))}
+		arrowStyle := Style{GrowX: Some(float32(0)), MinSize: Some(Size{Width: 22, Height: 22}), MaxSize: Some(Size{Width: 22, Height: 22}), Padding: Some(UniformInsets(2)), Border: Some(Border{Width: 1, Color: color.NRGBA{R: 150, G: 150, B: 155, A: 140}}), Background: Some(color.NRGBA{})}
 		var drag *ToolbarReorderHandle
 		if available {
 			drag = epoch.handles[itemID]
@@ -341,7 +341,9 @@ func (c *ToolbarCustomizer) View() (result Node, err error) {
 				epoch.handles[itemID] = drag
 			}
 		}
-		grip := Node{ID: ToolbarCustomizationDragID(id, itemID), Kind: Button, Icon: SymbolMenu, Appearance: ButtonTool, Style: arrowStyle, Disabled: !available, ToolbarReorder: drag, Accessibility: Accessibility{Name: "Drag " + label + " to reorder", Help: "Drag to a new position. Use the adjacent arrow buttons with the keyboard."}}
+		gripStyle := arrowStyle
+		gripStyle.Border = Some(Border{})
+		grip := Node{ID: ToolbarCustomizationDragID(id, itemID), Kind: Button, Icon: SymbolGrip, Appearance: ButtonTool, Style: gripStyle, Disabled: !available, ToolbarReorder: drag, Accessibility: Accessibility{Name: "Drag " + label + " to reorder", Help: "Drag to a new position. Use the adjacent arrow buttons with the keyboard."}}
 		rows = append(rows, Node{ID: toolbarCustomizationItemID(id, itemID, "row"), Kind: Row, Style: Style{GrowX: Some(float32(1)), Align: Some(AlignCenter), Gap: Some(float32(8)), Padding: Some(Insets{Top: 4, Bottom: 4})}, Children: []Node{grip, art, show,
 			{ID: ToolbarCustomizationEarlierID(id, itemID), Kind: Button, Icon: SymbolUp, Appearance: ButtonTool, Disabled: index == 0, Style: arrowStyle, Accessibility: Accessibility{Name: "Move " + label + " earlier", Help: "Move one place toward the start"}, Activate: move(-1)},
 			{ID: ToolbarCustomizationLaterID(id, itemID), Kind: Button, Icon: SymbolDown, Appearance: ButtonTool, Disabled: index == len(items)-1, Style: arrowStyle, Accessibility: Accessibility{Name: "Move " + label + " later", Help: "Move one place toward the end"}, Activate: move(1)},
@@ -359,10 +361,10 @@ func (c *ToolbarCustomizer) View() (result Node, err error) {
 			{ID: id + "/help", Kind: Label, Text: "Choose the actions to show. Drag the grips or use the arrows to reorder. Changes apply immediately."},
 			{ID: id + "/items", Kind: Scroll, Style: Style{GrowX: Some(float32(1)), MaxSize: Some(Size{Height: 300}), Gap: Some(float32(2))}, Children: rows},
 			{ID: id + "/actions", Kind: Row, Style: Style{GrowX: Some(float32(1)), Justify: Some(AlignEnd), Gap: Some(float32(8))}, Children: []Node{
-				{ID: ToolbarCustomizationRestoreID(id), Kind: Button, Text: "Restore Defaults", Appearance: ButtonSecondary, Activate: func() {
+				{ID: ToolbarCustomizationRestoreID(id), Kind: Button, Text: "Restore Defaults", Appearance: ButtonSecondary, Style: Style{Border: Some(Border{Width: 1, Color: color.NRGBA{R: 150, G: 150, B: 155, A: 140}})}, Activate: func() {
 					emit(func(value *ToolbarLayout) bool { *value = ToolbarLayout{}; return true })
 				}},
-				{ID: done, Kind: Button, Text: "Done", Appearance: ButtonPrimary, Style: Style{Background: Some(color.NRGBA{R: 0, G: 112, B: 245, A: 255}), Foreground: Some(color.NRGBA{R: 255, G: 255, B: 255, A: 255})}, Activate: close},
+				{ID: done, Kind: Button, Text: "Done", Appearance: ButtonPrimary, Style: Style{Border: Some(Border{}), Background: Some(color.NRGBA{R: 0, G: 112, B: 245, A: 255}), Foreground: Some(color.NRGBA{R: 255, G: 255, B: 255, A: 255})}, Activate: close},
 			}},
 		}}
 	if err := Validate(n); err != nil {

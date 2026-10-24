@@ -28,15 +28,20 @@ type toolbarDragBinding struct {
 	active *toolbarDragGesture // originating render ownership only
 }
 type toolbarDragGesture struct {
-	scope    *toolbarDragScope
-	scroll   *core.Frame
-	rows     []*core.WidgetBase
-	start    image.Point
-	scale    float64
-	dragging bool
-	token    uint64
-	stage    *core.Stage
-	sprite   string
+	scope                                            *toolbarDragScope
+	scroll                                           *core.Frame
+	rows                                             []*core.WidgetBase
+	start                                            image.Point
+	scale                                            float64
+	dragging                                         bool
+	token                                            uint64
+	stage                                            *core.Stage
+	sprite                                           string
+	animation                                        *core.Animation
+	animationScene                                   *core.Scene
+	previewClip                                      image.Rectangle
+	lineY, fromY, targetY, elapsed, alpha, fromAlpha float32
+	hasLine                                          bool
 }
 
 func syncToolbarDrag(r *record) {
@@ -89,11 +94,14 @@ func (b *toolbarDragBinding) end() {
 	if g == nil {
 		return
 	}
+	g.hasLine = false
+	g.stopAnimation()
 	if g.scroll.Scene != nil {
 		g.scroll.Scene.Events.ReleasePointer(g.token)
 	}
 	if g.stage != nil {
 		g.stage.Sprites.Delete(g.sprite)
+		g.stage = nil
 	}
 	// No timers, application callbacks or captured row references survive exit.
 }
@@ -227,25 +235,97 @@ func (g *toolbarDragGesture) destination(p image.Point) (string, float32, bool) 
 	last := g.rows[len(g.rows)-1]
 	return "", last.Geom.Pos.Total.Y + last.Geom.Size.Actual.Total.Y, true
 }
-func (g *toolbarDragGesture) preview(p image.Point) {
-	if g.stage != nil {
-		g.stage.Sprites.Delete(g.sprite)
+
+// Native scene animations run only on originating render ownership. There is
+// at most one animation per captured gesture; exit removes it synchronously.
+func (g *toolbarDragGesture) stopAnimation() {
+	if a := g.animation; a != nil {
+		a.Done = true
+		a.Func = nil
+		a.Widget = nil
+		if g.animationScene != nil {
+			g.animationScene.Animations = slices.DeleteFunc(g.animationScene.Animations, func(other *core.Animation) bool { return other == a })
+		}
 	}
-	g.stage = nil
+	g.animation = nil
+	g.animationScene = nil
+}
+func (g *toolbarDragGesture) preview(p image.Point) {
 	scene := g.scroll.Scene
 	if scene == nil || scene.Stage == nil || scene.Stage.Main == nil {
 		return
 	}
 	_, y, valid := g.destination(p)
 	if !valid {
+		g.stopAnimation()
+		g.hasLine = false
+		if g.stage != nil {
+			g.stage.Sprites.Delete(g.sprite)
+		}
+		g.stage = nil
 		return
 	}
 	clip := g.scroll.Geom.ContentBBox.Add(scene.SceneGeom.Pos)
 	y += float32(scene.SceneGeom.Pos.Y)
 	y = max(float32(clip.Min.Y)+1, min(float32(clip.Max.Y)-1, y))
+	if g.hasLine && g.targetY == y && g.previewClip == clip {
+		return
+	}
+	g.previewClip = clip
 	g.stage = scene.Stage.Main
+	if !g.hasLine {
+		g.lineY = y
+		g.hasLine = true
+		g.alpha = .4
+	}
+	g.fromY = g.lineY
+	g.fromAlpha = g.alpha
+	g.targetY = y
+	g.elapsed = 0
+	g.publishLine()
+	if g.animation == nil {
+		a := &core.Animation{Widget: &g.scroll.WidgetBase}
+		a.Func = func(a *core.Animation) {
+			if !g.scope.input.allowed() || !g.hasLine || g.scroll.Scene != scene {
+				a.Done = true
+				return
+			}
+			// An explicit/manual clock may paint twice without advancing.
+			// Do not keep requesting redraws when interpolation cannot progress.
+			if a.Dt <= 0 {
+				return
+			}
+			g.elapsed += a.Dt
+			f := min(float32(1), g.elapsed/100)
+			eased := 1 - (1-f)*(1-f)*(1-f)
+			g.lineY = g.fromY + (g.targetY-g.fromY)*eased
+			g.alpha = g.fromAlpha + (1-g.fromAlpha)*eased
+			g.publishLine()
+			scene.NeedsRender()
+			if f >= 1 {
+				a.Done = true
+				g.animation = nil
+				g.animationScene = nil
+			}
+		}
+		g.animation = a
+		g.animationScene = scene
+		scene.Animations = append(scene.Animations, a)
+	}
+	scene.NeedsRender()
+}
+func (g *toolbarDragGesture) publishLine() {
+	if g.stage == nil || !g.hasLine || !g.scope.input.allowed() {
+		return
+	}
+	clip, y, scale, alpha := g.previewClip, g.lineY, float32(g.scale), g.alpha
+	col := color.NRGBA{R: 0, G: 112, B: 245, A: uint8(255 * alpha)}
+	thickness := max(float32(2), 2*scale)
+	line := max(float32(clip.Min.Y)+thickness/2, min(float32(clip.Max.Y)-thickness/2, y))
 	sprite := core.NewSprite(g.sprite, func(pc *paint.Painter) {
-		pc.FillBox(math32.Vec2(float32(clip.Min.X), y-1), math32.Vec2(float32(clip.Dx()), 2), colors.Uniform(color.NRGBA{R: 0, G: 112, B: 245, A: 255}))
+		// Immutable detached values: painting never mutates captures or follows refs.
+		pc.FillBox(math32.Vec2(float32(clip.Min.X)+2*scale, line-thickness/2), math32.Vec2(max(float32(0), float32(clip.Dx())-4*scale), thickness), colors.Uniform(col))
+		pc.FillBox(math32.Vec2(float32(clip.Min.X)+2*scale, line-3*scale), math32.Vec2(3*scale, 6*scale), colors.Uniform(col))
 	})
 	sprite.Active = true
 	g.stage.Sprites.Add(sprite)

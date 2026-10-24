@@ -1133,3 +1133,22 @@ context tests cover action/space forwarding, child-menu priority, lock-key-safe
 Shift-F10, exactly-once menu selection, focused-child restoration, disable/stale
 callbacks and shutdown. Gallery per-bar modes/customization and preference round
 trips, legacy reload and focused vet passed. No remaining actionable finding.
+
+## Toolbar interaction polish
+
+Prism Anthropic claude-sonnet-5-5 reviewed the original and corrected full
+checkpoints. Applied explicit terminal hasLine/stage guards in addition to
+synchronous animation removal; a late callback regression confirms it cannot
+recreate the sprite. Applied the final suggestion to compute immutable paint
+coordinates before publishing the closure. Animations skip zero elapsed time so
+an explicit clock cannot trigger a redraw loop; native scene time interpolation,
+retarget alpha continuity, exactly-once commit and all cancellation tests pass.
+Six-dot Grip artwork maps to the pinned bundled icon, with native grab cursor.
+
+Focus cues now combine actual native focus with an atomic current input-scope
+publication. Focus events explicitly restyle retained controls even when their
+Focused bit was already set. Light/dark tests open/close the panel repeatedly,
+check background suppression, stale flag handling and stable geometry. UI race
+tests, scaled customization routing, context/space tests, adjacent input activation/
+focus regressions, gallery tests, SDK contracts and vet passed. No backend policy
+or release gate changed. No remaining actionable Prism finding.

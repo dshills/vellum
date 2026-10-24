@@ -2,15 +2,19 @@ package cogent
 
 import (
 	"image"
+	"image/color"
 	"sync/atomic"
 
 	"cogentcore.org/core/colors"
+	"cogentcore.org/core/cursors"
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/ui"
 )
+
+var uiColorAccent = color.NRGBA{R: 0, G: 112, B: 245, A: 255}
 
 const inputOutlineProperty = "vellum.input-outline"
 
@@ -81,11 +85,24 @@ func styleManagedInputFocus(r *record, s *styles.Style) {
 		}
 		return
 	}
-	if r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton {
+	if r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton || r.node.Kind == ui.Checkbox {
 		style, err := ui.ResolveStyle(r.node, r.theme)
-		if err == nil && style.Border.Set && !nativeWindowActive(r) {
-			restoreManagedBorder(s, style.Border.Value)
-			s.StateLayer = 0
+		if r.node.ToolbarReorder != nil {
+			s.Cursor = cursors.Grab
+		}
+		if err == nil && style.Border.Set {
+			border := style.Border.Value
+			restoreManagedBorder(s, border)
+			s.MaxBorder = s.Border
+			s.MaxBorder.Width.Set(units.Dp(max(border.Width, 2)))
+			s.MaxBorder.Color.Set(colors.Uniform(uiColorAccent))
+			focused := s.Is(states.Focused) && r.widget.AsWidget().ContainsFocus() && nativeWindowActive(r) && r.focusVisibility.Load() != 2 && !controlDisabled(r)
+			if focused {
+				s.Border = s.MaxBorder
+			}
+			if !nativeWindowActive(r) || r.focusVisibility.Load() == 2 {
+				s.StateLayer = 0
+			}
 		}
 		return
 	}

@@ -32,6 +32,7 @@ const (
 	SymbolUp           Symbol = "up"
 	SymbolDown         Symbol = "down"
 	SymbolMenu         Symbol = "menu"
+	SymbolGrip         Symbol = "grip"
 	SymbolExpand       Symbol = "expand"
 	SymbolCollapse     Symbol = "collapse"
 	SymbolBackspace    Symbol = "backspace"
@@ -50,7 +51,7 @@ const (
 var symbols = [...]Symbol{SymbolAdd, SymbolRemove, SymbolCheck, SymbolClose,
 	SymbolSearch, SymbolSettings, SymbolSave, SymbolOpen, SymbolFolder, SymbolDocument, SymbolUndo, SymbolRedo,
 	SymbolCopy, SymbolCut, SymbolPaste, SymbolInfo, SymbolWarning, SymbolDelete,
-	SymbolLeft, SymbolRight, SymbolUp, SymbolDown, SymbolMenu, SymbolExpand, SymbolCollapse,
+	SymbolLeft, SymbolRight, SymbolUp, SymbolDown, SymbolMenu, SymbolGrip, SymbolExpand, SymbolCollapse,
 	SymbolBackspace, SymbolSidebar, SymbolCalculator, SymbolSun, SymbolCloud,
 	SymbolRain, SymbolWind, SymbolSunrise, SymbolPartlyCloudy, SymbolCircle, SymbolCircleCheck}
 

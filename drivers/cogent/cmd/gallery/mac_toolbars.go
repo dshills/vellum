@@ -218,7 +218,7 @@ func (m *macToolbarGallery) withOverflow(n ui.Node) ui.Node {
 func (m *macToolbarGallery) customizationHeading(id, title string) ui.Node {
 	return ui.Node{ID: id + "/heading", Kind: ui.Row, Style: ui.Style{GrowX: ui.Some(float32(1)), Align: ui.Some(ui.AlignCenter), Gap: ui.Some(float32(8))}, Children: []ui.Node{
 		{ID: id + "/label", Kind: ui.Label, Text: title, Style: ui.Style{GrowX: ui.Some(float32(1))}},
-		{ID: id + "/customize", Kind: ui.Button, Text: "Customize…", Appearance: ui.ButtonQuiet, Style: ui.Style{Padding: ui.Some(ui.Insets{Left: 6, Right: 6}), Typography: ui.Some(ui.Typography{Size: 12}), MaxSize: ui.Some(ui.Size{Height: 20})}, Accessibility: ui.Accessibility{Name: "Customize " + strings.TrimPrefix(id, "toolbar-") + " toolbar"}, Activate: func() { m.customizeTarget = id; m.customizer.Open = true }},
+		{ID: id + "/customize", Kind: ui.Button, Text: "Customize…", Appearance: ui.ButtonQuiet, Style: ui.Style{Border: ui.Some(ui.Border{}), Padding: ui.Some(ui.Insets{Left: 6, Right: 6}), Typography: ui.Some(ui.Typography{Size: 12}), MaxSize: ui.Some(ui.Size{Height: 20})}, Accessibility: ui.Accessibility{Name: "Customize " + strings.TrimPrefix(id, "toolbar-") + " toolbar"}, Activate: func() { m.customizeTarget = id; m.customizer.Open = true }},
 	}}
 }
 func (m *macToolbarGallery) configuredToolbar(canonical ui.Node) ui.Node {

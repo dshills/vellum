@@ -59,13 +59,14 @@ type Driver struct {
 	PresentationMetrics *PresentationMetrics
 }
 type record struct {
-	scope        app.WindowRef
-	widget       core.Widget
-	node         ui.Node
-	children     []*record
-	theme        ui.Theme
-	control      *controlState
-	inputOutline *inputOutlineState
+	scope           app.WindowRef
+	widget          core.Widget
+	node            ui.Node
+	children        []*record
+	theme           ui.Theme
+	control         *controlState
+	inputOutline    *inputOutlineState
+	focusVisibility atomic.Uint32 // 0 unpublished, 1 active input scope, 2 outside modal/tab scope
 }
 
 var processRun atomic.Bool
@@ -640,8 +641,14 @@ func mountShallowScoped(parent tree.Node, n ui.Node, a *app.Application, scope a
 			r.widget.(*core.Text).AllocationLayout = err == nil && (value.TextAlign.Set || value.GrowX.Set || value.GrowY.Set)
 		}
 	})
-	if r.node.Kind == ui.Row || r.node.Kind == ui.TextField || r.node.Kind == ui.NumberField || r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton {
+	if r.node.Kind == ui.Row || r.node.Kind == ui.TextField || r.node.Kind == ui.NumberField || r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton || r.node.Kind == ui.Checkbox {
 		r.widget.AsWidget().FinalStyler(func(s *styles.Style) { styleManagedInputFocus(r, s) })
+		if r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton || r.node.Kind == ui.Checkbox {
+			// Retained controls can already carry Focused when native focus changes.
+			// Restyle on the actual focus event even if no state bit changed.
+			r.widget.AsWidget().OnFocus(func(events.Event) { r.widget.AsWidget().Restyle() })
+			r.widget.AsWidget().OnFocusLost(func(events.Event) { r.widget.AsWidget().Restyle() })
+		}
 	}
 	return r, nil
 }

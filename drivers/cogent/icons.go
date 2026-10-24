@@ -64,6 +64,8 @@ func nativeSymbol(symbol ui.Symbol) icons.Icon {
 		return icons.KeyboardArrowUp
 	case ui.SymbolDown:
 		return icons.KeyboardArrowDown
+	case ui.SymbolGrip:
+		return icons.DragIndicator
 	case ui.SymbolMenu:
 		return icons.Menu
 	case ui.SymbolExpand:
