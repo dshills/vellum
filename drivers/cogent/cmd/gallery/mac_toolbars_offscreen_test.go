@@ -114,6 +114,9 @@ func testMacToolbarsPublicManual(t *testing.T, dark bool) {
 		return cogent.ManualElement{}
 	}
 
+	if vertical, viewport := find("toolbar-vertical").Bounds, find("toolbars").Bounds; vertical.Empty() || !vertical.In(viewport) {
+		t.Fatal("vertical example clipped in standard window", vertical, viewport)
+	}
 	heights := []int{}
 	for _, size := range macToolbarSizes {
 		box := find("toolbar-" + size.name + "/New").Bounds

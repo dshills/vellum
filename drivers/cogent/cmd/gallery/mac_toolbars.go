@@ -109,6 +109,15 @@ func (m *macToolbarGallery) view() ui.Node {
 			mixed.Children[i] = m.action("toolbar-mixed", "Open", ui.SymbolFolder, macToolbarSizes[1], "text")
 		}
 	}
-	children = append(children, ui.Node{ID: "toolbar-mixed-label", Kind: ui.Label, Text: "Mixed · text, icons and labels together"}, mixed, ui.Node{ID: "toolbar-vertical-label", Kind: ui.Label, Text: "Vertical · scroll to reveal more tools"}, m.toolbar("toolbar-vertical", macToolbarSizes[1], "icons", true), ui.Node{ID: "toolbar-limits", Kind: ui.Label, Text: "Content toolbars with retained scrolling overflow. No title-bar integration, customization palette, or overflow menu."})
-	return ui.Node{ID: "toolbars", Kind: ui.Scroll, Grow: true, Style: ui.Style{Padding: ui.Some(ui.UniformInsets(16)), Gap: ui.Some(float32(10)), Background: ui.Some(background)}, Children: children}
+	children = append(children, ui.Node{ID: "toolbar-extra-examples", Kind: ui.Row, Style: ui.Style{GrowX: ui.Some(float32(1)), Align: ui.Some(ui.AlignStart), Gap: ui.Some(float32(16))}, Children: []ui.Node{
+		{ID: "toolbar-mixed-column", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1)), Gap: ui.Some(float32(10))}, Children: []ui.Node{
+			{ID: "toolbar-mixed-label", Kind: ui.Label, Text: "Mixed · text, icons and labels together"}, mixed,
+			{ID: "toolbar-limits", Kind: ui.Label, Text: "Content toolbars with retained scrolling overflow. No title-bar integration, customization palette, or overflow menu."},
+		}},
+		{ID: "toolbar-vertical-column", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(0)), Gap: ui.Some(float32(10)), MinSize: ui.Some(ui.Size{Width: 72}), MaxSize: ui.Some(ui.Size{Width: 72})}, Children: []ui.Node{
+			{ID: "toolbar-vertical-label", Kind: ui.Label, Text: "Vertical"}, m.toolbar("toolbar-vertical", macToolbarSizes[1], "icons", true),
+		}},
+	}})
+
+	return ui.Node{ID: "toolbars", Kind: ui.Scroll, Grow: true, Style: ui.Style{Padding: ui.Some(ui.UniformInsets(16)), Gap: ui.Some(float32(8)), Background: ui.Some(background)}, Children: children}
 }

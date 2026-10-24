@@ -896,3 +896,9 @@ to horizontal samples, as documented; the vertical bar deliberately keeps its
 choices, while the top selector controls the three size comparisons. Delete is
 deliberately disabled, documented in the page, guide and spec, and skipped by
 the actual keyboard regression. No remaining demonstrated correctness issue.
+
+The native toolbar catalogue follow-up places mixed and vertical examples beside
+one another and reduces page gaps. Both-theme public Manual geometry confirms
+the vertical toolbar fits the standard 660x780 scene. Focused race tests and
+rebuild pass; Prism viewport review reports zero findings. Native screenshots
+are inspected again after packaging.
