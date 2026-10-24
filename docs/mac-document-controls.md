@@ -33,3 +33,25 @@ Up/Down moves rows and Return/double-click opens a leaf or toggles a branch.
 Disclosure also has accessible expand/collapse actions. Optional ContextMenu
 reuses existing source-list contextual actions. There is no item dragging,
 filesystem traversal, lazy child loading or built-in persistence.
+
+## Native Colors panel
+
+Get `Application.ColorPanels()` and call `ChooseColor` on a worker with an exact
+live parent WindowRef and ColorPanelOptions. The actual AppKit NSColorPanel offers
+its normal pickers, optional opacity, and a small accessory with Use Color/Cancel.
+Apply returns an sRGB straight-alpha `color.NRGBA`; extended-gamut values clamp to
+sRGB bytes. Cancel/Escape/close returns ErrCanceled. Preview is optional, runs
+serially on that calling worker, and coalesces to one latest value. Publish through
+window-scoped posts, guarded by your session epoch; commit only the returned value
+through a reserved completion. The gallery demonstrates that separation.
+
+One native document panel is admitted per process. A Colors panel previously
+created outside this service is refused with ErrServiceBusy because AppKit exposes
+no target/action getters to restore a foreign owner safely. Do not mix direct
+AppKit ownership of the shared panel with this service. Parent closure, context
+cancellation and shutdown revoke the session, remove observers/child attachment,
+hide the panel and restore its prior appearance/accessory state. Hidden/minimized
+parents refuse without activating another Space. Other platforms return unavailable.
+Offscreen tests compile the native path and cover request/reply parsing, exact
+parent revocation and bounded preview delivery without creating any native panel.
+Actual AppKit interaction is checked separately after the final package.

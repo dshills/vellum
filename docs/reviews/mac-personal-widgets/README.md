@@ -1434,3 +1434,11 @@ Prism: `mac-outline.json` (Anthropic Claude Sonnet 5.5, complete coverage).
 All four Prism concerns were checked against source and regression evidence. Native Update reruns the retained row and nested disclosure Maker; a new test removes/re-adds children without replacing the Switch. Arrow keys intentionally clamp at hierarchy edges so they cannot escape into unrelated controls; row guards and disabled native targets reject disabled actions. virtual.NewTree rejects missing parents/cycles before depth traversal, and tests exercise malformed graphs. Old callbacks reproject current visible state and compare parent identity; added reparent/disable regressions prove revocation before another View. Pointer disclosure preserves hidden selection without leaking selection/activation; keyboard and light/dark raster checks pass. No rendering or release-policy changes.
 
 Focused checks: `mac-outline-checks.json`, `mac-outline-reviewed-checks.json`.
+
+## Add native Colors panel with bounded live previews and lifetime cleanup
+
+Prism: `native-colors.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism concern was checked against synchronous admission: nativeOperationRun calls start synchronously before returning; the token is assigned before registering any preview entry. Refused/canceled admission registers nothing, proven by an added regression. The nested lifetime wrapper delegates Err to the original exact-parent context immediately, preserving revocation before asynchronous cancellation propagation; the real protocol fixture proves this. Terminal delivery has at most one pending coalesced preview and no callback invokes owner code. Options/reply/foreign-parent, registry cleanup and Foundation-only recipe tests pass, along with the gallery offscreen render. Actual shared-panel presentation, Apply/Cancel and live preview remain for the authorized final desktop checks.
+
+Focused checks: `native-colors-checks.json`, `native-colors-reviewed-checks.json`.
