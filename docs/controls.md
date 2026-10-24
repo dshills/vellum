@@ -119,6 +119,10 @@ human VoiceOver and physical input checks remain part of Mac qualification.
 See the [controls contract](../specs/controls.md) for detailed event, focus,
 editing, accessibility and lifetime behavior.
 
+The Mac gallery’s Toolbars page compares three action sizes, icon/text display
+modes, mixed controls, separators and vertical/narrow previews. See the
+[Mac toolbar recipes](mac-toolbars.md).
+
 Toolbars retain their child controls when a narrow viewport requires scrolling.
 They support horizontal/default or vertical Orientation. Tab visits child controls;
 unconsumed arrows wrap through enabled children, and Home/End focus the first/last.

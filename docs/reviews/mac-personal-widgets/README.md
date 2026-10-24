@@ -879,3 +879,20 @@ ink application and withdrawal, with selection colors retained; controlled actua
 keyboard tab navigation and both-theme gallery composition regressions pass.
 The native app is rebuilt from the tested source; live appearance observations
 are recorded in the local delivery receipt.
+
+## Mac toolbar catalogue
+
+Three size recipes and three display modes use existing public Toolbar/Button
+nodes. Mixed, vertical and narrow examples share owner-held count/status.
+Focused gallery race tests, public Manual geometry/identity/overflow routing,
+gallery composition and vet pass; native packaging uses the tested build.
+
+Applied the initial stable-item suggestion: mixed presentation now matches IDs,
+not array positions. The final zero-MaxSize question is answered by ui.Size's
+explicit contract: a zero maximum dimension is unbounded. Both-theme mounted
+geometry and overflowing focus tests pass with that value. Narrow applies only
+to horizontal samples, as documented; the vertical bar deliberately keeps its
+72x154 viewport. Mixed and vertical bars intentionally retain their own display
+choices, while the top selector controls the three size comparisons. Delete is
+deliberately disabled, documented in the page, guide and spec, and skipped by
+the actual keyboard regression. No remaining demonstrated correctness issue.

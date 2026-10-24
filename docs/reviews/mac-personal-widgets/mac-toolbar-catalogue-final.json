@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "8f2d2fd613927e7baa811df5f92d5d2b",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "769b131cc81240caa3be85ec9474505137fe70e0",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "62e18bf6ddc9ae24",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Zero MaxSize dimension may constrain layout",
+      "message": "In the vertical toolbar, style.MaxSize is overwritten to Width 72 Height 154 after the narrow cap, which discards the narrow setting; additionally in the horizontal case MaxSize for the toolbar sets Height 0 which may be interpreted as an explicit zero limit rather than unset, depending on ui.Size semantics.",
+      "suggestion": "Verify that a zero Width/Height in MaxSize means unconstrained; otherwise avoid specifying it.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_toolbars.go",
+          "lines": {
+            "start": 40,
+            "end": 40
+          }
+        }
+      ],
+      "tags": [
+        "layout",
+        "location-corrected"
+      ],
+      "evidence": "style.MaxSize = ui.Some(ui.Size{Width: size.height, Height: size.height})",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "dfbb2b64379064c7",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Mixed toolbar overrides ignore display mode",
+      "message": "Toolbars page always reuses the same node IDs for the same sizes regardless of narrow state, but more importantly the 'toolbar-mixed' bar and the 'toolbar-vertical' bar both contain IDs like \"toolbar-mixed/Delete\" and separator IDs; the separator ID is id+\"/separator\" which is unique per bar, so fine. However, the action Activate closure for \"Delete\" and disabled state are hardcoded by name, so a user-visible Delete is never activatable and the mixed-bar override replaces nodes by index while ignoring m.display, so the display switch is silently ignored for mixed bar. Low impact.",
+      "suggestion": "Keep as is if intended; otherwise document.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_toolbars.go",
+          "lines": {
+            "start": 101,
+            "end": 101
+          }
+        }
+      ],
+      "tags": [
+        "gallery",
+        "location-corrected"
+      ],
+      "evidence": "mixed := m.toolbar(\"toolbar-mixed\", macToolbarSizes[1], \"icons\", false)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6589,
+    "totalMs": 6626
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 30001,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 16604,
+        "output": 727,
+        "costUSD": 0.040478
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -1,7 +1,7 @@
 # Mac widget demo
 
 This private personal-use gallery includes Sidebar, Sheet, Collection, Shortcuts
-and Levels pages, plus the earlier controls on the Inputs page. All controls
+and Levels pages, a Toolbar catalogue, plus the earlier controls on the Inputs page. All controls
 are reusable through public Go APIs.
 For application code, see the [public-API integration guide](mac-widget-integration.md).
 
@@ -18,6 +18,12 @@ top tab strip. Each page fills the available width and uses its fixed light/dark
 window surface; scroll within Inputs to reach its sections. The ordinary macOS title bar remains draggable.
 
 
+- **Toolbars:** compare Small (26 pt), Regular (32 pt), and Large (40 pt) action
+  heights. Switch Icons / Text / Icons and text without recreating actions.
+  A mixed document bar shows per-item choices; a vertical bar demonstrates scrolling.
+  Narrow preview constrains horizontal bars to 280 pt. Tab enters actions; arrows,
+  Home and End move/reveal enabled tools. Delete is intentionally disabled.
+  Actions update a counter only; no document files are opened or changed.
 - **Sidebar:** choose an icon row to navigate. Section triangles collapse/expand
   groups; Tab visits section lists and arrows choose enabled rows. Archive is
   deliberately disabled. Badges show sample counts. This demonstration navigates
