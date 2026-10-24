@@ -167,3 +167,24 @@ retirement revoke queued delivery. Detach clears item targets/delegate, registry
 images and callback reachability. Unsupported backends/configurations fail before
 native startup. Existing content toolbars and their settings remain independent.
 See [prototype scope and usage](../docs/native-titlebar-toolbar-prototype.md).
+
+
+### Native customization and persistence
+
+An explicit stable CustomizationID enables AppKit's native palette, display-mode
+choices and autosaved configuration, independently of portable ToolbarLayout.
+Its catalogue/commands remain immutable. IDs are bounded ASCII settings namespaces
+and light/dark gallery bars must not share one. AppKit owns the opaque user-default
+format; attachment must not overwrite restored order/display/visibility. Missing
+retired actions cannot construct callbacks; new actions remain in the palette.
+Native layouts admit at most 32 slots including spaces. Full-color images must
+remain non-template on toolbar, palette and overflow, including after removal,
+re-add and relaunch. Customization is macOS15+; empty IDs keep prior behavior.
+
+Native palette entry must revoke queued commands before AppKit begins editing;
+palette exit, managed-modal transitions, toolbar item removal/reinsertion and
+window closure cannot revive an old permission. Native activation must match a
+current toolbar item/overflow representation rather than any old ID. Detached
+palette previews, removed items and menu forms must have their targets cleared.
+A scoped asynchronous CustomizeTitlebarToolbar request and gallery entry point
+must recover hidden/empty toolbars without requiring titlebar hit testing.

@@ -1239,3 +1239,34 @@ four-file correction with complete coverage and zero findings. Prior native
 checks passed real titlebar window movement, New action, modal disabling and
 restoration, narrow native overflow and Redo action, and a native close followed
 by a new-process launch. Rebuilt final light/dark visuals are checked separately.
+
+## Native titlebar customization and autosave
+
+Prism Anthropic claude-sonnet-5-5 reviewed the complete checkpoint twice with
+complete coverage. The initial scope-return finding is contradicted by the
+actual setCustomizing code: successful unchanged samples explicitly return true.
+The bool means admission, not change. Added repeated-entry/exit regression checks
+both the true result and stable permission identity, so duplicate KVO samples
+cannot revoke a newly restored scope. All tests pass.
+
+The final report's `[REDACTED]` build finding concerns Prism's rendered input,
+not repository source. owner.token=token and owner.window=window are explicitly
+assigned before native registry insertion in titlebar_toolbar_darwin.m, and the
+native build succeeds. No placeholder exists in the compiled source. Its other
+finding hypothesizes missing KVO. Customizable attachment explicitly requires
+macOS15+, where customizationPaletteIsRunning is documented as observable. The
+owner observes it before native attachment and removes that observation exactly
+once during native-main detach. Entry revokes before calling AppKit; failed/
+synchronous entry reconciles in finally; asynchronous sheet exit is observed.
+A polling timer or another modal state source is not introduced for an
+unsupported hypothetical missed OS notification. Native exit/reactivation checks
+follow packaging; no remaining demonstrated actionable review finding.
+
+Focused race tests pass for stable/invalid settings IDs, immutable catalogue,
+queued palette round trips, duplicate samples, managed-modal precedence, item
+membership changes, bridge/window retirement and foreign/plain recovery requests.
+Gallery tests cover independent light/dark IDs and original full-color command
+artwork. Adjacent native window/focus policies, existing toolbar/preferences
+regressions, vet and native build pass. AppKit owns the opaque persisted format;
+real customization/autosave/relaunch observations are separate in the local app
+receipt. No portable widget contract, renderer or pacing policy changed.

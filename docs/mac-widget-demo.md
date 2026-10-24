@@ -151,3 +151,9 @@ The current personal package also enables the
 starts on Toolbars. Its full-color titlebar commands update the sample action
 status. Content-toolbar controls and saved customization remain independent.
 Use `-native-titlebar=false` to launch the content-only gallery from source.
+
+Use **Customize Titlebar…** to open the native macOS customization palette, or
+right/Control-click the titlebar toolbar. Drag tools to reorder/remove/re-add them
+and use native display options; AppKit remembers these across launches separately
+for light and dark. This button also recovers a hidden native toolbar. Full-color
+artwork is retained. Native customization requires macOS 15+.

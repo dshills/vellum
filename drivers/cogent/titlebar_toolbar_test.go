@@ -196,3 +196,121 @@ func TestTitlebarPrototypeBridgeRetirementRevokesPendingActions(t *testing.T) {
 		t.Fatal("pending input not revoked until native detach")
 	}
 }
+
+func TestTitlebarPrototypeCustomizationIdentity(t *testing.T) {
+	a, spec, _ := prototypeFixture(t)
+	spec.CustomizationID = "com.example.documents.light-v1"
+	prepared, err := prepareTitlebarToolbar(a, spec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	spec.CustomizationID = "changed"
+	if prepared.customizationID != "com.example.documents.light-v1" {
+		t.Fatal("settings identity was not copied")
+	}
+	for _, id := range []string{"bad\x00id", "é", "has space", strings.Repeat("x", 129)} {
+		spec.CustomizationID = id
+		if _, err = prepareTitlebarToolbar(a, spec); err == nil {
+			t.Fatal("invalid customization ID accepted", id)
+		}
+	}
+	spec.CustomizationID = ""
+	plain, err := prepareTitlebarToolbar(a, spec)
+	if err != nil || plain.customizationID != "" {
+		t.Fatal("legacy unsaved configuration changed", err)
+	}
+}
+func TestTitlebarPrototypeCustomizationScopeAndMembership(t *testing.T) {
+	for _, revoke := range []string{"palette-round-trip", "items-changed", "managed-while-palette", "close-while-palette"} {
+		t.Run(revoke, func(t *testing.T) {
+			a, spec, count := prototypeFixture(t)
+			p, err := prepareTitlebarToolbar(a, spec)
+			if err != nil {
+				t.Fatal(err)
+			}
+			binding := newTitlebarToolbarBinding(a, p)
+			binding.setAllowed(true)
+			if !binding.deliver("new") {
+				t.Fatal("initial input refused")
+			}
+			switch revoke {
+			case "items-changed":
+				binding.itemsChanged()
+			case "palette-round-trip":
+				if !binding.setCustomizing(true) || binding.deliver("new") {
+					t.Fatal("palette allowed source command")
+				}
+				active := binding.permission.Load()
+				if !binding.setCustomizing(true) || binding.permission.Load() != active {
+					t.Fatal("duplicate native palette entry was refused or retired twice")
+				}
+				if !binding.setCustomizing(false) {
+					t.Fatal("palette exit refused")
+				}
+				restored := binding.permission.Load()
+				if !binding.setCustomizing(false) || binding.permission.Load() != restored {
+					t.Fatal("duplicate native palette exit retired restored permission")
+				}
+
+			case "managed-while-palette":
+				binding.setCustomizing(true)
+				binding.setAllowed(false)
+				binding.setCustomizing(false)
+				if binding.deliver("new") || binding.setCustomizing(true) {
+					t.Fatal("native palette bypassed managed modal")
+				}
+			case "close-while-palette":
+				binding.setCustomizing(true)
+				binding.close()
+				binding.setCustomizing(false)
+			}
+			if err = a.Drain(); err != nil {
+				t.Fatal(err)
+			}
+			if *count != 0 {
+				t.Fatal("stale input survived customization")
+			}
+			if revoke != "close-while-palette" {
+				binding.setAllowed(true)
+				if !binding.deliver("new") {
+					t.Fatal("input not restored")
+				}
+				if err = a.Drain(); err != nil {
+					t.Fatal(err)
+				}
+				if *count != 1 {
+					t.Fatal("restored action not exactly once")
+				}
+			}
+		})
+	}
+}
+func TestTitlebarPrototypeCustomizationRequestRejectsForeignOrPlainWindow(t *testing.T) {
+	a, spec, _ := prototypeFixture(t)
+	p, err := prepareTitlebarToolbar(a, spec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	bridge := newAccessibilityBridge(a)
+	defer bridge.closeFrom("customization-request-test")
+	bridge.bindScoped(spec.Window)
+	bridge.titlebar.Store(newTitlebarToolbarBinding(a, p))
+	if err = CustomizeTitlebarToolbar(spec.Window); err == nil {
+		t.Fatal("plain toolbar accepted palette request")
+	}
+	if err = CustomizeTitlebarToolbar(app.WindowRef{}); err == nil {
+		t.Fatal("zero window accepted")
+	}
+	other, err := app.New(app.Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer other.Close()
+	foreign, err := other.OpenWindow(scopeDeclaration(spec.Window.ID()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = CustomizeTitlebarToolbar(foreign); err == nil {
+		t.Fatal("foreign window accepted")
+	}
+}

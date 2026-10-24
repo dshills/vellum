@@ -12,6 +12,7 @@ import (
 // The toolbar catalogue composes only existing public nodes and local styles.
 // Applications can copy these recipes without depending on gallery internals.
 type macToolbarGallery struct {
+	customizeNative  func()
 	preferencesPath  string
 	preferencesError error
 	dark             bool
@@ -151,6 +152,9 @@ func (m *macToolbarGallery) view() ui.Node {
 		modes = append(modes, n)
 	}
 	children := []ui.Node{{ID: "toolbar-title", Kind: ui.Label, Text: "Toolbars", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 20, Weight: 600})}}, {ID: "toolbar-help", Kind: ui.Label, Text: "Compare sizes and display modes. Actions update the status below; Delete is deliberately disabled."}, {ID: "toolbar-display", Kind: ui.Row, Children: modes}, {ID: "toolbar-options", Kind: ui.Row, Children: []ui.Node{{ID: "toolbar-color", Kind: ui.Checkbox, Text: "Full-color icons", Checked: m.fullColor, Change: func(e ui.ChangeEvent) { m.fullColor = e.Checked }}, {ID: "toolbar-overflow-menu", Kind: ui.Checkbox, Text: "Overflow menu", Checked: m.overflowMenu, Change: func(e ui.ChangeEvent) { m.overflowMenu = e.Checked }}, {ID: "toolbar-narrow", Kind: ui.Checkbox, Text: "Narrow preview", Checked: m.narrow, Change: func(e ui.ChangeEvent) { m.narrow = e.Checked }}, {ID: "toolbar-disable", Kind: ui.Checkbox, Text: "Disable actions", Checked: m.disabled, Change: func(e ui.ChangeEvent) { m.disabled = e.Checked }}}}}
+	if m.customizeNative != nil {
+		children = append(children, ui.Node{ID: "toolbar-native-customize", Kind: ui.Button, Text: "Customize Titlebar…", Accessibility: ui.Accessibility{Help: "Show the native titlebar toolbar and its macOS customization palette"}, Style: ui.Style{GrowX: ui.Some(float32(0))}, Activate: m.customizeNative})
+	}
 	if m.preferencesError != nil {
 		children = append(children, ui.Node{ID: "toolbar-preferences-error", Kind: ui.Label, Text: "Toolbar settings: " + m.preferencesError.Error()})
 	}

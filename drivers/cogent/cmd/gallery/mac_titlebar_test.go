@@ -23,7 +23,7 @@ func TestMacNativeTitlebarPrototypeUsesIndependentFullColorActions(t *testing.T)
 		if err != nil {
 			t.Fatal(err)
 		}
-		if p.Window != ref || len(p.Items) != 8 {
+		if p.Window != ref || len(p.Items) != 8 || p.CustomizationID == "" || m.toolbars.customizeNative == nil {
 			t.Fatal("prototype config")
 		}
 		m.toolbars.disabled = true
@@ -47,6 +47,38 @@ func TestMacNativeTitlebarPrototypeUsesIndependentFullColorActions(t *testing.T)
 		}
 		if m.toolbars.count != 5 {
 			t.Fatal("unexpected action count")
+		}
+		a.Close()
+	}
+}
+
+func TestNativeTitlebarCustomizationSettingsAreStableAndAppearanceScoped(t *testing.T) {
+	ids := map[string]bool{}
+	for _, dark := range []bool{false, true} {
+		m := newMacWidgetsGallery(newInputHelpersGallery(), dark)
+		a, err := app.New(app.Config{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		ref, err := a.OpenWindow(app.Window{ID: "gallery", Title: "Gallery", Width: 660, Height: 740, View: m.view})
+		if err != nil {
+			t.Fatal(err)
+		}
+		first, err := m.titlebarPrototype(ref)
+		if err != nil {
+			t.Fatal(err)
+		}
+		second, err := m.titlebarPrototype(ref)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if first.CustomizationID != second.CustomizationID || ids[first.CustomizationID] {
+			t.Fatal("settings namespace unstable or shared across appearances")
+		}
+		ids[first.CustomizationID] = true
+		node := findGalleryDocumentNode(m.toolbars.view(), "toolbar-native-customize")
+		if node.Activate == nil || node.Text != "Customize Titlebar…" {
+			t.Fatal("hidden toolbar recovery unavailable")
 		}
 		a.Close()
 	}

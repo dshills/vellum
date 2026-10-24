@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "7b798ba20078eb90bd59ace259d5cc02",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "8ed6b755081ea8957491ec79cf046d10b09d01b0",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "cf98ab5c648ce064",
+      "severity": "medium",
+      "category": "bug",
+      "title": "setCustomizing returns true even when state unchanged ambiguous",
+      "message": "On palette exit the ObjC side calls the scope function with customizing=0, but the Go return value is ignored. Separately, setCustomizing(true) returns false when the state is already customizing (via no-op), so the ObjC runCustomizationPalette path can return early while a palette is already considered running. A reentrant or repeated call mismatches Go and native state; permission could stay revoked.",
+      "suggestion": "Make setCustomizing return true when the requested state is already satisfied, or have the native side distinguish refused from unchanged.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/titlebar_toolbar_darwin.go",
+          "lines": {
+            "start": 80,
+            "end": 81
+          }
+        }
+      ],
+      "tags": [
+        "state-sync",
+        "location-corrected"
+      ],
+      "evidence": "func vellumTitlebarCustomizationScope(token C.uint64_t, customizing C.int) C.int {\n\tif titlebarBindingForToken(uint64(token)).setCustomizing(customizing != 0) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4434,
+    "totalMs": 4469
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 11,
+    "bytes": 46506,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 23838,
+        "output": 380,
+        "costUSD": 0.051476
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

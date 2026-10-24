@@ -3,8 +3,10 @@ package cogent
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"image/png"
+	"sync"
 	"sync/atomic"
 	"unicode"
 	"unicode/utf8"
@@ -18,10 +20,15 @@ import (
 // ui.Toolbar. Configure before Driver.Run; do not mutate during Run. Additional
 // windows/reopened lifetimes and ChromeUnified are refused in this prototype.
 // AppKit owns placement, overflow, accessibility, and native button appearance.
-// The toolbar has no native customization or configuration persistence yet.
+// A nonempty CustomizationID enables AppKit customization and autosave on macOS
+// 15+. An empty ID retains the original noncustomizable, unsaved prototype.
 type TitlebarToolbarPrototype struct {
 	Window app.WindowRef
 	Items  []TitlebarToolbarItem
+	// CustomizationID is a stable application/window-kind settings namespace,
+	// independent of WindowRef. Use different IDs for independently saved bars.
+	// ASCII letters, digits, dot, underscore and hyphen; at most 128 bytes.
+	CustomizationID string
 }
 
 // TitlebarToolbarItem supports Button, ToolbarSpace and ToolbarFlexibleSpace.
@@ -46,9 +53,10 @@ type titlebarWireItem struct {
 	Disabled bool   `json:"disabled"`
 }
 type preparedTitlebarToolbar struct {
-	ref     app.WindowRef
-	wire    string
-	actions map[string]func()
+	ref             app.WindowRef
+	customizationID string
+	wire            string
+	actions         map[string]func()
 }
 
 func toolbarPrototypeText(s string) bool {
@@ -76,7 +84,15 @@ func prepareTitlebarToolbar(a *app.Application, spec *TitlebarToolbarPrototype) 
 	if len(spec.Items) == 0 || len(spec.Items) > 16 {
 		return nil, fmt.Errorf("cogent: titlebar prototype requires 1..16 items")
 	}
-	p := &preparedTitlebarToolbar{ref: spec.Window, actions: map[string]func(){}}
+	if len(spec.CustomizationID) > 128 {
+		return nil, fmt.Errorf("cogent: titlebar customization ID is too long")
+	}
+	for _, c := range spec.CustomizationID {
+		if !(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '.' || c == '_' || c == '-') {
+			return nil, fmt.Errorf("cogent: invalid titlebar customization ID")
+		}
+	}
+	p := &preparedTitlebarToolbar{ref: spec.Window, customizationID: spec.CustomizationID, actions: map[string]func(){}}
 	wire := make([]titlebarWireItem, 0, len(spec.Items))
 	seen := map[string]bool{}
 	buttons := 0
@@ -133,10 +149,12 @@ func (p *preparedTitlebarToolbar) accepts(ref app.WindowRef) bool { return p == 
 // trips. No UI model is read by the native-main callback.
 type titlebarPermission struct{ allowed bool }
 type titlebarToolbarBinding struct {
-	owner      *app.Application
-	config     *preparedTitlebarToolbar
-	permission atomic.Pointer[titlebarPermission]
-	closed     atomic.Bool
+	owner                       *app.Application
+	scopeMu                     sync.Mutex
+	managedAllowed, customizing bool
+	config                      *preparedTitlebarToolbar
+	permission                  atomic.Pointer[titlebarPermission]
+	closed                      atomic.Bool
 }
 
 func newTitlebarToolbarBinding(a *app.Application, p *preparedTitlebarToolbar) *titlebarToolbarBinding {
@@ -145,21 +163,57 @@ func newTitlebarToolbarBinding(a *app.Application, p *preparedTitlebarToolbar) *
 	return b
 }
 func (b *titlebarToolbarBinding) setAllowed(allowed bool) bool {
-	if b == nil || b.closed.Load() {
+	if b == nil {
 		return false
 	}
-	old := b.permission.Load()
-	if old != nil && old.allowed == allowed {
+	b.scopeMu.Lock()
+	defer b.scopeMu.Unlock()
+	if b.closed.Load() || b.managedAllowed == allowed {
 		return false
 	}
-	b.permission.Store(&titlebarPermission{allowed: allowed})
+	b.managedAllowed = allowed
+	b.publishPermissionLocked()
 	return true
 }
-func (b *titlebarToolbarBinding) close() {
-	if b != nil {
-		b.closed.Store(true)
-		b.permission.Store(&titlebarPermission{})
+func (b *titlebarToolbarBinding) publishPermissionLocked() {
+	b.permission.Store(&titlebarPermission{allowed: b.managedAllowed && !b.customizing && !b.closed.Load()})
+}
+
+// setCustomizing returns admission, including an already-satisfied request;
+// duplicate AppKit/KVO samples must not revoke a current permission again.
+func (b *titlebarToolbarBinding) setCustomizing(customizing bool) bool {
+	if b == nil {
+		return false
 	}
+	b.scopeMu.Lock()
+	defer b.scopeMu.Unlock()
+	if b.closed.Load() || (customizing && !b.managedAllowed) {
+		return false
+	}
+	if b.customizing != customizing {
+		b.customizing = customizing
+		b.publishPermissionLocked()
+	}
+	return true
+}
+func (b *titlebarToolbarBinding) itemsChanged() {
+	if b == nil {
+		return
+	}
+	b.scopeMu.Lock()
+	defer b.scopeMu.Unlock()
+	if !b.closed.Load() {
+		b.publishPermissionLocked()
+	}
+}
+func (b *titlebarToolbarBinding) close() {
+	if b == nil {
+		return
+	}
+	b.scopeMu.Lock()
+	defer b.scopeMu.Unlock()
+	b.closed.Store(true)
+	b.publishPermissionLocked()
 }
 func (b *titlebarToolbarBinding) deliver(id string) bool {
 	if b == nil || b.closed.Load() {
@@ -184,4 +238,40 @@ func deliverTitlebarToolbarAction(token uint64, id string) bool {
 	b := accessibilityRegistry.bridges[token]
 	accessibilityRegistry.Unlock()
 	return b != nil && !b.closed.Load() && b.titlebar.Load().deliver(id)
+}
+
+// CustomizeTitlebarToolbar asynchronously asks AppKit to show the toolbar and
+// its native customization palette. This also recovers a toolbar hidden through
+// AppKit's context menu. Call from an owner callback; nil means the request was
+// accepted, not that the palette has appeared. Managed/native modal scope and
+// lifetime are checked again on native main. No native-main wait is performed.
+func CustomizeTitlebarToolbar(ref app.WindowRef) error {
+	if ref.Context().Err() != nil {
+		return app.ErrWindowClosed
+	}
+	bridge, err := lookupAccessibility(ref.ID())
+	if err != nil {
+		return err
+	}
+	bridge.mu.Lock()
+	same := bridge.windowRef == ref
+	bridge.mu.Unlock()
+	if !same {
+		return app.ErrInvalidWindowRef
+	}
+	binding := bridge.titlebar.Load()
+	if binding == nil || binding.closed.Load() || binding.config.customizationID == "" {
+		return errors.New("cogent: native titlebar customization unavailable")
+	}
+	nativeTitlebarCustomize(bridge.token)
+	return nil
+}
+func titlebarBindingForToken(token uint64) *titlebarToolbarBinding {
+	accessibilityRegistry.Lock()
+	b := accessibilityRegistry.bridges[token]
+	accessibilityRegistry.Unlock()
+	if b == nil || b.closed.Load() {
+		return nil
+	}
+	return b.titlebar.Load()
 }

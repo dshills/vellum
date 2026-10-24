@@ -14,7 +14,16 @@ func (m *macWidgetsGallery) titlebarPrototype(ref app.WindowRef) (*cogent.Titleb
 	if m.toolbars.artworkError != nil {
 		return nil, m.toolbars.artworkError
 	}
-	result := &cogent.TitlebarToolbarPrototype{Window: ref}
+	appearance := "light"
+	if m.dark {
+		appearance = "dark"
+	}
+	result := &cogent.TitlebarToolbarPrototype{Window: ref, CustomizationID: "com.dshills.vellum.widgets.titlebar." + appearance + ".v1"}
+	m.toolbars.customizeNative = func() {
+		if err := cogent.CustomizeTitlebarToolbar(ref); err != nil {
+			m.toolbars.last = "Titlebar customization: " + err.Error()
+		}
+	}
 	for i, action := range []struct {
 		name   string
 		symbol ui.Symbol
