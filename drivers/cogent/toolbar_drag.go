@@ -13,8 +13,30 @@ import (
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/math32"
 	"cogentcore.org/core/paint"
+	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/ui"
 )
+
+const toolbarDragActiveProperty = "vellum.toolbar-drag-active"
+
+// Suppress target-row help as well as source help. A tooltip is a native popup
+// and would retire same-window capture during an otherwise valid held drag.
+func bindToolbarDragTooltipGuard(widget core.Widget) {
+	for _, typ := range []events.Types{events.LongHoverStart, events.LongPressStart} {
+		widget.AsWidget().OnFirst(typ, func(e events.Event) {
+			for p := widget.AsTree(); p != nil; {
+				if g, ok := p.Property(toolbarDragActiveProperty).(*toolbarDragGesture); ok && g.scroll.Scene != nil && g.scroll.Scene.Events.PointerCaptured(g.token) {
+					e.SetHandled()
+					return
+				}
+				if tree.IsNil(p.Parent) {
+					break
+				}
+				p = p.Parent.AsTree()
+			}
+		})
+	}
+}
 
 // Application-owner publication; native routing never reads the customizer.
 type toolbarDragScope struct {
@@ -94,6 +116,9 @@ func (b *toolbarDragBinding) end() {
 	if g == nil {
 		return
 	}
+	if g.scroll.Property(toolbarDragActiveProperty) == g {
+		g.scroll.DeleteProperty(toolbarDragActiveProperty)
+	}
 	g.hasLine = false
 	g.stopAnimation()
 	if g.scroll.Scene != nil {
@@ -140,6 +165,7 @@ func (b *toolbarDragBinding) press(e events.Event) {
 	}
 	g.token = token
 	b.active = g
+	scroll.SetProperty(toolbarDragActiveProperty, g)
 	b.button.SetFocusQuiet()
 }
 

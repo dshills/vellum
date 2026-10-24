@@ -107,6 +107,21 @@ func TestToolbarCustomizationDragRouting(t *testing.T) {
 					t.Fatal("missing threshold/preview")
 				}
 				animated := grip("item-2").active
+				for _, id := range []string{ui.ToolbarCustomizationDragID(c.ID, "item-0"), ui.ToolbarCustomizationVisibilityID(c.ID, "item-0"), ui.ToolbarCustomizationLaterID(c.ID, "item-0")} {
+					target := findRecord(root, id).widget.AsWidget()
+					hover := events.NewMouse(events.LongHoverStart, events.Left, end, 0)
+					target.HandleEvent(hover)
+					unitSettle(t, m)
+					if !hover.IsHandled() || grip("item-2").active != animated {
+						t.Fatal("target help canceled held drag", id)
+					}
+				}
+				rowHover := events.NewMouse(events.LongHoverStart, events.Left, end, 0)
+				core.AsWidget(grip("item-0").button.Parent).HandleEvent(rowHover)
+				unitSettle(t, m)
+				if !rowHover.IsHandled() || grip("item-2").active != animated {
+					t.Fatal("non-control row help escaped shared drag guard")
+				}
 				if animated.animation == nil {
 					t.Fatal("drag lacks bounded scene animation")
 				}
@@ -138,6 +153,9 @@ func TestToolbarCustomizationDragRouting(t *testing.T) {
 					t.Fatal("release retained animation references")
 				}
 				lateFrame(animation)
+				if animated.scroll.Property(toolbarDragActiveProperty) != nil {
+					t.Fatal("release retained shared list drag capability")
+				}
 				if animated.hasLine || animated.stage != nil || (animationScene != nil && len(animationScene.Animations) != 0) {
 					t.Fatal("late frame recreated a completed preview")
 				}

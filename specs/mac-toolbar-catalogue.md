@@ -140,3 +140,9 @@ buttons/checkboxes paint focus only when they own actual focus, are enabled and
 belong to the current modal/tab input projection. Resting/focused border allowance
 is stable. Background openers and stale native Focused flags cannot paint extra
 focus cues. Reduced-motion system preferences are not queried by this demo.
+
+While list capture is active, LongHoverStart/LongPressStart help on every managed
+source/target row control is consumed. The shared list capability is removed on
+all terminal paths; normal help then resumes. This prevents tooltip-stage
+retirement during a held drag. Native target-grip/checkbox/arrow regression
+coverage is separate from the packaged held-pointer observation.

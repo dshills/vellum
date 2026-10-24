@@ -1152,3 +1152,26 @@ check background suppression, stale flag handling and stable geometry. UI race
 tests, scaled customization routing, context/space tests, adjacent input activation/
 focus regressions, gallery tests, SDK contracts and vet passed. No backend policy
 or release gate changed. No remaining actionable Prism finding.
+
+## Native verification followup: held help and gap hits
+
+The packaged held-pointer check exposed a target-row tooltip opening and retiring
+capture. The shared list guard now covers every managed widget mount, including
+non-control rows/labels, and checks the current scoped pointer token. Prism
+Anthropic claude-sonnet-5-5 reviewed both focused checkpoints. Applied explicit
+typed-nil-safe parent traversal and moved guard installation to the common mount
+path; target grip/checkbox/arrow and non-control row regressions pass. A replaced
+or destroyed list cannot leave an admitted capability: source disposal/loss ends
+capture and clears the exact old list property; a mismatched property belongs to
+a different gesture and is never deleted. The suggested race between assigning
+b.active and the property is not possible under originating render ownership;
+there is no callback between those assignments. Retain post-admission publication.
+
+Native toolbar gap hits also require a passive Clickable container so right mouse
+release generates ContextMenu. This adds no action/focus stop; the bar's state
+layer remains neutral. Regression now routes actual Right input through the owned
+core window, with explicit visible geometry; it also preserves Control on the
+Right input produced by pinned desktop MouseButtonEvent's Control+Left mapping.
+Raw offscreen Source input does not perform that desktop conversion. Child menu
+priority, stale retirement, held capture cleanup, repeated focus tests and vet
+pass; native build succeeded. No remaining actionable Prism finding.

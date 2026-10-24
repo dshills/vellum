@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "3911744accba34352074e48068db7bd6",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "e9778e3fd60c5abbe8b97da0ef6914560df8c7d8",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "e7ed6c290eb86cd9",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Tooltip guard may miss widgets or rely on stale properties",
+      "message": "The guard walks parent chain per hover event and only checks the property on the scroll frame. Because the property is set on a frame via SetProperty, a stale property could remain if the scroll frame is replaced/disposed while capture is active; the DeleteProperty in end() only runs if g.scroll still holds g. Also, the guard is bound only in mountControl, so controls mounted elsewhere (e.g. chrome frames, non-control widgets such as row containers) do not suppress tooltips.",
+      "suggestion": "Verify all row widgets are mounted via mountControl, or store the active-drag state on a shared scene-level object instead of walking the parent chain; add a test for tooltips on non-control row children.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/toolbar_drag.go",
+          "lines": {
+            "start": 28,
+            "end": 28
+          }
+        }
+      ],
+      "tags": [
+        "tooltip",
+        "drag",
+        "location-corrected"
+      ],
+      "evidence": "if g, ok := p.Property(toolbarDragActiveProperty).(*toolbarDragGesture); ok \u0026\u0026 g.scroll.Scene != nil \u0026\u0026 g.scroll.Scene.Events.PointerCaptured(g.token) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4761,
+    "totalMs": 4784
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 7,
+    "bytes": 15963,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 10224,
+        "output": 436,
+        "costUSD": 0.024808
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

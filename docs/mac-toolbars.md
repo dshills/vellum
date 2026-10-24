@@ -257,3 +257,7 @@ changing drop validation. Completion/cancellation removes the scene animation an
 preview immediately. Focus outlines follow the current enabled control and modal
 scope, including after repeated opening/closing; changing focus does not resize
 controls. Animation uses the existing native scene clock, with no drag timers.
+
+Help popups on source and target rows are suppressed during capture, so holding
+an insertion position cannot open a tooltip and cancel the drag. Ordinary help
+returns once the gesture ends.

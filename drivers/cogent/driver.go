@@ -632,6 +632,7 @@ func mountShallowScoped(parent tree.Node, n ui.Node, a *app.Application, scope a
 	mountInputOutline(r)
 	bindWindowScope(r.widget, a, scope)
 	r.widget.AsWidget().SetName(n.ID)
+	bindToolbarDragTooltipGuard(r.widget)
 	syncSemantics(r)
 	bindFileDrop(r, a, scope.ID())
 	r.widget.AsWidget().Styler(func(s *styles.Style) {

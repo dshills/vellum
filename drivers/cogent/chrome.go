@@ -9,6 +9,7 @@ import (
 	"cogentcore.org/core/events/key"
 	"cogentcore.org/core/math32"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/styles/abilities"
 	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/tree"
@@ -46,6 +47,10 @@ func mountChrome(parent tree.Node, r *record) core.Widget {
 		s.Align.Items = styles.Center
 		s.Background = colors.Scheme.SurfaceContainer
 		if r.node.Kind == ui.Toolbar {
+			// Empty/gap hits need a press target for native right/Control-click
+			// to generate ContextMenu; this adds no action or focus stop.
+			s.SetAbilities(r.node.ContextMenu != nil, abilities.Clickable)
+			s.StateLayer = 0
 			if r.node.Orientation == ui.Vertical {
 				s.Direction = styles.Column
 				s.Grow.Set(0, 1)
