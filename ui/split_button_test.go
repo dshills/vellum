@@ -44,3 +44,15 @@ func TestSplitButtonIndependentActionsAndStaleOptions(t *testing.T) {
 		t.Fatal("retired identity admitted")
 	}
 }
+
+func TestSplitButtonLayoutMarkerValidation(t *testing.T) {
+	b := &SplitButton{ID: "s", Label: "Save", Options: []Option{{ID: "a", Label: "Action"}}}
+	n, err := b.View()
+	if err != nil || !n.SplitButtonLayout {
+		t.Fatal(n, err)
+	}
+	n.Children[1].ID = "foreign"
+	if Validate(n) == nil {
+		t.Fatal("malformed presentation marker accepted")
+	}
+}

@@ -49,7 +49,7 @@ func (p *Inspector) View() (Node, error) {
 	}
 	id := p.ID
 	prefix := id + "/inspector/"
-	root := Node{ID: id, Kind: Column, Disabled: p.Disabled, Style: Style{Gap: Some(float32(10)), Padding: Some(UniformInsets(12))}.Overlay(p.Style)}
+	root := Node{ID: id, Kind: Column, Disabled: p.Disabled, Style: Style{GrowX: Some(float32(1)), Gap: Some(float32(10)), Padding: Some(UniformInsets(12))}.Overlay(p.Style)}
 	title := Node{ID: prefix + "title", Kind: Label, Text: p.Title, Style: Style{Typography: Some(Typography{Size: 14, Weight: 600})}}
 	heading := Node{ID: prefix + "heading", Kind: Row, Children: []Node{title}}
 	if p.IconImage != nil {
@@ -83,19 +83,21 @@ func (p *Inspector) View() (Node, error) {
 			}
 			props[property.ID] = true
 			editor := property.Editor
-			var namespaceOK func(Node) bool
-			namespaceOK = func(n Node) bool {
-				if n.ID == "" || strings.HasPrefix(n.ID, prefix) {
+			seenEditors := map[string]bool{}
+			var namespaceOK func(Node, int) bool
+			namespaceOK = func(n Node, depth int) bool {
+				if depth >= 128 || n.ID == "" || seenEditors[n.ID] || strings.HasPrefix(n.ID, prefix) {
 					return false
 				}
+				seenEditors[n.ID] = true
 				for _, c := range n.Children {
-					if !namespaceOK(c) {
+					if !namespaceOK(c, depth+1) {
 						return false
 					}
 				}
 				return true
 			}
-			if !namespaceOK(editor) {
+			if !namespaceOK(editor, 0) {
 				return Node{}, fmt.Errorf("ui: inspector editors require IDs outside %s", prefix)
 			}
 			if editor.Accessibility.Name == "" {
@@ -109,9 +111,9 @@ func (p *Inspector) View() (Node, error) {
 			label := Node{ID: rowID + "/label", Kind: Label, Text: property.Label, Style: Style{MinSize: Some(Size{Width: width}), MaxSize: Some(Size{Width: width}), TextAlign: Some(AlignEnd)}}
 			children := []Node{label, editor}
 			if property.Mixed {
-				children = append(children, Node{ID: rowID + "/mixed", Kind: Label, Text: "Multiple values", Accessibility: Accessibility{Name: property.Label + ": multiple values"}, Style: Style{Typography: Some(Typography{Size: 11, Italic: true})}})
+				children = append(children, Node{ID: rowID + "/mixed", Kind: Label, Text: "Multiple values", Accessibility: Accessibility{Name: property.Label + ": multiple values"}, Style: Style{MinSize: Some(Size{Width: 104}), MaxSize: Some(Size{Width: 104}), Typography: Some(Typography{Size: 11, Italic: true})}})
 			}
-			group.Children = append(group.Children, Node{ID: rowID, Kind: Row, Style: Style{Gap: Some(float32(8)), Align: Some(AlignCenter)}, Children: children})
+			group.Children = append(group.Children, Node{ID: rowID, Kind: Row, Style: Style{GrowX: Some(float32(1)), Gap: Some(float32(8)), Align: Some(AlignCenter)}, Children: children})
 		}
 		root.Children = append(root.Children, group)
 	}

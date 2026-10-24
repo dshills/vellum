@@ -653,6 +653,9 @@ func mountShallowScoped(parent tree.Node, n ui.Node, a *app.Application, scope a
 		return nil, fmt.Errorf("cogent: extension %q returned nil widget", n.ID)
 	}
 	mountInputOutline(r)
+	if r.node.Kind == ui.Row {
+		r.widget.AsTree().SetProperty(splitButtonOwnerProperty, r)
+	}
 	bindWindowScope(r.widget, a, scope)
 	r.widget.AsWidget().SetName(n.ID)
 	bindToolbarDragTooltipGuard(r.widget)
@@ -665,14 +668,17 @@ func mountShallowScoped(parent tree.Node, n ui.Node, a *app.Application, scope a
 			r.widget.(*core.Text).AllocationLayout = err == nil && (value.TextAlign.Set || value.GrowX.Set || value.GrowY.Set)
 		}
 	})
-	if r.node.Kind == ui.Row || r.node.Kind == ui.TextField || r.node.Kind == ui.NumberField || r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton || r.node.Kind == ui.Checkbox {
+	if r.node.Kind == ui.Row || r.node.Kind == ui.TextField || r.node.Kind == ui.NumberField || r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton || r.node.Kind == ui.Selector || r.node.Kind == ui.Checkbox {
 		r.widget.AsWidget().FinalStyler(func(s *styles.Style) { styleManagedInputFocus(r, s) })
-		if r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton || r.node.Kind == ui.Checkbox {
+		if r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton || r.node.Kind == ui.Selector || r.node.Kind == ui.Checkbox {
 			// Retained controls can already carry Focused when native focus changes.
 			// Restyle on the actual focus event even if no state bit changed.
 			r.widget.AsWidget().OnFocus(func(events.Event) { r.widget.AsWidget().Restyle() })
 			r.widget.AsWidget().OnFocusLost(func(events.Event) { r.widget.AsWidget().Restyle() })
 		}
+	}
+	if r.node.Kind == ui.Row || r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton {
+		r.widget.AsWidget().FinalStyler(func(s *styles.Style) { styleSplitButtonLayout(r, s) })
 	}
 	return r, nil
 }
@@ -698,13 +704,19 @@ func syncRecordVisible(r *record, n ui.Node, visible bool, scopes []*tabCloseSco
 	r.node = n
 	syncInputOutline(r)
 	disabledChanged := r.widget.AsWidget().IsDisabled() != controlDisabled(r)
-	if previous.Style != n.Style || previous.Grow != n.Grow || previous.MinWidth != n.MinWidth || previous.MinHeight != n.MinHeight {
+	if previous.SplitButtonLayout != n.SplitButtonLayout || previous.Style != n.Style || previous.Grow != n.Grow || previous.MinWidth != n.MinWidth || previous.MinHeight != n.MinHeight {
 		if r.control != nil && r.control.grid != nil {
 			r.control.grid.layoutPending.Store(true)
 			r.control.grid.layout.valid = false
 		}
 		r.widget.AsWidget().Update()
 	}
+	if previous.SplitButtonLayout != n.SplitButtonLayout {
+		for _, child := range r.children {
+			child.widget.AsWidget().Update()
+		}
+	}
+
 	switch n.Kind {
 	case ui.Label:
 		if previous.Text != n.Text || r.widget.(*core.Text).Text != html.EscapeString(n.Text) {

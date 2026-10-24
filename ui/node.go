@@ -94,10 +94,13 @@ type Node struct {
 	CanvasGrid      float32           // optional world-space grid spacing; zero hides it
 	PlacementSource *placement.Source // focusable palette Button; Activate supplies keyboard placement
 	PlacementTarget *placement.Target // optional Canvas2D acceptance endpoint
-	Style           Style
-	Checked         bool
-	Number          float32
-	Numeric         Numeric
+	// SplitButtonLayout marks the two segments produced by SplitButton.View.
+	// It is a detached presentation hint; callbacks remain ordinary child actions.
+	SplitButtonLayout bool
+	Style             Style
+	Checked           bool
+	Number            float32
+	Numeric           Numeric
 	// NumberButtons optionally selects compact up/down arrows on NumberField.
 	NumberButtons NumberFieldButtons
 	// Orientation applies to display/choice/toolbar/split controls; RadioGroup defaults vertical.

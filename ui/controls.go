@@ -151,6 +151,19 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+
+	if n.SplitButtonLayout && (n.Kind != Row || len(n.Children) != 2 || n.Children[0].Kind != Button || n.Children[0].ID != SplitPrimaryID(n.ID) || n.Children[1].Kind != MenuButton || n.Children[1].ID != SplitMenuID(n.ID) || n.Children[1].MenuAnchorID != n.ID) {
+		return fmt.Errorf("ui: split-button layout requires its generated primary/menu segments")
+	}
+
+	if n.SplitButtonLayout && len(n.Children) == 2 {
+		for _, part := range n.Children {
+			if !part.Style.Border.Set || part.Style.Border.Value.Width != 0 || !part.Style.Background.Set || part.Style.Background.Value.A != 0 {
+				return fmt.Errorf("ui: split segments require explicit borderless transparent styling")
+			}
+		}
+	}
+
 	if IsToolbarSpace(n.Kind) && (n.Activate != nil || n.Change != nil || n.ContextMenu != nil || n.PlacementSource != nil || n.ToolbarReorder != nil) {
 		return fmt.Errorf("ui: toolbar spaces are display-only")
 	}

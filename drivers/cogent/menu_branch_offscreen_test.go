@@ -3,6 +3,7 @@
 package cogent
 
 import (
+	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
 	"github.com/dshills/vellum/ui"
@@ -32,6 +33,11 @@ func TestCascadingMenuKeyboardAndRetirement(t *testing.T) {
 	input(key.CodeRightArrow)
 	if p.child == nil || p.child.dead.Load() || calls != 0 {
 		t.Fatal("branch did not open without action")
+	}
+	item := p.child.items["save"]
+	caption := item.ChildByName("menu-caption")
+	if caption == nil || caption.(core.Widget).AsWidget().Styles.Color.At(0, 0) != item.Styles.Color.At(0, 0) {
+		t.Fatal("shortcut caption lost focused contrast")
 	}
 	_, handlers := menuAccessibility(r, "menu", nil)
 	stale := handlers[menuActionID("menu", "save")]

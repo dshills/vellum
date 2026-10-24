@@ -197,7 +197,7 @@ func (b *ColumnBrowser) View() (Node, error) {
 	if label == "" {
 		label = "Browser"
 	}
-	root := Node{ID: id, Kind: Scroll, Disabled: b.Disabled, Accessibility: Accessibility{Name: label}, Style: Style{MinSize: Some(Size{Height: 240}), MaxSize: Some(Size{Height: 320}), GrowX: Some(float32(1)), Padding: Some(Insets{})}.Overlay(b.Style), Children: []Node{content}}
+	root := Node{ID: id, Kind: Scroll, Disabled: b.Disabled, Accessibility: Accessibility{Name: label}, Style: Style{MinSize: Some(Size{Width: 160, Height: 240}), MaxSize: Some(Size{Height: 320}), GrowX: Some(float32(1)), Padding: Some(Insets{})}.Overlay(b.Style), Children: []Node{content}}
 	if err := Validate(root); err != nil {
 		return Node{}, err
 	}

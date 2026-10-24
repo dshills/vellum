@@ -37,3 +37,13 @@ func TestInspectorRejectsEditorNamespace(t *testing.T) {
 		t.Fatal("reserved editor namespace admitted")
 	}
 }
+
+func TestInspectorRejectsCyclicEditorDescription(t *testing.T) {
+	children := make([]Node, 1)
+	editor := Node{ID: "loop", Kind: Column, Children: children}
+	children[0] = editor
+	p := &Inspector{ID: "inspector", Title: "Properties", Sections: []InspectorSection{{ID: "section", Title: "Section", Properties: []InspectorProperty{{ID: "p", Label: "Property", Editor: editor}}}}}
+	if _, err := p.View(); err == nil {
+		t.Fatal("cyclic editor admitted")
+	}
+}

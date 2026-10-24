@@ -23,7 +23,9 @@ separately in the packaged delivery.
 
 Retain a `ui.SplitButton` and call `View()`. Set `Primary`, `Options` and `Change`
 independently; `Small` selects the compact size. `IconImage` preserves full-color
-artwork. The disclosure anchors to the combined control and accepts cascading
+artwork. The native adapter removes segment margins and draws one themed outer outline
+with an internal divider; each segment retains its own keyboard focus cue.
+The disclosure anchors to the combined control and accepts cascading
 options. Tab reaches each segment; Return activates the focused segment and
 Down opens its menu. Disabled or removed options revoke old action closures.
 The Components → Split buttons page demonstrates regular and compact variants.

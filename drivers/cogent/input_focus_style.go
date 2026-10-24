@@ -170,3 +170,31 @@ func managedAccent(r *record) color.NRGBA {
 	}
 	return uiColorAccent
 }
+
+const splitButtonOwnerProperty = "vellum.split-button-owner"
+
+func styleSplitButtonLayout(r *record, s *styles.Style) {
+	if r.node.SplitButtonLayout {
+		control, err := ui.ResolveStyle(ui.Node{Kind: ui.Button}, r.theme)
+		if err != nil {
+			return
+		}
+		control = control.Overlay(r.node.Style)
+		applyStyle(s, ui.Node{Kind: ui.Row, Style: control}, ui.Theme{})
+		s.Margin.Zero()
+	}
+	if p := r.widget.AsTree().Parent; !tree.IsNil(p) {
+		owner, _ := p.AsTree().Property(splitButtonOwnerProperty).(*record)
+		if owner != nil && owner.node.SplitButtonLayout && (r.node.Kind == ui.Button && r.node.ID == ui.SplitPrimaryID(owner.node.ID) || r.node.Kind == ui.MenuButton && r.node.ID == ui.SplitMenuID(owner.node.ID)) {
+			s.Margin.Zero()
+			if r.node.Kind == ui.MenuButton && s.Border.Width.Top.Value == 0 {
+				line := color.NRGBA{R: 160, G: 160, B: 160, A: 255}
+				if r.theme.Palette.Set {
+					line = r.theme.Palette.Value.Line
+				}
+				s.Border.Width.Left = units.Dp(1)
+				s.Border.Color.Left = colors.Uniform(line)
+			}
+		}
+	}
+}

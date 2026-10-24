@@ -1362,3 +1362,11 @@ Prism: `mac-selector-theme.json` (Anthropic Claude Sonnet 5.5, complete coverage
 Packaged visual inspection found pale selector fills with dark-scope text. Mac presets now explicitly paint selector fills/borders; palette-scoped 1..64-choice selectors reuse managed menus with current selection, disabled-row focus exclusion and Selector-kind events. Larger catalogues retain the documented legacy popup. Prism requested parentheses and an explicit AX policy: closed selectors retain direct settable choices for compatibility; open ones replace them with actual popup rows. Added a regression for both states. Focused native keys, event kind, disabled options and theme replacement revocation pass.
 
 Focused checks: `mac-selector-theme-verified-checks.json`, `mac-selector-ax-final-checks.json`.
+
+## Polish joined Mac controls and verify themed catalogue offscreen
+
+Prism: `mac-components-shipping-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Native inspection found low-contrast shortcut captions and separated split segments; fixed with inherited caption ink, validated borderless child segments and a themed shared outline/divider. Focus rings remain complete. Offscreen rasters found shrinking browser/rule wrappers; fixed and asserted full viewport widths, with one-line mixed hints. Parent-owner records are retained stable pointers; styling and sync execute under the originating native ownership boundary, as other record stylers do, so the conditional off-sync race in Prism is outside the supported execution model. Marker changes explicitly update child styles. ResolveStyle is already guarded by SplitButtonLayout; no per-normal-row resolve occurs. Strict tests defocus before checking divider removal/restoration, and separately verify the full focused ring. Applied final structure-first validation suggestion. Added bounded/seen-ID inspector namespace traversal with cyclic-description regression. User explicitly deferred further live checks; two-theme completed rasters and focused race/native-routing/SDK checks pass. No final physical-pointer qualification claimed.
+
+Focused checks: `mac-components-visual-fix-checks.json`, `mac-components-offscreen-width-checks.json`, `mac-components-final-raster-checks.json`, `mac-components-shipping-guards-checks.json`, `mac-components-validation-order-checks.json`.

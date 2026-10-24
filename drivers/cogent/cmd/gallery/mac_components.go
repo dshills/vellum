@@ -174,7 +174,7 @@ func (m *macComponentsGallery) browserPreview() ui.Node {
 	if err != nil {
 		return ui.Node{ID: "components/browser-error", Kind: ui.Label, Text: err.Error()}
 	}
-	return ui.Node{ID: "components/browser-demo", Kind: ui.Column, Children: []ui.Node{{ID: "components/browser-help", Kind: ui.Label, Text: "Select a folder to reveal its column. Tab moves through columns/dividers; drag a divider to resize. Scroll horizontally for deeper paths."}, n}}
+	return ui.Node{ID: "components/browser-demo", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}, Children: []ui.Node{{ID: "components/browser-help", Kind: ui.Label, Text: "Select a folder to reveal its column. Tab moves through columns/dividers; drag a divider to resize. Scroll horizontally for deeper paths."}, n}}
 }
 
 func (m *macComponentsGallery) rulesPreview() ui.Node {
@@ -189,5 +189,5 @@ func (m *macComponentsGallery) rulesPreview() ui.Node {
 	if err != nil {
 		return ui.Node{ID: "components/rules-error", Kind: ui.Label, Text: err.Error()}
 	}
-	return ui.Node{ID: "components/rules-demo", Kind: ui.Column, Children: []ui.Node{{ID: "components/rules-help", Kind: ui.Label, Text: "Compose typed conditions and All/Any groups. Changes update the model; this demonstration does not execute a search."}, n}}
+	return ui.Node{ID: "components/rules-demo", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}, Children: []ui.Node{{ID: "components/rules-help", Kind: ui.Label, Text: "Compose typed conditions and All/Any groups. Changes update the model; this demonstration does not execute a search."}, n}}
 }

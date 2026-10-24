@@ -1,0 +1,43 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 0.8236495000310242
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestSplitButtonNative|TestCascading|TestScopedSelector",
+      "-count=1",
+      "-timeout",
+      "60s"
+    ],
+    "exit_code": 0,
+    "seconds": 14.854057291988283
+  },
+  {
+    "cwd": "examples/sdk-contract",
+    "argv": [
+      "go",
+      "test",
+      "./...",
+      "-run",
+      "TestPublicMacComposition",
+      "-count=1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.7610513328108937
+  }
+]

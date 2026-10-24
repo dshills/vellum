@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"github.com/dshills/vellum/canvas"
+	"image/color"
 	"slices"
 )
 
@@ -33,7 +34,7 @@ func (s *SplitButton) View() (Node, error) {
 	if s.Small {
 		h = 24
 	}
-	compact := Style{MinSize: Some(Size{Height: h}), MaxSize: Some(Size{Height: h}), Padding: Some(Insets{Top: 2, Bottom: 2, Left: 8, Right: 8}), GrowX: Some(float32(0)), CornerRadius: Some(float32(4))}
+	compact := Style{MinSize: Some(Size{Height: h}), MaxSize: Some(Size{Height: h}), Padding: Some(Insets{Top: 2, Bottom: 2, Left: 8, Right: 8}), GrowX: Some(float32(0)), CornerRadius: Some(float32(0)), Border: Some(Border{}), Background: Some(color.NRGBA{})}
 	available := func() bool { return s.ID == id && !s.Disabled }
 	main := Node{ID: SplitPrimaryID(id), Kind: Button, Text: s.Label, Icon: s.Icon, IconImage: s.IconImage, Style: compact, Disabled: s.Disabled || s.Primary == nil, Activate: func() {
 		if available() && s.Primary != nil {
@@ -56,7 +57,7 @@ func (s *SplitButton) View() (Node, error) {
 		}
 	}}
 	style := Style{Gap: Some(float32(0)), Padding: Some(Insets{}), GrowX: Some(float32(0)), Align: Some(AlignCenter)}.Overlay(s.Style)
-	root := Node{ID: id, Kind: Row, Style: style, Disabled: s.Disabled, Accessibility: Accessibility{Name: s.Label}, Children: []Node{main, menu}}
+	root := Node{ID: id, Kind: Row, SplitButtonLayout: true, Style: style, Disabled: s.Disabled, Accessibility: Accessibility{Name: s.Label}, Children: []Node{main, menu}}
 	if err := Validate(root); err != nil {
 		return Node{}, err
 	}

@@ -446,7 +446,6 @@ func populateManagedMenu(r *record, p *menuPopup, scene *core.Scene, keyboard fu
 				tree.AddAt(plan, "menu-caption", func(w *core.Text) {
 					w.SetText(html.EscapeString(o.Shortcut))
 					w.Styler(func(s *styles.Style) {
-						s.Color = colors.Uniform(color.NRGBA{R: 128, G: 128, B: 128, A: 255})
 						s.Margin.Left = units.Dp(24)
 					})
 				})
