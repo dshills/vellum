@@ -47,11 +47,23 @@ func TestMacSheetModalActionsFocusAndCleanup(t *testing.T) {
 				t.Fatal("sheet did not open")
 			}
 			stage := d.body.Scene.Stage
-			if !stage.Modal || !stage.Scrim || stage.Resizable || stage.DisplayTitle || stage.NewWindow || stage.Scene.Parts != nil {
+			if !stage.Modal || !stage.Scrim || stage.Resizable || stage.DisplayTitle || stage.NewWindow || stage.Title != "" || stage.Scene.Parts != nil {
 				t.Fatal("incorrect sheet presentation")
 			}
 			if len(ui.FocusOrder(ui.FocusScope(m.implementation.find("one").state.root.node))) != 2 {
 				t.Fatal("modal scope leaked parent")
+			}
+			bounds := r.widget.AsWidget().Scene.SceneGeom.Bounds()
+			rect := d.body.Scene.SceneGeom.Bounds()
+			if rect.Min != bounds.Min.Add(bounds.Size().Sub(rect.Size()).Div(2)) {
+				t.Fatal("sheet not centered", rect, bounds)
+			}
+			want := d.host.Geom.Size.Actual.Total.Add(d.body.Scene.Geom.Size.Space).Add(d.body.Geom.Size.Space).ToPointCeil()
+			if rect.Size() != want {
+				t.Fatal("sheet retained generic outer allowance", rect.Size(), want, d.body.HasScroll, d.body.Scene.HasScroll, d.body.Geom.Size.Space, d.body.Scene.Geom.Size.Space)
+			}
+			if !findRecord(root, ui.SheetConfirmID("sheet")).widget.AsWidget().ContainsFocus() {
+				t.Fatal("default-only sheet did not initially focus primary action")
 			}
 			oldScope := d.tabScope.Load()
 			if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: events.KeyChord, Code: key.CodeEscape}); err != nil {
@@ -62,8 +74,10 @@ func TestMacSheetModalActionsFocusAndCleanup(t *testing.T) {
 				t.Fatal("Escape did not cancel/restore", s.Open, cancels, confirms)
 			}
 			click(opener)
-			_, done := imageManualElement(t, m, ui.SheetConfirmID("sheet"))
-			click(done)
+			if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: events.KeyChord, Code: key.CodeReturnEnter}); err != nil {
+				t.Fatal(err)
+			}
+			unitSettle(t, m)
 			if s.Open || confirms != 1 || cancels != 1 {
 				t.Fatal("confirmation duplicated", confirms, cancels)
 			}

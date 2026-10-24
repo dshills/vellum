@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "5fb750e5fabb8b4e5ccb42d3a52b0b98",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "d18c71e17c2215b3356669dcb1fac7997a67f23f",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "57ead0a6c418598e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "activationGuard may be nil for recorder nodes",
+      "message": "The handler's guard runs before the action-kind check, yet `x.activationGuard` is only assigned for Buttons with r.control != nil. For a ListBox or recorder without a control, activationGuard may be nil, so calling it panics. The new `n.ShortcutRecorder != nil` branch widens the set of nodes that call the guard; if any recorder node reaches here without a control the guard is nil.",
+      "suggestion": "Check `x.activationGuard != nil` before calling it, or default activationGuard to a func returning true.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility.go",
+          "lines": {
+            "start": 716,
+            "end": 720
+          }
+        }
+      ],
+      "tags": [
+        "nil",
+        "panic"
+      ],
+      "evidence": "if accepted \u0026\u0026 action.Kind == \"press\" \u0026\u0026 n.ShortcutRecorder != nil \u0026\u0026 b != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4194,
+    "totalMs": 4219
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 32351,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 17950,
+        "output": 330,
+        "costUSD": 0.0392
+      }
+    ],
+    "widenedFiles": 8,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

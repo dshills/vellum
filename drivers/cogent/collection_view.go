@@ -94,13 +94,16 @@ func bindCollectionChoice(r *record, id string, b *core.Switch) {
 			})
 		}
 		tree.AddAt(p, "collection-label", func(w *core.Text) {
+			// Keep the intrinsic paragraph centered with the fixed artwork. The
+			// native allocation policy also centers shorter wrapped lines.
+			w.AllocationLayout = true
 			w.Styler(func(s *styles.Style) {
 				s.RenderBox = false
 				s.SetNonSelectable()
 				s.SetTextWrap(true)
 				s.Text.Align = text.Center
 				s.Max.X = units.Dp(collectionWidth(r) - 16)
-				s.Grow.X = 1
+				s.Grow.X = 0
 				s.Font.Size.Dp(12)
 			})
 			w.Updater(func() {

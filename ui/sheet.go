@@ -51,7 +51,7 @@ func (s *Sheet) View() (Node, error) {
 		secondary = "Cancel"
 	}
 	content := append([]Node{{ID: id + "/sheet/title", Kind: Label, Text: s.Title, Style: Style{Typography: Some(Typography{Size: 17, Weight: 600})}}}, s.Children...)
-	actions := Node{ID: id + "/sheet/actions", Kind: Row, Style: Style{Justify: Some(AlignEnd), Gap: Some(float32(8)), Padding: Some(Insets{Top: 12})}, Children: []Node{{ID: SheetCancelID(id), Kind: Button, Text: secondary, Appearance: ButtonSecondary, Activate: cancel}, {ID: SheetConfirmID(id), Kind: Button, Text: primary, Appearance: ButtonPrimary, Style: Style{Background: Some(color.NRGBA{R: 0, G: 112, B: 245, A: 255}), Foreground: Some(color.NRGBA{R: 255, G: 255, B: 255, A: 255})}, Disabled: s.Confirm == nil || s.ConfirmDisabled, Activate: func() {
+	actions := Node{ID: id + "/sheet/actions", Kind: Row, Style: Style{GrowX: Some(float32(1)), Justify: Some(AlignEnd), Gap: Some(float32(8)), Padding: Some(Insets{Top: 12})}, Children: []Node{{ID: SheetCancelID(id), Kind: Button, Text: secondary, Appearance: ButtonSecondary, Activate: cancel}, {ID: SheetConfirmID(id), Kind: Button, Text: primary, Appearance: ButtonPrimary, Style: Style{Background: Some(color.NRGBA{R: 0, G: 112, B: 245, A: 255}), Foreground: Some(color.NRGBA{R: 255, G: 255, B: 255, A: 255})}, Disabled: s.Confirm == nil || s.ConfirmDisabled, Activate: func() {
 		if live() && !s.ConfirmDisabled && s.Confirm != nil {
 			s.Confirm()
 		}

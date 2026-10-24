@@ -64,3 +64,8 @@ handlers, hidden/disabled/replaced/closed capabilities and idle
 command restoration. These are automated routing/ownership evidence. Physical
 keyboard verification and live system-reserved shortcut delivery are separate
 native checks; they are not implied by offscreen tests.
+
+Accessible Press uses the same owner-held source/session capability and requests
+focus through the existing pending-focus bridge. It never writes native focus
+from model delivery. Captured handlers are revoked on component replacement or
+modal retirement before they can begin or focus a replacement recorder.

@@ -21,3 +21,11 @@ Render and mutate a Sheet only on its application owner. Concurrent View calls o
 cross-owner/window sharing are unsupported, as with the other retained composite
 widgets. Disabled/nil-Confirm default buttons are valid and inert; validation must
 allow a temporarily unavailable action while input is being corrected.
+
+The card is centered from measured retained content, without generic dialog
+minimum-size allowance or a native-window title change. Action rows fill its
+width and align trailing. If only action buttons are focusable, initial focus
+chooses the enabled primary action; a leading editor retains first focus.
+
+The outer body/scene do not introduce automatic scrollbars. Applications with
+long content provide a bounded Scroll child inside the card.

@@ -458,3 +458,137 @@ func TestShortcutRecorderModalEscapeAndTabWithAccessibility(t *testing.T) {
 		t.Fatal("idle modal Escape not restored", dismissed)
 	}
 }
+
+func TestShortcutRecorderAccessibilityPressRequestsOriginFocus(t *testing.T) {
+	calls := 0
+	recorder := &ui.ShortcutRecorder{ID: "shortcut", Label: "Duplicate shortcut"}
+	recorder.Change = func(e ui.ShortcutEvent) { calls++; recorder.Value = e.Value }
+	view := func() ui.Node {
+		n, err := recorder.View()
+		if err != nil {
+			panic(err)
+		}
+		return ui.Node{ID: "root", Kind: ui.Column, Focus: ui.FocusRequest{ID: "other", Sequence: 1}, Children: []ui.Node{{ID: "other", Kind: ui.Button, Text: "Other"}, n}}
+	}
+	m, a := simpleManual(t, manualConfig(t, 1340), view)
+	unitSettle(t, m)
+	w := m.implementation.find("one").state
+	source := findRecord(w.root, "shortcut")
+	other := findRecord(w.root, "other")
+	if !other.widget.AsWidget().ContainsFocus() || source.widget.AsWidget().ContainsFocus() {
+		t.Fatal("fixture did not start with other control focused")
+	}
+	bridge := &accessibilityBridge{}
+	id := accessibilityManagedID("shortcut")
+	nodes, handlers := accessibilitySnapshot(w.root, bridge)
+	guardFound := false
+	for _, node := range nodes {
+		if node.ID == id {
+			guardFound = node.activationGuard != nil && node.activationGuard()
+		}
+	}
+	if !guardFound || handlers[id] == nil || !handlers[id](accessibilityAction{Kind: "press"}) {
+		t.Fatal("live recorder AX Press refused")
+	}
+	pending := bridge.pendingFocus.Swap(nil)
+	if pending == nil || *pending != id || !recorder.Recording() {
+		t.Fatal("AX Press did not request focus and recording")
+	}
+	// The owner callback must not change another native window's focus itself.
+	if !other.widget.AsWidget().ContainsFocus() || source.widget.AsWidget().ContainsFocus() {
+		t.Fatal("owner-side AX handler touched native focus")
+	}
+	// Apply the bridge request on the originating native owner, as syncAccessibility
+	// does on its own refresh, then publish the recording scope and deliver a chord.
+	if !accessibilityApplyFocus(w.root, *pending) || !source.widget.AsWidget().ContainsFocus() {
+		t.Fatal("originating pending focus was not acknowledged")
+	}
+	if err := a.Invalidate("one"); err != nil {
+		t.Fatal(err)
+	}
+	unitSettle(t, m)
+	w.body.SystemEvents().KeyChord('k', key.CodeK, (1<<key.Meta)|(1<<key.Shift))
+	unitSettle(t, m)
+	if calls != 1 || recorder.Value != (ui.Shortcut{Key: "K", Modifiers: ui.ShortcutCommand | ui.ShortcutShift}) || recorder.Recording() {
+		t.Fatal("AX-focused recorder did not receive chord", calls, recorder.Value)
+	}
+}
+
+func TestShortcutRecorderAccessibilityRejectsSameIDReplacement(t *testing.T) {
+	first := &ui.ShortcutRecorder{ID: "shortcut", Change: func(ui.ShortcutEvent) { t.Error("unexpected first proposal") }}
+	current := first
+	view := func() ui.Node {
+		n, _ := current.View()
+		return ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{n}}
+	}
+	m, a := simpleManual(t, manualConfig(t, 1341), view)
+	unitSettle(t, m)
+	w := m.implementation.find("one").state
+	source := findRecord(w.root, "shortcut")
+	native := source.widget
+	bridge := &accessibilityBridge{}
+	id := accessibilityManagedID("shortcut")
+	_, handlers := accessibilitySnapshot(w.root, bridge)
+	old := handlers[id]
+	guard := shortcutAccessibilityGuard(source)
+	if old == nil || !guard() {
+		t.Fatal("initial recorder capability not live")
+	}
+	replacement := &ui.ShortcutRecorder{ID: "shortcut", Change: func(ui.ShortcutEvent) { t.Error("unexpected replacement proposal") }}
+	current = replacement
+	if err := a.Invalidate("one"); err != nil {
+		t.Fatal(err)
+	}
+	unitSettle(t, m)
+	if findRecord(w.root, "shortcut").widget != native {
+		t.Fatal("fixture remounted same-ID button instead of replacing component")
+	}
+	if guard() || old(accessibilityAction{Kind: "press"}) || old(accessibilityAction{Kind: "focus"}) || first.Recording() || replacement.Recording() || bridge.pendingFocus.Load() != nil {
+		t.Fatal("old AX capability activated/focused replacement")
+	}
+	_, fresh := accessibilitySnapshot(w.root, bridge)
+	if !fresh[id](accessibilityAction{Kind: "press"}) || !replacement.Recording() || bridge.pendingFocus.Load() == nil {
+		t.Fatal("fresh replacement AX capability refused")
+	}
+	replacement.Cancel(replacement.Session())
+}
+
+func TestShortcutRecorderAccessibilityRejectsRetiredModal(t *testing.T) {
+	a, _ := newAXTest(t, 16)
+	original := core.NewBody("Recorder AX modal origin")
+	host := core.NewFrame(original)
+	recorder := &ui.ShortcutRecorder{ID: "shortcut", Change: func(ui.ShortcutEvent) { t.Error("unexpected proposal") }}
+	n, _ := recorder.View()
+	descriptor := ui.Node{ID: "dialog", Kind: ui.Dialog, Text: "Shortcuts", Open: true, Dismiss: func() {}, Children: []ui.Node{n}}
+	root, err := reconcile(host, nil, descriptor, a, "ax")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer disposeControlTree(root)
+	modal := prepareDialogBody(root)
+	modal.NewDialog(root.widget)
+	root.control.dialog.active = true
+	if err := syncRecord(root, descriptor); err != nil {
+		t.Fatal(err)
+	}
+	source := findRecord(root, "shortcut")
+	scope := source.control.shortcut.scope.Load()
+	if scope == nil || len(scope.epoch.scopes) == 0 || !tabCloseEpochLive(scope.epoch) {
+		t.Fatal("fixture lacks current modal capability")
+	}
+	bridge := &accessibilityBridge{}
+	_, handlers := accessibilitySnapshot(root, bridge)
+	id := accessibilityManagedID("shortcut")
+	old := handlers[id]
+	guard := shortcutAccessibilityGuard(source)
+	if old == nil || !guard() {
+		t.Fatal("modal recorder AX capability not live")
+	}
+	// Actual native modal closure retires its epoch before retained children are
+	// parked or the application can reconcile another same-ID component.
+	modal.Send(events.Close)
+	if tabCloseEpochLive(scope.epoch) || guard() || old(accessibilityAction{Kind: "press"}) || old(accessibilityAction{Kind: "focus"}) || recorder.Recording() || bridge.pendingFocus.Load() != nil {
+		t.Fatal("retired modal AX handler remained active")
+	}
+	a.Drain()
+}

@@ -694,13 +694,16 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 		}
 		if n.Kind == ui.Button && r.control != nil {
 			x.activationGuard = placementActivationGuard(r)
+			if n.ShortcutRecorder != nil {
+				x.activationGuard = shortcutAccessibilityGuard(r)
+			}
 		}
 		protectSecureAccessibility(n, &x)
 		nodes = append(nodes, x)
 		if len(x.Actions) > 0 {
 			allowed := append([]string(nil), x.Actions...)
 			handlers[x.ID] = func(action accessibilityAction) bool {
-				if n.Kind == ui.ListBox && !x.activationGuard() {
+				if (n.Kind == ui.ListBox || n.ShortcutRecorder != nil) && (x.activationGuard == nil || !x.activationGuard()) {
 					return false
 				}
 				if !containsAccessibilityAction(allowed, action.Kind) {
@@ -710,7 +713,11 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 					accessibilityFocus(b, x.ID)
 					return true
 				}
-				return applyAccessibilityAction(r, action)
+				accepted := applyAccessibilityAction(r, action)
+				if accepted && action.Kind == "press" && n.ShortcutRecorder != nil && b != nil {
+					accessibilityFocus(b, x.ID)
+				}
+				return accepted
 			}
 		}
 		if n.Kind == ui.Disclosure && r.control != nil && r.control.disclosure != nil {
@@ -1164,7 +1171,13 @@ func accessibilityDialogInitialFocus(r *record, body *core.Body) core.Widget {
 	}
 	targets := map[string]accessibilityFocusTarget{}
 	accessibilityNativeFocusTargets(r, "", targets)
-	for _, id := range ui.FocusOrder(projection) {
+	order := ui.FocusOrder(projection)
+	if r.node.Sheet && len(order) > 0 && order[0] == accessibilityManagedID(ui.SheetCancelID(r.node.ID)) {
+		if target, ok := targets[accessibilityManagedID(r.node.DialogDefaultID)]; ok && !accessibilityTreeNil(target.widget) && !target.widget.AsWidget().IsDisabled() {
+			return target.widget
+		}
+	}
+	for _, id := range order {
 		if target, ok := targets[id]; ok && !accessibilityTreeNil(target.widget) {
 			return target.widget
 		}

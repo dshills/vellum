@@ -24,7 +24,8 @@ top tab strip; scroll within Inputs to reach its sections. The ordinary macOS ti
 - **Sheet:** choose Export drawing… to open a window-modal card. Cancel/Escape
   dismisses, Export confirms once and increments the sample count. Return activates
   the focused action or an unconsumed default; text editors keep their key handling.
-  Focus returns to Export drawing… after closing. No file is written.
+  The card is centered and its default action receives initial focus when there
+  is no editor. Focus returns to Export drawing… after closing. No file is written.
 - **Collection:** resize the window to change the number of columns. Click selects;
   Command-click toggles and Shift-click extends. Arrows follow the grid, Shift
   extends, Command-A selects enabled items. Return or double-click increments the

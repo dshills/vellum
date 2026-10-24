@@ -4,6 +4,11 @@ package cogent
 
 import (
 	"fmt"
+	"image"
+	"math"
+
+	"cogentcore.org/core/core"
+	"github.com/dshills/vellum/app"
 	"slices"
 	"testing"
 
@@ -285,6 +290,104 @@ func TestMacCollectionReplacementRetiresSelectionActivationAndAX(t *testing.T) {
 			a.Drain()
 			if selectionCalls != 1 || activationCalls != 1 {
 				t.Fatal("fresh replacement input refused", selectionCalls, activationCalls)
+			}
+		})
+	}
+}
+
+func TestMacCollectionCenteredLabelsAtDemoWidth(t *testing.T) {
+	for _, dark := range []bool{false, true} {
+		t.Run(fmt.Sprintf("dark%v", dark), func(t *testing.T) {
+			cfg := manualConfig(t, 83)
+			cfg.Theme = ui.MacTheme(dark)
+			cfg.Theme.Default.Background = cfg.Theme.Kinds[ui.ListBox].Background
+			cfg.Theme.Default.Typography = ui.Some(ui.Typography{Family: "Noto Sans", Size: 13})
+			f := &ui.CollectionView{ID: "files", Label: "Documents", Items: []ui.CollectionItem{{ID: "folder", Label: "Projects", Icon: ui.SymbolFolder}, {ID: "notes", Label: "Design notes", Icon: ui.SymbolDocument}, {ID: "thumbnail", Label: "Color study", Thumbnail: managedImageSource(t)}, {ID: "long", Label: "A considerably longer document title", Thumbnail: managedImageSource(t)}}, Change: func(ui.ListSelectionEvent) {}}
+			a, err := app.New(app.Config{QueueCapacity: 8})
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(a.Close)
+			if err := a.Open(app.Window{ID: "one", Title: "Collection alignment", Width: 660, Height: 400, View: func() ui.Node {
+				n, err := f.View()
+				if err != nil {
+					panic(err)
+				}
+				return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Style: ui.Style{Padding: ui.Some(ui.UniformInsets(16))}, Children: []ui.Node{n}}
+			}}); err != nil {
+				t.Fatal(err)
+			}
+			m, err := NewManual(testContext, a, cfg)
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() {
+				if err := m.Close(testContext); err != nil {
+					t.Error(err)
+				}
+			})
+			unitSettle(t, m)
+			r := findRecord(m.implementation.find("one").state.root, "files")
+			frame, err := m.Capture(testContext, "one")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if frame.Bounds().Dx() != 660 {
+				t.Fatal("fixture differs from actual demo width", frame.Bounds())
+			}
+			for _, item := range f.Items {
+				tile := r.control.choice.buttons[item.ID]
+				label := tile.ChildByName("collection-label", 0).(*core.Text)
+				artwork := tile.ChildByName("collection-icon", 0)
+				if item.Thumbnail != nil {
+					artwork = tile.ChildByName("collection-thumbnail", 0)
+				}
+				art := artwork.(core.Widget).AsWidget()
+				center := tile.Geom.Pos.Content.X + tile.Geom.Size.Actual.Content.X/2
+				artCenter := art.Geom.Pos.Content.X + art.Geom.Size.Actual.Content.X/2
+				if math.Abs(float64(artCenter-center)) > 1 {
+					t.Fatalf("%s artwork offcenter: artwork=%v tile=%v", item.ID, art.Geom, tile.Geom)
+				}
+				labelCenter := label.Geom.Pos.Content.X + label.Geom.Size.Actual.Content.X/2
+				if math.Abs(float64(labelCenter-center)) > 1 {
+					t.Fatalf("%s label allocation offcenter: label=%v tile=%v", item.ID, label.Geom, tile.Geom)
+				}
+				shaped := label.PaintText()
+				origin := label.Geom.Pos.Content.X
+				if label.AllocationLayout {
+					origin += max(float32(0), label.Geom.Size.Actual.Content.X-shaped.Bounds.Size().X) * label.Styles.Text.Align.Factor()
+				}
+				for _, line := range shaped.Lines {
+					lineCenter := origin + shaped.Offset.X + line.Offset.X + (line.Bounds.Min.X+line.Bounds.Max.X)/2
+					if math.Abs(float64(lineCenter-center)) > 1.5 {
+						t.Fatalf("%s shaped line offcenter: origin=%v line=%v tileCenter=%v", item.ID, origin, line, center)
+					}
+				}
+				bounds := label.Geom.TotalBBox.Intersect(frame.Bounds())
+				ink := image.Rectangle{}
+				for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+					for x := bounds.Min.X; x < bounds.Max.X; x++ {
+						c := frame.RGBAAt(x, y)
+						isInk := c.R < 100 && c.G < 100 && c.B < 100
+						if dark {
+							isInk = c.R > 190 && c.G > 190 && c.B > 190
+						}
+						if isInk {
+							pixel := image.Rect(x, y, x+1, y+1)
+							if ink.Empty() {
+								ink = pixel
+							} else {
+								ink = ink.Union(pixel)
+							}
+						}
+					}
+				}
+				if ink.Empty() {
+					t.Fatal("missing completed label glyph pixels", item.ID, bounds)
+				}
+				if math.Abs(float64(float32(ink.Min.X+ink.Max.X)/2-center)) > 3 {
+					t.Fatalf("%s glyph pixels offcenter: ink=%v tileCenter=%v label=%v", item.ID, ink, center, label.Geom)
+				}
 			}
 		})
 	}

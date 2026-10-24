@@ -811,6 +811,9 @@ func syncDialog(r *record) {
 		}
 	}
 	if d.active || d.dismissed {
+		if d.active && r.node.Sheet {
+			positionSheet(r)
+		}
 		return
 	}
 	body := prepareDialogBody(r)
@@ -827,10 +830,11 @@ func syncDialog(r *record) {
 		finishPopoverSurface(body)
 		positionPopover(r, anchor)
 	} else if r.node.Sheet {
-		stage := body.NewDialog(r.widget).SetDisplayTitle(false).SetResizable(false).SetScrim(true).SetUseMinSize(true)
-		preparePopoverSurface(r, body)
+		stage := body.NewDialog(r.widget).SetDisplayTitle(false).SetResizable(false).SetScrim(true).SetUseMinSize(false).SetTitle("")
+		prepareSheetSurface(r, body)
 		stage.Run()
 		finishPopoverSurface(body)
+		positionSheet(r)
 	} else {
 		body.NewDialog(r.widget).Run()
 	}

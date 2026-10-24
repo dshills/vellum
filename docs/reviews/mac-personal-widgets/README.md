@@ -833,3 +833,31 @@ safe (early return preceded defer and validate was nil-safe); the final path now
 returns an explicit error for clarity as suggested. Raw reviews are retained.
 Packaged native observations and their limits are recorded separately in the
 private delivery verification receipt. No public asset publication is included.
+
+## Packaged live corrections for the next widget batch
+
+Live light-package checks found the Sheet at the upper-left with an oversized
+outer surface/native-title side effect, collection labels horizontally offset
+from their artwork, and accessible recorder Press starting a session without
+transferring focus. Keyboard-focused recorder Return→CommandShiftK already
+worked; rating edits, capacity threshold updates and clear worked through native
+accessibility. These observations justified this bounded followup.
+
+Sheet now centers measured retained content, removes generic dialog minimum and
+outer scroll allocation, keeps the parent title and aligns actions trailing.
+With no leading editor, its primary action receives initial focus; routed Return
+confirms exactly once, Escape restores the opener. The regression caught an
+extra10px outer scrollbar reservation; disabling outer Body/Scene automatic
+scrolling removes it, while long content remains caller-owned bounded Scroll.
+Collection uses AllocationLayout plus intrinsic label width; actual660px light/
+dark tests check artwork, paragraph-line and completed glyph-pixel centers.
+Accessible recorder Press uses exact source/session/window/modal guard and the
+pending-focus bridge; owner delivery never writes native focus. Tests reject
+captured actions after same-ID component replacement or actual modal retirement.
+
+Focused race tests and native vet pass. Prism Anthropic claude-sonnet-5-5 reviewed
+all12 changed files. Its nil-guard concern requires an unmounted/incomplete record
+(the normal mount path installs control state), but the handler now also fails
+closed if a required activation guard is absent. This preserves secure refusal
+without a possible nil call. The raw review is retained. Updated private packages
+and final light/dark native observations are recorded in the delivery receipt.

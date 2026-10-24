@@ -105,6 +105,26 @@ func shortcutOwnerLive(r *record, b *shortcutRecorderBinding, s *shortcutRecorde
 	return r != nil && r.control != nil && !r.control.retired && !r.control.disabled && r.control.shortcut == b && b.scope.Load() == s && s != nil && tabCloseEpochLive(s.epoch) && r.node.ShortcutRecorder == s.recorder
 }
 
+// shortcutAccessibilityGuard captures the exact owner-held recorder source and
+// native eligibility publication. It runs only on the application owner, so an
+// AX callback cannot start a same-ID replacement or a retired modal session.
+// Native focus is requested separately through the bridge's pending-focus path.
+func shortcutAccessibilityGuard(r *record) func() bool {
+	if r == nil || r.control == nil || r.control.shortcut == nil {
+		return func() bool { return false }
+	}
+	c := r.control
+	binding := c.shortcut
+	scope := binding.scope.Load()
+	recorder := r.node.ShortcutRecorder
+	id := r.node.ID
+	return func() bool {
+		return r.control == c && c.windowRef.Context().Err() == nil && recorder != nil &&
+			recorder.ID == id && !recorder.Disabled && recorder.Change != nil &&
+			shortcutOwnerLive(r, binding, scope) && scope.recorder == recorder
+	}
+}
+
 // activateShortcutRecorder replaces generic Button activation with an immutable
 // capability, preventing a queued click from beginning a replacement component.
 func activateShortcutRecorder(r *record, e events.Event) bool {

@@ -4,6 +4,7 @@ import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
+	"cogentcore.org/core/math32"
 	"cogentcore.org/core/styles"
 )
 
@@ -64,4 +65,29 @@ func sheetRecord(r *record, id string) *record {
 		}
 	}
 	return nil
+}
+
+// Center the measured card inside its originating client area. Use its retained
+// content size, rather than the generic dialog minimum/title allowance.
+func positionSheet(r *record) {
+	d := r.control.dialog
+	if d == nil || d.body == nil || d.body.Scene == nil || r.widget.AsWidget().Scene == nil {
+		return
+	}
+	scene, parent := d.body.Scene, r.widget.AsWidget().Scene
+	bounds := parent.SceneGeom.Bounds()
+	size := d.host.Geom.Size.Actual.Total.Add(scene.Geom.Size.Space).Add(d.body.Geom.Size.Space).ToPointCeil()
+	size.X = max(1, min(size.X, bounds.Dx()))
+	size.Y = max(1, min(size.Y, bounds.Dy()))
+	pos := bounds.Min.Add(bounds.Size().Sub(size).Div(2))
+	if scene.SceneGeom.Pos != pos || scene.SceneGeom.Size != size {
+		scene.Resize(math32.Geom2DInt{Pos: pos, Size: size})
+		scene.LayoutScene()
+	}
+}
+
+func prepareSheetSurface(r *record, body *core.Body) {
+	preparePopoverSurface(r, body)
+	body.FinalStyler(func(s *styles.Style) { s.Overflow.Set(styles.OverflowHidden) })
+	body.Scene.FinalStyler(func(s *styles.Style) { s.Overflow.Set(styles.OverflowHidden) })
 }
