@@ -7,6 +7,7 @@ import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
+	"cogentcore.org/core/math32"
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/styles/units"
@@ -166,6 +167,30 @@ func toolbarKey(r *record, e events.Event) {
 	}
 }
 
+// The native ScrollToThis path intentionally refuses an item larger than its
+// viewport when it lies to the right/bottom. Keep oversized toolbar actions
+// reachable by showing their leading edge, matching native scroll priority.
+// This runs on the native owner after the widget's normal Focus handler;
+// the event manager may subsequently apply its ordinary scroll margin.
+func revealOversizedToolbarTarget(r *record, target *core.Frame) {
+	if r == nil || r.control == nil || r.control.retired || r.control.disabled || r.control.chrome == nil || !target.StateIs(states.Focused) {
+		return
+	}
+	host := r.control.chrome.host
+	axis := math32.X
+	if r.node.Orientation == ui.Vertical {
+		axis = math32.Y
+	}
+	if host.Geom.ContentBBox.Empty() || !host.HasScroll[axis] {
+		return
+	}
+	raw := math32.RectFromPosSizeMax(target.Geom.Pos.Total, target.Geom.Size.Actual.Total)
+	if math32.PointDim(raw.Size(), axis) <= math32.PointDim(host.Geom.ContentBBox.Size(), axis) {
+		return
+	}
+	host.ScrollDimToStart(axis, math32.PointDim(raw.Min, axis))
+}
+
 const toolbarScopeProperty = "vellum.toolbar-scope"
 const toolbarHookProperty = "vellum.toolbar-hook"
 
@@ -252,6 +277,10 @@ func bindToolbarNavigation(root *record) {
 				installed, _ := frame.Property(toolbarHookProperty).(bool)
 				if !installed {
 					frame.SetProperty(toolbarHookProperty, true)
+					frame.OnFinal(events.Focus, func(events.Event) {
+						current, _ := frame.Property(toolbarScopeProperty).(*record)
+						revealOversizedToolbarTarget(current, frame)
+					})
 					frame.OnFinal(events.KeyChord, func(e events.Event) {
 						current, _ := frame.Property(toolbarScopeProperty).(*record)
 						if current != nil {

@@ -49,6 +49,8 @@ use the dropdown; there is no per-keystroke completion filtering, comma-triggere
 commit, inline chip editing or rearrangement. Long chips abbreviate their visible labels;
 accessibility and removal keep the full value. Abbreviation is fixed rather than
 width-responsive; at very narrow widths a single chip can still be clipped.
+Keyboard focus scrolls oversized chips into view at their leading edge; Return
+or Space removes the focused chip even if its trailing remove mark is clipped.
 See the [integration limits](mac-widget-integration.md#limits) for the reproduced
 case. In this standalone demo, tag acceptance, rejection and chip removal return focus to tag entry for repeated
 entry. Tag validation feedback appears above the controls so it stays visible

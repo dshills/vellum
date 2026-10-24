@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "23c06a2e993cd47ac171301f4af02e7c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "c4e0f06a2036d19e1939cd0fb4f8fc68b4ad3eea",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "b4ae54cb20e7f302",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible nil host dereference",
+      "message": "The host is dereferenced without a nil check, although the guard only verifies r.control.chrome. If a stale or partially built chrome has a nil host, the Focus handler will panic. The handler is registered on every descendant frame in scope, so it can run on unusual widgets.",
+      "suggestion": "Add `|| r.control.chrome.host == nil` to the guard clause.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/chrome.go",
+          "lines": {
+            "start": 179,
+            "end": 180
+          }
+        }
+      ],
+      "tags": [
+        "nil-deref",
+        "location-corrected"
+      ],
+      "evidence": "host := r.control.chrome.host\n\taxis := math32.X",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "ea9d48e1720e1b57",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Reveal applies to any scoped frame, not only toolbar actions",
+      "message": "The handler is installed on every descendant frame in a toolbar scope, including nested layout frames and the toolbar host itself. A focused or focus-within nested frame that is itself larger than the viewport (e.g. the host's inner layout) could trigger scrolling to its start, which fights native scrolling. The handler also does not check that the target is a descendant of the host.",
+      "suggestion": "Restrict the reveal to frames that are direct managed toolbar items, or verify the target is a strict descendant of host and not host itself.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/chrome.go",
+          "lines": {
+            "start": 187,
+            "end": 187
+          }
+        }
+      ],
+      "tags": [
+        "scope",
+        "location-corrected"
+      ],
+      "evidence": "raw := math32.RectFromPosSizeMax(target.Geom.Pos.Total, target.Geom.Size.Actual.Total)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 14029,
+    "totalMs": 14054
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 22340,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 12758,
+        "output": 582,
+        "costUSD": 0.031336
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -134,104 +134,139 @@ func TestTokenFieldLongChipKeepsRemovalVisible(t *testing.T) {
 func TestTokenFieldFullToolbarKeyboardRemoval(t *testing.T) {
 	for _, dark := range []bool{false, true} {
 		for _, dpi := range []float32{160, 320} {
-			t.Run(fmt.Sprintf("dark-%v/dpi-%.0f", dark, dpi), func(t *testing.T) {
-				p := &ui.TokenField{ID: "tags"}
-				for i := range ui.MaxTokens {
-					p.Tokens = append(p.Tokens, ui.Token{ID: fmt.Sprintf("token-%d", i), Text: fmt.Sprintf("%d %s", i, strings.Repeat("Segment😀/", 12))})
-				}
-				first, last := ui.TokenRemoveID(p.ID, p.Tokens[0].ID), ui.TokenRemoveID(p.ID, p.Tokens[len(p.Tokens)-1].ID)
-				fullLast := p.Tokens[len(p.Tokens)-1]
-				focus := ui.FocusRequest{ID: first, Sequence: 1}
-				var edits []ui.TokenEvent
-				p.Change = func(e ui.TokenEvent) {
-					edits = append(edits, e)
-					if !e.Remove {
-						return
+			for _, width := range []float32{200, 320} {
+				t.Run(fmt.Sprintf("dark-%v/dpi-%.0f/width-%.0f", dark, dpi, width), func(t *testing.T) {
+					p := &ui.TokenField{ID: "tags"}
+					for i := range ui.MaxTokens {
+						p.Tokens = append(p.Tokens, ui.Token{ID: fmt.Sprintf("token-%d", i), Text: fmt.Sprintf("%d %s", i, strings.Repeat("Segment😀/", 12))})
 					}
-					for i, tok := range p.Tokens {
-						if tok.ID == e.TokenID {
-							p.Tokens = append(p.Tokens[:i], p.Tokens[i+1:]...)
-							focus = ui.FocusRequest{ID: ui.TokenInputID(p.ID), Sequence: focus.Sequence + 1}
+					first, last := ui.TokenRemoveID(p.ID, p.Tokens[0].ID), ui.TokenRemoveID(p.ID, p.Tokens[len(p.Tokens)-1].ID)
+					fullLast := p.Tokens[len(p.Tokens)-1]
+					focus := ui.FocusRequest{ID: first, Sequence: 1}
+					var edits []ui.TokenEvent
+					p.Change = func(e ui.TokenEvent) {
+						edits = append(edits, e)
+						if !e.Remove {
 							return
 						}
+						for i, tok := range p.Tokens {
+							if tok.ID == e.TokenID {
+								p.Tokens = append(p.Tokens[:i], p.Tokens[i+1:]...)
+								focus = ui.FocusRequest{ID: ui.TokenInputID(p.ID), Sequence: focus.Sequence + 1}
+								return
+							}
+						}
 					}
-				}
-				view := func() ui.Node {
-					n, err := p.View()
+					view := func() ui.Node {
+						n, err := p.View()
+						if err != nil {
+							panic(err)
+						}
+						return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Focus: focus, Style: ui.Style{MaxSize: ui.Some(ui.Size{Width: width})}, Children: []ui.Node{n}}
+					}
+					cfg := manualConfig(t, 958)
+					cfg.Theme = ui.MacTheme(dark)
+					cfg.Theme.Default.Background = ui.Some(color.NRGBA{R: 246, G: 246, B: 248, A: 255})
+					if dark {
+						cfg.Theme.Default.Background = ui.Some(color.NRGBA{R: 29, G: 29, B: 31, A: 255})
+					}
+					cfg.Theme.Default.Typography = ui.Some(ui.Typography{Family: "Noto Sans", Size: 13})
+					cfg.LogicalDPI = dpi
+					// Match software window/DPI scale. The 200dp case deliberately
+					// makes each long chip wider than the available viewport.
+					a, err := app.New(app.Config{QueueCapacity: 16})
 					if err != nil {
-						panic(err)
+						t.Fatal(err)
 					}
-					return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Focus: focus, Style: ui.Style{MaxSize: ui.Some(ui.Size{Width: 320})}, Children: []ui.Node{n}}
-				}
-				cfg := manualConfig(t, 958)
-				cfg.Theme = ui.MacTheme(dark)
-				cfg.Theme.Default.Background = ui.Some(color.NRGBA{R: 246, G: 246, B: 248, A: 255})
-				if dark {
-					cfg.Theme.Default.Background = ui.Some(color.NRGBA{R: 29, G: 29, B: 31, A: 255})
-				}
-				cfg.Theme.Default.Typography = ui.Some(ui.Typography{Family: "Noto Sans", Size: 13})
-				cfg.LogicalDPI = dpi
-				// Scale the software window together with DPI, retaining a 320dp
-				// content region. simpleManual's fixed 400px window is narrower
-				// in logical units at DPI320 and is not a matched-scale fixture.
-				a, err := app.New(app.Config{QueueCapacity: 16})
-				if err != nil {
-					t.Fatal(err)
-				}
-				t.Cleanup(a.Close)
-				scale := dpi / 160
-				if err = a.Open(app.Window{ID: "one", Title: "Full tag toolbar", Width: 400 * scale, Height: 240 * scale, View: view}); err != nil {
-					t.Fatal(err)
-				}
-				m, err := NewManual(testContext, a, cfg)
-				if err != nil {
-					t.Fatal(err)
-				}
-				t.Cleanup(func() {
-					if err := m.Close(testContext); err != nil {
-						t.Error(err)
+					t.Cleanup(a.Close)
+					scale := dpi / 160
+					windowWidth := float32(400)
+					if width == 200 {
+						windowWidth = 200
 					}
-				})
-				unitSettle(t, m)
-				w, entry := imageManualElement(t, m, ui.TokenInputID(p.ID))
-				if entry.Enabled {
-					t.Fatal("full token field admitted entry")
-				}
-				toolbar := findRecord(m.implementation.find("one").state.root, "tags/tokens/chips").control.chrome.host
-				if toolbar.Scrolls[math32.X] == nil {
-					t.Fatal("full chip toolbar has no overflow")
-				}
-				send := func(code key.Codes) {
-					t.Helper()
-					if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: events.KeyChord, Code: code}); err != nil {
+					if err = a.Open(app.Window{ID: "one", Title: "Full tag toolbar", Width: windowWidth * scale, Height: 240 * scale, View: view}); err != nil {
+						t.Fatal(err)
+					}
+					m, err := NewManual(testContext, a, cfg)
+					if err != nil {
+						t.Fatal(err)
+					}
+					t.Cleanup(func() {
+						if err := m.Close(testContext); err != nil {
+							t.Error(err)
+						}
+					})
+					unitSettle(t, m)
+					w, entry := imageManualElement(t, m, ui.TokenInputID(p.ID))
+					if entry.Enabled {
+						t.Fatal("full token field admitted entry")
+					}
+					toolbar := findRecord(m.implementation.find("one").state.root, "tags/tokens/chips").control.chrome.host
+					if toolbar.Scrolls[math32.X] == nil {
+						t.Fatal("full chip toolbar has no overflow")
+					}
+					send := func(code key.Codes) {
+						t.Helper()
+						if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: events.KeyChord, Code: code}); err != nil {
+							t.Fatal(err)
+						}
+						unitSettle(t, m)
+					}
+					send(key.CodeEnd)
+					_, chip := imageManualElement(t, m, last)
+					lastRecord := findRecord(m.implementation.find("one").state.root, last)
+					box := lastRecord.widget.AsWidget().Geom.TotalBBox
+					if !chip.Focused || toolbar.Scrolls[math32.X].Value <= 0 || box.Empty() || !box.In(toolbar.Geom.ContentBBox) {
+						t.Fatal("last chip focus not visible in toolbar", chip, box, toolbar.Geom.ContentBBox)
+					}
+					raw := math32.RectFromPosSizeMax(lastRecord.widget.AsWidget().Geom.Pos.Total, lastRecord.widget.AsWidget().Geom.Size.Actual.Total)
+					if width == 200 {
+						if raw.Dx() <= toolbar.Geom.ContentBBox.Dx() || raw.Min.X < toolbar.Geom.ContentBBox.Min.X || raw.Min.X >= toolbar.Geom.ContentBBox.Max.X {
+							t.Fatal("oversized chip leading edge not revealed", raw, toolbar.Geom.ContentBBox)
+						}
+					} else if !raw.In(toolbar.Geom.ContentBBox) {
+						t.Fatal("ordinary chip is clipped", raw, toolbar.Geom.ContentBBox)
+					}
+					if lastRecord.node.Accessibility.Name != "Remove "+fullLast.Text {
+						t.Fatal("full label lost")
+					}
+					send(key.CodeReturnEnter)
+					if len(edits) != 1 || !edits[0].Remove || edits[0].TokenID != fullLast.ID || edits[0].Text != fullLast.Text || len(p.Tokens) != ui.MaxTokens-1 {
+						t.Fatal("keyboard removal did not deliver one full-value edit", edits, len(p.Tokens))
+					}
+					_, entry = imageManualElement(t, m, ui.TokenInputID(p.ID))
+					if !entry.Enabled || !entry.Focused {
+						t.Fatal("consumer focus did not reach re-enabled entry", entry)
+					}
+					// A managed focus request uses the same reveal path without a
+					// toolbar navigation key. It must reach a retained chip.
+					next := ui.TokenRemoveID(p.ID, p.Tokens[len(p.Tokens)-1].ID)
+					if err := a.Do(func() { focus = ui.FocusRequest{ID: next, Sequence: focus.Sequence + 1}; _ = a.Invalidate("one") }); err != nil {
 						t.Fatal(err)
 					}
 					unitSettle(t, m)
-				}
-				send(key.CodeEnd)
-				_, chip := imageManualElement(t, m, last)
-				lastRecord := findRecord(m.implementation.find("one").state.root, last)
-				box := lastRecord.widget.AsWidget().Geom.TotalBBox
-				if !chip.Focused || toolbar.Scrolls[math32.X].Value <= 0 || box.Empty() || !box.In(toolbar.Geom.ContentBBox) {
-					t.Fatal("last chip not fully revealed", chip, box, toolbar.Geom.ContentBBox)
-				}
-				if lastRecord.node.Accessibility.Name != "Remove "+fullLast.Text {
-					t.Fatal("full label lost")
-				}
-				send(key.CodeReturnEnter)
-				if len(edits) != 1 || !edits[0].Remove || edits[0].TokenID != fullLast.ID || edits[0].Text != fullLast.Text || len(p.Tokens) != ui.MaxTokens-1 {
-					t.Fatal("keyboard removal did not deliver one full-value edit", edits, len(p.Tokens))
-				}
-				_, entry = imageManualElement(t, m, ui.TokenInputID(p.ID))
-				if !entry.Enabled || !entry.Focused {
-					t.Fatal("consumer focus did not reach re-enabled entry", entry)
-				}
-				// A settling frame must not redeliver the removal after its target vanished.
-				unitSettle(t, m)
-				if len(edits) != 1 {
-					t.Fatal("removal redelivered", edits)
-				}
-			})
+					_, requested := imageManualElement(t, m, next)
+					if !requested.Focused || requested.Bounds.Empty() {
+						t.Fatal("managed focus left chip invisible", requested)
+					}
+					// Ordinary Shift-Tab is native traversal, not toolbarKey or a
+					// managed focus request. Its oversized target must be visible too.
+					if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: events.KeyChord, Code: key.CodeTab, Modifiers: 1 << key.Shift}); err != nil {
+						t.Fatal(err)
+					}
+					unitSettle(t, m)
+					previous := ui.TokenRemoveID(p.ID, p.Tokens[len(p.Tokens)-2].ID)
+					_, tabbed := imageManualElement(t, m, previous)
+					if !tabbed.Focused || tabbed.Bounds.Empty() {
+						t.Fatal("Tab traversal left chip invisible", tabbed)
+					}
+					// A settling frame must not redeliver the removal after its target vanished.
+					unitSettle(t, m)
+					if len(edits) != 1 {
+						t.Fatal("removal redelivered", edits)
+					}
+				})
+			}
 		}
 	}
 }

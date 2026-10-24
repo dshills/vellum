@@ -157,3 +157,20 @@ viewport-responsive. A long chip may exceed a roughly 200-logical-pixel viewport
 and have clipped completed bounds. Preserve that finding in the integration
 guide; responsive chip sizing is follow-up work, not part of the passing
 matched-scale assertion. No public API, rendering policy or release gate changes.
+
+## Oversized toolbar focus recovery
+
+A focused chip larger than its toolbar viewport must not remain wholly offscreen.
+The adapter adds a native Focus fallback using the current toolbar scope and
+existing scroll APIs to reveal its leading edge, retaining the native scroll
+margin. This applies to horizontal/vertical toolbar frames, managed focus requests
+and ordinary keyboard focus; normal-sized controls retain native scrolling.
+Bindings follow current ancestry and are cleared on reparenting; disabled or
+retired scopes do not scroll. No owner-queue work, polling or public API is added.
+
+The 32-token regression now includes 200/320 logical widths and checks unclipped
+raw geometry for ordinary chips, visible leading geometry for oversized chips,
+one full-value removal and an independent managed FocusRequest after removal.
+A separate oversized vertical-action regression checks visibility, activation and
+Home return. Narrow chips still have partial labels/trailing marks; responsive
+truncation remains separate work, as disclosed in the integration guide.

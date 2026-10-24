@@ -547,3 +547,37 @@ also a value. No rendered callback retains a slice header to these items. The
 owner callback runs serially; no data race or aliased shifted view occurs. Keep
 the ordinary owner-controlled removal pattern; no production fix is warranted by
 this hypothetical finding. All reviewed files have complete coverage.
+
+## Oversized toolbar focus recovery
+
+The width200 token repro left the last focused chip completely offscreen in both
+themes at DPI160/320. Pinned native ScrollToThis intentionally refuses an oversized
+target to the right/bottom. A native final Focus listener now uses the existing,
+current toolbar-scope property and ScrollDimToStart fallback only for oversized
+frames. Native focus's later pass retains its normal leading margin. No queued
+owner callback, polling, public API or renderer/pacing change is introduced.
+
+Eight full-token cases cover two logical widths, themes and matched DPI values.
+They require visible oversized leading geometry, unclipped raw ordinary-chip
+geometry (not merely clipped published bounds), full accessible names, exactly
+one full-value Return removal, consumer focus reaching the newly enabled entry,
+an independent managed FocusRequest and native Shift-Tab traversal. The vertical
+oversized action checks End visibility, one activation and Home return. Existing
+nested/reparent/disabled-toolbar and token cases pass under race; driver vet and
+native gallery build pass. The first trailing-edge candidate was superseded:
+native focus's later scroll pass favors the leading edge. Narrow labels and the
+trailing remove mark may still clip; this is explicitly retained as a limit.
+
+Prism Anthropic claude-sonnet-5-5 completed coverage and raised two hypothetical
+concerns. chrome.host cannot be nil in a published toolbar: mountChrome constructs
+outer, initializes host to outer, then publishes chrome; no code clears host.
+Retirement is guarded before using it. The focus handler tests states.Focused,
+not ContainsFocus; nonfocusable layout/toolbar frames do not acquire that state
+from normal native Focus (the pinned handler checks abilities.Focusable). The
+current scope is read at event time, and the existing binder clears moved-out
+frames and chooses the nearest nested toolbar. Passing reparent/nested tests
+exercise that lifetime behavior. No stale-host or focus-within scenario described
+by the review is reachable under these source invariants. Keep the bounded
+fallback rather than adding speculative state or redundant ancestor walks.
+Native app confirmation follows packaging; software DPI evidence is not a
+physical display-scaling claim.

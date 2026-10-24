@@ -147,10 +147,14 @@ one native window. Font/color pickers do not own shared system panels, path
 controls do not access files, and token chips do not support inline editing or
 drag rearrangement. Chip abbreviation uses a fixed 24-rune budget rather than
 viewport-responsive truncation. A chip wider than its toolbar viewport can be
-clipped; a reproduced example uses the 400px software window at DPI320 (about
-200 logical pixels) with long mixed-script labels. Allow enough space for the
-chosen typography. The matched-scale regression uses a 320-logical-pixel field,
-32 long labels, both themes and DPI160/320; it verifies last-chip reveal and
-exactly-once keyboard removal. This does not qualify physical display scaling.
+clipped; a reproduced example uses a roughly 200-logical-pixel field with long
+mixed-script labels. Keyboard focus now scrolls an oversized toolbar action into
+view at its leading edge instead of leaving it wholly offscreen. Return/Space
+still invokes the visible chip's removal action, and its accessible name stays
+full; the trailing remove mark can remain clipped. Allow enough space for the
+chosen typography. Regressions use 200- and 320-logical-pixel fields, 32 long labels,
+both themes and matched DPI160/320 windows; they verify visible oversized focus,
+full ordinary-chip geometry and exactly-once removal. These checks do not qualify
+physical display scaling.
 See the [full control reference](controls.md) and
 [demo limitations](mac-widget-demo.md#current-limits).
