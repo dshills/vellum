@@ -1,7 +1,7 @@
 # Mac toolbar catalogue
 
-Scope: application-local examples built with existing public nodes. Framework,
-rendering, title-bar and release-policy scope remains unchanged.
+Scope: Mac toolbar examples and public content-toolbar helpers. Rendering,
+title-bar and release-policy scope remains unchanged.
 
 - Toolbars page in both Mac widget packages, with three size recipes and four
   display modes. Small/Regular/Large control heights are 26/32/40 pt; font sizes
@@ -51,3 +51,30 @@ stale actions. Menu row artwork is 18 logical pixels, contained and never tinted
 Checked items with artwork show a separate check indicator; plain checked items
 retain the existing marker. Menu option IconImage is immutable and exclusive with
 Icon. Separators cannot carry either artwork or action state.
+
+
+Toolbar customization uses public ToolbarLayout (partial Order/Hidden stable ID
+lists) and a retained owner-held ToolbarCustomizer. Apply the value to the fresh
+complete flat horizontal Buttons/Separators catalogue before overflow. Normalize
+separators, preserve artwork/styles/callbacks and visible retained identities;
+hiding removes controls from both toolbar and overflow. Unknown/duplicate IDs and
+unsupported sources are rejected. Hidden actions can be reordered; showing an
+action recreates the same public identity. All-hidden is valid with an external
+opener. Max 64 catalogue items, at least one action. New omitted IDs append in
+catalogue order; stale unknown IDs require caller migration.
+
+The same-window sheet has full-color decorative artwork, named visibility
+checkboxes and earlier/later buttons, Restore Defaults and Done. Edits emit
+controlled proposals against the latest accepted Value, suppress no-ops, and
+never invoke toolbar commands. Disabled actions remain configurable. Done/Escape
+retains edits, revokes the session and restores focus. Disable, ID replacement,
+invalid descriptions and native disposal also revoke stale input. Small, Regular,
+Large and Mixed have independent gallery values and openers. No disk preferences,
+drag customization, cross-window customization or NSToolbar system palette.
+
+Portable tests cover normalization, malformed layouts, callback identity,
+accepted/rejected/queued edits, restore, hidden-all and session revocation. Public
+SDK consumption is separate. Native Manual routes real pointer events through
+both-theme sheets, checks retained identity/artwork on reorder, removal from
+ordinary and overflow actions, focus restoration, disabling and window teardown.
+Packaged screenshot/AX/native-key observations remain separate evidence.

@@ -39,3 +39,32 @@ func TestPublicFullColorToolbarAction(t *testing.T) {
 		t.Fatal(calls)
 	}
 }
+
+func TestPublicToolbarCustomizationAndOverflow(t *testing.T) {
+	calls := 0
+	catalogue := ui.Node{ID: "drawing-tools", Kind: ui.Toolbar, Children: []ui.Node{
+		{ID: "open", Kind: ui.Button, Text: "Open", Icon: ui.SymbolFolder, Activate: func() { calls++ }},
+		{ID: "save", Kind: ui.Button, Text: "Save", Icon: ui.SymbolSave, Activate: func() { calls++ }},
+	}}
+	layout := ui.ToolbarLayout{Order: []string{"save", "open"}, Hidden: []string{"open"}}
+	applied, err := layout.Apply(catalogue)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(applied.Children) != 1 || applied.Children[0].ID != "save" {
+		t.Fatal("layout lost")
+	}
+	overflow := ui.WithToolbarOverflow(applied)
+	if err := ui.Validate(overflow); err != nil {
+		t.Fatal(err)
+	}
+	overflow.Children[1].Change(ui.ChangeEvent{SelectedID: "save"})
+	if calls != 1 {
+		t.Fatal("action changed")
+	}
+	customizer := ui.ToolbarCustomizer{ID: "customize", Toolbar: catalogue, Value: layout, Open: true, Dismiss: func() {}, Change: func(next ui.ToolbarLayout) { layout = next }}
+	panel, err := customizer.View()
+	if err != nil || panel.Kind != ui.Dialog || !panel.Sheet {
+		t.Fatal("public customization sheet", err)
+	}
+}

@@ -1015,3 +1015,46 @@ scrolling toolbar tests pass. Gallery public Manual tests compare both modes and
 both appearances; portable UI, independent SDK consumer, vet and native build
 pass. Packaged native observations are recorded separately in the local delivery
 receipt, without claiming human VoiceOver or physical-pointer qualification.
+
+
+## Reordering and hiding toolbar actions
+
+ToolbarLayout.Apply filters/reorders a complete flat horizontal catalogue before
+overflow. ToolbarCustomizer is an owner-held controlled content sheet built from
+existing Dialog/Sheet, scrolling, image, checkbox and button APIs. It retains
+full-color artwork and action IDs/callbacks; customization never invokes commands.
+The gallery supplies separate Small/Regular/Large/Mixed values with external
+openers, live edits, Restore Defaults, Done/Escape and session-only state.
+
+Prism reviewed all nine changed implementation/test/guide/spec files with
+Anthropic Claude Sonnet 5.5 twice, complete coverage and no high findings. The
+initial target-capture finding was addressed: the gallery saves through a closure
+bound to the View target, checking current target/catalogue/Open before assigning.
+A regression invokes an old checkbox precisely after a new opener changes target
+and before its next View, then again after replacement View; neither toolbar is
+modified. No queued target transition can cross-save configuration.
+
+Final findings have source-backed dispositions. customizeTarget is private, set
+only by the four internally generated opener closures or the Regular constructor
+default. All four targets are inserted in catalogues on every View. It has no
+external/persisted input and vertical toolbars have no opener. An unknown target
+would represent internal state corruption; the existing visible error fails
+closed rather than silently accepting a different toolbar. Every target is
+exercised by the independent-per-bar regression, including all-hidden/restore.
+
+The claimed spurious Hidden reordering does not occur: emit resolves the accepted
+value before editing and resolves the candidate afterward. resolveToolbarLayout
+serializes Hidden in resolved Order, then slices.Equal compares the normalized
+lists. The portable regression hides two items and unchecks the first again;
+the Change count remains unchanged. Rejected proposals, queued accepted edits,
+invalid replacements, close/reopen, disabled sessions and removed IDs are covered.
+
+Focused portable UI race tests and public SDK consumer checks pass. Native Manual
+pointer routing covers both themes, retained action and artwork identity on reorder,
+removal from toolbar/overflow on hiding, all-hidden, Restore Defaults, modal
+focus/AX scope, stale input, disabling and window-close cleanup. Gallery tests
+cover per-toolbar independence and existing sizes/modes/overflow behavior. Vet and
+native build pass. Packaged app observations are recorded in the local delivery
+receipt separately from automated routing. No drag customization, disk settings,
+NSToolbar system palette, physical-pointer or human VoiceOver qualification is
+claimed by this checkpoint.

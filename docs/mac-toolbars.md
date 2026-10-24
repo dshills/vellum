@@ -103,7 +103,7 @@ Escape, outside click and window shutdown use managed-menu lifetime handling.
 Return/Space or Down opens More actions; the popup uses native menu keyboard
 navigation. Tab and toolbar arrows skip hidden controls, with End reaching More.
 Widening restores the same native controls. Overflow is a custom-rendered
-same-window menu, with no NSToolbar title-bar integration or customization palette.
+same-window menu, with no NSToolbar title-bar integration or macOS system palette.
 
 A regular monochrome action, independently consumable by an application:
 
@@ -133,7 +133,7 @@ recipe to every action in a bar. The generated vector icon follows the action's
 font-relative sizing. Local styles leave hover and keyboard-focus feedback intact.
 
 These are custom-rendered **content** toolbars. They do not install NSToolbar,
-provide title-bar merging, vibrancy, customization palettes, draggable items,
+provide title-bar merging, vibrancy, the macOS system customization palette, draggable items,
 or cross-window overflow menus. Explicit light/dark palettes and size
 metrics do not follow automatic NSControlSize or OS appearance changes. Artwork
 uses original full-color sample pixels or Vellum’s bundled vector symbols;
@@ -145,3 +145,57 @@ retained action identities across display modes, exactly-once activation,
 disabled actions, and keyboard revelation of narrow overflow. Native keyboard,
 accessibility actions and screenshots are recorded separately in the delivery
 receipt; neither is a claim of human VoiceOver or physical-pointer qualification.
+
+
+## Reordering and hiding actions
+
+Choose **Customize…** beside Small, Regular, Large or Mixed. Each toolbar has its
+own settings. The window-modal content sheet shows full-color artwork and labeled
+visibility checkboxes. Up/down buttons move an item one place earlier/later,
+including while hidden. These buttons and checkboxes support keyboard focus and
+named accessibility actions. Disabled toolbar commands can still be configured;
+editing the layout never runs their command. Restore Defaults resets both order
+and visibility. Done and Escape close the sheet and restore focus to its opener.
+Changes apply immediately; Escape keeps them. The gallery retains settings only
+for the current process and has no preferences-file side effects.
+
+Public applications use `ui.ToolbarLayout` and a retained `ui.ToolbarCustomizer`:
+
+```go
+// Keep catalogue complete, with stable action IDs, original artwork/callbacks.
+customizer := &ui.ToolbarCustomizer{ID: "customize-tools", Toolbar: catalogue,
+    ReturnFocusID: "show-customizer"}
+customizer.Change = func(next ui.ToolbarLayout) { customizer.Value = next }
+customizer.Dismiss = func() { customizer.Open = false }
+// On the owner, opening sets customizer.Open = true. In each View:
+configured, err := customizer.Value.Apply(catalogue)
+// Handle err. Add overflow only if at least one visible item remains.
+if len(configured.Children) > 0 {
+    configured = ui.WithToolbarOverflow(configured)
+}
+customizer.Toolbar = catalogue
+panel, err := customizer.View()
+// Handle err; return configured and panel alongside an external opener.
+```
+
+Retain the customizer on one application owner. Accept a Change proposal by
+assigning Value immediately; the component resolves queued edits against that
+latest accepted configuration. Reject by leaving Value unchanged. Keep View
+updated on close/disable/configuration changes so old sessions are revoked.
+The driver also guards removed/closed native controls. The generated control ID
+helpers support independent consumers and automation. The complete catalogue
+supports 1..64 ordinary horizontal Buttons/Separators, with at least one action;
+editors, nested controls, placement sources and context-menu hosts are refused.
+Apply customization before adding overflow, so hidden actions never reappear in
+More actions. Reordering preserves retained visible control identity; hiding
+removes an action, and showing it mounts a new native control with the same public
+ID, artwork and application callback. Leading/trailing/adjacent separators are
+normalized. Hiding every action is valid: keep the opener outside the toolbar.
+
+Order is a partial ID list, with omitted items appended in catalogue order.
+Hidden is also a list of IDs. Unknown/duplicate IDs produce an error rather than
+silently changing a different action. The value has JSON fields `order`/`hidden`;
+applications may store it and handle catalogue migrations themselves. The gallery
+does not write settings to disk. Customization uses an explicit content sheet,
+with arrow controls for order; drag reordering, cross-window customization and
+NSToolbar's native customization palette are not supplied.

@@ -74,3 +74,69 @@ func TestToolbarFullColorComparison(t *testing.T) {
 		t.Fatal("artwork not shared")
 	}
 }
+
+func TestMacToolbarCustomizationIsIndependentPerBar(t *testing.T) {
+	for _, id := range []string{"toolbar-Small", "toolbar-Regular", "toolbar-Large", "toolbar-mixed"} {
+		m := newMacToolbarGallery(false)
+		findGalleryDocumentNode(m.view(), id+"/customize").Activate()
+		panel := m.view()
+		if !m.customizer.Open || m.customizer.Toolbar.ID != id {
+			t.Fatal("wrong customization target", id)
+		}
+		original := findGalleryDocumentNode(panel, id+"/Save").IconImage
+		findGalleryDocumentNode(panel, ui.ToolbarCustomizationEarlierID("toolbar-customizer", id+"/Save")).Activate()
+		panel = m.view()
+		findGalleryDocumentNode(panel, ui.ToolbarCustomizationVisibilityID("toolbar-customizer", id+"/New")).Change(ui.ChangeEvent{Checked: false})
+		panel = m.view()
+		bar := findGalleryDocumentNode(panel, id)
+		if bar.Children[0].ID != id+"/Save" || bar.Children[0].IconImage != original {
+			t.Fatal("configuration lost order/artwork", id)
+		}
+		other := "toolbar-Regular"
+		if id == other {
+			other = "toolbar-Small"
+		}
+		if findGalleryDocumentNode(panel, other).Children[0].ID != other+"/New" {
+			t.Fatal("configuration changed peer toolbar")
+		}
+		for _, name := range []string{"Open", "Save", "Undo", "Redo", "Delete"} {
+			findGalleryDocumentNode(m.view(), ui.ToolbarCustomizationVisibilityID("toolbar-customizer", id+"/"+name)).Change(ui.ChangeEvent{Checked: false})
+		}
+		panel = m.view()
+		bar = findGalleryDocumentNode(panel, id)
+		if len(bar.Children) != 0 {
+			t.Fatal("all-hidden toolbar retained overflow or separator", id)
+		}
+		if e := ui.Validate(panel); e != nil {
+			t.Fatal(e)
+		}
+		findGalleryDocumentNode(panel, ui.ToolbarCustomizationRestoreID("toolbar-customizer")).Activate()
+		panel = m.view()
+		if findGalleryDocumentNode(panel, id).Children[0].ID != id+"/New" {
+			t.Fatal("restore failed", id)
+		}
+		findGalleryDocumentNode(panel, ui.ToolbarCustomizationDoneID("toolbar-customizer")).Activate()
+		if m.customizer.Open || m.count != 0 {
+			t.Fatal("customization ran action or stayed open", id)
+		}
+	}
+}
+
+func TestMacToolbarCustomizationQueuedTargetChangeCannotCrossSave(t *testing.T) {
+	m := newMacToolbarGallery(false)
+	initial := m.view()
+	findGalleryDocumentNode(initial, "toolbar-Regular/customize").Activate()
+	regular := m.view()
+	oldHide := findGalleryDocumentNode(regular, ui.ToolbarCustomizationVisibilityID("toolbar-customizer", "toolbar-Regular/New"))
+	// The new opener has run, but the owner has not built the new View yet.
+	findGalleryDocumentNode(initial, "toolbar-Small/customize").Activate()
+	oldHide.Change(ui.ChangeEvent{Checked: false})
+	if len(m.layouts["toolbar-Regular"].Hidden) != 0 || len(m.layouts["toolbar-Small"].Hidden) != 0 {
+		t.Fatal("stale edit saved to old/new target")
+	}
+	m.view()
+	oldHide.Change(ui.ChangeEvent{Checked: false})
+	if len(m.layouts["toolbar-Small"].Hidden) != 0 {
+		t.Fatal("old sheet edited replacement toolbar")
+	}
+}

@@ -28,6 +28,9 @@ window surface; scroll within Inputs to reach its sections. The ordinary macOS t
   click the trailing » to see hidden actions with full-color icons and labels.
   Turn Overflow menu off to compare scrolling. Tab enters actions; arrows,
   Home and End move/reveal enabled tools. Delete is intentionally disabled.
+  Choose Customize… beside a horizontal toolbar to reorder actions with arrows,
+  show/hide items, or Restore Defaults. Changes are independent per toolbar and
+  live; Done/Escape closes the panel and keeps them. Settings last for this session.
   Actions update a counter only; no document files are opened or changed.
 - **Sidebar:** choose an icon row to navigate. Section triangles collapse/expand
   groups; Tab visits section lists and arrows choose enabled rows. Archive is

@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "8013f9676b0cefd7cea1e548d78e05a8",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "2799cfde5702dd5cabb0ec544b01f418be27d64f",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "8a725ebd91d79f51",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unknown customize target breaks entire gallery view",
+      "message": "The customizer's Toolbar is the 'mixed' or sized canonical catalogue, but catalogues is populated only for the sized and mixed bars. The vertical toolbar is excluded, which is fine, but if customizeTarget is ever not in catalogues, Toolbar is a zero Node and View returns an error that replaces the whole page with a label.",
+      "suggestion": "Guard the lookup with an ok check and skip building the panel when the target is unknown.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_toolbars.go",
+          "lines": {
+            "start": 168,
+            "end": 169
+          }
+        }
+      ],
+      "tags": [
+        "robustness",
+        "location-corrected"
+      ],
+      "evidence": "m.customizer.Toolbar = catalogues[m.customizeTarget]\n\tm.customizer.Value = m.layouts[m.customizeTarget]",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "60485754269a2bfa",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unchecking an already hidden item reorders Hidden and may emit spurious change",
+      "message": "The Hidden-checkbox Change handler removes the ID and appends it again when unchecked. Because a checked Change event always removes it and an unchecked one always re-appends it, the checkbox visibility handler is idempotent only if the edit is compared by value; the order of Hidden entries changes between a no-op uncheck (remove then append moves the ID to the end). This can emit spurious Change proposals when Hidden has several entries in a different order, because the comparison uses slices.Equal on ordered slices.",
+      "suggestion": "Skip the edit when the requested state already matches (return false if already hidden and unchecking, or not hidden and checking). Alternatively compare Hidden as sets.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "ui/toolbar_customization.go",
+          "lines": {
+            "start": 213,
+            "end": 217
+          }
+        }
+      ],
+      "tags": [
+        "correctness",
+        "location-corrected"
+      ],
+      "evidence": "hidden := map[string]bool{}\n\tfor _, item := range layout.Hidden {\n\t\thidden[item] = true\n\t}\n\trows := make([]Node, 0, len(items))",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6560,
+    "totalMs": 6596
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 52572,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 26926,
+        "output": 742,
+        "costUSD": 0.061272
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
