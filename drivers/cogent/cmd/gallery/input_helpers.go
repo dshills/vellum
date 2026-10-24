@@ -243,6 +243,19 @@ func (m *inputHelpersGallery) view() ui.Node {
 	if len(matches) == 0 {
 		matches = append(matches, ui.Node{ID: "no-matches", Kind: ui.Label, Text: "No matching components"})
 	}
+	fontChildren := []ui.Node{font}
+	if m.fontError != "" {
+		fontChildren = append(fontChildren, ui.Node{ID: "font-feedback", Kind: ui.Label, Text: m.fontError})
+	}
+	tokenChildren := []ui.Node{}
+	if m.tokenError != "" {
+		tokenChildren = append(tokenChildren, ui.Node{ID: "token-feedback", Kind: ui.Label, Text: m.tokenError})
+	}
+	tokenChildren = append(tokenChildren, tokens)
+	dateChildren := []ui.Node{date}
+	if m.dateError != "" {
+		dateChildren = append(dateChildren, ui.Node{ID: "date-error", Kind: ui.Label, Text: m.dateError})
+	}
 	background := color.NRGBA{R: 246, G: 246, B: 248, A: 255}
 	if m.dark {
 		background = color.NRGBA{R: 29, G: 29, B: 31, A: 255}
@@ -252,8 +265,8 @@ func (m *inputHelpersGallery) view() ui.Node {
 		{ID: "inputs-description", Kind: ui.Label, Text: "Mac-style colors, tags, fonts, paths and protected text through public Go APIs."},
 		{ID: "secure-group", Kind: ui.FormGroup, Text: "Secure entry — synthetic demo text", Children: []ui.Node{secure}},
 		{ID: "path-group", Kind: ui.FormGroup, Text: "Location — ancestor menus and overflow", Children: []ui.Node{path}},
-		{ID: "font-group", Kind: ui.FormGroup, Text: "Font", Children: []ui.Node{font, {ID: "font-feedback", Kind: ui.Label, Text: m.fontError}}},
-		{ID: "tokens-group", Kind: ui.FormGroup, Text: "Tags — Return adds, chip button removes", Children: []ui.Node{{ID: "token-feedback", Kind: ui.Label, Text: m.tokenError}, tokens}},
+		{ID: "font-group", Kind: ui.FormGroup, Text: "Font", Children: fontChildren},
+		{ID: "tokens-group", Kind: ui.FormGroup, Text: "Tags — Return adds, chip button removes", Children: tokenChildren},
 		{ID: "color-well-group", Kind: ui.FormGroup, Text: "Drawing color", Children: []ui.Node{well}},
 		search,
 		{ID: "combo-group", Kind: ui.FormGroup, Text: "Drawing units — type a value or choose", Children: []ui.Node{combo}},
@@ -280,7 +293,7 @@ func (m *inputHelpersGallery) view() ui.Node {
 			{ID: "selected-objects", Kind: ui.Label, Text: "Selected: " + strings.Join(m.selectedObjects, ", ")},
 			{ID: "reject-selection", Kind: ui.Checkbox, Text: "Reject selection edits", Checked: m.rejectSelection, Change: func(e ui.ChangeEvent) { m.rejectSelection = e.Checked }},
 		}},
-		{ID: "date-group", Kind: ui.FormGroup, Text: "Date and time", Children: []ui.Node{date, {ID: "date-error", Kind: ui.Label, Text: m.dateError}}},
+		{ID: "date-group", Kind: ui.FormGroup, Text: "Date and time", Children: dateChildren},
 		notice,
 		{ID: "input-requests", Kind: ui.Label, Text: fmt.Sprintf("Search requests: %d", m.requests)},
 		{ID: "input-options", Kind: ui.Row, Children: []ui.Node{

@@ -203,6 +203,12 @@ func TestInputGalleryTagFeedbackVisibleAtEntry(t *testing.T) {
 	for _, dark := range []bool{false, true} {
 		t.Run(map[bool]string{false: "light", true: "dark"}[dark], func(t *testing.T) {
 			model, _, m, settle := inputGalleryManualWithTheme(t, dark)
+			var original uint64
+			for _, e := range settle().Elements {
+				if e.ID == ui.TokenInputID("drawing-tags") {
+					original = e.Incarnation
+				}
+			}
 			inputGalleryTypeTag(t, m, settle, "alpha")
 			w := inputGalleryTypeTag(t, m, settle, "alpha")
 			var feedback, entry cogent.ManualElement
@@ -223,6 +229,40 @@ func TestInputGalleryTagFeedbackVisibleAtEntry(t *testing.T) {
 			}
 			if strings.HasPrefix(model.tokenError, "ui: ") {
 				t.Fatal("internal package prefix leaked into user feedback", model.tokenError)
+			}
+			if original == 0 || entry.Incarnation != original {
+				t.Fatal("feedback insertion replaced entry", original, entry.Incarnation)
+			}
+			corrected := inputGalleryTypeTag(t, m, settle, "gamma")
+			if model.tokenError != "" || corrected.FocusedID != entry.ID {
+				t.Fatal("correction lost focus or feedback state", model.tokenError, corrected.FocusedID)
+			}
+			for _, e := range corrected.Elements {
+				if e.ID == "token-feedback" {
+					t.Fatal("cleared feedback still reserves a row")
+				}
+				if e.ID == entry.ID && e.Incarnation != original {
+					t.Fatal("feedback removal replaced entry", original, e.Incarnation)
+				}
+			}
+		})
+	}
+}
+
+func TestInputGalleryEmptyFeedbackDoesNotReserveRows(t *testing.T) {
+	for _, dark := range []bool{false, true} {
+		t.Run(fmt.Sprintf("dark-%v", dark), func(t *testing.T) {
+			model, _, _, settle := inputGalleryManualWithTheme(t, dark)
+			w := settle()
+			for _, id := range []string{"font-feedback", "token-feedback", "date-error"} {
+				for _, e := range w.Elements {
+					if e.ID == id {
+						t.Errorf("empty feedback remains in mounted control tree: %s", id)
+					}
+				}
+				if n := findGalleryDocumentNode(model.view(), id); n.ID != "" {
+					t.Errorf("empty feedback descriptor reserves a row: %s", id)
+				}
 			}
 		})
 	}

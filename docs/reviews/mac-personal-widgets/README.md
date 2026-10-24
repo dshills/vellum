@@ -581,3 +581,26 @@ by the review is reachable under these source invariants. Keep the bounded
 fallback rather than adding speculative state or redundant ancestor walks.
 Native app confirmation follows packaging; software DPI evidence is not a
 physical display-scaling claim.
+
+## Conditional gallery feedback rows
+
+Native light/dark images suggested unnecessary blank space above tags and below
+the font preview. Empty text bounds alone did not establish a layout defect: an
+initial test only found the empty descriptors, so it was followed by a real
+completed-frame comparison. Omitting those descriptors reduced the font group
+from 250 to 222 pixels and the tag group from 163 to 140 at the pinned software
+font/DPI160 in both themes. The comparison helper/source and its log remain local
+execution evidence; the shipped code has no test transform or runtime option.
+
+The private gallery now emits font/tag/date feedback labels only when nonempty.
+Tag feedback remains before the editor. Light/dark mounted checks require no
+blank feedback nodes, readable duplicate feedback, accepted correction, retained
+focus and the same native entry incarnation across insertion/removal. Model tests
+also reject and correct font/date values and require their rows to disappear.
+Existing reset, stale callbacks, capacity, disable and descriptor-error cases
+pass under race; gallery vet and native build pass. Measurements describe this
+fixture, not a public fixed-height contract. Public components, shared styles,
+rendering/pacing and release policy are unchanged.
+
+Prism Anthropic claude-sonnet-5-5 completed coverage of all five changed files
+with no findings. Private-package light/dark visual confirmation follows.

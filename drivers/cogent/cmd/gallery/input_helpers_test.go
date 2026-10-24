@@ -247,6 +247,11 @@ func TestInputHelpersStandaloneTokenRemovalFocusContinuity(t *testing.T) {
 func TestInputHelpersValidationMessagesUseUserWording(t *testing.T) {
 	m := newInputHelpersGallery()
 	node := func(id string) ui.Node { return findGalleryDocumentNode(m.view(), id) }
+	for _, id := range []string{"token-feedback", "font-feedback", "date-error"} {
+		if node(id).ID != "" {
+			t.Fatal("blank feedback present before editing", id)
+		}
+	}
 	node(ui.TokenInputID("drawing-tags")).Change(ui.ChangeEvent{Text: "Design"})
 	node(ui.ComboInputID(ui.FontFamilyID("drawing-font"))).Change(ui.ChangeEvent{Text: "Unlisted font"})
 	node(ui.DateTimeInputID("reminder-date")).Change(ui.ChangeEvent{Text: "not-a-date"})
@@ -258,4 +263,16 @@ func TestInputHelpersValidationMessagesUseUserWording(t *testing.T) {
 			t.Fatal("missing or developer-oriented validation message", id, feedback.Text)
 		}
 	}
+	node(ui.TokenInputID("drawing-tags")).Change(ui.ChangeEvent{Text: "Review"})
+	node(ui.ComboInputID(ui.FontFamilyID("drawing-font"))).Change(ui.ChangeEvent{Text: "Helvetica Neue"})
+	node(ui.DateTimeInputID("reminder-date")).Change(ui.ChangeEvent{Text: "2026-10-24 14:30"})
+	for _, id := range []string{"token-feedback", "font-feedback", "date-error"} {
+		if node(id).ID != "" {
+			t.Fatal("cleared feedback left a blank row", id)
+		}
+	}
+	if err := ui.Validate(m.view()); err != nil {
+		t.Fatal(err)
+	}
+
 }

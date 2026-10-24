@@ -53,7 +53,8 @@ Keyboard focus scrolls oversized chips into view at their leading edge; Return
 or Space removes the focused chip even if its trailing remove mark is clipped.
 See the [integration limits](mac-widget-integration.md#limits) for the reproduced
 case. In this standalone demo, tag acceptance, rejection and chip removal return focus to tag entry for repeated
-entry. Tag validation feedback appears above the controls so it stays visible
+entry. Font, tag and date feedback rows appear only while an error is present.
+Tag validation feedback appears above the controls so it stays visible
 while correcting an entry near the bottom of the viewport. At 32 tags, focus advances to Drawing color; removing a tag enables entry
 again. Disable inputs cancels pending focus requests. This is demo focus policy.
 Fonts use a caller-supplied catalog,

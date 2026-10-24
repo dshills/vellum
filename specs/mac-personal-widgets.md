@@ -174,3 +174,17 @@ one full-value removal and an independent managed FocusRequest after removal.
 A separate oversized vertical-action regression checks visibility, activation and
 Home return. Narrow chips still have partial labels/trailing marks; responsive
 truncation remains separate work, as disclosed in the integration guide.
+
+## Conditional gallery feedback rows
+
+The private gallery emits font/tag/date feedback labels only when their messages
+are nonempty. Empty labels have no visible text bounds but still contributed
+child layout/gap space: a completed-frame before/after comparison measured 28
+pixels in the font group and 23 in the tag group at the pinned software font/DPI,
+in both themes. Those measurements are fixture-specific, not universal widget
+height promises. Shared control styling and public components are unchanged.
+
+Actual tag entry/rejection/correction checks require visible feedback at the
+focused entry and preserve that editor's native incarnation as the label is
+inserted and removed. The mounted empty state contains no blank feedback labels;
+font/date corrections and Reset clear their conditional rows as well.
