@@ -779,3 +779,31 @@ grounded dispositions; no retained issue requires another product change.
 
 These are routed software checks. Packaged native appearance/input observations
 follow final integration; physical input and human VoiceOver are not inferred.
+
+## Next widgets, phase 4: ShortcutRecorder
+
+Added owner-held controlled one-chord recording with Mac modifier glyphs,
+canonical command-registry spelling, conflict validation, clearing and cancellation.
+The native adapter publishes immutable atomic scopes, intercepts before either
+command phase, bounds focus/cancellation references, and rebinds retained buttons
+when a modal transfers scenes. Window deactivation cancels main/modal recorders.
+Queued Begin/keys cannot survive focus loss, Tab/Escape, hiding, disablement,
+replacement, modal retirement or closure. Queue refusal retains bounded cleanup
+without clearing the existing refusal/failure policy.
+
+Focused public/native race tests, UI/native vet and gallery checks pass. Actual
+software FIFO tests cover Return→recorded chord, Tab traversal and Delete clearing.
+A production-accessibility-handler modal fixture proves recording Escape cancels
+without dismissing, Tab cancels/moves, and idle Escape restores modal dismissal.
+A queue-full fixture uses a direct owner/adapter and checks refusal identity; it
+does not attempt recovery from a terminal Manual failure. Initial fixture compile
+and deferred-Shown setup mistakes were corrected without changing failure policy.
+
+Prism Anthropic claude-sonnet-5-5 reviewed all13 phase files. Its one concern was
+stale demo feedback after cancel/retry. The gallery now clears the prior error
+when a new recording begins (Reset already cleared both errors), so a subsequent
+cancel does not leave an obsolete error. Public error policy remains caller-owned.
+The raw review is retained. Native input is local to a focused active window;
+OS-intercepted keys, global registration, non-ASCII/physical-layout-independent
+bindings and multi-stroke sequences are outside this version. No OS settings,
+render backend, pacing or release-policy changes.

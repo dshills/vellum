@@ -709,6 +709,7 @@ func syncRecordVisible(r *record, n ui.Node, visible bool, scopes []*tabCloseSco
 		scopes = append(append([]*tabCloseScope(nil), scopes...), scope)
 	}
 	syncTabVisibility(r, visible, scopes)
+	syncShortcutRecorderVisibility(r, visible, scopes)
 	for i, c := range n.Children {
 		childVisible := visible
 		switch n.Kind {

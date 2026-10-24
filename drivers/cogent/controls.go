@@ -42,6 +42,7 @@ type Semantics struct {
 type fieldChangeEpoch struct{ marker byte }
 
 type controlState struct {
+	shortcut          *shortcutRecorderBinding
 	a                 *app.Application
 	window            string
 	windowRef         app.WindowRef
@@ -143,6 +144,9 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 			}
 		})
 		button.OnClick(func(e events.Event) {
+			if activateShortcutRecorder(r, e) {
+				return
+			}
 			if r.node.PlacementSource != nil && e.HasPos() {
 				e.SetHandled()
 				return
@@ -461,6 +465,7 @@ func syncControl(r *record, previous ui.Node) error {
 	// reconcile attaches the full topology before syncRecord visits parents then
 	// children; parent semantic properties are current before this snapshot.
 	r.control.disabled = controlDisabled(r)
+	syncShortcutRecorder(r)
 	if err := syncPlacement(r); err != nil {
 		return err
 	}
@@ -955,6 +960,7 @@ func disposeControl(r *record) {
 	}
 	if r.control != nil {
 		disposePlacement(r)
+		disposeShortcutRecorder(r)
 		r.control.retired = true
 		if r.control.tabs != nil {
 			r.control.tabs.pending.Store(nil)

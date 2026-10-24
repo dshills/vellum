@@ -40,6 +40,8 @@ type Node struct {
 	// Secure protects TextField visual/native accessibility exposure even when
 	// Reveal is explicitly requested. Reveal belongs only on a Secure field.
 	Secure, Reveal bool
+	// ShortcutRecorder marks the managed button produced by its View method.
+	ShortcutRecorder *ShortcutRecorder
 	// Icon is bundled artwork for Icon/Button/ToggleButton. Text is alternate
 	// text for an Icon. Icon-only actions require Accessibility.Name.
 	Icon Symbol
