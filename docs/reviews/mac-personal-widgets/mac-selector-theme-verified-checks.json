@@ -1,0 +1,45 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 0.14325833297334611
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestScopedSelector|TestSimpleControls|TestCascading|TestMenuButtonReal|TestMenuChecks|TestScopedTheme",
+      "-count=1",
+      "-timeout",
+      "60s"
+    ],
+    "exit_code": 0,
+    "seconds": 14.975373291876167
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestMacComponent|TestMacWidgetsNextPages",
+      "-count=1"
+    ],
+    "exit_code": 0,
+    "seconds": 8.458996583009139
+  }
+]

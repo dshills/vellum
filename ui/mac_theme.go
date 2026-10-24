@@ -41,7 +41,7 @@ func MacThemeWithAccent(dark bool, accent color.NRGBA) Theme {
 		Row:       {Gap: Some(float32(6)), Padding: Some(Insets{}), Align: Some(AlignCenter)},
 		FormGroup: {Gap: Some(float32(8)), Padding: Some(UniformInsets(12)), Background: Some(button), Border: Some(Border{Width: 1, Color: line}), CornerRadius: Some(float32(8))},
 		Label:     {Padding: Some(Insets{})},
-		Button:    buttonStyle, MenuButton: buttonStyle,
+		Button:    buttonStyle, MenuButton: buttonStyle, Selector: buttonStyle,
 		TextField: input, NumberField: number,
 		ListBox: {GrowX: Some(float32(1)), GrowY: Some(float32(0)), Background: Some(field), Border: Some(Border{Width: 1, Color: line}), CornerRadius: Some(float32(6)), Padding: Some(UniformInsets(4))},
 	}}

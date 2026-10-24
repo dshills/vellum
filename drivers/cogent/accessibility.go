@@ -676,7 +676,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			if n.Kind == ui.Button && n.Activate != nil {
 				x.Actions = append(x.Actions, "press")
 			}
-			if n.Kind == ui.MenuButton {
+			if n.Kind == ui.MenuButton || managedSelector(r) {
 				x.Actions = append(x.Actions, "press", "expand")
 				if menuOpen(r) {
 					x.Actions = append(x.Actions, "cancel", "collapse")
@@ -785,7 +785,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 				handlers[id] = handler
 			}
 		}
-		if n.Kind == ui.Tabs || n.Kind == ui.Selector {
+		if n.Kind == ui.Tabs || (n.Kind == ui.Selector && !menuOpen(r)) {
 			for _, o := range n.Options {
 				id := accessibilityOptionID(n.ID, o.ID)
 				child := accessibilityNode{ID: id, Parent: x.ID, Role: "option", DomainID: o.ID, Name: o.Label, Selected: o.ID == n.SelectedID, Value: o.ID == n.SelectedID, Disabled: disabled || o.Disabled, Actions: []string{}}
@@ -873,7 +873,7 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 		_ = r.control.a.Invalidate(r.control.window)
 		return true
 	}
-	if n.Kind == ui.MenuButton {
+	if n.Kind == ui.MenuButton || managedSelector(r) && action.Kind != "set" {
 		if !menuAvailable(r) {
 			return false
 		}

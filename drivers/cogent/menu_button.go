@@ -15,6 +15,7 @@ import (
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/styles/abilities"
 	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/ui"
@@ -72,7 +73,25 @@ func (w *menuItem) Render() {
 		})
 	}
 }
+
+// Retain legacy chooser behavior for large catalogues or unscoped themes.
+func managedSelector(r *record) bool {
+	return r.node.Kind == ui.Selector && r.theme.Palette.Set && len(r.node.Options) > 0 && len(r.node.Options) <= ui.MaxMenuOptions
+}
 func menuDescriptor(r *record) ui.Node {
+	if r.node.Kind == ui.Selector {
+		options := slices.Clone(r.node.Options)
+		for i := range options {
+			options[i].Checkable = true
+			options[i].Checked = options[i].ID == r.node.SelectedID
+		}
+		n := ui.Node{ID: r.node.ID, Kind: ui.MenuButton, Text: "Choose value", Disabled: r.node.Disabled, Options: options}
+		if r.node.Change != nil {
+			n.Change = func(e ui.ChangeEvent) { e.Kind = ui.Selector; e.Checked = false; r.node.Change(e) }
+		}
+		return n
+	}
+
 	if r.node.Kind == ui.MenuButton {
 		n := r.node
 		if owner, _ := r.widget.AsWidget().Property(toolbarOverflowOwnerProperty).(*record); owner != nil && owner.node.ToolbarOverflow {
@@ -253,7 +272,7 @@ func openManagedMenu(r *record) {
 
 	menuWidth := 0
 	pos := r.widget.AsWidget().ContextMenuPos(nil)
-	if r.node.Kind == ui.MenuButton {
+	if r.node.Kind == ui.MenuButton || r.node.Kind == ui.Selector {
 		anchor := r.widget
 		if r.node.MenuAnchorID != "" {
 			anchor = nil
@@ -398,6 +417,7 @@ func populateManagedMenu(r *record, p *menuPopup, scene *core.Scene, keyboard fu
 		installMenuArtwork(&item.Button, o)
 
 		item.FinalStyler(func(style *styles.Style) {
+			style.SetAbilities(!o.Disabled, abilities.Focusable, abilities.Activatable)
 			applyStyle(style, ui.Node{Kind: ui.Label, Style: itemStyle}, ui.Theme{})
 			style.Grow.Set(1, 0)
 			style.Justify.Content = styles.Start
@@ -417,7 +437,7 @@ func populateManagedMenu(r *record, p *menuPopup, scene *core.Scene, keyboard fu
 		})
 		item.SetState(o.Disabled, states.Disabled)
 		p.items[o.ID] = item
-		if first == nil && !o.Disabled {
+		if (first == nil || r.node.Kind == ui.Selector && o.Checked) && !o.Disabled {
 			first = item
 		}
 		if o.Shortcut != "" {

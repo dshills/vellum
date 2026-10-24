@@ -31,3 +31,9 @@ choices. These choices are local to that page and are not persisted yet. Apply
 the same scope at an application root to theme its whole managed content. The
 preset does not automatically follow system accent, appearance, increased
 contrast or reduced-motion settings.
+
+Mac presets explicitly style selector fills and focus borders. Palette-scoped
+selectors with 1–64 options use the same themed popup, check, cancellation and
+stale-action path as managed action menus. Larger selector catalogues retain the
+legacy chooser popup and its startup/window palette; their closed control still
+uses the scoped theme. Selection values/callback kinds remain `ui.Selector`.

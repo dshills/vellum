@@ -235,12 +235,23 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		widget = core.NewSeparator(parent)
 	case ui.Selector:
 		chooser := core.NewChooser(parent)
+		c.menu = &menuState{epoch: &menuEpoch{}}
 		// Chooser consumes Click while opening its menu, before the base widget
 		// can take quiet focus. Preserve that ordinary click behavior first so
 		// closing the menu returns keyboard input to the actual selector.
-		chooser.OnFirst(events.Click, func(events.Event) {
+		chooser.OnFirst(events.Click, func(e events.Event) {
 			if !chooser.IsReadOnly() && chooser.AbilityIs(abilities.Focusable) {
 				chooser.SetFocusQuiet()
+			}
+			if managedSelector(r) {
+				e.SetHandled()
+				epoch := c.menu.epoch
+				postControl(r, func() {
+					if menuAvailable(r) && c.menu.epoch == epoch {
+						c.menu.request = true
+						_ = c.a.Invalidate(c.window)
+					}
+				})
 			}
 		})
 		widget = chooser

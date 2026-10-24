@@ -1354,3 +1354,11 @@ Prism: `mac-components-integration.json` (Anthropic Claude Sonnet 5.5, complete 
 Prism requested clearer regression failure guards; the menu test now checks node identity, callback, option length and stable grid ID before accessing it. All source and SDK tests pass, focused gallery and existing toolbar regressions pass, and driver/gallery vet passes. The Components page is first and startup-selected; native toolbar behavior remains unchanged.
 
 Focused checks: `mac-components-integration-checks.json`, `mac-components-menu-final-checks.json`.
+
+## Fix scoped Mac selector fills and themed popup navigation
+
+Prism: `mac-selector-theme.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Packaged visual inspection found pale selector fills with dark-scope text. Mac presets now explicitly paint selector fills/borders; palette-scoped 1..64-choice selectors reuse managed menus with current selection, disabled-row focus exclusion and Selector-kind events. Larger catalogues retain the documented legacy popup. Prism requested parentheses and an explicit AX policy: closed selectors retain direct settable choices for compatibility; open ones replace them with actual popup rows. Added a regression for both states. Focused native keys, event kind, disabled options and theme replacement revocation pass.
+
+Focused checks: `mac-selector-theme-verified-checks.json`, `mac-selector-ax-final-checks.json`.

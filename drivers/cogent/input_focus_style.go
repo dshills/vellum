@@ -85,7 +85,7 @@ func styleManagedInputFocus(r *record, s *styles.Style) {
 		}
 		return
 	}
-	if r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton || r.node.Kind == ui.Checkbox {
+	if r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton || r.node.Kind == ui.Selector || r.node.Kind == ui.Checkbox {
 		style, err := ui.ResolveStyle(r.node, r.theme)
 		if r.node.ToolbarReorder != nil {
 			s.Cursor = cursors.Grab

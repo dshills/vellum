@@ -1,0 +1,94 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b47368f9b8b81895a1ee0013672f720b",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "a0e3e295fd5ffde97fe668a9999d4b9379f6110b",
+    "branch": "codex/mac-components-theming"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "5aba1d3226ff16c5",
+      "severity": "medium",
+      "category": "bug",
+      "title": "x",
+      "message": "Option children are suppressed whenever a selector menu is open, including legacy (non-managed) selectors where menuOpen is presumably false anyway. More importantly, the closed state exposes options as accessibility children while a managed selector also gets press/expand actions, so the two paths overlap. The mixed \u0026\u0026/|| precedence without parentheses is also easy to misread.",
+      "suggestion": "Parenthesize the condition, and decide explicitly whether managed selectors should expose option children when closed.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility.go",
+          "lines": {
+            "start": 788,
+            "end": 788
+          }
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "precedence"
+      ],
+      "evidence": "if n.Kind == ui.Tabs || n.Kind == ui.Selector \u0026\u0026 !menuOpen(r) {",
+      "fix": {
+        "before": "if n.Kind == ui.Tabs || n.Kind == ui.Selector \u0026\u0026 !menuOpen(r) {",
+        "after": "if n.Kind == ui.Tabs || (n.Kind == ui.Selector \u0026\u0026 !menuOpen(r)) {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4211,
+    "totalMs": 4231
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 7,
+    "bytes": 14723,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 9609,
+        "output": 386,
+        "costUSD": 0.023078
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
