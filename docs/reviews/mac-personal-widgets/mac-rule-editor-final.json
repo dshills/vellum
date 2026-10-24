@@ -1,0 +1,140 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "4c991157995a2801654a573ae6424526",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "e7c84acf615a4b506e731cb0c13f6bbaa306d8fe",
+    "branch": "codex/mac-components-theming"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "2e2caa13a6e61e91",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Add handler indexes e.Fields[0] without guarding",
+      "message": "The Change handler is invoked directly by the editor and the gallery's Change callback dereferences m.rules, which is fine, but Validate for a group requires Value to be exactly zero while a Rule with Group and nil Rules is allowed; more importantly, the text rule value check rejects any Number/Checked, yet changing a boolean field operator or value from an empty-leaf group is fine. The real issue: the 4096 limit counts bytes but an empty group (no children) is valid, so a root with zero rules is acceptable while the default add path assumes e.Fields[0] exists without re-validation under concurrent mutation.",
+      "suggestion": "Ensure edits re-validate Fields before indexing e.Fields[0] in the add handler.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/rule_editor.go",
+          "lines": {
+            "start": 112,
+            "end": 112
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "location-corrected"
+      ],
+      "evidence": "if !validTokenText(f.ID) || !validTokenText(f.Label) || fields[f.ID] || len(ruleOperators(f.Kind)) == 0 {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "fd419e632f8ac4a0",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Edit guard compares fields shallowly",
+      "message": "The gallery Change callback references m.rules.Root and mutates it; if the editor is replaced the stale closure still points at the new editor. Additionally, RuleEditor.View captures e by pointer, so copying the struct (check := *e) copies nextID and other state, fine, but callers who copy RuleEditor lose retention semantics silently.",
+      "suggestion": "Document that RuleEditor must not be copied, and add a copy guard.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "ui/rule_editor.go",
+          "lines": {
+            "start": 222,
+            "end": 222
+          }
+        }
+      ],
+      "tags": [
+        "api",
+        "location-corrected"
+      ],
+      "evidence": "if e.ID != id || e.Disabled || e.Change == nil || e.Validate() != nil || !slices.Equal(fields, e.Fields) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "b317065cbc9b78a0",
+      "severity": "medium",
+      "category": "bug",
+      "title": "ID counter consumed by rejected proposals",
+      "message": "freshRuleID mutates e.nextID inside the edit callback even when the proposal is later rejected by the host. This is documented, but nextID is also consumed when the edit is a no-op in later validation, and the loop can burn up to 65 IDs per click. Also the check against the candidate only, not against previously proposed IDs, relies on the counter alone.",
+      "suggestion": "Only advance nextID after the candidate passes validation, or accept the documented behavior and cap retries.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "ui/rule_editor.go",
+          "lines": {
+            "start": 290,
+            "end": 290
+          }
+        }
+      ],
+      "tags": [
+        "state",
+        "location-corrected"
+      ],
+      "evidence": "newID := e.freshRuleID(root)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 8587,
+    "totalMs": 8612
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 7,
+    "bytes": 30743,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 17783,
+        "output": 975,
+        "costUSD": 0.045316
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

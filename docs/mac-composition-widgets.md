@@ -52,3 +52,20 @@ Nested split dividers resize columns. Accept `BrowserResizeEvent.Fraction` into
 `Fractions[event.ColumnID]`; bound the map to the visible columns (the example
 resets it when the path changes). Horizontal scrolling preserves usable minimum
 column widths. Components → Column browser demonstrates hierarchy and previews.
+
+## Filter / rule editor
+
+Retain `ui.RuleEditor` with `Fields` and a root `Rule{Group: ...}`. Text, number
+and boolean fields admit compatible operators and typed values. `Change` proposes
+a detached validated tree; assign `event.Root` to accept. Rejecting a proposal
+cannot mutate the accepted model. IDs are globally unique across at most 64
+nodes/three levels. Generated additions use a retained monotonic counter and never reuse a removed
+proposal ID during the component lifetime (rejected additions also consume IDs). Numbers are
+finite within ±1,000,000; text is bounded to 4096 UTF-8 bytes.
+
+All/Any selectors, Add Rule, Add Group and removal reuse existing managed controls.
+`AddIconImage` and `GroupIconImage` preserve full-color artwork. Tab navigates the
+rows. Current-field/operator checks revoke stale typed editors, while successive
+absolute edits of the same type remain ordered. This API edits predicates; it
+does not evaluate them or access external data. Components → Filter / rule editor
+shows all three field types and a nested group.

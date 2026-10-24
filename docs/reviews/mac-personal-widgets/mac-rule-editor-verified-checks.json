@@ -1,0 +1,59 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 2.332264083204791
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestRuleEditorNative",
+      "-count=1",
+      "-timeout",
+      "60s"
+    ],
+    "exit_code": 0,
+    "seconds": 14.088857375085354
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestMacComponent",
+      "-count=1"
+    ],
+    "exit_code": 0,
+    "seconds": 8.11284145899117
+  },
+  {
+    "cwd": "examples/sdk-contract",
+    "argv": [
+      "go",
+      "test",
+      "./...",
+      "-run",
+      "TestPublicMacComposition",
+      "-count=1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.5535557090770453
+  }
+]

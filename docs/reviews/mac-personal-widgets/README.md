@@ -1338,3 +1338,11 @@ Prism: `mac-column-browser-final.json` (Anthropic Claude Sonnet 5.5, complete co
 The sample initializes immutable artwork synchronously before browser construction and resets its fraction map on path changes; a defensive nil-map initialization was added. Invalid/unbounded caller fraction maps intentionally return documented validation errors. Final depth findings are contradicted by the loop: the fourth column is appended and selects path[3] before empty children stop iteration. A new four-level/preview regression asserts all four selections plus four resize fractions. The maximum is four data columns and one preview, hence at most four dividers; the cap of five map entries cannot reject a current visible set. No feature gate or renderer policy changed.
 
 Focused checks: `mac-column-browser-checks.json`, `mac-column-browser-final-checks.json`, `mac-column-browser-depth-checks.json`.
+
+## Add typed Mac filter editor with bounded All and Any groups
+
+Prism: `mac-rule-editor-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Fixed initial review ID reuse with a retained monotonic bounded-memory counter and explicit exhaustion rejection, tested stale removal after replacement. Structural operations intentionally apply to the current same-ID/same-parent/same-kind node; typed value edits additionally recheck field/operator. Final review: edit already invokes Validate and compares current fields before indexing, verified by a nil-fields stale-Add regression. Fields contain only comparable values, so slices.Equal is complete. Retained one-owner/no-copy semantics are explicit; concurrent mutation is unsupported. Consuming rejected proposal IDs is deliberate to prevent later reuse; retries cap at 65 and uint64 exhaustion rejects. Independent SDK and native add/remove/retained-sibling checks pass.
+
+Focused checks: `mac-rule-editor-verified-checks.json`, `mac-rule-editor-identities-checks.json`, `mac-rule-editor-guard-checks.json`.

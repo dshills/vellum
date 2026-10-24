@@ -8,6 +8,7 @@ import (
 )
 
 type macComponentsGallery struct {
+	rules     *ui.RuleEditor
 	browser   *ui.ColumnBrowser
 	inspector *ui.Inspector
 	width     float32
@@ -64,6 +65,9 @@ func (m *macComponentsGallery) view() ui.Node {
 		}
 	}})
 	content := m.themePreview()
+	if m.page == "rules" {
+		content = m.rulesPreview()
+	}
 	if m.page == "browser" {
 		content = m.browserPreview()
 	}
@@ -76,7 +80,7 @@ func (m *macComponentsGallery) view() ui.Node {
 	if m.page == "menus" {
 		content = m.menuPreview()
 	}
-	navigation := ui.Node{ID: "components/pages", Kind: ui.Selector, SelectedID: m.page, Options: []ui.Option{{ID: "theme", Label: "Themes"}, {ID: "menus", Label: "Cascading menus"}, {ID: "split", Label: "Split buttons"}, {ID: "inspector", Label: "Inspector panel"}, {ID: "browser", Label: "Column browser"}}, Accessibility: ui.Accessibility{Name: "Component demonstration"}, Change: func(e ui.ChangeEvent) { m.page = e.SelectedID }}
+	navigation := ui.Node{ID: "components/pages", Kind: ui.Selector, SelectedID: m.page, Options: []ui.Option{{ID: "theme", Label: "Themes"}, {ID: "menus", Label: "Cascading menus"}, {ID: "split", Label: "Split buttons"}, {ID: "inspector", Label: "Inspector panel"}, {ID: "browser", Label: "Column browser"}, {ID: "rules", Label: "Filter / rule editor"}}, Accessibility: ui.Accessibility{Name: "Component demonstration"}, Change: func(e ui.ChangeEvent) { m.page = e.SelectedID }}
 
 	return ui.Node{ID: "mac-components", Kind: ui.Scroll, Theme: &theme, Grow: true, Style: ui.Style{Background: ui.Some(palette.Window), Padding: ui.Some(ui.UniformInsets(16)), Gap: ui.Some(float32(12))}, Children: []ui.Node{{ID: "components/title", Kind: ui.Label, Text: "Mac components", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 20, Weight: 600})}}, {ID: "components/appearance", Kind: ui.Row, Children: appearance}, navigation, content, {ID: "components/status", Kind: ui.Label, Text: fmt.Sprintf("%s · actions: %d", m.status, m.count)}}}
 }
@@ -164,4 +168,19 @@ func (m *macComponentsGallery) browserPreview() ui.Node {
 		return ui.Node{ID: "components/browser-error", Kind: ui.Label, Text: err.Error()}
 	}
 	return ui.Node{ID: "components/browser-demo", Kind: ui.Column, Children: []ui.Node{{ID: "components/browser-help", Kind: ui.Label, Text: "Select a folder to reveal its column. Tab moves through columns/dividers; drag a divider to resize. Scroll horizontally for deeper paths."}, n}}
+}
+
+func (m *macComponentsGallery) rulesPreview() ui.Node {
+	if m.rules == nil {
+		m.rules = &ui.RuleEditor{ID: "components/rules", Fields: []ui.RuleField{{ID: "name", Label: "Name", Kind: ui.RuleText}, {ID: "size", Label: "Size", Kind: ui.RuleNumber}, {ID: "visible", Label: "Visible", Kind: ui.RuleBoolean}}, Root: ui.Rule{ID: "root", Group: &ui.RuleGroup{Match: ui.RuleAll, Rules: []ui.Rule{
+			{ID: "name-rule", FieldID: "name", Operator: ui.RuleContains, Value: ui.RuleValue{Text: "Drawing"}},
+			{ID: "size-rule", FieldID: "size", Operator: ui.RuleGreater, Value: ui.RuleValue{Number: 10}},
+			{ID: "nested", Group: &ui.RuleGroup{Match: ui.RuleAny, Rules: []ui.Rule{{ID: "visible-rule", FieldID: "visible", Operator: ui.RuleIs, Value: ui.RuleValue{Checked: true}}}}},
+		}}}, AddIconImage: m.artwork[ui.SymbolAdd], GroupIconImage: m.artwork[ui.SymbolFolder], Change: func(e ui.RuleEditEvent) { m.rules.Root = e.Root; m.count++; m.status = "Rule updated: " + e.RuleID }}
+	}
+	n, err := m.rules.View()
+	if err != nil {
+		return ui.Node{ID: "components/rules-error", Kind: ui.Label, Text: err.Error()}
+	}
+	return ui.Node{ID: "components/rules-demo", Kind: ui.Column, Children: []ui.Node{{ID: "components/rules-help", Kind: ui.Label, Text: "Compose typed conditions and All/Any groups. Changes update the model; this demonstration does not execute a search."}, n}}
 }
