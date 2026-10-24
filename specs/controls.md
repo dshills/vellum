@@ -147,6 +147,16 @@ nodes cannot carry independent focus requests. A Tabs request targets its select
 enabled native tab button, or the first enabled option when the selected option
 is disabled. A Tabs control with no enabled options cannot receive focus.
 
+For accepted main-scene requests, the Mac adapter keeps one pending visibility
+intent per native window. After layout and before child painting it reveals the
+still-focused native target using existing scrolling. This includes a repeated
+request for a retained field whose position changed during reconciliation. It
+does not change focus or editing selection, replay on later manual scrolling,
+or re-use an intent for a replaced/hidden/disabled target. Empty/failed requests
+and native retirement clear it. Dialog-scene focus retains its existing policy.
+This uses normal paint invalidation, without new frame scheduling or renderer
+options.
+
 Focused tab headers handle unmodified Left/Right with enabled-option wrap and
 Home/End with enabled endpoints; Space/Enter proposes the focused option.
 Keyboard movement changes native header focus and queues one stable-ID proposal

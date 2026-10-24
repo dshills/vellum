@@ -71,23 +71,24 @@ type record struct {
 var processRun atomic.Bool
 
 type nativeWindow struct {
-	window           app.Window
-	body             *core.Body
-	host             *core.Frame
-	root             *record
-	rootMu           sync.Mutex
-	lastFocus        ui.FocusRequest
-	axScope          string // originating event loop, under rootMu
-	stopLoss         func()
-	lossMu           sync.Mutex
-	input            atomic.Pointer[textWindow]
-	visibility       atomic.Pointer[windowVisibility]
-	activation       atomic.Pointer[windowActivation]
-	metrics          *frameWindowMetrics
-	presentation     *presentationSink
-	desktop          *DesktopSession
-	source           atomic.Pointer[events.Source]
-	pending, closing atomic.Bool
+	window             app.Window
+	body               *core.Body
+	host               *core.Frame
+	root               *record
+	rootMu             sync.Mutex
+	lastFocus          ui.FocusRequest
+	pendingFocusReveal atomic.Pointer[focusRevealRequest]
+	axScope            string // originating event loop, under rootMu
+	stopLoss           func()
+	lossMu             sync.Mutex
+	input              atomic.Pointer[textWindow]
+	visibility         atomic.Pointer[windowVisibility]
+	activation         atomic.Pointer[windowActivation]
+	metrics            *frameWindowMetrics
+	presentation       *presentationSink
+	desktop            *DesktopSession
+	source             atomic.Pointer[events.Source]
+	pending, closing   atomic.Bool
 }
 
 func (d Driver) Run(ctx context.Context, a *app.Application) error {
@@ -225,7 +226,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			bindTreeScopes(w.root)
 			flushDialogs(w.root)
 			bindWorkbenchInputScopes(w.root)
-			if err := applyFocus(w.root, n.Focus, &w.lastFocus); err != nil {
+			if err := applyWindowFocus(w, n.Focus); err != nil {
 				failWindow(w, err)
 			}
 			if err := bindTextWindow(w); err != nil {
@@ -255,6 +256,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 		defer func() {
 			for _, w := range launch {
 				w.closing.Store(true)
+				w.pendingFocusReveal.Store(nil)
 				cleanup := func() {
 					w.rootMu.Lock()
 					defer w.rootMu.Unlock()
@@ -376,6 +378,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				lifetime := spec.Ref().Context()
 				if w.closing.Load() || lifetime.Err() != nil {
 					w.closing.Store(true)
+					w.pendingFocusReveal.Store(nil)
 					if native := w.body.Scene.RenderWindow(); native != nil {
 						go native.SystemWindow.CloseReq()
 					}
@@ -431,6 +434,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			bindCloseRequest(w, a, d.OnError)
 			w.body.OnClose(func(events.Event) {
 				w.closing.Store(true)
+				w.pendingFocusReveal.Store(nil)
 				// CloseWindow changes registration and wakes topology reconciliation;
 				// native CloseReq runs outside the application owner. If the owner
 				// already stopped, skip model notifications; native/control cleanup

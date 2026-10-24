@@ -46,7 +46,7 @@ func inputGalleryManualWithTheme(t *testing.T, dark bool) (*inputHelpersGallery,
 	model := newInputHelpersGallery()
 	model.setAppearance(dark)
 	model.focus = ui.FocusRequest{ID: ui.TokenInputID("drawing-tags"), Sequence: 1}
-	if err := a.Open(app.Window{ID: "inputs", Title: "Input recovery", Width: 660, Height: 760, View: model.windowView}); err != nil {
+	if err := a.Open(app.Window{ID: "inputs", Title: "Input recovery", Width: 660, Height: 740, View: model.windowView}); err != nil {
 		t.Fatal(err)
 	}
 	theme := ui.MacTheme(dark)
@@ -204,7 +204,11 @@ func TestInputGalleryTagFeedbackVisibleAtEntry(t *testing.T) {
 		t.Run(map[bool]string{false: "light", true: "dark"}[dark], func(t *testing.T) {
 			model, _, m, settle := inputGalleryManualWithTheme(t, dark)
 			var original uint64
+			var originalRowHeight int
 			for _, e := range settle().Elements {
+				if e.ID == "drawing-tags/tokens/entry" {
+					originalRowHeight = e.Bounds.Dy()
+				}
 				if e.ID == ui.TokenInputID("drawing-tags") {
 					original = e.Incarnation
 				}
@@ -223,6 +227,11 @@ func TestInputGalleryTagFeedbackVisibleAtEntry(t *testing.T) {
 			frame, err := m.Capture(context.Background(), "inputs")
 			if err != nil {
 				t.Fatal(err)
+			}
+			for _, e := range w.Elements {
+				if e.ID == "drawing-tags/tokens/entry" && (originalRowHeight < 28 || e.Bounds.Dy() != originalRowHeight) {
+					t.Fatalf("feedback clips focused outline: original height%d, current%v", originalRowHeight, e.Bounds)
+				}
 			}
 			if w.FocusedID != entry.ID || !feedback.Visible || feedback.Bounds.Empty() || feedback.Bounds.Dy() < 12 || !feedback.Bounds.In(frame.Bounds()) || !entry.Bounds.In(frame.Bounds()) {
 				t.Fatal("tag rejection feedback is outside the focused viewport", feedback.Bounds, entry.Bounds, frame.Bounds())

@@ -188,3 +188,20 @@ Actual tag entry/rejection/correction checks require visible feedback at the
 focused entry and preserve that editor's native incarnation as the label is
 inserted and removed. The mounted empty state contains no blank feedback labels;
 font/date corrections and Reset clear their conditional rows as well.
+
+## Retained entry visibility at the native initial window size
+
+The standalone gallery starts at 660×740. Its Manual helper now uses that height
+instead of 760. A duplicate-tag repro at matching dimensions retained the field
+but clipped its shared outline from a 38-pixel initial row to 24 visible pixels.
+The matched light/dark regression requires the unchanged row height in addition
+to readable feedback, entry focus and native identity through correction.
+
+The driver reuses accepted root FocusRequests to queue at most one main-scene
+visibility intent per native window. A pre-child-paint check uses completed
+positions and existing ScrollToThis, retaining native focus/selection. It cancels
+on changed native identity, hidden/disabled/removed targets, emptied/failed
+requests, a different scene or window closure. No continuous focus lock, owner
+queue task, polling, renderer option, pacing or release-gate change is introduced.
+Focus-only requests use ordinary NeedsRender so they settle even without layout
+changes. Dialog-scene focus remains unchanged.

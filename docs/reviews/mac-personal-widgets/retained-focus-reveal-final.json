@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "40b2488218ac8a2ce99613c118bee0a4",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "ac2d078c141b4e21ab4d57f3a8618dde874ffc0c",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "511f597c8a64ed65",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible deadlock or missing lock around applyWindowFocus",
+      "message": "The new rootMu.Lock in OnShow may deadlock if OnShow fires synchronously from a code path that already holds rootMu (e.g., refresh/show during a locked update). sync.Mutex is not reentrant. Also, applyWindowFocus documents requiring rootMu held, but the Run path call site is not shown to hold it.",
+      "suggestion": "Verify that OnShow is never triggered with rootMu held, and that the Run() call site in driver.go holds rootMu around applyWindowFocus; otherwise the lastFocus access races.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/manual_offscreen.go",
+          "lines": {
+            "start": 512,
+            "end": 512
+          }
+        }
+      ],
+      "tags": [
+        "deadlock",
+        "concurrency",
+        "location-corrected"
+      ],
+      "evidence": "\tp.fail(applyWindowFocus(n, n.root.node.Focus))",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3969,
+    "totalMs": 3985
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 8,
+    "bytes": 23146,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 13308,
+        "output": 343,
+        "costUSD": 0.030046
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

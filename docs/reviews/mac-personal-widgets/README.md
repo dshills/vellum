@@ -604,3 +604,42 @@ rendering/pacing and release policy are unchanged.
 
 Prism Anthropic claude-sonnet-5-5 completed coverage of all five changed files
 with no findings. Private-package light/dark visual confirmation follows.
+
+## Retained field visibility after validation layout
+
+Native duplicate-tag images showed the lower entry outline at the scroll edge.
+The gallery Manual helper used 760px height while the executable starts at 740.
+Matching that size and comparing the unchanged input row's visible height
+reproduced clipping from 38 to 24 pixels in both themes. The former in-frame
+published-bounds assertion alone was insufficient because those bounds are
+already clipped; the regression now compares the unchanged row height too.
+
+Accepted main-scene root focus requests retain one immutable atomic visibility
+intent per native window. The existing accessibility host consumes it before
+child painting with completed layout geometry, using ordinary ScrollToThis.
+Identity, current scope/enablement, focus, scene, request and lifetime checks
+cancel obsolete targets. Native retirement clears the pointer. Focus-only
+requests use normal NeedsRender; no owner task, deferred callback queue, polling,
+backend option, pacing or release policy change. Dialog-scene policy is unchanged.
+
+Focused race checks preserve text/selection and observe no added Focus/Lost
+notifications. A wheel-away remains away after unrelated invalidation; a new
+sequence reveals the field again without descriptor changes. Removal and native
+retirement release pending references. Closing the last Manual application
+window requires explicit Manual.Close, so the per-window retirement fixture keeps
+a second window alive and uses public Step to retire its origin. Matched gallery
+feedback/recovery, popup, nested/reparented toolbars, window replacement and origin
+wake checks pass. Driver/gallery vet and final native build pass.
+
+Prism Anthropic claude-sonnet-5-5 first requested a clear locking contract. Driver
+refresh and Manual refresh already hold rootMu; Manual OnShow now does too, and
+the helper documents that requirement. Targeted race/startup checks pass after
+that correction. The final review asked whether OnShow could re-enter the mutex.
+The actual Manual syncTopology call invokes RunManual only after refresh returns
+and releases rootMu. Pinned core stages.runDeferred sends initial Shown after
+rendering; renderwindow.go explicitly runs that phase outside render locks. The
+host's pre-paint mutex is released before child rendering. Tabs defer Shown on
+their page subtree rather than the root Body. Driver Run refresh visibly acquires
+rootMu before applyWindowFocus. These paths do not synchronously re-enter the
+mutex as hypothesized; no additional source change is warranted. Both complete
+review outputs are retained. Native same-size confirmation follows packaging.

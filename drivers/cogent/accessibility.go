@@ -430,7 +430,7 @@ func accessibilityFocus(b *accessibilityBridge, id string) {
 	copy := id
 	b.pendingFocus.Store(&copy)
 }
-func accessibilityApplyFocus(root *record, id string) bool {
+func accessibilityResolveFocus(root *record, id string) (accessibilityFocusTarget, bool) {
 	targets := map[string]accessibilityFocusTarget{}
 	accessibilityNativeFocusTargets(root, "", targets)
 	if _, ok := targets[id]; !ok {
@@ -441,12 +441,20 @@ func accessibilityApplyFocus(root *record, id string) bool {
 		scopeID = target.scopeID
 	}
 	if _, ok := ui.FocusTarget(ui.FocusScope(accessibilityFocusProjection(root, "")), scopeID); !ok {
-		return false
+		return accessibilityFocusTarget{}, false
 	}
 	target, ok := targets[id]
 	if !ok || accessibilityTreeNil(target.widget) {
+		return accessibilityFocusTarget{}, false
+	}
+	return target, true
+}
+func accessibilityApplyFocus(root *record, id string) bool {
+	target, ok := accessibilityResolveFocus(root, id)
+	if !ok {
 		return false
 	}
+
 	widget := target.widget.AsWidget()
 	if widget.Scene == nil || widget.Scene.RenderWindow() == nil {
 		widget.StartFocus()
@@ -1188,6 +1196,7 @@ func newAccessibilityHost(w *nativeWindow) *core.Frame {
 	return &host.Frame
 }
 func (h *accessibilityHost) RenderWidget() {
+	finishWindowFocusReveal(h.window, h.Scene)
 	h.Frame.RenderWidget()
 	publishAccessibilityGeometry(h.window)
 }
