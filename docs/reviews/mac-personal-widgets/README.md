@@ -1418,3 +1418,11 @@ Prism: `essentials-integration-final.json` (Anthropic Claude Sonnet 5.5, complet
 Offscreen raster inspection found and corrected sparse calendar row misalignment, a clipped month arrow and the light popup surface under scoped dark appearance. Column geometry, both month controls and all five light/dark pages now pass. Prior Prism fallback concern was fixed: unscoped selected dates use the native scheme; scoped dates use the semantic accent/contrast colors. The final review concern was fixed by comparing only the selected boolean when deciding whether a retained cell needs restyling, avoiding deep comparison of 42-string navigation snapshots. Focused selection/routing checks pass after that change. Independent SDK construction, root race checks and affected-module vet pass. All desktop interactions remain deferred; the alert raster is expressly content-only.
 
 Focused checks: `essentials-integration-checks.json`, `essentials-calendar-layout-checks.json`, `essentials-polish-checks.json`, `essentials-palette-fallback-checks.json`, `essentials-selection-sync-checks.json`, `essentials-final-vet-checks.json`.
+
+## Add full-color Finder-style document list with controlled columns
+
+Prism: `document-list.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism: reduced selection admission to one validation and one enabled-ID map per event, removing repeated whole-list checks. Its row-plan concern is covered by a new regression that reorders/removes columns on the same native Switch: native Update reruns FinalMaker. Its resize concern is covered by two pointer moves across re-render: SameSource compares retained component/column identity, not detached-handle pointer, and dispatch uses the current handle callback with the original press width. Focused race tests, existing list/collection routing and light/dark gallery rasters pass. External files are neither scanned nor opened. Physical pointer checks follow final packaging.
+
+Focused checks: `document-list-checks.json`, `document-list-final-checks.json`, `document-list-reviewed-checks.json`.

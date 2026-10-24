@@ -1,0 +1,34 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui",
+      "-run",
+      "TestDocumentList",
+      "-count=1"
+    ],
+    "exit_code": 0,
+    "seconds": 2.223386958008632
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestDocumentList",
+      "-count=1",
+      "-timeout",
+      "60s"
+    ],
+    "exit_code": 0,
+    "seconds": 14.222089791903272
+  }
+]

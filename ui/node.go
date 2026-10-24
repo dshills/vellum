@@ -96,6 +96,8 @@ type Node struct {
 	PlacementTarget *placement.Target // optional Canvas2D acceptance endpoint
 	// CalendarCell is immutable focus metadata emitted by Calendar.View.
 	CalendarCell *CalendarCell
+	DocumentList *DocumentListLayout
+	ColumnResize *ColumnResizeHandle
 	// SplitButtonLayout marks the two segments produced by SplitButton.View.
 	// It is a detached presentation hint; callbacks remain ordinary child actions.
 	SplitButtonLayout bool

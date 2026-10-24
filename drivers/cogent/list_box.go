@@ -24,6 +24,7 @@ type listBoxEligibility struct {
 type listBoxCatalogEpoch struct {
 	options    []listBoxEligibility
 	collection *ui.CollectionLayout
+	documents  *ui.DocumentListLayout
 }
 
 func styleListBox(s *styles.Style) {
@@ -80,8 +81,9 @@ func listBoxActionGuard(r *record, id string, button *core.Switch) func() bool {
 	c := r.control.choice
 	scope, row := c.listScope.Load(), c.listRows[id]
 	collection := r.node.Collection
+	documents := r.node.DocumentList
 	return func() bool {
-		return row != nil && scope.allowed() && collectionSourceLive(collection, r.node.Collection) && choiceLive(r, id, button) && r.control.choice == c && c.listRows[id] == row
+		return row != nil && scope.allowed() && collectionSourceLive(collection, r.node.Collection) && documents.SameSource(r.node.DocumentList) && choiceLive(r, id, button) && r.control.choice == c && c.listRows[id] == row
 	}
 }
 func listBoxHostGuard(r *record) func() bool {
@@ -93,7 +95,7 @@ func listBoxHostGuard(r *record) func() bool {
 }
 func syncListBoxEpochs(r *record) bool {
 	c := r.control.choice
-	sourceChanged := c.listCatalog == nil || !collectionSourceLive(c.listCatalog.collection, r.node.Collection)
+	sourceChanged := c.listCatalog == nil || (!collectionSourceLive(c.listCatalog.collection, r.node.Collection) || !c.listCatalog.documents.SameSource(r.node.DocumentList))
 	changed := sourceChanged || len(c.listCatalog.options) != len(r.node.Options)
 	for i, o := range r.node.Options {
 		if c.listCatalog == nil || i >= len(c.listCatalog.options) || c.listCatalog.options[i] != (listBoxEligibility{o.ID, o.Disabled}) {
@@ -108,7 +110,7 @@ func syncListBoxEpochs(r *record) bool {
 		for i, o := range r.node.Options {
 			options[i] = listBoxEligibility{o.ID, o.Disabled}
 		}
-		c.listCatalog = &listBoxCatalogEpoch{options: options, collection: r.node.Collection}
+		c.listCatalog = &listBoxCatalogEpoch{options: options, collection: r.node.Collection, documents: r.node.DocumentList}
 	}
 	// Keep only the current detached presentation; identity-compatible image
 	// updates need not retain an old thumbnail catalog.

@@ -151,6 +151,12 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if err := ValidateDocumentListNode(n); err != nil {
+		return err
+	}
+	if h := n.ColumnResize; h != nil && (n.Kind != Button || !finite(h.Width) || h.Width < 60 || h.Width > 600 || h.Change == nil) {
+		return fmt.Errorf("ui: invalid column resize handle")
+	}
 	if c := n.CalendarCell; c != nil {
 		if n.Kind != Button || c.Index < 0 || c.Index >= 42 || (!n.Disabled && c.IDs[c.Index] != n.ID) || (n.Disabled && c.IDs[c.Index] != "") {
 			return fmt.Errorf("ui: invalid calendar cell navigation metadata")

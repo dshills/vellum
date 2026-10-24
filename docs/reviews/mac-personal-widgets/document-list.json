@@ -1,0 +1,141 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "131bab410d58eb43e2fc935251d7b7d3",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "b4c1a7856a301569df4959f8ceed906d1d10c757",
+    "branch": "codex/mac-document-controls"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "533f6211f645fb4f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Row cell plan not refreshed when columns change",
+      "message": "The row plan is built once from the column set at construction time, and the cell frames are keyed by column ID. If the column count or order changes, the existing Switch's FinalMaker plan is not rebuilt. Rows would keep stale cells. The dirty check marks the switch for an update but does not guarantee the plan is rebuilt.",
+      "suggestion": "Ensure the Maker is re-run when the columns change, or make the plan read the columns at update time. The Maker could also be registered with Updater logic.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/document_list.go",
+          "lines": {
+            "start": 63,
+            "end": 63
+          }
+        }
+      ],
+      "tags": [
+        "staleness",
+        "location-corrected"
+      ],
+      "evidence": "if r.node.DocumentList == nil || index \u003e= len(r.node.DocumentList.Columns) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "ff5994e581e762d8",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Pointer drag uses stale handle after re-render",
+      "message": "The drag target width is computed from h.Width, which is captured when the mouse went down. That is stable, so it works only if the handle is not re-rendered. If it is rebuilt, the captured h has a stale source and h.SameSource(r.node.ColumnResize) may fail. Drags would then silently stop acting.",
+      "suggestion": "Capture the starting width once on MouseDown and compare against the current r.node.ColumnResize handle. Use the current handle's Change rather than the captured one.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/document_list.go",
+          "lines": {
+            "start": 213,
+            "end": 213
+          }
+        }
+      ],
+      "tags": [
+        "resize",
+        "stale-state",
+        "location-corrected"
+      ],
+      "evidence": "queue(h, h.Width+float32(event.Pos().X-start.X)/scale)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "04a35523da054560",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Revalidating the entire list on every eligibility check",
+      "message": "The live check runs a full validate, which iterates over up to 256 items. It runs on every eligible call. During a pointer drag, resize runs live() per mouse move. Each selection target in a multi-selection triggers eligible() and thus live(), which makes selection O(n^2).",
+      "suggestion": "Check the cheap conditions in live() and evaluate validate once per event. Alternatively, build a set of eligible IDs once.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/document_list.go",
+          "lines": {
+            "start": 140,
+            "end": 140
+          }
+        }
+      ],
+      "tags": [
+        "performance",
+        "location-corrected"
+      ],
+      "evidence": "live := func() bool { return d.ID == id \u0026\u0026 !d.Disabled \u0026\u0026 d.validate() == nil }",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 8288,
+    "totalMs": 8338
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 16,
+    "bytes": 45971,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 24913,
+        "output": 884,
+        "costUSD": 0.058666
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
