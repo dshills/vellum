@@ -1,0 +1,44 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 2.300345709081739
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestCascading|TestMenuButtonReal|TestMenuChecks|TestToolbarOverflow|TestContextMenu",
+      "-count=1"
+    ],
+    "exit_code": 0,
+    "seconds": 15.922338125063106
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestMacComponentTheme",
+      "-count=1"
+    ],
+    "exit_code": 0,
+    "seconds": 8.173562833108008
+  }
+]

@@ -313,9 +313,9 @@ func accessibilityNativeFocusTargets(root *record, prefix string, out map[string
 				out[prefix+accessibilityDisclosureID(root.node.ID)] = accessibilityFocusTarget{widget: widget, focused: focused, scopeID: prefix + accessibilityManagedID(root.node.ID)}
 			}
 			if menuOpen(root) {
-				for _, o := range menuDescriptor(root).Options {
+				for _, o := range menuVisibleOptions(root.control.menu.popup) {
 					if !o.Disabled {
-						if item := root.control.menu.popup.items[o.ID]; item != nil {
+						if item := menuItems(root.control.menu.popup)[o.ID]; item != nil {
 							out[prefix+menuActionID(root.node.ID, o.ID)] = accessibilityFocusTarget{widget: item, focused: item.ContainsFocus(), scopeID: prefix + accessibilityManagedID(root.node.ID)}
 						}
 					}

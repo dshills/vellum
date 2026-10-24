@@ -31,7 +31,7 @@ func (c *ComboBox) View() (Node, error) {
 	}
 	seen := map[string]bool{}
 	for _, o := range c.Options {
-		if o.ID == "" || seen[o.ID] || o.Closable || o.Separator || o.Checkable || o.Checked || strings.TrimSpace(o.Label) == "" || !utf8.ValidString(o.Label) || strings.ContainsRune(o.Label, 0) {
+		if o.ID == "" || seen[o.ID] || o.Branch != nil || o.Shortcut != "" || o.Closable || o.Separator || o.Checkable || o.Checked || strings.TrimSpace(o.Label) == "" || !utf8.ValidString(o.Label) || strings.ContainsRune(o.Label, 0) {
 			return Node{}, fmt.Errorf("ui: invalid combo suggestion")
 		}
 		seen[o.ID] = true

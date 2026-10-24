@@ -905,13 +905,26 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 					w.nextRecord++
 					popup.manualIncarnation = w.nextRecord
 				}
-				for _, o := range r.control.menu.options {
+				for _, o := range menuVisibleOptions(popup) {
 					if o.Separator {
 						continue
 					}
 					id := prefix + menuActionID(r.node.ID, o.ID)
 					b := bounds[id]
-					item := popup.items[o.ID]
+					item := menuItems(popup)[o.ID]
+					if item == nil {
+						continue
+					}
+					level := item.popup
+					if level.manualIncarnation == 0 {
+						if w.nextRecord == math.MaxUint64 {
+							gridCaptureErr = ErrManualConfig
+							return
+						}
+						w.nextRecord++
+						level.manualIncarnation = w.nextRecord
+					}
+
 					focused := item != nil && item.ContainsFocus()
 					if focused {
 						result.FocusedID = id
@@ -920,7 +933,7 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 					if o.Checkable {
 						value = fmt.Sprint(o.Checked)
 					}
-					result.Elements = append(result.Elements, ManualElement{ID: id, Parent: prefix + r.node.ID, Incarnation: popup.manualIncarnation, Kind: ui.MenuButton, Name: o.Label, Value: value, Enabled: !controlDisabled(r) && !o.Disabled, Visible: true, Focused: focused, Bounds: image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))})
+					result.Elements = append(result.Elements, ManualElement{ID: id, Parent: prefix + r.node.ID, Incarnation: level.manualIncarnation, Kind: ui.MenuButton, Name: o.Label, Value: value, Enabled: !controlDisabled(r) && !o.Disabled, Visible: true, Focused: focused, Bounds: image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))})
 				}
 			}
 			if visible && r.control != nil && r.control.tabs != nil {

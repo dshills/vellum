@@ -1,0 +1,141 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "dd1013c9cc67cc8427ccf4c6fb6dd05a",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "191d6c6e999c79456d510b625f454b7d8abc5103",
+    "branch": "codex/mac-components-theming"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "954d144353845f5e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Native click closes chain before queued action is verified",
+      "message": "closeMenuChain(p.top()) calls closeMenuLevel, which sets items=nil, scene=nil and stage=nil on the live top popup, and runs it on the native click path. The owner-side state (menu.popup/closing) is only reconciled later via postControl, so queueMenuAction posted on OnClick may run after dead is set. queueMenuAction checks p.dead in the native handler before posting, but the posted closure compares r.control.menu.popup to p.top(). Closing the chain also marks popups dead before the owner dispatches Change, which risks dropping actions or racing with accessibility handlers.",
+      "suggestion": "Close the chain through the owner-side requestMenuClose after the action is queued, or ensure the posted action does not depend on the popup's dead flag. Add a test that a mouse click on a leaf dispatches Change exactly once.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/menu_button.go",
+          "lines": {
+            "start": 448,
+            "end": 448
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "menu",
+        "location-corrected"
+      ],
+      "evidence": "item.OnFinal(events.Click, func(events.Event) { closeMenuChain(p.top()) })",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "2916abacf3ba6d52",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Child popup destruction leaves dangling child pointer",
+      "message": "menuItem.Destroy for a child popup (parent != nil) never triggers owner cleanup. When a submenu scene is destroyed by the framework (not by closeMenuLevel), p.dead is set, but the parent's p.child still points to the dead level. menuItems/menuVisibleOptions stop at the dead child, but a stale child stays referenced until the top closes.",
+      "suggestion": "On child Destroy, post to the owner and clear parent.child if it equals p, then invalidate.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/menu_button.go",
+          "lines": {
+            "start": 57,
+            "end": 57
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle",
+        "location-corrected"
+      ],
+      "evidence": "if p.parent == nil \u0026\u0026 p.owner.control.menu.popup == p {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "83b42809e393da9f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Accessibility parent resolution is quadratic and fragile",
+      "message": "Parent resolution iterates all descendants and assigns the last match, but only the deepest level containing the option matters; since IDs are unique across the tree it works, yet options of the root are walked starting from p.child, so a grandchild option gets parent q.branchID of its own level. This is OK, but the root-level popup lacks a parent accessibility entry for a branch whose level is deeper than the first and it is O(n^2) per rebuild. Minor correctness risk if the branch ID accessibility node is not emitted.",
+      "suggestion": "Track each level's options while iterating levels once, setting parent to the level's parent branchID directly.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/menu_button.go",
+          "lines": {
+            "start": 528,
+            "end": 531
+          }
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "location-corrected"
+      ],
+      "evidence": "for q := p.child; q != nil \u0026\u0026 !q.dead.Load(); q = q.child {\n\t\t\tfor _, child := range q.options {\n\t\t\t\tif child.ID == o.ID {\n\t\t\t\t\toptionParent = menuActionID(r.node.ID, q.branchID)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 9694,
+    "totalMs": 9726
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 45477,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 24698,
+        "output": 1152,
+        "costUSD": 0.060916
+      }
+    ],
+    "widenedFiles": 5,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -22,14 +22,18 @@ import (
 
 type menuEpoch struct{ marker byte }
 type menuState struct {
-	epoch    *menuEpoch
-	options  []ui.Option
-	popup    *menuPopup
-	closing  *menuPopup // owner revokes first; originating reconciliation destroys native scene
-	request  bool
-	position *image.Point
+	epoch         *menuEpoch
+	options       []ui.Option
+	popup         *menuPopup
+	closing       *menuPopup // owner revokes first; originating reconciliation destroys native scene
+	request       bool
+	branchRequest string
+	position      *image.Point
 }
 type menuPopup struct {
+	parent, child     *menuPopup
+	options           []ui.Option
+	branchID          string
 	owner             *record
 	epoch             *menuEpoch
 	stage             *core.Stage
@@ -50,7 +54,7 @@ func (w *menuItem) Destroy() {
 	w.Button.Destroy()
 	if p != nil && p.dead.CompareAndSwap(false, true) {
 		postControl(p.owner, func() {
-			if p.owner.control.menu.popup == p {
+			if p.parent == nil && p.owner.control.menu.popup == p {
 				requestMenuClose(p.owner)
 				_ = p.owner.control.a.Invalidate(p.owner.control.window)
 			}
@@ -62,7 +66,7 @@ func (w *menuItem) Render() {
 	p := w.popup
 	if p != nil && !p.dead.Load() && p.geometryReady.CompareAndSwap(false, true) {
 		postControl(p.owner, func() {
-			if p.owner.control.menu.popup == p {
+			if p.owner.control.menu.popup == p.top() {
 				_ = p.owner.control.a.Invalidate(p.owner.control.window)
 			}
 		})
@@ -135,12 +139,7 @@ func menuAvailable(r *record) bool {
 	if r.control == nil || r.control.retired || r.control.disabled || toolbarOverflowHidden(r) || menuDescriptor(r).Change == nil {
 		return false
 	}
-	for _, o := range menuDescriptor(r).Options {
-		if !o.Disabled && !o.Separator {
-			return true
-		}
-	}
-	return false
+	return ui.MenuEnabled(menuDescriptor(r))
 }
 func menuOpen(r *record) bool {
 	return r != nil && r.control != nil && r.control.menu != nil && r.control.menu.popup != nil && !r.control.menu.popup.dead.Load()
@@ -199,6 +198,14 @@ func syncMenuButton(r *record, previous ui.Node) {
 		}
 		r.widget.AsWidget().SetState(!menuAvailable(r), states.Disabled)
 	}
+	if id := s.branchRequest; id != "" {
+		s.branchRequest = ""
+		if menuOpen(r) {
+			if item := menuItems(s.popup)[id]; item != nil && item.Menu != nil {
+				item.Send(events.Click)
+			}
+		}
+	}
 	if s.request {
 		s.request = false
 		if menuAvailable(r) && !menuOpen(r) {
@@ -218,7 +225,7 @@ func openManagedMenu(r *record) {
 			flushMenuClose(old.owner)
 		}
 	}
-	p := &menuPopup{owner: r, epoch: s.epoch, items: map[string]*menuItem{}}
+	p := &menuPopup{owner: r, epoch: s.epoch, items: map[string]*menuItem{}, options: s.options}
 	scene := core.NewScene("vellum-action-menu")
 	core.StyleMenuScene(scene)
 	scene.FinalStyler(func(style *styles.Style) {
@@ -242,77 +249,8 @@ func openManagedMenu(r *record) {
 			break
 		}
 	}
-	// Menu rows inherit typography/ink, not ordinary push-button borders/fills.
-	itemStyle := ui.Style{Typography: r.theme.Default.Typography, Foreground: r.theme.Default.Foreground}
-	var first core.Widget
-	for _, o := range s.options {
-		o := o
-		if o.Separator {
-			core.NewSeparator(scene).SetName(o.ID)
-			continue
-		}
-		item := tree.New[menuItem](scene)
-		item.popup = p
-		item.SetName(o.ID)
-		item.SetText(html.EscapeString(o.Label))
-		if o.Icon != "" {
-			item.SetIcon(nativeSymbol(o.Icon))
-		}
-		if o.Checkable && o.Checked {
-			if o.Icon != "" || o.IconImage != nil {
-				item.SetIndicator(nativeSymbol(ui.SymbolCheck))
-			} else {
-				item.SetIcon(nativeSymbol(ui.SymbolCheck))
-			}
-		}
-		installMenuArtwork(&item.Button, o)
+	populateManagedMenu(r, p, scene, keyboard)
 
-		item.FinalStyler(func(style *styles.Style) {
-			applyStyle(style, ui.Node{Kind: ui.Label, Style: itemStyle}, ui.Theme{})
-			style.Grow.Set(1, 0)
-			style.Justify.Content = styles.Start
-			style.Border.Width.Zero()
-			style.MaxBorder.Width.Zero()
-			style.Border.Radius.Set(units.Dp(4))
-			style.Padding.Set(units.Dp(4), units.Dp(10))
-			style.Min.Y = units.Dp(24)
-			style.Background = colors.Uniform(color.NRGBA{})
-			if style.Is(states.Focused) || style.Is(states.Hovered) || style.Is(states.Active) {
-				style.Background = colors.Uniform(managedAccent(r))
-				style.Color = colors.Uniform(color.NRGBA{R: 255, G: 255, B: 255, A: 255})
-				if r.theme.Palette.Set {
-					style.Color = colors.Uniform(r.theme.Palette.Value.AccentInk)
-				}
-			}
-		})
-		item.SetState(o.Disabled, states.Disabled)
-		p.items[o.ID] = item
-		if first == nil && !o.Disabled {
-			first = item
-		}
-		item.OnClick(func(events.Event) { queueMenuAction(r, p, o.ID) })
-		item.OnFinal(events.Click, func(events.Event) {
-			if p.stage != nil {
-				p.stage.ClosePopup()
-			}
-		})
-		item.OnFocus(func(events.Event) { postControl(r, func() { _ = r.control.a.Invalidate(r.control.window) }) })
-	}
-	scene.OnFirst(events.KeyChord, func(e events.Event) {
-		modifiers := e.Modifiers() & ^((1 << key.CapsLock) | (1 << key.NumLock))
-		if e.KeyCode() == key.CodeEscape || (e.KeyCode() == key.CodeTab && (modifiers == 0 || modifiers == 1<<key.Shift)) {
-			if p.stage != nil {
-				p.stage.ClosePopup() // native event owns this window's render context
-			}
-			if e.KeyCode() == key.CodeTab && keyboard != nil {
-				keyboard(e) // same event boundary, before declaring handled
-			}
-			e.SetHandled()
-		}
-	})
-	if first != nil {
-		scene.Events.SetStartFocus(first)
-	}
 	menuWidth := 0
 	pos := r.widget.AsWidget().ContextMenuPos(nil)
 	if r.node.Kind == ui.MenuButton {
@@ -373,21 +311,171 @@ func openManagedMenu(r *record) {
 		scene.LayoutScene()
 	}
 }
+
+func (p *menuPopup) top() *menuPopup {
+	for p.parent != nil {
+		p = p.parent
+	}
+	return p
+}
+func menuItems(p *menuPopup) map[string]*menuItem {
+	out := map[string]*menuItem{}
+	for ; p != nil && !p.dead.Load(); p = p.child {
+		for id, item := range p.items {
+			out[id] = item
+		}
+	}
+	return out
+}
+func menuVisibleOptions(p *menuPopup) []ui.Option {
+	var out []ui.Option
+	for ; p != nil && !p.dead.Load(); p = p.child {
+		out = append(out, p.options...)
+	}
+	return out
+}
+
+// Native-context only: each level releases children before its own stage.
+func closeMenuLevel(p *menuPopup) {
+	if p == nil {
+		return
+	}
+	closeMenuLevel(p.child)
+	p.child = nil
+	p.dead.Store(true)
+	st := p.stage
+	if st == nil && p.scene != nil {
+		st = p.scene.Stage
+	}
+	if st != nil {
+		st.ClosePopup()
+	}
+	p.items = nil
+	p.scene = nil
+	p.stage = nil
+	p.context = nil
+}
+func closeMenuChain(p *menuPopup) {
+	closeMenuLevel(p)
+	if p != nil {
+		postControl(p.owner, func() {
+			if p.owner.control.menu.popup == p {
+				requestMenuClose(p.owner)
+				_ = p.owner.control.a.Invalidate(p.owner.control.window)
+			}
+		})
+	}
+}
+func populateManagedMenu(r *record, p *menuPopup, scene *core.Scene, keyboard func(events.Event)) {
+	scene.FinalStyler(func(s *styles.Style) {
+		if r.theme.Palette.Set {
+			s.Background = colors.Uniform(r.theme.Palette.Value.Popup)
+		}
+	})
+	// Menu rows inherit typography/ink, not ordinary push-button borders/fills.
+	itemStyle := ui.Style{Typography: r.theme.Default.Typography, Foreground: r.theme.Default.Foreground}
+	var first core.Widget
+	for _, o := range p.options {
+		o := o
+		if o.Separator {
+			core.NewSeparator(scene).SetName(o.ID)
+			continue
+		}
+		item := tree.New[menuItem](scene)
+		item.popup = p
+		item.SetName(o.ID)
+		item.SetText(html.EscapeString(o.Label))
+		if o.Icon != "" {
+			item.SetIcon(nativeSymbol(o.Icon))
+		}
+		if o.Checkable && o.Checked {
+			if o.Icon != "" || o.IconImage != nil {
+				item.SetIndicator(nativeSymbol(ui.SymbolCheck))
+			} else {
+				item.SetIcon(nativeSymbol(ui.SymbolCheck))
+			}
+		}
+		installMenuArtwork(&item.Button, o)
+
+		item.FinalStyler(func(style *styles.Style) {
+			applyStyle(style, ui.Node{Kind: ui.Label, Style: itemStyle}, ui.Theme{})
+			style.Grow.Set(1, 0)
+			style.Justify.Content = styles.Start
+			style.Border.Width.Zero()
+			style.MaxBorder.Width.Zero()
+			style.Border.Radius.Set(units.Dp(4))
+			style.Padding.Set(units.Dp(4), units.Dp(10))
+			style.Min.Y = units.Dp(24)
+			style.Background = colors.Uniform(color.NRGBA{})
+			if style.Is(states.Focused) || style.Is(states.Hovered) || style.Is(states.Active) {
+				style.Background = colors.Uniform(managedAccent(r))
+				style.Color = colors.Uniform(color.NRGBA{R: 255, G: 255, B: 255, A: 255})
+				if r.theme.Palette.Set {
+					style.Color = colors.Uniform(r.theme.Palette.Value.AccentInk)
+				}
+			}
+		})
+		item.SetState(o.Disabled, states.Disabled)
+		p.items[o.ID] = item
+		if first == nil && !o.Disabled {
+			first = item
+		}
+		if o.Shortcut != "" {
+			item.Maker(func(plan *tree.Plan) {
+				tree.AddAt(plan, "menu-caption-space", func(w *core.Stretch) {})
+				tree.AddAt(plan, "menu-caption", func(w *core.Text) {
+					w.SetText(html.EscapeString(o.Shortcut))
+					w.Styler(func(s *styles.Style) {
+						s.Color = colors.Uniform(color.NRGBA{R: 128, G: 128, B: 128, A: 255})
+						s.Margin.Left = units.Dp(24)
+					})
+				})
+			})
+		}
+		if o.Branch != nil {
+			item.SetIndicator(nativeSymbol(ui.SymbolRight))
+			item.SetMenu(func(sc *core.Scene, pos image.Point) {
+				if p.dead.Load() {
+					return
+				}
+				closeMenuLevel(p.child)
+				q := &menuPopup{owner: r, epoch: p.epoch, parent: p, branchID: o.ID, options: o.Branch.Items(), scene: sc, context: p.context, items: map[string]*menuItem{}}
+				p.child = q
+				populateManagedMenu(r, q, sc, keyboard)
+			})
+		} else {
+			item.OnClick(func(events.Event) { queueMenuAction(r, p, o.ID) })
+			item.OnFinal(events.Click, func(events.Event) { closeMenuChain(p.top()) })
+		}
+
+		item.OnFocus(func(events.Event) { postControl(r, func() { _ = r.control.a.Invalidate(r.control.window) }) })
+	}
+	scene.OnFirst(events.KeyChord, func(e events.Event) {
+		modifiers := e.Modifiers() & ^((1 << key.CapsLock) | (1 << key.NumLock))
+		if e.KeyCode() == key.CodeEscape || (e.KeyCode() == key.CodeTab && (modifiers == 0 || modifiers == 1<<key.Shift)) {
+			closeMenuChain(p.top())
+			if e.KeyCode() == key.CodeTab && keyboard != nil {
+				keyboard(e) // same event boundary, before declaring handled
+			}
+			e.SetHandled()
+		}
+	})
+	if first != nil {
+		scene.Events.SetStartFocus(first)
+	}
+}
 func queueMenuAction(r *record, p *menuPopup, id string) {
 	if p == nil || p.dead.Load() {
 		return
 	}
 	postControl(r, func() {
-		if r.control.menu.popup != p || r.control.menu.epoch != p.epoch || !menuAvailable(r) {
+		if r.control.menu.popup != p.top() || r.control.menu.epoch != p.epoch || !menuAvailable(r) {
 			return
 		}
-		for _, o := range menuDescriptor(r).Options {
-			if o.ID == id && !o.Disabled && !o.Separator {
-				requestMenuClose(r)
-				menuDescriptor(r).Change(ui.ChangeEvent{ID: r.node.ID, Kind: ui.MenuButton, SelectedID: id, Checked: o.Checkable && !o.Checked})
-				_ = r.control.a.Invalidate(r.control.window)
-				return
-			}
+		if o, ok := ui.MenuAction(menuDescriptor(r).Options, id); ok {
+			requestMenuClose(r)
+			menuDescriptor(r).Change(ui.ChangeEvent{ID: r.node.ID, Kind: ui.MenuButton, SelectedID: id, Checked: o.Checkable && !o.Checked})
+			_ = r.control.a.Invalidate(r.control.window)
 		}
 	})
 }
@@ -399,6 +487,7 @@ func requestMenuClose(r *record) {
 	p := s.popup
 	s.popup = nil
 	s.request = false
+	s.branchRequest = ""
 	s.position = nil
 	if p != nil {
 		p.dead.Store(true)
@@ -418,13 +507,7 @@ func flushMenuClose(r *record) {
 	if p.context != nil && p.context.Property("vellum.menu.active") == p {
 		p.context.SetProperty("vellum.menu.active", nil)
 	}
-	p.context = nil
-	if p.stage != nil {
-		p.stage.ClosePopup()
-	}
-	p.items = nil
-	p.scene = nil
-	p.stage = nil
+	closeMenuChain(p)
 }
 func menuActionID(parent, id string) string {
 	return "menu:" + base64.RawURLEncoding.EncodeToString([]byte(parent)) + ":" + base64.RawURLEncoding.EncodeToString([]byte(id))
@@ -436,23 +519,33 @@ func menuAccessibility(r *record, parent string, b *accessibilityBridge) ([]acce
 		return nodes, handlers
 	}
 	p := r.control.menu.popup
-	for _, o := range r.control.menu.options {
+	for _, o := range menuVisibleOptions(p) {
 		if o.Separator {
 			continue
 		}
 		id := menuActionID(r.node.ID, o.ID)
-		node := accessibilityNode{ID: id, Parent: parent, Role: "menu-item", Actions: []string{}, DomainID: o.ID, Name: o.Label, Disabled: o.Disabled, Focusable: !o.Disabled}
+		optionParent := parent
+		for q := p.child; q != nil && !q.dead.Load(); q = q.child {
+			for _, child := range q.options {
+				if child.ID == o.ID {
+					optionParent = menuActionID(r.node.ID, q.branchID)
+				}
+			}
+		}
+		node := accessibilityNode{ID: id, Parent: optionParent, Role: "menu-item", Actions: []string{}, DomainID: o.ID, Name: o.Label, Disabled: o.Disabled, Focusable: !o.Disabled}
 		if o.Checkable {
 			node.Value = o.Checked
 		}
-		if item := p.items[o.ID]; item != nil {
+		if item := menuItems(p)[o.ID]; item != nil {
 			node.Focused = item.StateIs(states.Focused)
 		}
 		if !o.Disabled {
 			node.Actions = []string{"focus", "press"}
 			option := o.ID
+			branch := o.Branch != nil
+			nativeItem := menuItems(p)[o.ID]
 			handlers[id] = func(a accessibilityAction) bool {
-				if !menuOpen(r) || r.control.menu.popup != p {
+				if !menuOpen(r) || r.control.menu.popup != p || nativeItem == nil || nativeItem.popup.dead.Load() {
 					return false
 				}
 				switch a.Kind {
@@ -463,7 +556,16 @@ func menuAccessibility(r *record, parent string, b *accessibilityBridge) ([]acce
 					accessibilityFocus(b, id)
 					return true
 				case "press":
-					queueMenuAction(r, p, option)
+					if branch {
+						postControl(r, func() {
+							if menuOpen(r) && r.control.menu.popup == p && !nativeItem.popup.dead.Load() {
+								r.control.menu.branchRequest = option
+								_ = r.control.a.Invalidate(r.control.window)
+							}
+						})
+					} else {
+						queueMenuAction(r, nativeItem.popup, option)
+					}
 					return true
 				default:
 					return false
@@ -476,7 +578,7 @@ func menuAccessibility(r *record, parent string, b *accessibilityBridge) ([]acce
 }
 func menuPopupBounds(r *record, bounds func(string, core.Widget)) {
 	if menuOpen(r) {
-		for id, item := range r.control.menu.popup.items {
+		for id, item := range menuItems(r.control.menu.popup) {
 			bounds(menuActionID(r.node.ID, id), item)
 		}
 	}

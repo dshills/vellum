@@ -1306,3 +1306,11 @@ and retain compatible controls. Mac palette/accent values are local; no global
 color mutation, OS appearance change or image tint is introduced. The remaining
 five widget phases are planned separately in mac-composition-widgets.md. No
 remaining actionable review finding.
+
+## Add bounded cascading action menus with full-color artwork
+
+Prism: `mac-cascades-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Initial review cleanup findings were fixed: native closure posts FIFO owner retirement after queued leaf dispatch, and branch accessibility requests revalidate on owner. Final review concerns were inspected: the posted leaf closure intentionally does not check dead, so queued valid dispatch precedes retirement; both keyboard and real routed mouse regressions assert one callback and nil popup/closing state. A closed submenu remains one bounded dead level until replacement or root cleanup; it has no exposed targets and cannot act. The parent lookup is bounded by 64 items/four levels and globally unique IDs; every open branch parent is emitted. These latter observations are not outstanding correctness defects.
+
+Focused checks: `mac-cascades-checks.json`, `mac-cascades-final-checks.json`, `mac-cascades-mouse-checks.json`.

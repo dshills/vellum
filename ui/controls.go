@@ -42,6 +42,9 @@ const (
 // each option ID corresponds to the child page ID, in the same order.
 type Option struct {
 	ID, Label string
+	// Branch is an immutable submenu. Shortcut is a display caption, not a binding.
+	Branch   *MenuBranch
+	Shortcut string
 	// Icon decorates MenuButton actions and multiple-selection ListBox rows.
 	// Badge decorates only multiple-selection ListBox rows (including Sidebar navigation).
 	Icon Symbol
@@ -328,7 +331,7 @@ func ValidateControl(n Node) error {
 	}
 	if n.Kind != MenuButton {
 		for _, o := range n.Options {
-			if o.Separator || o.Checkable || o.Checked {
+			if o.Separator || o.Checkable || o.Checked || o.Branch != nil || o.Shortcut != "" {
 				return fmt.Errorf("ui: separator/check action metadata belongs only on menu options")
 			}
 		}
