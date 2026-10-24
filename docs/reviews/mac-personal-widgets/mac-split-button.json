@@ -1,0 +1,93 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "d4c1b908e6d164ca39526bb545f1146a",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "c8377847a074ac868ae61ca624e7151bdad43791",
+    "branch": "codex/mac-components-theming"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "872999756821dbea",
+      "severity": "medium",
+      "category": "bug",
+      "title": "panic on View error in UI render path",
+      "message": "Panicking in a view function crashes the whole gallery app on a validation error; the error should be surfaced without terminating.",
+      "suggestion": "Render an error label instead of panicking.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_components.go",
+          "lines": {
+            "start": 96,
+            "end": 99
+          }
+        }
+      ],
+      "tags": [
+        "error-handling"
+      ],
+      "evidence": "\t\tif err != nil {\n\t\t\tpanic(err)\n\t\t}",
+      "fix": {
+        "before": "\t\tif err != nil {\n\t\t\tpanic(err)\n\t\t}",
+        "after": "\t\tif err != nil {\n\t\t\tchildren = append(children, ui.Node{ID: \"components/split/error\", Kind: ui.Label, Text: err.Error()})\n\t\t\tcontinue\n\t\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3273,
+    "totalMs": 3290
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 11345,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 7867,
+        "output": 325,
+        "costUSD": 0.018984
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

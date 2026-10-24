@@ -1,0 +1,17 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestMacComponent",
+      "-count=1"
+    ],
+    "exit_code": 0,
+    "seconds": 2.34175254101865
+  }
+]

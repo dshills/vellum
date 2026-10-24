@@ -1314,3 +1314,11 @@ Prism: `mac-cascades-final.json` (Anthropic Claude Sonnet 5.5, complete coverage
 Initial review cleanup findings were fixed: native closure posts FIFO owner retirement after queued leaf dispatch, and branch accessibility requests revalidate on owner. Final review concerns were inspected: the posted leaf closure intentionally does not check dead, so queued valid dispatch precedes retirement; both keyboard and real routed mouse regressions assert one callback and nil popup/closing state. A closed submenu remains one bounded dead level until replacement or root cleanup; it has no exposed targets and cannot act. The parent lookup is bounded by 64 items/four levels and globally unique IDs; every open branch parent is emitted. These latter observations are not outstanding correctness defects.
 
 Focused checks: `mac-cascades-checks.json`, `mac-cascades-final-checks.json`, `mac-cascades-mouse-checks.json`.
+
+## Add reusable compact and regular Mac split buttons
+
+Prism: `mac-split-button.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism requested safe error presentation in the example View; changed it to a visible error label and reran the gallery regression. Public API validation returns errors. Portable tests cover independent primary/menu paths and stale option/identity rejection; a real offscreen keyboard sequence tabs between segments and activates each exactly once.
+
+Focused checks: `mac-split-button-checks.json`, `mac-split-gallery-final-checks.json`.

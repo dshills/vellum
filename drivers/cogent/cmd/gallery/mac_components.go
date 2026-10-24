@@ -8,6 +8,7 @@ import (
 )
 
 type macComponentsGallery struct {
+	splits  []*ui.SplitButton
 	menu    *ui.MenuBranch
 	dark    bool
 	accent  string
@@ -60,10 +61,13 @@ func (m *macComponentsGallery) view() ui.Node {
 		}
 	}})
 	content := m.themePreview()
+	if m.page == "split" {
+		content = m.splitPreview()
+	}
 	if m.page == "menus" {
 		content = m.menuPreview()
 	}
-	navigation := ui.Node{ID: "components/pages", Kind: ui.Selector, SelectedID: m.page, Options: []ui.Option{{ID: "theme", Label: "Themes"}, {ID: "menus", Label: "Cascading menus"}}, Accessibility: ui.Accessibility{Name: "Component demonstration"}, Change: func(e ui.ChangeEvent) { m.page = e.SelectedID }}
+	navigation := ui.Node{ID: "components/pages", Kind: ui.Selector, SelectedID: m.page, Options: []ui.Option{{ID: "theme", Label: "Themes"}, {ID: "menus", Label: "Cascading menus"}, {ID: "split", Label: "Split buttons"}}, Accessibility: ui.Accessibility{Name: "Component demonstration"}, Change: func(e ui.ChangeEvent) { m.page = e.SelectedID }}
 
 	return ui.Node{ID: "mac-components", Kind: ui.Scroll, Theme: &theme, Grow: true, Style: ui.Style{Background: ui.Some(palette.Window), Padding: ui.Some(ui.UniformInsets(16)), Gap: ui.Some(float32(12))}, Children: []ui.Node{{ID: "components/title", Kind: ui.Label, Text: "Mac components", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 20, Weight: 600})}}, {ID: "components/appearance", Kind: ui.Row, Children: appearance}, navigation, content, {ID: "components/status", Kind: ui.Label, Text: fmt.Sprintf("%s · actions: %d", m.status, m.count)}}}
 }
@@ -76,4 +80,23 @@ func (m *macComponentsGallery) menuPreview() ui.Node {
 		{ID: "components/menu-help", Kind: ui.Label, Text: "Open Export, then use Right / Left to navigate. Escape cancels. Shortcut captions do not install bindings."},
 		{ID: "components/actions", Kind: ui.MenuButton, Text: "Document actions", IconImage: m.artwork[ui.SymbolFolder], Options: []ui.Option{{ID: "export", Label: "Export", IconImage: m.artwork[ui.SymbolSave], Branch: m.menu}, {ID: "separator", Separator: true}, {ID: "grid", Label: "Show grid", Checkable: true, Checked: m.count%2 == 1}}, Change: func(e ui.ChangeEvent) { m.count++; m.status = "Menu action: " + e.SelectedID }},
 	}}
+}
+
+func (m *macComponentsGallery) splitPreview() ui.Node {
+	if len(m.splits) == 0 {
+		for i, small := range []bool{false, true} {
+			b := &ui.SplitButton{ID: fmt.Sprintf("components/split/%d", i), Label: "Save", Small: small, IconImage: m.artwork[ui.SymbolSave], Options: []ui.Option{{ID: "save-as", Label: "Save As…", IconImage: m.artwork[ui.SymbolFolder]}, {ID: "formats", Label: "Export", Branch: m.menu}}, Primary: func() { m.count++; m.status = "Primary Save action" }, Change: func(e ui.ChangeEvent) { m.count++; m.status = "Split option: " + e.SelectedID }}
+			m.splits = append(m.splits, b)
+		}
+	}
+	children := []ui.Node{{ID: "components/split/help", Kind: ui.Label, Text: "Regular and small sizes. Save runs the primary action; the adjacent arrow opens options."}}
+	for _, b := range m.splits {
+		n, err := b.View()
+		if err != nil {
+			children = append(children, ui.Node{ID: b.ID + "/error", Kind: ui.Label, Text: err.Error()})
+			continue
+		}
+		children = append(children, n)
+	}
+	return ui.Node{ID: "components/split-demo", Kind: ui.FormGroup, Text: "Split buttons", Children: children}
 }

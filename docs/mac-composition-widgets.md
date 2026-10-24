@@ -18,3 +18,12 @@ actions with full-color artwork, a disabled leaf and a controlled check action.
 Focused offscreen tests cover real key routing, exactly-once dispatch, Left,
 Escape and stale accessibility handlers; physical pointer checks are recorded
 separately in the packaged delivery.
+
+## Split buttons
+
+Retain a `ui.SplitButton` and call `View()`. Set `Primary`, `Options` and `Change`
+independently; `Small` selects the compact size. `IconImage` preserves full-color
+artwork. The disclosure anchors to the combined control and accepts cascading
+options. Tab reaches each segment; Return activates the focused segment and
+Down opens its menu. Disabled or removed options revoke old action closures.
+The Components → Split buttons page demonstrates regular and compact variants.
