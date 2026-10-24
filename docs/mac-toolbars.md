@@ -159,8 +159,12 @@ including while hidden. These buttons and checkboxes support keyboard focus and
 named accessibility actions. Disabled toolbar commands can still be configured;
 editing the layout never runs their command. Restore Defaults resets both order
 and visibility. Done and Escape close the sheet and restore focus to its opener.
-Changes apply immediately; Escape keeps them. The gallery retains settings only
-for the current process and has no preferences-file side effects.
+Changes apply immediately; Escape keeps them. The packaged gallery remembers order and hidden actions across launches in
+`~/Library/Application Support/Vellum/MacWidgets/toolbars-light.json` (or
+`toolbars-dark.json`). Restore Defaults is saved too. A visible error explains a
+failed load/save; current edits stay usable. Retired IDs are pruned when the
+catalogue changes. Invalid or unsupported files are preserved without overwriting them; saving
+stays disabled for that session. Repair/remove the file and relaunch to resume saving. These files belong to the demo; portable components still perform no I/O.
 
 Public applications use `ui.ToolbarLayout` and a retained `ui.ToolbarCustomizer`:
 

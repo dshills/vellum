@@ -1094,3 +1094,17 @@ replacement, sheet disable/close and window teardown. Existing arrow/visibility
 regressions remain in place. Packaged native pointer observations are separate
 from deterministic routing; no broader performance or release qualification is
 claimed. No remaining actionable review finding.
+
+## Toolbar preferences
+
+Anthropic claude-sonnet-5-5 reviewed the full persistence checkpoint. Applied the
+file-preservation finding: every failed load except a missing file disables writes
+for that session, retaining the original invalid/newer file. Focused regressions
+confirm this for malformed, oversized and unsupported-version files. Round trips,
+independent bars, catalogue migration, Restore Defaults, save failure retaining
+memory and temporary cleanup pass with the race detector; gallery toolbar checks
+and vet also passed. The second finding calls CreateTemp's 0600 permission an
+accident; it is the Go API's specified mode, also asserted by the file-mode test.
+Deferred close/remove after rename are harmless cleanup. Atomic replacement is
+claimed; power-loss durability of the containing directory is not. No remaining
+actionable review finding.

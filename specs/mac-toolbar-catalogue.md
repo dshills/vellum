@@ -98,3 +98,14 @@ all hidden actions. Public Manual regression tests cover both appearances, two
 scales, long-list scrolling, threshold/no-op/duplicate release, outside release
 consumption, Escape and lifecycle cancellation; packaged pointer checks remain
 separate evidence.
+
+The personal Mac gallery opts into versioned application-owned preferences at
+UserConfigDir()/Vellum/MacWidgets/toolbars-{light,dark}.json. Pure constructors and
+portable controls perform no I/O. Each accepted layout edit writes through a
+0600 temporary file, sync, close and atomic rename; failures leave in-memory edits
+usable and show a visible error. Loading is bounded to 64 KiB/four layouts/64
+items. Retired and duplicate IDs are removed and new catalogue items use their
+default order. Invalid files and unsupported schema versions are left untouched; persistence is
+disabled for that session until the file is repaired/removed and the app relaunched.
+Restore Defaults is persisted through the same Change path. Appearance packages
+have separate files to avoid concurrently overwriting each other's settings.

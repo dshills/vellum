@@ -272,6 +272,7 @@ func main() {
 	if *macWidgets {
 		g.inputHelpers.setAppearance(*macDark)
 		macGallery := newMacWidgetsGallery(g.inputHelpers, *macDark)
+		macGallery.toolbars.enablePreferences()
 		view = macGallery.view
 	}
 	if *catalogue {
