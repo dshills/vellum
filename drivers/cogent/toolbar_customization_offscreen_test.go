@@ -28,7 +28,7 @@ func TestToolbarCustomizationNativeReorderHideRestoreAndLifecycle(t *testing.T) 
 			c.Change = func(next ui.ToolbarLayout) { changes++; c.Value = next }
 			view := func() ui.Node {
 				items := []ui.Node{}
-				for i, name := range []string{"one", "two", "three", "disabled"} {
+				for i, name := range []string{"one", "two", "three", "disabled", "extra", "last"} {
 					if i == 2 {
 						items = append(items, ui.Node{ID: "rule", Kind: ui.Separator})
 					}
@@ -89,10 +89,28 @@ func TestToolbarCustomizationNativeReorderHideRestoreAndLifecycle(t *testing.T) 
 			if !panel.control.dialog.active {
 				t.Fatal("customizer not modal")
 			}
+			arrowX := -1
+			for _, id := range []string{"one", "two", "rule", "three", "disabled", "extra", "last"} {
+				checkbox := findRecord(root, ui.ToolbarCustomizationVisibilityID(c.ID, id)).widget.(*core.Switch)
+				indicator := checkbox.ChildByName("stack").(*core.Frame)
+				if indicator.Geom.TotalBBox.Min.X-checkbox.Geom.ContentBBox.Min.X > 2 {
+					t.Fatal("visibility checkbox content centered", id, indicator.Geom.TotalBBox, checkbox.Geom.ContentBBox)
+				}
+				arrow := findRecord(root, ui.ToolbarCustomizationEarlierID(c.ID, id)).widget.AsWidget().Geom.TotalBBox
+				if arrowX >= 0 && arrow.Min.X != arrowX {
+					t.Fatal("reorder columns do not align", id, arrow.Min.X, arrowX)
+				}
+				arrowX = arrow.Min.X
+				row := checkbox.Parent.(core.Widget).AsWidget()
+				viewport := findRecord(root, c.ID+"/items").widget.AsWidget().Geom.ContentBBox
+				if row.Geom.TotalBBox.Empty() || !row.Geom.TotalBBox.In(viewport) || float32(row.Geom.TotalBBox.Dy())+1 < row.Geom.Size.Actual.Total.Y {
+					t.Fatal("customization row clipped", id, row.Geom.TotalBBox, viewport, row.Geom.Size.Actual.Total)
+				}
+			}
 			earlier := ui.ToolbarCustomizationEarlierID(c.ID, "three")
 			tap(earlier)
 			tap(earlier)
-			if !slices.Equal(c.Value.Order, []string{"one", "three", "two", "rule", "disabled"}) || changes != 2 {
+			if !slices.Equal(c.Value.Order, []string{"one", "three", "two", "rule", "disabled", "extra", "last"}) || changes != 2 {
 				t.Fatal("reorder did not merge exactly once", c.Value, changes)
 			}
 			if findRecord(root, "three").widget != retained {
@@ -127,14 +145,14 @@ func TestToolbarCustomizationNativeReorderHideRestoreAndLifecycle(t *testing.T) 
 				t.Fatal("closed panel accepted stale native action")
 			}
 			tap("opener")
-			for _, id := range []string{"three", "two", "disabled"} {
+			for _, id := range []string{"three", "two", "disabled", "extra", "last"} {
 				tap(ui.ToolbarCustomizationVisibilityID(c.ID, id))
 			}
 			if bar := findRecord(root, "tools"); len(bar.children) != 0 {
 				t.Fatal("all-hidden toolbar retained actions/overflow")
 			}
 			tap(ui.ToolbarCustomizationRestoreID(c.ID))
-			if len(c.Value.Hidden) != 0 || !slices.Equal(c.Value.Order, []string{"one", "two", "rule", "three", "disabled"}) {
+			if len(c.Value.Hidden) != 0 || !slices.Equal(c.Value.Order, []string{"one", "two", "rule", "three", "disabled", "extra", "last"}) {
 				t.Fatal("restore defaults failed", c.Value)
 			}
 			tap(ui.ToolbarCustomizationDoneID(c.ID))

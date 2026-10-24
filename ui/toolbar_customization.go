@@ -217,16 +217,17 @@ func (c *ToolbarCustomizer) View() (result Node, err error) {
 	rows := make([]Node, 0, len(items))
 	for index, item := range items {
 		itemID, label := item.ID, toolbarItemLabel(item)
-		art := Node{ID: toolbarCustomizationItemID(id, itemID, "art"), Kind: Label, Style: Style{MinSize: Some(Size{Width: 22, Height: 22}), MaxSize: Some(Size{Width: 22, Height: 22}), GrowX: Some(float32(0))}}
+		art := Node{ID: toolbarCustomizationItemID(id, itemID, "art"), Kind: Icon, Icon: SymbolRemove, Style: Style{MinSize: Some(Size{Width: 22, Height: 22}), MaxSize: Some(Size{Width: 22, Height: 22}), GrowX: Some(float32(0))}}
 		if item.IconImage != nil {
 			art.Kind = Image
+			art.Icon = ""
 			art.Image = item.IconImage
 			art.Fit = ImageContain
 		} else if item.Icon != "" {
 			art.Kind = Icon
 			art.Icon = item.Icon
 		}
-		show := Node{ID: ToolbarCustomizationVisibilityID(id, itemID), Kind: Checkbox, Text: label, Checked: !hidden[itemID], Style: Style{GrowX: Some(float32(1))}, Accessibility: Accessibility{Name: "Show " + label, Help: "Include this item in the toolbar"}, Change: func(e ChangeEvent) {
+		show := Node{ID: ToolbarCustomizationVisibilityID(id, itemID), Kind: Checkbox, Text: label, Checked: !hidden[itemID], Style: Style{GrowX: Some(float32(1)), Justify: Some(AlignStart)}, Accessibility: Accessibility{Name: "Show " + label, Help: "Include this item in the toolbar"}, Change: func(e ChangeEvent) {
 			emit(func(value *ToolbarLayout) bool {
 				if slices.Index(value.Order, itemID) < 0 {
 					return false
@@ -251,7 +252,7 @@ func (c *ToolbarCustomizer) View() (result Node, err error) {
 				})
 			}
 		}
-		arrowStyle := Style{GrowX: Some(float32(0)), MinSize: Some(Size{Width: 28, Height: 28}), MaxSize: Some(Size{Width: 28, Height: 28}), Padding: Some(UniformInsets(4))}
+		arrowStyle := Style{GrowX: Some(float32(0)), MinSize: Some(Size{Width: 22, Height: 22}), MaxSize: Some(Size{Width: 22, Height: 22}), Padding: Some(UniformInsets(2))}
 		rows = append(rows, Node{ID: toolbarCustomizationItemID(id, itemID, "row"), Kind: Row, Style: Style{GrowX: Some(float32(1)), Align: Some(AlignCenter), Gap: Some(float32(8)), Padding: Some(Insets{Top: 4, Bottom: 4})}, Children: []Node{art, show,
 			{ID: ToolbarCustomizationEarlierID(id, itemID), Kind: Button, Icon: SymbolUp, Appearance: ButtonTool, Disabled: index == 0, Style: arrowStyle, Accessibility: Accessibility{Name: "Move " + label + " earlier", Help: "Move one place toward the start"}, Activate: move(-1)},
 			{ID: ToolbarCustomizationLaterID(id, itemID), Kind: Button, Icon: SymbolDown, Appearance: ButtonTool, Disabled: index == len(items)-1, Style: arrowStyle, Accessibility: Accessibility{Name: "Move " + label + " later", Help: "Move one place toward the end"}, Activate: move(1)},

@@ -1058,3 +1058,18 @@ native build pass. Packaged app observations are recorded in the local delivery
 receipt separately from automated routing. No drag customization, disk settings,
 NSToolbar system palette, physical-pointer or human VoiceOver qualification is
 claimed by this checkpoint.
+
+
+### Packaged customization-sheet alignment correction
+
+The first packaged screenshot exposed centered checkbox contents and a narrower
+separator row caused by its empty native Text placeholder. Visibility controls
+now justify their contents at the leading edge, the separator has the same fixed
+artwork slot with a decorative minus symbol, and compact arrow buttons leave all
+seven catalogue rows inside the 300 pt scrolling viewport. No editing/state or
+native driver policy changed. Added native geometry assertions for both themes:
+checkbox indicators start at their content edge, every arrow column has the same
+X position, and all seven rows fit without clipping. Prism reviewed the two-file
+correction with Anthropic Claude Sonnet 5.5, complete coverage, zero findings.
+Focused layout/routing tests, gallery customization tests and rebuilt native app
+pass. Final packaged observations remain separate in the local delivery receipt.
