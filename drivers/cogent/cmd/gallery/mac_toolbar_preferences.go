@@ -17,8 +17,10 @@ const toolbarPreferenceLimit = 64 << 10
 var personalToolbarIDs = []string{"toolbar-Small", "toolbar-Regular", "toolbar-Large", "toolbar-mixed"}
 
 type macToolbarPreferences struct {
-	Version int                         `json:"version"`
-	Layouts map[string]ui.ToolbarLayout `json:"layouts"`
+	Version  int                         `json:"version"`
+	Layouts  map[string]ui.ToolbarLayout `json:"layouts"`
+	Displays map[string]string           `json:"displays,omitempty"`
+	Display  string                      `json:"display,omitempty"`
 }
 
 // Persistence belongs to this application. Portable components perform no I/O.
@@ -104,14 +106,28 @@ func (m *macToolbarGallery) loadPreferences(path string) {
 		}
 		next[id] = ui.ToolbarLayout{Order: prune(layout.Order), Hidden: prune(layout.Hidden)}
 	}
-	m.layouts = next
+	if len(value.Displays) > len(personalToolbarIDs) {
+		m.preferencesError = fmt.Errorf("too many toolbar display settings")
+		return
+	}
+	displays := map[string]string{}
+	for id, mode := range value.Displays {
+		if slices.Contains(personalToolbarIDs, id) && toolbarDisplayValid(mode) {
+			displays[id] = mode
+		}
+	}
+	display := "both"
+	if toolbarDisplayValid(value.Display) {
+		display = value.Display
+	}
+	m.layouts, m.displays, m.display = next, displays, display
 	m.preferencesError = nil
 }
 func (m *macToolbarGallery) savePreferences() {
 	if m.preferencesPath == "" {
 		return
 	}
-	value := macToolbarPreferences{Version: 1, Layouts: m.layouts}
+	value := macToolbarPreferences{Version: 1, Layouts: m.layouts, Displays: m.displays, Display: m.display}
 	data, err := json.MarshalIndent(value, "", "  ")
 	if err == nil && len(data) > toolbarPreferenceLimit {
 		err = fmt.Errorf("toolbar preferences exceed 64 KiB")

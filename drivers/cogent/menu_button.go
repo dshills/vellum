@@ -83,9 +83,28 @@ func menuDescriptor(r *record) ui.Node {
 	}
 	return n
 }
+
+const toolbarContextOwnerProperty = "vellum.toolbar-context-owner"
+
 func bindContextMenu(r *record, w core.Widget) {
 	request := func(e events.Event) {
-		if e.IsHandled() || r.node.ContextMenu == nil {
+		if e.IsHandled() {
+			return
+		}
+		host := r
+		if host.node.ContextMenu == nil {
+			// Existing button/space routing forwards to its nearest toolbar. A child's
+			// explicit context menu still wins. Traversal stays under native ownership.
+			host = nil
+			for p := w.AsTree().Parent; p != nil; p = p.AsTree().Parent {
+				owner, _ := p.AsTree().Property(toolbarContextOwnerProperty).(*record)
+				if owner != nil && owner.node.ContextMenu != nil {
+					host = owner
+					break
+				}
+			}
+		}
+		if host == nil || host.node.ContextMenu == nil || host.control == nil || host.control.menu == nil {
 			return
 		}
 		e.SetHandled()
@@ -94,22 +113,24 @@ func bindContextMenu(r *record, w core.Widget) {
 			p := e.WindowPos()
 			position = &p
 		}
-		epoch := r.control.menu.epoch
-		postControl(r, func() {
-			if menuAvailable(r) && r.control.menu.epoch == epoch {
-				r.control.menu.position = position
-				r.control.menu.request = true
-				_ = r.control.a.Invalidate(r.control.window)
+		epoch := host.control.menu.epoch
+		postControl(host, func() {
+			if menuAvailable(host) && host.control.menu.epoch == epoch {
+				host.control.menu.position = position
+				host.control.menu.request = true
+				_ = host.control.a.Invalidate(host.control.window)
 			}
 		})
 	}
 	w.AsWidget().OnFirst(events.ContextMenu, request)
 	w.AsWidget().OnFirst(events.KeyChord, func(e events.Event) {
-		if e.KeyCode() == key.CodeF10 && e.Modifiers() == 1<<key.Shift {
+		mods := e.Modifiers() & ^((1 << key.CapsLock) | (1 << key.NumLock))
+		if e.KeyCode() == key.CodeF10 && mods == 1<<key.Shift {
 			request(e)
 		}
 	})
 }
+
 func menuAvailable(r *record) bool {
 	if r.control == nil || r.control.retired || r.control.disabled || toolbarOverflowHidden(r) || menuDescriptor(r).Change == nil {
 		return false
@@ -331,7 +352,9 @@ func openManagedMenu(r *record) {
 		context.SetProperty("vellum.menu.active", p)
 	}
 	s.popup = p
-	r.widget.AsWidget().SetFocus()
+	if r.node.Kind != ui.Toolbar {
+		r.widget.AsWidget().SetFocus()
+	}
 	p.stage.Run()
 	if menuWidth > 0 && context != nil {
 		geom := scene.SceneGeom

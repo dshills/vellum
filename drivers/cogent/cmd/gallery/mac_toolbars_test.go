@@ -140,3 +140,41 @@ func TestMacToolbarCustomizationQueuedTargetChangeCannotCrossSave(t *testing.T) 
 		t.Fatal("old sheet edited replacement toolbar")
 	}
 }
+
+func TestMacToolbarContextDisplayAndCustomization(t *testing.T) {
+	m := newMacToolbarGallery(false)
+	n := m.view()
+	bar := findGalleryDocumentNode(n, "toolbar-Regular")
+	image := findGalleryDocumentNode(n, "toolbar-Regular/Save").IconImage
+	bar.ContextMenu.Change(ui.ChangeEvent{SelectedID: "icons"})
+	n = m.view()
+	if findGalleryDocumentNode(n, "toolbar-Regular/Save").Text != "" || findGalleryDocumentNode(n, "toolbar-Small/Save").Text != "Save" || findGalleryDocumentNode(n, "toolbar-Regular/Save").IconImage != image {
+		t.Fatal("per-toolbar display lost independence/artwork")
+	}
+	ctx := findGalleryDocumentNode(n, "toolbar-Regular").ContextMenu
+	checked := false
+	for _, o := range ctx.Options {
+		if o.ID == "icons" {
+			checked = o.Checked
+		}
+	}
+	if !checked {
+		t.Fatal("context menu lost current display check")
+	}
+	ctx.Change(ui.ChangeEvent{SelectedID: "customize"})
+	m.view()
+	if !m.customizer.Open || m.customizeTarget != "toolbar-Regular" || m.count != 0 {
+		t.Fatal("context opened wrong customizer or command")
+	}
+	ctx.Change(ui.ChangeEvent{SelectedID: "text"})
+	if m.displays["toolbar-Regular"] != "icons" {
+		t.Fatal("stale context edited open modal")
+	}
+	m.customizer.Dismiss()
+	n = m.view()
+	findGalleryDocumentNode(n, "toolbar-display/text").Activate()
+	n = m.view()
+	if len(m.displays) != 0 || findGalleryDocumentNode(n, "toolbar-Regular/Save").IconImage != nil {
+		t.Fatal("gallery display override did not reset per-bar mode")
+	}
+}

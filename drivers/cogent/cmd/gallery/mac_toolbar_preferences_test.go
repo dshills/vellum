@@ -88,3 +88,33 @@ func TestMacToolbarPreferencesSaveFailureRetainsMemory(t *testing.T) {
 		t.Fatal("save damaged existing file")
 	}
 }
+
+func TestMacToolbarDisplayPreferencesRoundTrip(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "toolbars.json")
+	m := newMacToolbarGallery(false)
+	m.loadPreferences(path)
+	n := m.view()
+	findGalleryDocumentNode(n, "toolbar-Regular").ContextMenu.Change(ui.ChangeEvent{SelectedID: "above"})
+	restored := newMacToolbarGallery(false)
+	restored.loadPreferences(path)
+	if restored.displays["toolbar-Regular"] != "above" || findGalleryDocumentNode(restored.view(), "toolbar-Regular/Save").IconPlacement != ui.IconAboveText {
+		t.Fatal("display mode did not round trip")
+	}
+	findGalleryDocumentNode(m.view(), "toolbar-display/text").Activate()
+	restored.loadPreferences(path)
+	if restored.display != "text" || len(restored.displays) != 0 {
+		t.Fatal("global display choice did not round trip")
+	}
+}
+
+func TestMacToolbarDisplayLegacyReloadResetsDefault(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "toolbars.json")
+	os.WriteFile(path, []byte(`{"version":1,"layouts":{}}`), 0600)
+	m := newMacToolbarGallery(false)
+	m.display = "above"
+	m.displays["toolbar-Regular"] = "text"
+	m.loadPreferences(path)
+	if m.display != "both" || len(m.displays) != 0 || m.preferencesError != nil {
+		t.Fatal("legacy file retained stale display")
+	}
+}

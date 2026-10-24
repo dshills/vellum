@@ -33,6 +33,9 @@ func mountChrome(parent tree.Node, r *record) core.Widget {
 		outer = core.NewFrame(parent)
 		widget = outer
 	}
+	if r.node.Kind == ui.Toolbar {
+		outer.SetProperty(toolbarContextOwnerProperty, r)
+	}
 	c := &chromeState{host: outer}
 	r.control.chrome = c
 	outer.Styler(func(s *styles.Style) {

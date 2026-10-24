@@ -117,3 +117,15 @@ IDs and participate in customization ordering/hiding/persistence. Neither has a
 focus stop, accessible action, command or overflow menu entry. An all-hidden action
 catalogue produces an empty bar even if spaces remain configured. Mixed toolbar
 demonstrates both types; simple Small/Regular/Large comparisons remain unchanged.
+
+Toolbar.ContextMenu reuses existing managed-menu validation/lifetimes. Right/
+Control-click over empty toolbar areas, spaces or ordinary actions routes to the
+nearest toolbar menu; a child's explicit context menu takes precedence. Shift-F10
+on a toolbar action opens the menu, ignoring CapsLock/NumLock flags. Menu opening
+preserves the focused child. Disable, option replacement, removal and window
+teardown revoke menu capabilities. Gallery menus expose checked per-toolbar
+Icons Only, Text Only, Icons and Text, Icon Above Text, and Customize Toolbar.
+Mixed also offers its original mixed presentation. Per-toolbar display overrides
+and the common display choice are persisted in the version-1 preference document.
+Common gallery display buttons clear overrides. Opening customization from a menu
+uses the same retained customizer and external return-focus target.

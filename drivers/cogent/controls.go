@@ -301,7 +301,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	if button, ok := widget.(*core.Button); ok {
 		installButtonImage(r, button)
 	}
-	if r.node.Kind == ui.Button || r.node.Kind == ui.Canvas2D || r.node.Kind == ui.ListBox {
+	if r.node.Kind == ui.Button || r.node.Kind == ui.Canvas2D || r.node.Kind == ui.ListBox || r.node.Kind == ui.Toolbar || ui.IsToolbarSpace(r.node.Kind) || r.node.Kind == ui.Separator {
 		c.menu = &menuState{epoch: &menuEpoch{}}
 		bindContextMenu(r, widget)
 	}
@@ -998,6 +998,7 @@ func disposeControl(r *record) {
 		disposeToolbarDrag(r)
 		disposeButtonImage(r)
 		r.widget.AsWidget().DeleteProperty(toolbarOverflowOwnerProperty)
+		r.widget.AsWidget().DeleteProperty(toolbarContextOwnerProperty)
 		r.widget.AsWidget().DeleteProperty(toolbarOverflowHiddenProperty)
 		r.control.retired = true
 		if r.control.tabs != nil {

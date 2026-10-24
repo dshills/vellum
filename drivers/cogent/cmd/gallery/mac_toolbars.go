@@ -20,6 +20,7 @@ type macToolbarGallery struct {
 	fullColor        bool
 	overflowMenu     bool
 	layouts          map[string]ui.ToolbarLayout
+	displays         map[string]string
 	customizeTarget  string
 	customizer       ui.ToolbarCustomizer
 	artwork          map[ui.Symbol]*canvas.TiledImage
@@ -46,7 +47,7 @@ func (s macToolbarMetrics) actionHeight(display string) float32 {
 
 func newMacToolbarGallery(dark bool) *macToolbarGallery {
 	icons, err := toolbarColorIcons()
-	m := &macToolbarGallery{dark: dark, display: "both", fullColor: true, overflowMenu: true, artwork: icons, artworkError: err, last: "No action yet", layouts: make(map[string]ui.ToolbarLayout), customizeTarget: "toolbar-Regular"}
+	m := &macToolbarGallery{dark: dark, display: "both", fullColor: true, overflowMenu: true, artwork: icons, artworkError: err, last: "No action yet", layouts: make(map[string]ui.ToolbarLayout), displays: make(map[string]string), customizeTarget: "toolbar-Regular"}
 	m.customizer = ui.ToolbarCustomizer{ID: "toolbar-customizer", Dismiss: func() { m.customizer.Open = false }}
 	m.customizer.Style = ui.MacTheme(dark).Kinds[ui.FormGroup]
 	m.customizer.Style.Padding = ui.Some(ui.UniformInsets(20))
@@ -89,6 +90,9 @@ func (m *macToolbarGallery) action(prefix, name string, icon ui.Symbol, size mac
 	}}
 }
 func (m *macToolbarGallery) toolbar(id string, size macToolbarMetrics, display string, vertical bool) ui.Node {
+	if !vertical {
+		display = m.toolbarDisplay(id, display)
+	}
 	theme := ui.MacTheme(m.dark)
 	style := ui.Style{GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(0)), Padding: ui.Some(ui.UniformInsets(5)), Gap: ui.Some(float32(4)), Background: theme.Kinds[ui.FormGroup].Background, Border: theme.Kinds[ui.FormGroup].Border, CornerRadius: ui.Some(float32(8)), Align: ui.Some(ui.AlignCenter)}
 	orientation := ui.Horizontal
@@ -132,7 +136,14 @@ func (m *macToolbarGallery) view() ui.Node {
 	modes := []ui.Node{}
 	for _, mode := range []struct{ id, label string }{{"icons", "Icons"}, {"text", "Text"}, {"both", "Icons and text"}, {"above", "Icon above text"}} {
 		mode := mode
-		n := ui.Node{ID: "toolbar-display/" + mode.id, Kind: ui.Button, Text: mode.label, Activate: func() { m.display = mode.id }, Accessibility: ui.Accessibility{Help: "Show toolbar actions as " + mode.label}, Style: ui.Style{Grow: ui.Some(float32(0))}}
+		n := ui.Node{ID: "toolbar-display/" + mode.id, Kind: ui.Button, Text: mode.label, Activate: func() {
+			if m.customizer.Open || (m.display == mode.id && len(m.displays) == 0) {
+				return
+			}
+			m.display = mode.id
+			clear(m.displays)
+			m.savePreferences()
+		}, Accessibility: ui.Accessibility{Help: "Show toolbar actions as " + mode.label}, Style: ui.Style{Grow: ui.Some(float32(0))}}
 		if m.display == mode.id {
 			n.Style.Background = ui.Some(color.NRGBA{R: 0, G: 112, B: 245, A: 255})
 			n.Style.Foreground = ui.Some(color.NRGBA{R: 255, G: 255, B: 255, A: 255})
@@ -149,12 +160,15 @@ func (m *macToolbarGallery) view() ui.Node {
 		id := "toolbar-" + size.name
 		canonical := m.toolbar(id, size, m.display, false)
 		catalogues[id] = canonical
-		children = append(children, m.customizationHeading(id, fmt.Sprintf("%s · %g pt controls", size.name, size.actionHeight(m.display))), m.configuredToolbar(canonical))
+		children = append(children, m.customizationHeading(id, fmt.Sprintf("%s · %g pt controls", size.name, size.actionHeight(m.toolbarDisplay(id, m.display)))), m.configuredToolbar(canonical))
 	}
 	mixed := m.toolbar("toolbar-mixed", macToolbarSizes[1], "icons", false)
 	mixed.Accessibility.Name = "Mixed document toolbar"
 	// These are ordinary actions: explicit per-item presentation can coexist.
 	for i, child := range mixed.Children {
+		if m.displays[mixed.ID] != "" {
+			break
+		}
 		switch child.ID {
 		case "toolbar-mixed/New":
 			mixed.Children[i] = m.action("toolbar-mixed", "New", ui.SymbolAdd, macToolbarSizes[1], "both")
@@ -216,5 +230,50 @@ func (m *macToolbarGallery) configuredToolbar(canonical ui.Node) ui.Node {
 		n.Accessibility.Help = "No visible actions. Choose Customize to restore them."
 		n.MinHeight = 28
 	}
-	return m.withOverflow(n)
+	n = m.withOverflow(n)
+	n.ContextMenu = m.toolbarContext(canonical.ID)
+	return n
+}
+
+func toolbarDisplayValid(mode string) bool {
+	return mode == "icons" || mode == "text" || mode == "both" || mode == "above"
+}
+func (m *macToolbarGallery) toolbarDisplay(id, fallback string) string {
+	if mode := m.displays[id]; toolbarDisplayValid(mode) {
+		return mode
+	}
+	return fallback
+}
+func (m *macToolbarGallery) toolbarContext(id string) *ui.ContextMenu {
+	current := m.toolbarDisplay(id, m.display)
+	if id == "toolbar-mixed" && m.displays[id] == "" {
+		current = "mixed"
+	}
+	options := []ui.Option{}
+	for _, mode := range []struct{ id, label string }{{"icons", "Icons Only"}, {"text", "Text Only"}, {"both", "Icons and Text"}, {"above", "Icon Above Text"}} {
+		options = append(options, ui.Option{ID: mode.id, Label: mode.label, Checkable: true, Checked: current == mode.id})
+	}
+	if id == "toolbar-mixed" {
+		options = append(options, ui.Option{ID: "mixed", Label: "Mixed Presentation", Checkable: true, Checked: current == "mixed"})
+	}
+	options = append(options, ui.Option{ID: "rule", Separator: true}, ui.Option{ID: "customize", Label: "Customize Toolbar…"})
+	return &ui.ContextMenu{Options: options, Change: func(e ui.ChangeEvent) {
+		if m.disabled || m.customizer.Open {
+			return
+		}
+		if e.SelectedID == "customize" {
+			m.customizeTarget = id
+			m.customizer.Open = true
+			return
+		}
+		if e.SelectedID == "mixed" && id == "toolbar-mixed" {
+			delete(m.displays, id)
+			m.savePreferences()
+			return
+		}
+		if toolbarDisplayValid(e.SelectedID) {
+			m.displays[id] = e.SelectedID
+			m.savePreferences()
+		}
+	}}
 }

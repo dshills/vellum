@@ -238,3 +238,15 @@ Space and Flexible Space; reorder or hide them just like actions. Their settings
 persist in the gallery. They add no focus/AX target and never become menu entries.
 Flexible space contracts as the toolbar narrows; actions still use the original
 overflow menu, artwork and callbacks. Hiding every action leaves an empty bar.
+
+## Toolbar context menus
+
+Right-click or Control-click a horizontal toolbar, action or gap for display
+choices and **Customize Toolbar…**. Shift-F10 on an action provides keyboard
+access. Each bar can use Icons Only, Text Only, Icons and Text, or Icon Above Text;
+the menu checks its current mode. Mixed Presentation restores the mixed recipe.
+These per-toolbar choices persist across launches. The display buttons above the
+examples reset overrides and apply their common mode. Layout order/hidden settings
+are preserved when switching display. A child's explicit context menu takes
+precedence over the containing toolbar. Applications attach `ui.ContextMenu` to
+the public Toolbar node; existing menu options, callbacks and lifecycle apply.

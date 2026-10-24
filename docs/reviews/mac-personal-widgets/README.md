@@ -1120,3 +1120,16 @@ unbounded convention. Spaces never enter the menu-eligible ID map; ordinary menu
 options retain explicit catalogue alignment. UI race tests, native sizing,
 overflow/customization routing, gallery toolbar regressions, independent SDK
 contracts and focused vet passed. No remaining actionable finding.
+
+## Toolbar context menu and display preferences
+
+Prism Anthropic claude-sonnet-5-5 reviewed the full checkpoint. The reported
+partial-load concern had no later failing check or intermediate owner observation;
+nonetheless layouts, overrides and common display now publish together. Applied
+the valid legacy-reload concern: missing/invalid display resets to the default
+rather than retaining an earlier loaded mode, with regression coverage. Display
+buttons also ignore stale modal callbacks and avoid unchanged saves. Native routed
+context tests cover action/space forwarding, child-menu priority, lock-key-safe
+Shift-F10, exactly-once menu selection, focused-child restoration, disable/stale
+callbacks and shutdown. Gallery per-bar modes/customization and preference round
+trips, legacy reload and focused vet passed. No remaining actionable finding.
