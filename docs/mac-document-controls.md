@@ -55,3 +55,23 @@ parents refuse without activating another Space. Other platforms return unavaila
 Offscreen tests compile the native path and cover request/reply parsing, exact
 parent revocation and bounded preview delivery without creating any native panel.
 Actual AppKit interaction is checked separately after the final package.
+
+## Native Fonts panel
+
+`Application.FontPanels().ChooseFont` opens the actual AppKit NSFontPanel on a
+worker, with an exact parent WindowRef. Options specify an installed PostScript
+Name and Size; an unavailable name refuses. The panel exposes installed families,
+faces and sizes; effects such as underline, shadow and text color are excluded.
+Sizes clamp to 6..144 points, matching the managed FontPicker. The accepted result
+includes exact PostScript Name, Family, Size and Bold/Italic descriptor hints.
+Use the exact Name for font identity; hints do not describe every variable axis.
+
+Preview, Apply/Cancel, ownership and cancellation follow the Colors service. The
+shared NSFontManager target/action/selection and panel accessory/delegate state
+are restored after completion when a prior selection existed; first use leaves
+the system panel selection cached. A foreign preexisting shared Font panel refuses;
+Colors and Fonts sessions cannot overlap. The demo maps accepted choices into
+the existing managed FontPicker and previews live family/style/size changes.
+Its extra preview caps display size to 72 points while reporting the actual size.
+Font rendering may substitute if the text backend cannot resolve an installed
+face; no font installation or document/rich-text mutation is performed.

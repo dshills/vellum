@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -91,5 +92,17 @@ func TestNativeDocumentPanelCanceledAdmissionHasNoPreviewEntry(t *testing.T) {
 	documentPanelPreviews.Unlock()
 	if remaining != 0 {
 		t.Fatal("refused admission leaked preview entry")
+	}
+}
+
+func TestNativeFontPanelRecipeWithoutPresentation(t *testing.T) {
+	valid := `{"Kind":"font","Options":{"Title":"Fonts","Name":"HelveticaNeue","Size":13}}`
+	if !strings.Contains(nativeDocumentPanelRecipeFixture(valid), "Use Font") {
+		t.Fatal("valid font recipe/action title")
+	}
+	for _, wire := range []string{`{"Kind":"font","Options":{"Title":"Fonts","Name":"HelveticaNeue","Size":0}}`, `{"Kind":"font","Options":{"Title":"Fonts","Name":"","Size":13}}`} {
+		if nativeDocumentPanelRecipeFixture(wire) != "" {
+			t.Fatal("bad font recipe")
+		}
 	}
 }

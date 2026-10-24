@@ -12,14 +12,16 @@ import (
 )
 
 type macDocumentGallery struct {
-	parent       *macComponentsGallery
-	list         *ui.DocumentList
-	outline      *ui.OutlineView
-	colorWell    *ui.ColorWell
-	colorPreview color.NRGBA
-	nativeBusy   bool
-	nativeEpoch  uint64
-	colorArtwork *canvas.TiledImage
+	parent                 *macComponentsGallery
+	list                   *ui.DocumentList
+	outline                *ui.OutlineView
+	colorWell              *ui.ColorWell
+	colorPreview           color.NRGBA
+	nativeBusy             bool
+	nativeEpoch            uint64
+	colorArtwork           *canvas.TiledImage
+	fontPicker             *ui.FontPicker
+	fontValue, fontPreview app.FontPanelSelection
 }
 
 func (m *macComponentsGallery) documentListView() ui.Node {
@@ -191,4 +193,96 @@ func (e *macDocumentGallery) chooseColor() {
 			_ = a.Invalidate(window.ID())
 		})
 	}()
+}
+
+func (m *macComponentsGallery) nativeFontView() ui.Node {
+	if m.documents == nil {
+		m.documents = &macDocumentGallery{parent: m}
+	}
+	e := m.documents
+	if e.fontPicker == nil {
+		e.fontValue = app.FontPanelSelection{Name: "HelveticaNeue", Family: "Helvetica Neue", Size: 18}
+		e.fontPreview = e.fontValue
+		e.fontPicker = &ui.FontPicker{ID: "documents/font-picker", Label: "Document font"}
+		e.fontPicker.Change = func(event ui.FontSelectionEvent) {
+			e.fontPicker.Value = event.Apply(e.fontPicker.Value)
+			e.fontValue.Size = e.fontPicker.Value.Size
+			e.fontPreview = e.fontValue
+		}
+	}
+	weight := 400
+	if e.fontValue.Bold {
+		weight = 700
+	}
+	e.fontPicker.Families = []ui.FontFamily{{ID: "selected", Name: e.fontValue.Family, Typefaces: []ui.FontTypeface{{ID: "selected-face", Name: e.fontValue.Name, Weight: weight, Italic: e.fontValue.Italic}}}}
+	e.fontPicker.Value = ui.FontSelection{FamilyID: "selected", TypefaceID: "selected-face", Size: e.fontValue.Size}
+	e.fontPicker.Disabled = e.nativeBusy
+	e.fontPicker.FieldStyle = m.theme().Kinds[ui.TextField]
+	e.fontPicker.Preview = "The quick brown fox draws a precise line."
+	picker, err := e.fontPicker.View()
+	if err != nil {
+		return ui.Node{ID: "documents/font-error", Kind: ui.Label, Text: err.Error()}
+	}
+	previewWeight := 400
+	if e.fontPreview.Bold {
+		previewWeight = 700
+	}
+	return ui.Node{ID: "documents/native-font-page", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}, Children: []ui.Node{{ID: "documents/native-font-help", Kind: ui.Label, Text: "The actual macOS Fonts panel supplies installed families and typefaces. Use Font accepts; Cancel/Escape restores. Live preview is capped at 72 points for layout."}, picker, {ID: "documents/font-live", Kind: ui.Label, Text: "Native font preview", Style: ui.Style{Typography: ui.Some(ui.Typography{Family: e.fontPreview.Family, Size: min(72, e.fontPreview.Size), Weight: previewWeight, Italic: e.fontPreview.Italic})}}, {ID: "documents/font-identity", Kind: ui.Label, Text: fmt.Sprintf("%s · %.1f pt", e.fontPreview.Name, e.fontPreview.Size)}, {ID: "documents/choose-native-font", Kind: ui.Button, Text: "Show macOS Fonts…", IconImage: m.artwork[ui.SymbolDocument], Disabled: e.nativeBusy, Activate: e.chooseFont}}}
+}
+func (e *macDocumentGallery) chooseFont() {
+	m := e.parent
+	a, window := m.essentials.application, m.essentials.window
+	if e.nativeBusy {
+		return
+	}
+	if a == nil {
+		m.status = "Native Fonts unavailable offscreen"
+		return
+	}
+	ticket, err := a.ReserveWindowCompletion(window, nil)
+	if err != nil {
+		m.status = err.Error()
+		return
+	}
+	e.nativeBusy = true
+	e.nativeEpoch++
+	epoch := e.nativeEpoch
+	accepted := e.fontValue
+	go func() {
+		var value app.FontPanelSelection
+		service, failure := a.FontPanels()
+		if failure == nil {
+			value, failure = service.ChooseFont(window.Context(), window, app.FontPanelOptions{Title: "Drawing Fonts", Name: accepted.Name, Size: accepted.Size, Preview: func(v app.FontPanelSelection) {
+				_ = a.PostWindow(window, func() {
+					if e.acceptFontPreview(epoch, v) {
+						_ = a.Invalidate(window.ID())
+					}
+				})
+			}})
+		}
+		_ = ticket.Publish(func() {
+			if e.nativeEpoch != epoch {
+				return
+			}
+			e.nativeBusy = false
+			if failure != nil {
+				e.fontPreview = accepted
+				m.status = fmt.Sprint("Native Fonts: ", failure)
+			} else {
+				e.fontValue = value
+				e.fontPreview = value
+				m.count++
+				m.status = "Native font accepted"
+			}
+			_ = a.Invalidate(window.ID())
+		})
+	}()
+}
+
+func (e *macDocumentGallery) acceptFontPreview(epoch uint64, value app.FontPanelSelection) bool {
+	if !e.nativeBusy || e.nativeEpoch != epoch {
+		return false
+	}
+	e.fontPreview = value
+	return true
 }

@@ -1,0 +1,35 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestNativeFont|TestNativeColor|TestNativeDocumentPanel",
+      "-count=1",
+      "-timeout",
+      "60s"
+    ],
+    "exit_code": 0,
+    "seconds": 14.080092249903828
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestMacFont|TestMacComponentPages",
+      "-count=1"
+    ],
+    "exit_code": 0,
+    "seconds": 8.505110792117193
+  }
+]

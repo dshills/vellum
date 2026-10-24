@@ -1442,3 +1442,11 @@ Prism: `native-colors.json` (Anthropic Claude Sonnet 5.5, complete coverage).
 Prism concern was checked against synchronous admission: nativeOperationRun calls start synchronously before returning; the token is assigned before registering any preview entry. Refused/canceled admission registers nothing, proven by an added regression. The nested lifetime wrapper delegates Err to the original exact-parent context immediately, preserving revocation before asynchronous cancellation propagation; the real protocol fixture proves this. Terminal delivery has at most one pending coalesced preview and no callback invokes owner code. Options/reply/foreign-parent, registry cleanup and Foundation-only recipe tests pass, along with the gallery offscreen render. Actual shared-panel presentation, Apply/Cancel and live preview remain for the authorized final desktop checks.
 
 Focused checks: `native-colors-checks.json`, `native-colors-reviewed-checks.json`.
+
+## Add native Fonts panel and managed font-picker integration
+
+Prism: `native-fonts.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism preview-order concern is prevented by the owner-only busy+epoch guard; an extracted helper and regression now prove late completion and prior-session previews cannot overwrite accepted state. The native action title was already parameterized; the Foundation fixture now verifies Use Font from the exact helper used by AppKit. Replaced shared-selector casts with typed Font/Color accessory helpers for clarity. Native CGO/recipe/lifetime tests and full gallery construction pass offscreen. Existing manager selection is restored when present; an initial nil selection is documented as cached first-use state. Actual panel choice, cancellation, reuse and appearance checks follow final packaging.
+
+Focused checks: `native-fonts-checks.json`, `native-fonts-final-checks.json`, `native-fonts-reviewed-checks.json`.

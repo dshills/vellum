@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/ui"
 	"os"
 	"path/filepath"
@@ -30,7 +31,7 @@ func TestMacComponentThemePreviewRetainsArtworkAndValue(t *testing.T) {
 func TestMacComponentPagesAreConsumable(t *testing.T) {
 	for _, dark := range []bool{false, true} {
 		m := newMacComponentsGallery(dark)
-		for _, page := range []string{"theme", "menus", "split", "inspector", "browser", "rules", "image-well", "icon-picker", "settings", "alerts", "calendar", "documents", "outline", "native-colors"} {
+		for _, page := range []string{"theme", "menus", "split", "inspector", "browser", "rules", "image-well", "icon-picker", "settings", "alerts", "calendar", "documents", "outline", "native-colors", "native-fonts"} {
 			m.page = page
 			n := m.view()
 			if err := ui.Validate(n); err != nil {
@@ -144,5 +145,29 @@ func TestMacSettingsPreferencesRemainModelOwned(t *testing.T) {
 	n = m.view()
 	if findGalleryDocumentNode(n, "essentials/settings/name").Text != "Renamed" {
 		t.Fatal("preference lost")
+	}
+}
+
+func TestMacFontLatePreviewCannotOverwriteFinalOrNewSession(t *testing.T) {
+	m := newMacComponentsGallery(false)
+	m.page = "native-fonts"
+	m.view()
+	e := m.documents
+	e.nativeBusy = true
+	e.nativeEpoch = 1
+	preview := app.FontPanelSelection{Name: "Menlo-Regular", Family: "Menlo", Size: 24}
+	if !e.acceptFontPreview(1, preview) {
+		t.Fatal("current preview refused")
+	}
+	accepted := e.fontValue
+	e.nativeBusy = false
+	e.fontPreview = accepted
+	if e.acceptFontPreview(1, preview) || e.fontPreview != accepted {
+		t.Fatal("late preview overwrote completion")
+	}
+	e.nativeBusy = true
+	e.nativeEpoch = 2
+	if e.acceptFontPreview(1, preview) {
+		t.Fatal("old session preview admitted")
 	}
 }

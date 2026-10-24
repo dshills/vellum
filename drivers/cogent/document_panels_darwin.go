@@ -135,3 +135,14 @@ func nativeDocumentPanelRecipeFixture(wire string) string {
 	defer C.free(unsafe.Pointer(result))
 	return C.GoString(result)
 }
+
+func nativeChooseFontPanel(ctx context.Context, owner *app.Application, parent app.WindowRef, o app.FontPanelOptions) (string, error) {
+	return nativeDocumentPanel(ctx, owner, parent, struct {
+		Kind    string
+		Options app.FontPanelOptions
+	}{"font", o}, func(wire string) {
+		if value, err := decodeFontPanel(wire); err == nil && o.Preview != nil {
+			o.Preview(value)
+		}
+	})
+}
