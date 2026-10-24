@@ -1,0 +1,35 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestImageWellNative|TestFileDrop",
+      "-count=1",
+      "-timeout",
+      "60s"
+    ],
+    "exit_code": 0,
+    "seconds": 14.198339750058949
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestMacImageWell|TestImageWellLoader|TestMacComponent",
+      "-count=1"
+    ],
+    "exit_code": 0,
+    "seconds": 2.4641658749897033
+  }
+]

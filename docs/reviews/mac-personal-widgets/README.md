@@ -1370,3 +1370,11 @@ Prism: `mac-components-shipping-final.json` (Anthropic Claude Sonnet 5.5, comple
 Native inspection found low-contrast shortcut captions and separated split segments; fixed with inherited caption ink, validated borderless child segments and a themed shared outline/divider. Focus rings remain complete. Offscreen rasters found shrinking browser/rule wrappers; fixed and asserted full viewport widths, with one-line mixed hints. Parent-owner records are retained stable pointers; styling and sync execute under the originating native ownership boundary, as other record stylers do, so the conditional off-sync race in Prism is outside the supported execution model. Marker changes explicitly update child styles. ResolveStyle is already guarded by SplitButtonLayout; no per-normal-row resolve occurs. Strict tests defocus before checking divider removal/restoration, and separately verify the full focused ring. Applied final structure-first validation suggestion. Added bounded/seen-ID inspector namespace traversal with cyclic-description regression. User explicitly deferred further live checks; two-theme completed rasters and focused race/native-routing/SDK checks pass. No final physical-pointer qualification claimed.
 
 Focused checks: `mac-components-visual-fix-checks.json`, `mac-components-offscreen-width-checks.json`, `mac-components-final-raster-checks.json`, `mac-components-shipping-guards-checks.json`, `mac-components-validation-order-checks.json`.
+
+## Add full-color image well with worker-based file loading
+
+Prism: `essentials-image-well.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Fixed regular-file/encoded-size admission before decoding; decoder already enforces the 32MiB content limit. Zero WindowRef.Context is explicitly a canceled context, so the reported nil/panic concern is inapplicable. Refused completion publication occurs only after this captured window lifetime retires; never write UI fields from the worker to revive a dead instance. Result callbacks always invalidate, including errors. Manual deliberately refuses OS-drop transport, so keyboard fixture omits that transport annotation and reuses separate production file-drop fixtures. Desktop chooser/drop verification remains deferred.
+
+Focused checks: `essentials-image-well-checks.json`, `essentials-image-well-verified-checks.json`.

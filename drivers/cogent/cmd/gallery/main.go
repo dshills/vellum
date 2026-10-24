@@ -321,6 +321,14 @@ func main() {
 		macGallery.page = "mac-components"
 	}
 	must(a.Open(window))
+	if macGallery != nil {
+		if macGallery.components.essentials == nil {
+			macGallery.components.essentials = newMacEssentialsGallery(macGallery.components)
+		}
+		macGallery.components.essentials.application = a
+		macGallery.components.essentials.window, err = a.WindowRef(window.ID)
+		must(err)
+	}
 	var titlebar *cogent.TitlebarToolbarPrototype
 	if *nativeTitlebar {
 		ref, refErr := a.WindowRef(window.ID)

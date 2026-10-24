@@ -8,20 +8,21 @@ import (
 )
 
 type macComponentsGallery struct {
-	rules     *ui.RuleEditor
-	browser   *ui.ColumnBrowser
-	inspector *ui.Inspector
-	width     float32
-	splits    []*ui.SplitButton
-	menuGrid  bool
-	menu      *ui.MenuBranch
-	dark      bool
-	accent    string
-	page      string
-	name      string
-	status    string
-	count     int
-	artwork   map[ui.Symbol]*canvas.TiledImage
+	essentials *macEssentialsGallery
+	rules      *ui.RuleEditor
+	browser    *ui.ColumnBrowser
+	inspector  *ui.Inspector
+	width      float32
+	splits     []*ui.SplitButton
+	menuGrid   bool
+	menu       *ui.MenuBranch
+	dark       bool
+	accent     string
+	page       string
+	name       string
+	status     string
+	count      int
+	artwork    map[ui.Symbol]*canvas.TiledImage
 }
 
 func newMacComponentsGallery(dark bool) *macComponentsGallery {
@@ -65,7 +66,13 @@ func (m *macComponentsGallery) view() ui.Node {
 			m.accent = e.SelectedID
 		}
 	}})
+	if m.essentials == nil {
+		m.essentials = newMacEssentialsGallery(m)
+	}
 	content := m.themePreview()
+	if m.page == "image-well" {
+		content = m.essentials.imageWellView()
+	}
 	if m.page == "rules" {
 		content = m.rulesPreview()
 	}
@@ -81,7 +88,7 @@ func (m *macComponentsGallery) view() ui.Node {
 	if m.page == "menus" {
 		content = m.menuPreview()
 	}
-	navigation := ui.Node{ID: "components/pages", Kind: ui.Selector, SelectedID: m.page, Options: []ui.Option{{ID: "theme", Label: "Themes"}, {ID: "menus", Label: "Cascading menus"}, {ID: "split", Label: "Split buttons"}, {ID: "inspector", Label: "Inspector panel"}, {ID: "browser", Label: "Column browser"}, {ID: "rules", Label: "Filter / rule editor"}}, Accessibility: ui.Accessibility{Name: "Component demonstration"}, Change: func(e ui.ChangeEvent) { m.page = e.SelectedID }}
+	navigation := ui.Node{ID: "components/pages", Kind: ui.Selector, SelectedID: m.page, Options: []ui.Option{{ID: "theme", Label: "Themes"}, {ID: "menus", Label: "Cascading menus"}, {ID: "split", Label: "Split buttons"}, {ID: "inspector", Label: "Inspector panel"}, {ID: "browser", Label: "Column browser"}, {ID: "rules", Label: "Filter / rule editor"}, {ID: "image-well", Label: "Image well"}}, Accessibility: ui.Accessibility{Name: "Component demonstration"}, Change: func(e ui.ChangeEvent) { m.page = e.SelectedID }}
 
 	return ui.Node{ID: "mac-components", Kind: ui.Scroll, Theme: &theme, Grow: true, Style: ui.Style{Background: ui.Some(palette.Window), Padding: ui.Some(ui.UniformInsets(16)), Gap: ui.Some(float32(12))}, Children: []ui.Node{{ID: "components/title", Kind: ui.Label, Text: "Mac components", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 20, Weight: 600})}}, {ID: "components/appearance", Kind: ui.Row, Children: appearance}, navigation, content, {ID: "components/status", Kind: ui.Label, Text: fmt.Sprintf("%s · actions: %d", m.status, m.count)}}}
 }

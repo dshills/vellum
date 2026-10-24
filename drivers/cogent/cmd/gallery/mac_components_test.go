@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/dshills/vellum/ui"
+	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -80,5 +82,42 @@ func TestMacComponentMenuChecksAreIndependentOfActionCount(t *testing.T) {
 	menu.Change(ui.ChangeEvent{SelectedID: "grid", Checked: true})
 	if !menuView().Options[2].Checked {
 		t.Fatal("grid proposal not accepted")
+	}
+}
+
+func TestMacImageWellSampleAndOffscreenChoose(t *testing.T) {
+	m := newMacComponentsGallery(false)
+	m.page = "image-well"
+	n := m.view()
+	if err := ui.Validate(n); err != nil {
+		t.Fatal(err)
+	}
+	findGalleryDocumentNode(n, "essentials/sample-image").Activate()
+	if m.essentials.well.Image == nil || m.count != 1 {
+		t.Fatal("sample not accepted")
+	}
+	n = m.view()
+	findGalleryDocumentNode(n, "essentials/well/image-well/choose").Activate()
+	if m.essentials.well.Busy {
+		t.Fatal("offscreen chooser started worker")
+	}
+}
+
+func TestImageWellLoaderRejectsDirectoriesAndOversize(t *testing.T) {
+	dir := t.TempDir()
+	if _, err := loadWellImage(dir); err == nil {
+		t.Fatal("directory admitted")
+	}
+	path := filepath.Join(dir, "huge.png")
+	f, err := os.Create(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = f.Truncate(ui.MaxEncodedImageBytes + 1); err != nil {
+		t.Fatal(err)
+	}
+	f.Close()
+	if _, err := loadWellImage(path); err == nil {
+		t.Fatal("oversize file admitted")
 	}
 }

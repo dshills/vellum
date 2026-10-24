@@ -1,0 +1,141 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f065be9ccc18338caa4021aefe670a29",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "d7d48214da76d5886e8c8ab0f132ab655eeb308b",
+    "branch": "codex/mac-widget-essentials"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "bd6662803bcc00f2",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Zero-value window ref used in offscreen path",
+      "message": "If application is set but window is the zero WindowRef, Context() may panic or return nil. Also, Request sets Status and returns false without the caller invalidating, so the offscreen message may not display until the next redraw.",
+      "suggestion": "Guard against a zero WindowRef explicitly, for example with a separate ready flag set in main after WindowRef succeeds.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_essentials.go",
+          "lines": {
+            "start": 34,
+            "end": 34
+          }
+        }
+      ],
+      "tags": [
+        "nil",
+        "robustness",
+        "location-corrected"
+      ],
+      "evidence": "if e.application == nil || e.window.Context().Err() != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "2d53c5a60271dbbf",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Opening arbitrary dropped path may block on special files",
+      "message": "The Choose action on the worker goroutine calls a native file chooser, and the `path` variable is then captured by the publish closure; this is fine. However, the Busy state is set before the chooser opens, and the file is opened without any size check before DecodeImage, which relies on its own bound. A file that is a directory or special file such as a FIFO could block the worker indefinitely.",
+      "suggestion": "Stat the path and require a regular file before opening it, and consider io.LimitReader at 32MiB.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_essentials.go",
+          "lines": {
+            "start": 52,
+            "end": 52
+          }
+        }
+      ],
+      "tags": [
+        "robustness",
+        "location-corrected"
+      ],
+      "evidence": "path, failure = service.ChooseFile(e.window.Context(), app.FileOptions{Title: \"Choose drawing artwork\", Extensions: []string{\"png\", \"jpg\", \"jpeg\"}})",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "d9f66ccdaf0ba229",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Busy never reset if Publish fails",
+      "message": "The publish closure runs on the owner after a successful reservation, but if ticket.Publish fails (window closed), Busy stays true forever because the error is discarded. The well then remains permanently disabled and any later request is rejected.",
+      "suggestion": "Check the Publish error and handle it. Cancel the ticket or reset Busy when publishing fails, keeping owner-thread access rules in mind.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_essentials.go",
+          "lines": {
+            "start": 66,
+            "end": 69
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "state"
+      ],
+      "evidence": "e.well.Busy = false\n\t\t\tif failure != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7912,
+    "totalMs": 7928
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 19348,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 11528,
+        "output": 894,
+        "costUSD": 0.031996
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
