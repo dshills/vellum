@@ -137,6 +137,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if err := validateSheet(n); err != nil {
+		return err
+	}
 	if n.MenuAnchorID != "" && n.Kind != MenuButton {
 		return fmt.Errorf("ui: MenuAnchorID belongs only on MenuButton")
 	}

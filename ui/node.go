@@ -100,9 +100,12 @@ type Node struct {
 	Accessibility   Accessibility
 	Focus           FocusRequest
 	// PopoverAnchor makes a Dialog an anchored panel; prefer Popover.View.
-	PopoverAnchor string
-	Open          bool
-	Dismiss       func()
+	// Sheet requests a nonresizable window-modal card with explicit actions.
+	Sheet                                bool
+	DialogDefaultID, DialogReturnFocusID string
+	PopoverAnchor                        string
+	Open                                 bool
+	Dismiss                              func()
 }
 
 func Validate(root Node) error {

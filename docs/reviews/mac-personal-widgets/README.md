@@ -725,3 +725,23 @@ comparison intentionally revokes callbacks after item replacement. Final review
 has no retained findings; both raw outputs are retained. Physical pointer and
 human VoiceOver remain separate from automated routed evidence. No render,
 pacing or release-policy changes.
+
+## Next widgets, phase 2: Sheet
+
+Added owner-held ui.Sheet on the existing modal Dialog infrastructure, explicit
+Cancel/primary actions, fallback Return, exact modal-scope guard, opener focus
+restoration and nonresizable Mac card styling. Presentation-kind changes retire
+the old Dialog lifetime. Native test proves modal/scrim flags, no title/resize/
+extra Close chrome, parent focus exclusion, one Escape cancellation, one accepted
+confirmation, scope retirement and safe shutdown in both themes. UI race tests,
+adjacent Dialog/Popover tests and standalone gallery tests pass. A native build
+seam that accidentally used a test-only lookup was caught and replaced with the
+production scoped record lookup before commit.
+
+Prism Anthropic claude-sonnet-5-5 reviewed twice. Owner-only mutation/View and
+inert disabled defaults are now explicit. The final validator also accepts a
+Button default without an action (with a focused regression), matching the safe
+runtime nil/disabled checks. No concurrency guarantee or implicit default action
+is claimed. Both reviews and their dispositions are retained. Packaged native
+interaction confirmation follows final integration; no AppKit sheet attachment
+or animation is claimed.

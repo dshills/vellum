@@ -245,6 +245,9 @@ func compatible(old, next ui.Node) bool {
 	if old.ID != next.ID || old.Kind != next.Kind {
 		return false
 	}
+	if next.Kind == ui.Dialog && (old.Sheet != next.Sheet || old.PopoverAnchor != next.PopoverAnchor) {
+		return false
+	}
 	if next.Kind == ui.DataTree && old.Tree != next.Tree {
 		return false
 	}

@@ -268,7 +268,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		widget = w
 		c.dialog = &dialogState{host: newAccessibilityDialogHost(w, r)}
 		c.dialog.host.Styler(func(s *styles.Style) { s.Direction = styles.Column; s.Grow.Set(1, 1) })
-		c.dialog.host.FinalStyler(func(s *styles.Style) { stylePopoverHost(r, s) })
+		c.dialog.host.FinalStyler(func(s *styles.Style) { stylePopoverHost(r, s); styleSheetHost(r, s) })
 	default:
 		r.control = nil
 		return nil, false, nil
@@ -820,6 +820,11 @@ func syncDialog(r *record) {
 		stage.Run()
 		finishPopoverSurface(body)
 		positionPopover(r, anchor)
+	} else if r.node.Sheet {
+		stage := body.NewDialog(r.widget).SetDisplayTitle(false).SetResizable(false).SetScrim(true).SetUseMinSize(true)
+		preparePopoverSurface(r, body)
+		stage.Run()
+		finishPopoverSurface(body)
 	} else {
 		body.NewDialog(r.widget).Run()
 	}
@@ -845,6 +850,7 @@ func prepareDialogBody(r *record) *core.Body {
 		}
 	}
 	bindAccessibilityDialogKeyboard(r, body)
+	bindSheetDefault(r, body)
 	body.Scene.OnFirst(events.Custom, func(e events.Event) {
 		if r.control.wake != nil {
 			r.control.wake(e)
@@ -862,6 +868,7 @@ func prepareDialogBody(r *record) *core.Body {
 		d.host.SetScene(r.widget.AsWidget().Scene)
 		d.active = false
 		d.body = nil
+		restoreSheetFocus(r)
 		if r.node.PopoverAnchor != "" {
 			if anchor := popoverAnchor(r); anchor != nil {
 				anchor.AsWidget().SetFocus()
@@ -878,7 +885,7 @@ func prepareDialogBody(r *record) *core.Body {
 			r.control.a.Invalidate(r.control.window)
 		})
 	})
-	if r.node.PopoverAnchor == "" {
+	if r.node.PopoverAnchor == "" && !r.node.Sheet {
 		body.AddBottomBar(func(bar *core.Frame) { body.AddCancel(bar).SetText("Close") })
 	}
 	return body
