@@ -57,3 +57,20 @@ a window completion. Suppression persistence and destructive work belong to the
 application; the demo changes counters only. Offscreen tests cover option/reply
 validation, parent/operation lifetime and the Foundation recipe parser; actual
 AppKit presentation remains unverified until desktop checks are authorized.
+
+## Calendar and date picker
+
+`ui.Calendar` provides an embeddable controlled month grid. Navigate accepts a
+Month proposal; Change accepts a date. Value's civil time and location are kept
+using the existing DateTimePicker range/DST engine. Monday/Sunday/etc first
+weekday, a pure AllowDate predicate, original-color header image and a caller-
+provided Today are supported. English labels are currently used. Left/Right move
+between enabled cells; Up/Down retain the weekday column; Return selects. Bounds
+are inclusive and years are limited to 1..9999.
+
+`ui.DateTimePicker` now uses this same month grid in its popover, retains its
+published focus IDs, and exposes Today/FirstWeekday/AllowDate/CalendarIconImage.
+Typed dates and Today use the same bounds/predicate. Closed or replaced popover
+sessions revoke old day actions. The demo disables weekends and shows both the
+month view and compact field. Locale labels, range selection and event agendas
+are outside this version.

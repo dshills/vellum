@@ -7,12 +7,17 @@ import (
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/ui"
+	"image"
+	"image/color"
 	"image/png"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type macEssentialsGallery struct {
+	calendar                         *ui.Calendar
+	datePicker                       *ui.DateTimePicker
 	alertBusy                        bool
 	parent                           *macComponentsGallery
 	application                      *app.Application
@@ -208,4 +213,54 @@ func (e *macEssentialsGallery) alertView() ui.Node {
 		{ID: "essentials/alert-note", Kind: ui.Label, Text: "The button opens an actual AppKit sheet on this window. The card below previews its content only; offscreen checks never display the system sheet."},
 		{ID: "essentials/alert-preview", Kind: ui.FormGroup, Children: []ui.Node{{ID: "essentials/alert-icon", Kind: ui.Image, Image: e.parent.artwork[ui.SymbolDocument], Text: "Alert application icon", Fit: ui.ImageContain, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 64, Height: 64}), MaxSize: ui.Some(ui.Size{Width: 64, Height: 64})}}, {ID: "essentials/alert-title", Kind: ui.Label, Text: "Keep the current drawing?", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 17, Weight: 600})}}, {ID: "essentials/alert-message", Kind: ui.Label, Text: "This is a native alert demonstration. No drawing files will be changed."}}},
 		{ID: "essentials/show-alert", Kind: ui.Button, Text: "Show native alert…", IconImage: e.parent.artwork[ui.SymbolDocument], Disabled: e.alertBusy, Activate: e.showAlert}}}
+}
+
+func calendarArtwork() *canvas.TiledImage {
+	pixels := image.NewNRGBA(image.Rect(0, 0, 64, 64))
+	for y := 6; y < 58; y++ {
+		for x := 8; x < 56; x++ {
+			c := color.NRGBA{R: 243, G: 246, B: 250, A: 255}
+			if y < 22 {
+				c = color.NRGBA{R: 215, G: 60, B: 70, A: 255}
+			} else if x < 11 || x > 52 || y > 54 {
+				c = color.NRGBA{R: 150, G: 160, B: 175, A: 255}
+			} else if y >= 29 && (y-29)%10 < 4 && x >= 17 && (x-17)%11 < 5 {
+				c = color.NRGBA{R: 63, G: 120, B: 180, A: 255}
+			}
+			pixels.SetNRGBA(x, y, c)
+		}
+	}
+	art, err := canvas.NewTiledImage(pixels)
+	if err != nil {
+		panic(err)
+	}
+	return art
+}
+func (e *macEssentialsGallery) calendarView() ui.Node {
+	if e.calendar == nil {
+		now := time.Now()
+		value := time.Date(now.Year(), now.Month(), now.Day(), 12, 0, 0, 0, now.Location())
+		art := calendarArtwork()
+		allowed := func(v time.Time) bool { return v.Weekday() != time.Saturday && v.Weekday() != time.Sunday }
+		e.calendar = &ui.Calendar{ID: "essentials/calendar", Value: value, Today: value, FirstWeekday: time.Monday, AllowDate: allowed, HeaderIconImage: art, Change: func(event ui.CalendarEvent) {
+			e.calendar.Value = event.Value
+			e.calendar.Month = event.Value
+			e.parent.count++
+			e.parent.status = "Calendar: " + event.Value.Format("2006-01-02")
+		}, Navigate: func(event ui.CalendarMonthEvent) { e.calendar.Month = event.Month }}
+		e.datePicker = &ui.DateTimePicker{ID: "essentials/date", Label: "Appointment", Value: value, Mode: ui.DateOnly, Today: value, FirstWeekday: time.Monday, AllowDate: allowed, CalendarIconImage: art, Change: func(event ui.DateTimeEvent) {
+			e.datePicker.Value = event.Value
+			e.parent.count++
+			e.parent.status = "Date field: " + event.Value.Format("2006-01-02")
+		}, Invalid: func(err error) { e.parent.status = err.Error() }}
+	}
+	month, err := e.calendar.View()
+	if err != nil {
+		return ui.Node{ID: "essentials/calendar-error", Kind: ui.Label, Text: err.Error()}
+	}
+	picker, err := e.datePicker.View()
+	if err != nil {
+		return ui.Node{ID: "essentials/date-error", Kind: ui.Label, Text: err.Error()}
+	}
+	return ui.Node{ID: "essentials/calendar-page", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}, Children: []ui.Node{{ID: "essentials/calendar-help", Kind: ui.Label, Text: "Monday-first calendar; weekends are unavailable. Arrows move across enabled dates; Return selects. Today respects the same rules."}, month, {ID: "essentials/date-help", Kind: ui.Label, Text: "The existing date field uses the same calendar and validation:"}, picker}}
 }

@@ -151,6 +151,12 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if c := n.CalendarCell; c != nil {
+		if n.Kind != Button || c.Index < 0 || c.Index >= 42 || c.IDs[c.Index] != n.ID || n.Disabled {
+			return fmt.Errorf("ui: invalid calendar cell navigation metadata")
+		}
+	}
+
 	if n.TabsHideHeader && n.Kind != Tabs {
 		return fmt.Errorf("ui: TabsHideHeader belongs only on Tabs")
 	}

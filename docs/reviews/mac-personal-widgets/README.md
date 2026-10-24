@@ -1402,3 +1402,11 @@ Prism: `essentials-native-alert.json` (Anthropic Claude Sonnet 5.5, complete cov
 Addressed Prism finding by separating missing native parents (ErrWindowClosed) from unavailable/hidden presentation and invalid recipe errors. Added reply mapping regression. Native alert options, foreign parents, immediate parent cancellation, operation cleanup and the shared Foundation recipe parser pass offscreen; no NSAlert or file chooser was displayed. Native sheet visual/interaction qualification remains explicitly deferred. Existing bounded service dispatch and native-main cleanup are reused.
 
 Focused checks: `essentials-native-alert-checks.json`, `essentials-native-alert-final-checks.json`.
+
+## Add reusable full-color calendar and shared date-picker navigation
+
+Prism: `essentials-calendar.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Both reported concerns were checked against the source. Enabled civil-day IDs match the rendered IDs; skipped civil dates deliberately keep unique disabled IDs and carry no focus metadata. DateTimePicker wraps the detached month view with liveCalendar/available checks against its current source ID, location, mode, month and popup epoch; obsolete source locations are covered by an added regression. Focused checks cover leap dates, bounds, predicates, skipped civil days, stale sessions, native arrow/Return routing and retained legacy focus IDs. No physical pointer or desktop calendar checks were run.
+
+Focused checks: `essentials-calendar-checks.json`, `essentials-calendar-final-checks.json`, `essentials-calendar-location-checks.json`.

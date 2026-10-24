@@ -70,6 +70,9 @@ func (m *macComponentsGallery) view() ui.Node {
 		m.essentials = newMacEssentialsGallery(m)
 	}
 	content := m.themePreview()
+	if m.page == "calendar" {
+		content = m.essentials.calendarView()
+	}
 	if m.page == "alerts" {
 		content = m.essentials.alertView()
 	}
@@ -97,7 +100,7 @@ func (m *macComponentsGallery) view() ui.Node {
 	if m.page == "menus" {
 		content = m.menuPreview()
 	}
-	navigation := ui.Node{ID: "components/pages", Kind: ui.Selector, SelectedID: m.page, Options: []ui.Option{{ID: "theme", Label: "Themes"}, {ID: "menus", Label: "Cascading menus"}, {ID: "split", Label: "Split buttons"}, {ID: "inspector", Label: "Inspector panel"}, {ID: "browser", Label: "Column browser"}, {ID: "rules", Label: "Filter / rule editor"}, {ID: "image-well", Label: "Image well"}, {ID: "icon-picker", Label: "Searchable icon picker"}, {ID: "settings", Label: "Settings pane"}, {ID: "alerts", Label: "Native alert"}}, Accessibility: ui.Accessibility{Name: "Component demonstration"}, Change: func(e ui.ChangeEvent) { m.page = e.SelectedID }}
+	navigation := ui.Node{ID: "components/pages", Kind: ui.Selector, SelectedID: m.page, Options: []ui.Option{{ID: "theme", Label: "Themes"}, {ID: "menus", Label: "Cascading menus"}, {ID: "split", Label: "Split buttons"}, {ID: "inspector", Label: "Inspector panel"}, {ID: "browser", Label: "Column browser"}, {ID: "rules", Label: "Filter / rule editor"}, {ID: "image-well", Label: "Image well"}, {ID: "icon-picker", Label: "Searchable icon picker"}, {ID: "settings", Label: "Settings pane"}, {ID: "alerts", Label: "Native alert"}, {ID: "calendar", Label: "Calendar picker"}}, Accessibility: ui.Accessibility{Name: "Component demonstration"}, Change: func(e ui.ChangeEvent) { m.page = e.SelectedID }}
 
 	return ui.Node{ID: "mac-components", Kind: ui.Scroll, Theme: &theme, Grow: true, Style: ui.Style{Background: ui.Some(palette.Window), Padding: ui.Some(ui.UniformInsets(16)), Gap: ui.Some(float32(12))}, Children: []ui.Node{{ID: "components/title", Kind: ui.Label, Text: "Mac components", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 20, Weight: 600})}}, {ID: "components/appearance", Kind: ui.Row, Children: appearance}, navigation, content, {ID: "components/status", Kind: ui.Label, Text: fmt.Sprintf("%s · actions: %d", m.status, m.count)}}}
 }

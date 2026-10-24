@@ -2,7 +2,7 @@ package ui
 
 import (
 	"fmt"
-	"strconv"
+	"github.com/dshills/vellum/canvas"
 	"strings"
 	"time"
 )
@@ -36,9 +36,16 @@ type DateTimePicker struct {
 	Change              func(DateTimeEvent)
 	Invalid             func(error)
 	Style, PopoverStyle Style
+	Today               time.Time
+	FirstWeekday        time.Weekday
+	AllowDate           func(time.Time) bool
+	CalendarIconImage   *canvas.TiledImage
+	calendarEpoch       *dateCalendarEpoch
 	calendarOpen        bool
 	month               time.Time
 }
+
+type dateCalendarEpoch struct{ marker byte }
 
 func DateTimeInputID(root string) string    { return root + "/date-time/input" }
 func DateTimeCalendarID(root string) string { return root + "/date-time/calendar-button" }
@@ -96,7 +103,7 @@ func (p *DateTimePicker) parse(text string) (time.Time, error) {
 			err = fmt.Errorf("ui: nonexistent local date/time")
 		}
 	}
-	if err == nil && !p.valid(v) {
+	if err == nil && (!p.valid(v) || p.mode() != TimeOnly && p.AllowDate != nil && !p.AllowDate(v)) {
 		err = fmt.Errorf("ui: date/time is outside inclusive bounds")
 	}
 	return v, err
@@ -119,6 +126,9 @@ func (p *DateTimePicker) View() (Node, error) {
 	timeFields := parseErr == nil && parsed.Hour() == 17 && parsed.Minute() == 46
 	if (p.mode() != TimeOnly && !dateFields) || (p.mode() != DateOnly && !timeFields) || (p.mode() == DateOnly && (parsed.Hour() != 0 || parsed.Minute() != 0 || parsed.Second() != 0)) || (p.mode() == TimeOnly && (parsed.Year() != 0 || parsed.Month() != 1 || parsed.Day() != 1)) {
 		return Node{}, fmt.Errorf("ui: layout must represent all fields for its date/time mode")
+	}
+	if p.FirstWeekday < time.Sunday || p.FirstWeekday > time.Saturday {
+		return Node{}, fmt.Errorf("ui: invalid first weekday")
 	}
 	id := p.ID
 	mode := p.mode()
@@ -149,9 +159,14 @@ func (p *DateTimePicker) View() (Node, error) {
 		p.Change(DateTimeEvent{ID: id, Value: v})
 	}}}}
 	if mode != TimeOnly {
-		row.Children = append(row.Children, Node{ID: DateTimeCalendarID(id), Kind: Button, Text: "Choose date…", Accessibility: Accessibility{Name: label + " calendar"}, Activate: func() {
+		row.Children = append(row.Children, Node{ID: DateTimeCalendarID(id), Kind: Button, Text: "Choose date…", IconImage: p.CalendarIconImage, Accessibility: Accessibility{Name: label + " calendar"}, Activate: func() {
 			if available() {
 				p.calendarOpen = !p.calendarOpen
+				if p.calendarOpen {
+					p.calendarEpoch = &dateCalendarEpoch{}
+				} else {
+					p.calendarEpoch = nil
+				}
 				p.month = time.Time{}
 			}
 		}})
@@ -159,64 +174,56 @@ func (p *DateTimePicker) View() (Node, error) {
 		if month.IsZero() {
 			month = time.Date(p.Value.Year(), p.Value.Month(), 1, 12, 0, 0, 0, p.Value.Location())
 		}
-		content := []Node{{ID: id + "/date-time/month-nav", Kind: Row, Children: []Node{
-			{ID: id + "/date-time/previous", Kind: Button, Icon: SymbolLeft, Appearance: ButtonTool, Disabled: month.Year() == 1 && month.Month() == time.January, Accessibility: Accessibility{Name: "Previous month"}, Activate: func() {
-				if available() && (month.Year() > 1 || month.Month() > time.January) {
-					p.month = month.AddDate(0, -1, 0)
-				}
-			}},
-			{ID: id + "/date-time/month-label", Kind: Label, Text: month.Format("January 2006"), Grow: true},
-			{ID: id + "/date-time/next", Kind: Button, Icon: SymbolRight, Appearance: ButtonTool, Disabled: month.Year() == 9999 && month.Month() == time.December, Accessibility: Accessibility{Name: "Next month"}, Activate: func() {
-				if available() && (month.Year() < 9999 || month.Month() < time.December) {
-					p.month = month.AddDate(0, 1, 0)
-				}
-			}},
-		}}}
-		dayStyle := Style{MinSize: Some(Size{Width: 28, Height: 26}), MaxSize: Some(Size{Width: 32}), GrowX: Some(float32(0)), Padding: Some(UniformInsets(3)), TextAlign: Some(AlignCenter)}
-		weekdays := []Node{}
-		for i, name := range []string{"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"} {
-			weekdays = append(weekdays, Node{ID: id + "/date-time/weekday/" + strconv.Itoa(i), Kind: Label, Text: name, Style: dayStyle})
+
+		if !available() {
+			p.calendarOpen = false
+			p.calendarEpoch = nil
+			p.month = time.Time{}
 		}
-		content = append(content, Node{ID: id + "/date-time/weekdays", Kind: Row, Style: Style{Gap: Some(float32(2))}, Children: weekdays})
-		last := month.AddDate(0, 1, -1).Day()
-		offset := int(month.Weekday())
-		for week := 0; week < 6; week++ {
-			children := []Node{}
-			for col := 0; col < 7; col++ {
-				day := week*7 + col - offset + 1
-				cellID := id + "/date-time/cell/" + strconv.Itoa(week*7+col)
-				if day < 1 || day > last {
-					children = append(children, Node{ID: cellID, Kind: Label, Style: dayStyle})
-					continue
-				}
-				candidate, err := p.localDate(month.Year(), month.Month(), day)
-				enabled := err == nil && p.valid(candidate)
-				selected := p.Value.Year() == month.Year() && p.Value.Month() == month.Month() && p.Value.Day() == day
-				kind := Button
-				appearance := ButtonAppearance("")
-				if selected {
-					appearance = ButtonPrimary
-				}
-				children = append(children, Node{ID: cellID, Kind: kind, Text: strconv.Itoa(day), Appearance: appearance, Disabled: !enabled, Style: dayStyle, Accessibility: Accessibility{Name: month.Format("January") + " " + strconv.Itoa(day) + ", " + strconv.Itoa(month.Year())}, Activate: func() {
-					if !available() {
-						return
-					}
-					v, err := p.localDate(month.Year(), month.Month(), day)
-					if err != nil || !p.valid(v) {
-						if err == nil {
-							err = fmt.Errorf("ui: date is outside bounds")
-						}
-						report(err)
-						return
-					}
-					p.Change(DateTimeEvent{ID: id, Value: v})
-					p.calendarOpen = false
-					p.month = time.Time{}
-				}})
+		if p.calendarOpen && p.calendarEpoch == nil {
+			p.calendarEpoch = &dateCalendarEpoch{}
+		}
+		epoch := p.calendarEpoch
+		sameMonth := func() bool {
+			current := p.month
+			if current.IsZero() {
+				current = time.Date(p.Value.Year(), p.Value.Month(), 1, 12, 0, 0, 0, p.Value.Location())
 			}
-			content = append(content, Node{ID: id + "/date-time/week/" + strconv.Itoa(week), Kind: Row, Style: Style{Gap: Some(float32(2))}, Children: children})
+			return current.Equal(month)
 		}
-		panel, err := (Popover{ID: id + "/date-time/popup", AnchorID: DateTimeCalendarID(id), Label: label, Open: p.calendarOpen, Disabled: !available(), Dismiss: func() { p.calendarOpen = false; p.month = time.Time{} }, Style: p.PopoverStyle, Children: content}).View()
+		liveCalendar := func() bool {
+			return available() && p.calendarOpen && epoch != nil && p.calendarEpoch == epoch && sameMonth()
+		}
+		calendar := &Calendar{ID: id + "/date-time/month-view", Value: p.Value, Month: month, Today: p.Today, FirstWeekday: p.FirstWeekday, Min: p.Min, Max: p.Max, HeaderIconImage: p.CalendarIconImage, AllowDate: p.AllowDate, Disabled: !available(), Navigate: func(e CalendarMonthEvent) {
+			if liveCalendar() {
+				p.month = e.Month
+			}
+		}, Change: func(e CalendarEvent) {
+			if !liveCalendar() {
+				return
+			}
+			v, err := p.localDate(e.Value.Year(), e.Value.Month(), e.Value.Day())
+			if err != nil || !p.valid(v) || p.AllowDate != nil && !p.AllowDate(v) {
+				return
+			}
+			p.Change(DateTimeEvent{ID: id, Value: v})
+			p.calendarOpen = false
+			p.calendarEpoch = nil
+			p.month = time.Time{}
+		}}
+		calendarNode, err := calendar.view(id+"/date-time", true)
+		if err != nil {
+			return Node{}, err
+		}
+		content := calendarNode.Children
+
+		panel, err := (Popover{ID: id + "/date-time/popup", AnchorID: DateTimeCalendarID(id), Label: label, Open: p.calendarOpen, Disabled: !available(), Dismiss: func() {
+			if liveCalendar() {
+				p.calendarOpen = false
+				p.calendarEpoch = nil
+				p.month = time.Time{}
+			}
+		}, Style: p.PopoverStyle, Children: content}).View()
 		if err != nil {
 			return Node{}, err
 		}
