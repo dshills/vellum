@@ -499,3 +499,24 @@ and diagnostic errors. View failures describe invalid developer descriptors,
 not rejected user edits; retaining their source detail is intentional for this
 internal demo. No additional production change is warranted by that finding.
 Native light/dark feedback visibility confirmation follows packaging.
+
+## Widget discovery and published-preview status
+
+README and the control index now link the newer personal-use widget demo and
+public integration guide. The index includes existing managed controls and
+composites, with source-checked public names. Composites are explicitly separated
+from node kinds and AppKit controls.
+
+GitHub release metadata and the published release body confirm alpha.3 was
+published as a prerelease on 23 October 2026 at
+320376ec8573a8603f75faaa3b3a7ea8a8ea0366. The documentation now states that fact,
+retains ad-hoc signing/notarization and qualification limits, and distinguishes
+the newer source widgets from published alpha.3 assets. Current status notes mark
+the implementation log and preview ledger as historical checkpoint snapshots;
+those original reports and ledger entries remain intact. The exact-payload audit
+and separate publication approval remain required for new public artifacts.
+
+All 146 local links in the four edited documents resolve; all 49 referenced public
+identifiers exist in ui source. git diff --check passes. No runtime inputs changed,
+so the tested 07d38ba app package remains current. Prism Anthropic
+claude-sonnet-5-5 completed coverage of all four documents with no findings.

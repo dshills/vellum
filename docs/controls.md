@@ -5,7 +5,7 @@ application-owned values are accepted state, and callbacks request changes on th
 application owner. The portable API has no native dependencies. The Mac adapter
 renders these elements and publishes their supported accessibility semantics.
 
-| Element | Public kind | Main state |
+| Element | Public API | Main state |
 | --- | --- | --- |
 | Label | `ui.Label` | `Text` |
 | Action button | `ui.Button` | `Text`, `Activate` |
@@ -15,15 +15,26 @@ renders these elements and publishes their supported accessibility semantics.
 | On/off switch | `ui.Switch` | `Checked`, `Change` |
 | Toggle button | `ui.ToggleButton` | `Checked`, `Change` |
 | Action menu | `ui.MenuButton` | `Options`, `Change.SelectedID` action requests |
+| Source list | `ui.ListBox` | `Options`, `SelectedID`, `Change`; or `Multiple`, `SelectedIDs`, `SelectionChange` |
 | Selection menu | `ui.Selector` | `Options`, `SelectedID`, `Change` |
 | Radio choices | `ui.RadioGroup` | `Options`, `SelectedID`, `Change`, `Orientation` |
 | Segmented choices | `ui.SegmentedControl` | `Options`, `SelectedID`, `Change`, `Orientation` |
 | Slider | `ui.Slider` | `Numeric`, `Number`, `Change` |
 | Inline color picker | `ui.ColorPicker.View()` | Straight-alpha `Color`, `Change(ColorEdit)`, `Invalid` |
+| Color well | `ui.ColorWell.View()` | `Color`, `Recent`, `Change(ColorEdit)`, `Invalid` |
+| Token field | `ui.TokenField.View()` | `Tokens`, `Draft`, `Suggestions`, `Change(TokenEvent)`, `Invalid` |
+| Font picker | `ui.FontPicker.View()` | `Families`, `Value`, `Preview`, `Change(FontSelectionEvent)`, `Invalid` |
+| Path control | `ui.PathControl.View()` | `Items`, `Navigate(PathEvent)`, `MaxVisible`, `MaxLabelRunes` |
+| Protected field | `ui.SecureField.View()` | `Text`, `AllowReveal`, `Change` |
+| Search input | `ui.SearchBox.View()` | `Text`, `Placeholder`, `Change(SearchEvent)` |
+| Editable choices | `ui.ComboBox.View()` | `Text`, `Options`, `Change(ComboEvent)` |
+| Date/time picker | `ui.DateTimePicker.View()` | `Value`, `Mode`, `Layout`, `Min`, `Max`, `Change(DateTimeEvent)`, `Invalid` |
 | Numeric field | `ui.NumberField` | `Numeric`, `Number`, `Change` |
 | Single-line field | `ui.TextField` | `Text`, `Change` |
 | Document editor | `ui.MultilineText` | `Editor`, `SoftWrap`, `TabInserts` |
 | Progress bar | `ui.ProgressBar` | `Number` fraction, `Orientation` |
+| Circular progress | `ui.ProgressRing`, `ui.ProgressGauge` | `Number` fraction |
+| Retained canvas | `ui.Canvas2D` | `Canvas`, `CanvasObjects`, `CanvasGrid`, optional `PlacementTarget` |
 | Decorative separator | `ui.Separator` | `Orientation` |
 | Managed data grid | `ui.DataGrid` | `Grid`, `GridChange`, `GridCommit` |
 | Managed outline | `ui.DataTree` | `Tree`, `TreeChange`, `TreeDisclosure` |
@@ -32,15 +43,26 @@ renders these elements and publishes their supported accessibility semantics.
 | Modal dialog | `ui.Dialog` | `Open`, `Dismiss`, children |
 | Toolbar | `ui.Toolbar` | Children, `Orientation`, scrolling overflow |
 | Status bar | `ui.StatusBar` | `Text` status, children |
+| Anchored panel | `ui.Popover.View()` | `AnchorID`, `Open`, `Dismiss`, children |
+| Contextual actions | `ui.Node.ContextMenu`, `ui.ContextMenu` | `Options`, `Change`; Button, Canvas2D or ListBox host |
+| Breadcrumb | `ui.Breadcrumb.View()` | `Items`, `Navigate(BreadcrumbEvent)` |
+| Labeled input | `ui.FormField.View()` | `Content`, `Label`, `Required`, `Help`, `ValidationMessage` |
+| Inline feedback | `ui.InlineNotice.View()` | `Text`, `Tone`, optional `ActionLabel` and `Activate` |
 | Labeled form group | `ui.FormGroup` | `Text` heading, children |
 | Collapsible section | `ui.Disclosure` | `Text` heading, `Checked` expansion, `Change`, children |
 | Adjustable split pane | `ui.SplitPane` | Two children, `Number` fraction, `Numeric`, `Orientation`, `Change` |
 | Horizontal/vertical layout | `ui.Row`, `ui.Column` | Children, `Style` |
 | Custom driver extension | `ui.Extension` | `Custom` |
 
+Composite entries expand into ordinary managed nodes; they are not additional
+node kinds or AppKit controls. The [Mac integration guide](mac-widget-integration.md)
+shows owner-held state, event acceptance and lifecycle rules for the five newer
+widgets. The [focused demo](mac-widget-demo.md) includes their current limits.
+These newer widgets are source work beyond the published alpha.3 assets.
+
 All elements support stable identity, disabled ancestry, local styles and themes.
 Focusable controls support managed focus requests. Interactive controls use their
-specified callbacks; progress bars and separators are passive leaves and reject
+specified callbacks; progress indicators and separators are passive leaves and reject
 Change/Activate callbacks. Separators do not enter the accessible hierarchy.
 
 Use `ui.Disclosure` for collapsible inspector or settings sections. Keep its child

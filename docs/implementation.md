@@ -1,13 +1,20 @@
 # Framework implementation phases
 
-For the active Mac finish line, ordered backlog and next commits, follow the
-[Mac delivery plan](../specs/macos-delivery.md). Historical phase completion below
-does not close its remaining acceptance gates.
+Current status: [v0.1.0-alpha.3](https://github.com/dshills/vellum/releases/tag/v0.1.0-alpha.3)
+was published on 23 October 2026 as an experimental Apple Silicon macOS developer
+preview. Its bounded acceptance and exact-payload distribution decision do not
+establish production readiness or full performance/platform qualification. See
+the [preview ledger](macos-preview-release.md) and published release limits.
 
-This implementation proceeds alongside the unresolved foundation checks. Those
-checks still prevent a production-ready claim. They do not prevent building and
-assessing the workbench API. Each phase receives Prism review, relevant tests,
-and a separate commit.
+Newer personal-use Mac widget work is separate from those published assets; see
+the [widget demo](mac-widget-demo.md), [integration guide](mac-widget-integration.md)
+and [control index](controls.md).
+
+The phase entries below retain their historical checkpoint scope, including
+then-pending checks and publication statements. They do not redefine the current
+release policy. The [Mac delivery plan](../specs/macos-delivery.md) records broader
+qualification work beyond the approved preview. Each implementation phase receives
+Prism review, relevant tests and a separate commit.
 
 1. Application lifecycle and keyed UI API — implemented; native driver and executable example.
 2. Commands and cancellable tasks — implemented; shared registry, menus, toolbar, palette, shortcuts and bounded owner-thread completions.
