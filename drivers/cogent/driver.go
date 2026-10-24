@@ -33,6 +33,9 @@ type Extension interface {
 type ThemeExtension interface{ SetTheme(ui.Theme) }
 
 type Driver struct {
+	// TitlebarToolbarPrototype opts into a real AppKit toolbar for one window.
+	// Experimental driver-only API; nil preserves existing window chrome.
+	TitlebarToolbarPrototype *TitlebarToolbarPrototype
 	// DesktopSession opts into bounded native integration routing and frame barriers.
 	// It cannot be combined with FrameMetrics. Ordinary applications leave it nil.
 	DesktopSession *DesktopSession
@@ -114,6 +117,13 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			return err
 		}
 	}
+	titlebar, err := prepareTitlebarToolbar(a, d.TitlebarToolbarPrototype)
+	if err != nil {
+		return err
+	}
+	if err := validateTitlebarToolbarSupport(titlebar); err != nil {
+		return err
+	}
 	if !processRun.CompareAndSwap(false, true) {
 		return fmt.Errorf("cogent: native main loop runs once per process")
 	}
@@ -129,7 +139,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 		}
 		defer d.DesktopSession.close()
 	}
-	if err := configureAccessibility(a); err != nil {
+	if err := configureAccessibility(a, titlebar); err != nil {
 		return err
 	}
 	defer releaseAccessibilityConfiguration()
@@ -300,6 +310,10 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			}
 		}
 		for _, spec := range desired {
+			if !titlebar.accepts(spec.Ref()) {
+				fail(fmt.Errorf("cogent: titlebar prototype supports only its original window opening"))
+				return
+			}
 			mu.Lock()
 			_, exists := windows[spec.ID]
 			mu.Unlock()

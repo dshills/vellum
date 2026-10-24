@@ -7,11 +7,11 @@ import (
 	"github.com/dshills/vellum/app"
 )
 
-func configureAccessibility(*app.Application) error                { return nil }
-func windowAccessibilityBridge(*nativeWindow) *accessibilityBridge { return nil }
-func nativeAccessibilityUpdate(uint64, string)                     {}
-func nativeAccessibilityUpdatePending(uint64, string, string)      {}
-func nativeAccessibilityGeometry(uint64, string)                   {}
+func configureAccessibility(*app.Application, *preparedTitlebarToolbar) error { return nil }
+func windowAccessibilityBridge(*nativeWindow) *accessibilityBridge            { return nil }
+func nativeAccessibilityUpdate(uint64, string)                                {}
+func nativeAccessibilityUpdatePending(uint64, string, string)                 {}
+func nativeAccessibilityGeometry(uint64, string)                              {}
 func InspectAccessibility(context.Context, string) (AccessibilityInspection, error) {
 	return AccessibilityInspection{}, app.ErrUnavailable
 }

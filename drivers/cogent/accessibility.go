@@ -69,6 +69,7 @@ type accessibilityAction struct {
 type accessibilityHandler func(accessibilityAction) bool
 
 type accessibilityBridge struct {
+	titlebar          atomic.Pointer[titlebarToolbarBinding]
 	activation        *windowActivation // immutable after construction
 	visibility        *windowVisibility // immutable after native attachment construction
 	token             uint64
@@ -176,6 +177,9 @@ func (b *accessibilityBridge) closeFrom(source string) {
 	// Publish the record before signaling closure so every canceled request sees
 	// the same first-close provenance, even when a later cleanup path runs.
 	b.closed.Store(true)
+	if binding := b.titlebar.Load(); binding != nil {
+		binding.close()
+	}
 	b.activation.close()
 	b.visibility.close()
 	b.generation.Add(1)
@@ -476,6 +480,11 @@ func syncAccessibility(w *nativeWindow, a *app.Application) {
 		return
 	}
 	b.bindScoped(w.window.Ref())
+	if b.titlebar.Load() != nil {
+		projection := accessibilityFocusProjection(w.root, "")
+		activeScope := ui.FocusScope(projection)
+		titlebarToolbarAllowed(b, !projection.Disabled && activeScope.Kind != ui.Dialog)
+	}
 	if request := b.pendingFocus.Swap(nil); request != nil {
 		accessibilityApplyFocus(w.root, *request)
 	}

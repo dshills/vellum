@@ -1193,3 +1193,36 @@ stage selection instead of an enum-order comparison. Both-scale/light/dark marke
 pixels, capture/animation cleanup, responsive overflow, space/context regressions,
 gallery geometry, vet and native build passed. No backend rendering or release
 gate changes. No remaining actionable review finding.
+
+## Native titlebar toolbar prototype
+
+Prism Anthropic claude-sonnet-5-5 reviewed the full 17-file checkpoint twice with
+complete coverage. The initial partial-attachment finding was addressed by
+explicit attachment.Close and nil,error. The pinned NativeAttach contract also
+closes partial attachments before releasing the native view, but this path no
+longer needs to rely on that convention.
+
+Final findings have source-backed dispositions. PostWindow uses postLocked's
+capacity check, returning ErrQueueFull immediately; it never waits for queue
+space or enters Do/Drain on native main. Native allowed is asynchronous visual
+state; Go's immutable permission identity is authoritative at admission and owner
+drain. Modal round trips and bridge/window retirement revoke pending actions.
+NativeAttachment.Close and attach failure run on native main by the pinned
+system/driver/desktop contract and releaseNativeResources implementation; do not
+add a secondary asynchronous teardown that could outlive the original view. The
+reported missing owner.window/token assignments are both explicitly present
+before registry insertion in titlebar_toolbar_darwin.m. No truncation or missing
+coverage was reported by Prism. No remaining demonstrated actionable finding.
+
+Internal review also added immediate Go binding revocation in bridge.closeFrom,
+a native-token retirement regression and a nil-prototype guard so ordinary
+windows do not pay for another modal focus projection. Native detach removes the
+Go attachment reference and all AppKit targets, including full-color menu forms.
+
+Focused titlebar configuration/immutable payload, action delivery, modal identity,
+bridge retirement, window lifetime replacement and offscreen refusal tests pass
+with the race detector. Adjacent window chrome, modal focus/context routing,
+gallery catalogue/preferences regressions and focused vet/native build pass.
+Native AppKit interaction/visual observations are recorded separately with the
+personal package after launch. This is a single-window driver experiment; no
+portable toolbar API or renderer/pacing policy changed.

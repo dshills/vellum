@@ -266,3 +266,9 @@ Space/Stretch render no surface. Flexible layout reserves every visible action's
 intrinsic width before sharing the remainder; trailing actions stay visible when
 they fit. The insertion preview is composed on the current dialog stage, above
 the sheet, with regression coverage for its actual blue pixels.
+
+## Native titlebar experiment
+
+A separate opt-in [AppKit titlebar prototype](native-titlebar-toolbar-prototype.md)
+now demonstrates native compact window chrome and the same original full-color
+artwork. It does not replace `ui.Toolbar` or share its customization settings.

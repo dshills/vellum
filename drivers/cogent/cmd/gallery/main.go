@@ -216,7 +216,11 @@ func main() {
 	widgetDefault, darkDefault := macWidgetExecutableDefaults(os.Args[0])
 	macWidgets := flag.Bool("mac-widgets", widgetDefault, "open the focused Mac input widget gallery")
 	macDark := flag.Bool("mac-dark", darkDefault, "use the dark Mac appearance with mac-widgets")
+	nativeTitlebar := flag.Bool("native-titlebar", widgetDefault, "attach the single-window native AppKit toolbar prototype (mac-widgets only)")
 	flag.Parse()
+	if *nativeTitlebar && !*macWidgets {
+		must(errors.New("native-titlebar requires mac-widgets"))
+	}
 	if *macDark && !*macWidgets {
 		must(errors.New("mac-dark requires mac-widgets"))
 	}
@@ -269,9 +273,10 @@ func main() {
 		g.tab = "colors"
 	}
 	view := g.view
+	var macGallery *macWidgetsGallery
 	if *macWidgets {
 		g.inputHelpers.setAppearance(*macDark)
-		macGallery := newMacWidgetsGallery(g.inputHelpers, *macDark)
+		macGallery = newMacWidgetsGallery(g.inputHelpers, *macDark)
 		macGallery.toolbars.enablePreferences()
 		view = macGallery.view
 	}
@@ -308,7 +313,21 @@ func main() {
 		// Keep native title-bar appearance and dragging under the OS default policy.
 		window.Chrome = app.WindowChrome{}
 	}
+	if *nativeTitlebar {
+		window.Chrome.Appearance = app.AppearanceLight
+		if *macDark {
+			window.Chrome.Appearance = app.AppearanceDark
+		}
+		macGallery.page = "toolbars"
+	}
 	must(a.Open(window))
+	var titlebar *cogent.TitlebarToolbarPrototype
+	if *nativeTitlebar {
+		ref, refErr := a.WindowRef(window.ID)
+		must(refErr)
+		titlebar, err = macGallery.titlebarPrototype(ref)
+		must(err)
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	var progressDone chan error
@@ -387,7 +406,7 @@ func main() {
 		must(runControlCatalogue(ctx, a, g, theme))
 		return
 	}
-	err = a.Run(ctx, cogent.Driver{Theme: theme})
+	err = a.Run(ctx, cogent.Driver{Theme: theme, TitlebarToolbarPrototype: titlebar})
 	if progressDone != nil {
 		cancel()
 		var checkErr error

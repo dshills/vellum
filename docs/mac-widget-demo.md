@@ -143,3 +143,11 @@ active window; OS-intercepted keys may never reach the app. Ratings use accessib
 star buttons with Tab/Return/Space, without pointer-drag or arrow adjustment.
 See the [control reference](controls.md) for public APIs and
 [independent integration example](../examples/sdk-contract/mac_widgets_next_test.go).
+
+## Native titlebar experiment
+
+The current personal package also enables the
+[native titlebar toolbar prototype](native-titlebar-toolbar-prototype.md) and
+starts on Toolbars. Its full-color titlebar commands update the sample action
+status. Content-toolbar controls and saved customization remain independent.
+Use `-native-titlebar=false` to launch the content-only gallery from source.

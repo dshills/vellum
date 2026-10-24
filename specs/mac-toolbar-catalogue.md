@@ -153,3 +153,17 @@ Space/Stretch leaves. Overflow growth subtracts the intrinsic widths of visible
 items rather than the adapter's deliberately small shrinkable minimum, so flex
 space cannot displace trailing actions or More. A dialog is itself a main stage:
 the insertion sprite belongs to that current stage, above the sheet surface.
+
+## Native titlebar feasibility prototype
+
+An explicit driver-only `TitlebarToolbarPrototype` may attach a real AppKit
+compact unified toolbar to one standard-chrome window opening. It must preserve
+OS traffic-light placement and dragging, leave content below the titlebar and
+retain existing native view/delegate/GPU ownership. Prototype actions use stable
+IDs, original bounded full-color PNGs, native disabled/overflow/AX behavior and
+fixed/flexible spaces. Native callbacks post to the bounded application owner
+queue for the captured WindowRef. Managed modal transitions and native/window
+retirement revoke queued delivery. Detach clears item targets/delegate, registry,
+images and callback reachability. Unsupported backends/configurations fail before
+native startup. Existing content toolbars and their settings remain independent.
+See [prototype scope and usage](../docs/native-titlebar-toolbar-prototype.md).
