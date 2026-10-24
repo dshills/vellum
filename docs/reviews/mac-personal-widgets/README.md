@@ -1378,3 +1378,11 @@ Prism: `essentials-image-well.json` (Anthropic Claude Sonnet 5.5, complete cover
 Fixed regular-file/encoded-size admission before decoding; decoder already enforces the 32MiB content limit. Zero WindowRef.Context is explicitly a canceled context, so the reported nil/panic concern is inapplicable. Refused completion publication occurs only after this captured window lifetime retires; never write UI fields from the worker to revive a dead instance. Result callbacks always invalidate, including errors. Manual deliberately refuses OS-drop transport, so keyboard fixture omits that transport annotation and reuses separate production file-drop fixtures. Desktop chooser/drop verification remains deferred.
 
 Focused checks: `essentials-image-well-checks.json`, `essentials-image-well-verified-checks.json`.
+
+## Add searchable full-color icon picker with accepted-choice recents
+
+Prism: `essentials-icon-picker.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Addressed both Prism findings: external opening starts a fresh query/category/highlight session; identity changes clear recents, and removed catalogue IDs are pruned. Added external-reopen and pruning regressions. Native offscreen Return chooses exactly once through the existing collection/popover path; closed/stale search sessions cannot select. No desktop tests run.
+
+Focused checks: `essentials-icon-picker-checks.json`, `essentials-icon-picker-final-checks.json`.

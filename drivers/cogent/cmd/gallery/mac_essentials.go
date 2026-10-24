@@ -15,6 +15,7 @@ type macEssentialsGallery struct {
 	application *app.Application
 	window      app.WindowRef
 	well        *ui.ImageWell
+	picker      *ui.IconPicker
 }
 
 func newMacEssentialsGallery(parent *macComponentsGallery) *macEssentialsGallery {
@@ -107,4 +108,25 @@ func loadWellImage(path string) (*canvas.TiledImage, error) {
 		return nil, fmt.Errorf("image file changed or is not regular")
 	}
 	return ui.DecodeImage(file)
+}
+
+func (e *macEssentialsGallery) iconPickerView() ui.Node {
+	if e.picker == nil {
+		e.picker = &ui.IconPicker{ID: "essentials/picker", Label: "Choose component artwork", SelectedID: "folder", Change: func(event ui.IconPickerEvent) {
+			e.picker.SelectedID = event.ItemID
+			e.parent.count++
+			e.parent.status = "Icon selected: " + event.ItemID
+		}}
+		for _, item := range []struct {
+			id, label, category string
+			symbol              ui.Symbol
+		}{{"folder", "Folder", "Documents", ui.SymbolFolder}, {"drawing", "Drawing", "Documents", ui.SymbolDocument}, {"new", "New document", "Documents", ui.SymbolAdd}, {"save", "Save", "Actions", ui.SymbolSave}, {"undo", "Undo", "Actions", ui.SymbolUndo}, {"redo", "Redo", "Actions", ui.SymbolRedo}, {"delete", "Delete", "Actions", ui.SymbolDelete}} {
+			e.picker.Items = append(e.picker.Items, ui.IconPickerItem{ID: item.id, Label: item.label, Category: item.category, Image: e.parent.artwork[item.symbol]})
+		}
+	}
+	n, err := e.picker.View()
+	if err != nil {
+		return ui.Node{ID: "essentials/picker-error", Kind: ui.Label, Text: err.Error()}
+	}
+	return ui.Node{ID: "essentials/picker-page", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}, Children: []ui.Node{{ID: "essentials/picker-help", Kind: ui.Label, Text: "Search or filter full-color artwork. Arrows highlight; Return or Choose accepts. Cancel keeps the original selection."}, n}}
 }

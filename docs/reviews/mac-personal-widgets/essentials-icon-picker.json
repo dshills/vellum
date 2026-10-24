@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "4d2afef353d09b157871ec879178c523",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "d45ccf6a987f18fe361234701c2147eb9a1644e7",
+    "branch": "codex/mac-widget-essentials"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "96f7cea652f42691",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Session state is not reset when opened externally",
+      "message": "The epoch is reset whenever View runs with Open false. If the Activate handler sets p.Open=true and the app re-renders, a new epoch is created, which is fine. But recents and category are never reset when the ID changes, and the stale query and category persist if Open is set externally rather than via the button. A reopen via Open=true bypasses the reset of query and category.",
+      "suggestion": "Reset query, category and highlight whenever a new epoch is created, not only in the button Activate.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/icon_picker.go",
+          "lines": {
+            "start": 73,
+            "end": 76
+          }
+        }
+      ],
+      "tags": [
+        "state",
+        "location-corrected"
+      ],
+      "evidence": "if p.identity != p.ID || !p.Open || p.Disabled {\n\t\tp.epoch = nil\n\t\tp.identity = p.ID\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "2586e5286b5d8e48",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Stale recent IDs are never pruned",
+      "message": "Recents can contain IDs of items later removed from Items. A stale ID occupies one of the eight recent slots while it shows nothing, and the 'Recently used' option may appear with an empty grid. recent is also never pruned on validation.",
+      "suggestion": "Filter p.recent to IDs currently present in Items in View before using it.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/icon_picker.go",
+          "lines": {
+            "start": 108,
+            "end": 108
+          }
+        }
+      ],
+      "tags": [
+        "state",
+        "location-corrected"
+      ],
+      "evidence": "p.recent = p.recent[:min(8, len(p.recent))]",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4976,
+    "totalMs": 4990
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 18865,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 11356,
+        "output": 550,
+        "costUSD": 0.028212
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
