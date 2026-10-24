@@ -477,3 +477,25 @@ duplicate text are entry rejections, for which retaining entry focus is intended
 The persistent root request is sequence-based: applyAccessibleFocus ignores an
 already-consumed request; disable explicitly cancels it. No source change is
 needed for the reported scenarios.
+
+## Visible, user-worded inline feedback
+
+Light/dark duplicate-entry repros found token-feedback had empty clipped bounds
+while entry remained focused. The label now appears before the tag component,
+so the focused viewport includes it. Completed-frame Manual checks require a
+nonempty readable-height feedback box and entry inside the captured viewport.
+Repeated entry/correction, capacity, same-batch disable, reset and stale-editor
+checks continue to pass under race; gallery vet passes.
+
+The demo's font/tag/color/date Invalid callbacks remove only the leading ui:
+package prefix. Public component errors and diagnostic/configuration error paths
+are unchanged. An integration test triggers all four real invalid-input paths
+and inspects their displayed feedback. No public API or rendering policy change.
+
+Prism Anthropic claude-sonnet-5-5 completed coverage and suggested extending the
+formatter to View errors or narrowing the wording. The spec and review context
+already explicitly distinguish input validation from unchanged configuration
+and diagnostic errors. View failures describe invalid developer descriptors,
+not rejected user edits; retaining their source detail is intentional for this
+internal demo. No additional production change is warranted by that finding.
+Native light/dark feedback visibility confirmation follows packaging.

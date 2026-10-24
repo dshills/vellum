@@ -243,3 +243,19 @@ func TestInputHelpersStandaloneTokenRemovalFocusContinuity(t *testing.T) {
 		t.Fatal("ordinary gallery invalid", err)
 	}
 }
+
+func TestInputHelpersValidationMessagesUseUserWording(t *testing.T) {
+	m := newInputHelpersGallery()
+	node := func(id string) ui.Node { return findGalleryDocumentNode(m.view(), id) }
+	node(ui.TokenInputID("drawing-tags")).Change(ui.ChangeEvent{Text: "Design"})
+	node(ui.ComboInputID(ui.FontFamilyID("drawing-font"))).Change(ui.ChangeEvent{Text: "Unlisted font"})
+	node(ui.DateTimeInputID("reminder-date")).Change(ui.ChangeEvent{Text: "not-a-date"})
+	node(ui.ColorWellButtonID("drawing-color")).Activate()
+	node(ui.ColorFieldID(ui.ColorWellPickerID("drawing-color"), ui.ColorHex)).Change(ui.ChangeEvent{Text: "not-a-color"})
+	for _, id := range []string{"token-feedback", "font-feedback", "date-error", ui.ColorWellPickerID("drawing-color") + "/color/validation"} {
+		feedback := node(id)
+		if feedback.Text == "" || strings.Contains(feedback.Text, "ui: ") {
+			t.Fatal("missing or developer-oriented validation message", id, feedback.Text)
+		}
+	}
+}

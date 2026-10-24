@@ -23,6 +23,9 @@ import (
 )
 
 func inputGalleryManual(t *testing.T) (*inputHelpersGallery, *app.Application, *cogent.Manual, func() cogent.ManualWindowSnapshot) {
+	return inputGalleryManualWithTheme(t, false)
+}
+func inputGalleryManualWithTheme(t *testing.T, dark bool) (*inputHelpersGallery, *app.Application, *cogent.Manual, func() cogent.ManualWindowSnapshot) {
 	t.Helper()
 	ctx := context.Background()
 	clock, err := execution.NewManualClock(time.Unix(1730000000, 0).UTC(), 256, 256)
@@ -41,12 +44,16 @@ func inputGalleryManual(t *testing.T) (*inputHelpersGallery, *app.Application, *
 	}
 	t.Cleanup(a.Close)
 	model := newInputHelpersGallery()
+	model.setAppearance(dark)
 	model.focus = ui.FocusRequest{ID: ui.TokenInputID("drawing-tags"), Sequence: 1}
 	if err := a.Open(app.Window{ID: "inputs", Title: "Input recovery", Width: 660, Height: 760, View: model.windowView}); err != nil {
 		t.Fatal(err)
 	}
-	theme := ui.MacTheme(false)
+	theme := ui.MacTheme(dark)
 	theme.Default.Background = ui.Some(color.NRGBA{R: 246, G: 246, B: 248, A: 255})
+	if dark {
+		theme.Default.Background = ui.Some(color.NRGBA{R: 29, G: 29, B: 31, A: 255})
+	}
 	theme.Default.Typography = ui.Some(ui.Typography{Family: "Noto Sans", Size: 13})
 	cfg := cogent.ManualConfig{Clock: clock, Executor: executor, OwnerBatch: 7, MaxWindows: 1, EventCapacity: 128, LogicalDPI: 160, Theme: theme}
 	if err := fs.WalkDir(fonts.Default, ".", func(path string, d fs.DirEntry, e error) error {
@@ -189,5 +196,34 @@ func TestInputGalleryQueuedTagRemovalThenDisable(t *testing.T) {
 	settle()
 	if model.windowView().Focus.ID != "" {
 		t.Fatal("disabled demo kept a pending field focus request")
+	}
+}
+
+func TestInputGalleryTagFeedbackVisibleAtEntry(t *testing.T) {
+	for _, dark := range []bool{false, true} {
+		t.Run(map[bool]string{false: "light", true: "dark"}[dark], func(t *testing.T) {
+			model, _, m, settle := inputGalleryManualWithTheme(t, dark)
+			inputGalleryTypeTag(t, m, settle, "alpha")
+			w := inputGalleryTypeTag(t, m, settle, "alpha")
+			var feedback, entry cogent.ManualElement
+			for _, e := range w.Elements {
+				if e.ID == "token-feedback" {
+					feedback = e
+				}
+				if e.ID == ui.TokenInputID("drawing-tags") {
+					entry = e
+				}
+			}
+			frame, err := m.Capture(context.Background(), "inputs")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if w.FocusedID != entry.ID || !feedback.Visible || feedback.Bounds.Empty() || feedback.Bounds.Dy() < 12 || !feedback.Bounds.In(frame.Bounds()) || !entry.Bounds.In(frame.Bounds()) {
+				t.Fatal("tag rejection feedback is outside the focused viewport", feedback.Bounds, entry.Bounds, frame.Bounds())
+			}
+			if strings.HasPrefix(model.tokenError, "ui: ") {
+				t.Fatal("internal package prefix leaked into user feedback", model.tokenError)
+			}
+		})
 	}
 }

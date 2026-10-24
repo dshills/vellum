@@ -137,3 +137,8 @@ entry is disabled and continuation moves to the color well. Disabling inputs
 cancels pending root focus requests while preserving their monotonic sequence;
 re-enabling does not replay them. This is application policy with existing APIs,
 not a change to TokenField's reusable focus contract or ordinary text-field Return.
+
+The demo displays tag validation feedback above the tag controls, keeping it
+visible when entry focus scrolls near the viewport's bottom edge. Input validation
+messages omit the internal ui: package prefix; diagnostic/configuration errors
+and the reusable components' error values remain unchanged.

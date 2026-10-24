@@ -64,7 +64,7 @@ func (m *inputHelpersGallery) resetFields() {
 	}
 	m.fontPicker = &ui.FontPicker{ID: "drawing-font", Label: "Drawing font", Preview: "A drawing starts with an idea.", Value: ui.FontSelection{FamilyID: "helvetica", TypefaceID: "regular", Size: 16}, Families: []ui.FontFamily{{ID: "helvetica", Name: "Helvetica Neue", Typefaces: []ui.FontTypeface{{ID: "regular", Name: "Regular", Weight: 400}, {ID: "bold", Name: "Bold", Weight: 700}, {ID: "italic", Name: "Italic", Weight: 400, Italic: true}}}, {ID: "times", Name: "Times New Roman", Typefaces: []ui.FontTypeface{{ID: "regular", Name: "Regular", Weight: 400}, {ID: "bold", Name: "Bold", Weight: 700}}}, {ID: "menlo", Name: "Menlo", Typefaces: []ui.FontTypeface{{ID: "regular", Name: "Regular", Weight: 400}}}}}
 	m.fontPicker.Change = func(e ui.FontSelectionEvent) { m.fontPicker.Value = e.Apply(m.fontPicker.Value); m.fontError = "" }
-	m.fontPicker.Invalid = func(err error) { m.fontError = err.Error() }
+	m.fontPicker.Invalid = func(err error) { m.fontError = inputFeedback(err) }
 	m.tokens = &ui.TokenField{ID: "drawing-tags", Label: "Drawing tags", Tokens: []ui.Token{{ID: "tag-1", Text: "Design"}}, Suggestions: []ui.Option{{ID: "work", Label: "Work"}, {ID: "personal", Label: "Personal"}, {ID: "review", Label: "Review"}}}
 	m.tokenNext = 1
 	m.tokens.Change = func(e ui.TokenEvent) {
@@ -85,14 +85,14 @@ func (m *inputHelpersGallery) resetFields() {
 		}
 		m.tokenError = ""
 	}
-	m.tokens.Invalid = func(err error) { m.tokenError = err.Error(); m.focusAfterTokenEdit() }
+	m.tokens.Invalid = func(err error) { m.tokenError = inputFeedback(err); m.focusAfterTokenEdit() }
 	m.colorWell = &ui.ColorWell{ID: "drawing-color", Label: "Drawing color", Color: color.NRGBA{R: 52, G: 120, B: 246, A: 255}, Recent: []color.NRGBA{{R: 52, G: 120, B: 246, A: 255}, {R: 237, G: 90, B: 80, A: 255}, {R: 64, G: 180, B: 110, A: 255}}}
 	m.colorWell.Change = func(e ui.ColorEdit) { m.colorWell.Color = e.Apply(m.colorWell.Color); m.colorError = "" }
-	m.colorWell.Invalid = func(err error) { m.colorError = err.Error() }
+	m.colorWell.Invalid = func(err error) { m.colorError = inputFeedback(err) }
 
 	m.datePicker = &ui.DateTimePicker{ID: "reminder-date", Label: "Reminder date and time", Mode: ui.DateAndTime, Value: time.Date(2026, 10, 23, 9, 0, 0, 0, time.Local)}
 	m.datePicker.Change = func(e ui.DateTimeEvent) { m.datePicker.Value = e.Value; m.dateError = "" }
-	m.datePicker.Invalid = func(err error) { m.dateError = err.Error() }
+	m.datePicker.Invalid = func(err error) { m.dateError = inputFeedback(err) }
 	m.combo = &ui.ComboBox{ID: "unit-combo", Label: "Drawing units", Text: "Millimeters", Options: []ui.Option{{ID: "mm", Label: "Millimeters"}, {ID: "cm", Label: "Centimeters"}, {ID: "in", Label: "Inches"}}}
 	m.combo.Change = func(e ui.ComboEvent) { m.combo.Text = e.Text }
 	m.search = &ui.SearchBox{ID: "object-search", Label: "Search objects", Help: "Filter the component names below"}
@@ -105,6 +105,14 @@ func (m *inputHelpersGallery) resetFields() {
 	m.notice = &ui.InlineNotice{ID: "input-notice", Tone: ui.NoticeInformation, Text: "These widgets use application-owned values.", ActionLabel: "Reset fields", Activate: m.resetFields}
 	m.setAppearance(dark)
 	m.setDisabled(disabled)
+}
+
+// Validation errors are user feedback; keep package prefixes in diagnostics.
+func inputFeedback(err error) string {
+	if err == nil {
+		return ""
+	}
+	return strings.TrimPrefix(err.Error(), "ui: ")
 }
 
 // The standalone demo supports repeated tag entry. Nested galleries continue
@@ -245,7 +253,7 @@ func (m *inputHelpersGallery) view() ui.Node {
 		{ID: "secure-group", Kind: ui.FormGroup, Text: "Secure entry — synthetic demo text", Children: []ui.Node{secure}},
 		{ID: "path-group", Kind: ui.FormGroup, Text: "Location — ancestor menus and overflow", Children: []ui.Node{path}},
 		{ID: "font-group", Kind: ui.FormGroup, Text: "Font", Children: []ui.Node{font, {ID: "font-feedback", Kind: ui.Label, Text: m.fontError}}},
-		{ID: "tokens-group", Kind: ui.FormGroup, Text: "Tags — Return adds, chip button removes", Children: []ui.Node{tokens, {ID: "token-feedback", Kind: ui.Label, Text: m.tokenError}}},
+		{ID: "tokens-group", Kind: ui.FormGroup, Text: "Tags — Return adds, chip button removes", Children: []ui.Node{{ID: "token-feedback", Kind: ui.Label, Text: m.tokenError}, tokens}},
 		{ID: "color-well-group", Kind: ui.FormGroup, Text: "Drawing color", Children: []ui.Node{well}},
 		search,
 		{ID: "combo-group", Kind: ui.FormGroup, Text: "Drawing units — type a value or choose", Children: []ui.Node{combo}},

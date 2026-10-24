@@ -49,7 +49,8 @@ use the dropdown; there is no per-keystroke completion filtering, comma-triggere
 commit, inline chip editing or rearrangement. Long chips abbreviate their visible labels;
 accessibility and removal keep the full value. In this standalone demo, accepted
 tag acceptance, rejection and chip removal return focus to tag entry for repeated
-entry. At 32 tags, focus advances to Drawing color; removing a tag enables entry
+entry. Tag validation feedback appears above the controls so it stays visible
+while correcting an entry near the bottom of the viewport. At 32 tags, focus advances to Drawing color; removing a tag enables entry
 again. Disable inputs cancels pending focus requests. This is demo focus policy.
 Fonts use a caller-supplied catalog,
 may substitute if unavailable, and support sizes 6–144 logical pixels. Path
