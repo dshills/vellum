@@ -1426,3 +1426,11 @@ Prism: `document-list.json` (Anthropic Claude Sonnet 5.5, complete coverage).
 Prism: reduced selection admission to one validation and one enabled-ID map per event, removing repeated whole-list checks. Its row-plan concern is covered by a new regression that reorders/removes columns on the same native Switch: native Update reruns FinalMaker. Its resize concern is covered by two pointer moves across re-render: SameSource compares retained component/column identity, not detached-handle pointer, and dispatch uses the current handle callback with the original press width. Focused race tests, existing list/collection routing and light/dark gallery rasters pass. External files are neither scanned nor opened. Physical pointer checks follow final packaging.
 
 Focused checks: `document-list-checks.json`, `document-list-final-checks.json`, `document-list-reviewed-checks.json`.
+
+## Add Mac outline with color icons and retained hidden selection
+
+Prism: `mac-outline.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+All four Prism concerns were checked against source and regression evidence. Native Update reruns the retained row and nested disclosure Maker; a new test removes/re-adds children without replacing the Switch. Arrow keys intentionally clamp at hierarchy edges so they cannot escape into unrelated controls; row guards and disabled native targets reject disabled actions. virtual.NewTree rejects missing parents/cycles before depth traversal, and tests exercise malformed graphs. Old callbacks reproject current visible state and compare parent identity; added reparent/disable regressions prove revocation before another View. Pointer disclosure preserves hidden selection without leaking selection/activation; keyboard and light/dark raster checks pass. No rendering or release-policy changes.
+
+Focused checks: `mac-outline-checks.json`, `mac-outline-reviewed-checks.json`.

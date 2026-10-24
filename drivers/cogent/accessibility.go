@@ -641,6 +641,9 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			x.Role = "radio-group"
 			if n.Kind == ui.ListBox {
 				x.Role = "list-box"
+				if n.Outline != nil {
+					x.Role = "outline"
+				}
 				x.RowCount = len(n.Options)
 				x.activationGuard = listBoxHostGuard(r)
 			}

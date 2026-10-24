@@ -67,6 +67,9 @@ func bindCollectionChoice(r *record, id string, b *core.Switch) {
 	// FinalMaker replaces Switch's private checkbox stack for collections only.
 	// Existing ListBox semantic options, eligibility and membership remain intact.
 	b.FinalMaker(func(p *tree.Plan) {
+		if makeOutlineViewRow(r, id, b, p) {
+			return
+		}
 		if makeDocumentRow(r, id, p) {
 			return
 		}

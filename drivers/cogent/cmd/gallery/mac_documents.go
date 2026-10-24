@@ -7,8 +7,9 @@ import (
 )
 
 type macDocumentGallery struct {
-	parent *macComponentsGallery
-	list   *ui.DocumentList
+	parent  *macComponentsGallery
+	list    *ui.DocumentList
+	outline *ui.OutlineView
 }
 
 func (m *macComponentsGallery) documentListView() ui.Node {
@@ -42,4 +43,33 @@ func (m *macComponentsGallery) documentListView() ui.Node {
 		return ui.Node{ID: "documents/list-error", Kind: ui.Label, Text: err.Error()}
 	}
 	return ui.Node{ID: "documents/list-page", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}, Children: []ui.Node{{ID: "documents/list-help", Kind: ui.Label, Text: "Finder-style document metadata. Click a header to sort. Drag its divider or focus the divider and use Left/Right. Command/Shift select; Return opens the sample only."}, n}}
+}
+
+func (m *macComponentsGallery) outlineView() ui.Node {
+	if m.documents == nil {
+		m.documents = &macDocumentGallery{parent: m}
+	}
+	e := m.documents
+	if e.outline == nil {
+		e.outline = &ui.OutlineView{ID: "documents/outline", Label: "Project outline", ExpandedIDs: []string{"project", "drawings"}, Items: []ui.OutlineItem{
+			{ID: "project", Label: "My project", Badge: "4", Image: m.artwork[ui.SymbolFolder]},
+			{ID: "drawings", Parent: "project", Label: "Drawings", Image: m.artwork[ui.SymbolFolder]},
+			{ID: "floor", Parent: "drawings", Label: "Floor plan", Image: m.artwork[ui.SymbolDocument]},
+			{ID: "detail", Parent: "drawings", Label: "Details", Image: m.artwork[ui.SymbolSave]},
+			{ID: "components", Parent: "project", Label: "Components", Image: m.artwork[ui.SymbolFolder]},
+			{ID: "block", Parent: "components", Label: "Block", Image: m.artwork[ui.SymbolDocument]},
+			{ID: "archive", Parent: "project", Label: "Archive (unavailable)", Disabled: true, Image: m.artwork[ui.SymbolFolder]},
+		}}
+		e.outline.Change = func(event ui.ListSelectionEvent) {
+			e.outline.SelectedIDs = event.Apply(e.outline.SelectedIDs)
+			m.status = fmt.Sprint("Outline selection: ", e.outline.SelectedIDs)
+		}
+		e.outline.Disclosure = func(event ui.OutlineDisclosureEvent) { e.outline.ExpandedIDs = event.Apply(e.outline.ExpandedIDs) }
+		e.outline.Activate = func(event ui.OutlineEvent) { m.count++; m.status = "Open outline item: " + event.ItemID }
+	}
+	n, err := e.outline.View()
+	if err != nil {
+		return ui.Node{ID: "documents/outline-error", Kind: ui.Label, Text: err.Error()}
+	}
+	return ui.Node{ID: "documents/outline-page", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}, Children: []ui.Node{{ID: "documents/outline-help", Kind: ui.Label, Text: "Expand folders with their triangles or Right. Left collapses or moves to the parent. Command/Shift selects; Return opens a leaf. Hidden selections survive collapse."}, n}}
 }

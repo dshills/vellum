@@ -151,6 +151,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if err := ValidateOutlineViewNode(n); err != nil {
+		return err
+	}
 	if err := ValidateDocumentListNode(n); err != nil {
 		return err
 	}

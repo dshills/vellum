@@ -63,6 +63,9 @@ func choiceKey(r *record, id string, button *core.Switch, e events.Event) {
 	if e.IsHandled() || !choiceLive(r, id, button) {
 		return
 	}
+	if outlineViewKey(r, id, button, e) {
+		return
+	}
 	if r.node.DocumentList != nil && e.KeyCode() == key.CodeReturnEnter && e.Modifiers() == 0 {
 		e.SetHandled()
 		queueDocumentActivation(r, id, button)
@@ -223,6 +226,7 @@ func prepareChoice(r *record, n ui.Node) error {
 		})
 		bindCollectionChoice(r, id, button)
 		bindDocumentChoice(r, id, button)
+		bindOutlineChoice(r, id, button)
 	}
 	return nil
 }
@@ -267,7 +271,7 @@ func syncChoice(r *record, previous ui.Node) error {
 		text := html.EscapeString(o.Label)
 		disabled := r.control.disabled || o.Disabled
 		checked := ui.ListOptionSelected(r.node, o.ID)
-		dirty := b.Text != text || b.Type != typ || b.IsChecked() != checked || b.StateIs(states.Disabled) != disabled || previous.Multiple != r.node.Multiple || (collectionPresentationChanged(previous.Collection, r.node.Collection) || documentChanged(previous.DocumentList, r.node.DocumentList))
+		dirty := b.Text != text || b.Type != typ || b.IsChecked() != checked || b.StateIs(states.Disabled) != disabled || previous.Multiple != r.node.Multiple || (collectionPresentationChanged(previous.Collection, r.node.Collection) || (documentChanged(previous.DocumentList, r.node.DocumentList) || outlineViewChanged(previous.Outline, r.node.Outline)))
 		b.SetType(typ).SetText(text).SetChecked(checked).SetState(disabled, states.Disabled)
 		if r.node.Kind == ui.ListBox && r.node.Multiple {
 			b.IconOn = icons.None
@@ -283,7 +287,7 @@ func syncChoice(r *record, previous ui.Node) error {
 		}
 	}
 	syncSemantics(r)
-	if (collectionPresentationChanged(previous.Collection, r.node.Collection) || documentChanged(previous.DocumentList, r.node.DocumentList)) || sourceListNeedsFocusRestyle(r) || listCatalogChanged || previous.Multiple != r.node.Multiple || !slices.Equal(previous.SelectedIDs, r.node.SelectedIDs) || previous.Orientation != r.node.Orientation || !reflect.DeepEqual(previous.Options, r.node.Options) || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility {
+	if (collectionPresentationChanged(previous.Collection, r.node.Collection) || (documentChanged(previous.DocumentList, r.node.DocumentList) || outlineViewChanged(previous.Outline, r.node.Outline))) || sourceListNeedsFocusRestyle(r) || listCatalogChanged || previous.Multiple != r.node.Multiple || !slices.Equal(previous.SelectedIDs, r.node.SelectedIDs) || previous.Orientation != r.node.Orientation || !reflect.DeepEqual(previous.Options, r.node.Options) || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility {
 		r.widget.AsWidget().Update()
 	}
 	return nil
@@ -326,10 +330,30 @@ func choiceAccessibility(r *record, parent string, b *accessibilityBridge, disab
 				n.Help = "Badge: " + o.Badge
 			}
 			n.RowIndex = len(nodes) + 1
+			if r.node.Outline != nil {
+				row := outlineViewRow(r, optionID)
+				n.Role = "tree-row"
+				n.Level = row.Depth + 1
+				if row.HasChildren {
+					expanded := row.Expanded
+					n.Expanded = &expanded
+				}
+			}
+			if r.node.DocumentList != nil {
+				row := documentRow(r, optionID)
+				for i, text := range row.Cells {
+					n.Help += r.node.DocumentList.Columns[i].Title + ": " + text + ". "
+				}
+			}
+
 			n.activationGuard = guard
 		}
 		if !blocked {
 			n.Actions = append(n.Actions, "focus")
+			if r.node.Outline != nil && outlineViewRow(r, optionID).HasChildren && r.node.Outline.Disclosure != nil {
+				n.Actions = append(n.Actions, "expand", "collapse")
+			}
+
 			if r.node.Change != nil || r.node.Multiple && r.node.SelectionChange != nil {
 				n.Actions = append(n.Actions, "press")
 			}
@@ -338,6 +362,13 @@ func choiceAccessibility(r *record, parent string, b *accessibilityBridge, disab
 					return false
 				}
 				switch action.Kind {
+				case "expand", "collapse":
+					if r.node.Outline == nil || r.node.Outline.Disclosure == nil {
+						return false
+					}
+					r.node.Outline.Disclosure(ui.OutlineDisclosureEvent{ID: r.node.ID, ItemID: optionID, Expanded: action.Kind == "expand"})
+					requestControlRestore(r)
+					return true
 				case "focus":
 					if b == nil {
 						return false

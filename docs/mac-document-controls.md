@@ -18,3 +18,18 @@ Activate separately. Disabled/removed items and stale component sources cannot
 act. Size is shown in bytes, dates in English. Context menus and automatic
 filesystem operations are outside this component. Components → Document list
 demonstrates all operations using in-memory sample metadata.
+
+## Mac outline
+
+`ui.OutlineView` composes the existing bounded `virtual.Tree` index with managed
+source-list selection. Provide <=256 flat parent-linked `OutlineItem` values,
+depth <=16, stable IDs, original-color images, optional badges and disabled items.
+Larger indexed datasets retain the existing worker-built `DataTree` route.
+Accept Disclosure with `event.Apply(ExpandedIDs)` and selection with
+`event.Apply(SelectedIDs)`. Collapsed descendants retain application selection;
+only visible selected rows are published to the native list. Disabled ancestors
+disable their descendants. Right opens/enters, Left closes/returns to the parent,
+Up/Down moves rows and Return/double-click opens a leaf or toggles a branch.
+Disclosure also has accessible expand/collapse actions. Optional ContextMenu
+reuses existing source-list contextual actions. There is no item dragging,
+filesystem traversal, lazy child loading or built-in persistence.

@@ -30,7 +30,7 @@ func TestMacComponentThemePreviewRetainsArtworkAndValue(t *testing.T) {
 func TestMacComponentPagesAreConsumable(t *testing.T) {
 	for _, dark := range []bool{false, true} {
 		m := newMacComponentsGallery(dark)
-		for _, page := range []string{"theme", "menus", "split", "inspector", "browser", "rules", "image-well", "icon-picker", "settings", "alerts", "calendar", "documents"} {
+		for _, page := range []string{"theme", "menus", "split", "inspector", "browser", "rules", "image-well", "icon-picker", "settings", "alerts", "calendar", "documents", "outline"} {
 			m.page = page
 			n := m.view()
 			if err := ui.Validate(n); err != nil {

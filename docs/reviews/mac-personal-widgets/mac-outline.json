@@ -1,0 +1,165 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "5dcae74495e27cd872593f76d195cee4",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "8645ee9e858546ef22ed88602fb22636e2ed54b2",
+    "branch": "codex/mac-document-controls"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "f7030ce2b4845eb2",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Disclosure button may not appear after rows change",
+      "message": "The disclosure slot's Maker runs only on rebuild. If a row gains or loses children while the Switch is retained, the Maker may not rerun because the slot has no Updater. The disclosure triangle can then be stale, or be missing for a new parent.",
+      "suggestion": "Force the slot to rebuild on outline changes, for example by calling Update on the row from syncChoice.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/outline_view.go",
+          "lines": {
+            "start": 81,
+            "end": 83
+          }
+        }
+      ],
+      "tags": [
+        "staleness",
+        "location-corrected"
+      ],
+      "evidence": "if !outlineViewRow(r, id).HasChildren {\n\t\t\t\treturn\n\t\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "5c377349bd5bc232",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Left/Right key swallowed with no target",
+      "message": "On Left with no parent, target is the empty string and the lookup fails harmlessly. But the Right/Left handler calls SetHandled and consumes the key even when nothing happens, which blocks default focus navigation. Also the disabled-row check ignores the row's Disabled flag.",
+      "suggestion": "Only mark the event handled when an action is taken.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/outline_view.go",
+          "lines": {
+            "start": 191,
+            "end": 191
+          }
+        }
+      ],
+      "tags": [
+        "keyboard",
+        "location-corrected"
+      ],
+      "evidence": "if next := r.control.choice.buttons[target]; next != nil \u0026\u0026 !next.IsDisabled() {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "321b9e29fc20dc7e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible unbounded depth loop",
+      "message": "A cycle in the parent chain loops forever in the depth check before bounds are enforced, but only if virtual.NewTree did not reject it. The depth loop runs after NewTree, so it is probably safe. However, the Apply for expansion uses append(next[:i], next[i+1:]...) on a clone, which is fine.",
+      "suggestion": "No change required unless NewTree allows cycles.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/outline_view.go",
+          "lines": {
+            "start": 24,
+            "end": 25
+          }
+        }
+      ],
+      "tags": [
+        "verify",
+        "location-corrected"
+      ],
+      "evidence": "next := slices.Clone(current)\n\ti := slices.Index(next, e.ItemID)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "7d5b82a29244d15e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Stale eligibility on re-parent",
+      "message": "The eligibility check compares row.Parent to the earlier shown row's Parent, but the keyboard handler passes e.TargetID from the previous view. If an item is disabled between views, current() omits it and the selection is silently dropped, which is acceptable. However, queueOutlineDisclosure in the driver captures the guard before the post and the item row, so a collapsed hidden state could fire a stale event. Low risk but it should be verified.",
+      "suggestion": "Add tests for disabled and re-parented rows.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "ui/outline_view.go",
+          "lines": {
+            "start": 140,
+            "end": 142
+          }
+        }
+      ],
+      "tags": [
+        "stale",
+        "location-corrected"
+      ],
+      "evidence": "if p.ID != id || p.Disabled {\n\t\t\treturn nil\n\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 9241,
+    "totalMs": 9293
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 15,
+    "bytes": 51497,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 27905,
+        "output": 1091,
+        "costUSD": 0.06672
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

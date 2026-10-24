@@ -97,6 +97,7 @@ type Node struct {
 	// CalendarCell is immutable focus metadata emitted by Calendar.View.
 	CalendarCell *CalendarCell
 	DocumentList *DocumentListLayout
+	Outline      *OutlineViewLayout
 	ColumnResize *ColumnResizeHandle
 	// SplitButtonLayout marks the two segments produced by SplitButton.View.
 	// It is a detached presentation hint; callbacks remain ordinary child actions.
