@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "9977657e2eb5efc36eb2833f6544f854",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "dcf683f7393d2e647da32ef667fcee1a4f4403f8",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "c3a0380479f8f662",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Styler reads r.node, which may be stale",
+      "message": "The styler closure captures `r` and reads `r.node.Style.Foreground` at style time. It is unclear that `r.node` is updated to the latest node on every sync. If `r.node` is stale or reassigned, the unselected tab ink will not follow the owner and withdrawn ink may not reset. The styler also never restyles when the selected state changes unless a restyle is triggered.",
+      "suggestion": "Store the current foreground in the tabs control state, updated in syncControl, and have the styler read from it. Also request a restyle when the foreground changes.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/controls.go",
+          "lines": {
+            "start": 670,
+            "end": 670
+          }
+        }
+      ],
+      "tags": [
+        "state",
+        "closure",
+        "location-corrected"
+      ],
+      "evidence": "if !button.StateIs(states.Selected) \u0026\u0026 r.node.Style.Foreground.Set {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3420,
+    "totalMs": 3430
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 12559,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 8338,
+        "output": 326,
+        "costUSD": 0.019936
+      }
+    ],
+    "widenedFiles": 5,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

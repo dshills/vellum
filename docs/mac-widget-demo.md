@@ -14,7 +14,8 @@ go run ./cmd/gallery -mac-widgets -mac-dark
 
 The packaged **Vellum Mac Widgets.app** starts the focused light gallery directly;
 **Vellum Mac Widgets Dark.app** starts the dark version. Choose a page in the
-top tab strip; scroll within Inputs to reach its sections. The ordinary macOS title bar remains draggable.
+top tab strip. Each page fills the available width and uses its fixed light/dark
+window surface; scroll within Inputs to reach its sections. The ordinary macOS title bar remains draggable.
 
 
 - **Sidebar:** choose an icon row to navigate. Section triangles collapse/expand

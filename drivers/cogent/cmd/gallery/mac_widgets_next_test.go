@@ -18,6 +18,17 @@ func TestMacWidgetsNextPagesUsePublicComponents(t *testing.T) {
 				t.Fatal(page, dark, err)
 			}
 			tabs := n.Children[0]
+			if !n.Style.Background.Set || n.Style.Background.Value.A != 255 {
+				t.Fatal("gallery must supply an opaque window surface", dark)
+			}
+			if !tabs.Style.Foreground.Set {
+				t.Fatal("tab strip must supply its appearance ink", dark)
+			}
+			for _, pageNode := range tabs.Children {
+				if !pageNode.Style.GrowX.Set || pageNode.Style.GrowX.Value != 1 || pageNode.Style.Background != n.Style.Background {
+					t.Fatal("page must fill and paint its surface", pageNode.ID, dark)
+				}
+			}
 			found := false
 			for i, o := range tabs.Options {
 				if o.ID == page {

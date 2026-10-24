@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/dshills/vellum/ui"
+	"image/color"
 )
 
 // Separate pages keep these larger controls independently inspectable.
@@ -46,7 +47,19 @@ func (m *macWidgetsGallery) view() ui.Node {
 	navigation := ui.Node{ID: "navigation", Kind: ui.Row, Grow: true, Children: []ui.Node{nav, {ID: "navigation-detail", Kind: ui.Column, Grow: true, Style: ui.Style{Padding: ui.Some(ui.UniformInsets(20))}, Children: []ui.Node{{ID: "navigation-heading", Kind: ui.Label, Text: "Library", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 20, Weight: 600})}}, {ID: "navigation-value", Kind: ui.Label, Text: fmt.Sprintf("Selected: %s", m.sidebar.SelectedID)}, {ID: "navigation-help", Kind: ui.Label, Text: "Choose a location. Collapse a section with its disclosure triangle. Tab moves between lists; arrows choose items."}}}}}
 	options := []ui.Option{{ID: "navigation", Label: "Sidebar"}, {ID: "sheets", Label: "Sheet"}, {ID: "mac-collection-page", Label: "Collection"}, {ID: "shortcuts", Label: "Shortcuts"}, {ID: "levels", Label: "Levels"}, {ID: "inputs", Label: "Inputs"}}
 	children := []ui.Node{navigation, m.sheet.view(), m.collection.view(), m.shortcut.view(), m.level.view(), m.inputs.view()}
-	root := ui.Node{ID: "mac-widgets-root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "mac-widgets-pages", Kind: ui.Tabs, Grow: true, SelectedID: m.page, Options: options, Change: func(e ui.ChangeEvent) { m.page = e.SelectedID }, Children: children}}}
+	background := color.NRGBA{R: 246, G: 246, B: 248, A: 255}
+	if m.dark {
+		background = color.NRGBA{R: 29, G: 29, B: 31, A: 255}
+	}
+	for i := range children {
+		if !children[i].Style.GrowX.Set {
+			children[i].Style.GrowX = ui.Some(float32(1))
+		}
+		if !children[i].Style.Background.Set {
+			children[i].Style.Background = ui.Some(background)
+		}
+	}
+	root := ui.Node{ID: "mac-widgets-root", Kind: ui.Column, Grow: true, Style: ui.Style{Background: ui.Some(background)}, Children: []ui.Node{{ID: "mac-widgets-pages", Kind: ui.Tabs, Grow: true, Style: ui.Style{Foreground: ui.MacTheme(m.dark).Default.Foreground}, SelectedID: m.page, Options: options, Change: func(e ui.ChangeEvent) { m.page = e.SelectedID }, Children: children}}}
 	if m.page == "inputs" {
 		root.Focus = m.inputs.focus
 	}

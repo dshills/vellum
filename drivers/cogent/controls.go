@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/dshills/vellum/drivers/cogent/internal/textinput"
 	"html"
+	"image"
 	"reflect"
 	"strings"
 	"sync/atomic"
@@ -663,6 +664,13 @@ func prepareControl(r *record, n ui.Node) error {
 		if c.pages[o.ID] == nil {
 			page, button := w.NewTab(o.ID)
 			button.SetText(html.EscapeString(o.Label))
+			// Explicit tab-strip ink also applies to its generated unselected labels.
+			// Selected tabs retain the upstream paired selection colors.
+			button.Styler(func(s *styles.Style) {
+				if !button.StateIs(states.Selected) && r.node.Style.Foreground.Set {
+					s.Color = image.NewUniform(r.node.Style.Foreground.Value)
+				}
+			})
 			c.pages[o.ID] = page
 			c.buttons[o.ID] = button
 			c.order = append(c.order, o.ID)

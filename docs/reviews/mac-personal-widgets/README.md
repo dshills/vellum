@@ -861,3 +861,21 @@ all12 changed files. Its nil-guard concern requires an unmounted/incomplete reco
 closed if a required activation guard is absent. This preserves secure refusal
 without a possible nil call. The raw review is retained. Updated private packages
 and final light/dark native observations are recorded in the delivery receipt.
+
+## Five-widget gallery appearance correction
+
+Final native dark inspection reproduced light ink over the upstream white surface
+and a non-growing sheet page. The gallery now supplies opaque fixed-appearance
+window/page surfaces and fills page width, preserving explicit page styles.
+Generated unselected tab labels honor explicit strip ink; selected tabs retain
+the upstream paired selection colors. No new API or system appearance change.
+
+Both Prism suggestions from the first pass were applied: preserve page-provided
+fields and use direct explicit ink rather than repeated full style resolution.
+The final stale-record concern is disproven by `syncRecordVisible`: it assigns
+`r.node = n` before syncing controls and updates on Style changes. Native selection
+changes also update widget state. The mounted race regression verifies explicit
+ink application and withdrawal, with selection colors retained; controlled actual
+keyboard tab navigation and both-theme gallery composition regressions pass.
+The native app is rebuilt from the tested source; live appearance observations
+are recorded in the local delivery receipt.

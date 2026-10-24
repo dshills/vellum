@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "c38a6765518d9000758ef919eff40121",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "dcf683f7393d2e647da32ef667fcee1a4f4403f8",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "2a7edfe4883bf905",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Page background and GrowX overwrite existing child styles",
+      "message": "The loop overwrites Style.Background and Style.GrowX on the child nodes. Nodes returned by sub-galleries may already set a Style. Replacing those fields unconditionally can clobber it. The pages' own backgrounds, such as the sidebar's dark appearance, are lost.",
+      "suggestion": "Only set Background and GrowX when they are not already Set on the child node.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_widgets_next.go",
+          "lines": {
+            "start": 54,
+            "end": 57
+          }
+        }
+      ],
+      "tags": [
+        "style-override"
+      ],
+      "evidence": "children[i].Style.GrowX = ui.Some(float32(1))\n\t\tchildren[i].Style.Background = ui.Some(background)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "78db273785231e62",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Styler resolves full style on every pass and swallows errors",
+      "message": "The Styler closure captures r and reads r.node and r.theme on every style pass. If the record's node is replaced or r.node is stale or unset when styling runs, the tab ink may be wrong. ResolveStyle also runs for every tab on every style pass, which is wasteful. It is called even when no foreground is set, and its error is silently swallowed.",
+      "suggestion": "Check r.node.Style.Foreground.Set first and only then call ResolveStyle. Otherwise use r.node.Style.Foreground.Value directly. Handle or log the error.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/controls.go",
+          "lines": {
+            "start": 670,
+            "end": 671
+          }
+        }
+      ],
+      "tags": [
+        "performance",
+        "closure",
+        "location-corrected"
+      ],
+      "evidence": "style, err := ui.ResolveStyle(r.node, r.theme)\n\t\t\t\tif err == nil \u0026\u0026 !button.StateIs(states.Selected) \u0026\u0026 r.node.Style.Foreground.Set {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5736,
+    "totalMs": 5746
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 12527,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 8318,
+        "output": 668,
+        "costUSD": 0.023316
+      }
+    ],
+    "widenedFiles": 5,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
