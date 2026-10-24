@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/dshills/vellum/drivers/cogent/internal/textinput"
 	"html"
+	"image"
 	"reflect"
 	"strings"
 	"sync/atomic"
@@ -42,6 +43,8 @@ type Semantics struct {
 type fieldChangeEpoch struct{ marker byte }
 
 type controlState struct {
+	toolbarDrag       *toolbarDragBinding
+	shortcut          *shortcutRecorderBinding
 	a                 *app.Application
 	window            string
 	windowRef         app.WindowRef
@@ -50,6 +53,7 @@ type controlState struct {
 	disclosure        *disclosureState
 	split             *splitState
 	choice            *choiceState
+	number            *numberFieldState
 	menu              *menuState
 	dialog            *dialogState
 	wake              func(events.Event)
@@ -142,6 +146,9 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 			}
 		})
 		button.OnClick(func(e events.Event) {
+			if activateShortcutRecorder(r, e) {
+				return
+			}
 			if r.node.PlacementSource != nil && e.HasPos() {
 				e.SetHandled()
 				return
@@ -188,6 +195,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 			}
 			if r.node.Kind == ui.ListBox {
 				styleListBox(s)
+				styleCollectionHost(r, s)
 			}
 		})
 	case ui.Switch:
@@ -200,6 +208,29 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		widget = core.NewMeter(parent).SetType(core.MeterCircle)
 	case ui.ProgressGauge:
 		widget = core.NewMeter(parent).SetType(core.MeterSemicircle)
+	case ui.ToolbarSpace, ui.ToolbarFlexibleSpace:
+		// Native spacing leaves participate in flex allocation without painting a
+		// container surface or introducing another frame layout pass.
+		if r.node.Kind == ui.ToolbarFlexibleSpace {
+			widget = core.NewStretch(parent)
+		} else {
+			widget = core.NewSpace(parent)
+		}
+		widget.AsWidget().Styler(func(s *styles.Style) {
+			s.RenderBox = false
+			s.Padding.Zero()
+			s.Margin.Zero()
+			s.Border.Width.Zero()
+			s.Gap.Zero()
+			s.Min.Set(units.Dp(16), units.Dp(1))
+			s.Max.Set(units.Dp(16), units.Dp(1))
+			s.Grow.Set(0, 0)
+			if r.node.Kind == ui.ToolbarFlexibleSpace {
+				s.Min.X = units.Dp(8)
+				s.Max.X = units.Dp(0)
+				s.Grow.X = 1
+			}
+		})
 	case ui.Separator:
 		widget = core.NewSeparator(parent)
 	case ui.Selector:
@@ -217,6 +248,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		widget = core.NewSlider(parent)
 	case ui.NumberField:
 		spinner := core.NewSpinner(parent)
+		bindNumberField(r, spinner)
 		bindFieldPointerFocus(&spinner.TextField)
 		widget = spinner
 	case ui.TextField:
@@ -266,11 +298,19 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		widget = w
 		c.dialog = &dialogState{host: newAccessibilityDialogHost(w, r)}
 		c.dialog.host.Styler(func(s *styles.Style) { s.Direction = styles.Column; s.Grow.Set(1, 1) })
+		c.dialog.host.FinalStyler(func(s *styles.Style) { stylePopoverHost(r, s); styleSheetHost(r, s) })
 	default:
 		r.control = nil
 		return nil, false, nil
 	}
 	r.widget = widget
+	if button, ok := widget.(*core.Button); ok {
+		installButtonImage(r, button)
+	}
+	if r.node.Kind == ui.Button || r.node.Kind == ui.Canvas2D || r.node.Kind == ui.ListBox || r.node.Kind == ui.Toolbar || ui.IsToolbarSpace(r.node.Kind) || r.node.Kind == ui.Separator {
+		c.menu = &menuState{epoch: &menuEpoch{}}
+		bindContextMenu(r, widget)
+	}
 	if r.node.Kind == ui.ProgressBar || r.node.Kind == ui.ProgressRing || r.node.Kind == ui.ProgressGauge || r.node.Kind == ui.Separator || r.node.Kind == ui.Slider {
 		if r.node.Kind != ui.Slider {
 			widget.AsWidget().Styler(func(s *styles.Style) {
@@ -428,6 +468,12 @@ func syncSemantics(r *record) {
 	}
 	disabled := controlDisabled(r)
 	sem := Semantics{ID: r.node.ID, Role: r.node.Kind, Name: name, Help: r.node.Accessibility.Help, Disabled: disabled, Checked: r.node.Checked, Number: r.node.Number, Text: r.node.Text, SelectedID: r.node.SelectedID}
+	if r.node.Secure {
+		sem.Text = ""
+		if r.node.Accessibility.Name == "" {
+			sem.Name = "Password"
+		}
+	}
 	r.widget.AsTree().SetProperty(SemanticsProperty, sem)
 	r.widget.AsTree().SetProperty(disabledProperty, r.node.Disabled)
 	r.widget.AsWidget().Tooltip = html.EscapeString(r.node.Accessibility.Help)
@@ -447,6 +493,8 @@ func syncControl(r *record, previous ui.Node) error {
 	// reconcile attaches the full topology before syncRecord visits parents then
 	// children; parent semantic properties are current before this snapshot.
 	r.control.disabled = controlDisabled(r)
+	syncShortcutRecorder(r)
+	syncToolbarDrag(r)
 	if err := syncPlacement(r); err != nil {
 		return err
 	}
@@ -466,6 +514,9 @@ func syncControl(r *record, previous ui.Node) error {
 			return syncTree(r)
 		}
 		return syncGrid(r)
+	}
+	if r.control.menu != nil && r.node.Kind != ui.MenuButton {
+		syncMenuButton(r, previous)
 	}
 	nativeValueChanged := false
 	if r.control.choice != nil {
@@ -489,7 +540,7 @@ func syncControl(r *record, previous ui.Node) error {
 	}
 	switch w := r.widget.(type) {
 	case *core.Button:
-		if r.control.menu != nil {
+		if r.node.Kind == ui.MenuButton {
 			syncMenuButton(r, previous)
 		}
 		w.SetText(html.EscapeString(r.node.Text)).SetIcon(nativeSymbol(r.node.Icon)).SetType(nativeButtonAppearance(r.node.Appearance))
@@ -551,17 +602,26 @@ func syncControl(r *record, previous ui.Node) error {
 			w.Type = core.MeterLinear
 		}
 	case *core.Spinner:
+		if err := syncFieldOutline(r, &w.TextField); err != nil {
+			return err
+		}
 		w.Precision = 9 // round-trip every float32 without crossing tight bounds
 		n := r.node.Numeric
 		w.SetMin(n.Min).SetMax(n.Max)
 		w.Step = n.Step
 		w.EnforceStep = false
+		syncNumberField(r, w)
 		if previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || committed {
 			w.SetValue(r.node.Number)
 		}
 	case *textcore.Editor:
 		syncEditor(r)
 	case *core.TextField:
+		if err := syncFieldOutline(r, w); err != nil {
+			return err
+		}
+		w.SetPlaceholder(r.node.Placeholder)
+		w.SetNoEcho(r.node.Secure && !r.node.Reveal)
 		if previous.Text != r.node.Text {
 			r.control.textEpoch++
 		}
@@ -595,7 +655,7 @@ func syncControl(r *record, previous ui.Node) error {
 	}
 	// Value setters preserve identity; a redraw is necessary when externally
 	// controlled values/option labels change, including same-length option edits.
-	if nativeValueChanged || restoring || previous.Image != r.node.Image || previous.Fit != r.node.Fit || previous.Icon != r.node.Icon || previous.Appearance != r.node.Appearance || previous.Orientation != r.node.Orientation || previous.SoftWrap != r.node.SoftWrap || previous.Text != r.node.Text || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
+	if nativeValueChanged || restoring || previous.Image != r.node.Image || previous.Fit != r.node.Fit || previous.Icon != r.node.Icon || previous.IconImage != r.node.IconImage || previous.IconPlacement != r.node.IconPlacement || previous.Appearance != r.node.Appearance || previous.Orientation != r.node.Orientation || previous.SoftWrap != r.node.SoftWrap || previous.Text != r.node.Text || previous.Secure != r.node.Secure || previous.Reveal != r.node.Reveal || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
 		r.widget.AsWidget().Update()
 	}
 	if refused != nil {
@@ -632,6 +692,13 @@ func prepareControl(r *record, n ui.Node) error {
 		if c.pages[o.ID] == nil {
 			page, button := w.NewTab(o.ID)
 			button.SetText(html.EscapeString(o.Label))
+			// Explicit tab-strip ink also applies to its generated unselected labels.
+			// Selected tabs retain the upstream paired selection colors.
+			button.Styler(func(s *styles.Style) {
+				if !button.StateIs(states.Selected) && r.node.Style.Foreground.Set {
+					s.Color = image.NewUniform(r.node.Style.Foreground.Value)
+				}
+			})
 			c.pages[o.ID] = page
 			c.buttons[o.ID] = button
 			c.order = append(c.order, o.ID)
@@ -737,21 +804,76 @@ func selectTabButtons(r *record, selected string) {
 
 func syncDialog(r *record) {
 	d := r.control.dialog
-	if !r.node.Open || controlDisabled(r) || !accessibilityDialogVisible(r) {
+	if !r.node.Open {
 		d.dismissed = false
 		closeDialog(r)
 		return
 	}
-	if d.active || d.dismissed {
+	if controlDisabled(r) || !accessibilityDialogVisible(r) {
+		closeDialog(r)
+		if r.node.PopoverAnchor != "" && !d.dismissed {
+			d.dismissed = true
+			postControl(r, func() {
+				if r.node.Dismiss != nil {
+					r.node.Dismiss()
+				}
+				_ = r.control.a.Invalidate(r.control.window)
+			})
+		}
 		return
 	}
 	scene := r.widget.AsWidget().Scene
 	if scene == nil || scene.RenderWindow() == nil {
 		return
 	}
+	if r.node.PopoverAnchor != "" {
+		anchor := popoverAnchor(r)
+		if anchor == nil {
+			if !d.dismissed {
+				closeDialog(r)
+				d.dismissed = true
+				postControl(r, func() {
+					if r.node.Dismiss != nil {
+						r.node.Dismiss()
+					}
+					_ = r.control.a.Invalidate(r.control.window)
+				})
+			}
+			return
+		}
+		if d.active {
+			positionPopover(r, anchor)
+			return
+		}
+	}
+	if d.active || d.dismissed {
+		if d.active && r.node.Sheet {
+			positionSheet(r)
+		}
+		return
+	}
 	body := prepareDialogBody(r)
 	d.active = true
-	body.NewDialog(r.widget).Run()
+	if r.node.PopoverAnchor != "" {
+		anchor := popoverAnchor(r)
+		if anchor == nil {
+			closeDialog(r)
+			return
+		}
+		stage := body.NewDialog(anchor).SetScrim(false).SetDisplayTitle(false).SetResizable(false).SetUseMinSize(false).SetTitle("")
+		preparePopoverSurface(r, body)
+		stage.Run()
+		finishPopoverSurface(body)
+		positionPopover(r, anchor)
+	} else if r.node.Sheet {
+		stage := body.NewDialog(r.widget).SetDisplayTitle(false).SetResizable(false).SetScrim(true).SetUseMinSize(false).SetTitle("")
+		prepareSheetSurface(r, body)
+		stage.Run()
+		finishPopoverSurface(body)
+		positionSheet(r)
+	} else {
+		body.NewDialog(r.widget).Run()
+	}
 }
 
 // prepareDialogBody keeps one stable child host across native modal scenes.
@@ -761,7 +883,20 @@ func prepareDialogBody(r *record) *core.Body {
 	d.tabScope.Store(scope)
 	d.body = core.NewBody(r.node.Text)
 	body := d.body
+	if r.node.PopoverAnchor != "" {
+		previous := body.Scene.EventBoundary
+		body.Scene.EventBoundary = func(e events.Event) {
+			if previous != nil {
+				previous(e)
+			}
+			if e.Type() == events.MouseUp && e.HasPos() && !e.WindowPos().In(body.Scene.SceneGeom.Bounds()) {
+				e.SetHandled() // same native event must not activate an underlying control
+				body.Close()
+			}
+		}
+	}
 	bindAccessibilityDialogKeyboard(r, body)
+	bindSheetDefault(r, body)
 	body.Scene.OnFirst(events.Custom, func(e events.Event) {
 		if r.control.wake != nil {
 			r.control.wake(e)
@@ -779,6 +914,12 @@ func prepareDialogBody(r *record) *core.Body {
 		d.host.SetScene(r.widget.AsWidget().Scene)
 		d.active = false
 		d.body = nil
+		restoreSheetFocus(r)
+		if r.node.PopoverAnchor != "" {
+			if anchor := popoverAnchor(r); anchor != nil {
+				anchor.AsWidget().SetFocus()
+			}
+		}
 		if d.closing {
 			return
 		}
@@ -790,7 +931,9 @@ func prepareDialogBody(r *record) *core.Body {
 			r.control.a.Invalidate(r.control.window)
 		})
 	})
-	body.AddBottomBar(func(bar *core.Frame) { body.AddCancel(bar).SetText("Close") })
+	if r.node.PopoverAnchor == "" && !r.node.Sheet {
+		body.AddBottomBar(func(bar *core.Frame) { body.AddCancel(bar).SetText("Close") })
+	}
 	return body
 }
 
@@ -808,6 +951,11 @@ func closeDialog(r *record) {
 	d.body = nil
 	d.active = false
 	d.closing = false
+	if r.node.PopoverAnchor != "" {
+		if anchor := popoverAnchor(r); anchor != nil {
+			anchor.AsWidget().SetFocus()
+		}
+	}
 }
 func flushDialogs(r *record) {
 	if r == nil {
@@ -852,6 +1000,12 @@ func disposeControl(r *record) {
 	}
 	if r.control != nil {
 		disposePlacement(r)
+		disposeShortcutRecorder(r)
+		disposeToolbarDrag(r)
+		disposeButtonImage(r)
+		r.widget.AsWidget().DeleteProperty(toolbarOverflowOwnerProperty)
+		r.widget.AsWidget().DeleteProperty(toolbarContextOwnerProperty)
+		r.widget.AsWidget().DeleteProperty(toolbarOverflowHiddenProperty)
 		r.control.retired = true
 		if r.control.tabs != nil {
 			r.control.tabs.pending.Store(nil)
@@ -940,4 +1094,23 @@ func focusWidget(r *record) (core.Widget, error) {
 		return first, nil
 	}
 	return nil, fmt.Errorf("cogent: focus target %q has no enabled tab", r.node.ID)
+}
+
+// syncFieldOutline keeps a caller's full border consistent with the backend's
+// layout/focus border. Filled fields reserve only a bottom focus border; using
+// that allocation with an all-sided custom border clips the resting outline.
+func syncFieldOutline(r *record, field *core.TextField) error {
+	style, err := ui.ResolveStyle(r.node, r.theme)
+	if err != nil {
+		return err
+	}
+	wanted := core.TextFieldFilled
+	if style.Border.Set && style.Border.Value.Width > 0 {
+		wanted = core.TextFieldOutlined
+	}
+	if field.Type != wanted {
+		field.Type = wanted
+		field.Update()
+	}
+	return nil
 }

@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "aafc73c3f84aa7c2eacef778dd6406fb",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "48eae42f40bcb384062b496515820e4d6a8bc3ec",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "083132e3bde68552",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Secure-field key sequence may produce zero or two edits",
+      "message": "For the secure case, sending 'x' and then Enter relies on the field changing text on a key chord and on Enter committing exactly once. The test asserts calls == 1, so if the 'x' chord also triggers Change (per-keystroke) and Enter triggers it again, calls would be 2. Conversely, if KeyChord with a Rune does not insert text, the edit count could be 0. The assertion is fragile and may not exercise the intended path.",
+      "suggestion": "Send text through the proper text-input event type, and assert on p.Text as well as the call count so the expected edit is checked explicitly.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/mac_personal_disabled_offscreen_test.go",
+          "lines": {
+            "start": 88,
+            "end": 89
+          }
+        }
+      ],
+      "tags": [
+        "test-fragility",
+        "location-corrected"
+      ],
+      "evidence": "send(key.CodeX, 'x')\n\t\t\t\tsend(key.CodeReturnEnter, 0)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5389,
+    "totalMs": 5395
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 2,
+    "bytes": 6208,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5130,
+        "output": 370,
+        "costUSD": 0.01396
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

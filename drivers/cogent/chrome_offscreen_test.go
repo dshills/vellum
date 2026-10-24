@@ -322,3 +322,83 @@ func TestChromeManualAllDisabledToolsDoNotNavigateToDisabledSibling(t *testing.T
 		})
 	}
 }
+
+func TestChromeManualOversizedVerticalFocusVisible(t *testing.T) {
+	calls := 0
+	view := func() ui.Node {
+		return ui.Node{ID: "root", Kind: ui.Column, Focus: ui.FocusRequest{ID: "small", Sequence: 1}, Children: []ui.Node{
+			{ID: "tools", Kind: ui.Toolbar, Orientation: ui.Vertical, Style: ui.Style{MaxSize: ui.Some(ui.Size{Height: 100})}, Children: []ui.Node{
+				{ID: "small", Kind: ui.Button, Text: "First", Activate: func() {}},
+				{ID: "middle1", Kind: ui.Button, Text: "Second", Activate: func() {}},
+				{ID: "middle2", Kind: ui.Button, Text: "Third", Activate: func() {}},
+				{ID: "tall", Kind: ui.Button, Text: "Large action", Style: ui.Style{MinSize: ui.Some(ui.Size{Height: 180})}, Activate: func() { calls++ }},
+			}},
+		}}
+	}
+	m, _ := simpleManual(t, manualConfig(t, 959), view)
+	unitSettle(t, m)
+	w, _ := imageManualElement(t, m, "small")
+	send := func(code key.Codes) {
+		t.Helper()
+		if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: events.KeyChord, Code: code}); err != nil {
+			t.Fatal(err)
+		}
+		unitSettle(t, m)
+	}
+	send(key.CodeEnd)
+	_, large := imageManualElement(t, m, "tall")
+	host := findRecord(m.implementation.find("one").state.root, "tools").control.chrome.host
+	r := findRecord(m.implementation.find("one").state.root, "tall").widget.AsWidget()
+	raw := math32.RectFromPosSizeMax(r.Geom.Pos.Total, r.Geom.Size.Actual.Total)
+	if !large.Focused || large.Bounds.Empty() || raw.Dy() <= host.Geom.ContentBBox.Dy() || raw.Min.Y < host.Geom.ContentBBox.Min.Y || raw.Min.Y >= host.Geom.ContentBBox.Max.Y {
+		t.Fatal("oversized vertical target invisible", large, raw, host.Geom.ContentBBox)
+	}
+	send(key.CodeReturnEnter)
+	if calls != 1 {
+		t.Fatal("focused oversized action did not run exactly once", calls)
+	}
+	send(key.CodeHome)
+	_, small := imageManualElement(t, m, "small")
+	if !small.Focused || small.Bounds.Empty() {
+		t.Fatal("Home lost ordinary target", small)
+	}
+}
+
+// macOS desktop input always reports NumLock; lock flags must not bypass the
+// managed toolbar's disabled-target filtering in favor of generic Frame keys.
+func TestChromeToolbarLockModifiersKeepEnabledNavigation(t *testing.T) {
+	for _, orientation := range []ui.Orientation{ui.Horizontal, ui.Vertical} {
+		for _, mods := range []key.Modifiers{1 << key.NumLock, 1 << key.CapsLock, (1 << key.NumLock) | (1 << key.CapsLock)} {
+			t.Run(fmt.Sprintf("%s-%d", orientation, mods), func(t *testing.T) {
+				m, _ := simpleManual(t, manualConfig(t, 7), func() ui.Node {
+					return ui.Node{ID: "tools", Kind: ui.Toolbar, Orientation: orientation, Focus: ui.FocusRequest{ID: "first", Sequence: 1}, Children: []ui.Node{{ID: "first", Kind: ui.Button, Text: "First"}, {ID: "skip", Kind: ui.Button, Text: "Disabled", Disabled: true}, {ID: "last", Kind: ui.Button, Text: "Last"}, {ID: "skip-end", Kind: ui.Button, Text: "Disabled end", Disabled: true}}}
+				})
+				unitSettle(t, m)
+				w := m.implementation.find("one")
+				send := func(code key.Codes, want string) {
+					t.Helper()
+					if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.incarnation, Type: events.KeyChord, Code: code, Modifiers: mods}); err != nil {
+						t.Fatal(err)
+					}
+					unitSettle(t, m)
+					snap, err := m.Snapshot(testContext)
+					if err != nil {
+						t.Fatal(err)
+					}
+					if got := snap.Windows[0].FocusedID; got != want {
+						t.Fatalf("key %v focus %s want %s", code, got, want)
+					}
+				}
+				next, prev := key.CodeRightArrow, key.CodeLeftArrow
+				if orientation == ui.Vertical {
+					next, prev = key.CodeDownArrow, key.CodeUpArrow
+				}
+				send(next, "last")
+				send(next, "first")
+				send(prev, "last")
+				send(key.CodeHome, "first")
+				send(key.CodeEnd, "last")
+			})
+		}
+	}
+}

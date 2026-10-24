@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "aad380276767c66300147348733196cf",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "48eae42f40bcb384062b496515820e4d6a8bc3ec",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "c4deb258e7148b59",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Secure assertion computed from pre-edit state and weakly checked",
+      "message": "For secure kind, the final check compares secureValue() with expectedSecure, but calls is asserted to be 1 only in the else-if branch. The test never verifies that the secure edit actually fires exactly once, since calls is only checked inside the non-color else-if (which does run for secure). However, expectedSecure is computed before Return from the pre-edit text, which may be flaky if selection offsets are UTF-16 in the editing state, and the test would pass vacuously if secureValue is nil for other kinds.",
+      "suggestion": "Assert the secure state explicitly within the secure case after Return, and guard the selection computation against an empty or unexpected EditingState.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/mac_personal_disabled_offscreen_test.go",
+          "lines": {
+            "start": 125,
+            "end": 125
+          }
+        }
+      ],
+      "tags": [
+        "testing",
+        "location-corrected"
+      ],
+      "evidence": "if secureValue != nil \u0026\u0026 secureValue() != expectedSecure {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4198,
+    "totalMs": 4205
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 2,
+    "bytes": 6898,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5412,
+        "output": 371,
+        "costUSD": 0.014534
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

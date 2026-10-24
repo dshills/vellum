@@ -16,7 +16,7 @@ func isWindowWake(e events.Event) bool {
 // unrelated Custom events retain the usual target and modality rules.
 func bindWindowOriginCustom(w *nativeWindow, session *DesktopSession, custom func(*nativeWindow, events.Event)) {
 	w.body.Scene.SetOriginCustomHandler(func(e events.Event) bool {
-		if handleWindowVisibility(w, e) {
+		if handleWindowActivation(w, e) || handleWindowVisibility(w, e) {
 			return true
 		}
 		if !isWindowWake(e) && !session.owns(w, e) {

@@ -36,6 +36,10 @@ func nativeSymbol(symbol ui.Symbol) icons.Icon {
 		return icons.Save
 	case ui.SymbolOpen:
 		return icons.Open
+	case ui.SymbolFolder:
+		return icons.Folder
+	case ui.SymbolDocument:
+		return icons.Description
 	case ui.SymbolUndo:
 		return icons.Undo
 	case ui.SymbolRedo:
@@ -60,6 +64,8 @@ func nativeSymbol(symbol ui.Symbol) icons.Icon {
 		return icons.KeyboardArrowUp
 	case ui.SymbolDown:
 		return icons.KeyboardArrowDown
+	case ui.SymbolGrip:
+		return icons.DragIndicator
 	case ui.SymbolMenu:
 		return icons.Menu
 	case ui.SymbolExpand:

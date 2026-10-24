@@ -10,6 +10,7 @@ import (
 	"image"
 	"image/color"
 	"os"
+	"path/filepath"
 	"time"
 
 	"cogentcore.org/core/core"
@@ -23,6 +24,7 @@ import (
 )
 
 type gallery struct {
+	inputHelpers                                                                               *inputHelpersGallery
 	notes                                                                                      *editor.Model
 	textRequests, editRequests, dialogOpens, dialogDismisses, dialogApplies                    int
 	textReject, textDisabled, notesDisabled                                                    bool
@@ -105,6 +107,7 @@ func newGallery() *gallery {
 		}
 	}
 
+	g.inputHelpers = newInputHelpersGallery()
 	g.listSelection = "layer-00"
 	return g
 }
@@ -193,7 +196,7 @@ func (g *gallery) view() ui.Node {
 
 	return ui.Node{ID: "gallery", Kind: ui.Column, Grow: true, Focus: g.focus, Style: ui.Style{Padding: ui.Some(ui.UniformInsets(16)), Gap: ui.Some(float32(12))}, Children: []ui.Node{
 		{ID: "title", Kind: ui.Label, Text: "Vellum controls gallery", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 24, Weight: 600})}},
-		{ID: "pages", Kind: ui.Tabs, Grow: true, SelectedID: g.tab, Options: []ui.Option{{ID: "controls", Label: "Controls"}, {ID: "split-demo", Label: "Split panes"}, {ID: "symbols", Label: "Icons and actions"}, {ID: "images", Label: "Images"}, {ID: "colors", Label: "Colors"}, {ID: "documents", Label: "Document tabs"}, {ID: "lists", Label: "Lists"}, {ID: "chrome", Label: "Chrome"}, {ID: "text-page", Label: "Text and dialogs"}, {ID: "about", Label: "About"}}, Change: func(e ui.ChangeEvent) { g.tab = e.SelectedID }, Children: []ui.Node{controls, splitDemo, symbols, images, colorsPage, g.documentsView(), g.listBoxView(), g.chromeView(), g.textPage(), {ID: "about", Kind: ui.Column, Children: []ui.Node{{ID: "about-text", Kind: ui.Label, Text: "Ordinary Go nodes, retained native controls, local theme values."}}}}},
+		{ID: "pages", Kind: ui.Tabs, Grow: true, SelectedID: g.tab, Options: []ui.Option{{ID: "controls", Label: "Controls"}, {ID: "split-demo", Label: "Split panes"}, {ID: "symbols", Label: "Icons and actions"}, {ID: "images", Label: "Images"}, {ID: "colors", Label: "Colors"}, {ID: "documents", Label: "Document tabs"}, {ID: "lists", Label: "Lists"}, {ID: "chrome", Label: "Chrome"}, {ID: "text-page", Label: "Text and dialogs"}, {ID: "inputs", Label: "Input helpers"}, {ID: "about", Label: "About"}}, Change: func(e ui.ChangeEvent) { g.tab = e.SelectedID }, Children: []ui.Node{controls, splitDemo, symbols, images, colorsPage, g.documentsView(), g.listBoxView(), g.chromeView(), g.textPage(), g.inputHelpers.view(), {ID: "about", Kind: ui.Column, Children: []ui.Node{{ID: "about-text", Kind: ui.Label, Text: "Ordinary Go nodes, retained native controls, local theme values."}}}}},
 		g.preferencesDialog(),
 	}}
 }
@@ -210,7 +213,20 @@ func main() {
 	structure := flag.Bool("structure-native-check", false, "run bounded tabs/disclosure/split/scroll native FIFO acceptance")
 	media := flag.Bool("media-native-check", false, "run bounded image/chrome/composite native FIFO acceptance")
 	textModal := flag.Bool("text-native-check", false, "run bounded text/editor/dialog native FIFO acceptance")
+	widgetDefault, darkDefault := macWidgetExecutableDefaults(os.Args[0])
+	macWidgets := flag.Bool("mac-widgets", widgetDefault, "open the focused Mac input widget gallery")
+	macDark := flag.Bool("mac-dark", darkDefault, "use the dark Mac appearance with mac-widgets")
+	nativeTitlebar := flag.Bool("native-titlebar", widgetDefault, "attach the single-window native AppKit toolbar prototype (mac-widgets only)")
 	flag.Parse()
+	if *nativeTitlebar && !*macWidgets {
+		must(errors.New("native-titlebar requires mac-widgets"))
+	}
+	if *macDark && !*macWidgets {
+		must(errors.New("mac-dark requires mac-widgets"))
+	}
+	if *macWidgets && (*textModal || *media || *structure || *navigation || *choices || *catalogue || *smoke || *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke) {
+		must(errors.New("mac-widgets runs separately from native acceptance fixtures"))
+	}
 	if *textModal && (*media || *structure || *navigation || *choices || *catalogue || *smoke || *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *exit > 0) {
 		must(errors.New("text-native-check requires its own bounded process"))
 	}
@@ -257,6 +273,13 @@ func main() {
 		g.tab = "colors"
 	}
 	view := g.view
+	var macGallery *macWidgetsGallery
+	if *macWidgets {
+		g.inputHelpers.setAppearance(*macDark)
+		macGallery = newMacWidgetsGallery(g.inputHelpers, *macDark)
+		macGallery.toolbars.enablePreferences()
+		view = macGallery.view
+	}
 	if *catalogue {
 		view = g.controlCatalogueView
 	}
@@ -282,7 +305,29 @@ func main() {
 	if *textModal || *media || *choices || *navigation || *structure {
 		width, height = 900, 700
 	}
-	must(a.Open(app.Window{ID: "gallery", Title: "Vellum Controls", Width: width, Height: height, View: view}))
+	window := app.Window{ID: "gallery", Title: "Vellum Controls", Width: width, Height: height, View: view}
+	if *macWidgets {
+		window.Title = "Vellum Mac Widgets"
+		window.Width = 660
+		window.Height = 740
+		// Keep native title-bar appearance and dragging under the OS default policy.
+		window.Chrome = app.WindowChrome{}
+	}
+	if *nativeTitlebar {
+		window.Chrome.Appearance = app.AppearanceLight
+		if *macDark {
+			window.Chrome.Appearance = app.AppearanceDark
+		}
+		macGallery.page = "toolbars"
+	}
+	must(a.Open(window))
+	var titlebar *cogent.TitlebarToolbarPrototype
+	if *nativeTitlebar {
+		ref, refErr := a.WindowRef(window.ID)
+		must(refErr)
+		titlebar, err = macGallery.titlebarPrototype(ref)
+		must(err)
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	var progressDone chan error
@@ -334,6 +379,9 @@ func main() {
 		time.AfterFunc(2200*time.Millisecond, func() { _ = a.Post(func() { g.dialog = false; a.Invalidate("gallery") }) })
 	}
 	theme := ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Size: 16}), Foreground: ui.Some(color.NRGBA{R: 32, G: 36, B: 42, A: 255})}, Kinds: map[ui.Kind]ui.Style{ui.Column: {Gap: ui.Some(float32(8))}}}
+	if *macWidgets {
+		theme = ui.MacTheme(*macDark)
+	}
 	if *textModal {
 		must(runTextCatalogue(ctx, a, g, theme))
 		return
@@ -358,7 +406,7 @@ func main() {
 		must(runControlCatalogue(ctx, a, g, theme))
 		return
 	}
-	err = a.Run(ctx, cogent.Driver{Theme: theme})
+	err = a.Run(ctx, cogent.Driver{Theme: theme, TitlebarToolbarPrototype: titlebar})
 	if progressDone != nil {
 		cancel()
 		var checkErr error
@@ -417,5 +465,18 @@ func must(err error) {
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
+	}
+}
+
+// A development .app can use the real Go executable directly, without a shell
+// launcher. Ordinary gallery binaries still start in the full gallery mode.
+func macWidgetExecutableDefaults(executable string) (bool, bool) {
+	switch filepath.Base(executable) {
+	case "Vellum Mac Widgets":
+		return true, false
+	case "Vellum Mac Widgets Dark":
+		return true, true
+	default:
+		return false, false
 	}
 }

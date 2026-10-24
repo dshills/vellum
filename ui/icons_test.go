@@ -1,13 +1,14 @@
 package ui
 
 import (
+	"github.com/dshills/vellum/canvas"
 	"reflect"
 	"testing"
 )
 
 func TestIconsPortableContract(t *testing.T) {
 	list := Symbols()
-	if len(list) != 34 {
+	if len(list) != 37 {
 		t.Fatal("public symbol catalog", list)
 	}
 	for _, symbol := range list {
@@ -49,6 +50,61 @@ func TestIconsPortableContract(t *testing.T) {
 	} {
 		if err := Validate(n); err == nil {
 			t.Fatal("invalid symbol/presentation accepted", n)
+		}
+	}
+}
+
+func TestFullColorButtonIconContract(t *testing.T) {
+	source := imageSource(t)
+	for _, kind := range []Kind{Button, MenuButton} {
+		n := Node{ID: "color-action", Kind: kind, IconImage: source, Accessibility: Accessibility{Name: "Open"}}
+		if kind == MenuButton {
+			n.Options = []Option{{ID: "open", Label: "Open"}}
+			n.Change = func(ChangeEvent) {}
+		}
+		if err := Validate(n); err != nil {
+			t.Fatal(err)
+		}
+		if got := FocusOrder(n); len(got) != 1 || got[0] != n.ID {
+			t.Fatal("artwork added focus", got)
+		}
+	}
+	for _, n := range []Node{
+		{ID: "bad", Kind: Button, IconImage: source},
+		{ID: "bad", Kind: Button, Text: "Open", IconImage: source, Icon: SymbolOpen},
+		{ID: "bad", Kind: Label, Text: "Open", IconImage: source},
+		{ID: "bad", Kind: ToggleButton, Text: "Open", IconImage: source},
+		{ID: "bad", Kind: Button, Text: "Open", IconImage: &canvas.TiledImage{}},
+	} {
+		if err := Validate(n); err == nil {
+			t.Fatal("invalid full-color icon accepted", n.Kind)
+		}
+	}
+}
+
+func TestButtonIconPlacementPortableContract(t *testing.T) {
+	source := imageSource(t)
+	for _, n := range []Node{
+		{ID: "inline", Kind: Button, Icon: SymbolOpen, IconPlacement: IconLeading},
+		{ID: "stacked", Kind: Button, Text: "Open", Icon: SymbolOpen, IconPlacement: IconAboveText},
+		{ID: "color", Kind: Button, Text: "Open", IconImage: source, IconPlacement: IconAboveText},
+	} {
+		if n.Text == "" {
+			n.Accessibility.Name = "Open"
+		}
+		if err := Validate(n); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, n := range []Node{
+		{ID: "bad", Kind: Button, Text: "Open", Icon: SymbolOpen, IconPlacement: "unknown"},
+		{ID: "bad", Kind: Button, Text: "Open", IconPlacement: IconAboveText},
+		{ID: "bad", Kind: Button, Icon: SymbolOpen, Accessibility: Accessibility{Name: "Open"}, IconPlacement: IconAboveText},
+		{ID: "bad", Kind: Label, Text: "Open", IconPlacement: IconLeading},
+		{ID: "bad", Kind: MenuButton, Text: "Open", Icon: SymbolOpen, IconPlacement: IconAboveText, Options: []Option{{ID: "open", Label: "Open"}}},
+	} {
+		if err := Validate(n); err == nil {
+			t.Fatal("invalid placement accepted", n.Kind, n.IconPlacement)
 		}
 	}
 }

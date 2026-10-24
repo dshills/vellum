@@ -7,7 +7,9 @@ import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
+	"cogentcore.org/core/math32"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/styles/abilities"
 	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/tree"
@@ -21,7 +23,20 @@ type chromeState struct {
 }
 
 func mountChrome(parent tree.Node, r *record) core.Widget {
-	outer := core.NewFrame(parent)
+	var outer *core.Frame
+	var widget core.Widget
+	if r.node.Kind == ui.Toolbar {
+		custom := tree.New[overflowToolbarFrame](parent)
+		custom.owner = r
+		outer = &custom.Frame
+		widget = custom
+	} else {
+		outer = core.NewFrame(parent)
+		widget = outer
+	}
+	if r.node.Kind == ui.Toolbar {
+		outer.SetProperty(toolbarContextOwnerProperty, r)
+	}
 	c := &chromeState{host: outer}
 	r.control.chrome = c
 	outer.Styler(func(s *styles.Style) {
@@ -32,9 +47,17 @@ func mountChrome(parent tree.Node, r *record) core.Widget {
 		s.Align.Items = styles.Center
 		s.Background = colors.Scheme.SurfaceContainer
 		if r.node.Kind == ui.Toolbar {
+			// Empty/gap hits need a press target for native right/Control-click
+			// to generate ContextMenu; this adds no action or focus stop.
+			s.SetAbilities(r.node.ContextMenu != nil, abilities.Clickable)
+			s.StateLayer = 0
 			if r.node.Orientation == ui.Vertical {
 				s.Direction = styles.Column
 				s.Grow.Set(0, 1)
+			}
+			if r.node.ToolbarOverflow {
+				s.Overflow.Set(styles.OverflowHidden)
+				return
 			}
 			// Scroll keeps the same native controls and their private editing state.
 			s.Overflow.Set(styles.OverflowAuto, styles.OverflowVisible)
@@ -82,10 +105,13 @@ func mountChrome(parent tree.Node, r *record) core.Widget {
 			}
 		})
 	}
-	return outer
+	return widget
 }
 func syncChrome(r *record, previous ui.Node) {
 	c := r.control.chrome
+	if previous.ToolbarOverflow != r.node.ToolbarOverflow {
+		r.widget.AsWidget().Update()
+	}
 	if c.caption != nil {
 		// DisplayNone marks Invisible during Style; explicitly restore both ways
 		// before Update so the native walker can reach a returning caption.
@@ -97,7 +123,9 @@ func syncChrome(r *record, previous ui.Node) {
 	}
 }
 func toolbarKey(r *record, e events.Event) {
-	if e.IsHandled() || e.Modifiers() != 0 || r.control.retired {
+	// macOS desktop input always includes NumLock; lock flags are not chords.
+	modifiers := e.Modifiers() & ^((1 << key.CapsLock) | (1 << key.NumLock))
+	if e.IsHandled() || modifiers != 0 || r.control.retired {
 		return
 	}
 	step, boundary := 0, 0
@@ -135,7 +163,7 @@ func toolbarKey(r *record, e events.Event) {
 		e.SetHandled()
 		return
 	}
-	order := ui.FocusOrder(ui.FocusScope(r.node))
+	order := ui.FocusOrder(ui.FocusScope(accessibilityFocusDescriptor(r)))
 	if len(order) == 0 {
 		e.SetHandled()
 		return
@@ -164,6 +192,30 @@ func toolbarKey(r *record, e events.Event) {
 		next.widget.AsWidget().SetFocus()
 		e.SetHandled()
 	}
+}
+
+// The native ScrollToThis path intentionally refuses an item larger than its
+// viewport when it lies to the right/bottom. Keep oversized toolbar actions
+// reachable by showing their leading edge, matching native scroll priority.
+// This runs on the native owner after the widget's normal Focus handler;
+// the event manager may subsequently apply its ordinary scroll margin.
+func revealOversizedToolbarTarget(r *record, target *core.Frame) {
+	if r == nil || r.control == nil || r.control.retired || r.control.disabled || r.control.chrome == nil || !target.StateIs(states.Focused) {
+		return
+	}
+	host := r.control.chrome.host
+	axis := math32.X
+	if r.node.Orientation == ui.Vertical {
+		axis = math32.Y
+	}
+	if host.Geom.ContentBBox.Empty() || !host.HasScroll[axis] {
+		return
+	}
+	raw := math32.RectFromPosSizeMax(target.Geom.Pos.Total, target.Geom.Size.Actual.Total)
+	if math32.PointDim(raw.Size(), axis) <= math32.PointDim(host.Geom.ContentBBox.Size(), axis) {
+		return
+	}
+	host.ScrollDimToStart(axis, math32.PointDim(raw.Min, axis))
 }
 
 const toolbarScopeProperty = "vellum.toolbar-scope"
@@ -240,6 +292,16 @@ func bindToolbarNavigation(root *record) {
 			if owner.node.Kind == ui.Toolbar {
 				scope = owner
 			}
+			if scope != nil && scope.node.ToolbarOverflow && owner.node.Kind == ui.MenuButton && owner.node.ID == ui.ToolbarOverflowID(scope.node.ID) {
+				node.AsTree().SetProperty(toolbarOverflowOwnerProperty, scope)
+			}
+			if scope == nil || !scope.node.ToolbarOverflow {
+				if hidden, _ := node.AsTree().Property(toolbarOverflowHiddenProperty).(bool); hidden {
+					node.(core.Widget).AsWidget().SetState(false, states.Invisible)
+				}
+				node.AsTree().DeleteProperty(toolbarOverflowHiddenProperty)
+				node.AsTree().DeleteProperty(toolbarOverflowOwnerProperty)
+			}
 			if owner.node.Kind == ui.Dialog {
 				scope = nil
 			} // a modal is a separate input scope
@@ -252,6 +314,10 @@ func bindToolbarNavigation(root *record) {
 				installed, _ := frame.Property(toolbarHookProperty).(bool)
 				if !installed {
 					frame.SetProperty(toolbarHookProperty, true)
+					frame.OnFinal(events.Focus, func(events.Event) {
+						current, _ := frame.Property(toolbarScopeProperty).(*record)
+						revealOversizedToolbarTarget(current, frame)
+					})
 					frame.OnFinal(events.KeyChord, func(e events.Event) {
 						current, _ := frame.Property(toolbarScopeProperty).(*record)
 						if current != nil {

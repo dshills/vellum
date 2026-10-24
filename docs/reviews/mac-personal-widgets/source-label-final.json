@@ -1,0 +1,120 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a1162327822b6f25559782a56372c9ea",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "ae7085042b2bd6d8c884fa78811e1e10ab743954",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a6ba2610bf8c6a43",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Styler may not restore RenderBox when leaving multi-select mode",
+      "message": "The OnChildAdded hook adds a new Styler to the label every time a child Text is added. If the button recreates its text child (e.g. on config or icon change), stylers accumulate on each new label. Also, the Styler only sets RenderBox=false and never restores true when the mode changes. This relies on the base styler resetting it on each restyle, which is fragile.",
+      "suggestion": "Set s.RenderBox explicitly in both branches, or guard the hook so it applies only to the 'text' child. Verify the base styler resets the value on mode change.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/choices.go",
+          "lines": {
+            "start": 139,
+            "end": 139
+          }
+        }
+      ],
+      "tags": [
+        "cogent",
+        "styling",
+        "location-corrected"
+      ],
+      "evidence": "label.Styler(func(s *styles.Style) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5157,
+    "totalMs": 5165
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 11358,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 7787,
+        "output": 577,
+        "costUSD": 0.021344
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "17eb85c63215921e",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Unchecked type assertion in test can panic",
+        "message": "The unchecked type assertion on the ChildByName result panics with a nil interface if the child is missing, instead of failing the test cleanly. This occurs in two places in the mode-change test.",
+        "suggestion": "Use a checked assertion (label, ok := ...(*core.Text)) and call t.Fatal when !ok.",
+        "confidence": 0.55,
+        "locations": [
+          {
+            "path": "drivers/cogent/source_list_appearance_offscreen_test.go",
+            "lines": {
+              "start": 143,
+              "end": 112
+            }
+          }
+        ],
+        "tags": [
+          "test",
+          "panic"
+        ],
+        "evidence": "!row.ChildByName(\"text\", 0).(*core.Text).Styles.RenderBox {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/source_list_appearance_offscreen_test.go"
+    }
+  ],
+  "suppressed": []
+}

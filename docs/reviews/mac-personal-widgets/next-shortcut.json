@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "261bebedb953a62ff5aeb142f2288ef1",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "66a3eb3c84e359c77dbe8d40e366294a6eecc0d6",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "94970b98204edd1a",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Stale validation error persists after cancel",
+      "message": "Non-recording clear path and Change do not reset the stale error when a later Begin occurs; additionally, the Reset button cancels sessions but the error text is only cleared on success. Minor, but Invalid feedback persists after Cancel/Escape until a successful change.",
+      "suggestion": "Clear the feedback string when a new recording begins or is cancelled.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_shortcut.go",
+          "lines": {
+            "start": 21,
+            "end": 10
+          }
+        }
+      ],
+      "tags": [
+        "ui"
+      ],
+      "evidence": "m.duplicate.Change = func(e ui.ShortcutEvent) { m.duplicate.Value = e.Value; m.duplicateError = \"\" }",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3926,
+    "totalMs": 3970
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 13,
+    "bytes": 65148,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 34059,
+        "output": 295,
+        "costUSD": 0.071068
+      }
+    ],
+    "widenedFiles": 5,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

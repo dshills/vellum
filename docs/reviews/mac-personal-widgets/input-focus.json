@@ -1,0 +1,116 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "92c9b2356325ecb4d01088deb91619f7",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "c3b23a4ae65154ddb5d04ad4f22a9ac53edc1003",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "092bbedd19d2b3e4",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Tree property mutated and read across goroutines in styler",
+      "message": "The FinalStyler writes a widget property while styling, so it is a side effect during style computation. inputOutlineParent reads it from the parent's property map in focus callbacks, which can run on another goroutine and race with the write. The property is also only updated when the row restyles, so it can be stale.",
+      "suggestion": "Compute the shared flag when the record is synced on the owner and keep it in record or control state, rather than as a tree property written in a styler.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/input_focus_style.go",
+          "lines": {
+            "start": 58,
+            "end": 58
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "state",
+        "location-corrected"
+      ],
+      "evidence": "r.widget.AsTree().SetProperty(inputOutlineProperty, shared)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "8bd9976fb377e236",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Focus handler dereferences r.control off-owner without nil check",
+      "message": "The focus handler reads r.control from the native scene loop and dereferences it without a nil check. Focus events can arrive after the record has been retired or r.control cleared, and also off the owner goroutine, so this is a racy read and a possible nil-pointer panic.",
+      "suggestion": "Capture c := r.control once in bindInputFocusStyle, on the owner and before registering the handlers. Add a nil check, and check c.retired inside the posted closure.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/input_focus_style.go",
+          "lines": {
+            "start": 108,
+            "end": 119
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "nil"
+      ],
+      "evidence": "c := r.control\n\t\t\tif !c.inputFocusStylePending.CompareAndSwap(false, true) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6182,
+    "totalMs": 6204
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 26374,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 14595,
+        "output": 597,
+        "costUSD": 0.03516
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

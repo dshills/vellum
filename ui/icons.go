@@ -17,6 +17,8 @@ const (
 	SymbolSettings     Symbol = "settings"
 	SymbolSave         Symbol = "save"
 	SymbolOpen         Symbol = "open"
+	SymbolFolder       Symbol = "folder"
+	SymbolDocument     Symbol = "document"
 	SymbolUndo         Symbol = "undo"
 	SymbolRedo         Symbol = "redo"
 	SymbolCopy         Symbol = "copy"
@@ -30,6 +32,7 @@ const (
 	SymbolUp           Symbol = "up"
 	SymbolDown         Symbol = "down"
 	SymbolMenu         Symbol = "menu"
+	SymbolGrip         Symbol = "grip"
 	SymbolExpand       Symbol = "expand"
 	SymbolCollapse     Symbol = "collapse"
 	SymbolBackspace    Symbol = "backspace"
@@ -46,9 +49,9 @@ const (
 )
 
 var symbols = [...]Symbol{SymbolAdd, SymbolRemove, SymbolCheck, SymbolClose,
-	SymbolSearch, SymbolSettings, SymbolSave, SymbolOpen, SymbolUndo, SymbolRedo,
+	SymbolSearch, SymbolSettings, SymbolSave, SymbolOpen, SymbolFolder, SymbolDocument, SymbolUndo, SymbolRedo,
 	SymbolCopy, SymbolCut, SymbolPaste, SymbolInfo, SymbolWarning, SymbolDelete,
-	SymbolLeft, SymbolRight, SymbolUp, SymbolDown, SymbolMenu, SymbolExpand, SymbolCollapse,
+	SymbolLeft, SymbolRight, SymbolUp, SymbolDown, SymbolMenu, SymbolGrip, SymbolExpand, SymbolCollapse,
 	SymbolBackspace, SymbolSidebar, SymbolCalculator, SymbolSun, SymbolCloud,
 	SymbolRain, SymbolWind, SymbolSunrise, SymbolPartlyCloudy, SymbolCircle, SymbolCircleCheck}
 
@@ -66,7 +69,38 @@ const (
 	ButtonTool      ButtonAppearance = "tool"
 )
 
+// ButtonIconPlacement arranges a Button's artwork and caption, independently
+// of the orientation of a containing Toolbar. MenuButton remains inline.
+type ButtonIconPlacement string
+
+const (
+	IconLeading   ButtonIconPlacement = "leading"
+	IconAboveText ButtonIconPlacement = "above-text"
+)
+
 func validateIcon(n Node) error {
+	if n.IconPlacement != "" {
+		if n.Kind != Button {
+			return fmt.Errorf("ui: IconPlacement belongs only on Button")
+		}
+		switch n.IconPlacement {
+		case IconLeading:
+		case IconAboveText:
+			if (n.Icon == "" && n.IconImage == nil) || strings.TrimSpace(n.Text) == "" {
+				return fmt.Errorf("ui: IconAboveText requires artwork and a caption")
+			}
+		default:
+			return fmt.Errorf("ui: invalid icon placement %q", n.IconPlacement)
+		}
+	}
+	if n.IconImage != nil {
+		if (n.Kind != Button && n.Kind != MenuButton) || n.IconImage.TileCount() == 0 || n.Icon != "" {
+			return fmt.Errorf("ui: IconImage requires nonempty immutable pixels on Button/MenuButton without Icon")
+		}
+		if strings.TrimSpace(n.Text) == "" && strings.TrimSpace(n.Accessibility.Name) == "" {
+			return fmt.Errorf("ui: image-only actions require an accessible name")
+		}
+	}
 	if n.Icon != "" {
 		known := false
 		for _, symbol := range symbols {

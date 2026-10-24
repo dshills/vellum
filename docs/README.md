@@ -4,6 +4,8 @@ Start with the [project overview](../README.md), [development guide](development
 and [implementation status](implementation.md). For current Mac work, follow the
 [delivery plan](../specs/macos-delivery.md).
 
+- [Mac input widgets](mac-widget-integration.md): public API setup, themes, owner values and focus helpers.
+- [Mac widget demo](mac-widget-demo.md): run the private light/dark gallery.
 - [Repository layout](repository-layout.md): package, module, command and archive boundaries.
 - [Research and recommendations](research/README.md): source-backed investigation and architecture alternatives.
 - [Architecture decisions](decisions/): recorded choices and the evidence available when each was made.

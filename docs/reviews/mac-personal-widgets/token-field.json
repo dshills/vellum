@@ -1,0 +1,82 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "10b2ae55690c66110847c8455fd5016b",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "d7540ec70159a27e2498ec0751ff57a1817653a7",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3608,
+    "totalMs": 3624
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 23183,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 14059,
+        "output": 239,
+        "costUSD": 0.030508
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "8fda1e09e5772804",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Suggestion limit documented but not enforced",
+        "message": "The documentation promises at most 64 suggestions, but View copies f.Suggestions without checking the count. It relies on ComboBox to reject oversized input, which is not shown. The cap may be enforced inconsistently with the documented limit.",
+        "suggestion": "Validate len(f.Suggestions) \u003c= 64 in validate() and return an error.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "ui/token_field.go",
+            "lines": {
+              "start": 50,
+              "end": 132
+            }
+          }
+        ],
+        "evidence": "if len(f.Tokens) \u003e MaxTokens {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in ui/token_field.go"
+    }
+  ],
+  "suppressed": []
+}

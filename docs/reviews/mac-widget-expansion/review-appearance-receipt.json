@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "<USER_HOME>/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "docs/controls.md,drivers/cogent/cmd/gallery/input_helpers.go,drivers/cogent/cmd/gallery/input_helpers_test.go,drivers/cogent/cmd/gallery/main.go,drivers/cogent/controls.go,drivers/cogent/input_helpers_offscreen_test.go,drivers/cogent/mac_field_geometry_offscreen_test.go,specs/controls.md,specs/mac-widget-expansion.md,ui/controls.go,ui/form_field.go,ui/inline_notice.go,ui/input_helpers_test.go,ui/mac_theme.go,ui/node.go,ui/search_box.go",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "6",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-expansion/review-appearance/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "<USER_HOME>/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-expansion/review-appearance/prism.json"
+  ],
+  "cwd": "<USER_HOME>/Development/projects/Vellum",
+  "started_utc": "2026-10-23T15:13:47.189510+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 1,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 20696,
+  "group": 20696,
+  "owned": {
+    "created": true,
+    "pid": 20696,
+    "group": 20696,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 1,
+    "errors": [],
+    "observation": {
+      "group": 20696,
+      "members": [],
+      "observation_sha256": "e9da7a2b0576441705d45a8709445a270b31189a19f6ce12b95529dcc1b7ce84"
+    }
+  },
+  "seconds": 8.796018874971196,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

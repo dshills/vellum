@@ -1,0 +1,114 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f99f9ab7c591c0e1b7d7ba7eba44b1d6",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "427ea188a6f6b2f73810ada4254b33c8ef6b009a",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "72d658cfd6611655",
+      "severity": "medium",
+      "category": "bug",
+      "title": "View mutates state without synchronization",
+      "message": "View mutates the Sheet (epoch/identity) and is not safe if View is invoked from a different goroutine or called multiple times per frame. More importantly, closures capture s and compare to epoch; a View call while closed resets epoch, so a click queued on an old node after reopen is correctly rejected, but any View called between Open=true and the user's activation of the earlier-rendered node keeps the same epoch, fine. The mutation in a view function is a hidden side effect that can race with owner callbacks.",
+      "suggestion": "Document that View must run on the owner goroutine, or guard the state with a mutex.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/sheet.go",
+          "lines": {
+            "start": 27,
+            "end": 27
+          }
+        }
+      ],
+      "tags": [
+        "concurrency"
+      ],
+      "evidence": "if s.identity != s.ID || !s.Open || s.Disabled {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "edc6c96a415f363c",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Validation accepts disabled default button",
+      "message": "The default action is enabled-checked only by Activate != nil, but the confirm Button may be Disabled (Confirm nil or ConfirmDisabled). Validation passes. Runtime checks controlDisabled, so Return silently does nothing; acceptable, but a nil-Confirm sheet reports valid with a permanently disabled default. Also the walk does not reject Disabled default targets.",
+      "suggestion": "Also require !c.Disabled in the walk, or document that disabled defaults are inert.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "ui/sheet.go",
+          "lines": {
+            "start": 84,
+            "end": 84
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "location-corrected"
+      ],
+      "evidence": "if n.DialogDefaultID == \"\" || !found || n.DialogReturnFocusID == n.ID {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7273,
+    "totalMs": 7291
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 11,
+    "bytes": 25029,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 14464,
+        "output": 626,
+        "costUSD": 0.035188
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

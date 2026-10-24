@@ -33,6 +33,9 @@ type Extension interface {
 type ThemeExtension interface{ SetTheme(ui.Theme) }
 
 type Driver struct {
+	// TitlebarToolbarPrototype opts into a real AppKit toolbar for one window.
+	// Experimental driver-only API; nil preserves existing window chrome.
+	TitlebarToolbarPrototype *TitlebarToolbarPrototype
 	// DesktopSession opts into bounded native integration routing and frame barriers.
 	// It cannot be combined with FrameMetrics. Ordinary applications leave it nil.
 	DesktopSession *DesktopSession
@@ -59,33 +62,37 @@ type Driver struct {
 	PresentationMetrics *PresentationMetrics
 }
 type record struct {
-	scope    app.WindowRef
-	widget   core.Widget
-	node     ui.Node
-	children []*record
-	theme    ui.Theme
-	control  *controlState
+	scope           app.WindowRef
+	widget          core.Widget
+	node            ui.Node
+	children        []*record
+	theme           ui.Theme
+	control         *controlState
+	inputOutline    *inputOutlineState
+	focusVisibility atomic.Uint32 // 0 unpublished, 1 active input scope, 2 outside modal/tab scope
 }
 
 var processRun atomic.Bool
 
 type nativeWindow struct {
-	window           app.Window
-	body             *core.Body
-	host             *core.Frame
-	root             *record
-	rootMu           sync.Mutex
-	lastFocus        ui.FocusRequest
-	axScope          string // originating event loop, under rootMu
-	stopLoss         func()
-	lossMu           sync.Mutex
-	input            atomic.Pointer[textWindow]
-	visibility       atomic.Pointer[windowVisibility]
-	metrics          *frameWindowMetrics
-	presentation     *presentationSink
-	desktop          *DesktopSession
-	source           atomic.Pointer[events.Source]
-	pending, closing atomic.Bool
+	window             app.Window
+	body               *core.Body
+	host               *core.Frame
+	root               *record
+	rootMu             sync.Mutex
+	lastFocus          ui.FocusRequest
+	pendingFocusReveal atomic.Pointer[focusRevealRequest]
+	axScope            string // originating event loop, under rootMu
+	stopLoss           func()
+	lossMu             sync.Mutex
+	input              atomic.Pointer[textWindow]
+	visibility         atomic.Pointer[windowVisibility]
+	activation         atomic.Pointer[windowActivation]
+	metrics            *frameWindowMetrics
+	presentation       *presentationSink
+	desktop            *DesktopSession
+	source             atomic.Pointer[events.Source]
+	pending, closing   atomic.Bool
 }
 
 func (d Driver) Run(ctx context.Context, a *app.Application) error {
@@ -110,6 +117,13 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			return err
 		}
 	}
+	titlebar, err := prepareTitlebarToolbar(a, d.TitlebarToolbarPrototype)
+	if err != nil {
+		return err
+	}
+	if err := validateTitlebarToolbarSupport(titlebar); err != nil {
+		return err
+	}
 	if !processRun.CompareAndSwap(false, true) {
 		return fmt.Errorf("cogent: native main loop runs once per process")
 	}
@@ -125,7 +139,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 		}
 		defer d.DesktopSession.close()
 	}
-	if err := configureAccessibility(a); err != nil {
+	if err := configureAccessibility(a, titlebar); err != nil {
 		return err
 	}
 	defer releaseAccessibilityConfiguration()
@@ -223,7 +237,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			bindTreeScopes(w.root)
 			flushDialogs(w.root)
 			bindWorkbenchInputScopes(w.root)
-			if err := applyFocus(w.root, n.Focus, &w.lastFocus); err != nil {
+			if err := applyWindowFocus(w, n.Focus); err != nil {
 				failWindow(w, err)
 			}
 			if err := bindTextWindow(w); err != nil {
@@ -253,6 +267,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 		defer func() {
 			for _, w := range launch {
 				w.closing.Store(true)
+				w.pendingFocusReveal.Store(nil)
 				cleanup := func() {
 					w.rootMu.Lock()
 					defer w.rootMu.Unlock()
@@ -295,6 +310,10 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			}
 		}
 		for _, spec := range desired {
+			if !titlebar.accepts(spec.Ref()) {
+				fail(fmt.Errorf("cogent: titlebar prototype supports only its original window opening"))
+				return
+			}
 			mu.Lock()
 			_, exists := windows[spec.ID]
 			mu.Unlock()
@@ -334,6 +353,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				nativeMountServices(w.body, services)
 				configureInitialWindow(w.body)
 				configureWindowChromeContent(w.body, spec)
+				configureTitlebarToolbarContent(w.body, titlebar)
 				w.host = newAccessibilityHost(w)
 				configureRootScrolling(w.body, w.host, spec)
 				bindWindowScope(w.host, a, spec.Ref())
@@ -374,12 +394,17 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				lifetime := spec.Ref().Context()
 				if w.closing.Load() || lifetime.Err() != nil {
 					w.closing.Store(true)
+					w.pendingFocusReveal.Store(nil)
 					if native := w.body.Scene.RenderWindow(); native != nil {
 						go native.SystemWindow.CloseReq()
 					}
 					return
 				}
 				w.source.Store(w.body.SystemEvents())
+				if err := bindWindowActivation(w); err != nil {
+					failWindow(w, err)
+					return
+				}
 				if err := bindWindowVisibility(w); err != nil {
 					failWindow(w, err)
 					return
@@ -425,6 +450,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			bindCloseRequest(w, a, d.OnError)
 			w.body.OnClose(func(events.Event) {
 				w.closing.Store(true)
+				w.pendingFocusReveal.Store(nil)
 				// CloseWindow changes registration and wakes topology reconciliation;
 				// native CloseReq runs outside the application owner. If the owner
 				// already stopped, skip model notifications; native/control cleanup
@@ -618,8 +644,10 @@ func mountShallowScoped(parent tree.Node, n ui.Node, a *app.Application, scope a
 		}
 		return nil, fmt.Errorf("cogent: extension %q returned nil widget", n.ID)
 	}
+	mountInputOutline(r)
 	bindWindowScope(r.widget, a, scope)
 	r.widget.AsWidget().SetName(n.ID)
+	bindToolbarDragTooltipGuard(r.widget)
 	syncSemantics(r)
 	bindFileDrop(r, a, scope.ID())
 	r.widget.AsWidget().Styler(func(s *styles.Style) {
@@ -629,6 +657,15 @@ func mountShallowScoped(parent tree.Node, n ui.Node, a *app.Application, scope a
 			r.widget.(*core.Text).AllocationLayout = err == nil && (value.TextAlign.Set || value.GrowX.Set || value.GrowY.Set)
 		}
 	})
+	if r.node.Kind == ui.Row || r.node.Kind == ui.TextField || r.node.Kind == ui.NumberField || r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton || r.node.Kind == ui.Checkbox {
+		r.widget.AsWidget().FinalStyler(func(s *styles.Style) { styleManagedInputFocus(r, s) })
+		if r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton || r.node.Kind == ui.Checkbox {
+			// Retained controls can already carry Focused when native focus changes.
+			// Restyle on the actual focus event even if no state bit changed.
+			r.widget.AsWidget().OnFocus(func(events.Event) { r.widget.AsWidget().Restyle() })
+			r.widget.AsWidget().OnFocusLost(func(events.Event) { r.widget.AsWidget().Restyle() })
+		}
+	}
 	return r, nil
 }
 func syncRecord(r *record, n ui.Node) error {
@@ -651,6 +688,7 @@ func syncRecordVisible(r *record, n ui.Node, visible bool, scopes []*tabCloseSco
 	}
 	previous := r.node
 	r.node = n
+	syncInputOutline(r)
 	disabledChanged := r.widget.AsWidget().IsDisabled() != controlDisabled(r)
 	if previous.Style != n.Style || previous.Grow != n.Grow || previous.MinWidth != n.MinWidth || previous.MinHeight != n.MinHeight {
 		if r.control != nil && r.control.grid != nil {
@@ -694,6 +732,8 @@ func syncRecordVisible(r *record, n ui.Node, visible bool, scopes []*tabCloseSco
 		scopes = append(append([]*tabCloseScope(nil), scopes...), scope)
 	}
 	syncTabVisibility(r, visible, scopes)
+	syncShortcutRecorderVisibility(r, visible, scopes)
+	syncToolbarDragVisibility(r, visible, scopes)
 	for i, c := range n.Children {
 		childVisible := visible
 		switch n.Kind {

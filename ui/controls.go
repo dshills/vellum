@@ -4,40 +4,51 @@ import (
 	"fmt"
 	"math"
 	"strings"
+
+	"github.com/dshills/vellum/canvas"
 )
 
 const (
-	SplitPane        Kind = "split-pane"
-	Toolbar          Kind = "toolbar"
-	StatusBar        Kind = "status-bar"
-	FormGroup        Kind = "form-group"
-	Disclosure       Kind = "disclosure"
-	Checkbox         Kind = "checkbox"
-	Switch           Kind = "switch"
-	ToggleButton     Kind = "toggle-button"
-	ProgressBar      Kind = "progress-bar"
-	ProgressRing     Kind = "progress-ring"
-	ProgressGauge    Kind = "progress-gauge"
-	Separator        Kind = "separator"
-	Selector         Kind = "selector"
-	ListBox          Kind = "list-box"
-	MenuButton       Kind = "menu-button"
-	RadioGroup       Kind = "radio-group"
-	SegmentedControl Kind = "segmented-control"
-	Slider           Kind = "slider"
-	NumberField      Kind = "number-field"
-	TextField        Kind = "text-field"
-	MultilineText    Kind = "multiline-text"
-	Tabs             Kind = "tabs"
-	Scroll           Kind = "scroll"
-	Dialog           Kind = "dialog"
-	Canvas2D         Kind = "canvas-2d"
+	SplitPane            Kind = "split-pane"
+	Toolbar              Kind = "toolbar"
+	ToolbarSpace         Kind = "toolbar-space"
+	ToolbarFlexibleSpace Kind = "toolbar-flexible-space"
+	StatusBar            Kind = "status-bar"
+	FormGroup            Kind = "form-group"
+	Disclosure           Kind = "disclosure"
+	Checkbox             Kind = "checkbox"
+	Switch               Kind = "switch"
+	ToggleButton         Kind = "toggle-button"
+	ProgressBar          Kind = "progress-bar"
+	ProgressRing         Kind = "progress-ring"
+	ProgressGauge        Kind = "progress-gauge"
+	Separator            Kind = "separator"
+	Selector             Kind = "selector"
+	ListBox              Kind = "list-box"
+	MenuButton           Kind = "menu-button"
+	RadioGroup           Kind = "radio-group"
+	SegmentedControl     Kind = "segmented-control"
+	Slider               Kind = "slider"
+	NumberField          Kind = "number-field"
+	TextField            Kind = "text-field"
+	MultilineText        Kind = "multiline-text"
+	Tabs                 Kind = "tabs"
+	Scroll               Kind = "scroll"
+	Dialog               Kind = "dialog"
+	Canvas2D             Kind = "canvas-2d"
 )
 
 // Option has a stable domain ID independent of its displayed label. For Tabs,
 // each option ID corresponds to the child page ID, in the same order.
 type Option struct {
 	ID, Label string
+	// Icon decorates MenuButton actions and multiple-selection ListBox rows.
+	// Badge decorates only multiple-selection ListBox rows (including Sidebar navigation).
+	Icon Symbol
+	// IconImage decorates MenuButton actions with immutable full-color artwork.
+	// Menu options accept either Icon or IconImage; Badge remains ListBox-only.
+	IconImage *canvas.TiledImage
+	Badge     string
 	Disabled  bool
 	// MenuButton alone supports passive separators and controlled check actions.
 	// Separators retain a stable ID, but have no label, value or input behavior.
@@ -47,6 +58,12 @@ type Option struct {
 	Checkable bool
 	Checked   bool
 }
+
+// NumberFieldButtons selects a numeric field's pointer affordance.
+// Empty preserves the existing inline minus/plus buttons.
+type NumberFieldButtons string
+
+const NumberButtonsStepper NumberFieldButtons = "stepper"
 
 // Numeric uses finite float32 values supported by the native widgets. Step is
 // the keyboard increment; pointer and typed values need not be step multiples.
@@ -90,6 +107,9 @@ type FocusRequest struct {
 	Sequence uint64
 }
 
+// IsToolbarSpace reports decorative fixed/flexible toolbar spacing items.
+func IsToolbarSpace(kind Kind) bool { return kind == ToolbarSpace || kind == ToolbarFlexibleSpace }
+
 func IsContainer(kind Kind) bool {
 	switch kind {
 	case Row, Column, Tabs, Scroll, Dialog, Toolbar, StatusBar, FormGroup, SplitPane, Disclosure:
@@ -128,6 +148,65 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if IsToolbarSpace(n.Kind) && (n.Activate != nil || n.Change != nil || n.ContextMenu != nil || n.PlacementSource != nil || n.ToolbarReorder != nil) {
+		return fmt.Errorf("ui: toolbar spaces are display-only")
+	}
+	if err := ValidateToolbarReorderNode(n); err != nil {
+		return err
+	}
+	if err := ValidateShortcutRecorderNode(n); err != nil {
+		return err
+	}
+	if err := ValidateCollectionNode(n); err != nil {
+		return err
+	}
+	if err := validateSheet(n); err != nil {
+		return err
+	}
+	if n.MenuAnchorID != "" && n.Kind != MenuButton {
+		return fmt.Errorf("ui: MenuAnchorID belongs only on MenuButton")
+	}
+	if (n.Multiple || len(n.SelectedIDs) > 0 || n.SelectionChange != nil) && n.Kind != ListBox {
+		return fmt.Errorf("ui: multiple selection belongs only on ListBox")
+	}
+	if n.PopoverAnchor != "" {
+		if n.Kind != Dialog || n.PopoverAnchor == n.ID || n.Dismiss == nil {
+			return fmt.Errorf("ui: popover anchor requires a dismissible Dialog")
+		}
+		var descendant func(Node) bool
+		descendant = func(c Node) bool {
+			if c.ID == n.PopoverAnchor {
+				return true
+			}
+			for _, child := range c.Children {
+				if descendant(child) {
+					return true
+				}
+			}
+			return false
+		}
+		for _, c := range n.Children {
+			if descendant(c) {
+				return fmt.Errorf("ui: popover anchor cannot be its own descendant")
+			}
+		}
+	}
+
+	if err := validateContextMenu(n); err != nil {
+		return err
+	}
+	if n.NumberButtons != "" && (n.Kind != NumberField || n.NumberButtons != NumberButtonsStepper) {
+		return fmt.Errorf("ui: NumberButtons requires stepper on NumberField")
+	}
+	if (n.Secure || n.Reveal) && n.Kind != TextField {
+		return fmt.Errorf("ui: secure/reveal belong only on TextField")
+	}
+	if n.Reveal && !n.Secure {
+		return fmt.Errorf("ui: reveal requires secure TextField")
+	}
+	if n.Placeholder != "" && n.Kind != TextField {
+		return fmt.Errorf("ui: Placeholder belongs only on TextField")
+	}
 	if n.Kind == ListBox {
 		if err := validateListBox(n); err != nil {
 			return err
@@ -152,7 +231,16 @@ func ValidateControl(n Node) error {
 	if n.Kind != Tabs && n.TabClose != nil {
 		return fmt.Errorf("ui: TabClose belongs only on tabs")
 	}
+	if err := validateToolbarOverflow(n); err != nil {
+		return err
+	}
 	for _, option := range n.Options {
+		if option.IconImage != nil && n.Kind != MenuButton {
+			return fmt.Errorf("ui: option IconImage requires MenuButton")
+		}
+		if ((option.Icon != "" && n.Kind != MenuButton) || option.Badge != "") && (n.Kind != ListBox || !n.Multiple) {
+			return fmt.Errorf("ui: option icons and badges require a multiple ListBox")
+		}
 		if option.Closable && (n.Kind != Tabs || n.TabClose == nil) {
 			return fmt.Errorf("ui: closable tab requires Tabs and TabClose")
 		}

@@ -15,7 +15,7 @@ static char inputKey, inputBaseClassKey;
  NSView *view;
  Class baseClass, subclass;
  uintptr_t handle;
- uint64_t sequence, clientID, requestedLimitClient;
+ uint64_t sequence, clientID, requestedLimitClient, secureClient, requestedSecureClient;
  NSUInteger maximum, requestedMaximum;
  BOOL deltas, active, forwarding, forwarded, closed;
  NSEvent *keyEvent;
@@ -44,6 +44,7 @@ static Class inputParentClass(id view) {
 static struct objc_super parent(id view) { return (struct objc_super){view,inputParentClass(view)}; }
 static BOOL responds(id view,SEL selector){Class base=inputParentClass(view);return base && class_getInstanceMethod(base,selector)!=NULL;}
 static BOOL usable(VellumManagedInputState *s) { return s && s->active && !s->closed && !s->forwarding; }
+static BOOL protectedText(VellumManagedInputState *s){return s && s->secureClient!=0 && s->secureClient==s->clientID;}
 static BOOL composing(VellumManagedInputState *s){return s && (s->before || s->marked.location!=NSNotFound);}
 static BOOL validRange(NSString *text, NSRange range) {
  NSUInteger count=text.length;
@@ -205,6 +206,7 @@ static NSRect clipTextRect(NSRect r,NSRect viewport){
 - (NSArray *)validAttributesForMarkedText {if(usable(state(self)))return @[NSUnderlineStyleAttributeName,NSMarkedClauseSegmentAttributeName];if(!responds(self,_cmd))return @[];struct objc_super p=parent(self);return ((id(*)(struct objc_super *,SEL))objc_msgSendSuper)(&p,_cmd);}
 - (NSAttributedString *)attributedSubstringForProposedRange:(NSRange)range actualRange:(NSRangePointer)actual {
  VellumManagedInputState *s=state(self);
+ if(protectedText(s)){if(actual)*actual=NSMakeRange(NSNotFound,0);return nil;}
  if(!usable(s)){if(!responds(self,_cmd)){if(actual)*actual=NSMakeRange(NSNotFound,0);return nil;}struct objc_super p=parent(self);return ((id(*)(struct objc_super *,SEL,NSRange,NSRangePointer))objc_msgSendSuper)(&p,_cmd,range,actual);}
  if(actual)*actual=NSMakeRange(NSNotFound,0);
  // Context requests may extend beyond the document. Clamp without adding
@@ -331,7 +333,7 @@ static BOOL publish(void *input,const char *text,int anchor,int focus,int marked
  // focus-loss commit leaves composition active until credit is available.
  if(s->active && (!active || clientID!=s->clientID)){if(!finish(s,NO))return NO;[[s->view inputContext] discardMarkedText];}
  if(acknowledged<s->sequence)return NO;
- s->clientID=clientID;s->active=active;
+ s->clientID=clientID;s->active=active;s->secureClient=s->requestedSecureClient;
  if(s->requestedLimitClient==clientID)s->maximum=s->requestedMaximum;s->caret=NSMakeRect(x,y,width,height);
  // External edits invalidate the whole-document restoration baseline. Retain
  // their marked range but refuse cancellation until it is unmarked; otherwise
@@ -414,7 +416,7 @@ char *vellum_managed_input_probe(void *input,int step) {
  NSRange all=NSMakeRange(0,s->text.length),substringRange;
  NSAttributedString *substring=[client attributedSubstringForProposedRange:all actualRange:&substringRange];
  char *source=vellum_managed_input_source();
- NSDictionary *report=@{@"client_id":@(s->clientID),@"step":@(step),@"sequence":@(s->sequence),@"text":s->text,@"selected_start":@(selection.location),@"selected_length":@(selection.length),@"marked_start":marked.location==NSNotFound ? @(-1):@(marked.location),@"marked_length":@(marked.length),@"has_marked":@([client hasMarkedText]),@"caret_screen":@[@(rect.origin.x),@(rect.origin.y),@(rect.size.width),@(rect.size.height)],@"caret_view":@[@(s->caret.origin.x),@(s->caret.origin.y),@(s->caret.size.width),@(s->caret.size.height)],@"actual_caret_start":actual.location==NSNotFound ? @(-1) : @(actual.location),@"substring":substring.string ?: @"",@"active":@(s->active),@"cell_count":@(s->cells.length/sizeof(VellumTextCell)),@"caret_count":@(s->carets.length/sizeof(VellumTextCaret)),@"viewport":@[@(s->viewport.origin.x),@(s->viewport.origin.y),@(s->viewport.size.width),@(s->viewport.size.height)],@"input_source":@(source ?: "unknown")};
+ NSDictionary *report=@{@"client_id":@(s->clientID),@"step":@(step),@"sequence":@(s->sequence),@"text":protectedText(s)?@"":s->text,@"selected_start":@(selection.location),@"selected_length":@(selection.length),@"marked_start":marked.location==NSNotFound ? @(-1):@(marked.location),@"marked_length":@(marked.length),@"has_marked":@([client hasMarkedText]),@"caret_screen":@[@(rect.origin.x),@(rect.origin.y),@(rect.size.width),@(rect.size.height)],@"caret_view":@[@(s->caret.origin.x),@(s->caret.origin.y),@(s->caret.size.width),@(s->caret.size.height)],@"actual_caret_start":actual.location==NSNotFound ? @(-1) : @(actual.location),@"substring":substring.string ?: @"",@"active":@(s->active),@"cell_count":@(s->cells.length/sizeof(VellumTextCell)),@"caret_count":@(s->carets.length/sizeof(VellumTextCaret)),@"viewport":@[@(s->viewport.origin.x),@(s->viewport.origin.y),@(s->viewport.size.width),@(s->viewport.size.height)],@"input_source":@(source ?: "unknown")};
  free(source);
  NSData *data=[NSJSONSerialization dataWithJSONObject:report options:0 error:NULL];
  return strdup([[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease].UTF8String);
@@ -546,7 +548,7 @@ bool vellum_managed_input_fixture_delegates(void *view) {
 }
 char *vellum_managed_input_fixture_snapshot(void *input) {
  VellumManagedInputState *s=(id)input;if(!s || s->closed)return NULL;
- NSDictionary *v=@{@"text":s->text,@"sequence":@(s->sequence),@"client":@(s->clientID),@"selected":@[@(s->selected.location),@(s->selected.length)],@"marked":s->marked.location==NSNotFound ? @(-1):@(s->marked.location),@"baseline":s->before!=nil ? @YES:@NO};
+ NSDictionary *v=@{@"text":protectedText(s)?@"":s->text,@"sequence":@(s->sequence),@"client":@(s->clientID),@"selected":@[@(s->selected.location),@(s->selected.length)],@"marked":s->marked.location==NSNotFound ? @(-1):@(s->marked.location),@"baseline":s->before!=nil ? @YES:@NO};
  NSData *data=[NSJSONSerialization dataWithJSONObject:v options:0 error:NULL];
  return strdup([[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding]autorelease].UTF8String);
 }
@@ -563,3 +565,12 @@ void vellum_managed_input_fixture_edit(void *input,const char *value,int bytes,i
 
 void *vellum_managed_input_fixture_pool(void) { return [[NSAutoreleasePool alloc]init]; }
 void vellum_managed_input_fixture_drain(void *pool) { [(NSAutoreleasePool *)pool drain]; }
+
+void vellum_managed_input_secure_client(void *input,uint64_t clientID){VellumManagedInputState *s=(id)input;if(s && !s->closed)s->requestedSecureClient=clientID;}
+
+char *vellum_managed_input_fixture_substring(void *input,int start,int length){
+ VellumManagedInputState *s=(id)input;if(!s || s->closed)return NULL;
+ NSRange range=NSMakeRange(NSNotFound,0);NSAttributedString *value=[(id<NSTextInputClient>)s->view attributedSubstringForProposedRange:NSMakeRange(start,length) actualRange:&range];
+ NSDictionary *report=@{@"substring":value.string?:@"",@"substring_range":@[range.location==NSNotFound?@(-1):@(range.location),@(range.length)]};
+ NSData *data=[NSJSONSerialization dataWithJSONObject:report options:0 error:NULL];return strdup([[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding]autorelease].UTF8String);
+}

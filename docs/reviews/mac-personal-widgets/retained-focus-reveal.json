@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "e013a112447016d8118bb0432a668272",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "ac2d078c141b4e21ab4d57f3a8618dde874ffc0c",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "36f7cb1f84382b0a",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible unsynchronized access to lastFocus/root",
+      "message": "applyWindowFocus reads w.lastFocus and w.root and calls accessibilityResolveFocus, while finishWindowFocusReveal takes rootMu. If callers of applyWindowFocus do not hold rootMu, this is a data race with the paint-time consumer. The Manual syncTopology and refresh paths are not clearly under rootMu.",
+      "suggestion": "Confirm all applyWindowFocus callers hold rootMu, or document and enforce the lock requirement.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/focus_reveal.go",
+          "lines": {
+            "start": 34,
+            "end": 38
+          }
+        }
+      ],
+      "tags": [
+        "concurrency"
+      ],
+      "evidence": "if w.closing.Load() || w.window.Ref().Context().Err() != nil {\n\t\tw.pendingFocusReveal.Store(nil)\n\t} else {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4028,
+    "totalMs": 4055
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 8,
+    "bytes": 22882,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 13174,
+        "output": 344,
+        "costUSD": 0.029788
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

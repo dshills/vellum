@@ -287,3 +287,21 @@ func fixtureInputEdit(i *Input, value string, start, length, mode int) {
 
 func fixtureInputPool() unsafe.Pointer          { return C.vellum_managed_input_fixture_pool() }
 func fixtureDrainInputPool(pool unsafe.Pointer) { C.vellum_managed_input_fixture_drain(pool) }
+
+// SetSecureClient requests substring/diagnostic protection on the next accepted publication.
+// A refused publication retains the previous client protection.
+// It does not enable OS secure-event-input mode. Call on Cocoa main before publish.
+func (i *Input) SetSecureClient(client uint64) {
+	if i != nil && i.native != nil {
+		C.vellum_managed_input_secure_client(i.native, C.uint64_t(client))
+	}
+}
+
+func fixtureInputSubstring(i *Input, start, length int) string {
+	p := C.vellum_managed_input_fixture_substring(i.native, C.int(start), C.int(length))
+	if p == nil {
+		return ""
+	}
+	defer C.free(unsafe.Pointer(p))
+	return C.GoString(p)
+}

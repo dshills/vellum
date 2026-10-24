@@ -1,0 +1,142 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "267ea9101279251a070bcae2621e0c2a",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "128817d6302bf2f65c983121d0415f7b21c79ba6",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "36c807f68aa00e91",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Native-main callback into Go may block",
+      "message": "The native callback `vellumTitlebarAction` is invoked synchronously on the AppKit main thread and takes accessibilityRegistry lock and calls PostWindow. If PostWindow blocks (bounded queue), it could stall the main thread. Also vellumTitlebarAllowed uses dispatch_async while Go-side setAllowed flips state immediately, so permission in Go and native `allowed` can diverge transiently.",
+      "suggestion": "Confirm PostWindow is non-blocking; keep native `allowed` authoritative only as UI state and rely on Go permission for gating.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/titlebar_toolbar_darwin.m",
+          "lines": {
+            "start": 44,
+            "end": 44
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "location-corrected"
+      ],
+      "evidence": "vellumTitlebarAction(self.token,[entry[@\"id\"] UTF8String]);",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "df73e6dc4c6a860c",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Detach silently no-ops off main thread",
+      "message": "vellumTitlebarDetach returns early if not on the main thread, silently leaking the toolbar and registry entry. closeTitlebarToolbar in Go is called from accessibilityAttachment.Close and the attach-failure path; if those run off the main thread, detach never happens and the registry (limit 1) stays occupied.",
+      "suggestion": "Dispatch to the main queue when not on main thread (dispatch_sync/async) instead of returning.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/titlebar_toolbar_darwin.m",
+          "lines": {
+            "start": 110,
+            "end": 110
+          }
+        }
+      ],
+      "tags": [
+        "cgo",
+        "leak",
+        "location-corrected"
+      ],
+      "evidence": "owner.closed=YES;owner.allowed=NO;[owner refreshEnabled];",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "ff8fb02b9dd14d5a",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Owner window/token assignment unclear; detach may not remove toolbar",
+      "message": "On attach failure paths after the owner is registered in vellumTitlebars (e.g. the final `return window.contentView==view \u0026\u0026 window.toolbar==toolbar`), the Go side calls vellumTitlebarDetach. But the earlier early-returns before registration are fine; the problem is that Detach runs `owner.window` which is weak and `owner.window` is never assigned in the visible code (the line is redacted/truncated), so restoring window.toolbar may be skipped, leaving the toolbar attached to a window after detach.",
+      "suggestion": "Ensure owner.window=window and owner.token=token are set explicitly on separate statements before registering the owner.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/titlebar_toolbar_darwin.m",
+          "lines": {
+            "start": 64,
+            "end": 64
+          }
+        }
+      ],
+      "tags": [
+        "cgo",
+        "objc",
+        "location-corrected"
+      ],
+      "evidence": "if(![NSThread isMainThread] || !pointer || !json || !token)return 0;",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 8413,
+    "totalMs": 8462
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 17,
+    "bytes": 46205,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 24328,
+        "output": 1018,
+        "costUSD": 0.058836
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

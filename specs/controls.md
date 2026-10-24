@@ -147,6 +147,16 @@ nodes cannot carry independent focus requests. A Tabs request targets its select
 enabled native tab button, or the first enabled option when the selected option
 is disabled. A Tabs control with no enabled options cannot receive focus.
 
+For accepted main-scene requests, the Mac adapter keeps one pending visibility
+intent per native window. After layout and before child painting it reveals the
+still-focused native target using existing scrolling. This includes a repeated
+request for a retained field whose position changed during reconciliation. It
+does not change focus or editing selection, replay on later manual scrolling,
+or re-use an intent for a replaced/hidden/disabled target. Empty/failed requests
+and native retirement clear it. Dialog-scene focus retains its existing policy.
+This uses normal paint invalidation, without new frame scheduling or renderer
+options.
+
 Focused tab headers handle unmodified Left/Right with enabled-option wrap and
 Home/End with enabled endpoints; Space/Enter proposes the focused option.
 Keyboard movement changes native header focus and queues one stable-ID proposal
@@ -321,13 +331,23 @@ updates and reordering. Moving children out of a removed container happens
 before its private host is destroyed.
 
 Toolbar defaults horizontal; Orientation Vertical selects a vertical toolbar.
+`WithToolbarOverflow` opts a horizontal Buttons/Separators bar into a fitting
+prefix plus a managed More actions menu. It appends ToolbarOverflowID(root),
+sets ToolbarOverflow, and validates 1..64 flat items; use it after composing
+per-item presentation. Hidden actions retain native identity but are excluded
+from ordinary focus/AX routing; menus preserve labels, artwork and callbacks.
+Width, contents, disabling and lifetime changes revoke stale menu presentations.
+Ordinary toolbars, including editors and vertical bars, keep scrolling.
+
 Only its main axis scrolls when constrained. The cross axis retains natural
 control size subject to explicit style limits. Overflow uses the same retained
 controls in a native scrolling region, preserving private editing state. Keyboard
 focus reveals an offscreen tool. Tab follows each child's ordinary managed stop;
 unconsumed main-axis arrows wrap through enabled stops, and Home/End focus the
 first/last enabled stop. Child text and choice editing consume their keys before
-toolbar navigation. Modified chords remain available to enclosing shortcuts.
+toolbar navigation. CapsLock/NumLock flags do not modify a navigation chord
+(macOS reports NumLock on ordinary input). Shift/Command/Control/Option chords
+remain available to their existing handlers and enclosing shortcuts.
 Toolbar publishes the Mac toolbar role and ordinary child semantics. Nested
 managed layouts follow the same enabled traversal; a nested Toolbar has its own
 nearest scope. Moving a layout out removes the old navigation scope. Modal
@@ -534,3 +554,38 @@ An accepted NumberField Enter completes editing and follows normal focus
 traversal. A later numeric key step requires actual focus to be routed back to
 the field. The native check's remaining focus guard reflects that consumer
 sequence requirement, not a request to keep the Spinner focused artificially.
+
+Post-preview reusable input helpers and Mac appearance are specified in
+[mac-widget-expansion.md](mac-widget-expansion.md). They compose existing controls;
+TextField additionally accepts a literal Placeholder hint.
+
+## Full-color button artwork
+
+`Node.IconImage` accepts immutable nonempty `canvas.TiledImage` pixels on Button
+and MenuButton, mutually exclusive with Symbol Icon. Text may coexist; an empty
+text label requires Accessibility.Name. The native renderer contains the source
+within the same font-relative leading icon slot, preserving full color and alpha.
+It adds no child focus stop or accessible action. Native button identity, hit
+routing, menus, focus, disabled ancestry and keyboard behavior remain unchanged.
+Source replacement refreshes pixels; source removal destroys the private image
+slot and releases its reference. Retiring the action releases its image source.
+ToggleButton, standalone Symbol Icon and menu item options retain their current
+contracts. Bounded decoding is explicit through ui.DecodeImage, outside View.
+
+## Button icon placement
+
+Button.IconPlacement is a ButtonIconPlacement: empty/IconLeading retains inline
+artwork; IconAboveText requires nonblank Text and either Icon or IconImage. Other
+kinds, unknown values, absent artwork or absent stacked caption are rejected.
+Above-text lays out the same action's private parts in a centered column with
+2 em artwork and a default 4 pt gap; local Gap/Padding/Typography remain effective.
+Native inline icon spacer is omitted in the stacked plan and restored on return
+to leading. Caption and button identity remain stable; content adds no semantic
+or focus targets. Existing command routing, disabled ancestry and image cleanup
+are unchanged. Applications allocate adequate height or use intrinsic sizing.
+
+The adapter is pinned to the native Button plan's inline `space` part. The
+symbol-path restoration regression requires that part in inline mode and its
+absence in stacked mode, so a native dependency upgrade must preserve or update
+that contract. Managed styles run after the adapter's layout defaults; a mounted
+regression verifies explicit zero Gap and omitted-gap restoration.

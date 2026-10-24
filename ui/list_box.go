@@ -6,22 +6,45 @@ import (
 	"unicode/utf8"
 )
 
-// MaxListBoxOptions bounds an always-visible, single-selection list. Larger
-// collections use virtual data views; Grid supports multi-selection.
+// MaxListBoxOptions bounds an always-visible single- or multi-selection list.
+// Larger collections use virtual data views.
 const MaxListBoxOptions = 256
 
 func validateListBox(n Node) error {
 	if len(n.Options) > MaxListBoxOptions || n.Activate != nil {
 		return fmt.Errorf("ui: list box requires at most %d options and uses Change for selection", MaxListBoxOptions)
 	}
+
+	if n.Multiple {
+		if n.SelectedID != "" || n.Change != nil {
+			return fmt.Errorf("ui: multiple ListBox uses SelectedIDs and SelectionChange")
+		}
+	} else if len(n.SelectedIDs) > 0 || n.SelectionChange != nil {
+		return fmt.Errorf("ui: SelectedIDs/SelectionChange require Multiple")
+	}
 	seen := make(map[string]bool, len(n.Options))
 	selected := n.SelectedID == ""
 	for _, o := range n.Options {
+		if len(o.Badge) > 32 || !utf8.ValidString(o.Badge) || strings.ContainsAny(o.Badge, "\x00\r\n") {
+			return fmt.Errorf("ui: list badge requires at most 32 UTF-8 bytes without line breaks")
+		}
+		if o.Icon != "" {
+			if err := validateIcon(Node{Kind: Icon, Icon: o.Icon}); err != nil {
+				return err
+			}
+		}
 		if strings.TrimSpace(o.ID) == "" || !utf8.ValidString(o.ID) || strings.ContainsRune(o.ID, 0) || seen[o.ID] || strings.TrimSpace(o.Label) == "" || !utf8.ValidString(o.Label) {
 			return fmt.Errorf("ui: list box requires unique nonblank UTF-8 item IDs and labels")
 		}
 		seen[o.ID] = true
 		selected = selected || o.ID == n.SelectedID
+	}
+	selectedSet := map[string]bool{}
+	for _, id := range n.SelectedIDs {
+		if !seen[id] || selectedSet[id] {
+			return fmt.Errorf("ui: multiple list selection contains missing or duplicate ID")
+		}
+		selectedSet[id] = true
 	}
 	if !selected {
 		return fmt.Errorf("ui: list box selected ID %q is absent", n.SelectedID)

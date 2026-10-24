@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a38bdc0137a68f3564715b5472841dd4",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "fcce658e73684a2a1c72b6ed82c04673db41ceb6",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "8fb65a6598b9acce",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Select-all event semantics depend on unseen Apply behavior",
+      "message": "Select-all applies the node's SelectionChange to every enabled option, but Apply is built from ListSelectionEvent with IDs only. The ListSelectionEvent carries no Range/Mode field, so how Apply interprets IDs with TargetID=id is unclear. If Apply treats an event with TargetID and no modifiers as an ordinary click (replace with a single target), select-all would not work. The tests cover only the happy path.",
+      "suggestion": "Verify that Apply replaces the selection with IDs when IDs is non-empty. Add an explicit test for Apply with an empty enabled set.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/list_box.go",
+          "lines": {
+            "start": 130,
+            "end": 136
+          }
+        }
+      ],
+      "tags": [
+        "correctness"
+      ],
+      "evidence": "if r.node.Multiple \u0026\u0026 r.node.SelectionChange != nil {\n\t\t\te.SetHandled()\n\t\t\tqueueListSelectAll(r, id, button)\n\t\t}\n\t\treturn",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4402,
+    "totalMs": 4416
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 11919,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 7865,
+        "output": 396,
+        "costUSD": 0.01969
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

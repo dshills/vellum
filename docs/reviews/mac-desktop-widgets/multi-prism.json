@@ -1,0 +1,140 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "60f09d6899f61c8c8903a03e41ec999c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "55e92f4f70ddb39897ff0199117612178f7785dd",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "52f538d1681befb6",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Anchor set before acceptance and never invalidated",
+      "message": "The anchor is never cleared or revalidated when the anchor option is removed from Options or the selection is rejected or replaced externally. A stale anchor makes Shift ranges start from the target (first\u003c0 fallback) silently, and a rejected click still sets the anchor, so later Shift ranges use an anchor that was never accepted.",
+      "suggestion": "Set the anchor only after the event is accepted, and clear it when the option disappears (in finishChoice).",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/list_selection.go",
+          "lines": {
+            "start": 21,
+            "end": 23
+          }
+        }
+      ],
+      "tags": [
+        "state",
+        "location-corrected"
+      ],
+      "evidence": "if c.listAnchor == \"\" {\n\t\t\tc.listAnchor = anchorHint\n\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "015d8dfd381a5af1",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Option ID parsed from widget name",
+      "message": "Slicing b.Name by prefix length is fragile; the styler can run on a widget whose name differs, and it panics if the name is shorter than the prefix. Also it reads r.node from the styler goroutine without synchronization guarantees.",
+      "suggestion": "Capture the option id in the closure passed to FinalStyler instead of parsing the widget name.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/list_selection.go",
+          "lines": {
+            "start": 62,
+            "end": 62
+          }
+        }
+      ],
+      "tags": [
+        "fragility",
+        "location-corrected"
+      ],
+      "evidence": "if ui.ListOptionSelected(r.node, b.Name[len(\"choice:\"):]) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "5a1609a957e76a25",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Toggle with duplicate IDs flips twice",
+      "message": "Apply's toggle path removes membership correctly, but the Toggle/Add range path from queueListSelection is wrong when a Shift range is processed: Toggle is set only with Meta without Shift, so fine. However the real issue is the `Apply` replace path returns slices.Clone(nil) as nil for empty IDs, which is fine. Low risk.",
+      "suggestion": "Verify behavior with duplicate IDs in e.IDs.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "ui/list_selection.go",
+          "lines": {
+            "start": 24,
+            "end": 24
+          }
+        }
+      ],
+      "tags": [
+        "selection",
+        "location-corrected"
+      ],
+      "evidence": "result = append(result[:i], result[i+1:]...)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 8147,
+    "totalMs": 8190
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 14,
+    "bytes": 35037,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 19270,
+        "output": 826,
+        "costUSD": 0.0468
+      }
+    ],
+    "widenedFiles": 5,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

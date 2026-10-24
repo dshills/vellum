@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "5cdb9e60ff542780692b185c0287e727",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "b967009139664179c96be37a6506f0f2beb2c8fb",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a90c688e732cdb82",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Nil receiver relies on validate for error",
+      "message": "Not a crash: validate handles a nil receiver, and the early return is correct. But the deferred revision/identity update is skipped for nil, which is fine. No action required beyond noting reliance on validate's nil check.",
+      "suggestion": "Return an explicit error for nil instead of relying on the validate side effect.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/level_indicator.go",
+          "lines": {
+            "start": 108,
+            "end": 110
+          }
+        }
+      ],
+      "tags": [
+        "nil",
+        "location-corrected"
+      ],
+      "evidence": "if p == nil {\n\t\treturn Node{}, p.validate()\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "9f681911b3bc5aea",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Panic on image creation error inside View",
+      "message": "capacityImage panics if image construction fails, which would crash the UI from a View call even though View already returns an error. A constant-size image should not fail, but the panic path is unnecessary and capacityImage's signature hides the error.",
+      "suggestion": "Return (*canvas.TiledImage, error) from capacityImage and propagate the error from View.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "ui/level_indicator.go",
+          "lines": {
+            "start": 256,
+            "end": 261
+          }
+        }
+      ],
+      "tags": [
+        "panic",
+        "error-handling"
+      ],
+      "evidence": "result, err := canvas.NewTiledImage(pixels)\n\tif err != nil {\n\t\tpanic(err)\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5249,
+    "totalMs": 5288
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 55588,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 28581,
+        "output": 501,
+        "costUSD": 0.062172
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

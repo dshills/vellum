@@ -39,6 +39,7 @@ import (
 
 	"cogentcore.org/core/system/driver/desktop"
 	"github.com/dshills/vellum/app"
+	"github.com/go-gl/glfw/v3.4/glfw"
 )
 
 type accessibilityAttachment struct {
@@ -47,8 +48,9 @@ type accessibilityAttachment struct {
 	text    *textWindow
 }
 
-func (n *accessibilityAttachment) Focus(bool) {}
+func (n *accessibilityAttachment) Focus(focused bool) { n.bridge.activation.observe(focused) }
 func (n *accessibilityAttachment) Close() {
+	closeTitlebarToolbar(n.bridge)
 	n.display.close()
 	if n.text != nil {
 		// Native attachment retirement precedes the owner's WinClose cleanup.
@@ -61,12 +63,13 @@ func (n *accessibilityAttachment) Close() {
 	n.bridge.closeFrom("native-attachment-close")
 	C.vellumAXDetach(C.uint64_t(n.bridge.token))
 }
-func configureAccessibility(a *app.Application) error {
+func configureAccessibility(a *app.Application, titlebar *preparedTitlebarToolbar) error {
 	if desktop.TheApp.NativeAttach != nil {
 		return fmt.Errorf("cogent: accessibility requires exclusive native attachment hook")
 	}
 	desktop.TheApp.NativeAttach = func(w *desktop.Window) (desktop.NativeAttachment, error) {
 		b := newAccessibilityBridgeWithVisibility(a, newWindowVisibility())
+		b.activation.observe(w.Glw.GetAttrib(glfw.Focused) == glfw.True)
 		if C.vellumAXAttach(C.uint64_t(b.token), w.Glw.GetCocoaView(), w.Glw.GetCocoaWindow()) == 0 {
 			b.closeFrom("native-attach-failed")
 			return nil, fmt.Errorf("cogent: native accessibility attachment failed")
@@ -77,7 +80,12 @@ func configureAccessibility(a *app.Application) error {
 			C.vellumAXDetach(C.uint64_t(b.token))
 			return nil, err
 		}
-		return &accessibilityAttachment{bridge: b, text: text}, nil
+		attachment := &accessibilityAttachment{bridge: b, text: text}
+		if err := attachTitlebarToolbar(a, titlebar, b, w); err != nil {
+			attachment.Close()
+			return nil, err
+		}
+		return attachment, nil
 	}
 	return nil
 }

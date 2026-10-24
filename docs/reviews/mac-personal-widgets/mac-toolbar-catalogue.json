@@ -1,0 +1,145 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "ea3b646d3f294a08c27c1fa85c877436",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "769b131cc81240caa3be85ec9474505137fe70e0",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "43b307ab6d3e2c81",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Mixed toolbar patches children by hard-coded index",
+      "message": "The mixed toolbar replaces Children[0] and Children[1] by index with Button nodes. This only works because the separator is inserted at i==3, so the indices are coupled to the toolbar layout. Changing the item list or separator position would silently replace the wrong nodes.",
+      "suggestion": "Give toolbar() a per-item display override (e.g. a func(name string) string) instead of patching children by index.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_toolbars.go",
+          "lines": {
+            "start": 100,
+            "end": 100
+          }
+        }
+      ],
+      "tags": [
+        "fragile",
+        "location-corrected"
+      ],
+      "evidence": "mixed.Children[0] = m.action(\"toolbar-mixed\", \"New\", ui.SymbolAdd, macToolbarSizes[1], \"both\")",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7849,
+    "totalMs": 7877
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 29603,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 16422,
+        "output": 893,
+        "costUSD": 0.041774
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "3b8e4b520703378e",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Disabled state duplicated between node and callback",
+        "message": "Every toolbar in the vertical, mixed and sized variants uses a different prefix, but the status tracks only the last action. When a toolbar sets m.disabled it is also applied to the display controls' siblings. The nested toolbar-level Disabled flag is derived at view build time, so it can become stale relative to the Activate closure's live m.disabled check, giving inconsistent behavior.",
+        "suggestion": "Rely on a single source of truth, e.g. the Disabled field, rather than duplicating checks in the callback.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "drivers/cogent/cmd/gallery/mac_toolbars.go",
+            "lines": {
+              "start": 41,
+              "end": 43
+            }
+          }
+        ],
+        "tags": [
+          "consistency"
+        ],
+        "evidence": "Activate: func() {\n\t\tif !m.disabled \u0026\u0026 name != \"Delete\" {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/cmd/gallery/mac_toolbars.go"
+    },
+    {
+      "finding": {
+        "id": "b11c517fc3251995",
+        "severity": "medium",
+        "category": "testing",
+        "title": "Weakened gallery background test",
+        "message": "The test assertion was weakened from comparing against the window background to only checking the background is opaque. It no longer verifies that each page paints the shared window surface, so regressions in page appearance are not detected.",
+        "suggestion": "Keep a meaningful check, e.g. compare each page's background to the expected light/dark color, or exempt only the Toolbars page.",
+        "confidence": 0.55,
+        "locations": [
+          {
+            "path": "drivers/cogent/cmd/gallery/mac_widgets_next_test.go",
+            "lines": {
+              "start": 28,
+              "end": 36
+            }
+          }
+        ],
+        "tags": [
+          "test-weakening"
+        ],
+        "evidence": "|| pageNode.Style.Background != n.Style.Background {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/cmd/gallery/mac_widgets_next_test.go"
+    }
+  ],
+  "suppressed": []
+}

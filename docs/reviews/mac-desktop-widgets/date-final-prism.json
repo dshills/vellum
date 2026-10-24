@@ -1,0 +1,116 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a824775ad6e9dec90e3f97f1d65fd040",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "b1ee3a918dc4e63454060889e45ff167862a497e",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "8e4e93a58ba666b1",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Layout not validated against mode",
+      "message": "The Date-and-time layout check, and the TimeOnly path, only check fields; layouts lacking seconds/year parse with defaults (year 0 when layout has no year, e.g. a layout containing only month/day) and then valid() rejects year\u003c1 with a generic error. Also in DateOnly mode, a layout with time fields silently discards them, and in DateAndTime mode a layout without date fields yields year 0000 and an opaque bounds error.",
+      "suggestion": "Validate that the layout contains fields appropriate to the mode in View (e.g. require date tokens for date modes, time tokens for TimeOnly/DateAndTime) and return an error otherwise.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/date_time_picker.go",
+          "lines": {
+            "start": 89,
+            "end": 89
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "location-corrected"
+      ],
+      "evidence": "v = time.Date(p.Value.Year(), p.Value.Month(), p.Value.Day(), wall.Hour(), wall.Minute(), wall.Second(), wall.Nanosecond(), p.Value.Location())",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "656d06494c764e10",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Anchor click can reopen popover after outside-dismiss",
+      "message": "Activate on the calendar button toggles calendarOpen and resets month. In date-only mode TimeOnly is excluded, but also the Popover is rendered from stale closure state: day Activate closures capture `month` from render time, so they stay correct, but the Activate on the toggle button resets p.month even when closing, which is fine. However, the popover Dismiss fires on release outside, including a click on the anchor button itself, which can close the popover and then the button's Activate immediately reopens it (toggle after dismiss), making it impossible to close by clicking the button.",
+      "suggestion": "Handle the dismiss-then-toggle race: e.g. track whether the popover was just dismissed by the anchor click and ignore the following toggle, or make the anchor button only open.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "ui/date_time_picker.go",
+          "lines": {
+            "start": 147,
+            "end": 148
+          }
+        }
+      ],
+      "tags": [
+        "popover",
+        "interaction",
+        "location-corrected"
+      ],
+      "evidence": "p.calendarOpen = !p.calendarOpen\n\t\t\t\tp.month = time.Time{}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7891,
+    "totalMs": 7943
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 40817,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 21930,
+        "output": 798,
+        "costUSD": 0.05184
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

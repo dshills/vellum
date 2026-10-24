@@ -1,0 +1,116 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "6f20cc93112e5d942680d430a1b4520a",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "652f026533dceb6c854eb568b4265c8dd06f7c04",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "8089a67faccd7223",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Default gap may override local Gap style",
+      "message": "In stacked mode the styler sets IconSize and Gap unconditionally, overriding local Style.Gap or other styles applied earlier, depending on styler ordering. The docs claim local Gap/Padding overrides remain effective, but this Styler is installed after earlier stylers and may win over the node's Gap.",
+      "suggestion": "Install this styler before the node-style styler, or only set Gap when the local style has no Gap.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/button_image.go",
+          "lines": {
+            "start": 20,
+            "end": 20
+          }
+        }
+      ],
+      "tags": [
+        "styling",
+        "location-corrected"
+      ],
+      "evidence": "s.IconSize.Set(units.Em(2))",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "9af1065a22c6306c",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Spacer removal depends on private native plan item name",
+      "message": "The \"space\" spacer is also inserted by the native Button for non-icon cases; deleting by name is fragile. More importantly, FinalMaker only runs on Update; if IconPlacement changes the widget's Update is triggered via syncControl, but Styler direction/IconSize are set on the button for text-only buttons too. Deleting the space relies on the pinned Cogent version's internals, and a future upgrade silently breaks stacked layout.",
+      "suggestion": "Add a test pinning that the native spacer name is \"space\" (the test covers symbol path) and document the dependency; alternatively guard with a version-check test.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/button_image.go",
+          "lines": {
+            "start": 32,
+            "end": 32
+          }
+        }
+      ],
+      "tags": [
+        "fragile",
+        "cogent",
+        "location-corrected"
+      ],
+      "evidence": "p.Children = slices.DeleteFunc(p.Children, func(item *tree.PlanItem) bool { return item.Name == \"space\" })",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6384,
+    "totalMs": 6418
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 15,
+    "bytes": 45470,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 23045,
+        "output": 632,
+        "costUSD": 0.05241
+      }
+    ],
+    "widenedFiles": 9,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

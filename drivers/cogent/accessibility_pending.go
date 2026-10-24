@@ -130,7 +130,7 @@ func accessibilityPendingPatchBaseline(previous accessibilityWireBaseline, next 
 }
 
 func accessibilitySameWireNode(a, b accessibilityNode) bool {
-	if a.ID != b.ID || a.DomainID != b.DomainID || a.Parent != b.Parent || a.Role != b.Role || a.Name != b.Name || a.Help != b.Help ||
+	if a.ID != b.ID || a.DomainID != b.DomainID || a.Parent != b.Parent || a.Role != b.Role || a.Secure != b.Secure || a.Name != b.Name || a.Help != b.Help ||
 		!accessibilitySameScalar(a.Value, b.Value) || a.Disabled != b.Disabled || a.Focusable != b.Focusable || a.Focused != b.Focused || a.Selected != b.Selected ||
 		a.Orientation != b.Orientation || a.RowIndex != b.RowIndex || a.RowCount != b.RowCount || a.ColumnIndex != b.ColumnIndex || a.ColumnCount != b.ColumnCount ||
 		a.GridGeneration != b.GridGeneration || a.GridScope != b.GridScope || a.GridIncarnation != b.GridIncarnation || a.GridPending != b.GridPending || a.GridTargetGeneration != b.GridTargetGeneration ||

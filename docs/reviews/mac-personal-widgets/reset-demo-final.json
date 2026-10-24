@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "591b32ceda7bf2511e1605025c6bc712",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "0d86c7c145d1cffff8ed39fc35dbb1c5084a92c3",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "cb9382f4d96a8ea7",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Whole-struct reset relies on setDisabled to revoke stale callbacks",
+      "message": "resetFields zeroes the whole struct, including fields not recreated below (selectedObjects, contextAction, etc.), which is intended, but it also wipes any other state the struct holds that isn't restored (e.g. unexported fields set elsewhere in the file such as callbacks or layout caches). Also, resetFields is invoked as the notice Activate callback from within the old notice's handler; the old notice is replaced while its handler is running, which is OK, but the stale-revocation relies on setDisabled(true) only reaching components, not on any generation token. Any component not covered by setDisabled (e.g. combo, datePicker, search) may stay live.",
+      "suggestion": "Verify setDisabled covers every component (combo, datePicker, search, colorWell), or use an explicit generation counter checked in callbacks so stale callbacks are inert.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/input_helpers.go",
+          "lines": {
+            "start": 52,
+            "end": 52
+          }
+        }
+      ],
+      "tags": [
+        "state",
+        "stale-callbacks",
+        "location-corrected"
+      ],
+      "evidence": "*m = inputHelpersGallery{name: \"Untitled\", quantity: 1}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5455,
+    "totalMs": 5474
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 12578,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 8428,
+        "output": 448,
+        "costUSD": 0.021336
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

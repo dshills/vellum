@@ -8,6 +8,7 @@ import (
 	"cogentcore.org/core/events/key"
 	"cogentcore.org/core/styles/states"
 	"github.com/dshills/vellum/ui"
+	"image/color"
 	"testing"
 )
 
@@ -210,5 +211,36 @@ func TestTabFocusedOptionDisableRepairsNavigation(t *testing.T) {
 	unitSettle(t, m)
 	if !findRecord(w.state.root, "after").widget.AsWidget().ContainsFocus() || calls != 1 {
 		t.Fatal("all-disabled strip did not yield to enabled outside focus", calls)
+	}
+}
+
+// Explicit strip ink must reach generated labels and reset when withdrawn.
+func TestTabsExplicitInkFollowsOwnerWithoutChangingSelectionColors(t *testing.T) {
+	ink := ui.Some(color.NRGBA{R: 241, G: 241, B: 243, A: 255})
+	m, a := simpleManual(t, manualConfig(t, 7), func() ui.Node {
+		return ui.Node{ID: "tabs", Kind: ui.Tabs, Grow: true, SelectedID: "a", Style: ui.Style{Foreground: ink}, Options: []ui.Option{{ID: "a", Label: "One"}, {ID: "b", Label: "Two"}}, Children: []ui.Node{{ID: "a", Kind: ui.Column}, {ID: "b", Kind: ui.Column}}}
+	})
+	unitSettle(t, m)
+	r := m.implementation.find("one").state.root
+	sample := func(id string) color.NRGBA {
+		return color.NRGBAModel.Convert(r.control.tabs.buttons[id].Styles.Color.At(0, 0)).(color.NRGBA)
+	}
+	if got := sample("b"); got != ink.Value {
+		t.Fatal("unselected tab ink", got)
+	}
+	selected := sample("a")
+	if selected == ink.Value {
+		t.Fatal("selection ink lost its paired native palette")
+	}
+	ink = ui.Optional[color.NRGBA]{}
+	if err := a.Invalidate("one"); err != nil {
+		t.Fatal(err)
+	}
+	unitSettle(t, m)
+	if sample("b") == (color.NRGBA{R: 241, G: 241, B: 243, A: 255}) {
+		t.Fatal("withdrawn ink retained")
+	}
+	if sample("a") != selected {
+		t.Fatal("selection palette changed")
 	}
 }

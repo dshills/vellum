@@ -98,7 +98,7 @@ func (t *textWindow) publishEmptyInactive() (bool, error) {
 		return true, nil
 	}
 	t.inactivePublication = inactiveTextPublication{}
-	accepted, err := publishTextOnMain(t, 0, core.TextFieldEditingState{}, -1, -1, false, t.ack, [4]float64{}, textinput.Geometry{}, textinput.MaxDocumentBytes)
+	accepted, err := publishTextOnMain(t, 0, core.TextFieldEditingState{}, -1, -1, false, t.ack, [4]float64{}, textinput.Geometry{}, textinput.MaxDocumentBytes, false)
 	// Native acceptance is authoritative. Revalidate after the synchronous main
 	// callback, including logical closure, readiness, backend and pending input.
 	after, unchanged := t.emptyPublicationKey()
@@ -126,7 +126,7 @@ func (t *textWindow) setActiveClient(id uint64, active bool) {
 // native state; only accepted client-zero publication retires its activation.
 func (t *textWindow) deactivateNativeClient() (bool, error) {
 	t.inactivePublication = inactiveTextPublication{}
-	accepted, err := publishTextOnMain(t, 0, core.TextFieldEditingState{}, -1, -1, false, t.ack, [4]float64{}, textinput.Geometry{}, textinput.MaxDocumentBytes)
+	accepted, err := publishTextOnMain(t, 0, core.TextFieldEditingState{}, -1, -1, false, t.ack, [4]float64{}, textinput.Geometry{}, textinput.MaxDocumentBytes, false)
 	if accepted {
 		t.setActiveClient(0, false)
 	}
@@ -228,7 +228,7 @@ func (t *textWindow) publishClient(r *record, active bool) (bool, error) {
 		shadow.Revision, shadow.Epoch, shadow.SelectionEpoch = s.Revision, s.VisibleEpoch, s.SelectionEpoch
 		maximum = min(maximum, b.model.MaxBytes())
 	}
-	accepted, err := publishTextOnMain(t, r.control.client, state, start, end, active, t.ack, caret, geometry, maximum)
+	accepted, err := publishTextOnMain(t, r.control.client, state, start, end, active, t.ack, caret, geometry, maximum, r.node.Secure)
 	if err != nil {
 		editorError(r, err)
 		return false, err
@@ -272,7 +272,7 @@ func accessibilityTextGeometry(root *record) map[string]any {
 			return
 		}
 		if r.control != nil && r.control.client != 0 && !r.control.retired {
-			if client, ok := r.widget.(nativeTextClient); ok {
+			if client, ok := r.widget.(nativeTextClient); ok && !r.node.Secure {
 				state := client.EditingState()
 				geometry := textGeometry(state, client.NativeTextGeometry(), 1)
 				out[prefix+accessibilityManagedID(r.node.ID)] = map[string]any{"client": r.control.client, "text": state.Text, "geometry": geometry}

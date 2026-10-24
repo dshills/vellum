@@ -1,0 +1,114 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "0a55d2097ee61da6be58da04671a8781",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "1270e60d106ca1b8a6b35f32f7af64544f711cdd",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "ce9c0b56c30235df",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Corrupt preference file is overwritten on next save after a failed load",
+      "message": "On a validation failure after earlier layouts were pruned, loadPreferences returns without setting m.layouts, and preferencesPath remains set. The next customization change then calls savePreferences, which overwrites the user's invalid or too-large file. The same happens for the 'too many layouts', oversize, and parse-error cases. This contradicts the stated goal of not clobbering files, and a transient corrupt file is permanently replaced.",
+      "suggestion": "Treat load failures other than not-exist as non-destructive: clear preferencesPath (or keep a flag) so the file is not overwritten, or back it up before the first save.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_toolbar_preferences.go",
+          "lines": {
+            "start": 80,
+            "end": 82
+          }
+        }
+      ],
+      "tags": [
+        "data-loss"
+      ],
+      "evidence": "\t\t\tm.preferencesError = fmt.Errorf(\"saved toolbar layout exceeds item limit\")\n\t\t\treturn\n",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "f2191d3b9d9e9ab0",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Temp-file cleanup and permissions are implicit",
+      "message": "f.Close() is called twice, which is harmless. But the deferred os.Remove runs after a successful Rename; it just fails silently. Meanwhile, the Rename error is returned as-is, which is fine. The main concern is that the directory is never fsynced after the rename, so durability is not guaranteed on a crash. This is minor, but a more serious problem is that the temp file is created with CreateTemp's 0600 mode, which only works by accident and is not set explicitly.",
+      "suggestion": "Call f.Chmod(0600) explicitly and avoid the redundant remove after a successful rename.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_toolbar_preferences.go",
+          "lines": {
+            "start": 128,
+            "end": 128
+          }
+        }
+      ],
+      "tags": [
+        "io",
+        "location-corrected"
+      ],
+      "evidence": "defer func() { f.Close(); os.Remove(name) }()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6551,
+    "totalMs": 6570
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 7,
+    "bytes": 22331,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 12831,
+        "output": 776,
+        "costUSD": 0.033422
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

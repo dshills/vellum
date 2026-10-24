@@ -21,6 +21,8 @@ type managedImage struct {
 	fit    ui.ImageFit
 }
 
+func (w *managedImage) Destroy() { w.source = nil; w.WidgetBase.Destroy() }
+
 func (w *managedImage) SizeUp() {
 	w.WidgetBase.SizeUp()
 	if w.source == nil {

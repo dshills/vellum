@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "99c2ac1b36536001539cc5e6a9028cd3",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "5fb69be099329f0ea329c1aff9f2d6ca6d670727",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "df183aa6d97745e2",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Stage selection relies on enum ordering",
+      "message": "The code assumes stage types after DialogStage have a usable Main parent. For other main-like stage types, such as Window, Main may be nil or a different stage. The old code used Main unconditionally, so this alters stage selection. A nil Main is handled only by returning silently, which leaves the preview hidden.",
+      "suggestion": "Make the stage selection explicit by enumerating which stage types use scene.Stage itself and which use Main. Log or assert when neither is available.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/toolbar_drag.go",
+          "lines": {
+            "start": 304,
+            "end": 306
+          }
+        }
+      ],
+      "tags": [
+        "stage",
+        "drag",
+        "location-corrected"
+      ],
+      "evidence": "if scene.Stage.Type \u003e core.DialogStage {\n\t\tg.stage = scene.Stage.Main\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4064,
+    "totalMs": 4079
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 16813,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 10250,
+        "output": 315,
+        "costUSD": 0.02365
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

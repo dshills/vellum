@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b18097238f0f628e7bc88ae2e736fc21",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "ae7085042b2bd6d8c884fa78811e1e10ab743954",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "ea38dc83c02944ca",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Label styler relies on OnChildAdded timing",
+      "message": "The new OnChildAdded hook only styles the label when a child is added, but the styler checks r.node at style time, so it is correct for later mode changes. However, the hook only applies to *core.Text children. If the label is replaced or re-created, or added before the hook is installed, the style is not applied. Also, the test panics on a failed type assertion rather than failing cleanly.",
+      "suggestion": "Apply the styler to existing text children after construction too, and use a checked type assertion in the test with t.Fatal on failure.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/choices.go",
+          "lines": {
+            "start": 142,
+            "end": 142
+          }
+        }
+      ],
+      "tags": [
+        "robustness",
+        "location-corrected"
+      ],
+      "evidence": "if r.node.Kind == ui.ListBox \u0026\u0026 r.node.Multiple {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3849,
+    "totalMs": 3859
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 9306,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 6769,
+        "output": 309,
+        "costUSD": 0.016628
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

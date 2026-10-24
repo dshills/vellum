@@ -1,0 +1,94 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "c252d87e08b01eb7b3a44e4085a773f1",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "253504c8b6eea667adbc0a78201eba4c5e055f13",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "f1466a0a3b586dec",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Ungrammatical, non-localized AX value",
+      "message": "The summary is hard-coded English and always plural, so a screen reader announces \"1 items selected\" for a single selection. It is also not localizable.",
+      "suggestion": "Handle the singular case (\"1 item selected\") or use a neutral format such as \"%d selected\".",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility.go",
+          "lines": {
+            "start": 632,
+            "end": 632
+          }
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "i18n"
+      ],
+      "evidence": "x.Value = fmt.Sprintf(\"%d items selected\", len(n.SelectedIDs))",
+      "fix": {
+        "before": "x.Value = fmt.Sprintf(\"%d items selected\", len(n.SelectedIDs))",
+        "after": "x.Value = fmt.Sprintf(\"%d selected\", len(n.SelectedIDs))"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3816,
+    "totalMs": 3832
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 8386,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 6345,
+        "output": 321,
+        "costUSD": 0.0159
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

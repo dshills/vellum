@@ -309,7 +309,7 @@ func (p *manualImplementation) refresh(w *managedManualWindow) error {
 		bindTreeScopes(n.root)
 		flushDialogs(n.root)
 		bindWorkbenchInputScopes(n.root)
-		if updateErr = applyFocus(n.root, view.Focus, &n.lastFocus); updateErr != nil {
+		if updateErr = applyWindowFocus(n, view.Focus); updateErr != nil {
 			return
 		}
 		if updateErr = bindTextWindow(n); updateErr != nil {
@@ -504,10 +504,12 @@ func (p *manualImplementation) syncTopology(ctx context.Context) error {
 		bindCloseRequest(n, p.owner, nil)
 		n.body.OnShow(func(events.Event) {
 			showErr := withWindowOwner(p.owner, spec.Ref(), func() {
+				n.rootMu.Lock()
+				defer n.rootMu.Unlock()
 				if n.root != nil {
 					flushDialogs(n.root)
 					bindWorkbenchInputScopes(n.root)
-					p.fail(applyFocus(n.root, n.root.node.Focus, &n.lastFocus))
+					p.fail(applyWindowFocus(n, n.root.node.Focus))
 				}
 			})
 			if !errors.Is(showErr, app.ErrWindowClosed) {
@@ -516,6 +518,7 @@ func (p *manualImplementation) syncTopology(ctx context.Context) error {
 		})
 		n.body.OnClose(func(events.Event) {
 			n.closing.Store(true)
+			n.pendingFocusReveal.Store(nil)
 			if !w.suppressDomainClose && w.domain.Err() == nil {
 				// Once the owner stops, model notifications are no longer valid.
 				// Native/control cleanup below still retires every mounted record.
@@ -564,6 +567,7 @@ func (p *manualImplementation) syncTopology(ctx context.Context) error {
 }
 func (p *manualImplementation) retire(ctx context.Context, w *managedManualWindow) error {
 	w.state.closing.Store(true)
+	w.state.pendingFocusReveal.Store(nil)
 	var err error
 	if w.core != nil {
 		err = p.cleanup(w)
@@ -857,6 +861,11 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 				value = state.Text
 				offsets := utf16Selection(state.Text, state.Anchor, state.Focus)
 				selection, focus = offsets.rangeValue, offsets.focus
+			}
+			if r.node.Secure {
+				value = ""
+				selection = [2]int{-1, 0}
+				focus = 0
 			}
 			b := bounds[axID]
 			rect := image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))

@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "6d205ea38bc01829d9d0cf26823cb8c1",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "c3b23a4ae65154ddb5d04ad4f22a9ac53edc1003",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "73ea7b894a415bdc",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Styler reads mutable record fields (r.node, r.theme) concurrently with owner updates",
+      "message": "When the TextField is not inside a shared outline row, a nonzero border uses s.Is(states.Focused), but for the Row case ContainsFocus is read inside a styler. If r.widget ContainsFocus is read off the owner thread (styler runs during native render), it races with owner-side focus changes. Likewise r.node and r.theme are read in stylers while syncRecordVisible mutates r.node on the owner thread without synchronization.",
+      "suggestion": "Snapshot the needed node/theme data into atomics (as done for shared) or only read it under the same lock as the render pass.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/input_focus_style.go",
+          "lines": {
+            "start": 117,
+            "end": 117
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "concurrency",
+        "location-corrected"
+      ],
+      "evidence": "if !controlDisabled(r) \u0026\u0026 s.Is(states.Focused) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4141,
+    "totalMs": 4153
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 16292,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 10029,
+        "output": 352,
+        "costUSD": 0.023578
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

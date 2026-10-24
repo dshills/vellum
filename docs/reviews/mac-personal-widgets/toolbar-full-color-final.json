@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "e97a6ad8cb6b051fdd68b71e76cab614",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "9fcf45881c74db407e523050185cff5a4450c6bf",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "9952cae668c244de",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Manual reordering of plan children",
+      "message": "Reordering the plan children relies on the plan's internal slice and on tree.AddAt's behavior. Moving the item to index 0 happens on every Maker run. It can conflict with other Makers (such as the indicator and label) and with the Plan's name-based reconciliation, so child order may be unstable.",
+      "suggestion": "Prefer a supported ordering mechanism, or verify with tests that Plan reconciliation keeps the order. Alternatively, use a Maker that runs before the label.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/button_image.go",
+          "lines": {
+            "start": 35,
+            "end": 35
+          }
+        }
+      ],
+      "tags": [
+        "fragile",
+        "location-corrected"
+      ],
+      "evidence": "copy(p.Children[1:i+1], p.Children[:i])",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "eb74a4c0a8fdf00f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Dispose mutates node state without synchronization",
+      "message": "The Maker closure reads r.node.IconImage at plan time, and the Updater reads it later. If the Updater runs after dispose, it can overwrite w.source with nil or stale data, and there is no synchronization. Mutating r.node during dispose can also race with the owner goroutine if disposal occurs off-owner.",
+      "suggestion": "Ensure dispose runs on the owner goroutine, and guard the Updater with r.control.retired so it does not reassign the source after retirement.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/button_image.go",
+          "lines": {
+            "start": 44,
+            "end": 50
+          }
+        }
+      ],
+      "tags": [
+        "lifetime",
+        "concurrency"
+      ],
+      "evidence": "r.node.IconImage = nil\n\tif button, ok := r.widget.(*core.Button); ok {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5550,
+    "totalMs": 5586
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 19,
+    "bytes": 50658,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 26287,
+        "output": 601,
+        "costUSD": 0.058584
+      }
+    ],
+    "widenedFiles": 8,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

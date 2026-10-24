@@ -1,0 +1,117 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "63ff885fbe550ea5179063884b70e57e",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "8ed6b755081ea8957491ec79cf046d10b09d01b0",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "88db9fa76024db91",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Owner token/window assignment appears lost",
+      "message": "The context variable is declared as `vellumTitlebarPaletteContext`, but the new code elsewhere uses `\u0026vellumTitlebarPaletteContext` consistently. The real problem: `[REDACTED]` appears in the attach function, which makes the Objective-C source uncompilable as shown.",
+      "suggestion": "Restore the `owner.window=window;owner.token=token;` assignments, since without them token and window are never set on the owner.",
+      "confidence": 0.8,
+      "locations": [
+        {
+          "path": "drivers/cogent/titlebar_toolbar_darwin.m",
+          "lines": {
+            "start": 116,
+            "end": 116
+          }
+        }
+      ],
+      "tags": [
+        "objc",
+        "build",
+        "location-corrected"
+      ],
+      "evidence": "if(context==\u0026vellumTitlebarPaletteContext) { [self updateCustomization:self.toolbar.customizationPaletteIsRunning];return; }",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "c3c7301590d07b5c",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Customizing state can diverge between ObjC and Go",
+      "message": "In runCustomizationPalette:, Go-side customizing is set by the call to vellumTitlebarCustomizationScope(1), but if the super call does not start the palette (it returns immediately), the finally block calls updateCustomization:NO, which returns early when owner.customizing was already set YES... actually it will clear. However when [owner updateCustomization:] is invoked with the palette still running asynchronously as a sheet, it passes YES and does nothing, relying on KVO. If KVO is missed, Go-side permission stays revoked forever.",
+      "suggestion": "Make state transitions idempotent and set owner.customizing only through updateCustomization so Go and ObjC state cannot diverge.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/titlebar_toolbar_darwin.m",
+          "lines": {
+            "start": 43,
+            "end": 43
+          }
+        }
+      ],
+      "tags": [
+        "state",
+        "objc",
+        "location-corrected"
+      ],
+      "evidence": "owner.customizing=YES;[owner refreshEnabled];",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6400,
+    "totalMs": 6433
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 11,
+    "bytes": 47127,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 24071,
+        "output": 727,
+        "costUSD": 0.055412
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

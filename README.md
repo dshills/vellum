@@ -5,12 +5,16 @@ Applications compose UI descriptions from Go values and stable widget IDs, then
 handle changes through explicit commands, cancellable tasks, and Undo/Redo history.
 A separate native driver uses Cogent Core for windowing and WebGPU rendering.
 
-**Status:** `v0.1.0-alpha.3` macOS developer-preview candidate, not yet published.
-Features are frozen under the [approved release plan](specs/macos-first-release-plan.md).
-The private SDK and drawing application pass independent consumption/build checks;
-native acceptance, final distribution clearance and delivered-artifact checks are
-still in progress. Windows and Linux remain unqualified. Full production and
-numeric performance qualification are separate from this developer preview.
+**Status:** [v0.1.0-alpha.3](https://github.com/dshills/vellum/releases/tag/v0.1.0-alpha.3)
+is a published macOS developer preview for Apple Silicon. Its SDK and Placement
+app are experimental; the app is ad-hoc signed and unnotarized. Windows and Linux
+remain unqualified. Full production and numeric performance qualification remain
+separate from this preview under the [approved release plan](specs/macos-first-release-plan.md).
+
+The current source also includes newer macOS widget work for personal evaluation.
+Those widgets are not included in the published alpha.3 assets. See the
+[Mac widget demo](docs/mac-widget-demo.md) and
+[public-API integration guide](docs/mac-widget-integration.md) to try them from source.
 
 ## What is available
 
@@ -69,6 +73,7 @@ repository root with `drivers/cogent/env.sh` sourced.
 | Example | Run | Purpose |
 | --- | --- | --- |
 | [Hello](examples/hello/README.md) | `(cd examples/hello && go run .)` | Minimal public-API application |
+| [Mac widgets](docs/mac-widget-demo.md) | `(cd drivers/cogent && go run ./cmd/gallery -mac-widgets)` | Light/dark Mac input controls, color well, tags, font/path pickers and protected entry |
 | [Workbench](drivers/cogent/cmd/workbench/) | `(cd drivers/cogent && go run ./cmd/workbench)` | Docking and composed UI |
 | [Calculator](examples/macapps/calculator/README.md) | `(cd examples/macapps && go run ./cmd/calculator)` | Fixed-size calculator with arithmetic and keyboard input |
 | [Notes](examples/macapps/notes/README.md) | `(cd examples/macapps && go run ./cmd/notes)` | Folders, search, plain-text editing and Undo/Redo |
@@ -133,6 +138,8 @@ workflow is `scripts/check.sh`; see [CONTRIBUTING](CONTRIBUTING.md) and the
 ## License and release status
 
 Vellum's own code is [MIT licensed](LICENSE). Third-party components retain their
-original licenses and notices. Public SDK/binary distribution qualification,
-including the third-party/native distribution audit, remains open; see the
+original licenses and notices. The owner approved distribution of the exact
+alpha.3 payload and its notice bundle. That decision does not cover future changed
+payloads; new public artifacts still require the applicable audit, notice checks
+and publication approval. See the [published release and limitations](https://github.com/dshills/vellum/releases/tag/v0.1.0-alpha.3),
 [release contract](specs/release.md) and [release metadata](release/version.json).

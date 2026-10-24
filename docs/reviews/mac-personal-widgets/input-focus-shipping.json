@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f64f0018831366e669130c8c1078423f",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "c3b23a4ae65154ddb5d04ad4f22a9ac53edc1003",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "532ce3cdce1cf001",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Outline sync runs before theme/children updated",
+      "message": "syncInputOutline resolves styles with r.theme and calls Update() on the widget. It is invoked at the top of syncRecordVisible, before the record's children are synced and before theme changes are applied. sharesInputOutline reads n.Children (new node), but the child TextField style is resolved with the possibly stale r.theme. A theme change could therefore leave the outline state stale.",
+      "suggestion": "Call syncInputOutline after r.theme is updated, or confirm theme is updated earlier in the function; ensure Update is not triggered mid-sync.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 659,
+            "end": 661
+          }
+        }
+      ],
+      "tags": [
+        "correctness",
+        "state"
+      ],
+      "evidence": "\tr.node = n\n\tsyncInputOutline(r)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6442,
+    "totalMs": 6455
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 16914,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 10516,
+        "output": 671,
+        "costUSD": 0.027742
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -1,0 +1,85 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "009a08c6dad25567fe2a5d64ab5e7808",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "d4c96b04a5ffa1785649e37601e63c12dc8b00b8",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3967,
+    "totalMs": 3974
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 2,
+    "bytes": 7088,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5921,
+        "output": 342,
+        "costUSD": 0.015262
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "1912c6f4d28bbb17",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Clipping assertion may be unreliable",
+        "message": "The viewport check uses the bounds of the scroll container, which can be the full content or a clipped region. If the scroll content is taller than the viewport, the vertical toolbar may legitimately lie outside it and the check could fail or give a false pass. Also t.Fatal with multiple args does not format them clearly.",
+        "suggestion": "Use t.Fatalf with a format string, and make sure the viewport is the window or visible bounds rather than the scroll node's content bounds.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "drivers/cogent/cmd/gallery/mac_toolbars_offscreen_test.go",
+            "lines": {
+              "start": 117,
+              "end": 119
+            }
+          }
+        ],
+        "tags": [
+          "testing"
+        ],
+        "evidence": "vertical.Empty() || !vertical.In(viewport) {\n\t\tt.Fatal(\"vertical example clipped in standard window\", vertical, viewport)",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/cmd/gallery/mac_toolbars_offscreen_test.go"
+    }
+  ],
+  "suppressed": []
+}

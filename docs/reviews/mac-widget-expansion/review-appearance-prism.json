@@ -1,0 +1,117 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "00bad2bf00df6efc9906d0a50eb11ddb",
+  "repo": {
+    "root": "<USER_HOME>/Development/projects/Vellum",
+    "head": "320376ec8573a8603f75faaa3b3a7ea8a8ea0366",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "39135d34a41381bf",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Field type changed without relayout; error ignored",
+      "message": "syncFieldOutline silently returns on a style resolution error and otherwise overwrites field.Type on every sync, overriding any type the backend set elsewhere. It also sets Type without triggering a restyle/relayout, so a border change on a retained field may not take effect until the next layout.",
+      "suggestion": "Only update when Type changes and call field.NeedsLayout()/Update; propagate the error rather than swallowing it.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/controls.go",
+          "lines": {
+            "start": 554,
+            "end": 560
+          }
+        }
+      ],
+      "tags": [
+        "driver"
+      ],
+      "evidence": "syncFieldOutline(r, \u0026w.TextField)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 8671,
+    "totalMs": 8714
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 16,
+    "bytes": 54777,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 27769,
+        "output": 641,
+        "costUSD": 0.061948
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "f276807408776b92",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Same widget IDs rendered from shared state in multiple views",
+        "message": "The gallery view() is called twice per render in the normal gallery: once for the Input helpers tab via g.inputHelpers.view() and again in tests; the search/notice descriptors are re-created each call, which is fine, but the Tabs child ID \"inputs\" and the \"about\" ID are unique only if view succeeds. On the error path the node is a Label named \"inputs\", which is acceptable. However m.search.Style is mutated by setAppearance on the shared instance when -mac-widgets is set, after g.view was created; low risk.",
+        "suggestion": "Verify no duplicate IDs occur when both g.view and inputHelpers.view render the same IDs in one window.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "drivers/cogent/cmd/gallery/input_helpers.go",
+            "lines": {
+              "start": 98,
+              "end": 98
+            }
+          }
+        ],
+        "tags": [
+          "gallery"
+        ],
+        "evidence": "{ID: \"inputs\", Kind: ui.Scroll, Grow: true,",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/cmd/gallery/input_helpers.go"
+    }
+  ],
+  "suppressed": []
+}

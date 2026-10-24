@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "322ff7605d91898c1fa09d6e075a8a88",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "346ea7869ff1ee3ca44659d9a5d743c5abec3bb0",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a65d356821e456b7",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Prefix stripping not applied to view error labels",
+      "message": "The new helper is only wired into the Invalid callbacks. The view() error paths still render err.Error() directly as Label text, so the internal \"ui: \" prefix still reaches users in those paths. The spec claims input validation messages omit the prefix.",
+      "suggestion": "Route the view() error labels through inputFeedback only if those errors are meant to be user-facing. Otherwise narrow the spec wording to say it covers only Invalid callbacks.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/input_helpers.go",
+          "lines": {
+            "start": 88,
+            "end": 88
+          }
+        }
+      ],
+      "tags": [
+        "consistency",
+        "location-corrected"
+      ],
+      "evidence": "m.tokens.Invalid = func(err error) { m.tokenError = inputFeedback(err); m.focusAfterTokenEdit() }",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3981,
+    "totalMs": 3998
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 20614,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 12721,
+        "output": 323,
+        "costUSD": 0.028672
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

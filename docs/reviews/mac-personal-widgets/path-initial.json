@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "3e033464e69a0c892a23b8b9e9c11b9f",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "8b7a86b129de8236fe4455024ed9ff48a1cb9bf4",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "b639c282a6422476",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Disabled state not propagated to read-only children",
+      "message": "The read-only row has children and the segment ID is used as the prefix for the child IDs. The test asserts `n.Children[0].Children[1].Text`, which depends on this nesting. If a path control has a single item and Navigate is set, the overflow button or separators may also lack Disabled propagation for children, so item.Disabled only applies to the row and not the icon or label. The impact is minor.",
+      "suggestion": "Propagate Disabled to the child icon and label nodes, and verify rendering of disabled items.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/path_control.go",
+          "lines": {
+            "start": 199,
+            "end": 199
+          }
+        }
+      ],
+      "tags": [
+        "disabled",
+        "location-corrected"
+      ],
+      "evidence": "n = Node{ID: n.ID, Kind: Row, Disabled: n.Disabled, Style: Style{Gap: Some(float32(4)), Align: Some(AlignCenter), GrowX: Some(float32(0))}, Accessibility: n.Accessibility, Children: []Node{{ID: n.ID + \"/icon\", Kind: Icon, Icon: icon}, {ID: n.ID + \"/label\", Kind: Label, Text: n.Text, Style: segmentStyle}}}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4194,
+    "totalMs": 4227
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 31187,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 17975,
+        "output": 449,
+        "costUSD": 0.04044
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

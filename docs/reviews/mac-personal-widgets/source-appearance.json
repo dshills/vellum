@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "2fb97bc782601e5101e3b315ad562033",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "76a159004317c7a3f032e74eaafdabf834a04457",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "1886048786d033e3",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Icons never restored when leaving multiple mode",
+      "message": "Icons are cleared when Multiple is true, but nothing here restores them when switching back to single mode. The test expects IconOn == icons.Check after the switch, which relies on SetType resetting icons; if SetType does not reset them when the type is unchanged, single-choice rows keep no indicator. The behavior is fragile and not explicit.",
+      "suggestion": "Explicitly restore the default icons (icons.Check etc.) in an else branch when the ListBox is not Multiple.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/choices.go",
+          "lines": {
+            "start": 235,
+            "end": 236
+          }
+        }
+      ],
+      "tags": [
+        "state-restore",
+        "location-corrected"
+      ],
+      "evidence": "if r.node.Kind == ui.ListBox \u0026\u0026 r.node.Multiple {\n\t\t\tb.IconOn = icons.None",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4353,
+    "totalMs": 4373
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 20152,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 12259,
+        "output": 319,
+        "costUSD": 0.027708
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b7d0958628eeac40ca011d06a84544f6",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "29132921fc61e779fc7c02853254fafe84f4debd",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "fd36ff20ab19cc1a",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Sprite re-added after gesture teardown",
+      "message": "The sprite paint closure assigns to the captured variable y (a local copy), which is harmless, but the closure is created per publish and the previous sprite with the same name is replaced on every animation frame. Each frame allocates a new sprite and closure. More importantly, the animation Func runs on the render path and can call publishLine after stopAnimation or after the stage is deleted, re-adding a sprite that is never cleaned up.",
+      "suggestion": "In the animation Func and publishLine, check that the gesture is still active (for example g.scope.input.allowed() and g.hasLine) before re-adding the sprite, and clear hasLine in end() so a late frame cannot recreate it.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/toolbar_drag.go",
+          "lines": {
+            "start": 319,
+            "end": 319
+          }
+        }
+      ],
+      "tags": [
+        "leak",
+        "animation"
+      ],
+      "evidence": "y = max(float32(clip.Min.Y)+thickness/2, min(float32(clip.Max.Y)-thickness/2, y))",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4754,
+    "totalMs": 4786
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 13,
+    "bytes": 42438,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 23315,
+        "output": 387,
+        "costUSD": 0.0505
+      }
+    ],
+    "widenedFiles": 8,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

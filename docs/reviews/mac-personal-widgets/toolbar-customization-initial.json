@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "20f6e75f955d00c659b7d87d5ac84b34",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "2799cfde5702dd5cabb0ec544b01f418be27d64f",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "cef6975a8be0070e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Change callback reads mutable customizeTarget",
+      "message": "The gallery overwrites m.customizer.Value from m.layouts[m.customizeTarget] in view(). If the sheet is open and a different Customize button is activated, the target changes while the existing epoch persists only if identity is unchanged; the identity check does revoke it. However, a rejected or stale Change after the target changes could write to the wrong toolbar's layout, since Change reads m.customizeTarget at call time rather than capture time.",
+      "suggestion": "Capture the target at View time, or disable other Customize buttons while the sheet is open.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_toolbars.go",
+          "lines": {
+            "start": 48,
+            "end": 48
+          }
+        }
+      ],
+      "tags": [
+        "state",
+        "location-corrected"
+      ],
+      "evidence": "m.customizer = ui.ToolbarCustomizer{ID: \"toolbar-customizer\", Dismiss: func() { m.customizer.Open = false }, Change: func(value ui.ToolbarLayout) { m.layouts[m.customizeTarget] = value; m.customizer.Value = value }}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4457,
+    "totalMs": 4495
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 51534,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 26402,
+        "output": 409,
+        "costUSD": 0.056894
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -1,0 +1,114 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "3945980702dc73ec09bc563fbf0cf40f",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "d776d6c03a97d5f8bf643e4c188e5c6c460151ee",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "457af1483c5b34f8",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Presentation change detection depends on pointer equality",
+      "message": "CollectionItem contains a *canvas.TiledImage pointer and slices.Equal compares it by pointer identity; that is fine for replacement, but nil/non-nil transitions of Collection are handled. However the function is evaluated in syncChoice where `previous.Collection` and the new one may be compared after the Updater closures read `r.node` — if a record's node is updated before the comparison, stale presentation may be skipped. Verify ordering.",
+      "suggestion": "Confirm `previous` is the pre-update snapshot and add a test that swaps only a thumbnail pointer.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/collection_view.go",
+          "lines": {
+            "start": 220,
+            "end": 220
+          }
+        }
+      ],
+      "tags": [
+        "sync",
+        "location-corrected"
+      ],
+      "evidence": "return a.ItemWidth != b.ItemWidth || !slices.Equal(a.Items, b.Items)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "b61caa670a24454d",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Vertical navigation skipping disabled items changes column",
+      "message": "For vertical moves, when the target cell is disabled the scan continues along the linear order, so Down can land on an item in a different column or row than expected, and Up/Down can jump over several rows. Left/right is fine, but vertical moves should stay in the same column.",
+      "suggestion": "For dy != 0, step by `columns` through the same column and stay put if all cells are disabled, instead of scanning linearly.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/collection_view.go",
+          "lines": {
+            "start": 179,
+            "end": 184
+          }
+        }
+      ],
+      "tags": [
+        "navigation"
+      ],
+      "evidence": "\tfor i := target; i \u003e= 0 \u0026\u0026 i \u003c len(items); i += direction {\n\t\tif !items[i].Disabled {\n\t\t\treturn items[i].ID, true\n\t\t}\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6300,
+    "totalMs": 6333
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 11,
+    "bytes": 41495,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 22682,
+        "output": 652,
+        "costUSD": 0.051884
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

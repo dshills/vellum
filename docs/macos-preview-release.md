@@ -1,5 +1,14 @@
 # macOS developer-preview execution ledger
 
+Publication update: [v0.1.0-alpha.3](https://github.com/dshills/vellum/releases/tag/v0.1.0-alpha.3)
+was published as a prerelease on 23 October 2026 at
+`320376ec8573a8603f75faaa3b3a7ea8a8ea0366`, after owner approval. The SDK,
+Placement app ZIP and checksums are available there, with ad-hoc signing,
+notarization and qualification limits disclosed. The candidate ledger below
+preserves its prepublication checkpoint state, including P6's then-pending
+publication decision. Approval covered that exact payload; it does not authorize
+new artifacts or include the subsequent personal-use widget work.
+
 The owner approved [the delivery plan](../specs/macos-first-release-plan.md) on
 22 October 2026. Features are frozen. Default Cogent/WebGPU/Metal only; experimental
 rendering, pacing and rejected private candidate patches remain disabled.

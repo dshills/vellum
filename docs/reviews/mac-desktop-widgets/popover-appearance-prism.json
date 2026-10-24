@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "af88b2e4b4546560dc8aad1b2aa8f04e",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "073d5c0ecf37383c4cc24f9e4b8df1520ab0eb09",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a671d0650f6a5833",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible nil dereference of d.host",
+      "message": "positionPopover dereferences d.host without a nil check, though only d.body and d.body.Scene are guarded. If host is nil or not yet laid out, this panics. Its size is also read before layout may have run.",
+      "suggestion": "Add `d.host == nil` to the early-return guard at the top of positionPopover.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/popover.go",
+          "lines": {
+            "start": 42,
+            "end": 42
+          }
+        }
+      ],
+      "tags": [
+        "nil-deref",
+        "location-corrected"
+      ],
+      "evidence": "desired := d.host.Geom.Size.Actual.Total.ToPointCeil()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3282,
+    "totalMs": 3294
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 14226,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 9485,
+        "output": 246,
+        "costUSD": 0.02143
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -49,3 +49,12 @@ func configureRootScrolling(body *core.Body, host *core.Frame, spec app.Window) 
 	body.Styler(hide)
 	host.Styler(hide)
 }
+
+// The prototype uses ordinary AppKit content geometry below the titlebar.
+// Let the application's root surface fill that client area, avoiding the native
+// Scene's unrelated light 8dp margin around a dark application root.
+func configureTitlebarToolbarContent(body *core.Body, prototype *preparedTitlebarToolbar) {
+	if prototype != nil {
+		body.Scene.Styler(func(s *styles.Style) { s.Padding.Zero() })
+	}
+}

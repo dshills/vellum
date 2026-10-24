@@ -43,3 +43,8 @@ void vellum_managed_input_fixture_edit(void *input,const char *value,int bytes,i
 
 void *vellum_managed_input_fixture_pool(void);
 void vellum_managed_input_fixture_drain(void *pool);
+
+// Protect surrounding-text/diagnostic exposure for this client; zero clears.
+void vellum_managed_input_secure_client(void *input, uint64_t clientID);
+
+char *vellum_managed_input_fixture_substring(void *input, int start, int length);

@@ -1,0 +1,86 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "157e5332d440d72009c92bc9aded603c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "55b026f515505cb8bf049f0c1ac2198a986f18ce",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "5117b1d0a5654e73",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Stale reveal callback can re-toggle after ID round trip",
+      "message": "The reveal action's closure only checks s.ID == id, so a stale Activate from an earlier View of the same ID can still toggle reveal after the ID has changed away and back. The identity reset runs only inside View, so state changed between an ID edit and the next View is not covered. The risk is low but real for the stale-callback case.",
+      "suggestion": "Capture a per-identity generation counter in the closure and compare it in Activate, in addition to the ID check.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/secure_field.go",
+          "lines": {
+            "start": 26,
+            "end": 58
+          }
+        }
+      ],
+      "evidence": "if s.identity != id {\n\t\ts.revealed = false\n\t\ts.identity = id\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4575,
+    "totalMs": 4592
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 8,
+    "bytes": 14347,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 9174,
+        "output": 297,
+        "costUSD": 0.021318
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

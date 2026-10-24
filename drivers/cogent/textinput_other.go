@@ -14,7 +14,7 @@ func nativeTextScale(*nativeWindow) float64          { return 1 }
 
 // Unsupported native publishers never establish an empty-publication cache.
 func nativeTextMainAlive() bool { return false }
-func publishTextOnMain(*textWindow, uint64, core.TextFieldEditingState, int, int, bool, uint64, [4]float64, textinput.Geometry, int) (bool, error) {
+func publishTextOnMain(*textWindow, uint64, core.TextFieldEditingState, int, int, bool, uint64, [4]float64, textinput.Geometry, int, bool) (bool, error) {
 	return false, nil
 }
 func settleTextOnMain(ctx context.Context, t *textWindow, client, id uint64) error {

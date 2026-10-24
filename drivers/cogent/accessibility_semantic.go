@@ -308,6 +308,9 @@ func (e *accessibilitySemanticWriter) node(n *accessibilityNode) {
 		e.out.WriteString(`,"min":`)
 		e.floating(float64(*n.Min), 32)
 	}
+	if n.Secure {
+		e.out.WriteString(`,"secure":true`)
+	}
 	if n.TextClient != 0 {
 		e.out.WriteString(`,"text_client":`)
 		e.unsigned(n.TextClient)

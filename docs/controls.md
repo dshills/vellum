@@ -5,7 +5,7 @@ application-owned values are accepted state, and callbacks request changes on th
 application owner. The portable API has no native dependencies. The Mac adapter
 renders these elements and publishes their supported accessibility semantics.
 
-| Element | Public kind | Main state |
+| Element | Public API | Main state |
 | --- | --- | --- |
 | Label | `ui.Label` | `Text` |
 | Action button | `ui.Button` | `Text`, `Activate` |
@@ -15,15 +15,31 @@ renders these elements and publishes their supported accessibility semantics.
 | On/off switch | `ui.Switch` | `Checked`, `Change` |
 | Toggle button | `ui.ToggleButton` | `Checked`, `Change` |
 | Action menu | `ui.MenuButton` | `Options`, `Change.SelectedID` action requests |
+| Sidebar navigator | `ui.Sidebar.View()` | Sections, stable item IDs, controlled navigation, disclosure, icons/badges |
+| Icon/thumbnail collection | `ui.CollectionView.View()` | Items, SelectedIDs, Change, Activate; responsive native grid |
+| Window-modal sheet | `ui.Sheet.View()` | Open, retained children, Confirm, Cancel, ReturnFocusID |
+| Shortcut recorder | `ui.ShortcutRecorder.View()` | Value, Validate, Change; local focused recording |
+| Capacity/rating indicator | `ui.LevelIndicator.View()` | Continuous/discrete capacity or controlled star rating |
+| Source list | `ui.ListBox` | `Options`, `SelectedID`, `Change`; or `Multiple`, `SelectedIDs`, `SelectionChange` |
 | Selection menu | `ui.Selector` | `Options`, `SelectedID`, `Change` |
 | Radio choices | `ui.RadioGroup` | `Options`, `SelectedID`, `Change`, `Orientation` |
 | Segmented choices | `ui.SegmentedControl` | `Options`, `SelectedID`, `Change`, `Orientation` |
 | Slider | `ui.Slider` | `Numeric`, `Number`, `Change` |
 | Inline color picker | `ui.ColorPicker.View()` | Straight-alpha `Color`, `Change(ColorEdit)`, `Invalid` |
+| Color well | `ui.ColorWell.View()` | `Color`, `Recent`, `Change(ColorEdit)`, `Invalid` |
+| Token field | `ui.TokenField.View()` | `Tokens`, `Draft`, `Suggestions`, `Change(TokenEvent)`, `Invalid` |
+| Font picker | `ui.FontPicker.View()` | `Families`, `Value`, `Preview`, `Change(FontSelectionEvent)`, `Invalid` |
+| Path control | `ui.PathControl.View()` | `Items`, `Navigate(PathEvent)`, `MaxVisible`, `MaxLabelRunes` |
+| Protected field | `ui.SecureField.View()` | `Text`, `AllowReveal`, `Change` |
+| Search input | `ui.SearchBox.View()` | `Text`, `Placeholder`, `Change(SearchEvent)` |
+| Editable choices | `ui.ComboBox.View()` | `Text`, `Options`, `Change(ComboEvent)` |
+| Date/time picker | `ui.DateTimePicker.View()` | `Value`, `Mode`, `Layout`, `Min`, `Max`, `Change(DateTimeEvent)`, `Invalid` |
 | Numeric field | `ui.NumberField` | `Numeric`, `Number`, `Change` |
 | Single-line field | `ui.TextField` | `Text`, `Change` |
 | Document editor | `ui.MultilineText` | `Editor`, `SoftWrap`, `TabInserts` |
 | Progress bar | `ui.ProgressBar` | `Number` fraction, `Orientation` |
+| Circular progress | `ui.ProgressRing`, `ui.ProgressGauge` | `Number` fraction |
+| Retained canvas | `ui.Canvas2D` | `Canvas`, `CanvasObjects`, `CanvasGrid`, optional `PlacementTarget` |
 | Decorative separator | `ui.Separator` | `Orientation` |
 | Managed data grid | `ui.DataGrid` | `Grid`, `GridChange`, `GridCommit` |
 | Managed outline | `ui.DataTree` | `Tree`, `TreeChange`, `TreeDisclosure` |
@@ -32,15 +48,26 @@ renders these elements and publishes their supported accessibility semantics.
 | Modal dialog | `ui.Dialog` | `Open`, `Dismiss`, children |
 | Toolbar | `ui.Toolbar` | Children, `Orientation`, scrolling overflow |
 | Status bar | `ui.StatusBar` | `Text` status, children |
+| Anchored panel | `ui.Popover.View()` | `AnchorID`, `Open`, `Dismiss`, children |
+| Contextual actions | `ui.Node.ContextMenu`, `ui.ContextMenu` | `Options`, `Change`; Button, Canvas2D or ListBox host |
+| Breadcrumb | `ui.Breadcrumb.View()` | `Items`, `Navigate(BreadcrumbEvent)` |
+| Labeled input | `ui.FormField.View()` | `Content`, `Label`, `Required`, `Help`, `ValidationMessage` |
+| Inline feedback | `ui.InlineNotice.View()` | `Text`, `Tone`, optional `ActionLabel` and `Activate` |
 | Labeled form group | `ui.FormGroup` | `Text` heading, children |
 | Collapsible section | `ui.Disclosure` | `Text` heading, `Checked` expansion, `Change`, children |
 | Adjustable split pane | `ui.SplitPane` | Two children, `Number` fraction, `Numeric`, `Orientation`, `Change` |
 | Horizontal/vertical layout | `ui.Row`, `ui.Column` | Children, `Style` |
 | Custom driver extension | `ui.Extension` | `Custom` |
 
+Composite entries expand into ordinary managed nodes; they are not additional
+node kinds or AppKit controls. The [Mac integration guide](mac-widget-integration.md)
+shows owner-held state, event acceptance and lifecycle rules for the five newer
+widgets. The [focused demo](mac-widget-demo.md) includes their current limits.
+These newer widgets are source work beyond the published alpha.3 assets.
+
 All elements support stable identity, disabled ancestry, local styles and themes.
 Focusable controls support managed focus requests. Interactive controls use their
-specified callbacks; progress bars and separators are passive leaves and reject
+specified callbacks; progress indicators and separators are passive leaves and reject
 Change/Activate callbacks. Separators do not enter the accessible hierarchy.
 
 Use `ui.Disclosure` for collapsible inspector or settings sections. Keep its child
@@ -91,6 +118,10 @@ object fixtures cover controlled behavior and the new Mac role/value mappings;
 human VoiceOver and physical input checks remain part of Mac qualification.
 See the [controls contract](../specs/controls.md) for detailed event, focus,
 editing, accessibility and lifetime behavior.
+
+The Mac gallery’s Toolbars page compares three action sizes, icon/text display
+modes, mixed controls, separators and vertical/narrow previews. See the
+[Mac toolbar recipes](mac-toolbars.md).
 
 Toolbars retain their child controls when a narrow viewport requires scrolling.
 They support horizontal/default or vertical Orientation. Tab visits child controls;
@@ -146,6 +177,17 @@ Raw SVG, paths and unknown names are refused.
 
 Buttons and toggle buttons accept Icon beside their Text. Icon-only actions
 require a nonblank Accessibility.Name; Accessibility.Help supplies the tooltip.
+Button and MenuButton also accept `IconImage`, an immutable `canvas.TiledImage`,
+for full-color leading artwork. It preserves source colors/transparency and scales
+with the button’s icon slot; disabled actions dim it. Use `ui.DecodeImage` for
+bounded PNG/JPEG input. Leave `Icon` empty; the two sources are mutually exclusive.
+Image-only actions require `Accessibility.Name`. Artwork adds no focus stop or
+separate accessibility action. See [toolbar recipes](mac-toolbars.md).
+`Button.IconPlacement` may be `ui.IconAboveText` to center full-color or symbol
+artwork above a required nonblank caption. Empty or `ui.IconLeading` uses the
+ordinary inline layout. Stacked content keeps one action and one focus stop.
+Allow enough control height for artwork, caption and spacing; see the toolbar
+recipes for all three sizes. MenuButton and ToggleButton remain inline.
 Button Appearance may be ButtonPrimary (filled), ButtonSecondary (outlined),
 ButtonQuiet (text emphasis) or ButtonTool (compact toolbar action). Omission
 preserves the existing filled appearance. Styles remain application-local.
@@ -260,3 +302,199 @@ See [the contract](../specs/tab-close.md) for lifetime and accessibility details
 Canvas2D optionally exposes existing scene objects through `CanvasObjects` stable
 IDs and names. Option+Left/Right/Home/End selects visible named objects in paint
 order, with one host focus stop. See the [contract](../specs/canvas-accessibility.md).
+
+
+## Mac input helpers
+
+The post-preview widget branch adds three reusable components. They compose the
+existing managed primitives and work through the public Go API:
+
+| Component | Purpose |
+| --- | --- |
+| ui.SearchBox | Query input, placeholder, search symbol and Clear |
+| ui.FormField | A label, help, required indication and validation text for a control |
+| ui.InlineNotice | Inline feedback with an optional action |
+| ui.MacTheme(dark) | Application-local compact light/dark defaults |
+
+Retain mutable components on the application owner:
+
+~~~go
+search := &ui.SearchBox{ID: "find", Label: "Search objects"}
+search.Change = func(e ui.SearchEvent) { search.Text = e.Text }
+node, err := search.View() // include node in your window's view; handle err
+// Request focus with ui.SearchInputID("find").
+~~~
+
+Clear requests empty Text through the same handler. Leave Text unchanged to reject
+a proposal. Nil Change disables the input. The ordinary single-line field commit
+behavior is retained; there is no new per-keystroke query stream or search worker.
+Use InputStyle and ClearStyle for the private input/action presentation; Style
+applies to the outer row. Placeholder defaults to Label, while Accessibility.Name
+continues to supply the input's name independently of the hint.
+
+~~~go
+field, err := (ui.FormField{
+    ID: "name-field", Label: "Drawing name", Required: true,
+    Help: "Use a unique name.", ValidationMessage: nameError,
+    Content: ui.Node{ID: "name", Kind: ui.TextField, Text: name,
+        Change: func(e ui.ChangeEvent) { name = e.Text }},
+}).View()
+~~~
+
+The application supplies name/nameError and performs validation. Content must be
+a focusable leaf; its stable ID and callbacks are retained. Required is descriptive.
+An explicit accessible name is preserved; label/help/error text otherwise supplies
+the field's name and description. Error labels add no extra focus stop.
+
+~~~go
+notice := &ui.InlineNotice{
+    ID: "save-message", Tone: ui.NoticeWarning, Text: "The drawing has unsaved changes.",
+    ActionLabel: "Save", Activate: save,
+}
+message, err := notice.View()
+~~~
+
+The application supplies save. Omit both action fields for passive feedback.
+Information/success/warning/error tones choose a symbol and accessible description.
+These are ordinary semantic groups, not modal alerts or live-region announcements.
+
+To try the focused gallery after dependency preparation:
+
+~~~sh
+cd drivers/cogent
+go run ./cmd/gallery -mac-widgets
+go run ./cmd/gallery -mac-widgets -mac-dark
+~~~
+
+The regular gallery also has an Input helpers page. Applications opt into the
+same appearance with cogent.Driver{Theme: ui.MacTheme(false)} (true for dark).
+It uses installed Helvetica Neue and fixed light/dark colors. This is Mac-style
+custom rendering with existing native input/window integration, not AppKit
+NSControls or automatic accent/high-contrast tracking. See the
+[post-preview contract](../specs/mac-widget-expansion.md) for behavior and limits.
+
+For a compact Mac-style up/down affordance, set NumberButtons to
+ui.NumberButtonsStepper on a NumberField. The upper/lower arrow halves and normal
+arrow keys use the same value, step and clamped bounds; the field remains directly
+editable. Omitting NumberButtons preserves the existing inline minus/plus style.
+
+### Editable combo box
+
+`ui.ComboBox` provides controlled free text plus up to 64 predefined suggestions.
+Use `ComboInputID(root)` for field focus. `ComboEvent.OptionID` is empty for typing
+and identifies a stable choice for menu selection. Retain one component per owner;
+update `Text` in `Change` to accept. Apply `MacTheme(dark).Kinds[ui.TextField]` to
+its outer `Style`, with zero padding, for a single compact field outline. Tab to
+the suggestions button and press Down/Return to choose; Escape dismisses.
+
+### Context menus
+
+Set `Node.ContextMenu` on Button, Canvas2D or ListBox with `Options` and `Change`.
+The event identifies the host and stable action; checked actions propose `Checked`.
+Right/Control-click and Shift-F10 open it; Escape closes. Existing MenuButton
+check/separator rules apply. This does not replace text-editing context menus.
+
+### Anchored popover
+
+`ui.Popover{ID, AnchorID, Open, Dismiss, Children}.View()` supplies a compact
+managed panel below a same-window Button. Set `Open=false` in `Dismiss`. Apply a
+Mac FormGroup style for an inset neutral surface. Escape/outside release closes;
+focus returns to the anchor. Children retain keyed identity. Missing/hidden anchors
+close the panel. Edge clamping is supported; detachable panels are not.
+
+### Multiple-selection source list
+
+Use `ListBox` with `Multiple:true`, `SelectedIDs` and `SelectionChange`; accept via
+`selected = e.Apply(selected)`. Single-selection APIs remain unchanged. Command
+click toggles, Shift selects a range and Command-Shift adds a range. Shift with
+Up/Down/Home/End extends by keyboard. Apply to your current model so queued edits
+compose; ignore the event to reject. Keep accepted IDs present in Options.
+
+### Date/time picker
+
+Retain `ui.DateTimePicker` with a `time.Time` Value, optional inclusive Min/Max,
+`Mode` and `Change`. Accept by updating Value; Invalid reports refused text.
+`DateTimeInputID(root)` targets the field. Date modes offer an anchored calendar;
+month navigation does not change Value until a day is selected. A caller-supplied
+Go `Layout` controls formatting. Default ISO/24-hour formatting and English
+Sunday-first calendar are explicit; system-locale discovery is not implemented.
+
+Combo suggestions align below the full field's left edge and match its width.
+`MenuButton.MenuAnchorID` optionally names a same-window visible managed anchor;
+without it, action menus open below their own button. Popup options are full-width
+menu rows on one surface, not separately outlined push buttons.
+
+For retained component setup, themes, focus IDs and owner acceptance examples,
+see [Integrating the Mac input widgets](mac-widget-integration.md).
+
+### Color well
+
+`ui.ColorWell.View()` returns a compact swatch and same-window anchored editor.
+Retain the component; accept `ColorEdit` with `well.Color = edit.Apply(well.Color)`.
+Optional `Recent` contains at most 16 caller-owned colors; rejected edits never
+mutate it. RGBA/opacity and hex editing reuse ColorPicker validation. Set
+`PopoverStyle` from MacTheme's FormGroup style. `ColorWellButtonID` is the focus
+target. This is a managed panel, not the shared system color panel.
+
+### Token field
+
+`ui.TokenField.View()` composes removable chips and a controlled entry with
+suggestions. Supply at most 32 `Token{ID, Text}` values and at most 64 suggestions.
+`TokenEvent` requests one addition or removal; the application assigns new IDs,
+accepts by updating Tokens and clears Draft on acceptance. Enter one token with
+Return, or choose a suggestion. Focus a chip with Tab and press Return/Space to
+remove it. Duplicate labels, blank/invalid or >256-byte tokens are refused.
+No in-place chip editing, comma-triggered commit or chip dragging is provided.
+
+### Font picker
+
+`ui.FontPicker.View()` offers family, typeface, compact size stepper and a live
+plain-text preview. Supply a bounded catalog of `FontFamily`/`FontTypeface`, using
+installed font names. Accept with `picker.Value = event.Apply(picker.Value)`. Sizes
+are 6–144 logical pixels. Set FieldStyle from MacTheme TextField for light/dark
+inputs. Typed names must match a catalog entry; unavailable installed fonts may
+substitute. No automatic enumeration, installation or system font panel.
+
+### Path control
+
+`ui.PathControl.View()` extends breadcrumb navigation with folder/document icons,
+ancestor menus, bounded visible segments and central label truncation. Supply
+`PathItem` values with stable IDs; accept `PathEvent` by updating Items. At most 64
+items; MaxVisible defaults to four, configurable 3–8, plus an overflow menu. Root,
+parent and current location remain visible. Full labels remain in accessibility
+and menu text. Truncation is explicit rather than window-width responsive. No
+filesystem access, URL resolution, permission grants or drag-and-drop is implied.
+
+### Secure text field
+
+`ui.SecureField.View()` composes a native-backed masked TextField and optional
+Show/Hide button (`AllowReveal`). Nil Change disables entry and reveal. Accept Text through Change; `SecureInputID` is
+the managed focus target. `Node.Secure` and `Node.Reveal` are available directly
+on TextField. Reveal requires Secure and only changes visible glyphs: AX values,
+selection/geometry text and native surrounding-text/diagnostic queries remain
+protected, with the macOS secure text subrole. Masked core fields disallow copy
+and cut; explicit reveal permits ordinary text copying. Disabling remasks the
+composite. Values remain ordinary Go strings; no secret store, memory erasure or
+OS secure-event-input guarantee is provided.
+
+TokenField also revokes queued suggestions immediately when the application
+changes their catalog entry, without requiring an intermediate View. SecureField
+starts masked when its ID changes; reveal state is never inherited by a different
+field identity.
+
+ColorWell closes its private editor on observed identity, disabled or read-only
+transitions. Restoring editing does not reopen the panel automatically.
+
+Multi-selection ListBox supports Command-A to propose all enabled rows in catalog
+order, preserving focus. The existing SelectionChange callback accepts or rejects
+it through Apply. Command/Control/Option letter shortcuts do not act as list
+initial-letter navigation; ordinary letters and Shift-uppercase retain cycling.
+
+The next Mac widget batch is available in the private gallery's Sidebar, Sheet,
+Collection, Shortcuts and Levels pages; Inputs keeps the earlier gallery.
+Sidebar/Collection reuse source-list routing and accessibility. `Option.Icon` and
+`Option.Badge` decorate Multiple ListBox source rows only. The
+[independent consumer contract](../examples/sdk-contract/mac_widgets_next_test.go)
+uses public Go APIs for all five without importing a native driver.
+See the [Mac demo](mac-widget-demo.md) and individual specifications for tested
+scope and limitations. This source work is beyond the published alpha.3 assets.

@@ -130,6 +130,9 @@ func (c *CommandBar) Sync(core.Widget) error {
 func bindCommandShortcutsScoped(scene *core.Scene, owner *app.Application, ref app.WindowRef, registry *command.Registry, onError func(error)) {
 	route := func(scope command.ShortcutScope) func(events.Event) {
 		return func(e events.Event) {
+			if shortcutRecorderPreflight(scene, e) {
+				return
+			}
 			if e.IsHandled() {
 				return
 			}

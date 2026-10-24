@@ -1,0 +1,119 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "4c6293c77e55732f53aeb66b31d0a7c3",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "128817d6302bf2f65c983121d0415f7b21c79ba6",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "f95ee92fe7368d31",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Attachment returned alongside error leaks resources",
+      "message": "When the titlebar attach fails, the function returns both a non-nil attachment and an error. Callers conventionally ignore the value on error, so the already-created accessibility bridge and text input are never closed. That leaks native resources and leaves the AX attachment registered.",
+      "suggestion": "On error, close the attachment yourself (call attachment.Close()) and return nil, err, as the earlier error paths do.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility_darwin.go",
+          "lines": {
+            "start": 80,
+            "end": 359
+          }
+        }
+      ],
+      "tags": [
+        "resource-leak",
+        "error-handling"
+      ],
+      "evidence": "if err := attachTitlebarToolbar(a, titlebar, b, w); err != nil {\n\t\t\treturn attachment, err\n\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7802,
+    "totalMs": 7852
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 17,
+    "bytes": 43957,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 23235,
+        "output": 890,
+        "costUSD": 0.05537
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "31c314de7323f744",
+        "severity": "high",
+        "category": "bug",
+        "title": "Corrupted assignment line breaks owner setup",
+        "message": "The line `owner.[REDACTED]` is not valid Objective-C, so the file fails to compile. It presumably should set the token and window (owner.token=token;owner.window=window;). Without it, the owner has a zero token and nil window, so actions go nowhere and detach cannot restore the window.",
+        "suggestion": "Replace with `owner.token=token;owner.window=window;`.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "drivers/cogent/titlebar_toolbar_darwin.m",
+            "lines": {
+              "start": 96,
+              "end": 96
+            }
+          }
+        ],
+        "tags": [
+          "compile",
+          "objc"
+        ],
+        "evidence": "owner.[REDACTED]",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/titlebar_toolbar_darwin.m"
+    }
+  ],
+  "suppressed": []
+}

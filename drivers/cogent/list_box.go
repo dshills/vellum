@@ -21,7 +21,10 @@ type listBoxEligibility struct {
 	id       string
 	disabled bool
 }
-type listBoxCatalogEpoch struct{ options []listBoxEligibility }
+type listBoxCatalogEpoch struct {
+	options    []listBoxEligibility
+	collection *ui.CollectionLayout
+}
 
 func styleListBox(s *styles.Style) {
 	s.Direction = styles.Column
@@ -76,8 +79,9 @@ func listBoxActionGuard(r *record, id string, button *core.Switch) func() bool {
 	}
 	c := r.control.choice
 	scope, row := c.listScope.Load(), c.listRows[id]
+	collection := r.node.Collection
 	return func() bool {
-		return row != nil && scope.allowed() && choiceLive(r, id, button) && r.control.choice == c && c.listRows[id] == row
+		return row != nil && scope.allowed() && collectionSourceLive(collection, r.node.Collection) && choiceLive(r, id, button) && r.control.choice == c && c.listRows[id] == row
 	}
 }
 func listBoxHostGuard(r *record) func() bool {
@@ -89,12 +93,13 @@ func listBoxHostGuard(r *record) func() bool {
 }
 func syncListBoxEpochs(r *record) bool {
 	c := r.control.choice
-	changed := c.listCatalog == nil || len(c.listCatalog.options) != len(r.node.Options)
+	sourceChanged := c.listCatalog == nil || !collectionSourceLive(c.listCatalog.collection, r.node.Collection)
+	changed := sourceChanged || len(c.listCatalog.options) != len(r.node.Options)
 	for i, o := range r.node.Options {
 		if c.listCatalog == nil || i >= len(c.listCatalog.options) || c.listCatalog.options[i] != (listBoxEligibility{o.ID, o.Disabled}) {
 			changed = true
 		}
-		if epoch := c.listRows[o.ID]; epoch == nil || epoch.disabled != o.Disabled {
+		if epoch := c.listRows[o.ID]; epoch == nil || epoch.disabled != o.Disabled || sourceChanged {
 			c.listRows[o.ID] = &listBoxRowEpoch{disabled: o.Disabled}
 		}
 	}
@@ -103,8 +108,11 @@ func syncListBoxEpochs(r *record) bool {
 		for i, o := range r.node.Options {
 			options[i] = listBoxEligibility{o.ID, o.Disabled}
 		}
-		c.listCatalog = &listBoxCatalogEpoch{options: options}
+		c.listCatalog = &listBoxCatalogEpoch{options: options, collection: r.node.Collection}
 	}
+	// Keep only the current detached presentation; identity-compatible image
+	// updates need not retain an old thumbnail catalog.
+	c.listCatalog.collection = r.node.Collection
 	return changed
 }
 
@@ -126,6 +134,14 @@ func queueListBox(r *record, id string, button *core.Switch) {
 
 func listBoxKey(r *record, id string, button *core.Switch, e events.Event) {
 	if !listBoxActionGuard(r, id, button)() {
+		return
+	}
+	shortcutMods := e.Modifiers() & (1<<key.Meta | 1<<key.Control | 1<<key.Alt | 1<<key.Shift)
+	if e.KeyCode() == key.CodeA && shortcutMods == 1<<key.Meta {
+		if r.node.Multiple && r.node.SelectionChange != nil {
+			e.SetHandled()
+			queueListSelectAll(r, id, button)
+		}
 		return
 	}
 	target := ""
@@ -154,6 +170,11 @@ func listBoxKey(r *record, id string, button *core.Switch, e events.Event) {
 		target = id
 		activate = true
 	default:
+		// Application shortcuts and VoiceOver modifier chords are not typeahead.
+		// Keep Shift available for ordinary uppercase letter cycling.
+		if key.HasAnyModifier(e.Modifiers(), key.Meta, key.Control, key.Alt) {
+			return
+		}
 		// Single initial-letter cycling is deterministic: no timer, hidden
 		// accumulated search buffer or background state is retained.
 		runeValue := unicode.ToLower(e.KeyRune())
@@ -178,6 +199,10 @@ func listBoxKey(r *record, id string, button *core.Switch, e events.Event) {
 	next.SetFocus()
 	next.ScrollToThis()
 	if target != id || activate {
-		queueListBox(r, target, next)
+		if r.node.Multiple {
+			queueListSelection(r, target, next, e.Modifiers(), id)
+		} else {
+			queueListBox(r, target, next)
+		}
 	}
 }

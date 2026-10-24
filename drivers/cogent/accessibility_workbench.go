@@ -231,6 +231,7 @@ func accessibilityFocusProjection(root *record, prefix string) ui.Node {
 		return ui.Node{}
 	}
 	n := root.node
+	n.Disabled = n.Disabled || toolbarOverflowHidden(root) || n.Kind == ui.MenuButton && !menuAvailable(root)
 	n.Options = append([]ui.Option(nil), n.Options...)
 	n.ID = prefix + accessibilityManagedID(n.ID)
 	if n.Kind == ui.Dialog && root.control != nil && root.control.dialog != nil && root.control.dialog.dismissed {
@@ -280,7 +281,7 @@ type accessibilityFocusTarget struct {
 }
 
 func accessibilityNativeFocusTargets(root *record, prefix string, out map[string]accessibilityFocusTarget) {
-	if root == nil {
+	if root == nil || toolbarOverflowHidden(root) {
 		return
 	}
 	if ui.IsFocusable(root.node.Kind) {
@@ -312,7 +313,7 @@ func accessibilityNativeFocusTargets(root *record, prefix string, out map[string
 				out[prefix+accessibilityDisclosureID(root.node.ID)] = accessibilityFocusTarget{widget: widget, focused: focused, scopeID: prefix + accessibilityManagedID(root.node.ID)}
 			}
 			if menuOpen(root) {
-				for _, o := range root.node.Options {
+				for _, o := range menuDescriptor(root).Options {
 					if !o.Disabled {
 						if item := root.control.menu.popup.items[o.ID]; item != nil {
 							out[prefix+menuActionID(root.node.ID, o.ID)] = accessibilityFocusTarget{widget: item, focused: item.ContainsFocus(), scopeID: prefix + accessibilityManagedID(root.node.ID)}

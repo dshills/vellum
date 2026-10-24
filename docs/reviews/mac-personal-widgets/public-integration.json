@@ -1,0 +1,88 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "cfad8ee3bd4430a1b9f6c035239de0f6",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f418fb55e9c80041b67d2b1765dd7f5288ab69d0",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "8edb99753e92e960",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Callbacks invoked without a nil check",
+      "message": "The helper calls t.Fatalf and then returns a zero Node. Fatalf stops the test via runtime.Goexit, so the return is unreachable and harmless. The unconditional `.Activate()` and `.Change(...)` calls on the returned node could panic on a nil callback if a descriptor lacks a handler, but this is unlikely in practice.",
+      "suggestion": "No action is needed unless a node can lack a handler. Consider checking that the callback is non-nil before invoking it, to give a clearer failure.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/sdk-contract/mac_widgets_test.go",
+          "lines": {
+            "start": 108,
+            "end": 109
+          }
+        }
+      ],
+      "tags": [
+        "testing"
+      ],
+      "evidence": "t.Fatalf(\"public descriptor %q missing\", id)\n\treturn ui.Node{}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3792,
+    "totalMs": 3801
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 13484,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 8251,
+        "output": 327,
+        "costUSD": 0.019772
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

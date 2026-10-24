@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "5aa739510abdc0cd059bd3e4d57f1470",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "938480c5d2e7f5619b013eab6951a8c473467f84",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "9b7d71c5e3fc711f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Stale indicator risk on menu items",
+      "message": "The menu item now calls item.SetIcon(nativeSymbol(o.Icon)) for every option. For options with IconImage and an empty Icon this sets an empty icon, which is fine. However, a checked option that has no artwork relies on the SetIcon call placed before the check branch, so ordering is correct. The indicator, though, is set only on checked items and is never cleared when popups are rebuilt from reused buttons.",
+      "suggestion": "Explicitly set the indicator to an empty string for unchecked items.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/menu_button.go",
+          "lines": {
+            "start": 237,
+            "end": 237
+          }
+        }
+      ],
+      "tags": [
+        "menu",
+        "location-corrected"
+      ],
+      "evidence": "if o.Icon != \"\" || o.IconImage != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "345a2421bfaf7807",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Hidden property stale when SizeUp and SizeDown disagree",
+      "message": "SizeDown only computes hidden state when widths match children. If the child count changes between SizeUp and SizeDown, previously hidden controls stay marked Invisible, because SizeUp resets Invisible but the hidden property is not cleared. Accessibility and focus then treat visible controls as hidden.",
+      "suggestion": "Clear the hidden property on all children in SizeUp, and in the fallback path.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/toolbar_overflow.go",
+          "lines": {
+            "start": 68,
+            "end": 68
+          }
+        }
+      ],
+      "tags": [
+        "overflow",
+        "location-corrected"
+      ],
+      "evidence": "if len(f.widths) != len(f.owner.children) || len(f.widths) \u003c 2 {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5556,
+    "totalMs": 5611
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 18,
+    "bytes": 55476,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 28637,
+        "output": 585,
+        "costUSD": 0.063124
+      }
+    ],
+    "widenedFiles": 5,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

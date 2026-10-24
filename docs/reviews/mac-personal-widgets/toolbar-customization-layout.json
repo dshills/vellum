@@ -1,0 +1,86 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "783a27c9fdaa3dc66e376eff4c080f14",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "8ab605734ec0c70a7aa9f05f860a19e2dac920c4",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4023,
+    "totalMs": 4045
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 2,
+    "bytes": 14650,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 9558,
+        "output": 328,
+        "costUSD": 0.022396
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "95c3b77c8c4fb1f8",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Row-in-viewport check may fail for scrolled rows",
+        "message": "The loop requires every one of the 7 rows to lie fully inside the Scroll viewport, which has MaxSize height 300. With 7 rows of about 30px or more plus gaps, the rows can exceed the viewport. The test can then fail on legitimate scrolled-out rows rather than on real clipping.",
+        "suggestion": "Only check rows that are expected to be visible, or scroll each row into view first. Alternatively, compare against the unclipped content size rather than the viewport.",
+        "confidence": 0.35,
+        "locations": [
+          {
+            "path": "drivers/cogent/toolbar_customization_offscreen_test.go",
+            "lines": {
+              "start": 171,
+              "end": 172
+            }
+          }
+        ],
+        "tags": [
+          "test",
+          "flaky"
+        ],
+        "evidence": "findRecord(root, c.ID+\"/items\").widget.AsWidget().Geom.ContentBBox",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/toolbar_customization_offscreen_test.go"
+    }
+  ],
+  "suppressed": []
+}

@@ -34,6 +34,7 @@ type accessibilityNode struct {
 	DomainID             string      `json:"domain_id"`
 	Parent               string      `json:"parent"`
 	Role                 string      `json:"role"`
+	Secure               bool        `json:"secure,omitempty"`
 	Name                 string      `json:"name"`
 	Help                 string      `json:"help"`
 	Value                any         `json:"value,omitempty"`
@@ -68,6 +69,8 @@ type accessibilityAction struct {
 type accessibilityHandler func(accessibilityAction) bool
 
 type accessibilityBridge struct {
+	titlebar          atomic.Pointer[titlebarToolbarBinding]
+	activation        *windowActivation // immutable after construction
 	visibility        *windowVisibility // immutable after native attachment construction
 	token             uint64
 	owner             *app.Application
@@ -105,7 +108,7 @@ func newAccessibilityBridge(owner *app.Application) *accessibilityBridge {
 
 // All callback-readable fields are initialized before registry publication.
 func newAccessibilityBridgeWithVisibility(owner *app.Application, visibility *windowVisibility) *accessibilityBridge {
-	b := &accessibilityBridge{token: accessibilityToken.Add(1), owner: owner, visibility: visibility, handlers: map[string]accessibilityHandler{}, done: make(chan struct{})}
+	b := &accessibilityBridge{activation: &windowActivation{}, token: accessibilityToken.Add(1), owner: owner, visibility: visibility, handlers: map[string]accessibilityHandler{}, done: make(chan struct{})}
 	accessibilityRegistry.Lock()
 	accessibilityRegistry.bridges[b.token] = b
 	accessibilityRegistry.Unlock()
@@ -174,6 +177,10 @@ func (b *accessibilityBridge) closeFrom(source string) {
 	// Publish the record before signaling closure so every canceled request sees
 	// the same first-close provenance, even when a later cleanup path runs.
 	b.closed.Store(true)
+	if binding := b.titlebar.Load(); binding != nil {
+		binding.close()
+	}
+	b.activation.close()
 	b.visibility.close()
 	b.generation.Add(1)
 	b.handlers = nil
@@ -427,7 +434,7 @@ func accessibilityFocus(b *accessibilityBridge, id string) {
 	copy := id
 	b.pendingFocus.Store(&copy)
 }
-func accessibilityApplyFocus(root *record, id string) bool {
+func accessibilityResolveFocus(root *record, id string) (accessibilityFocusTarget, bool) {
 	targets := map[string]accessibilityFocusTarget{}
 	accessibilityNativeFocusTargets(root, "", targets)
 	if _, ok := targets[id]; !ok {
@@ -438,12 +445,20 @@ func accessibilityApplyFocus(root *record, id string) bool {
 		scopeID = target.scopeID
 	}
 	if _, ok := ui.FocusTarget(ui.FocusScope(accessibilityFocusProjection(root, "")), scopeID); !ok {
-		return false
+		return accessibilityFocusTarget{}, false
 	}
 	target, ok := targets[id]
 	if !ok || accessibilityTreeNil(target.widget) {
+		return accessibilityFocusTarget{}, false
+	}
+	return target, true
+}
+func accessibilityApplyFocus(root *record, id string) bool {
+	target, ok := accessibilityResolveFocus(root, id)
+	if !ok {
 		return false
 	}
+
 	widget := target.widget.AsWidget()
 	if widget.Scene == nil || widget.Scene.RenderWindow() == nil {
 		widget.StartFocus()
@@ -465,6 +480,11 @@ func syncAccessibility(w *nativeWindow, a *app.Application) {
 		return
 	}
 	b.bindScoped(w.window.Ref())
+	if b.titlebar.Load() != nil {
+		projection := accessibilityFocusProjection(w.root, "")
+		activeScope := ui.FocusScope(projection)
+		titlebarToolbarAllowed(b, !projection.Disabled && activeScope.Kind != ui.Dialog)
+	}
 	if request := b.pendingFocus.Swap(nil); request != nil {
 		accessibilityApplyFocus(w.root, *request)
 	}
@@ -510,16 +530,19 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 	}
 	var visit func(*record, string, bool)
 	visit = func(r *record, parent string, disabled bool) {
+		if toolbarOverflowHidden(r) {
+			return
+		}
 		start := len(nodes)
 		n := r.node
 		disabled = disabled || n.Disabled
 		if n.Kind == ui.MenuButton {
-			disabled = disabled || !ui.MenuEnabled(n)
+			disabled = disabled || !menuAvailable(r)
 		}
 		if n.Kind == ui.Dialog && (!n.Open || disabled || (r.control != nil && r.control.dialog != nil && r.control.dialog.dismissed)) {
 			return
 		}
-		if n.Kind == ui.Separator || ((n.Kind == ui.Icon || n.Kind == ui.Image) && strings.TrimSpace(n.Accessibility.Name) == "" && strings.TrimSpace(n.Text) == "") {
+		if n.Kind == ui.Separator || ui.IsToolbarSpace(n.Kind) || ((n.Kind == ui.Icon || n.Kind == ui.Image) && strings.TrimSpace(n.Accessibility.Name) == "" && strings.TrimSpace(n.Text) == "") {
 			return
 		} // decorative, no accessible target
 		name := n.Accessibility.Name
@@ -628,6 +651,9 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 					break
 				}
 			}
+			if n.Multiple {
+				x.Value = fmt.Sprintf("%d selected", len(n.SelectedIDs))
+			}
 			_, x.Focusable = ui.FocusTarget(n, n.ID)
 			// Keyboard focus belongs to one option; group focus is a managed proxy.
 			x.Focused = false
@@ -641,6 +667,9 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			}
 		}
 		if !disabled {
+			if n.ContextMenu != nil && menuAvailable(r) {
+				x.Actions = append(x.Actions, "show-menu")
+			}
 			if x.Focusable {
 				x.Actions = append(x.Actions, "focus")
 			}
@@ -659,7 +688,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			if n.Kind == ui.MultilineText {
 				x.Actions = append(x.Actions, "set", "selection")
 			}
-			if n.Kind == ui.TextField && n.Change != nil {
+			if n.Kind == ui.TextField && n.Change != nil && !n.Secure {
 				x.Actions = append(x.Actions, "selection")
 			}
 			if (n.Kind == ui.TextField || n.Kind == ui.Slider || n.Kind == ui.NumberField) && n.Change != nil {
@@ -668,7 +697,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			if (n.Kind == ui.Slider || n.Kind == ui.NumberField) && n.Change != nil {
 				x.Actions = append(x.Actions, "increment", "decrement")
 			}
-			if (n.Kind == ui.Selector || n.Kind == ui.Tabs || n.Kind == ui.RadioGroup || n.Kind == ui.SegmentedControl || n.Kind == ui.ListBox) && n.Change != nil {
+			if (n.Kind == ui.Selector || n.Kind == ui.Tabs || n.Kind == ui.RadioGroup || n.Kind == ui.SegmentedControl || n.Kind == ui.ListBox) && (n.Change != nil || n.Multiple && n.SelectionChange != nil) {
 				x.Actions = append(x.Actions, "set")
 			}
 			if n.Kind == ui.Dialog && n.Dismiss != nil {
@@ -677,12 +706,16 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 		}
 		if n.Kind == ui.Button && r.control != nil {
 			x.activationGuard = placementActivationGuard(r)
+			if n.ShortcutRecorder != nil {
+				x.activationGuard = shortcutAccessibilityGuard(r)
+			}
 		}
+		protectSecureAccessibility(n, &x)
 		nodes = append(nodes, x)
 		if len(x.Actions) > 0 {
 			allowed := append([]string(nil), x.Actions...)
 			handlers[x.ID] = func(action accessibilityAction) bool {
-				if n.Kind == ui.ListBox && !x.activationGuard() {
+				if (n.Kind == ui.ListBox || n.ShortcutRecorder != nil) && (x.activationGuard == nil || !x.activationGuard()) {
 					return false
 				}
 				if !containsAccessibilityAction(allowed, action.Kind) {
@@ -692,7 +725,11 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 					accessibilityFocus(b, x.ID)
 					return true
 				}
-				return applyAccessibilityAction(r, action)
+				accepted := applyAccessibilityAction(r, action)
+				if accepted && action.Kind == "press" && n.ShortcutRecorder != nil && b != nil {
+					accessibilityFocus(b, x.ID)
+				}
+				return accepted
 			}
 		}
 		if n.Kind == ui.Disclosure && r.control != nil && r.control.disclosure != nil {
@@ -741,7 +778,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 				handlers[id] = handler
 			}
 		}
-		if n.Kind == ui.MenuButton {
+		if r.control != nil && r.control.menu != nil {
 			extra, actions := menuAccessibility(r, x.ID, b)
 			nodes = append(nodes, extra...)
 			for id, handler := range actions {
@@ -824,8 +861,17 @@ func containsAccessibilityAction(actions []string, kind string) bool {
 }
 func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 	n := r.node
-	if n.Disabled || (r.control != nil && (r.control.disabled || r.control.retired)) {
+	if toolbarOverflowHidden(r) || n.Disabled || (r.control != nil && (r.control.disabled || r.control.retired)) {
 		return false
+	}
+	if n.ContextMenu != nil && action.Kind == "show-menu" {
+		if r.control == nil || r.control.menu == nil || !menuAvailable(r) {
+			return false
+		}
+		r.control.menu.position = nil
+		r.control.menu.request = true
+		_ = r.control.a.Invalidate(r.control.window)
+		return true
 	}
 	if n.Kind == ui.MenuButton {
 		if !menuAvailable(r) {
@@ -888,6 +934,20 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 			}
 			committedEditorChange(r)
 			return true
+		}
+		return false
+	}
+
+	if n.Kind == ui.ListBox && n.Multiple && action.Kind == "set" {
+		if n.SelectionChange == nil {
+			return false
+		}
+		for _, o := range n.Options {
+			if o.ID == action.Value && !o.Disabled {
+				n.SelectionChange(ui.ListSelectionEvent{ID: n.ID, TargetID: o.ID, IDs: []string{o.ID}})
+				requestControlRestore(r)
+				return true
+			}
 		}
 		return false
 	}
@@ -1123,7 +1183,13 @@ func accessibilityDialogInitialFocus(r *record, body *core.Body) core.Widget {
 	}
 	targets := map[string]accessibilityFocusTarget{}
 	accessibilityNativeFocusTargets(r, "", targets)
-	for _, id := range ui.FocusOrder(projection) {
+	order := ui.FocusOrder(projection)
+	if r.node.Sheet && len(order) > 0 && order[0] == accessibilityManagedID(ui.SheetCancelID(r.node.ID)) {
+		if target, ok := targets[accessibilityManagedID(r.node.DialogDefaultID)]; ok && !accessibilityTreeNil(target.widget) && !target.widget.AsWidget().IsDisabled() {
+			return target.widget
+		}
+	}
+	for _, id := range order {
 		if target, ok := targets[id]; ok && !accessibilityTreeNil(target.widget) {
 			return target.widget
 		}
@@ -1155,6 +1221,7 @@ func newAccessibilityHost(w *nativeWindow) *core.Frame {
 	return &host.Frame
 }
 func (h *accessibilityHost) RenderWidget() {
+	finishWindowFocusReveal(h.window, h.Scene)
 	h.Frame.RenderWidget()
 	publishAccessibilityGeometry(h.window)
 }
@@ -1381,6 +1448,7 @@ func accessibilityFocusDescriptor(root *record) ui.Node {
 		return ui.Node{}
 	}
 	n := root.node
+	n.Disabled = n.Disabled || toolbarOverflowHidden(root) || n.Kind == ui.MenuButton && !menuAvailable(root)
 	if n.Kind == ui.Dialog && root.control != nil && root.control.dialog != nil && root.control.dialog.dismissed {
 		n.Open = false
 	}
@@ -1455,4 +1523,30 @@ func accessibilityTreeNil(node tree.Node) bool {
 		return true
 	}
 	return tree.IsNil(node)
+}
+
+// All ordinary semantic and wire outputs share this final projection boundary.
+// Never derive the label from a protected value; explicit app labels remain labels.
+func protectSecureAccessibility(n ui.Node, x *accessibilityNode) {
+	if !n.Secure {
+		return
+	}
+	x.Secure = true
+	x.Value = ""
+	x.TextClient = 0
+	x.TextSelection = nil
+	x.TextFocus = 0
+	if n.Accessibility.Name == "" {
+		x.Name = "Password"
+	}
+	var actions []string
+	if x.Actions != nil {
+		actions = make([]string, 0, len(x.Actions))
+	}
+	for _, a := range x.Actions {
+		if a != "selection" {
+			actions = append(actions, a)
+		}
+	}
+	x.Actions = actions
 }
