@@ -151,6 +151,14 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if d := n.AngleDial; d != nil {
+		if n.Kind != Button || d.source == nil || d.Set == nil || d.Adjust == nil || !finite(d.Degrees) || d.Degrees < 0 || d.Degrees >= 360 || n.Number != d.Degrees || !finite(d.Size) || d.Size < 64 || d.Size > 160 {
+			return fmt.Errorf("ui: invalid angle dial input")
+		}
+		if _, ok := NormalizeAngle(d.Degrees, d.Step); !ok {
+			return fmt.Errorf("ui: invalid angle step")
+		}
+	}
 	if err := ValidateOutlineViewNode(n); err != nil {
 		return err
 	}

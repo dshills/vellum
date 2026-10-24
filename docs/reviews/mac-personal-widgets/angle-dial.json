@@ -1,0 +1,116 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "0aa7f85bba7e7679bd53be7ad1e8568c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "1c46f4af3220c5cc32ccb510f05356ea34b087a0",
+    "branch": "codex/mac-document-controls"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "f0e93175391c88f8",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Accessibility actions bypass disabled/stale guards",
+      "message": "The accessibility action path calls d.Adjust/d.Set directly using the node's AngleDial. Unlike the key and pointer paths, it does not check controlDisabled, retirement or the SameSource guard. It also always returns true, even when the change was rejected because the dial is disabled. If actions are dispatched from a stale snapshot, they can mutate a disabled or replaced dial. Callbacks also run synchronously on the accessibility goroutine instead of being posted via postControl.",
+      "suggestion": "Route accessibility actions through postControl with the same disabled, retired and SameSource checks the key handler uses. Return false when the dial is disabled.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility.go",
+          "lines": {
+            "start": 971,
+            "end": 977
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "accessibility",
+        "location-corrected"
+      ],
+      "evidence": "\t\tcase \"press\":\n\t\t\td.Adjust(1)\n\t\tdefault:\n\t\t\treturn false\n\t\t}\n\t\t_ = r.control.a.Invalidate(r.control.window)\n\t\treturn true",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "ea9e454fde92c9a3",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Capture callback reads record state without synchronization",
+      "message": "The pointer-capture callback reads r.node and r.control.retired directly. These are likely owned by the UI thread, while the queue helper uses postControl for the same state. Mixing the two risks a data race.",
+      "suggestion": "Confirm the capture callback runs on the same goroutine as r.node mutation. Otherwise post the check through postControl.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/angle_dial.go",
+          "lines": {
+            "start": 166,
+            "end": 166
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "location-corrected"
+      ],
+      "evidence": "if !d.SameSource(r.node.AngleDial) || controlDisabled(r) || r.control.retired || r.focusVisibility.Load() == 2 {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6691,
+    "totalMs": 6728
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 13,
+    "bytes": 29411,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 16971,
+        "output": 704,
+        "costUSD": 0.040982
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

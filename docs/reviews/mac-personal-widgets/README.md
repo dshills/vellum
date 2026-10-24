@@ -1450,3 +1450,11 @@ Prism: `native-fonts.json` (Anthropic Claude Sonnet 5.5, complete coverage).
 Prism preview-order concern is prevented by the owner-only busy+epoch guard; an extracted helper and regression now prove late completion and prior-session previews cannot overwrite accepted state. The native action title was already parameterized; the Foundation fixture now verifies Use Font from the exact helper used by AppKit. Replaced shared-selector casts with typed Font/Color accessory helpers for clarity. Native CGO/recipe/lifetime tests and full gallery construction pass offscreen. Existing manager selection is restored when present; an initial nil selection is documented as cached first-use state. Actual panel choice, cancellation, reuse and appearance checks follow final packaging.
 
 Focused checks: `native-fonts-checks.json`, `native-fonts-final-checks.json`, `native-fonts-reviewed-checks.json`.
+
+## Add Mac circular angle dial with pointer, keyboard and accessibility input
+
+Prism: `angle-dial.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism concerns were checked against the existing driver contract. applyAccessibilityAction executes on the application owner through scoped bridge delivery, rejects disabled/retired controls at entry, and calls the current descriptor; generated Set/Adjust closures also recheck component identity/disabled state. Added owner-path increment/decrement and disabled-AX regressions. Native capture callbacks use the established originating render/event ownership, read detached descriptors only and post model mutations through postControl, matching list/split/capture infrastructure. Race-enabled pointer/keyboard checks pass at DPI160/320, including loss/disable and release consumption. Offscreen raster QA centered the numeric field beside each dial through a retained entry-row wrapper. Live qualification follows final packaging.
+
+Focused checks: `angle-dial-checks.json`, `angle-dial-reviewed-checks.json`.

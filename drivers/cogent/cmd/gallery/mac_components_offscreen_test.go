@@ -115,7 +115,7 @@ func TestMacComponentsOffscreenSurfacesAndJoinedSegments(t *testing.T) {
 				t.Fatal("offscreen readiness bound")
 				return cogent.ManualWindowSnapshot{}
 			}
-			for _, page := range []string{"theme", "menus", "split", "inspector", "browser", "rules", "image-well", "icon-picker", "icon-picker-open", "settings", "alerts", "calendar", "documents", "outline", "native-colors", "native-fonts"} {
+			for _, page := range []string{"theme", "menus", "split", "inspector", "browser", "rules", "image-well", "icon-picker", "icon-picker-open", "settings", "alerts", "calendar", "documents", "outline", "native-colors", "native-fonts", "angle-dial"} {
 				if err := a.Do(func() {
 					model.page = page
 					if page == "icon-picker-open" {

@@ -674,7 +674,17 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 				}
 			}
 		}
+		if d := n.AngleDial; d != nil {
+			x.Role = "slider"
+			x.Value = d.Degrees
+			minimum, maximum := float32(0), float32(360)
+			x.Min = &minimum
+			x.Max = &maximum
+		}
 		if !disabled {
+			if n.AngleDial != nil {
+				x.Actions = append(x.Actions, "set", "increment", "decrement")
+			}
 			if n.ContextMenu != nil && menuAvailable(r) {
 				x.Actions = append(x.Actions, "show-menu")
 			}
@@ -944,6 +954,27 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 			return true
 		}
 		return false
+	}
+
+	if d := n.AngleDial; d != nil {
+		switch action.Kind {
+		case "increment":
+			d.Adjust(1)
+		case "decrement":
+			d.Adjust(-1)
+		case "set":
+			value, err := strconv.ParseFloat(action.Value, 32)
+			if err != nil || math.IsNaN(value) || math.IsInf(value, 0) {
+				return false
+			}
+			d.Set(float32(value))
+		case "press":
+			d.Adjust(1)
+		default:
+			return false
+		}
+		_ = r.control.a.Invalidate(r.control.window)
+		return true
 	}
 
 	if n.Kind == ui.ListBox && n.Multiple && action.Kind == "set" {

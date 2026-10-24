@@ -319,6 +319,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		installButtonImage(r, button)
 		bindCalendarCell(r, button)
 		bindColumnResize(r, button)
+		bindAngleDial(r, button)
 	}
 	if r.node.Kind == ui.Button || r.node.Kind == ui.Canvas2D || r.node.Kind == ui.ListBox || r.node.Kind == ui.Toolbar || ui.IsToolbarSpace(r.node.Kind) || r.node.Kind == ui.Separator {
 		c.menu = &menuState{epoch: &menuEpoch{}}

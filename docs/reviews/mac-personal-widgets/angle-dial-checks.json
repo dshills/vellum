@@ -1,0 +1,48 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 2.5338537499774247
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestAngleDial|TestNativeColor|TestNativeFont|TestNativeDocumentPanel",
+      "-count=1",
+      "-timeout",
+      "90s"
+    ],
+    "exit_code": 0,
+    "seconds": 14.588562041986734
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestMacComponent",
+      "-count=1",
+      "-timeout",
+      "90s"
+    ],
+    "exit_code": 0,
+    "seconds": 9.014629750046879
+  }
+]

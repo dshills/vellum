@@ -22,6 +22,7 @@ type macDocumentGallery struct {
 	colorArtwork           *canvas.TiledImage
 	fontPicker             *ui.FontPicker
 	fontValue, fontPreview app.FontPanelSelection
+	dials                  []*ui.AngleDial
 }
 
 func (m *macComponentsGallery) documentListView() ui.Node {
@@ -285,4 +286,32 @@ func (e *macDocumentGallery) acceptFontPreview(epoch uint64, value app.FontPanel
 	}
 	e.fontPreview = value
 	return true
+}
+
+func (m *macComponentsGallery) angleDialView() ui.Node {
+	if m.documents == nil {
+		m.documents = &macDocumentGallery{parent: m}
+	}
+	e := m.documents
+	if len(e.dials) == 0 {
+		for i, size := range []float32{64, 96, 128} {
+			index := i
+			d := &ui.AngleDial{ID: fmt.Sprintf("documents/angle/%d", i), Label: fmt.Sprintf("Rotation · %.0f pt", size), Degrees: float32(30 + i*45), Size: size, Step: 1, IconImage: m.artwork[ui.SymbolRedo]}
+			d.Change = func(event ui.AngleEvent) {
+				e.dials[index].Degrees = event.Degrees
+				m.count++
+				m.status = fmt.Sprintf("Rotation: %.1f°", event.Degrees)
+			}
+			e.dials = append(e.dials, d)
+		}
+	}
+	children := []ui.Node{{ID: "documents/angle-help", Kind: ui.Label, Text: "Circular degree controls in three sizes. Zero is up; clockwise increases. Drag, use arrows (Shift = ten steps), Home/End, or type degrees. Values wrap at 360."}}
+	for _, d := range e.dials {
+		n, err := d.View()
+		if err != nil {
+			return ui.Node{ID: "documents/angle-error", Kind: ui.Label, Text: err.Error()}
+		}
+		children = append(children, n)
+	}
+	return ui.Node{ID: "documents/angle-page", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}, Children: children}
 }

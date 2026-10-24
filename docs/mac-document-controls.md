@@ -75,3 +75,21 @@ the existing managed FontPicker and previews live family/style/size changes.
 Its extra preview caps display size to 72 points while reporting the actual size.
 Font rendering may substitute if the text backend cannot resolve an installed
 face; no font installation or document/rich-text mutation is performed.
+
+## Circular angle dial
+
+Retain `ui.AngleDial`, accepting AngleEvent by assigning Degrees. Canonical values
+are finite [0,360); zero is up and increases clockwise. Step defaults to 1, must
+divide 360 and is 0.1..180. Set Size to 64..160 logical points (default 96). A
+full-color optional header IconImage is preserved; the dial face uses the scoped
+semantic palette or the native scheme. Tick/needle painting uses the existing
+vector painter; no new rendering backend is introduced.
+
+Pointer capture converts the actual laid-out circular face coordinates, including
+display scale and scrolling. Center dead-zone avoids unstable angles. Release,
+capture loss, disabled/hidden scope and window retirement stop the gesture without
+a trailing click. Arrows adjust one step; Shift adjusts ten, Home zero and End the
+last step. Return/Space and accessibility Increment advance; Decrement and Set are
+available through the slider accessibility role. The accompanying numeric field
+shares normalization (360 wraps to zero). Proposals are live; applications own
+undo transactions and acceptance/rejection. The gallery shows 64/96/128pt variants.
