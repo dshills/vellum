@@ -19,7 +19,7 @@ type ToolbarLayout struct {
 
 func resolveToolbarLayout(toolbar Node, value ToolbarLayout) (ToolbarLayout, []Node, error) {
 	if toolbar.Kind != Toolbar || toolbar.ToolbarOverflow || len(toolbar.Children) < 1 || len(toolbar.Children) > MaxMenuOptions {
-		return ToolbarLayout{}, nil, fmt.Errorf("ui: toolbar customization requires a complete horizontal Toolbar with 1..64 Buttons/Separators before overflow")
+		return ToolbarLayout{}, nil, fmt.Errorf("ui: toolbar customization requires a complete horizontal Toolbar with 1..64 actions, separators or spaces before overflow")
 	}
 	if toolbar.Orientation == Vertical {
 		return ToolbarLayout{}, nil, fmt.Errorf("ui: toolbar customization requires horizontal actions")
@@ -30,8 +30,8 @@ func resolveToolbarLayout(toolbar Node, value ToolbarLayout) (ToolbarLayout, []N
 	byID := make(map[string]Node, len(toolbar.Children))
 	actions := 0
 	for _, item := range toolbar.Children {
-		if (item.Kind != Button && item.Kind != Separator) || item.ContextMenu != nil || item.PlacementSource != nil || item.ToolbarReorder != nil || len(item.Children) > 0 {
-			return ToolbarLayout{}, nil, fmt.Errorf("ui: customizable toolbar items must be ordinary Buttons or Separators")
+		if (item.Kind != Button && item.Kind != Separator && !IsToolbarSpace(item.Kind)) || item.ContextMenu != nil || item.PlacementSource != nil || item.ToolbarReorder != nil || len(item.Children) > 0 {
+			return ToolbarLayout{}, nil, fmt.Errorf("ui: customizable toolbar items must be ordinary Buttons, Separators or toolbar spaces")
 		}
 		if item.Kind == Button {
 			actions++
@@ -105,10 +105,19 @@ func (value ToolbarLayout) Apply(toolbar Node) (Node, error) {
 	if n := len(toolbar.Children); n > 0 && toolbar.Children[n-1].Kind == Separator {
 		toolbar.Children = toolbar.Children[:n-1]
 	}
+	if !slices.ContainsFunc(toolbar.Children, func(n Node) bool { return n.Kind == Button }) {
+		toolbar.Children = nil
+	}
 	return toolbar, nil
 }
 
 func toolbarItemLabel(item Node) string {
+	if IsToolbarSpace(item.Kind) {
+		if item.Kind == ToolbarFlexibleSpace {
+			return "Flexible Space"
+		}
+		return "Space"
+	}
 	if item.Kind == Separator {
 		return "Separator"
 	}

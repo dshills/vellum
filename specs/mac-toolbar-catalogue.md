@@ -109,3 +109,11 @@ default order. Invalid files and unsupported schema versions are left untouched;
 disabled for that session until the file is repaired/removed and the app relaunched.
 Restore Defaults is persisted through the same Change path. Appearance packages
 have separate files to avoid concurrently overwriting each other's settings.
+
+ToolbarSpace and ToolbarFlexibleSpace are noninteractive leaf kinds, with default
+16 pt fixed width and 8 pt minimum flexible width. Flexible space consumes spare
+horizontal toolbar width and contracts before actions overflow. Both use stable
+IDs and participate in customization ordering/hiding/persistence. Neither has a
+focus stop, accessible action, command or overflow menu entry. An all-hidden action
+catalogue produces an empty bar even if spaces remain configured. Mixed toolbar
+demonstrates both types; simple Small/Regular/Large comparisons remain unchanged.

@@ -208,6 +208,23 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		widget = core.NewMeter(parent).SetType(core.MeterCircle)
 	case ui.ProgressGauge:
 		widget = core.NewMeter(parent).SetType(core.MeterSemicircle)
+	case ui.ToolbarSpace, ui.ToolbarFlexibleSpace:
+		frame := core.NewFrame(parent)
+		frame.Styler(func(s *styles.Style) {
+			s.Padding.Zero()
+			s.Margin.Zero()
+			s.Border.Width.Zero()
+			s.Gap.Zero()
+			s.Min.Set(units.Dp(16), units.Dp(1))
+			s.Max.Set(units.Dp(16), units.Dp(1))
+			s.Grow.Set(0, 0)
+			if r.node.Kind == ui.ToolbarFlexibleSpace {
+				s.Min.X = units.Dp(8)
+				s.Max.X = units.Dp(0)
+				s.Grow.X = 1
+			}
+		})
+		widget = frame
 	case ui.Separator:
 		widget = core.NewSeparator(parent)
 	case ui.Selector:

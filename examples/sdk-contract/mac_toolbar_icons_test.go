@@ -68,3 +68,16 @@ func TestPublicToolbarCustomizationAndOverflow(t *testing.T) {
 		t.Fatal("public customization sheet", err)
 	}
 }
+
+func TestPublicToolbarSpaceKinds(t *testing.T) {
+	tools := ui.Node{ID: "space-tools", Kind: ui.Toolbar, Children: []ui.Node{
+		{ID: "action", Kind: ui.Button, Text: "Action", Activate: func() {}},
+		{ID: "gap", Kind: ui.ToolbarSpace}, {ID: "flex", Kind: ui.ToolbarFlexibleSpace},
+	}}
+	if err := ui.Validate(ui.WithToolbarOverflow(tools)); err != nil {
+		t.Fatal(err)
+	}
+	if got := ui.FocusOrder(tools); len(got) != 1 || got[0] != "action" {
+		t.Fatal("spacing is interactive", got)
+	}
+}

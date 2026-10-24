@@ -27,7 +27,7 @@ func WithToolbarOverflow(toolbar Node) Node {
 		}
 		options = append(options, Option{ID: item.ID, Label: label, Icon: item.Icon, IconImage: item.IconImage,
 			Disabled: item.Disabled || item.Activate == nil, Separator: item.Kind == Separator})
-		if item.Kind == Separator {
+		if item.Kind == Separator || IsToolbarSpace(item.Kind) {
 			options[len(options)-1] = Option{ID: item.ID, Separator: true}
 		}
 	}
@@ -61,8 +61,8 @@ func validateToolbarOverflow(n Node) error {
 		return fmt.Errorf("ui: use WithToolbarOverflow to create the managed overflow menu")
 	}
 	for i, child := range n.Children[:len(n.Children)-1] {
-		if (child.Kind != Button && child.Kind != Separator) || child.ContextMenu != nil || child.PlacementSource != nil || len(child.Children) != 0 {
-			return fmt.Errorf("ui: overflow toolbar items must be ordinary Buttons or Separators")
+		if (child.Kind != Button && child.Kind != Separator && !IsToolbarSpace(child.Kind)) || child.ContextMenu != nil || child.PlacementSource != nil || len(child.Children) != 0 {
+			return fmt.Errorf("ui: overflow toolbar items must be ordinary Buttons, Separators or toolbar spaces")
 		}
 		if child.Kind == Button && strings.TrimSpace(child.Text) == "" && strings.TrimSpace(child.Accessibility.Name) == "" {
 			return fmt.Errorf("ui: overflow toolbar actions need a label or accessible name")

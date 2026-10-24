@@ -88,7 +88,7 @@ func (f *overflowToolbarFrame) SizeDown(iter int) bool {
 				used += gap + w
 				fit = i + 1
 			}
-			for fit > 0 && f.owner.children[fit-1].node.Kind == ui.Separator {
+			for fit > 0 && (f.owner.children[fit-1].node.Kind == ui.Separator || ui.IsToolbarSpace(f.owner.children[fit-1].node.Kind)) {
 				fit--
 			}
 		}
@@ -170,7 +170,7 @@ func toolbarOverflowOptions(owner *record, options []ui.Option) []ui.Option {
 	}
 	hidden := make(map[string]bool, len(owner.children))
 	for _, child := range owner.children {
-		if toolbarOverflowHidden(child) {
+		if !ui.IsToolbarSpace(child.node.Kind) && toolbarOverflowHidden(child) {
 			hidden[child.node.ID] = true
 		}
 	}

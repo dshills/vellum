@@ -1108,3 +1108,15 @@ accident; it is the Go API's specified mode, also asserted by the file-mode test
 Deferred close/remove after rename are harmless cleanup. Atomic replacement is
 claimed; power-loss durability of the containing directory is not. No remaining
 actionable review finding.
+
+## Fixed and flexible toolbar spaces
+
+Prism Anthropic claude-sonnet-5-5 reviewed the full spacer diff. Replaced the
+flagged nested slice insertion with insertion while constructing the catalogue,
+and removed the second overflow-filter map. Fixed-width override and expanding/
+contracting flexible-space behavior are now measured by native geometry tests;
+node styles run after the default Styler, and native Max.X zero is the existing
+unbounded convention. Spaces never enter the menu-eligible ID map; ordinary menu
+options retain explicit catalogue alignment. UI race tests, native sizing,
+overflow/customization routing, gallery toolbar regressions, independent SDK
+contracts and focused vet passed. No remaining actionable finding.

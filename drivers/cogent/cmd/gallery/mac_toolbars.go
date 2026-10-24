@@ -106,6 +106,9 @@ func (m *macToolbarGallery) toolbar(id string, size macToolbarMetrics, display s
 		icon ui.Symbol
 	}{{"New", ui.SymbolAdd}, {"Open", ui.SymbolFolder}, {"Save", ui.SymbolSave}, {"Undo", ui.SymbolUndo}, {"Redo", ui.SymbolRedo}, {"Delete", ui.SymbolDelete}} {
 		if i == 3 {
+			if id == "toolbar-mixed" {
+				children = append(children, ui.Node{ID: id + "/space", Kind: ui.ToolbarSpace}, ui.Node{ID: id + "/flexible-space", Kind: ui.ToolbarFlexibleSpace})
+			}
 			sep := ui.Node{ID: id + "/separator", Kind: ui.Separator, Orientation: ui.Vertical, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 1, Height: size.actionHeight(display) - 8}), MaxSize: ui.Some(ui.Size{Width: 1, Height: size.actionHeight(display) - 8})}}
 			if vertical {
 				sep.Orientation = ui.Horizontal
@@ -162,7 +165,7 @@ func (m *macToolbarGallery) view() ui.Node {
 	catalogues[mixed.ID] = mixed
 	children = append(children, ui.Node{ID: "toolbar-extra-examples", Kind: ui.Row, Style: ui.Style{GrowX: ui.Some(float32(1)), Align: ui.Some(ui.AlignStart), Gap: ui.Some(float32(16))}, Children: []ui.Node{
 		{ID: "toolbar-mixed-column", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1)), Gap: ui.Some(float32(10))}, Children: []ui.Node{
-			m.customizationHeading("toolbar-mixed", "Mixed · text, icons and labels together"), m.configuredToolbar(mixed),
+			m.customizationHeading("toolbar-mixed", "Mixed · fixed and flexible spaces"), m.configuredToolbar(mixed),
 			{ID: "toolbar-limits", Kind: ui.Label, Text: "Customize each horizontal toolbar to reorder or hide actions. Toolbar order and hidden actions are remembered. Vertical bars scroll."},
 		}},
 		{ID: "toolbar-vertical-column", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(0)), Gap: ui.Some(float32(10)), MinSize: ui.Some(ui.Size{Width: 72}), MaxSize: ui.Some(ui.Size{Width: 72})}, Children: []ui.Node{

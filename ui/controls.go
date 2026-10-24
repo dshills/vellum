@@ -9,31 +9,33 @@ import (
 )
 
 const (
-	SplitPane        Kind = "split-pane"
-	Toolbar          Kind = "toolbar"
-	StatusBar        Kind = "status-bar"
-	FormGroup        Kind = "form-group"
-	Disclosure       Kind = "disclosure"
-	Checkbox         Kind = "checkbox"
-	Switch           Kind = "switch"
-	ToggleButton     Kind = "toggle-button"
-	ProgressBar      Kind = "progress-bar"
-	ProgressRing     Kind = "progress-ring"
-	ProgressGauge    Kind = "progress-gauge"
-	Separator        Kind = "separator"
-	Selector         Kind = "selector"
-	ListBox          Kind = "list-box"
-	MenuButton       Kind = "menu-button"
-	RadioGroup       Kind = "radio-group"
-	SegmentedControl Kind = "segmented-control"
-	Slider           Kind = "slider"
-	NumberField      Kind = "number-field"
-	TextField        Kind = "text-field"
-	MultilineText    Kind = "multiline-text"
-	Tabs             Kind = "tabs"
-	Scroll           Kind = "scroll"
-	Dialog           Kind = "dialog"
-	Canvas2D         Kind = "canvas-2d"
+	SplitPane            Kind = "split-pane"
+	Toolbar              Kind = "toolbar"
+	ToolbarSpace         Kind = "toolbar-space"
+	ToolbarFlexibleSpace Kind = "toolbar-flexible-space"
+	StatusBar            Kind = "status-bar"
+	FormGroup            Kind = "form-group"
+	Disclosure           Kind = "disclosure"
+	Checkbox             Kind = "checkbox"
+	Switch               Kind = "switch"
+	ToggleButton         Kind = "toggle-button"
+	ProgressBar          Kind = "progress-bar"
+	ProgressRing         Kind = "progress-ring"
+	ProgressGauge        Kind = "progress-gauge"
+	Separator            Kind = "separator"
+	Selector             Kind = "selector"
+	ListBox              Kind = "list-box"
+	MenuButton           Kind = "menu-button"
+	RadioGroup           Kind = "radio-group"
+	SegmentedControl     Kind = "segmented-control"
+	Slider               Kind = "slider"
+	NumberField          Kind = "number-field"
+	TextField            Kind = "text-field"
+	MultilineText        Kind = "multiline-text"
+	Tabs                 Kind = "tabs"
+	Scroll               Kind = "scroll"
+	Dialog               Kind = "dialog"
+	Canvas2D             Kind = "canvas-2d"
 )
 
 // Option has a stable domain ID independent of its displayed label. For Tabs,
@@ -105,6 +107,9 @@ type FocusRequest struct {
 	Sequence uint64
 }
 
+// IsToolbarSpace reports decorative fixed/flexible toolbar spacing items.
+func IsToolbarSpace(kind Kind) bool { return kind == ToolbarSpace || kind == ToolbarFlexibleSpace }
+
 func IsContainer(kind Kind) bool {
 	switch kind {
 	case Row, Column, Tabs, Scroll, Dialog, Toolbar, StatusBar, FormGroup, SplitPane, Disclosure:
@@ -143,6 +148,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if IsToolbarSpace(n.Kind) && (n.Activate != nil || n.Change != nil || n.ContextMenu != nil || n.PlacementSource != nil || n.ToolbarReorder != nil) {
+		return fmt.Errorf("ui: toolbar spaces are display-only")
+	}
 	if err := ValidateToolbarReorderNode(n); err != nil {
 		return err
 	}

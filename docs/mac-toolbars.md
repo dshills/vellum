@@ -227,3 +227,14 @@ rather than construct drag descriptors or call their native drop hooks directly.
 Automated routing covers drag commits, hidden membership, full-color row artwork,
 scrolling, scale, release consumption and teardown. Packaged native-pointer checks
 are recorded separately from deterministic routing evidence.
+
+## Fixed and flexible spaces
+
+The Mixed toolbar demonstrates `ui.ToolbarSpace` (16 pt fixed gap) and
+`ui.ToolbarFlexibleSpace` (8 pt minimum, expands to consume spare width). Supply
+these leaf kinds with stable IDs among horizontal toolbar actions. Fixed-space
+width can be styled with matching MinSize/MaxSize widths. Customize lists them as
+Space and Flexible Space; reorder or hide them just like actions. Their settings
+persist in the gallery. They add no focus/AX target and never become menu entries.
+Flexible space contracts as the toolbar narrows; actions still use the original
+overflow menu, artwork and callbacks. Hiding every action leaves an empty bar.
