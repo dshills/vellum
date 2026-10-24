@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "9ebf679d7a40b11769e0b019759387d4",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "092828f3728f7effd6297bfcb7184ef9d1a0e5dc",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "ee89aaa2704d0243",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Invalid handler requests focus unconditionally",
+      "message": "Invalid is also called for non-entry validation failures, such as exceeding capacity or an empty or overlong tag. Because it now unconditionally requests a focus change, it can move focus to the color well at 32 tags. A rejected add would then jump focus unexpectedly. Pending requests also persist across re-renders.",
+      "suggestion": "Request focus only for rejections that come from tag entry. At capacity, keep focus where it is. Alternatively, have focusAfterTokenEdit take the context of the edit as an argument.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/input_helpers.go",
+          "lines": {
+            "start": 88,
+            "end": 88
+          }
+        }
+      ],
+      "tags": [
+        "focus",
+        "ui",
+        "location-corrected"
+      ],
+      "evidence": "m.tokens.Invalid = func(err error) { m.tokenError = err.Error(); m.focusAfterTokenEdit() }",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6011,
+    "totalMs": 6033
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 15974,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 10210,
+        "output": 345,
+        "costUSD": 0.02387
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -31,8 +31,10 @@ Place the returned nodes in FormGroup or Column containers with suitable padding
 and gaps. Give each composite a distinct stable ID and reserve its generated child
 namespace. Use exported ID helpers for focus requests instead of constructing
 internal child names. Put a root `FocusRequest` on your window's actual root, not
-on a nested component. The gallery's return-to-entry policy after token removal
-is an application policy, not an implicit TokenField side effect.
+on a nested component. The gallery's return-to-entry policy after token acceptance, rejection or removal
+is an application policy, not an implicit TokenField side effect. Its root focus
+request advances to the next field at capacity and is canceled when inputs are
+disabled; request only enabled targets after applying your model edit.
 
 ## Accepting values
 

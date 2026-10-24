@@ -130,3 +130,10 @@ pacing or release policy.
 Activation binding is idempotent for the same event source. A changed publication
 requests one originating composition; duplicate observations or a coalesced return
 to the already-published state do not request another restyle or composition.
+
+The standalone widget gallery returns focus to tag entry after accepted/rejected
+entry and removal, so multiple tags can be entered in sequence. At MaxTokens the
+entry is disabled and continuation moves to the color well. Disabling inputs
+cancels pending root focus requests while preserving their monotonic sequence;
+re-enabling does not replay them. This is application policy with existing APIs,
+not a change to TokenField's reusable focus contract or ordinary text-field Return.

@@ -48,7 +48,10 @@ panels. Color recents are a caller-supplied palette (maximum 16). Token suggesti
 use the dropdown; there is no per-keystroke completion filtering, comma-triggered
 commit, inline chip editing or rearrangement. Long chips abbreviate their visible labels;
 accessibility and removal keep the full value. In this standalone demo, accepted
-chip removal returns keyboard focus to tag entry. Fonts use a caller-supplied catalog,
+tag acceptance, rejection and chip removal return focus to tag entry for repeated
+entry. At 32 tags, focus advances to Drawing color; removing a tag enables entry
+again. Disable inputs cancels pending focus requests. This is demo focus policy.
+Fonts use a caller-supplied catalog,
 may substitute if unavailable, and support sizes 6–144 logical pixels. Path
 controls describe virtual locations with explicit segment-count truncation, not
 filesystem access or width-responsive collapse. Secure entry holds ordinary Go

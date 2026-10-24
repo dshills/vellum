@@ -448,3 +448,32 @@ bounded 120-second probe timed out while the desktop tool stalled. The successfu
 two-window check supersedes that incomplete native attempt. Diagnostic overlays,
 helper apps and their logs stay private and are absent from shipped binaries.
 No broad release qualification or performance campaign was run.
+
+## Standalone tag entry and validation recovery
+
+Public Manual keyboard repros showed successful Return moved focus to the
+suggestion button, interrupting repeated entry. At the token bound it could leave
+that now-disabled menu focused. A separate same-batch removal→Disable repro
+failed with an actual disabled focus-target error during reconciliation.
+
+The standalone demo now requests entry focus after acceptance, entry rejection
+or removal. At 32 tags it advances to the enabled color well. Disabling cancels
+the pending target while retaining the sequence; re-enabling does not replay it.
+Nested gallery view still emits no root focus request. This is private demo
+application policy using existing APIs; reusable TokenField and generic Return
+semantics are unchanged.
+
+Focused race tests type two successive tags through public Manual events, reject
+a duplicate without changing accepted tags, correct it, cross the 31→32 boundary,
+and exercise same-batch removal/disable followed by re-enable. Existing reset,
+stale-callback, theme, standalone/nested focus and descriptor-error tests pass.
+Gallery vet passes. Native repeated-entry confirmation follows packaging.
+
+Prism Anthropic claude-sonnet-5-5 reported a hypothetical Invalid callback at
+capacity or outside entry. TokenField invokes Invalid only from its entry Change
+path, and that path returns before validation whenever len(Tokens)==MaxTokens.
+View configuration errors are returned, not sent to Invalid. Empty/overlong and
+duplicate text are entry rejections, for which retaining entry focus is intended.
+The persistent root request is sequence-based: applyAccessibleFocus ignores an
+already-consumed request; disable explicitly cancels it. No source change is
+needed for the reported scenarios.

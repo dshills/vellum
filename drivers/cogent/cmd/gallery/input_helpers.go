@@ -73,7 +73,7 @@ func (m *inputHelpersGallery) resetFields() {
 				if t.ID == e.TokenID {
 					remaining := append([]ui.Token(nil), m.tokens.Tokens...)
 					m.tokens.Tokens = append(remaining[:i], remaining[i+1:]...)
-					m.focus = ui.FocusRequest{ID: ui.TokenInputID(m.tokens.ID), Sequence: m.focus.Sequence + 1}
+					m.focusAfterTokenEdit()
 					break
 				}
 			}
@@ -81,10 +81,11 @@ func (m *inputHelpersGallery) resetFields() {
 			m.tokenNext++
 			m.tokens.Tokens = append(m.tokens.Tokens, ui.Token{ID: fmt.Sprintf("tag-%d", m.tokenNext), Text: e.Text})
 			m.tokens.Draft = ""
+			m.focusAfterTokenEdit()
 		}
 		m.tokenError = ""
 	}
-	m.tokens.Invalid = func(err error) { m.tokenError = err.Error() }
+	m.tokens.Invalid = func(err error) { m.tokenError = err.Error(); m.focusAfterTokenEdit() }
 	m.colorWell = &ui.ColorWell{ID: "drawing-color", Label: "Drawing color", Color: color.NRGBA{R: 52, G: 120, B: 246, A: 255}, Recent: []color.NRGBA{{R: 52, G: 120, B: 246, A: 255}, {R: 237, G: 90, B: 80, A: 255}, {R: 64, G: 180, B: 110, A: 255}}}
 	m.colorWell.Change = func(e ui.ColorEdit) { m.colorWell.Color = e.Apply(m.colorWell.Color); m.colorError = "" }
 	m.colorWell.Invalid = func(err error) { m.colorError = err.Error() }
@@ -105,8 +106,26 @@ func (m *inputHelpersGallery) resetFields() {
 	m.setAppearance(dark)
 	m.setDisabled(disabled)
 }
+
+// The standalone demo supports repeated tag entry. Nested galleries continue
+// to use their host's focus policy because view never emits this request.
+func (m *inputHelpersGallery) focusAfterTokenEdit() {
+	m.focus = ui.FocusRequest{Sequence: m.focus.Sequence + 1}
+	if m.disabled {
+		return
+	}
+	if len(m.tokens.Tokens) == ui.MaxTokens {
+		m.focus.ID = ui.ColorWellButtonID(m.colorWell.ID)
+	} else {
+		m.focus.ID = ui.TokenInputID(m.tokens.ID)
+	}
+}
+
 func (m *inputHelpersGallery) setDisabled(disabled bool) {
 	m.disabled = disabled
+	if disabled {
+		m.focus.ID = ""
+	} // Cancel an edit's pending focus request before its target is disabled.
 	m.colorWell.Disabled = disabled
 	m.tokens.Disabled = disabled
 	m.fontPicker.Disabled = disabled
