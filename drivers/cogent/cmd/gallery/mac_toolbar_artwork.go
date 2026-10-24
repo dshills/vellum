@@ -13,8 +13,8 @@ import (
 // Original Vellum sample artwork, generated once at 96px with 4x sampling.
 // No OS icon extraction, network resources or third-party image licensing.
 var toolbarColorIcons = sync.OnceValues(func() (map[ui.Symbol]*canvas.TiledImage, error) {
-	result := make(map[ui.Symbol]*canvas.TiledImage, 6)
-	for _, symbol := range []ui.Symbol{ui.SymbolAdd, ui.SymbolFolder, ui.SymbolSave, ui.SymbolUndo, ui.SymbolRedo, ui.SymbolDelete} {
+	result := make(map[ui.Symbol]*canvas.TiledImage, 7)
+	for _, symbol := range []ui.Symbol{ui.SymbolAdd, ui.SymbolFolder, ui.SymbolSave, ui.SymbolUndo, ui.SymbolRedo, ui.SymbolDelete, ui.SymbolDocument} {
 		pixels := image.NewNRGBA(image.Rect(0, 0, 96, 96))
 		for y := range 96 {
 			for x := range 96 {
@@ -70,6 +70,11 @@ func toolbarArtworkPixel(symbol ui.Symbol, x, y float64) color.NRGBA {
 		return inside
 	}
 	switch symbol {
+	case ui.SymbolDocument:
+		paint(round(19, 8, 77, 88, 7), rgb(54, 120, 190))
+		paint(round(23, 12, 73, 84, 4), rgb(245, 250, 255))
+		paint(rect(31, 25, 65, 31), rgb(63, 145, 218))
+		paint(rect(31, 42, 65, 46) || rect(31, 54, 65, 58) || rect(31, 66, 56, 70), rgb(130, 169, 204))
 	case ui.SymbolAdd:
 		paint(round(19, 8, 73, 86, 7), rgb(38, 123, 210))
 		paint(round(23, 12, 69, 82, 4), rgb(240, 248, 255))

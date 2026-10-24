@@ -28,6 +28,11 @@ func validateListBox(n Node) error {
 		if len(o.Badge) > 32 || !utf8.ValidString(o.Badge) || strings.ContainsAny(o.Badge, "\x00\r\n") {
 			return fmt.Errorf("ui: list badge requires at most 32 UTF-8 bytes without line breaks")
 		}
+		if o.IconImage != nil {
+			if err := validateIcon(Node{Kind: Button, Text: o.Label, Icon: o.Icon, IconImage: o.IconImage}); err != nil {
+				return err
+			}
+		}
 		if o.Icon != "" {
 			if err := validateIcon(Node{Kind: Icon, Icon: o.Icon}); err != nil {
 				return err

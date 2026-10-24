@@ -238,8 +238,8 @@ func ValidateControl(n Node) error {
 		return err
 	}
 	for _, option := range n.Options {
-		if option.IconImage != nil && n.Kind != MenuButton {
-			return fmt.Errorf("ui: option IconImage requires MenuButton")
+		if option.IconImage != nil && n.Kind != MenuButton && (n.Kind != ListBox || !n.Multiple) {
+			return fmt.Errorf("ui: option IconImage requires MenuButton or multiple ListBox")
 		}
 		if ((option.Icon != "" && n.Kind != MenuButton) || option.Badge != "") && (n.Kind != ListBox || !n.Multiple) {
 			return fmt.Errorf("ui: option icons and badges require a multiple ListBox")

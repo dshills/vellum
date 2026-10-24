@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "4f97a575c6490b48e11a2530e6e27efe",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "c4a4222aa289e154b77d25cd7af97fc00661f536",
+    "branch": "codex/mac-components-theming"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "936bc98178c7ff59",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Selection at deepest level not rendered",
+      "message": "Depth check allows up to 4 levels of items, but a path of length 4 selects a level-4 item whose children (level 5) are rejected; path length 4 also means browserChildren yields level-5 column, which must be empty. A level-4 folder with children is therefore rejected, yet the docs say four levels; it is consistent, but Path len check allows 4 which opens a 5th (empty) column, so no column is rendered and the selected leaf is not visible as selected in any column.",
+      "suggestion": "Render the last column's selection even when the next level has no items, e.g. stop the loop after appending the final column using depth bounds rather than len(items)\u003e0.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "ui/column_browser.go",
+          "lines": {
+            "start": 77,
+            "end": 77
+          }
+        }
+      ],
+      "tags": [
+        "logic",
+        "location-corrected"
+      ],
+      "evidence": "if depth \u003e MaxColumnBrowserDepth \u0026\u0026 len(items) \u003e 0 {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "429148fa77a50743",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Fraction cap may reject legitimate state",
+      "message": "The column loop walks the path while the ColumnBrowser validate allows depth up to 4 levels, but the preview split MinWidth and fraction map bound is MaxColumnBrowserDepth+1. When four path elements exist, columns can be 5 plus a preview (6), so valid Fractions entries for 5 dividers exceed the validate cap of 5 only barely, but with a Preview column the divider count can be 5 while the cap is 5; however the cap counts map entries from stale paths too. The gallery resets Fractions but a long path with preview can legitimately need more entries than allowed.",
+      "suggestion": "Bound Fractions by the actual divider count (columns including preview minus one) or MaxColumnBrowserDepth+2.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/column_browser.go",
+          "lines": {
+            "start": 174,
+            "end": 174
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "location-corrected"
+      ],
+      "evidence": "items, _ = browserChildren(b.Items, path[:depth+1])",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7467,
+    "totalMs": 7491
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 11,
+    "bytes": 32189,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 18617,
+        "output": 712,
+        "costUSD": 0.044354
+      }
+    ],
+    "widenedFiles": 5,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

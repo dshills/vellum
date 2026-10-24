@@ -68,6 +68,28 @@ func bindCollectionChoice(r *record, id string, b *core.Switch) {
 	// Existing ListBox semantic options, eligibility and membership remain intact.
 	b.FinalMaker(func(p *tree.Plan) {
 		if r.node.Collection == nil {
+			option := choiceOption(r, id)
+			if r.node.Kind != ui.ListBox || !r.node.Multiple || option.IconImage == nil {
+				return
+			}
+			p.Children = nil
+			tree.AddAt(p, "list-thumbnail", func(w *managedImage) {
+				w.Styler(func(s *styles.Style) {
+					s.Min.Set(units.Dp(18), units.Dp(18))
+					s.Max.Set(units.Dp(18), units.Dp(18))
+					s.Grow.Set(0, 0)
+					s.Padding.Zero()
+					s.Margin.Zero()
+				})
+				w.Updater(func() { w.source = choiceOption(r, id).IconImage; w.fit = ui.ImageContain })
+			})
+			tree.AddAt(p, "list-label", func(w *core.Text) {
+				w.Styler(func(s *styles.Style) { s.RenderBox = false; s.SetNonSelectable() })
+				w.Updater(func() { w.SetText(html.EscapeString(choiceOption(r, id).Label)) })
+			})
+			if option.Badge != "" {
+				tree.AddAt(p, "list-badge", func(w *core.Text) { w.Updater(func() { w.SetText(html.EscapeString(choiceOption(r, id).Badge)) }) })
+			}
 			return
 		}
 		p.Children = nil

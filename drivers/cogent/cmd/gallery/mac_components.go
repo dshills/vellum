@@ -8,6 +8,7 @@ import (
 )
 
 type macComponentsGallery struct {
+	browser   *ui.ColumnBrowser
 	inspector *ui.Inspector
 	width     float32
 	splits    []*ui.SplitButton
@@ -63,6 +64,9 @@ func (m *macComponentsGallery) view() ui.Node {
 		}
 	}})
 	content := m.themePreview()
+	if m.page == "browser" {
+		content = m.browserPreview()
+	}
 	if m.page == "inspector" {
 		content = m.inspectorPreview()
 	}
@@ -72,7 +76,7 @@ func (m *macComponentsGallery) view() ui.Node {
 	if m.page == "menus" {
 		content = m.menuPreview()
 	}
-	navigation := ui.Node{ID: "components/pages", Kind: ui.Selector, SelectedID: m.page, Options: []ui.Option{{ID: "theme", Label: "Themes"}, {ID: "menus", Label: "Cascading menus"}, {ID: "split", Label: "Split buttons"}, {ID: "inspector", Label: "Inspector panel"}}, Accessibility: ui.Accessibility{Name: "Component demonstration"}, Change: func(e ui.ChangeEvent) { m.page = e.SelectedID }}
+	navigation := ui.Node{ID: "components/pages", Kind: ui.Selector, SelectedID: m.page, Options: []ui.Option{{ID: "theme", Label: "Themes"}, {ID: "menus", Label: "Cascading menus"}, {ID: "split", Label: "Split buttons"}, {ID: "inspector", Label: "Inspector panel"}, {ID: "browser", Label: "Column browser"}}, Accessibility: ui.Accessibility{Name: "Component demonstration"}, Change: func(e ui.ChangeEvent) { m.page = e.SelectedID }}
 
 	return ui.Node{ID: "mac-components", Kind: ui.Scroll, Theme: &theme, Grow: true, Style: ui.Style{Background: ui.Some(palette.Window), Padding: ui.Some(ui.UniformInsets(16)), Gap: ui.Some(float32(12))}, Children: []ui.Node{{ID: "components/title", Kind: ui.Label, Text: "Mac components", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 20, Weight: 600})}}, {ID: "components/appearance", Kind: ui.Row, Children: appearance}, navigation, content, {ID: "components/status", Kind: ui.Label, Text: fmt.Sprintf("%s · actions: %d", m.status, m.count)}}}
 }
@@ -130,4 +134,34 @@ func (m *macComponentsGallery) inspectorPreview() ui.Node {
 		return ui.Node{ID: "components/inspector-error", Kind: ui.Label, Text: err.Error()}
 	}
 	return n
+}
+
+func (m *macComponentsGallery) browserPreview() ui.Node {
+	if m.browser == nil {
+		m.browser = &ui.ColumnBrowser{ID: "components/browser", Label: "Component library", Fractions: map[string]float32{}, Items: []ui.BrowserItem{
+			{ID: "drawings", Label: "Drawings", Thumbnail: m.artwork[ui.SymbolFolder], Children: []ui.BrowserItem{{ID: "floor", Label: "Floor plan", Thumbnail: m.artwork[ui.SymbolDocument]}, {ID: "detail", Label: "Detail drawing", Thumbnail: m.artwork[ui.SymbolSave]}}},
+			{ID: "components", Label: "Components", Thumbnail: m.artwork[ui.SymbolFolder], Children: []ui.BrowserItem{{ID: "symbols", Label: "Symbols", Thumbnail: m.artwork[ui.SymbolFolder], Children: []ui.BrowserItem{{ID: "connector", Label: "Connector", Thumbnail: m.artwork[ui.SymbolDocument]}}}, {ID: "notes", Label: "Notes", Thumbnail: m.artwork[ui.SymbolDocument]}}},
+			{ID: "cloud", Label: "Cloud (unavailable)", Disabled: true, Thumbnail: m.artwork[ui.SymbolFolder]},
+		}, Change: func(e ui.BrowserEvent) {
+			m.browser.Path = e.Path
+			m.browser.Fractions = map[string]float32{}
+			m.status = "Browser path: " + fmt.Sprint(e.Path)
+		}, Resize: func(e ui.BrowserResizeEvent) {
+			if m.browser.Fractions == nil {
+				m.browser.Fractions = map[string]float32{}
+			}
+			m.browser.Fractions[e.ColumnID] = e.Fraction
+		}}
+	}
+	label := "Choose an item"
+	if len(m.browser.Path) > 0 {
+		label = m.browser.Path[len(m.browser.Path)-1]
+	}
+	preview := ui.Node{ID: "components/browser-preview-content", Kind: ui.Column, Children: []ui.Node{{ID: "components/browser-preview-art", Kind: ui.Image, Text: "Document preview", Image: m.artwork[ui.SymbolDocument], Fit: ui.ImageContain, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 64, Height: 64}), MaxSize: ui.Some(ui.Size{Width: 64, Height: 64})}}, {ID: "components/browser-preview-name", Kind: ui.Label, Text: label}}}
+	m.browser.Preview = &preview
+	n, err := m.browser.View()
+	if err != nil {
+		return ui.Node{ID: "components/browser-error", Kind: ui.Label, Text: err.Error()}
+	}
+	return ui.Node{ID: "components/browser-demo", Kind: ui.Column, Children: []ui.Node{{ID: "components/browser-help", Kind: ui.Label, Text: "Select a folder to reveal its column. Tab moves through columns/dividers; drag a divider to resize. Scroll horizontally for deeper paths."}, n}}
 }

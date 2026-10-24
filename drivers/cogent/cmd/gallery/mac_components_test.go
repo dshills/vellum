@@ -23,3 +23,19 @@ func TestMacComponentThemePreviewRetainsArtworkAndValue(t *testing.T) {
 		t.Fatal("theme transition lost state or artwork")
 	}
 }
+
+func TestMacComponentPagesAreConsumable(t *testing.T) {
+	for _, dark := range []bool{false, true} {
+		m := newMacComponentsGallery(dark)
+		for _, page := range []string{"theme", "menus", "split", "inspector", "browser"} {
+			m.page = page
+			n := m.view()
+			if err := ui.Validate(n); err != nil {
+				t.Fatal(page, err)
+			}
+			if page == "browser" && findGalleryDocumentNode(n, "components/browser").ID == "" {
+				t.Fatal("browser failed to construct")
+			}
+		}
+	}
+}

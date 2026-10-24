@@ -1330,3 +1330,11 @@ Prism: `mac-inspector.json` (Anthropic Claude Sonnet 5.5, complete coverage).
 Fixed Prism finding by explicitly rejecting editor descendants inside the reserved inspector namespace (also rejects empty IDs); full-tree validation already rejects duplicates. Added a regression. Editors receive property accessibility labels and mixed-value help. Focused native collapse/reopen verifies the same editor instance survives.
 
 Focused checks: `mac-inspector-checks.json`, `mac-inspector-final-checks.json`.
+
+## Add resizable full-color column browser and document previews
+
+Prism: `mac-column-browser-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+The sample initializes immutable artwork synchronously before browser construction and resets its fraction map on path changes; a defensive nil-map initialization was added. Invalid/unbounded caller fraction maps intentionally return documented validation errors. Final depth findings are contradicted by the loop: the fourth column is appended and selects path[3] before empty children stop iteration. A new four-level/preview regression asserts all four selections plus four resize fractions. The maximum is four data columns and one preview, hence at most four dividers; the cap of five map entries cannot reject a current visible set. No feature gate or renderer policy changed.
+
+Focused checks: `mac-column-browser-checks.json`, `mac-column-browser-final-checks.json`, `mac-column-browser-depth-checks.json`.

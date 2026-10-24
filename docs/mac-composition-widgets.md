@@ -37,3 +37,18 @@ proposals by updating `Expanded`; sections retain child controls when collapsed.
 Set `LabelWidth` (48–320dp) to align rows. Header artwork uses immutable pixels.
 At most 32 sections/128 properties are accepted. No document-model logic is built
 in. The Components → Inspector panel page shows geometry and appearance sections.
+
+## Column browser
+
+Retain `ui.ColumnBrowser` with a bounded `BrowserItem` hierarchy (256 items, four
+levels). Accept `BrowserEvent.Path` in `Change`. Disabled ancestry and stale
+source descriptions reject callbacks. `Thumbnail` retains full-color immutable
+pixels; `Icon` is the symbol alternative. `Preview` is application-owned content.
+Columns reuse multi-list keyboard routing but propose exactly one path target.
+Up/Down/Home/End/typeahead navigate rows; Tab traverses columns and dividers.
+This version does not add Finder's Left/Right column shortcuts or filesystem I/O.
+
+Nested split dividers resize columns. Accept `BrowserResizeEvent.Fraction` into
+`Fractions[event.ColumnID]`; bound the map to the visible columns (the example
+resets it when the path changes). Horizontal scrolling preserves usable minimum
+column widths. Components → Column browser demonstrates hierarchy and previews.

@@ -105,7 +105,7 @@ func ValidateCollectionNode(n Node) error {
 	}
 	for i, item := range c.Items {
 		o := n.Options[i]
-		if o.ID != item.ID || o.Label != item.Label || o.Disabled != item.Disabled || o.Icon != item.Icon || o.Badge != "" {
+		if o.ID != item.ID || o.Label != item.Label || o.Disabled != item.Disabled || o.Icon != item.Icon || o.Badge != "" || o.IconImage != nil {
 			return fmt.Errorf("ui: collection presentation/options disagree")
 		}
 	}
