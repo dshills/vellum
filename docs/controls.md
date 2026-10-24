@@ -177,6 +177,12 @@ Raw SVG, paths and unknown names are refused.
 
 Buttons and toggle buttons accept Icon beside their Text. Icon-only actions
 require a nonblank Accessibility.Name; Accessibility.Help supplies the tooltip.
+Button and MenuButton also accept `IconImage`, an immutable `canvas.TiledImage`,
+for full-color leading artwork. It preserves source colors/transparency and scales
+with the button’s icon slot; disabled actions dim it. Use `ui.DecodeImage` for
+bounded PNG/JPEG input. Leave `Icon` empty; the two sources are mutually exclusive.
+Image-only actions require `Accessibility.Name`. Artwork adds no focus stop or
+separate accessibility action. See [toolbar recipes](mac-toolbars.md).
 Button Appearance may be ButtonPrimary (filled), ButtonSecondary (outlined),
 ButtonQuiet (text emphasis) or ButtonTool (compact toolbar action). Omission
 preserves the existing filled appearance. Styles remain application-local.

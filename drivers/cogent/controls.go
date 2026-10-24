@@ -280,6 +280,9 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		return nil, false, nil
 	}
 	r.widget = widget
+	if button, ok := widget.(*core.Button); ok {
+		installButtonImage(r, button)
+	}
 	if r.node.Kind == ui.Button || r.node.Kind == ui.Canvas2D || r.node.Kind == ui.ListBox {
 		c.menu = &menuState{epoch: &menuEpoch{}}
 		bindContextMenu(r, widget)
@@ -627,7 +630,7 @@ func syncControl(r *record, previous ui.Node) error {
 	}
 	// Value setters preserve identity; a redraw is necessary when externally
 	// controlled values/option labels change, including same-length option edits.
-	if nativeValueChanged || restoring || previous.Image != r.node.Image || previous.Fit != r.node.Fit || previous.Icon != r.node.Icon || previous.Appearance != r.node.Appearance || previous.Orientation != r.node.Orientation || previous.SoftWrap != r.node.SoftWrap || previous.Text != r.node.Text || previous.Secure != r.node.Secure || previous.Reveal != r.node.Reveal || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
+	if nativeValueChanged || restoring || previous.Image != r.node.Image || previous.Fit != r.node.Fit || previous.Icon != r.node.Icon || previous.IconImage != r.node.IconImage || previous.Appearance != r.node.Appearance || previous.Orientation != r.node.Orientation || previous.SoftWrap != r.node.SoftWrap || previous.Text != r.node.Text || previous.Secure != r.node.Secure || previous.Reveal != r.node.Reveal || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
 		r.widget.AsWidget().Update()
 	}
 	if refused != nil {
@@ -973,6 +976,7 @@ func disposeControl(r *record) {
 	if r.control != nil {
 		disposePlacement(r)
 		disposeShortcutRecorder(r)
+		disposeButtonImage(r)
 		r.control.retired = true
 		if r.control.tabs != nil {
 			r.control.tabs.pending.Store(nil)

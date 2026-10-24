@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image/color"
 
+	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/ui"
 )
 
@@ -13,6 +14,9 @@ type macToolbarGallery struct {
 	dark             bool
 	display          string
 	disabled, narrow bool
+	fullColor        bool
+	artwork          map[ui.Symbol]*canvas.TiledImage
+	artworkError     error
 	count            int
 	last             string
 }
@@ -25,7 +29,8 @@ type macToolbarMetrics struct {
 var macToolbarSizes = []macToolbarMetrics{{"Small", 26, 12, 6}, {"Regular", 32, 13, 8}, {"Large", 40, 16, 10}}
 
 func newMacToolbarGallery(dark bool) *macToolbarGallery {
-	return &macToolbarGallery{dark: dark, display: "both", last: "No action yet"}
+	icons, err := toolbarColorIcons()
+	return &macToolbarGallery{dark: dark, display: "both", fullColor: true, artwork: icons, artworkError: err, last: "No action yet"}
 }
 func (m *macToolbarGallery) action(prefix, name string, icon ui.Symbol, size macToolbarMetrics, display string) ui.Node {
 	text, art := name, icon
@@ -35,12 +40,17 @@ func (m *macToolbarGallery) action(prefix, name string, icon ui.Symbol, size mac
 	if display == "text" {
 		art = ""
 	}
+	var pixels *canvas.TiledImage
+	if m.fullColor && art != "" {
+		pixels = m.artwork[art]
+		art = ""
+	}
 	style := ui.Style{Grow: ui.Some(float32(0)), Padding: ui.Some(ui.Insets{Top: 3, Bottom: 3, Left: size.padding, Right: size.padding}), Gap: ui.Some(float32(5)), MinSize: ui.Some(ui.Size{Width: size.height, Height: size.height}), MaxSize: ui.Some(ui.Size{Height: size.height}), Typography: ui.Some(ui.Typography{Size: size.font}), CornerRadius: ui.Some(float32(5)), Border: ui.Some(ui.Border{}), Background: ui.Some(color.NRGBA{})}
 	if display == "icons" {
 		style.MaxSize = ui.Some(ui.Size{Width: size.height, Height: size.height})
 		style.Padding = ui.Some(ui.UniformInsets(3))
 	}
-	return ui.Node{ID: prefix + "/" + name, Kind: ui.Button, Text: text, Icon: art, Appearance: ui.ButtonTool, Style: style, Disabled: m.disabled || name == "Delete", Accessibility: ui.Accessibility{Name: name, Help: name + " — sample action"}, Activate: func() {
+	return ui.Node{ID: prefix + "/" + name, Kind: ui.Button, Text: text, Icon: art, IconImage: pixels, Appearance: ui.ButtonTool, Style: style, Disabled: m.disabled || name == "Delete", Accessibility: ui.Accessibility{Name: name, Help: name + " — sample action"}, Activate: func() {
 		if !m.disabled && name != "Delete" {
 			m.count++
 			m.last = prefix + ": " + name
@@ -78,6 +88,9 @@ func (m *macToolbarGallery) toolbar(id string, size macToolbarMetrics, display s
 	return ui.Node{ID: id, Kind: ui.Toolbar, Orientation: orientation, Disabled: m.disabled, Style: style, Accessibility: ui.Accessibility{Name: size.name + " " + display + " toolbar", Help: "Tab enters controls. Arrows move between enabled actions; Home and End reveal the first and last."}, Children: children}
 }
 func (m *macToolbarGallery) view() ui.Node {
+	if m.artworkError != nil {
+		return ui.Node{ID: "toolbars", Kind: ui.Label, Text: m.artworkError.Error()}
+	}
 	background := color.NRGBA{R: 246, G: 246, B: 248, A: 255}
 	if m.dark {
 		background = color.NRGBA{R: 29, G: 29, B: 31, A: 255}
@@ -92,7 +105,7 @@ func (m *macToolbarGallery) view() ui.Node {
 		}
 		modes = append(modes, n)
 	}
-	children := []ui.Node{{ID: "toolbar-title", Kind: ui.Label, Text: "Toolbars", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 20, Weight: 600})}}, {ID: "toolbar-help", Kind: ui.Label, Text: "Compare sizes and display modes. Actions update the status below; Delete is deliberately disabled."}, {ID: "toolbar-display", Kind: ui.Row, Children: modes}, {ID: "toolbar-options", Kind: ui.Row, Children: []ui.Node{{ID: "toolbar-narrow", Kind: ui.Checkbox, Text: "Narrow preview", Checked: m.narrow, Change: func(e ui.ChangeEvent) { m.narrow = e.Checked }}, {ID: "toolbar-disable", Kind: ui.Checkbox, Text: "Disable actions", Checked: m.disabled, Change: func(e ui.ChangeEvent) { m.disabled = e.Checked }}}}}
+	children := []ui.Node{{ID: "toolbar-title", Kind: ui.Label, Text: "Toolbars", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 20, Weight: 600})}}, {ID: "toolbar-help", Kind: ui.Label, Text: "Compare sizes and display modes. Actions update the status below; Delete is deliberately disabled."}, {ID: "toolbar-display", Kind: ui.Row, Children: modes}, {ID: "toolbar-options", Kind: ui.Row, Children: []ui.Node{{ID: "toolbar-color", Kind: ui.Checkbox, Text: "Full-color icons", Checked: m.fullColor, Change: func(e ui.ChangeEvent) { m.fullColor = e.Checked }}, {ID: "toolbar-narrow", Kind: ui.Checkbox, Text: "Narrow preview", Checked: m.narrow, Change: func(e ui.ChangeEvent) { m.narrow = e.Checked }}, {ID: "toolbar-disable", Kind: ui.Checkbox, Text: "Disable actions", Checked: m.disabled, Change: func(e ui.ChangeEvent) { m.disabled = e.Checked }}}}}
 	children = append(children, ui.Node{ID: "toolbar-status", Kind: ui.Label, Text: fmt.Sprintf("%s · actions: %d", m.last, m.count)})
 	for _, size := range macToolbarSizes {
 		id := "toolbar-" + size.name

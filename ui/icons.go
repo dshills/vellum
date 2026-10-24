@@ -69,6 +69,14 @@ const (
 )
 
 func validateIcon(n Node) error {
+	if n.IconImage != nil {
+		if (n.Kind != Button && n.Kind != MenuButton) || n.IconImage.TileCount() == 0 || n.Icon != "" {
+			return fmt.Errorf("ui: IconImage requires nonempty immutable pixels on Button/MenuButton without Icon")
+		}
+		if strings.TrimSpace(n.Text) == "" && strings.TrimSpace(n.Accessibility.Name) == "" {
+			return fmt.Errorf("ui: image-only actions require an accessible name")
+		}
+	}
 	if n.Icon != "" {
 		known := false
 		for _, symbol := range symbols {

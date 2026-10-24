@@ -150,7 +150,7 @@ func mountMenuButton(parent tree.Node, r *record) core.Widget {
 func syncMenuButton(r *record, previous ui.Node) {
 	s := r.control.menu
 	flushMenuClose(r)
-	changed := !slices.Equal(s.options, menuDescriptor(r).Options) || previous.MenuAnchorID != r.node.MenuAnchorID || previous.Text != r.node.Text || previous.Icon != r.node.Icon || previous.Appearance != r.node.Appearance || previous.Style != r.node.Style || previous.Grow != r.node.Grow || previous.Disabled != r.node.Disabled || previous.MinWidth != r.node.MinWidth || previous.MinHeight != r.node.MinHeight
+	changed := !slices.Equal(s.options, menuDescriptor(r).Options) || previous.MenuAnchorID != r.node.MenuAnchorID || previous.Text != r.node.Text || previous.Icon != r.node.Icon || previous.IconImage != r.node.IconImage || previous.Appearance != r.node.Appearance || previous.Style != r.node.Style || previous.Grow != r.node.Grow || previous.Disabled != r.node.Disabled || previous.MinWidth != r.node.MinWidth || previous.MinHeight != r.node.MinHeight
 	if changed {
 		requestMenuClose(r)
 		s.epoch = &menuEpoch{}

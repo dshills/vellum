@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"github.com/dshills/vellum/canvas"
 	"reflect"
 	"testing"
 )
@@ -49,6 +50,34 @@ func TestIconsPortableContract(t *testing.T) {
 	} {
 		if err := Validate(n); err == nil {
 			t.Fatal("invalid symbol/presentation accepted", n)
+		}
+	}
+}
+
+func TestFullColorButtonIconContract(t *testing.T) {
+	source := imageSource(t)
+	for _, kind := range []Kind{Button, MenuButton} {
+		n := Node{ID: "color-action", Kind: kind, IconImage: source, Accessibility: Accessibility{Name: "Open"}}
+		if kind == MenuButton {
+			n.Options = []Option{{ID: "open", Label: "Open"}}
+			n.Change = func(ChangeEvent) {}
+		}
+		if err := Validate(n); err != nil {
+			t.Fatal(err)
+		}
+		if got := FocusOrder(n); len(got) != 1 || got[0] != n.ID {
+			t.Fatal("artwork added focus", got)
+		}
+	}
+	for _, n := range []Node{
+		{ID: "bad", Kind: Button, IconImage: source},
+		{ID: "bad", Kind: Button, Text: "Open", IconImage: source, Icon: SymbolOpen},
+		{ID: "bad", Kind: Label, Text: "Open", IconImage: source},
+		{ID: "bad", Kind: ToggleButton, Text: "Open", IconImage: source},
+		{ID: "bad", Kind: Button, Text: "Open", IconImage: &canvas.TiledImage{}},
+	} {
+		if err := Validate(n); err == nil {
+			t.Fatal("invalid full-color icon accepted", n.Kind)
 		}
 	}
 }

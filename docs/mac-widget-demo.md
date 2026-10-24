@@ -19,7 +19,8 @@ window surface; scroll within Inputs to reach its sections. The ordinary macOS t
 
 
 - **Toolbars:** compare Small (26 pt), Regular (32 pt), and Large (40 pt) action
-  heights. Switch Icons / Text / Icons and text without recreating actions.
+  heights. Full-color icons start enabled; turn them off to compare monochrome
+  symbols. Switch Icons / Text / Icons and text without recreating actions.
   A mixed document bar shows per-item choices; a vertical bar demonstrates scrolling.
   Narrow preview constrains horizontal bars to 280 pt. Tab enters actions; arrows,
   Home and End move/reveal enabled tools. Delete is intentionally disabled.

@@ -6,6 +6,9 @@ rendering, title-bar and release-policy scope remains unchanged.
 - Toolbars page in both Mac widget packages, with three size recipes and three
   display modes. Small/Regular/Large control heights are 26/32/40 pt; font sizes
   12/13/16 pt. Icon-only controls are square. Text uses intrinsic width.
+- Full-color artwork is the initial icon mode. A comparison checkbox switches
+  to monochrome symbols without replacing native actions. Six original 96 px
+  sample images are created once and shared; no asset I/O occurs in View.
 - Root and bar backgrounds follow the explicit demo appearance. Actions have
   compact rounded, borderless tool treatment and ordinary focus/hover feedback.
 - Per-item icon/text choice, separators, mixed bar, vertical bar, disabled Delete,

@@ -920,3 +920,31 @@ contextually types the constant mask for e.Modifiers; compilation and the six
 failing-before/passing-after cases verify it. The same convention is already
 used by other managed control key handlers. No extra state or mask API needed.
 Native post-package traversal is recorded separately in the local receipt.
+
+## Full-color toolbar icons
+
+Public IconImage accepts immutable full-color pixels on Button/MenuButton. A
+private managedImage uses the existing contain/alpha painter inside the normal
+font-relative icon slot. Six original 96px sample assets are generated once and
+shared; the gallery starts with color and can compare monochrome symbols.
+
+Prism's ordering suggestions were applied using the supported FirstMaker hook,
+which precedes native label/indicator makers without mutating the plan slice.
+Retired Maker/Updater guards were added and exercised after disposal. The final
+MenuButton uncertainty is disproven by the shared mountControl core.Button path
+and the actual false-menu-button/true-menu-button pixel/identity/lifetime tests.
+These verify the leading private slot, full source colors despite magenta ink,
+replacement, disabled alpha, semantic identity, symbol restoration and cleanup.
+
+The final disposal-concurrency concern does not match this adapter's ownership:
+reconciliation, native widget updating and disposeControl are serialized by the
+existing owner path. Disposal clears r.node.IconImage and private source, just as
+the existing Image cleanup clears r.node.Image; no update interleaves before the
+retired flag is set. Later private updates reject retirement and cannot revive
+pixels. Avoiding descriptor clearing would retain the image through a disposed
+record. Race regressions and explicit UpdateWidget-after-dispose pass.
+
+Portable UI race tests, focused native image/icon/menu/toolbar routing and pixel
+checks, both-theme gallery/public Manual checks, independent public SDK consumer,
+vet and native build pass. Live packaged appearance observations are separate
+in the local delivery receipt; no physical-pointer or human VoiceOver claim.

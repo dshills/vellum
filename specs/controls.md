@@ -550,3 +550,16 @@ sequence requirement, not a request to keep the Spinner focused artificially.
 Post-preview reusable input helpers and Mac appearance are specified in
 [mac-widget-expansion.md](mac-widget-expansion.md). They compose existing controls;
 TextField additionally accepts a literal Placeholder hint.
+
+## Full-color button artwork
+
+`Node.IconImage` accepts immutable nonempty `canvas.TiledImage` pixels on Button
+and MenuButton, mutually exclusive with Symbol Icon. Text may coexist; an empty
+text label requires Accessibility.Name. The native renderer contains the source
+within the same font-relative leading icon slot, preserving full color and alpha.
+It adds no child focus stop or accessible action. Native button identity, hit
+routing, menus, focus, disabled ancestry and keyboard behavior remain unchanged.
+Source replacement refreshes pixels; source removal destroys the private image
+slot and releases its reference. Retiring the action releases its image source.
+ToggleButton, standalone Symbol Icon and menu item options retain their current
+contracts. Bounded decoding is explicit through ui.DecodeImage, outside View.

@@ -12,7 +12,9 @@ The catalogue compares three deliberate, application-local action sizes:
 | Regular | 32 pt | 13 pt | 32 pt |
 | Large | 40 pt | 16 pt | 40 pt |
 
-Choose Icons, Text, or Icons and text. Explicit icon-only accessible names and
+Choose Icons, Text, or Icons and text. **Full-color icons** is enabled initially;
+turn it off to compare the bundled monochrome symbols. Original 96 px sample
+artwork is shared across the three sizes and both appearances. Explicit icon-only accessible names and
 hover help remain present in every mode; labels do not become the identity.
 The mixed bar combines a labeled New action, text-only Open, and icon actions.
 Separators divide file and history groups. Delete demonstrates disabled appearance
@@ -26,7 +28,27 @@ editing commands. Lock-key flags preserve ordinary navigation, including the
 NumLock bit supplied on macOS. Disable actions applies to all sample toolbars but leaves the
 catalogue display controls available.
 
-A regular icon action, independently consumable by an application:
+Full-color action artwork is available through the public `IconImage` field on
+Button and MenuButton. Supply immutable pixels with `ui.DecodeImage` (PNG/JPEG)
+or `canvas.NewTiledImage`; keep that source and reuse it between View calls.
+Leave `Icon` empty. The pixels retain their colors, aspect ratio and transparency,
+scale into the font-relative leading icon slot, and dim with a disabled action.
+The image adds no separate accessible action or focus stop. `Icon` and `IconImage`
+are mutually exclusive; image-only actions require an accessible name.
+
+```go
+artwork, err := ui.DecodeImage(bytes.NewReader(pngBytes))
+// Handle err, then retain artwork in application state.
+button := ui.Node{ID: "open", Kind: ui.Button, IconImage: artwork,
+    Appearance: ui.ButtonTool, Activate: openDrawing,
+    Accessibility: ui.Accessibility{Name: "Open", Help: "Open a drawing"}}
+```
+
+Here `bytes` is the standard library package; the application supplies PNG bytes
+and `openDrawing`. No filesystem path or SVG string is loaded by the native button.
+ToggleButton and popup menu *items* do not support IconImage in this increment.
+
+A regular monochrome action, independently consumable by an application:
 
 ```go
 ui.Node{ID: "document-tools", Kind: ui.Toolbar,
@@ -57,7 +79,8 @@ These are custom-rendered **content** toolbars. They do not install NSToolbar,
 provide title-bar merging, vibrancy, customization palettes, draggable items,
 icon-above-label layouts, or overflow menus. Explicit light/dark palettes and size
 metrics do not follow automatic NSControlSize or OS appearance changes. Artwork
-uses Vellum's bundled vector symbols rather than dynamic SF Symbols.
+uses original full-color sample pixels or Vellum’s bundled vector symbols;
+neither extracts macOS app icons or uses dynamic SF Symbols.
 
 The focused public-Manual regression checks light/dark relative size geometry,
 retained action identities across display modes, exactly-once activation,

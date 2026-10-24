@@ -137,6 +137,12 @@ func testMacToolbarsPublicManual(t *testing.T, dark bool) {
 		}
 		current = settle()
 	}
+	for _, fullColor := range []bool{false, true} {
+		setup(func() { model.fullColor = fullColor })
+		if find("toolbar-Regular/Save").Incarnation != original {
+			t.Fatal("color mode replaced native action")
+		}
+	}
 	for _, mode := range []string{"icons", "text", "both"} {
 		setup(func() { model.display = mode })
 		if find("toolbar-Regular/Save").Incarnation != original {

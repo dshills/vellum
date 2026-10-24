@@ -15,7 +15,7 @@ func validateMenuButton(n Node) error {
 	if len(n.Options) < 1 || len(n.Options) > MaxMenuOptions || n.SelectedID != "" || n.Activate != nil || n.Open || n.Dismiss != nil {
 		return fmt.Errorf("ui: menu button requires 1..64 actions, no selected value, and Change for action requests")
 	}
-	if strings.TrimSpace(n.Text) == "" && (n.Icon == "" || strings.TrimSpace(n.Accessibility.Name) == "") {
+	if strings.TrimSpace(n.Text) == "" && ((n.Icon == "" && n.IconImage == nil) || strings.TrimSpace(n.Accessibility.Name) == "") {
 		return fmt.Errorf("ui: menu button requires text or a named icon")
 	}
 	for _, o := range n.Options {

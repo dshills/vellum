@@ -45,6 +45,10 @@ type Node struct {
 	// Icon is bundled artwork for Icon/Button/ToggleButton. Text is alternate
 	// text for an Icon. Icon-only actions require Accessibility.Name.
 	Icon Symbol
+	// IconImage is immutable full-color artwork for Button/MenuButton. It is
+	// mutually exclusive with Icon and scales into the ordinary leading icon slot.
+	// Icon-only actions require Accessibility.Name; artwork adds no focus stop.
+	IconImage *canvas.TiledImage
 	// Appearance changes Button presentation without changing its action.
 	Appearance ButtonAppearance
 	// Image holds immutable shared pixels for an Image node. Fit changes

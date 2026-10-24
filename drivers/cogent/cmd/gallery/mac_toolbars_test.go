@@ -25,17 +25,17 @@ func TestMacToolbarCatalogueVariants(t *testing.T) {
 						if item.Accessibility.Name == "" {
 							t.Fatal("unnamed action")
 						}
-						if mode == "icons" && (item.Text != "" || item.Icon == "") {
+						if mode == "icons" && (item.Text != "" || (item.Icon == "" && item.IconImage == nil)) {
 							t.Fatal("icon mode", item.ID)
 						}
-						if mode == "text" && (item.Icon != "" || item.Text == "") {
+						if mode == "text" && (item.Icon != "" || item.IconImage != nil || item.Text == "") {
 							t.Fatal("text mode", item.ID)
 						}
 					}
 				}
 				newAction := findGalleryDocumentNode(n, "toolbar-mixed/New")
 				openAction := findGalleryDocumentNode(n, "toolbar-mixed/Open")
-				if newAction.Text != "New" || newAction.Icon == "" || openAction.Text != "Open" || openAction.Icon != "" {
+				if newAction.Text != "New" || (newAction.Icon == "" && newAction.IconImage == nil) || openAction.Text != "Open" || openAction.Icon != "" || openAction.IconImage != nil {
 					t.Fatal("mixed action presentation")
 				}
 				findGalleryDocumentNode(n, "toolbar-Regular/Save").Activate()
@@ -52,5 +52,22 @@ func TestMacToolbarCatalogueVariants(t *testing.T) {
 				m.disabled = false
 			}
 		}
+	}
+}
+
+func TestToolbarFullColorComparison(t *testing.T) {
+	m := newMacToolbarGallery(false)
+	first := findGalleryDocumentNode(m.view(), "toolbar-Regular/New")
+	if first.IconImage == nil || first.Icon != "" {
+		t.Fatal("full-color artwork not initial")
+	}
+	findGalleryDocumentNode(m.view(), "toolbar-color").Change(ui.ChangeEvent{Checked: false})
+	mono := findGalleryDocumentNode(m.view(), first.ID)
+	if mono.Icon != ui.SymbolAdd || mono.IconImage != nil {
+		t.Fatal("monochrome comparison failed")
+	}
+	findGalleryDocumentNode(m.view(), "toolbar-color").Change(ui.ChangeEvent{Checked: true})
+	if next := findGalleryDocumentNode(m.view(), first.ID); next.IconImage != first.IconImage {
+		t.Fatal("artwork not shared")
 	}
 }
