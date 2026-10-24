@@ -68,7 +68,30 @@ const (
 	ButtonTool      ButtonAppearance = "tool"
 )
 
+// ButtonIconPlacement arranges a Button's artwork and caption, independently
+// of the orientation of a containing Toolbar. MenuButton remains inline.
+type ButtonIconPlacement string
+
+const (
+	IconLeading   ButtonIconPlacement = "leading"
+	IconAboveText ButtonIconPlacement = "above-text"
+)
+
 func validateIcon(n Node) error {
+	if n.IconPlacement != "" {
+		if n.Kind != Button {
+			return fmt.Errorf("ui: IconPlacement belongs only on Button")
+		}
+		switch n.IconPlacement {
+		case IconLeading:
+		case IconAboveText:
+			if (n.Icon == "" && n.IconImage == nil) || strings.TrimSpace(n.Text) == "" {
+				return fmt.Errorf("ui: IconAboveText requires artwork and a caption")
+			}
+		default:
+			return fmt.Errorf("ui: invalid icon placement %q", n.IconPlacement)
+		}
+	}
 	if n.IconImage != nil {
 		if (n.Kind != Button && n.Kind != MenuButton) || n.IconImage.TileCount() == 0 || n.Icon != "" {
 			return fmt.Errorf("ui: IconImage requires nonempty immutable pixels on Button/MenuButton without Icon")

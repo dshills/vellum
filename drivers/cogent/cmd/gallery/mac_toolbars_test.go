@@ -7,7 +7,7 @@ import (
 
 func TestMacToolbarCatalogueVariants(t *testing.T) {
 	for _, dark := range []bool{false, true} {
-		for _, mode := range []string{"icons", "text", "both"} {
+		for _, mode := range []string{"icons", "text", "both", "above"} {
 			m := newMacToolbarGallery(dark)
 			m.display = mode
 			for _, narrow := range []bool{false, true} {
@@ -27,6 +27,9 @@ func TestMacToolbarCatalogueVariants(t *testing.T) {
 						}
 						if mode == "icons" && (item.Text != "" || (item.Icon == "" && item.IconImage == nil)) {
 							t.Fatal("icon mode", item.ID)
+						}
+						if mode == "above" && (item.IconPlacement != ui.IconAboveText || item.Text == "" || (item.IconImage == nil && item.Icon == "")) {
+							t.Fatal("stacked mode", item.ID)
 						}
 						if mode == "text" && (item.Icon != "" || item.IconImage != nil || item.Text == "") {
 							t.Fatal("text mode", item.ID)

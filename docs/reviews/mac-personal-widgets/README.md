@@ -948,3 +948,30 @@ Portable UI race tests, focused native image/icon/menu/toolbar routing and pixel
 checks, both-theme gallery/public Manual checks, independent public SDK consumer,
 vet and native build pass. Live packaged appearance observations are separate
 in the local delivery receipt; no physical-pointer or human VoiceOver claim.
+
+## Icon-above-text toolbar layout
+
+Public Button.IconPlacement selects leading/default or centered IconAboveText
+content with Symbol or immutable full-color pixels. It retains one native action,
+caption, focus target and semantic action. Gallery Small/Regular/Large stacked
+heights are 52/60/72 pt. Other toolbar routing and lifecycle remain unchanged.
+
+Prism's gap-ordering concern is disproven by mountShallowScoped: managed applyStyle
+is installed after mountControl's content styler. The added mounted regression
+sets Gap to explicit zero, checks that it overrides the stacked default, then
+omits it and checks restoration to four. Local padding is checked too.
+The native spacer dependency is explicitly documented: the pinned Button adds
+its named `space` part for inline symbol/text. Regression requires that exact
+part on inline restoration and its absence while stacked; a dependency change
+therefore fails the native contract test. FinalMaker changes the declared private
+plan only, never reparenting managed actions. Text-only stacked controls are
+rejected by portable validation, so the concern about stacking those is inapplicable.
+
+Focused race tests cover both themes, both icon sources and all three sizes:
+nonoverlapping centered bounds inside the button, full-color completed pixels,
+icon/caption pointer activation once each, Return once with macOS NumLock,
+retained caption/button identity, native icon sizing and leading/default reset.
+Gallery public Manual checks cover above-mode narrow overflow, End/Home, disabled
+skipping and no disabled activation. Portable UI race suite, public SDK test,
+vet and native build pass. Packaged native observations remain in the local
+delivery receipt, separate from physical-pointer or human VoiceOver qualification.

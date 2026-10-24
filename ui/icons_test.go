@@ -81,3 +81,30 @@ func TestFullColorButtonIconContract(t *testing.T) {
 		}
 	}
 }
+
+func TestButtonIconPlacementPortableContract(t *testing.T) {
+	source := imageSource(t)
+	for _, n := range []Node{
+		{ID: "inline", Kind: Button, Icon: SymbolOpen, IconPlacement: IconLeading},
+		{ID: "stacked", Kind: Button, Text: "Open", Icon: SymbolOpen, IconPlacement: IconAboveText},
+		{ID: "color", Kind: Button, Text: "Open", IconImage: source, IconPlacement: IconAboveText},
+	} {
+		if n.Text == "" {
+			n.Accessibility.Name = "Open"
+		}
+		if err := Validate(n); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, n := range []Node{
+		{ID: "bad", Kind: Button, Text: "Open", Icon: SymbolOpen, IconPlacement: "unknown"},
+		{ID: "bad", Kind: Button, Text: "Open", IconPlacement: IconAboveText},
+		{ID: "bad", Kind: Button, Icon: SymbolOpen, Accessibility: Accessibility{Name: "Open"}, IconPlacement: IconAboveText},
+		{ID: "bad", Kind: Label, Text: "Open", IconPlacement: IconLeading},
+		{ID: "bad", Kind: MenuButton, Text: "Open", Icon: SymbolOpen, IconPlacement: IconAboveText, Options: []Option{{ID: "open", Label: "Open"}}},
+	} {
+		if err := Validate(n); err == nil {
+			t.Fatal("invalid placement accepted", n.Kind, n.IconPlacement)
+		}
+	}
+}

@@ -18,7 +18,7 @@ func TestPublicFullColorToolbarAction(t *testing.T) {
 		t.Fatal(err)
 	}
 	calls := 0
-	n := ui.Node{ID: "tools", Kind: ui.Toolbar, Children: []ui.Node{{ID: "open", Kind: ui.Button, IconImage: source, Appearance: ui.ButtonTool, Activate: func() { calls++ }, Accessibility: ui.Accessibility{Name: "Open"}}}}
+	n := ui.Node{ID: "tools", Kind: ui.Toolbar, Children: []ui.Node{{ID: "open", Kind: ui.Button, IconImage: source, Text: "Open", IconPlacement: ui.IconAboveText, Appearance: ui.ButtonTool, Activate: func() { calls++ }, Accessibility: ui.Accessibility{Name: "Open"}}}}
 	if err := ui.Validate(n); err != nil {
 		t.Fatal(err)
 	}

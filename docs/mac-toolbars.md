@@ -2,17 +2,18 @@
 
 Open the **Toolbars** page in the private Mac widget gallery. The light and dark
 packages contain the same examples. These recipes use existing public `ui.Toolbar`,
-`ui.Button`, `ui.Separator`, and `ui.Style` APIs; no new widget API is required.
+`ui.Button`, `ui.Separator`, and `ui.Style` APIs. `Button.IconPlacement` selects
+inline or icon-above-caption content without adding another action.
 
 The catalogue compares three deliberate, application-local action sizes:
 
-| Size | Minimum/control height | Label size | Icon-only width |
-| --- | --- | --- | --- |
-| Small | 26 pt | 12 pt | 26 pt |
-| Regular | 32 pt | 13 pt | 32 pt |
-| Large | 40 pt | 16 pt | 40 pt |
+| Size | Inline height | Icon-above height | Label size | Icon-only width |
+| --- | --- | --- | --- | --- |
+| Small | 26 pt | 52 pt | 12 pt | 26 pt |
+| Regular | 32 pt | 60 pt | 13 pt | 32 pt |
+| Large | 40 pt | 72 pt | 16 pt | 40 pt |
 
-Choose Icons, Text, or Icons and text. **Full-color icons** is enabled initially;
+Choose Icons, Text, Icons and text, or **Icon above text**. **Full-color icons** is enabled initially;
 turn it off to compare the bundled monochrome symbols. Original 96 px sample
 artwork is shared across the three sizes and both appearances. Explicit icon-only accessible names and
 hover help remain present in every mode; labels do not become the identity.
@@ -32,7 +33,7 @@ Full-color action artwork is available through the public `IconImage` field on
 Button and MenuButton. Supply immutable pixels with `ui.DecodeImage` (PNG/JPEG)
 or `canvas.NewTiledImage`; keep that source and reuse it between View calls.
 Leave `Icon` empty. The pixels retain their colors, aspect ratio and transparency,
-scale into the font-relative leading icon slot, and dim with a disabled action.
+scale into the font-relative icon slot, and dim with a disabled action.
 The image adds no separate accessible action or focus stop. `Icon` and `IconImage`
 are mutually exclusive; image-only actions require an accessible name.
 
@@ -47,6 +48,29 @@ button := ui.Node{ID: "open", Kind: ui.Button, IconImage: artwork,
 Here `bytes` is the standard library package; the application supplies PNG bytes
 and `openDrawing`. No filesystem path or SVG string is loaded by the native button.
 ToggleButton and popup menu *items* do not support IconImage in this increment.
+
+Set `IconPlacement: ui.IconAboveText` on an ordinary Button with artwork and a
+nonblank caption. Full-color `IconImage` and monochrome `Icon` both work. Artwork
+is centered above the caption with a 4 pt default gap and a 2 em icon slot; local
+Gap/Padding/Typography styles can override spacing and caption size. Give a fixed
+control enough height for both parts, or omit the fixed height for intrinsic sizing.
+The gallery uses 64/72/84 pt widths and 52/60/72 pt heights, with short labels.
+Scroll the page to see the lower examples when the taller option is selected.
+The mixed and vertical comparisons retain their own per-item layouts.
+
+```go
+ui.Node{ID: "save", Kind: ui.Button, Text: "Save", IconImage: artwork,
+    IconPlacement: ui.IconAboveText, Appearance: ui.ButtonTool, Activate: save,
+    Accessibility: ui.Accessibility{Name: "Save drawing"},
+    Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 72, Height: 60}),
+        Padding: ui.Some(ui.UniformInsets(5)), Gap: ui.Some(float32(4)),
+        Typography: ui.Some(ui.Typography{Size: 13})}}
+```
+
+Empty placement or `ui.IconLeading` restores the usual inline content. Changing
+placement keeps the same native action, caption, keyboard focus, and callback;
+artwork and caption add no private accessibility targets. MenuButton and
+ToggleButton keep their inline presentation in this increment.
 
 A regular monochrome action, independently consumable by an application:
 
@@ -77,12 +101,13 @@ font-relative sizing. Local styles leave hover and keyboard-focus feedback intac
 
 These are custom-rendered **content** toolbars. They do not install NSToolbar,
 provide title-bar merging, vibrancy, customization palettes, draggable items,
-icon-above-label layouts, or overflow menus. Explicit light/dark palettes and size
+or overflow menus. Explicit light/dark palettes and size
 metrics do not follow automatic NSControlSize or OS appearance changes. Artwork
 uses original full-color sample pixels or Vellum’s bundled vector symbols;
 neither extracts macOS app icons or uses dynamic SF Symbols.
 
 The focused public-Manual regression checks light/dark relative size geometry,
+stacked artwork/caption alignment without clipping, inline restoration,
 retained action identities across display modes, exactly-once activation,
 disabled actions, and keyboard revelation of narrow overflow. Native keyboard,
 accessibility actions and screenshots are recorded separately in the delivery

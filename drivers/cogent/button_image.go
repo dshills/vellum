@@ -3,8 +3,10 @@ package cogent
 import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/ui"
+	"slices"
 )
 
 const buttonImageName = "vellum-color-icon"
@@ -12,6 +14,23 @@ const buttonImageName = "vellum-color-icon"
 // Artwork stays private to the same native button, including hit testing,
 // focus, activation and accessibility. It uses the bounded shared-image painter.
 func installButtonImage(r *record, button *core.Button) {
+	button.Styler(func(s *styles.Style) {
+		if r.node.IconPlacement == ui.IconAboveText {
+			s.Direction = styles.Column
+			s.IconSize.Set(units.Em(2))
+			s.Gap.Set(units.Dp(4))
+		} else {
+			s.Direction = styles.Row
+		}
+	})
+	button.FinalMaker(func(p *tree.Plan) {
+		if r.node.IconPlacement != ui.IconAboveText {
+			return
+		}
+		// The pinned native Button inserts an inline icon/text spacer. Stacked
+		// content uses its managed gap instead; the next inline plan restores it.
+		p.Children = slices.DeleteFunc(p.Children, func(item *tree.PlanItem) bool { return item.Name == "space" })
+	})
 	button.FirstMaker(func(p *tree.Plan) {
 		if r.control.retired || r.node.IconImage == nil {
 			return

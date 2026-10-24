@@ -630,7 +630,7 @@ func syncControl(r *record, previous ui.Node) error {
 	}
 	// Value setters preserve identity; a redraw is necessary when externally
 	// controlled values/option labels change, including same-length option edits.
-	if nativeValueChanged || restoring || previous.Image != r.node.Image || previous.Fit != r.node.Fit || previous.Icon != r.node.Icon || previous.IconImage != r.node.IconImage || previous.Appearance != r.node.Appearance || previous.Orientation != r.node.Orientation || previous.SoftWrap != r.node.SoftWrap || previous.Text != r.node.Text || previous.Secure != r.node.Secure || previous.Reveal != r.node.Reveal || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
+	if nativeValueChanged || restoring || previous.Image != r.node.Image || previous.Fit != r.node.Fit || previous.Icon != r.node.Icon || previous.IconImage != r.node.IconImage || previous.IconPlacement != r.node.IconPlacement || previous.Appearance != r.node.Appearance || previous.Orientation != r.node.Orientation || previous.SoftWrap != r.node.SoftWrap || previous.Text != r.node.Text || previous.Secure != r.node.Secure || previous.Reveal != r.node.Reveal || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
 		r.widget.AsWidget().Update()
 	}
 	if refused != nil {

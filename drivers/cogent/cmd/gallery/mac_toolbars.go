@@ -24,9 +24,18 @@ type macToolbarGallery struct {
 type macToolbarMetrics struct {
 	name                  string
 	height, font, padding float32
+	stackedHeight         float32
 }
 
-var macToolbarSizes = []macToolbarMetrics{{"Small", 26, 12, 6}, {"Regular", 32, 13, 8}, {"Large", 40, 16, 10}}
+var macToolbarSizes = []macToolbarMetrics{{"Small", 26, 12, 6, 52}, {"Regular", 32, 13, 8, 60}, {"Large", 40, 16, 10, 72}}
+
+func (s macToolbarMetrics) actionHeight(display string) float32 {
+	if display == "above" {
+		return s.stackedHeight
+	}
+
+	return s.height
+}
 
 func newMacToolbarGallery(dark bool) *macToolbarGallery {
 	icons, err := toolbarColorIcons()
@@ -50,7 +59,17 @@ func (m *macToolbarGallery) action(prefix, name string, icon ui.Symbol, size mac
 		style.MaxSize = ui.Some(ui.Size{Width: size.height, Height: size.height})
 		style.Padding = ui.Some(ui.UniformInsets(3))
 	}
-	return ui.Node{ID: prefix + "/" + name, Kind: ui.Button, Text: text, Icon: art, IconImage: pixels, Appearance: ui.ButtonTool, Style: style, Disabled: m.disabled || name == "Delete", Accessibility: ui.Accessibility{Name: name, Help: name + " — sample action"}, Activate: func() {
+	placement := ui.ButtonIconPlacement("")
+	if display == "above" {
+		placement = ui.IconAboveText
+		height := size.actionHeight(display)
+		width := height + 12
+		style.MinSize = ui.Some(ui.Size{Width: width, Height: height})
+		style.MaxSize = style.MinSize
+		style.Gap = ui.Some(float32(4))
+		style.Padding = ui.Some(ui.Insets{Top: 5, Bottom: 5, Left: 6, Right: 6})
+	}
+	return ui.Node{ID: prefix + "/" + name, IconPlacement: placement, Kind: ui.Button, Text: text, Icon: art, IconImage: pixels, Appearance: ui.ButtonTool, Style: style, Disabled: m.disabled || name == "Delete", Accessibility: ui.Accessibility{Name: name, Help: name + " — sample action"}, Activate: func() {
 		if !m.disabled && name != "Delete" {
 			m.count++
 			m.last = prefix + ": " + name
@@ -75,7 +94,7 @@ func (m *macToolbarGallery) toolbar(id string, size macToolbarMetrics, display s
 		icon ui.Symbol
 	}{{"New", ui.SymbolAdd}, {"Open", ui.SymbolFolder}, {"Save", ui.SymbolSave}, {"Undo", ui.SymbolUndo}, {"Redo", ui.SymbolRedo}, {"Delete", ui.SymbolDelete}} {
 		if i == 3 {
-			sep := ui.Node{ID: id + "/separator", Kind: ui.Separator, Orientation: ui.Vertical, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 1, Height: size.height - 8}), MaxSize: ui.Some(ui.Size{Width: 1, Height: size.height - 8})}}
+			sep := ui.Node{ID: id + "/separator", Kind: ui.Separator, Orientation: ui.Vertical, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 1, Height: size.actionHeight(display) - 8}), MaxSize: ui.Some(ui.Size{Width: 1, Height: size.actionHeight(display) - 8})}}
 			if vertical {
 				sep.Orientation = ui.Horizontal
 				sep.Style.MinSize = ui.Some(ui.Size{Width: 24, Height: 1})
@@ -96,7 +115,7 @@ func (m *macToolbarGallery) view() ui.Node {
 		background = color.NRGBA{R: 29, G: 29, B: 31, A: 255}
 	}
 	modes := []ui.Node{}
-	for _, mode := range []struct{ id, label string }{{"icons", "Icons"}, {"text", "Text"}, {"both", "Icons and text"}} {
+	for _, mode := range []struct{ id, label string }{{"icons", "Icons"}, {"text", "Text"}, {"both", "Icons and text"}, {"above", "Icon above text"}} {
 		mode := mode
 		n := ui.Node{ID: "toolbar-display/" + mode.id, Kind: ui.Button, Text: mode.label, Activate: func() { m.display = mode.id }, Accessibility: ui.Accessibility{Help: "Show toolbar actions as " + mode.label}, Style: ui.Style{Grow: ui.Some(float32(0))}}
 		if m.display == mode.id {
@@ -109,7 +128,7 @@ func (m *macToolbarGallery) view() ui.Node {
 	children = append(children, ui.Node{ID: "toolbar-status", Kind: ui.Label, Text: fmt.Sprintf("%s · actions: %d", m.last, m.count)})
 	for _, size := range macToolbarSizes {
 		id := "toolbar-" + size.name
-		children = append(children, ui.Node{ID: id + "/label", Kind: ui.Label, Text: fmt.Sprintf("%s · %g pt controls", size.name, size.height)}, m.toolbar(id, size, m.display, false))
+		children = append(children, ui.Node{ID: id + "/label", Kind: ui.Label, Text: fmt.Sprintf("%s · %g pt controls", size.name, size.actionHeight(m.display))}, m.toolbar(id, size, m.display, false))
 	}
 	mixed := m.toolbar("toolbar-mixed", macToolbarSizes[1], "icons", false)
 	mixed.Accessibility.Name = "Mixed document toolbar"

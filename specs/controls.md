@@ -563,3 +563,21 @@ Source replacement refreshes pixels; source removal destroys the private image
 slot and releases its reference. Retiring the action releases its image source.
 ToggleButton, standalone Symbol Icon and menu item options retain their current
 contracts. Bounded decoding is explicit through ui.DecodeImage, outside View.
+
+## Button icon placement
+
+Button.IconPlacement is a ButtonIconPlacement: empty/IconLeading retains inline
+artwork; IconAboveText requires nonblank Text and either Icon or IconImage. Other
+kinds, unknown values, absent artwork or absent stacked caption are rejected.
+Above-text lays out the same action's private parts in a centered column with
+2 em artwork and a default 4 pt gap; local Gap/Padding/Typography remain effective.
+Native inline icon spacer is omitted in the stacked plan and restored on return
+to leading. Caption and button identity remain stable; content adds no semantic
+or focus targets. Existing command routing, disabled ancestry and image cleanup
+are unchanged. Applications allocate adequate height or use intrinsic sizing.
+
+The adapter is pinned to the native Button plan's inline `space` part. The
+symbol-path restoration regression requires that part in inline mode and its
+absence in stacked mode, so a native dependency upgrade must preserve or update
+that contract. Managed styles run after the adapter's layout defaults; a mounted
+regression verifies explicit zero Gap and omitted-gap restoration.

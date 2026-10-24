@@ -183,6 +183,11 @@ with the button’s icon slot; disabled actions dim it. Use `ui.DecodeImage` for
 bounded PNG/JPEG input. Leave `Icon` empty; the two sources are mutually exclusive.
 Image-only actions require `Accessibility.Name`. Artwork adds no focus stop or
 separate accessibility action. See [toolbar recipes](mac-toolbars.md).
+`Button.IconPlacement` may be `ui.IconAboveText` to center full-color or symbol
+artwork above a required nonblank caption. Empty or `ui.IconLeading` uses the
+ordinary inline layout. Stacked content keeps one action and one focus stop.
+Allow enough control height for artwork, caption and spacing; see the toolbar
+recipes for all three sizes. MenuButton and ToggleButton remain inline.
 Button Appearance may be ButtonPrimary (filled), ButtonSecondary (outlined),
 ButtonQuiet (text emphasis) or ButtonTool (compact toolbar action). Omission
 preserves the existing filled appearance. Styles remain application-local.

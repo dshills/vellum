@@ -3,9 +3,11 @@
 package cogent
 
 import (
+	"cogentcore.org/core/events/key"
 	"fmt"
 	"image"
 	"image/color"
+	"math"
 	"testing"
 
 	"cogentcore.org/core/core"
@@ -160,6 +162,153 @@ func TestButtonImageFullColorPixelsReplacementAndLifetime(t *testing.T) {
 				button.UpdateWidget()
 				if last.source != nil || r.node.IconImage != nil {
 					t.Fatal("retired action retained pixels")
+				}
+			})
+		}
+	}
+}
+
+func TestButtonIconAboveTextGeometryRoutingAndRestoration(t *testing.T) {
+	for _, dark := range []bool{false, true} {
+		for _, fullColor := range []bool{false, true} {
+			t.Run(fmt.Sprintf("dark-%v-color-%v", dark, fullColor), func(t *testing.T) {
+				source := fullColorButtonSource(t, false)
+				placement := ui.IconAboveText
+				font, height := float32(12), float32(52)
+				gap := ui.Some(float32(4))
+				calls := 0
+				cfg := manualConfig(t, 7)
+				cfg.Theme = ui.MacTheme(dark)
+				cfg.Theme.Default.Background = cfg.Theme.Kinds[ui.FormGroup].Background
+				cfg.Theme.Default.Typography = ui.Some(ui.Typography{Family: "Noto Sans", Size: 13})
+				m, a := simpleManual(t, cfg, func() ui.Node {
+					n := ui.Node{ID: "stacked", Kind: ui.Button, Text: "Save", IconPlacement: placement, Appearance: ui.ButtonTool, Activate: func() { calls++ }, Accessibility: ui.Accessibility{Name: "Save drawing"}, Style: ui.Style{Padding: ui.Some(ui.Insets{Top: 5, Bottom: 5, Left: 6, Right: 6}), Gap: gap, Typography: ui.Some(ui.Typography{Size: font}), MinSize: ui.Some(ui.Size{Width: height + 12, Height: height}), MaxSize: ui.Some(ui.Size{Width: height + 12, Height: height})}}
+					if fullColor {
+						n.IconImage = source
+					} else {
+						n.Icon = ui.SymbolSave
+					}
+					return ui.Node{ID: "root", Kind: ui.Toolbar, Focus: ui.FocusRequest{ID: "stacked", Sequence: 1}, Children: []ui.Node{n}}
+				})
+				unitSettle(t, m)
+				w := m.implementation.find("one")
+				r := findRecord(w.state.root, "stacked")
+				button := r.widget.(*core.Button)
+				icon := func() core.Widget {
+					if fullColor {
+						return button.ChildByName(buttonImageName).(*managedImage)
+					}
+					return button.ChildByName("icon").(*core.Icon)
+				}
+				label := button.ChildByName("text").(*core.Text)
+				var lastIconWidth int
+				for _, size := range []struct{ font, height float32 }{{12, 52}, {13, 60}, {16, 72}} {
+					font, height = size.font, size.height
+					if err := a.Invalidate("one"); err != nil {
+						t.Fatal(err)
+					}
+					unitSettle(t, m)
+					artBox, textBox := icon().AsWidget().Geom.TotalBBox, label.Geom.TotalBBox
+					content := button.Geom.ContentBBox
+					if artBox.Empty() || textBox.Empty() || artBox.Max.Y > textBox.Min.Y || !artBox.In(content) || !textBox.In(content) {
+						t.Fatal("stacked parts overlap or clip", size, artBox, textBox, content)
+					}
+					if math.Abs(float64((artBox.Min.X+artBox.Max.X)-(textBox.Min.X+textBox.Max.X))) > 3 {
+						t.Fatal("artwork/caption are not centered", artBox, textBox)
+					}
+					if button.ChildByName("space") != nil {
+						t.Fatal("inline spacer retained in stacked layout")
+					}
+					if r.widget != button || button.ChildByName("text") != label {
+						t.Fatal("layout replaced action or caption")
+					}
+					lastIconWidth = artBox.Dx()
+					frame, err := m.Capture(testContext, "one")
+					if err != nil {
+						t.Fatal(err)
+					}
+					if fullColor {
+						box := icon().AsWidget().Geom.ContentBBox
+						y := (box.Min.Y + box.Max.Y) / 2
+						left := frame.RGBAAt(box.Min.X+box.Dx()/6, y)
+						right := frame.RGBAAt(box.Max.X-1-box.Dx()/6, y)
+						if left.R < 200 || right.B < 190 {
+							t.Fatal("stacked artwork lost color", left, right)
+						}
+					}
+					before := calls
+					for _, box := range []image.Rectangle{artBox, textBox} {
+						for _, typ := range []events.Types{events.MouseDown, events.MouseUp} {
+							if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.incarnation, Type: typ, Button: events.Left, Position: box.Min.Add(box.Size().Div(2))}); err != nil {
+								t.Fatal(err)
+							}
+							unitSettle(t, m)
+						}
+					}
+					if calls != before+2 {
+						t.Fatal("icon and caption must each activate once", calls, before)
+					}
+				}
+				// Local explicit zero must override the adapter's default gap; omission
+				// restores it. This also pins managed/native styler ordering.
+				gap = ui.Some(float32(0))
+				if err := a.Invalidate("one"); err != nil {
+					t.Fatal(err)
+				}
+				unitSettle(t, m)
+				if button.Styles.Gap.Y.Dots != 0 || button.Styles.Padding.Top.Value != 5 {
+					t.Fatal("local spacing overridden", button.Styles.Gap, button.Styles.Padding)
+				}
+				gap = ui.Optional[float32]{}
+				if err := a.Invalidate("one"); err != nil {
+					t.Fatal(err)
+				}
+				unitSettle(t, m)
+				if button.Styles.Gap.Y.Value != 4 {
+					t.Fatal("default stacked gap not restored", button.Styles.Gap)
+				}
+				nodes, _ := accessibilitySnapshot(w.state.root, nil)
+				count := 0
+				for _, node := range nodes {
+					if node.DomainID == "stacked" {
+						count++
+						if node.Name != "Save drawing" {
+							t.Fatal("caption replaced action semantics")
+						}
+					} else if node.DomainID != "root" {
+						t.Fatal("private content exposed", node)
+					}
+				}
+				if count != 1 {
+					t.Fatal("expected one accessible action", count)
+				}
+				before := calls
+				if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.incarnation, Type: events.KeyChord, Code: key.CodeReturnEnter, Modifiers: 1 << key.NumLock}); err != nil {
+					t.Fatal(err)
+				}
+				unitSettle(t, m)
+				if calls != before+1 {
+					t.Fatal("keyboard activation", calls, before)
+				}
+				placement = ui.IconLeading
+				if err := a.Invalidate("one"); err != nil {
+					t.Fatal(err)
+				}
+				unitSettle(t, m)
+				artBox, textBox := icon().AsWidget().Geom.TotalBBox, label.Geom.TotalBBox
+				if artBox.Max.X > textBox.Min.X || artBox.Dx() >= lastIconWidth {
+					t.Fatal("inline layout/icon size not restored", artBox, textBox, lastIconWidth)
+				}
+				if !fullColor && button.ChildByName("space") == nil {
+					t.Fatal("native inline spacer not restored")
+				}
+				placement = ""
+				if err := a.Invalidate("one"); err != nil {
+					t.Fatal(err)
+				}
+				unitSettle(t, m)
+				if r.widget != button || button.ChildByName("text") != label {
+					t.Fatal("default placement replaced action")
 				}
 			})
 		}
