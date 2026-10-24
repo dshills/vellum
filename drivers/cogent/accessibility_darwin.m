@@ -882,3 +882,7 @@ char *vellumWindowVisibilityObserverFixture(void) {
   return json.UTF8String?strdup(json.UTF8String):NULL;
  }
 }
+
+// Native-main-only lookup for a lifetime-bound service. No window name, key
+// window fallback or cross-application pointer can retarget an old request.
+void *vellumAXNativeWindow(uint64_t token){if(!NSThread.isMainThread)return NULL;VellumAXState *state=vellumAXStates[@(token)];if(!state||state.closed)return NULL;return (__bridge void *)state.window;}

@@ -10,6 +10,7 @@ extern int vellumServiceActive(uint64_t token);
 extern void vellumServiceResult(uint64_t token, char *text, int status);
 extern int vellumMenuCommit(uint64_t token);
 extern void vellumMenuAction(uint64_t token, int index);
+extern int vellumCancelAllAlerts(void);
 static NSMutableDictionary<NSNumber *, NSSavePanel *> *vellumPanels;
 
 @interface VellumMenuTarget : NSObject
@@ -240,7 +241,7 @@ void vellumSetMenu(uint64_t token, const char *json) {
 }
 int vellumShutdownOnMain(void) {
     @autoreleasepool {
-        int status=0;
+        int status=vellumCancelAllAlerts();
         for (NSSavePanel *panel in vellumPanels.allValues.copy) {
             if (vellumDismissPanel(panel)) status=2;
         }

@@ -1,0 +1,117 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "4a7c6bfb30e28f7fe3aa9d387f42bb8f",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "a46f39670cc46af5000daa72088fc5071b95c2d0",
+    "branch": "codex/mac-widget-essentials"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "7ae8c58226f53778",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Parent visibility check conflates distinct failures",
+      "message": "A parent window that is miniaturized or on another Space is reported as not visible, so a valid request fails with a generic ErrUnavailable. Also, when the recipe is valid but the window is gone, the caller cannot distinguish a closed window from an invalid payload.",
+      "suggestion": "Report ErrWindowClosed for a missing parent window and ErrUnavailable only for an invalid recipe.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/alerts_darwin.m",
+          "lines": {
+            "start": 36,
+            "end": 36
+          }
+        }
+      ],
+      "tags": [
+        "location-corrected"
+      ],
+      "evidence": "if(!o||!parent||!parent.isVisible){vellumServiceResult(token,\"\",2);return;}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6303,
+    "totalMs": 6329
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 14,
+    "bytes": 35111,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 19388,
+        "output": 715,
+        "costUSD": 0.045926
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "7d5a6e7d9dafd548",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Cancel path and completion handler both report results",
+        "message": "The alert completion handler reports a result on every response and the later cancel path also calls vellumServiceResult. If cancellation dismisses the sheet via endSheet, the completion handler fires with NSModalResponseCancel and reports status 1. vellumCancelAlert then removes the alert and reports again. The duplicate result is ignored only because the operation is already gone, so the ordering is fragile. Meanwhile the busy check `vellumAlerts.count` can reject a new alert while an old one is still being dismissed.",
+        "suggestion": "Make cancel only dismiss the sheet and let the completion handler be the single reporter, or remove the entry before dismissing and guard against double reporting.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "drivers/cogent/alerts_darwin.m",
+            "lines": {
+              "start": 44,
+              "end": 48
+            }
+          }
+        ],
+        "tags": [
+          "concurrency"
+        ],
+        "evidence": "vellumServiceResult(token,(char *)(text?:@\"\").UTF8String,text?0:2);}}@catch(NSException *e){vellumServiceResult(token,\"\",2);}@finally{[vellumAlerts removeObjectForKey:@(token)];}}}];",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/alerts_darwin.m"
+    }
+  ],
+  "suppressed": []
+}

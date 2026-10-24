@@ -1394,3 +1394,11 @@ Prism: `essentials-settings.json` (Anthropic Claude Sonnet 5.5, complete coverag
 Fixed the Prism finding: sample preferences now live in explicit application model fields; page descriptions rebuild with stable IDs and callbacks no longer index mutable page arrays. Native offscreen switching preserves the same editor instance and excludes inactive pages; headerless stacks remove duplicate header focus/AX choices. Existing ordinary-tab routing regressions pass. Settings persistence remains application-owned.
 
 Focused checks: `essentials-settings-checks.json`, `essentials-settings-final-checks.json`.
+
+## Add lifetime-bound AppKit alerts with color icons and stable responses
+
+Prism: `essentials-native-alert.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Addressed Prism finding by separating missing native parents (ErrWindowClosed) from unavailable/hidden presentation and invalid recipe errors. Added reply mapping regression. Native alert options, foreign parents, immediate parent cancellation, operation cleanup and the shared Foundation recipe parser pass offscreen; no NSAlert or file chooser was displayed. Native sheet visual/interaction qualification remains explicitly deferred. Existing bounded service dispatch and native-main cleanup are reused.
+
+Focused checks: `essentials-native-alert-checks.json`, `essentials-native-alert-final-checks.json`.

@@ -148,6 +148,10 @@ func vellumServiceResult(token C.uint64_t, text *C.char, status C.int) {
 		value.err = app.ErrServiceTooLarge
 	} else if status == 4 {
 		value.err = app.ErrNotificationPermission
+	} else if status == 5 {
+		value.err = app.ErrServiceBusy
+	} else if status == 6 {
+		value.err = app.ErrWindowClosed
 	} else if status != 0 {
 		value.err = app.ErrUnavailable
 	} else if text != nil {

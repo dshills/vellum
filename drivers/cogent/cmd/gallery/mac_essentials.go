@@ -1,16 +1,19 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/ui"
+	"image/png"
 	"os"
 	"path/filepath"
 )
 
 type macEssentialsGallery struct {
+	alertBusy                        bool
 	parent                           *macComponentsGallery
 	application                      *app.Application
 	window                           app.WindowRef
@@ -153,4 +156,56 @@ func (e *macEssentialsGallery) settingsView() ui.Node {
 		return ui.Node{ID: "essentials/settings-error", Kind: ui.Label, Text: err.Error()}
 	}
 	return n
+}
+
+func (e *macEssentialsGallery) alertOptions() (app.AlertOptions, error) {
+	var icon bytes.Buffer
+	if err := png.Encode(&icon, e.parent.artwork[ui.SymbolDocument]); err != nil {
+		return app.AlertOptions{}, err
+	}
+	return app.AlertOptions{Title: "Keep the current drawing?", Message: "This is a native alert demonstration. No drawing files will be changed.", Style: app.AlertWarning, Buttons: []app.AlertButton{{ID: "keep", Label: "Keep Drawing", Role: app.AlertDefault}, {ID: "cancel", Label: "Cancel", Role: app.AlertCancel}, {ID: "discard", Label: "Discard", Role: app.AlertDestructive}}, IconPNG: icon.Bytes(), SuppressionLabel: "Don't ask again for this demonstration"}, nil
+}
+func (e *macEssentialsGallery) showAlert() {
+	if e.alertBusy {
+		return
+	}
+	if e.application == nil {
+		e.parent.status = "Native alerts are unavailable in offscreen mode"
+		return
+	}
+	options, err := e.alertOptions()
+	if err != nil {
+		e.parent.status = err.Error()
+		return
+	}
+	ticket, err := e.application.ReserveWindowCompletion(e.window, nil)
+	if err != nil {
+		e.parent.status = err.Error()
+		return
+	}
+	e.alertBusy = true
+	a, window := e.application, e.window
+	go func() {
+		var result app.AlertResult
+		service, err := a.Alerts()
+		if err == nil {
+			result, err = service.ShowAlert(window.Context(), window, options)
+		}
+		_ = ticket.Publish(func() {
+			e.alertBusy = false
+			if err != nil {
+				e.parent.status = fmt.Sprintf("Native alert: %.512s", err)
+			} else {
+				e.parent.status = fmt.Sprintf("Native response: %s · suppression: %t", result.ButtonID, result.Suppressed)
+				e.parent.count++
+			}
+			_ = a.Invalidate(window.ID())
+		})
+	}()
+}
+func (e *macEssentialsGallery) alertView() ui.Node {
+	return ui.Node{ID: "essentials/alert-page", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}, Children: []ui.Node{
+		{ID: "essentials/alert-note", Kind: ui.Label, Text: "The button opens an actual AppKit sheet on this window. The card below previews its content only; offscreen checks never display the system sheet."},
+		{ID: "essentials/alert-preview", Kind: ui.FormGroup, Children: []ui.Node{{ID: "essentials/alert-icon", Kind: ui.Image, Image: e.parent.artwork[ui.SymbolDocument], Text: "Alert application icon", Fit: ui.ImageContain, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 64, Height: 64}), MaxSize: ui.Some(ui.Size{Width: 64, Height: 64})}}, {ID: "essentials/alert-title", Kind: ui.Label, Text: "Keep the current drawing?", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 17, Weight: 600})}}, {ID: "essentials/alert-message", Kind: ui.Label, Text: "This is a native alert demonstration. No drawing files will be changed."}}},
+		{ID: "essentials/show-alert", Kind: ui.Button, Text: "Show native alert…", IconImage: e.parent.artwork[ui.SymbolDocument], Disabled: e.alertBusy, Activate: e.showAlert}}}
 }

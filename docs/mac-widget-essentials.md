@@ -37,3 +37,23 @@ navigation options cannot act. Inactive content and the hidden tab header leave
 focus/accessibility scope. Use `SettingsNavigationID` for initial focus.
 Embed the pane or put it in an ordinary application window. Persistence remains
 an application policy; the demo stores preferences for the current launch only.
+
+## Native alert service
+
+Get `Application.Alerts()` and call `ShowAlert(ctx, parentWindowRef, options)` on
+a worker. The optional macOS service presents an actual NSAlert sheet on that
+exact opening, with 1–3 stable-ID buttons, default/cancel/destructive roles,
+optional suppression checkbox and an original-color PNG icon. A missing icon uses
+the native app icon. Other platforms return ErrUnavailable. Selecting Cancel
+returns its button ID; cancellation without a button returns ErrCanceled.
+
+A hidden/minimized parent returns ErrUnavailable; the service does not activate
+a window or switch Spaces. A retired native parent returns ErrWindowClosed.
+One native alert is admitted at a time; a parent with an existing sheet refuses
+with ErrServiceBusy. Context, exact parent lifetime and app shutdown revoke the
+request. Native cleanup closes owned sheets and never retargets a reused window
+name. PNG input is <=256KiB, <=512px per dimension. Deliver worker results through
+a window completion. Suppression persistence and destructive work belong to the
+application; the demo changes counters only. Offscreen tests cover option/reply
+validation, parent/operation lifetime and the Foundation recipe parser; actual
+AppKit presentation remains unverified until desktop checks are authorized.
