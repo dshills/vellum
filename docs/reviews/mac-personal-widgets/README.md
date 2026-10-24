@@ -745,3 +745,37 @@ runtime nil/disabled checks. No concurrency guarantee or implicit default action
 is claimed. Both reviews and their dispositions are retained. Packaged native
 interaction confirmation follows final integration; no AppKit sheet attachment
 or animation is claimed.
+
+## Next widgets, phase 3: CollectionView
+
+Added bounded controlled icon/thumbnail collections on retained Multiple ListBox
+routing, responsive native wrapping, measured grid arrows, Command/Shift ranges,
+Return and generated exactly-once double-click activation. Source identity renews
+row/catalog leases across component replacement and collection→ordinary→collection
+ABA. Same-owner label/thumbnail/selection refreshes retain eligibility and release
+old catalog thumbnail references. Disabled/removed/hidden/modal/closed guards reuse
+the established list infrastructure. Each thumbnail remains immutable shared data.
+
+Focused portable/native race tests cover responsive columns, actual routed
+pointer modifiers and generated double-click, selection rejection, source/AX
+retirement, nil presentation transitions and thumbnail-only source replacement.
+Gallery checks and driver vet pass. Parent reran mounted checks with an explicit
+Max.Y210 assertion and Shift+CapsLock+NumLock selection to address final review.
+
+Prism Anthropic claude-sonnet-5-5 reviewed twice. Vertical disabled-cell skipping
+now stays in its column and stays put when a final-row column is missing. The
+thumbnail-only test confirms the pre-update snapshot comparison works. Final
+size-order concern is disproved: styleCollectionHost is registered during mount,
+then driver.go registers applyStyle; prepared core runStylers executes each list
+in registration order, so user dimensions override defaults, as asserted by the
+mounted Max.Y210 regression. Lock modifiers now pass the filtered value (the
+existing selection reducer already reads only Shift/Meta). The catalog pointer
+concern is also disproved: syncListBoxEpochs computes sourceChanged and renews
+row/catalog leases BEFORE assigning the new compatible snapshot. Replacement
+and same-owner ABA tests prove old queued selection, activation and AX handlers
+are rejected. Keeping only the current snapshot prevents old thumbnails from
+being retained for the control lifetime. Both raw reviews are retained with these
+grounded dispositions; no retained issue requires another product change.
+
+These are routed software checks. Packaged native appearance/input observations
+follow final integration; physical input and human VoiceOver are not inferred.

@@ -63,6 +63,10 @@ func choiceKey(r *record, id string, button *core.Switch, e events.Event) {
 	if e.IsHandled() || !choiceLive(r, id, button) {
 		return
 	}
+	if r.node.Collection != nil {
+		collectionKey(r, id, button, e)
+		return
+	}
 	if r.node.Kind == ui.ListBox {
 		modifiers := e.Modifiers() & ^((1 << key.CapsLock) | (1 << key.NumLock))
 		if (!r.node.Multiple && modifiers != 0) || modifiers & ^((1<<key.Shift)|(1<<key.Meta)) != 0 {
@@ -212,6 +216,7 @@ func prepareChoice(r *record, n ui.Node) error {
 				}
 			}
 		})
+		bindCollectionChoice(r, id, button)
 	}
 	return nil
 }
@@ -256,7 +261,7 @@ func syncChoice(r *record, previous ui.Node) error {
 		text := html.EscapeString(o.Label)
 		disabled := r.control.disabled || o.Disabled
 		checked := ui.ListOptionSelected(r.node, o.ID)
-		dirty := b.Text != text || b.Type != typ || b.IsChecked() != checked || b.StateIs(states.Disabled) != disabled || previous.Multiple != r.node.Multiple
+		dirty := b.Text != text || b.Type != typ || b.IsChecked() != checked || b.StateIs(states.Disabled) != disabled || previous.Multiple != r.node.Multiple || collectionPresentationChanged(previous.Collection, r.node.Collection)
 		b.SetType(typ).SetText(text).SetChecked(checked).SetState(disabled, states.Disabled)
 		if r.node.Kind == ui.ListBox && r.node.Multiple {
 			b.IconOn = icons.None
@@ -272,7 +277,7 @@ func syncChoice(r *record, previous ui.Node) error {
 		}
 	}
 	syncSemantics(r)
-	if sourceListNeedsFocusRestyle(r) || listCatalogChanged || previous.Multiple != r.node.Multiple || !slices.Equal(previous.SelectedIDs, r.node.SelectedIDs) || previous.Orientation != r.node.Orientation || !reflect.DeepEqual(previous.Options, r.node.Options) || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility {
+	if collectionPresentationChanged(previous.Collection, r.node.Collection) || sourceListNeedsFocusRestyle(r) || listCatalogChanged || previous.Multiple != r.node.Multiple || !slices.Equal(previous.SelectedIDs, r.node.SelectedIDs) || previous.Orientation != r.node.Orientation || !reflect.DeepEqual(previous.Options, r.node.Options) || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility {
 		r.widget.AsWidget().Update()
 	}
 	return nil

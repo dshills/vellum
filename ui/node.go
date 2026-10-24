@@ -90,6 +90,7 @@ type Node struct {
 	Orientation Orientation
 	Options     []Option
 	// Multiple/SelectedIDs/SelectionChange belong only on ListBox.
+	Collection      *CollectionLayout
 	Multiple        bool
 	SelectedIDs     []string
 	SelectionChange func(ListSelectionEvent)

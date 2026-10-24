@@ -189,6 +189,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 			}
 			if r.node.Kind == ui.ListBox {
 				styleListBox(s)
+				styleCollectionHost(r, s)
 			}
 		})
 	case ui.Switch:

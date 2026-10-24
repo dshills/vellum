@@ -137,6 +137,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if err := ValidateCollectionNode(n); err != nil {
+		return err
+	}
 	if err := validateSheet(n); err != nil {
 		return err
 	}

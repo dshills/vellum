@@ -1,0 +1,140 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f77b414ab3cba67a2875a7b9e798da42",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "d776d6c03a97d5f8bf643e4c188e5c6c460151ee",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "b645294ea2a03d5c",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Collection host forces size limits regardless of Style",
+      "message": "The host style hardcodes Max.Y to 360dp and Min.Y to 160dp, overriding any size the application sets through Node.Style, including the MaxSize that the gallery and tests set. Callers cannot control the collection height.",
+      "suggestion": "Apply these as defaults only when the node's Style does not specify sizes, or call styleCollectionHost before the user style overlay.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/collection_view.go",
+          "lines": {
+            "start": 29,
+            "end": 29
+          }
+        }
+      ],
+      "tags": [
+        "layout",
+        "location-corrected"
+      ],
+      "evidence": "s.Max.Y = units.Dp(360)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "cdcab52548e6a21a",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Space and arrow keys pass unfiltered modifiers including lock keys",
+      "message": "Space handling passes e.Modifiers() unfiltered, so CapsLock and NumLock bits are included even though they are masked out of mods earlier in the function. A lock key being active can change the selection semantics, for example by being treated as a modifier.",
+      "suggestion": "Pass the filtered `mods` value instead of e.Modifiers() in the Space case and in the arrow-key selection calls.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/collection_view.go",
+          "lines": {
+            "start": 192,
+            "end": 192
+          }
+        }
+      ],
+      "tags": [
+        "keyboard",
+        "location-corrected"
+      ],
+      "evidence": "queueListSelection(r, id, b, e.Modifiers(), id)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "9a7277d216ae5828",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Catalog collection overwritten on every sync defeats source comparison",
+      "message": "After the catalog is rebuilt, the collection is unconditionally overwritten with the current snapshot. This is harmless when the source matches, but SameSource falls back to pointer comparison when either source is nil. A catalog built from a snapshot with a nil source is therefore compared by pointer identity to later snapshots, and updating the stored pointer each time hides that mismatch from the next comparison. As a result, row leases may not renew when presentation or owner changes.",
+      "suggestion": "Store the collection only when a new catalog is created. Keep comparing against the originally stored snapshot rather than refreshing it on every sync.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/list_box.go",
+          "lines": {
+            "start": 111,
+            "end": 115
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle",
+        "stale-input"
+      ],
+      "evidence": "c.listCatalog.collection = r.node.Collection",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7434,
+    "totalMs": 7468
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 49928,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 26595,
+        "output": 867,
+        "costUSD": 0.06186
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
