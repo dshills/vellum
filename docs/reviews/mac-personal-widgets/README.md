@@ -1386,3 +1386,11 @@ Prism: `essentials-icon-picker.json` (Anthropic Claude Sonnet 5.5, complete cove
 Addressed both Prism findings: external opening starts a fresh query/category/highlight session; identity changes clear recents, and removed catalogue IDs are pruned. Added external-reopen and pruning regressions. Native offscreen Return chooses exactly once through the existing collection/popover path; closed/stale search sessions cannot select. No desktop tests run.
 
 Focused checks: `essentials-icon-picker-checks.json`, `essentials-icon-picker-final-checks.json`.
+
+## Add full-color Mac settings pane with retained category pages
+
+Prism: `essentials-settings.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Fixed the Prism finding: sample preferences now live in explicit application model fields; page descriptions rebuild with stable IDs and callbacks no longer index mutable page arrays. Native offscreen switching preserves the same editor instance and excludes inactive pages; headerless stacks remove duplicate header focus/AX choices. Existing ordinary-tab routing regressions pass. Settings persistence remains application-owned.
+
+Focused checks: `essentials-settings-checks.json`, `essentials-settings-final-checks.json`.

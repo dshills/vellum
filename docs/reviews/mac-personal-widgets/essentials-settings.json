@@ -1,0 +1,117 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "1aa88be835c45ff2cbe7a24ed0755a28",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "82a918d9270bdf0ddcbda063c63560c6ba748d2f",
+    "branch": "codex/mac-widget-essentials"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "f588813562610a3e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Callbacks index into pane structure by hard-coded positions",
+      "message": "The pane is built once, then each frame's View() is called on it. Change callbacks mutate e.settings.Pages by hard-coded indices. If the pane is rebuilt or pages reordered, the indices go stale. Also, a TextField's Text is stored in the pane tree, so the callbacks are brittle and a panic is possible if the structure changes.",
+      "suggestion": "Keep preference values in explicit fields on macEssentialsGallery (name string, reopen bool, grid bool) and build the page nodes from them in settingsView.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_essentials.go",
+          "lines": {
+            "start": 137,
+            "end": 139
+          }
+        }
+      ],
+      "tags": [
+        "fragility"
+      ],
+      "evidence": "e.settings = \u0026ui.SettingsPane{ID: \"essentials/settings\", Title: \"Application settings\", SelectedID: \"general\", Pages: []ui.SettingsPage{",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6930,
+    "totalMs": 6950
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 11,
+    "bytes": 26809,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 15285,
+        "output": 729,
+        "costUSD": 0.03786
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "be5fa3e409adcbf2",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Possible nil deref and stale-closure on tab bar styler",
+        "message": "The buttons map lookup may return nil if the native tab for Options[0] isn't created yet; button.AsTree() on a nil button would panic. Also the FinalStyler is installed once on the shared tab bar, and the hidden header closure captures the first record r, which becomes stale if the record is replaced. The property flag prevents re-installation.",
+        "suggestion": "Guard with `if button != nil` (and tree.IsNil) before dereferencing. Look up the node through the bar's owner or store the flag state on the bar so the styler doesn't capture a stale record.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "drivers/cogent/tab_close.go",
+            "lines": {
+              "start": 133,
+              "end": 136
+            }
+          }
+        ],
+        "tags": [
+          "nil-deref"
+        ],
+        "evidence": "button := r.control.tabs.buttons[r.node.Options[0].ID]\n\t\tif bar, ok := button.AsTree().Parent.(core.Widget); ok",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/tab_close.go"
+    }
+  ],
+  "suppressed": []
+}

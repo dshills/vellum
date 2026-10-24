@@ -27,3 +27,13 @@ requests selection. Accept by setting SelectedID in Change. Rejection leaves the
 popover open and does not record a recent choice; Cancel/Escape changes nothing.
 Closed/replaced sessions and filtered/removed/disabled items revoke old actions.
 No images are loaded by the picker. Catalogue search is bounded and local.
+
+## Settings pane
+
+`ui.SettingsPane` supplies a full-color sidebar and grouped detail pages. Up to
+16 pages remain mounted in a `TabsHideHeader` stack so native editors survive
+navigation. Accept Navigate by setting SelectedID. Disabled pages and stale
+navigation options cannot act. Inactive content and the hidden tab header leave
+focus/accessibility scope. Use `SettingsNavigationID` for initial focus.
+Embed the pane or put it in an ordinary application window. Persistence remains
+an application policy; the demo stores preferences for the current launch only.

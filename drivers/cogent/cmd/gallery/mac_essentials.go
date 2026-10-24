@@ -11,11 +11,14 @@ import (
 )
 
 type macEssentialsGallery struct {
-	parent      *macComponentsGallery
-	application *app.Application
-	window      app.WindowRef
-	well        *ui.ImageWell
-	picker      *ui.IconPicker
+	parent                           *macComponentsGallery
+	application                      *app.Application
+	window                           app.WindowRef
+	well                             *ui.ImageWell
+	picker                           *ui.IconPicker
+	settings                         *ui.SettingsPane
+	preferenceName                   string
+	preferenceReopen, preferenceGrid bool
 }
 
 func newMacEssentialsGallery(parent *macComponentsGallery) *macEssentialsGallery {
@@ -129,4 +132,25 @@ func (e *macEssentialsGallery) iconPickerView() ui.Node {
 		return ui.Node{ID: "essentials/picker-error", Kind: ui.Label, Text: err.Error()}
 	}
 	return ui.Node{ID: "essentials/picker-page", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}, Children: []ui.Node{{ID: "essentials/picker-help", Kind: ui.Label, Text: "Search or filter full-color artwork. Arrows highlight; Return or Choose accepts. Cancel keeps the original selection."}, n}}
+}
+
+func (e *macEssentialsGallery) settingsView() ui.Node {
+	if e.settings == nil {
+		e.preferenceName = "My drawings"
+		e.preferenceReopen = true
+		e.preferenceGrid = true
+		e.settings = &ui.SettingsPane{ID: "essentials/settings", Title: "Application settings", SelectedID: "general", Navigate: func(event ui.SettingsEvent) {
+			e.settings.SelectedID = event.PageID
+			e.parent.status = "Settings page: " + event.PageID
+		}}
+	}
+	e.settings.Pages = []ui.SettingsPage{
+		{ID: "general", Label: "General", Description: "Application-owned preferences with retained editors.", IconImage: e.parent.artwork[ui.SymbolDocument], Children: []ui.Node{{ID: "essentials/settings/general-group", Kind: ui.FormGroup, Text: "Defaults", Children: []ui.Node{{ID: "essentials/settings/name", Kind: ui.TextField, Text: e.preferenceName, Accessibility: ui.Accessibility{Name: "Default drawing name"}, Change: func(event ui.ChangeEvent) { e.preferenceName = event.Text }}, {ID: "essentials/settings/reopen", Kind: ui.Checkbox, Text: "Reopen the last drawing", Checked: e.preferenceReopen, Change: func(event ui.ChangeEvent) { e.preferenceReopen = event.Checked }}}}}},
+		{ID: "appearance", Label: "Appearance", Description: "Theme controls above apply to every page.", IconImage: e.parent.artwork[ui.SymbolFolder], Children: []ui.Node{{ID: "essentials/settings/appearance-group", Kind: ui.FormGroup, Text: "Canvas", Children: []ui.Node{{ID: "essentials/settings/grid", Kind: ui.Checkbox, Text: "Show grid", Checked: e.preferenceGrid, Change: func(event ui.ChangeEvent) { e.preferenceGrid = event.Checked }}}}}},
+		{ID: "advanced", Label: "Advanced", Disabled: true, IconImage: e.parent.artwork[ui.SymbolSave]}}
+	n, err := e.settings.View()
+	if err != nil {
+		return ui.Node{ID: "essentials/settings-error", Kind: ui.Label, Text: err.Error()}
+	}
+	return n
 }

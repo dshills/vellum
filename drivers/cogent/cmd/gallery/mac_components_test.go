@@ -121,3 +121,17 @@ func TestImageWellLoaderRejectsDirectoriesAndOversize(t *testing.T) {
 		t.Fatal("oversize file admitted")
 	}
 }
+
+func TestMacSettingsPreferencesRemainModelOwned(t *testing.T) {
+	m := newMacComponentsGallery(false)
+	m.page = "settings"
+	n := m.view()
+	findGalleryDocumentNode(n, "essentials/settings/name").Change(ui.ChangeEvent{Text: "Renamed"})
+	m.essentials.settings.SelectedID = "appearance"
+	m.view()
+	m.essentials.settings.SelectedID = "general"
+	n = m.view()
+	if findGalleryDocumentNode(n, "essentials/settings/name").Text != "Renamed" {
+		t.Fatal("preference lost")
+	}
+}

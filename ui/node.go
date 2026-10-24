@@ -115,10 +115,12 @@ type Node struct {
 	SelectionChange func(ListSelectionEvent)
 	MenuAnchorID    string // optional same-window managed anchor for MenuButton
 	SelectedID      string
-	TabClose        func(TabCloseEvent)
-	Change          func(ChangeEvent)
-	Accessibility   Accessibility
-	Focus           FocusRequest
+	// TabsHideHeader retains a page stack controlled by external navigation.
+	TabsHideHeader bool
+	TabClose       func(TabCloseEvent)
+	Change         func(ChangeEvent)
+	Accessibility  Accessibility
+	Focus          FocusRequest
 	// PopoverAnchor makes a Dialog an anchored panel; prefer Popover.View.
 	// Sheet requests a nonresizable window-modal card with explicit actions.
 	Sheet                                bool

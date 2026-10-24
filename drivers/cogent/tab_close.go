@@ -8,6 +8,7 @@ import (
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
 	"cogentcore.org/core/icons"
+	"cogentcore.org/core/styles"
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/ui"
 )
@@ -125,6 +126,18 @@ func syncTabsPresentation(r *record) {
 	}
 	w := r.widget.(*core.Tabs)
 	w.SetType(typ)
+	if len(r.node.Options) > 0 {
+		button := r.control.tabs.buttons[r.node.Options[0].ID]
+		if bar, ok := button.AsTree().Parent.(core.Widget); ok && bar.AsTree().Property("vellum.settings.tabbar") == nil {
+			bar.AsTree().SetProperty("vellum.settings.tabbar", true)
+			bar.AsWidget().FinalStyler(func(s *styles.Style) {
+				if r.node.TabsHideHeader {
+					s.Display = styles.DisplayNone
+				}
+			})
+		}
+	}
+
 	for _, o := range r.node.Options {
 		button := r.control.tabs.buttons[o.ID]
 		binding := r.control.tabs.bindings[o.ID]

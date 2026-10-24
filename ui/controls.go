@@ -151,6 +151,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if n.TabsHideHeader && n.Kind != Tabs {
+		return fmt.Errorf("ui: TabsHideHeader belongs only on Tabs")
+	}
 
 	if n.SplitButtonLayout && (n.Kind != Row || len(n.Children) != 2 || n.Children[0].Kind != Button || n.Children[0].ID != SplitPrimaryID(n.ID) || n.Children[1].Kind != MenuButton || n.Children[1].ID != SplitMenuID(n.ID) || n.Children[1].MenuAnchorID != n.ID) {
 		return fmt.Errorf("ui: split-button layout requires its generated primary/menu segments")
@@ -382,7 +385,7 @@ func FocusTarget(root Node, id string) (Node, bool) {
 	find = func(n Node, disabled bool) (Node, bool) {
 		disabled = disabled || n.Disabled
 		if n.ID == id {
-			if disabled || !IsFocusable(n.Kind) {
+			if disabled || !IsFocusable(n.Kind) || n.Kind == Tabs && n.TabsHideHeader {
 				return n, false
 			}
 			if n.Kind == MenuButton && n.Change == nil {

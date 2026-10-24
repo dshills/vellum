@@ -658,6 +658,11 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			// Keyboard focus belongs to one option; group focus is a managed proxy.
 			x.Focused = false
 		case ui.Selector, ui.Tabs:
+			if n.Kind == ui.Tabs && n.TabsHideHeader {
+				x.Role = "group"
+				x.Focusable = false
+				x.Focused = false
+			}
 			x.Value = n.SelectedID
 			for _, o := range n.Options {
 				if o.ID == n.SelectedID {
@@ -697,7 +702,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			if (n.Kind == ui.Slider || n.Kind == ui.NumberField) && n.Change != nil {
 				x.Actions = append(x.Actions, "increment", "decrement")
 			}
-			if (n.Kind == ui.Selector || n.Kind == ui.Tabs || n.Kind == ui.RadioGroup || n.Kind == ui.SegmentedControl || n.Kind == ui.ListBox) && (n.Change != nil || n.Multiple && n.SelectionChange != nil) {
+			if (n.Kind == ui.Selector || n.Kind == ui.Tabs && !n.TabsHideHeader || n.Kind == ui.RadioGroup || n.Kind == ui.SegmentedControl || n.Kind == ui.ListBox) && (n.Change != nil || n.Multiple && n.SelectionChange != nil) {
 				x.Actions = append(x.Actions, "set")
 			}
 			if n.Kind == ui.Dialog && n.Dismiss != nil {
@@ -785,7 +790,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 				handlers[id] = handler
 			}
 		}
-		if n.Kind == ui.Tabs || (n.Kind == ui.Selector && !menuOpen(r)) {
+		if n.Kind == ui.Tabs && !n.TabsHideHeader || (n.Kind == ui.Selector && !menuOpen(r)) {
 			for _, o := range n.Options {
 				id := accessibilityOptionID(n.ID, o.ID)
 				child := accessibilityNode{ID: id, Parent: x.ID, Role: "option", DomainID: o.ID, Name: o.Label, Selected: o.ID == n.SelectedID, Value: o.ID == n.SelectedID, Disabled: disabled || o.Disabled, Actions: []string{}}
@@ -1011,6 +1016,9 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 		}
 		change.SelectedID = action.Value
 	case ui.Selector, ui.Tabs:
+		if n.Kind == ui.Tabs && n.TabsHideHeader {
+			return false
+		}
 		if action.Kind != "set" {
 			return false
 		}
