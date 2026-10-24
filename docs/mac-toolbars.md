@@ -22,7 +22,8 @@ Narrow preview caps horizontal toolbars at 280 pt, preserving the same controls
 in a scrolling viewport. The vertical icon bar has a 154 pt viewport. Tab follows
 ordinary control order, unconsumed orientation arrows move within the toolbar,
 and Home/End reveal the first/last enabled action. Text editors keep their own
-editing commands. Disable actions applies to all sample toolbars but leaves the
+editing commands. Lock-key flags preserve ordinary navigation, including the
+NumLock bit supplied on macOS. Disable actions applies to all sample toolbars but leaves the
 catalogue display controls available.
 
 A regular icon action, independently consumable by an application:

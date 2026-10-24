@@ -98,7 +98,9 @@ func syncChrome(r *record, previous ui.Node) {
 	}
 }
 func toolbarKey(r *record, e events.Event) {
-	if e.IsHandled() || e.Modifiers() != 0 || r.control.retired {
+	// macOS desktop input always includes NumLock; lock flags are not chords.
+	modifiers := e.Modifiers() & ^((1 << key.CapsLock) | (1 << key.NumLock))
+	if e.IsHandled() || modifiers != 0 || r.control.retired {
 		return
 	}
 	step, boundary := 0, 0

@@ -337,7 +337,9 @@ controls in a native scrolling region, preserving private editing state. Keyboar
 focus reveals an offscreen tool. Tab follows each child's ordinary managed stop;
 unconsumed main-axis arrows wrap through enabled stops, and Home/End focus the
 first/last enabled stop. Child text and choice editing consume their keys before
-toolbar navigation. Modified chords remain available to enclosing shortcuts.
+toolbar navigation. CapsLock/NumLock flags do not modify a navigation chord
+(macOS reports NumLock on ordinary input). Shift/Command/Control/Option chords
+remain available to their existing handlers and enclosing shortcuts.
 Toolbar publishes the Mac toolbar role and ordinary child semantics. Nested
 managed layouts follow the same enabled traversal; a nested Toolbar has its own
 nearest scope. Moving a layout out removes the old navigation scope. Modal

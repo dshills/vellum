@@ -902,3 +902,21 @@ one another and reduces page gaps. Both-theme public Manual geometry confirms
 the vertical toolbar fits the standard 660x780 scene. Focused race tests and
 rebuild pass; Prism viewport review reports zero findings. Native screenshots
 are inspected again after packaging.
+
+## Toolbar lock-key navigation
+
+A native Down-arrow check reproduced focus entering disabled Delete. The desktop
+backend explicitly sets NumLock on every macOS key; toolbar navigation rejected
+all nonzero modifiers, allowing generic Frame navigation to handle these keys.
+The regression failed before the fix for both orientations with NumLock, CapsLock
+and both. Masking only lock bits restores enabled traversal, Home/End and wrapping
+while preserving actual chord modifiers and existing child-editor precedence.
+Focused chrome race/routing tests, gallery tests, driver/gallery vet and build pass.
+
+Prism's shift-type concern is disproven by the pinned key.Modifiers definition
+(events/key/modifiers.go): CapsLock and NumLock are iota bit positions on its
+int64 bitflag enum. SetFlag in the macOS desktop path uses those positions. Go
+contextually types the constant mask for e.Modifiers; compilation and the six
+failing-before/passing-after cases verify it. The same convention is already
+used by other managed control key handlers. No extra state or mask API needed.
+Native post-package traversal is recorded separately in the local receipt.
