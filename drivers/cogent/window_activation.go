@@ -54,6 +54,9 @@ func (v *windowActivation) bind(source *events.Source) error {
 	if v.source != nil && v.source != source {
 		return ErrDesktopSession
 	}
+	if v.source == source {
+		return nil
+	}
 	v.source = source
 	v.queueLocked()
 	return nil

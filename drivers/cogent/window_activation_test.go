@@ -47,6 +47,9 @@ func TestWindowActivationBoundedLatestPublication(t *testing.T) {
 	if v.consume(&foreign, wake) || !v.consume(&source, wake) || v.consume(&source, wake) || v.active() {
 		t.Fatal("source/exactly-once/latest-state publication")
 	}
+	if err := v.bind(&source); err != nil || activationQueueLen(&source) != 0 {
+		t.Fatal("binding the same source queued duplicate appearance work", err)
+	}
 	v.observe(true)
 	v.observe(false)
 	if v.consume(&source, activationNext(t, &source)) {

@@ -423,3 +423,28 @@ unconditionally returns a valid event and nil; there is no closed-deque failure
 or capacity-refusal path. The pending marker therefore cannot be stranded by the
 reported error. Queue cancellation and delivery/close races are exercised. No
 production change is needed for this finding.
+
+## Activation composition bounds and native observation
+
+Rebinding an already-bound activation source is now a no-op. The mounted tests
+also wrap the actual software compositor: one activation transition composes
+exactly one changed frame; duplicate notifications and a coalesced return to the
+published state perform no restyle or composition. Focused race checks and vet
+pass. Prism Anthropic claude-sonnet-5-5 completed coverage with no findings.
+
+Native validation at 610c629 used a temporary public-API two-window consumer and
+an overlay that only printed observed/published activation states. CUA invoked
+Open control window, then closed that second window. The first attachment's
+journal includes active→inactive→active publication on its native render owner;
+the second has its own distinct signal. The returned source screenshot/AX tree
+retain both selected rows and Alpha keyboard focus. CUA quit finishes the process
+with exit0 in 57.24 seconds, below its 60-second application deadline.
+
+This is native callback/publication and retained-focus evidence. It is separate
+from automated light/dark color and compositor checks. Targeted CUA images did not
+provide an inactive-window observation; blue images are not used to claim that
+visual state. An earlier app-switch attempt remained inconclusive, and its
+bounded 120-second probe timed out while the desktop tool stalled. The successful
+two-window check supersedes that incomplete native attempt. Diagnostic overlays,
+helper apps and their logs stay private and are absent from shipped binaries.
+No broad release qualification or performance campaign was run.

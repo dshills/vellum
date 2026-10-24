@@ -8,8 +8,16 @@ import (
 
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/system/composer"
 	"github.com/dshills/vellum/ui"
 )
+
+type activationDrawer struct {
+	composer.Drawer
+	calls int
+}
+
+func (d *activationDrawer) End() { d.calls++; d.Drawer.End() }
 
 func TestMacSourceListNativeWindowActivation(t *testing.T) {
 	for _, dark := range []bool{false, true} {
@@ -30,6 +38,11 @@ func TestMacSourceListNativeWindowActivation(t *testing.T) {
 			managed := m.implementation.find("one")
 			w := managed.state
 			bindWindowOriginCustom(w, nil, func(*nativeWindow, events.Event) {})
+			cd := w.body.Scene.RenderWindow().SystemWindow.Composer().(*composer.ComposerDrawer)
+			oldDrawer := cd.Drawer
+			drawer := &activationDrawer{Drawer: oldDrawer}
+			cd.Drawer = drawer
+			t.Cleanup(func() { cd.Drawer = oldDrawer })
 			v := &windowActivation{}
 			t.Cleanup(v.close)
 			if err := bindWindowActivationState(w, v); err != nil {
@@ -74,12 +87,17 @@ func TestMacSourceListNativeWindowActivation(t *testing.T) {
 				t.Fatal("callback directly styled native tree")
 			}
 			assertRows(true)
+			beforePaints := drawer.calls
 			pump()
 			assertRows(false)
+			if drawer.calls != beforePaints+1 {
+				t.Fatal("activation did not compose exactly one changed frame", beforePaints, drawer.calls)
+			}
 			if a.Pending().Ordinary != 4 {
 				t.Fatal("activation drained the application queue")
 			}
 			before := passes
+			beforePaints = drawer.calls
 			v.observe(false)
 			pump()
 			if passes != before {
@@ -88,8 +106,8 @@ func TestMacSourceListNativeWindowActivation(t *testing.T) {
 			v.observe(true)
 			v.observe(false)
 			pump()
-			if passes != before {
-				t.Fatal("coalesced unchanged state restyled")
+			if passes != before || drawer.calls != beforePaints {
+				t.Fatal("unchanged activation restyled or recomposed", passes, before, drawer.calls, beforePaints)
 			}
 			if err := a.Drain(); err != nil {
 				t.Fatal(err)

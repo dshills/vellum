@@ -126,3 +126,7 @@ appearance is published and restyled on that window's render owner. Repeated
 identical notifications do not restyle, and retirement cancels queued work. This
 increment does not change other controls' window-activation cues, rendering,
 pacing or release policy.
+
+Activation binding is idempotent for the same event source. A changed publication
+requests one originating composition; duplicate observations or a coalesced return
+to the already-published state do not request another restyle or composition.
