@@ -43,6 +43,7 @@ type Semantics struct {
 type fieldChangeEpoch struct{ marker byte }
 
 type controlState struct {
+	toolbarDrag       *toolbarDragBinding
 	shortcut          *shortcutRecorderBinding
 	a                 *app.Application
 	window            string
@@ -470,6 +471,7 @@ func syncControl(r *record, previous ui.Node) error {
 	// children; parent semantic properties are current before this snapshot.
 	r.control.disabled = controlDisabled(r)
 	syncShortcutRecorder(r)
+	syncToolbarDrag(r)
 	if err := syncPlacement(r); err != nil {
 		return err
 	}
@@ -976,6 +978,7 @@ func disposeControl(r *record) {
 	if r.control != nil {
 		disposePlacement(r)
 		disposeShortcutRecorder(r)
+		disposeToolbarDrag(r)
 		disposeButtonImage(r)
 		r.widget.AsWidget().DeleteProperty(toolbarOverflowOwnerProperty)
 		r.widget.AsWidget().DeleteProperty(toolbarOverflowHiddenProperty)

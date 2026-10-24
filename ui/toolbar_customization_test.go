@@ -175,3 +175,71 @@ func TestToolbarCustomizerRejectedChangeAndInvalidReplacement(t *testing.T) {
 		t.Fatal("invalid replacement did not revoke callbacks")
 	}
 }
+
+func TestToolbarCustomizerDragPreservesHiddenAndRevokesOldOrder(t *testing.T) {
+	changes := 0
+	c := &ToolbarCustomizer{ID: "customize", Toolbar: customizationCatalogue(), Open: true, Value: ToolbarLayout{Hidden: []string{"b"}}, Dismiss: func() {}}
+	c.Change = func(v ToolbarLayout) { changes++; c.Value = v }
+	view := func() Node {
+		n, e := c.View()
+		if e != nil {
+			t.Fatal(e)
+		}
+		return n
+	}
+	n := view()
+	handle := customizationNode(t, n, ToolbarCustomizationDragID(c.ID, "b")).ToolbarReorder
+	if handle == nil || handle.ListID() != c.ID+"/items" {
+		t.Fatal("missing drag capability")
+	}
+	rows := handle.RowIDs()
+	rows[0] = "tampered" // detached geometry catalogue
+	if handle.RowIDs()[0] == "tampered" {
+		t.Fatal("mutable handle rows")
+	}
+	// A harmless re-render keeps the same captured capability.
+	if customizationNode(t, view(), ToolbarCustomizationDragID(c.ID, "b")).ToolbarReorder != handle {
+		t.Fatal("refresh invalidates held drag")
+	}
+	handle.DropBefore(toolbarCustomizationItemID(c.ID, "a", "row"))
+	if changes != 1 || !reflect.DeepEqual(c.Value.Order, []string{"b", "a", "rule", "c"}) || !reflect.DeepEqual(c.Value.Hidden, []string{"b"}) {
+		t.Fatal("hidden drag lost membership/order", c.Value, changes)
+	}
+	handle.DropBefore("")
+	if changes != 1 {
+		t.Fatal("old order accepted twice")
+	}
+	n = view()
+	handle = customizationNode(t, n, ToolbarCustomizationDragID(c.ID, "b")).ToolbarReorder
+	handle.DropBefore("unknown")
+	handle.DropBefore(toolbarCustomizationItemID(c.ID, "b", "row"))
+	if changes != 1 {
+		t.Fatal("invalid/no-op drop proposed")
+	}
+	handle.DropBefore("")
+	if changes != 2 || c.Value.Order[3] != "b" || len(c.Value.Hidden) != 1 {
+		t.Fatal("end drop failed", c.Value)
+	}
+	n = view()
+	handle = customizationNode(t, n, ToolbarCustomizationDragID(c.ID, "a")).ToolbarReorder
+	c.Open = false
+	view()
+	c.Open = true
+	view()
+	handle.DropBefore("")
+	if changes != 2 {
+		t.Fatal("reopened session accepted stale drag")
+	}
+	n = view()
+	handle = customizationNode(t, n, ToolbarCustomizationDragID(c.ID, "a")).ToolbarReorder
+	c.Toolbar.Children = c.Toolbar.Children[1:]
+	c.Value = ToolbarLayout{}
+	handle.DropBefore("")
+	if changes != 2 {
+		t.Fatal("removed source accepted drop")
+	}
+	bad := Node{ID: "wrong", Kind: Label, ToolbarReorder: handle}
+	if ValidateControl(bad) == nil {
+		t.Fatal("forged marker accepted")
+	}
+}

@@ -1073,3 +1073,24 @@ X position, and all seven rows fit without clipping. Prism reviewed the two-file
 correction with Anthropic Claude Sonnet 5.5, complete coverage, zero findings.
 Focused layout/routing tests, gallery customization tests and rebuilt native app
 pass. Final packaged observations remain separate in the local delivery receipt.
+
+## Toolbar customization dragging
+
+Prism with Anthropic claude-sonnet-5-5 reviewed all 11 changed files with complete
+coverage. Its sole medium finding proposes subtracting the modal origin from
+`e.Pos()`. No coordinate change was made: pinned core `routeCapturedPointer`
+already calls `e.SetLocalOff(scene.SceneGeom.Pos)` before invoking the capture
+handler, so `e.Pos()` is scene-local and matches row/viewport bounds. Only the
+main-stage insertion sprite adds the origin. Subtracting twice would break modal
+hit testing. A code comment now states this boundary, and the routing fixture
+asserts a nonzero modal origin at both tested display scales.
+
+Focused UI race tests, public SDK toolbar contracts, native customization routing
+in light/dark at 160/320 logical DPI, gallery toolbar regressions, package vet and
+native build passed. Routing covers hidden-action/full-color retention, threshold,
+exactly-once commit/duplicate release, rejected/no-op/outside drops, release-click
+suppression, Escape, wheel scroll with a clipped source, capture loss, order/source
+replacement, sheet disable/close and window teardown. Existing arrow/visibility
+regressions remain in place. Packaged native pointer observations are separate
+from deterministic routing; no broader performance or release qualification is
+claimed. No remaining actionable review finding.

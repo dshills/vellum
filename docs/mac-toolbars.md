@@ -133,7 +133,7 @@ recipe to every action in a bar. The generated vector icon follows the action's
 font-relative sizing. Local styles leave hover and keyboard-focus feedback intact.
 
 These are custom-rendered **content** toolbars. They do not install NSToolbar,
-provide title-bar merging, vibrancy, the macOS system customization palette, draggable items,
+provide title-bar merging, vibrancy, the macOS system customization palette, direct dragging on the toolbar,
 or cross-window overflow menus. Explicit light/dark palettes and size
 metrics do not follow automatic NSControlSize or OS appearance changes. Artwork
 uses original full-color sample pixels or Vellum’s bundled vector symbols;
@@ -151,7 +151,10 @@ receipt; neither is a claim of human VoiceOver or physical-pointer qualification
 
 Choose **Customize…** beside Small, Regular, Large or Mixed. Each toolbar has its
 own settings. The window-modal content sheet shows full-color artwork and labeled
-visibility checkboxes. Up/down buttons move an item one place earlier/later,
+visibility checkboxes. Drag the leading grip to a new position; a blue insertion
+line shows the proposed order after a six-point movement threshold. Hidden actions
+remain in the panel, retain their artwork, and can be dragged normally. Up/down
+buttons move an item one place earlier/later,
 including while hidden. These buttons and checkboxes support keyboard focus and
 named accessibility actions. Disabled toolbar commands can still be configured;
 editing the layout never runs their command. Restore Defaults resets both order
@@ -199,3 +202,24 @@ applications may store it and handle catalogue migrations themselves. The galler
 does not write settings to disk. Customization uses an explicit content sheet,
 with arrow controls for order; drag reordering, cross-window customization and
 NSToolbar's native customization palette are not supplied.
+
+
+Customization dragging is confined to the open panel in the same native window.
+Release inside the list commits at most one controlled proposal. Release outside,
+Escape, capture loss, disabled/removed source, changed order, panel closure and
+window shutdown cancel without editing the layout or clicking the release target.
+A grip click does not reorder. During a drag, wheel/trackpad input scrolls this
+list only; moving near its top/bottom edge scrolls in bounded steps. Holding still
+at an edge does not run a background autoscroll timer. Scroll clipped rows use
+full row midpoints, current scroll geometry and the originating sheet/display
+coordinate mapping. The retained panel owns at most 64 handles and one native
+capture/preview, with no drag timers or file I/O. The arrow buttons remain the
+keyboard/accessibility alternative through the same controlled Change path.
+
+`ToolbarCustomizationDragID(panelID, itemID)` identifies a generated grip.
+`Node.ToolbarReorder` and its `ToolbarReorderHandle` are adapter capabilities
+emitted by `ToolbarCustomizer.View`; applications should consume the customizer
+rather than construct drag descriptors or call their native drop hooks directly.
+Automated routing covers drag commits, hidden membership, full-color row artwork,
+scrolling, scale, release consumption and teardown. Packaged native-pointer checks
+are recorded separately from deterministic routing evidence.

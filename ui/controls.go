@@ -143,6 +143,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if err := ValidateToolbarReorderNode(n); err != nil {
+		return err
+	}
 	if err := ValidateShortcutRecorderNode(n); err != nil {
 		return err
 	}

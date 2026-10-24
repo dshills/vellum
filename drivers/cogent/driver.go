@@ -710,6 +710,7 @@ func syncRecordVisible(r *record, n ui.Node, visible bool, scopes []*tabCloseSco
 	}
 	syncTabVisibility(r, visible, scopes)
 	syncShortcutRecorderVisibility(r, visible, scopes)
+	syncToolbarDragVisibility(r, visible, scopes)
 	for i, c := range n.Children {
 		childVisible := visible
 		switch n.Kind {

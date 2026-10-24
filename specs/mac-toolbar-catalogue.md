@@ -64,13 +64,12 @@ opener. Max 64 catalogue items, at least one action. New omitted IDs append in
 catalogue order; stale unknown IDs require caller migration.
 
 The same-window sheet has full-color decorative artwork, named visibility
-checkboxes and earlier/later buttons, Restore Defaults and Done. Edits emit
+checkboxes, leading drag grips and earlier/later buttons, Restore Defaults and Done. Edits emit
 controlled proposals against the latest accepted Value, suppress no-ops, and
 never invoke toolbar commands. Disabled actions remain configurable. Done/Escape
 retains edits, revokes the session and restores focus. Disable, ID replacement,
 invalid descriptions and native disposal also revoke stale input. Small, Regular,
-Large and Mixed have independent gallery values and openers. No disk preferences,
-drag customization, cross-window customization or NSToolbar system palette.
+Large and Mixed have independent gallery values and openers. No disk preferences, direct toolbar dragging, cross-window customization or NSToolbar system palette.
 
 Portable tests cover normalization, malformed layouts, callback identity,
 accepted/rejected/queued edits, restore, hidden-all and session revocation. Public
@@ -78,3 +77,24 @@ SDK consumption is separate. Native Manual routes real pointer events through
 both-theme sheets, checks retained identity/artwork on reorder, removal from
 ordinary and overflow actions, focus restoration, disabling and window teardown.
 Packaged screenshot/AX/native-key observations remain separate evidence.
+
+
+Customization-row drag contract: generated ToolbarReorderHandle capabilities are
+stable across harmless View refreshes, bounded by the 64-item catalogue and
+revoked on order/session replacement. Native primary pointer capture begins on a
+grip; six logical points activates the insertion preview. Full row midpoints and
+the current clipped viewport determine insertion before a row or at list end,
+including under scrolling/display scaling and the modal scene origin. Native
+routing consumes every captured release before ordinary click dispatch. A valid
+release queues one owner-checked DropBefore proposal against the captured order
+and current Hidden membership. Rejected/no-op changes do not edit caller state.
+Outside release, Escape, capture loss, source/target removal, order replacement,
+disable, sheet dismissal and window closure remove capture/preview and references.
+Native reads use immutable owner scope publications; application callbacks cannot
+inspect native parents. Wheel scroll is confined to the list; moving at an edge
+scrolls a bounded step. No stationary-edge autoscroll timer is provided. Existing
+arrow controls remain keyboard/AX reorder access. Preserve original artwork and
+all hidden actions. Public Manual regression tests cover both appearances, two
+scales, long-list scrolling, threshold/no-op/duplicate release, outside release
+consumption, Escape and lifecycle cancellation; packaged pointer checks remain
+separate evidence.
