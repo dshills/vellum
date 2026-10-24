@@ -201,7 +201,10 @@ func (d *DocumentList) View() (Node, error) {
 			}
 			for _, current := range d.columns() {
 				if current.ID == c.ID {
-					d.Resize(DocumentResizeEvent{ID: id, ColumnID: c.ID, Width: max(60, min(600, width))})
+					width = max(60, min(600, width))
+					if current.Width != width {
+						d.Resize(DocumentResizeEvent{ID: id, ColumnID: c.ID, Width: width})
+					}
 					return
 				}
 			}
@@ -224,6 +227,21 @@ func (d *DocumentList) View() (Node, error) {
 			}},
 			{ID: header + "/resize", Kind: Button, Text: "│", Appearance: ButtonTool, Disabled: d.Resize == nil, ColumnResize: &ColumnResizeHandle{source: d, column: c.ID, Width: c.Width, Change: resize}, Accessibility: Accessibility{Name: "Resize " + c.Title, Help: "Drag or use Left/Right. Shift changes ten points."}, Style: Style{Border: Some(Border{}), Padding: Some(Insets{})}},
 		}})
+		if c.ID == sort.ColumnID {
+			children := headers[len(headers)-1].Children
+			children[0].Text = c.Title
+			symbol := SymbolUp
+			label := "Sorted ascending"
+			if sort.Descending {
+				symbol = SymbolDown
+				label = "Sorted descending"
+			}
+			chevron := Node{ID: header + "/sort", Kind: Icon, Icon: symbol, Text: label, Style: Style{MinSize: Some(Size{Width: 10, Height: 10}), MaxSize: Some(Size{Width: 10, Height: 10})}}
+			nextChildren := []Node{children[0], chevron}
+			children = append(nextChildren, children[1:]...)
+			headers[len(headers)-1].Children = children
+		}
+
 	}
 	for _, i := range items {
 		cells := []string{}
@@ -290,10 +308,26 @@ func ValidateDocumentListNode(n Node) error {
 	if l == nil {
 		return nil
 	}
-	if n.Kind != ListBox || !n.Multiple || n.Collection != nil || len(l.Rows) != len(n.Options) || len(l.Columns) < 1 || len(l.Columns) > 4 {
+	if l.source == nil || n.Kind != ListBox || !n.Multiple || n.Collection != nil || len(l.Rows) != len(n.Options) || len(l.Columns) < 1 || len(l.Columns) > 4 {
 		return fmt.Errorf("ui: invalid document list presentation")
 	}
+
+	seen := map[string]bool{}
+	for _, column := range l.Columns {
+		if !documentColumn(column.ID) || seen[column.ID] || !validTokenText(column.Title) || !finite(column.Width) || column.Width < 60 || column.Width > 600 {
+			return fmt.Errorf("ui: invalid detached document column")
+		}
+		seen[column.ID] = true
+	}
 	for i, row := range l.Rows {
+		if err := validateIcon(Node{Kind: Button, Text: n.Options[i].Label, Icon: row.Icon, IconImage: row.Image}); err != nil {
+			return err
+		}
+		for _, cell := range row.Cells {
+			if len(cell) > 1024 || !utf8.ValidString(cell) || strings.ContainsAny(cell, "\x00\r\n") {
+				return fmt.Errorf("ui: invalid detached document cell")
+			}
+		}
 		if row.ID != n.Options[i].ID || len(row.Cells) != len(l.Columns) {
 			return fmt.Errorf("ui: document rows/options disagree")
 		}

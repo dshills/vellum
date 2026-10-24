@@ -77,6 +77,12 @@ func TestAngleDialNativeKeysPointerCaptureAndLoss(t *testing.T) {
 				t.Fatal("pointer angle/release click", d.Degrees, calls, beforeRelease)
 			}
 			input(events.MouseDown, top)
+			input(events.MouseUp, right)
+			if d.Degrees != 90 {
+				t.Fatal("release coordinate was lost when moves were coalesced")
+			}
+
+			input(events.MouseDown, top)
 			atLoss := calls
 			face.Scene.Events.CancelPointerCapture()
 			input(events.MouseMove, right)

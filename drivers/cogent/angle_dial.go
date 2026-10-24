@@ -171,6 +171,7 @@ func bindAngleDial(r *record, b *core.Button) {
 			case events.MouseMove, events.MouseDrag:
 				propose(event.Pos())
 			case events.MouseUp:
+				propose(event.Pos())
 				scene.Events.ReleasePointer(token)
 			}
 		}, func() {})

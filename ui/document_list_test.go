@@ -69,3 +69,19 @@ func TestDocumentListRejectsMalformedMetadata(t *testing.T) {
 		t.Fatal("absent selection")
 	}
 }
+
+func TestDocumentListDetachedMetadataValidation(t *testing.T) {
+	d := &DocumentList{ID: "files", Label: "Files", Items: []DocumentItem{{ID: "a", Name: "A"}}}
+	n, _ := d.View()
+	list := pickerNode(n, DocumentListID(d.ID))
+	list.DocumentList.Columns[0].Width = -1
+	if ValidateControl(list) == nil {
+		t.Fatal("mutated width admitted")
+	}
+	n, _ = d.View()
+	list = pickerNode(n, DocumentListID(d.ID))
+	list.DocumentList.Rows[0].Cells[0] = "bad\x00text"
+	if ValidateControl(list) == nil {
+		t.Fatal("invalid cell admitted")
+	}
+}

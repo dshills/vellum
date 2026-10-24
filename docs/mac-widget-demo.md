@@ -24,7 +24,8 @@ its startup appearance. Scroll inside a page to reach its controls. The ordinary
 
 - **Components:** choose Themes, Cascading menus, Split buttons, Inspector panel,
   Column browser, Filter / rule editor, Image well, Searchable icon picker,
-  Settings pane, Native alert, or Calendar picker. Menus open Export submenus with
+  Settings pane, Native alert, Calendar picker, Document list, Mac outline,
+  Native Colors panel, Native Fonts panel, or Circular angle dial. Menus open Export submenus with
   pointer/Right; Left closes a submenu and Escape cancels. Split buttons separate
   Save from its options. Collapse inspector headings without losing editor
   values. The column browser reveals child columns and accepts divider resizing;
@@ -54,6 +55,27 @@ its startup appearance. Scroll inside a page to reach its controls. The ordinary
   field shares this grid and date validation; invalid typed dates leave its value
   unchanged. Labels are English and the example uses Monday as its first weekday.
   [Public APIs and limits](mac-widget-essentials.md).
+- **Document list** (Components): click Name/Kind/Date Modified/Size to sort;
+  drag a header divider to resize or focus it and use Left/Right (Shift = ten
+  points). Command/Shift selects, Return/double-click updates the sample counter.
+  Header and rows scroll horizontally together. All files are in-memory samples.
+- **Mac outline** (Components): use triangles or Right to expand folders; Left
+  collapses or moves to the parent. Command/Shift selects. Collapsing a parent
+  preserves selected descendants; expand again to reveal them. Return opens a
+  leaf or toggles a branch. Archive is intentionally unavailable.
+- **Native Colors panel** (Components): Show macOS Colors opens AppKit's actual
+  panel with a Use Color/Cancel accessory and optional opacity. Live values affect
+  the preview; only Use Color commits. Cancel/Escape restores the accepted color.
+  The existing managed well remains an alternative.
+- **Native Fonts panel** (Components): Show macOS Fonts opens the installed-font
+  chooser. Choose a family/style/size, then Use Font or Cancel. Accepted choices
+  update the managed picker. Sizes are 6–144pt; the extra live preview caps its
+  display at 72pt. No fonts are installed and no document is changed.
+- **Circular angle dial** (Components): compare 64/96/128pt sizes. Drag clockwise
+  from zero at the top; arrows adjust one degree, Shift ten. Home resets, End
+  chooses the last step. Type degrees or use the adjacent stepper; 360 wraps to
+  zero. Each example retains its own value. Full-color header icons stay untinted.
+  [Public APIs and limits](mac-document-controls.md).
 - **Toolbars:** compare Small (26 pt), Regular (32 pt), and Large (40 pt) action
   heights. Full-color icons start enabled; turn them off to compare monochrome
   symbols. Switch Icons / Text / Icons and text / Icon above text without recreating
@@ -145,8 +167,9 @@ strings and does not enable OS secure-event-input mode or erase secret memory;
 use only synthetic text in this demo.
 
 
-These are custom-rendered controls using existing macOS window, text and
-accessibility integration, not AppKit NSControl wrappers or pixel-exact replicas.
+The managed controls use custom rendering with existing macOS window, text and
+accessibility integration and are not pixel-exact AppKit replicas. Native Colors,
+Fonts and alert services, plus the titlebar toolbar, use AppKit directly.
 Appearance is an explicit light/dark theme with fixed colors and Helvetica Neue;
 OS accent, high-contrast and automatic appearance tracking are not implemented.
 Context menus are flat and supported on Button, Canvas2D and ListBox. Popovers
@@ -197,3 +220,12 @@ artwork is retained. Native customization requires macOS 15+.
 On the tested macOS26 compact titlebar, native customization remains icons-only;
 the content toolbar display buttons do not change native chrome. See the native
 prototype guide for platform/style limits and the verified persistence scope.
+
+The new document list and outline are bounded to 256 items (outline depth 16);
+larger data uses DataGrid/DataTree. Metadata sorting is stable/case-insensitive,
+not Finder's localized natural sorting. Native panels allow one owned session and
+refuse foreign preexisting shared panels. Live previews are coalesced and do not
+constitute an accepted edit. Their appearance follows the native parent window,
+which the light/dark bundle selects at launch; local subtree theme buttons do not
+change native chrome. Native panel ownership/cleanup is separate from managed
+popover behavior. Dial proposals are continuous; application history is caller-owned.

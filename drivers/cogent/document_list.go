@@ -67,6 +67,7 @@ func makeDocumentRow(r *record, id string, p *tree.Plan) bool {
 					if row.Image != nil {
 						tree.AddAt(plan, "art", func(w *managedImage) {
 							w.Styler(func(s *styles.Style) {
+								s.RenderBox = false
 								s.Min.Set(units.Dp(18), units.Dp(18))
 								s.Max.Set(units.Dp(18), units.Dp(18))
 								s.Grow.Set(0, 0)
@@ -206,6 +207,7 @@ func bindColumnResize(r *record, b *core.Button) {
 				return
 			}
 			if event.Type() == events.MouseUp {
+				queue(h, h.Width+float32(event.Pos().X-start.X)/scale)
 				scene.Events.ReleasePointer(token)
 				return
 			}

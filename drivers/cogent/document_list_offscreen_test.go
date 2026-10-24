@@ -13,6 +13,8 @@ import (
 func TestDocumentListNativeSelectionActivationAndResize(t *testing.T) {
 	d := &ui.DocumentList{ID: "files", Label: "Files", Columns: ui.DefaultDocumentColumns(), Items: []ui.DocumentItem{{ID: "a", Name: "Alpha"}, {ID: "b", Name: "Beta"}}}
 	calls := 0
+	sortCalls := 0
+	d.SortChange = func(e ui.DocumentSortEvent) { sortCalls++; d.Sort = e.Sort }
 	d.Change = func(e ui.ListSelectionEvent) { d.SelectedIDs = e.Apply(d.SelectedIDs) }
 	d.Activate = func(ui.DocumentEvent) { calls++ }
 	d.Resize = func(e ui.DocumentResizeEvent) { d.Columns[0].Width = e.Width }
@@ -61,6 +63,25 @@ func TestDocumentListNativeSelectionActivationAndResize(t *testing.T) {
 	}
 	if d.Columns[0].Width <= 221 || calls != 1 {
 		t.Fatal("pointer resize or release consumption", d.Columns[0].Width, calls)
+	}
+
+	_, currentHandle := imageManualElement(t, m, ui.DocumentHeaderID(d.ID, "name")+"/resize")
+	startLoss := currentHandle.Bounds.Min.Add(currentHandle.Bounds.Size().Div(2))
+	lossEnd := startLoss.Add(image.Pt(24, 0))
+	widthBeforeLoss := d.Columns[0].Width
+	if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.incarnation, Type: events.MouseDown, Button: events.Left, Position: startLoss}); err != nil {
+		t.Fatal(err)
+	}
+	unitSettle(t, m)
+	findRecord(w.state.root, ui.DocumentHeaderID(d.ID, "name")+"/resize").widget.AsWidget().Scene.Events.CancelPointerCapture()
+	for _, typ := range []events.Types{events.MouseMove, events.MouseUp} {
+		if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.incarnation, Type: typ, Button: events.Left, Position: lossEnd}); err != nil {
+			t.Fatal(err)
+		}
+		unitSettle(t, m)
+	}
+	if d.Columns[0].Width != widthBeforeLoss || sortCalls != 0 {
+		t.Fatal("capture loss resized or clicked a header", d.Columns[0].Width, sortCalls)
 	}
 
 	if err := a.Do(func() {

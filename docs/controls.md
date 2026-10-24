@@ -10,6 +10,11 @@ renders these elements and publishes their supported accessibility semantics.
 | Label | `ui.Label` | `Text` |
 | Action button | `ui.Button` | `Text`, `Activate` |
 | Bundled icon | `ui.Icon` | `Icon`, optional alternate `Text`/accessible name |
+| Document list | `ui.DocumentList.View()` | Full-color metadata rows, controlled sort/width/selection, activation |
+| Mac outline | `ui.OutlineView.View()` | Parent hierarchy, disclosure, color icons/badges, hidden selection |
+| Native Colors panel | `app.Application.ColorPanels()` | AppKit pickers, opacity, coalesced preview, Apply/Cancel |
+| Native Fonts panel | `app.Application.FontPanels()` | Installed faces, 6–144pt sizes, style hints, preview, Apply/Cancel |
+| Circular angle dial | `ui.AngleDial.View()` | Wrapped degrees, ticks, pointer capture, keys, numeric field |
 | Image well | `ui.ImageWell.View()` | Immutable image, choose/replace/clear/drop requests, Busy/Status |
 | Searchable icon picker | `ui.IconPicker.View()` | Local categories/search, original-color items, accepted-choice recents |
 | Settings pane | `ui.SettingsPane.View()` | Full-color categories, retained headerless page stack, Navigate |
@@ -71,7 +76,7 @@ renders these elements and publishes their supported accessibility semantics.
 
 The [Mac essentials guide](mac-widget-essentials.md) covers image loading, icon
 selection, retained settings, calendars and the optional native alert service.
-The alert uses AppKit on macOS; other composite entries expand into ordinary managed nodes; they are not additional
+The alert and native Colors/Fonts services use AppKit on macOS; other composite entries expand into ordinary managed nodes; they are not additional
 node kinds or AppKit controls. The [Mac integration guide](mac-widget-integration.md)
 shows owner-held state, event acceptance and lifecycle rules for the five newer
 widgets. The [focused demo](mac-widget-demo.md) includes their current limits.
@@ -519,3 +524,6 @@ and light/dark presets. See [Mac theming](mac-theming.md) for inheritance, expli
 style precedence, map snapshots and native appearance limits.
 
 See [Mac composition widgets](mac-composition-widgets.md) and [scoped application themes](mac-theming.md) for public usage and current limits.
+
+See [Mac document controls](mac-document-controls.md) for the new list, outline,
+native panel services and circular dial, including bounds and ownership limits.

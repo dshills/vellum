@@ -215,11 +215,14 @@ func ValidateOutlineViewNode(n Node) error {
 	if l == nil {
 		return nil
 	}
-	if n.Kind != ListBox || !n.Multiple || n.Collection != nil || n.DocumentList != nil || len(l.Rows) != len(n.Options) {
+	if l.source == nil || n.Kind != ListBox || !n.Multiple || n.Collection != nil || n.DocumentList != nil || len(l.Rows) != len(n.Options) {
 		return fmt.Errorf("ui: invalid outline presentation")
 	}
 	for i, row := range l.Rows {
-		if row.ID != n.Options[i].ID || row.Disabled != n.Options[i].Disabled || row.Depth < 0 || row.Depth > 16 {
+		if err := validateIcon(Node{Kind: Button, Text: row.Label, Icon: row.Icon, IconImage: row.Image}); err != nil {
+			return err
+		}
+		if row.Label != n.Options[i].Label || row.Badge != n.Options[i].Badge || row.ID != n.Options[i].ID || row.Disabled != n.Options[i].Disabled || row.Depth < 0 || row.Depth > 16 {
 			return fmt.Errorf("ui: outline rows/options disagree")
 		}
 	}

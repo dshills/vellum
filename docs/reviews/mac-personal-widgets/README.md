@@ -1458,3 +1458,11 @@ Prism: `angle-dial.json` (Anthropic Claude Sonnet 5.5, complete coverage).
 Prism concerns were checked against the existing driver contract. applyAccessibilityAction executes on the application owner through scoped bridge delivery, rejects disabled/retired controls at entry, and calls the current descriptor; generated Set/Adjust closures also recheck component identity/disabled state. Added owner-path increment/decrement and disabled-AX regressions. Native capture callbacks use the established originating render/event ownership, read detached descriptors only and post model mutations through postControl, matching list/split/capture infrastructure. Race-enabled pointer/keyboard checks pass at DPI160/320, including loss/disable and release consumption. Offscreen raster QA centered the numeric field beside each dial through a retained entry-row wrapper. Live qualification follows final packaging.
 
 Focused checks: `angle-dial-checks.json`, `angle-dial-reviewed-checks.json`.
+
+## Integrate and harden the five Mac document controls
+
+Prism: `mac-documents-integration.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism: replaced nested append aliasing with an explicit sort-chevron child slice. The release-coordinate proposal shares the exact same admission helper and pre-dispatch capture/source/disabled guards as movement; capture loss unregisters the callback. A new real pointer regression proves a canceled header capture neither changes width nor sorts the adjacent header. Detached metadata validates source identity, columns and text/image bounds; SDK and all five light/dark gallery pages pass. Portable race/vet and focused native checks pass. The broader native suite exposed preexisting Secure-schema fixture drift and a stale menu-popup fixture, which are being repaired separately without weakening pending/publication guards. No rendering or release policy changed.
+
+Focused checks: `mac-documents-portable-checks.json`, `mac-documents-final-guards-checks.json`.

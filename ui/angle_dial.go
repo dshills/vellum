@@ -85,7 +85,7 @@ func (d *AngleDial) View() (Node, error) {
 		if !live() {
 			return
 		}
-		if normalized, ok := NormalizeAngle(value, d.Step); ok {
+		if normalized, ok := NormalizeAngle(value, d.Step); ok && normalized != d.Degrees {
 			d.Change(AngleEvent{ID: id, Degrees: normalized})
 		}
 	}

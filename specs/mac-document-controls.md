@@ -19,3 +19,9 @@ Begin offscreen, using public API tests, real managed event routing, light/dark
 rasters and native Foundation recipe checks. After packaging/relaunch, the user's
 sign-out authorizes bounded desktop tests; keep native observations distinct from
 automated evidence. Never interact with protected macOS system dialogs.
+
+Final integration also checks source-sealed detached list/outline metadata, width
+and cell bounds, original-color row image painting, bundle/SDK construction and
+the final release coordinate when intermediate pointer moves are coalesced.
+Native panel tests must include Apply, Cancel/Escape, repeat opening, exact-parent
+closure and light/dark startup appearance, without using system permission prompts.
