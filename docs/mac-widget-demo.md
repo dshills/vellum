@@ -23,14 +23,37 @@ its startup appearance. Scroll inside a page to reach its controls. The ordinary
 
 
 - **Components:** choose Themes, Cascading menus, Split buttons, Inspector panel,
-  Column browser, or Filter / rule editor. Menus open Export submenus with
+  Column browser, Filter / rule editor, Image well, Searchable icon picker,
+  Settings pane, Native alert, or Calendar picker. Menus open Export submenus with
   pointer/Right; Left closes a submenu and Escape cancels. Split buttons separate
   Save from its options. Collapse inspector headings without losing editor
   values. The column browser reveals child columns and accepts divider resizing;
   scroll horizontally at narrow widths. Rule rows provide typed text/number/bool
   values, Add Rule / Add Group, removal and All/Any groups. These are sample
-  model changes; no documents, searches or filesystem operations are performed.
+  model changes; those first six examples do not access the filesystem.
   [Public APIs and limits](mac-composition-widgets.md), [themes](mac-theming.md).
+- **Image well** (Components): use the full-color sample, choose a PNG/JPEG, or
+  drop one image file onto the well. Replace/Clear and loading/result status are
+  application-owned. The chooser and decoder run off the UI owner; files are read
+  without modification. External Finder drag cursor feedback is not customized.
+- **Searchable icon picker** (Components): open the artwork button, search or
+  filter Documents/Actions, highlight with arrows and accept with Return/Choose.
+  Cancel/Escape keeps the accepted selection. Recent contains up to eight accepted
+  choices for this launch. Original full-color artwork remains untinted.
+- **Settings pane** (Components): choose General or Appearance in the sidebar.
+  Edit the default name/reopen/grid preferences, then navigate away and back;
+  editors and accepted values remain. Advanced is deliberately disabled. These
+  sample preferences are not saved across launches.
+- **Native alert** (Components): Show native alert opens an actual AppKit sheet
+  attached to this window with original-color artwork, three stable-ID responses
+  and an optional suppression checkbox. Only counters change. The card is a
+  content preview, not a rendering of NSAlert. Native sheet interaction is pending
+  desktop verification; offscreen tests cover the request/lifetime/reply contract.
+- **Calendar picker** (Components): browse months, use Today, or use arrows and
+  Return on enabled dates. Weekends are unavailable in this sample. The compact
+  field shares this grid and date validation; invalid typed dates leave its value
+  unchanged. Labels are English and the example uses Monday as its first weekday.
+  [Public APIs and limits](mac-widget-essentials.md).
 - **Toolbars:** compare Small (26 pt), Regular (32 pt), and Large (40 pt) action
   heights. Full-color icons start enabled; turn them off to compare monochrome
   symbols. Switch Icons / Text / Icons and text / Icon above text without recreating
@@ -129,9 +152,9 @@ OS accent, high-contrast and automatic appearance tracking are not implemented.
 Context menus are flat and supported on Button, Canvas2D and ListBox. Popovers
 require same-window Button anchors and clamp at edges; they do not detach,
 automatically switch their direction marker or cross windows. Lists are bounded
-to 256 rows. Calendar is English/Sunday-first, with caller-selected date layout
-(default ISO/24-hour); automatic OS locale and calendar arrow-grid navigation
-are not available. The combo field opens suggestions through its separate
+to 256 rows. Calendar labels are English; weekday order and the date layout are
+caller-selected (default Sunday-first and ISO/24-hour). Arrow-grid navigation is
+supported; automatic OS locale tracking is not implemented. The combo field opens suggestions through its separate
 keyboard-focusable button; Down inside the text entry does not open it.
 
 The private package is ad-hoc signed and unnotarized. It uses this development
@@ -161,7 +184,7 @@ See the [control reference](controls.md) for public APIs and
 
 The current personal package also enables the
 [native titlebar toolbar prototype](native-titlebar-toolbar-prototype.md) and
-starts on Toolbars. Its full-color titlebar commands update the sample action
+starts on Components / Themes. Its full-color titlebar commands update the sample action
 status. Content-toolbar controls and saved customization remain independent.
 Use `-native-titlebar=false` to launch the content-only gallery from source.
 

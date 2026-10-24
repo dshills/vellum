@@ -1410,3 +1410,11 @@ Prism: `essentials-calendar.json` (Anthropic Claude Sonnet 5.5, complete coverag
 Both reported concerns were checked against the source. Enabled civil-day IDs match the rendered IDs; skipped civil dates deliberately keep unique disabled IDs and carry no focus metadata. DateTimePicker wraps the detached month view with liveCalendar/available checks against its current source ID, location, mode, month and popup epoch; obsolete source locations are covered by an added regression. Focused checks cover leap dates, bounds, predicates, skipped civil days, stale sessions, native arrow/Return routing and retained legacy focus IDs. No physical pointer or desktop calendar checks were run.
 
 Focused checks: `essentials-calendar-checks.json`, `essentials-calendar-final-checks.json`, `essentials-calendar-location-checks.json`.
+
+## Polish calendar layout and scoped popup themes across Mac essentials
+
+Prism: `essentials-integration-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Offscreen raster inspection found and corrected sparse calendar row misalignment, a clipped month arrow and the light popup surface under scoped dark appearance. Column geometry, both month controls and all five light/dark pages now pass. Prior Prism fallback concern was fixed: unscoped selected dates use the native scheme; scoped dates use the semantic accent/contrast colors. The final review concern was fixed by comparing only the selected boolean when deciding whether a retained cell needs restyling, avoiding deep comparison of 42-string navigation snapshots. Focused selection/routing checks pass after that change. Independent SDK construction, root race checks and affected-module vet pass. All desktop interactions remain deferred; the alert raster is expressly content-only.
+
+Focused checks: `essentials-integration-checks.json`, `essentials-calendar-layout-checks.json`, `essentials-polish-checks.json`, `essentials-palette-fallback-checks.json`, `essentials-selection-sync-checks.json`, `essentials-final-vet-checks.json`.

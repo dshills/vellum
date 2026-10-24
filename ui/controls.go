@@ -152,7 +152,7 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 
 func ValidateControl(n Node) error {
 	if c := n.CalendarCell; c != nil {
-		if n.Kind != Button || c.Index < 0 || c.Index >= 42 || c.IDs[c.Index] != n.ID || n.Disabled {
+		if n.Kind != Button || c.Index < 0 || c.Index >= 42 || (!n.Disabled && c.IDs[c.Index] != n.ID) || (n.Disabled && c.IDs[c.Index] != "") {
 			return fmt.Errorf("ui: invalid calendar cell navigation metadata")
 		}
 	}

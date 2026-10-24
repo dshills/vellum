@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"cogentcore.org/core/colors"
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/units"
@@ -230,5 +231,33 @@ func TestManagedEditorTypographyPreservesNativeFamily(t *testing.T) {
 		if font.Size.Value != wantSize || font.Weight != wantWeight || font.Slant != wantSlant {
 			t.Fatal("other typography lost", font)
 		}
+	}
+}
+
+func TestCalendarSelectionUsesScopedPalette(t *testing.T) {
+	for _, dark := range []bool{false, true} {
+		theme := ui.MacThemeWithAccent(dark, color.NRGBA{R: 126, G: 65, B: 194, A: 255})
+		n := ui.Node{Kind: ui.Button, CalendarCell: &ui.CalendarCell{Selected: true}}
+		var s styles.Style
+		s.Defaults()
+		applyStyle(&s, n, theme)
+		if s.Background.At(0, 0) != theme.Palette.Value.Accent || s.Color.At(0, 0) != theme.Palette.Value.AccentInk {
+			t.Fatal("selection lost scoped accent")
+		}
+		n.CalendarCell.Selected = false
+		s.Defaults()
+		applyStyle(&s, n, theme)
+		if s.Background.At(0, 0) == theme.Palette.Value.Accent {
+			t.Fatal("obsolete selection fill retained")
+		}
+	}
+}
+
+func TestCalendarSelectionWithoutPaletteUsesNativeScheme(t *testing.T) {
+	var s styles.Style
+	s.Defaults()
+	applyStyle(&s, ui.Node{Kind: ui.Button, CalendarCell: &ui.CalendarCell{Selected: true}}, ui.Theme{})
+	if s.Background != colors.Scheme.Primary.Base || s.Color != colors.Scheme.Primary.On {
+		t.Fatal("fallback ignored active native scheme")
 	}
 }

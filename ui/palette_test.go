@@ -36,3 +36,13 @@ func TestScopedThemeValidationAndPaletteSnapshots(t *testing.T) {
 		t.Fatal("inherited style conflict not rejected")
 	}
 }
+
+func TestMacPopupUsesLocalAppearance(t *testing.T) {
+	for _, dark := range []bool{false, true} {
+		theme := MacTheme(dark)
+		style, err := ResolveStyle(Node{Kind: Dialog}, theme)
+		if err != nil || !style.Background.Set || style.Background.Value != theme.Palette.Value.Popup || style.Foreground.Value != theme.Palette.Value.Ink {
+			t.Fatal("popup has a foreign theme", dark, err)
+		}
+	}
+}

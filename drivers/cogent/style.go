@@ -3,6 +3,7 @@ package cogent
 import (
 	"image"
 
+	"cogentcore.org/core/colors"
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/text/rich"
@@ -114,6 +115,15 @@ func applyStyle(s *styles.Style, n ui.Node, theme ui.Theme) {
 		}
 	}
 
+	if cell := n.CalendarCell; cell != nil && cell.Selected {
+		s.Background = colors.Scheme.Primary.Base
+		s.Color = colors.Scheme.Primary.On
+		if theme.Palette.Set {
+			palette := theme.Palette.Value
+			s.Background = image.NewUniform(palette.Accent)
+			s.Color = image.NewUniform(palette.AccentInk)
+		}
+	}
 }
 func nativeAlignment(a ui.Alignment) styles.Aligns {
 	switch a {

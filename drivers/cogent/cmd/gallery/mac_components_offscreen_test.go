@@ -63,7 +63,22 @@ func TestMacComponentsOffscreenSurfacesAndJoinedSegments(t *testing.T) {
 				t.Fatal(err)
 			}
 			defer a.Close()
-			if err := a.Open(app.Window{ID: "components", Title: "Offscreen components", Width: 660, Height: 740, View: model.view}); err != nil {
+			if err := a.Open(app.Window{ID: "components", Title: "Offscreen components", Width: 660, Height: 740, View: func() ui.Node {
+				n := model.view()
+				// Manual does not emulate external OS file transport. Project away only
+				// that annotation; production FileDrop routing has separate fixtures.
+				var project func(*ui.Node)
+				project = func(node *ui.Node) {
+					if node.ID == ui.ImageWellTargetID("essentials/well") {
+						node.FileDrop = nil
+					}
+					for i := range node.Children {
+						project(&node.Children[i])
+					}
+				}
+				project(&n)
+				return n
+			}}); err != nil {
 				t.Fatal(err)
 			}
 			m, err := cogent.NewManual(ctx, a, cfg)
@@ -100,9 +115,23 @@ func TestMacComponentsOffscreenSurfacesAndJoinedSegments(t *testing.T) {
 				t.Fatal("offscreen readiness bound")
 				return cogent.ManualWindowSnapshot{}
 			}
-			for _, page := range []string{"theme", "menus", "split", "inspector", "browser", "rules"} {
+			for _, page := range []string{"theme", "menus", "split", "inspector", "browser", "rules", "image-well", "icon-picker", "icon-picker-open", "settings", "alerts", "calendar"} {
 				if err := a.Do(func() {
 					model.page = page
+					if page == "icon-picker-open" {
+						model.page = "icon-picker"
+						model.essentials.iconPickerView()
+						model.essentials.picker.Open = true
+					}
+					if page == "calendar" {
+						model.essentials.calendarView()
+						date := time.Date(2026, 3, 16, 12, 0, 0, 0, time.UTC)
+						model.essentials.calendar.Value = date
+						model.essentials.calendar.Month = date
+						model.essentials.calendar.Today = date
+						model.essentials.datePicker.Value = date
+						model.essentials.datePicker.Today = date
+					}
 					if page == "browser" {
 						model.browserPreview()
 						model.browser.Path = []string{"drawings", "floor"}
@@ -112,6 +141,7 @@ func TestMacComponentsOffscreenSurfacesAndJoinedSegments(t *testing.T) {
 					t.Fatal(err)
 				}
 				w := settle()
+
 				find := func(id string) cogent.ManualElement {
 					t.Helper()
 					for _, e := range w.Elements {
@@ -122,6 +152,38 @@ func TestMacComponentsOffscreenSurfacesAndJoinedSegments(t *testing.T) {
 					t.Fatal("missing element", id)
 					return cogent.ManualElement{}
 				}
+				for _, element := range w.Elements {
+					if strings.HasSuffix(element.ID, "/error") || strings.HasSuffix(element.ID, "-error") {
+						t.Fatal("gallery construction error", page, element.ID)
+					}
+				}
+				if page == "image-well" && find(ui.ImageWellTargetID("essentials/well")).Bounds.Empty() {
+					t.Fatal("image well has no geometry")
+				}
+				if page == "settings" && find("essentials/settings/name").Bounds.Empty() {
+					t.Fatal("settings editor has no geometry")
+				}
+				if page == "calendar" && find(ui.CalendarDayID("essentials/calendar", time.Date(2026, 3, 16, 12, 0, 0, 0, time.UTC))).Bounds.Empty() {
+					t.Fatal("calendar date has no geometry")
+				}
+				if page == "calendar" {
+					previous := find("essentials/calendar/calendar/previous")
+					next := find("essentials/calendar/calendar/next")
+					if previous.Bounds.Empty() || next.Bounds.Empty() || next.Bounds.Min.X-previous.Bounds.Min.X > 270 {
+						t.Fatal("calendar navigation clipped or stretched", previous.Bounds, next.Bounds)
+					}
+					for col := 0; col < 7; col++ {
+						heading := find(fmt.Sprintf("essentials/calendar/calendar/weekday/%d", col)).Bounds
+						for _, day := range []int{2 + col, 9 + col, 23 + col} {
+							cell := find(ui.CalendarDayID("essentials/calendar", time.Date(2026, 3, day, 12, 0, 0, 0, time.UTC))).Bounds
+							difference := heading.Min.X + heading.Max.X - cell.Min.X - cell.Max.X
+							if cell.Empty() || difference < -2 || difference > 2 {
+								t.Fatal("calendar column shifted", col, heading, cell)
+							}
+						}
+					}
+				}
+
 				if page == "split" {
 					for i := 0; i < 2; i++ {
 						id := fmt.Sprintf("components/split/%d", i)

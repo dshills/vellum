@@ -37,6 +37,7 @@ func MacThemeWithAccent(dark bool, accent color.NRGBA) Theme {
 	buttonStyle := control
 	buttonStyle.Background = Some(button)
 	return Theme{Palette: Some(palette), Default: Style{Foreground: Some(ink), Typography: Some(Typography{Family: "Helvetica Neue", Size: 13})}, Kinds: map[Kind]Style{
+		Dialog:    {Background: Some(palette.Popup), Foreground: Some(palette.Ink), CornerRadius: Some(float32(8))},
 		Column:    {Gap: Some(float32(8)), Padding: Some(Insets{})},
 		Row:       {Gap: Some(float32(6)), Padding: Some(Insets{}), Align: Some(AlignCenter)},
 		FormGroup: {Gap: Some(float32(8)), Padding: Some(UniformInsets(12)), Background: Some(button), Border: Some(Border{Width: 1, Color: line}), CornerRadius: Some(float32(8))},

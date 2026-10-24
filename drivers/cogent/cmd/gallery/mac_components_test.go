@@ -4,6 +4,7 @@ import (
 	"github.com/dshills/vellum/ui"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -29,12 +30,22 @@ func TestMacComponentThemePreviewRetainsArtworkAndValue(t *testing.T) {
 func TestMacComponentPagesAreConsumable(t *testing.T) {
 	for _, dark := range []bool{false, true} {
 		m := newMacComponentsGallery(dark)
-		for _, page := range []string{"theme", "menus", "split", "inspector", "browser", "rules"} {
+		for _, page := range []string{"theme", "menus", "split", "inspector", "browser", "rules", "image-well", "icon-picker", "settings", "alerts", "calendar"} {
 			m.page = page
 			n := m.view()
 			if err := ui.Validate(n); err != nil {
 				t.Fatal(page, err)
 			}
+			var checkErrors func(ui.Node)
+			checkErrors = func(node ui.Node) {
+				if strings.HasSuffix(node.ID, "/error") || strings.HasSuffix(node.ID, "-error") {
+					t.Fatal(page, node.ID, node.Text)
+				}
+				for _, child := range node.Children {
+					checkErrors(child)
+				}
+			}
+			checkErrors(n)
 			if page == "browser" && findGalleryDocumentNode(n, "components/browser").ID == "" {
 				t.Fatal("browser failed to construct")
 			}

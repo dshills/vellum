@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"github.com/dshills/vellum/canvas"
+	"image/color"
 	"strconv"
 	"time"
 )
@@ -19,8 +20,9 @@ type CalendarMonthEvent struct {
 // CalendarCell is detached immutable focus metadata produced by Calendar.View.
 // Empty entries represent disabled/out-of-month cells; never mutate after View.
 type CalendarCell struct {
-	IDs   [42]string
-	Index int
+	IDs      [42]string
+	Index    int
+	Selected bool // accepted civil date; the adapter uses the scoped palette
 }
 
 func (c CalendarCell) Neighbor(delta int) string {
@@ -99,8 +101,9 @@ func (c *Calendar) view(prefix string, legacy bool) (Node, error) {
 			c.Change(CalendarEvent{ID: id, Value: v})
 		}
 	}
-	dayStyle := Style{MinSize: Some(Size{Width: 28, Height: 26}), MaxSize: Some(Size{Width: 32}), GrowX: Some(float32(0)), Padding: Some(UniformInsets(3)), TextAlign: Some(AlignCenter)}
-	nav := Node{ID: prefix + "/month-nav", Kind: Row, Children: []Node{{ID: prefix + "/previous", Kind: Button, Icon: SymbolLeft, Appearance: ButtonTool, Accessibility: Accessibility{Name: "Previous month"}, Disabled: c.Navigate == nil || month.Year() == 1 && month.Month() == time.January, Activate: func() {
+	dayStyle := Style{MinSize: Some(Size{Width: 24, Height: 24}), MaxSize: Some(Size{Width: 24, Height: 24}), GrowX: Some(float32(0)), GrowY: Some(float32(0)), Padding: Some(UniformInsets(2)), Border: Some(Border{Width: 2}), Background: Some(color.NRGBA{}), CornerRadius: Some(float32(16)), TextAlign: Some(AlignCenter)}
+
+	nav := Node{ID: prefix + "/month-nav", Kind: Row, Style: Style{MinSize: Some(Size{Width: 236}), MaxSize: Some(Size{Width: 236}), GrowX: Some(float32(1))}, Children: []Node{{ID: prefix + "/previous", Kind: Button, Icon: SymbolLeft, Appearance: ButtonTool, Accessibility: Accessibility{Name: "Previous month"}, Disabled: c.Navigate == nil || month.Year() == 1 && month.Month() == time.January, Activate: func() {
 		if live() && c.Navigate != nil && (month.Year() > 1 || month.Month() > time.January) {
 			c.Navigate(CalendarMonthEvent{ID: id, Month: month.AddDate(0, -1, 0)})
 		}
@@ -147,14 +150,12 @@ func (c *Calendar) view(prefix string, legacy bool) (Node, error) {
 			if !legacy {
 				cellID = fmt.Sprintf("%s/calendar/day/%04d-%02d-%02d", id, month.Year(), month.Month(), day)
 			}
-			appearance := ButtonAppearance("")
+			selected := false
 			if c.Value.Year() == month.Year() && c.Value.Month() == month.Month() && c.Value.Day() == day {
-				appearance = ButtonPrimary
+				selected = true
 			}
-			cell := Node{ID: cellID, Kind: Button, Text: strconv.Itoa(day), Disabled: ids[i] == "", Appearance: appearance, Style: dayStyle, Accessibility: Accessibility{Name: month.Format("January") + " " + strconv.Itoa(day) + ", " + strconv.Itoa(month.Year()), Help: "Arrow keys move; Return selects"}, Activate: func() { change(month.Year(), month.Month(), day) }}
-			if ids[i] != "" {
-				cell.CalendarCell = &CalendarCell{IDs: ids, Index: i}
-			}
+			cell := Node{ID: cellID, Kind: Button, Text: strconv.Itoa(day), Disabled: ids[i] == "", Appearance: ButtonTool, Style: dayStyle, Accessibility: Accessibility{Name: month.Format("January") + " " + strconv.Itoa(day) + ", " + strconv.Itoa(month.Year()), Help: "Arrow keys move; Return selects"}, Activate: func() { change(month.Year(), month.Month(), day) }}
+			cell.CalendarCell = &CalendarCell{IDs: ids, Index: i, Selected: selected}
 			cells = append(cells, cell)
 		}
 		content = append(content, Node{ID: prefix + "/week/" + strconv.Itoa(week), Kind: Row, Style: Style{Gap: Some(float32(2))}, Children: cells})
@@ -164,7 +165,7 @@ func (c *Calendar) view(prefix string, legacy bool) (Node, error) {
 		_, allowed := candidate(today.Year(), today.Month(), today.Day())
 		content = append(content, Node{ID: prefix + "/today", Kind: Button, Text: "Today", Disabled: !allowed, Activate: func() { change(today.Year(), today.Month(), today.Day()) }})
 	}
-	n := Node{ID: id, Kind: Column, Disabled: c.Disabled || c.Change == nil, Style: Style{GrowX: Some(float32(0)), Gap: Some(float32(2))}.Overlay(c.Style), Children: content}
+	n := Node{ID: id, Kind: Column, Disabled: c.Disabled || c.Change == nil, Style: Style{MinSize: Some(Size{Width: 236}), MaxSize: Some(Size{Width: 236}), GrowX: Some(float32(0)), Gap: Some(float32(2))}.Overlay(c.Style), Children: content}
 	if err := Validate(n); err != nil {
 		return Node{}, err
 	}

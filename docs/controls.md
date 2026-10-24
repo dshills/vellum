@@ -10,6 +10,11 @@ renders these elements and publishes their supported accessibility semantics.
 | Label | `ui.Label` | `Text` |
 | Action button | `ui.Button` | `Text`, `Activate` |
 | Bundled icon | `ui.Icon` | `Icon`, optional alternate `Text`/accessible name |
+| Image well | `ui.ImageWell.View()` | Immutable image, choose/replace/clear/drop requests, Busy/Status |
+| Searchable icon picker | `ui.IconPicker.View()` | Local categories/search, original-color items, accepted-choice recents |
+| Settings pane | `ui.SettingsPane.View()` | Full-color categories, retained headerless page stack, Navigate |
+| Calendar | `ui.Calendar.View()` | Controlled month, bounds, disabled dates, Today and arrow navigation |
+| Native alert service | `app.Application.Alerts()` | Exact-window AppKit sheet, stable button IDs, color PNG and suppression |
 | Image preview | `ui.Image` | Immutable `Image`, `Fit`, alternate `Text`/accessible name |
 | Checkbox | `ui.Checkbox` | `Checked`, `Change` |
 | On/off switch | `ui.Switch` | `Checked`, `Change` |
@@ -38,7 +43,7 @@ renders these elements and publishes their supported accessibility semantics.
 | Protected field | `ui.SecureField.View()` | `Text`, `AllowReveal`, `Change` |
 | Search input | `ui.SearchBox.View()` | `Text`, `Placeholder`, `Change(SearchEvent)` |
 | Editable choices | `ui.ComboBox.View()` | `Text`, `Options`, `Change(ComboEvent)` |
-| Date/time picker | `ui.DateTimePicker.View()` | `Value`, `Mode`, `Layout`, `Min`, `Max`, `Change(DateTimeEvent)`, `Invalid` |
+| Date/time picker | `ui.DateTimePicker.View()` | `Value`, `Mode`, `Layout`, `Min`, `Max`, `Today`, `FirstWeekday`, `AllowDate`, `CalendarIconImage`, `Change(DateTimeEvent)`, `Invalid` |
 | Numeric field | `ui.NumberField` | `Numeric`, `Number`, `Change` |
 | Single-line field | `ui.TextField` | `Text`, `Change` |
 | Document editor | `ui.MultilineText` | `Editor`, `SoftWrap`, `TabInserts` |
@@ -64,7 +69,9 @@ renders these elements and publishes their supported accessibility semantics.
 | Horizontal/vertical layout | `ui.Row`, `ui.Column` | Children, `Style` |
 | Custom driver extension | `ui.Extension` | `Custom` |
 
-Composite entries expand into ordinary managed nodes; they are not additional
+The [Mac essentials guide](mac-widget-essentials.md) covers image loading, icon
+selection, retained settings, calendars and the optional native alert service.
+The alert uses AppKit on macOS; other composite entries expand into ordinary managed nodes; they are not additional
 node kinds or AppKit controls. The [Mac integration guide](mac-widget-integration.md)
 shows owner-held state, event acceptance and lifecycle rules for the five newer
 widgets. The [focused demo](mac-widget-demo.md) includes their current limits.

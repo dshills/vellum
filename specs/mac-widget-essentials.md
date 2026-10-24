@@ -19,3 +19,12 @@ Use portable and focused actual managed-routing tests; record offscreen rasters
 separately from desktop evidence. Prism uses Anthropic Claude Sonnet 5.5 for each
 checkpoint. Existing framework-scope freeze in CONTRIBUTING predates and is
 superseded by the user's explicit widget/theming expansion request.
+
+Offscreen integration acceptance: render all five examples in light/dark themes,
+including the open icon-picker popup. Calendar weekday/day columns must align
+across sparse, enabled and disabled rows; both month arrows must have hit geometry
+inside a compact header. Selected dates use the scoped accent/contrast colors.
+Managed popovers use the local Mac popup surface rather than a startup theme.
+An independent SDK consumer must construct the components without native imports.
+Package both personal gallery variants from a clean committed source; native
+alert, file chooser/external drag and physical-pointer checks remain deferred.

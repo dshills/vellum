@@ -704,7 +704,9 @@ func syncRecordVisible(r *record, n ui.Node, visible bool, scopes []*tabCloseSco
 	r.node = n
 	syncInputOutline(r)
 	disabledChanged := r.widget.AsWidget().IsDisabled() != controlDisabled(r)
-	if previous.TabsHideHeader != n.TabsHideHeader || previous.SplitButtonLayout != n.SplitButtonLayout || previous.Style != n.Style || previous.Grow != n.Grow || previous.MinWidth != n.MinWidth || previous.MinHeight != n.MinHeight {
+	wasSelected := previous.CalendarCell != nil && previous.CalendarCell.Selected
+	isSelected := n.CalendarCell != nil && n.CalendarCell.Selected
+	if wasSelected != isSelected || previous.TabsHideHeader != n.TabsHideHeader || previous.SplitButtonLayout != n.SplitButtonLayout || previous.Style != n.Style || previous.Grow != n.Grow || previous.MinWidth != n.MinWidth || previous.MinHeight != n.MinHeight {
 		if r.control != nil && r.control.grid != nil {
 			r.control.grid.layoutPending.Store(true)
 			r.control.grid.layout.valid = false

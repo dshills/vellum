@@ -1,0 +1,41 @@
+[
+  {
+    "cwd": "examples/sdk-contract",
+    "argv": [
+      "go",
+      "test",
+      "./...",
+      "-count=1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.8509970000013709
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 2.766431957948953
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestMacComponent|TestMacImageWell|TestMacSettings|TestImageWellLoader",
+      "-count=1",
+      "-timeout",
+      "120s"
+    ],
+    "exit_code": 0,
+    "seconds": 9.061378167010844
+  }
+]

@@ -1,0 +1,118 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "da431df87eefe0e657d1b609b0ed185b",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "9b980d8833b359353554063bc368b87e0d1c69db",
+    "branch": "codex/mac-widget-essentials"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "bf99c8cd5b7840de",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Fallback palette hardcodes light mode",
+      "message": "When theme.Palette is unset, the selected calendar cell is styled from a light-mode palette with a fixed accent, regardless of the app's actual dark/light appearance. In dark mode, or with a custom accent, the selection colors would be wrong.",
+      "suggestion": "Resolve the palette from the active theme and skip the override when none is set, or derive dark mode from the theme instead of hardcoding false.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/style.go",
+          "lines": {
+            "start": 118,
+            "end": 118
+          }
+        }
+      ],
+      "tags": [
+        "theming",
+        "location-corrected"
+      ],
+      "evidence": "palette := ui.MacPalette(false, uiColorAccent)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6285,
+    "totalMs": 6318
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 13,
+    "bytes": 46808,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 24261,
+        "output": 674,
+        "costUSD": 0.055262
+      }
+    ],
+    "widenedFiles": 8,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "f6f52b2d401ac890",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Disabled calendar cells now carry navigation metadata",
+        "message": "The day style sets Border width 2 with a zero (transparent) color and CornerRadius 16 on a 24x24 cell, and the disabled cells now carry CalendarCell metadata. The ValidateControl relaxation allows disabled cells whose IDs entry is empty, but a disabled cell whose ids[i]=='' still passes only because of the new rule. Disabled cells previously carried no metadata and the validation previously rejected disabled nodes; the semantic loosening could let stale metadata through for a disabled node with an empty ID slot.",
+        "suggestion": "Add tests that cover disabled cells with navigation metadata, and verify that keyboard navigation (Neighbor) skips empty entries.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "ui/calendar.go",
+            "lines": {
+              "start": 165,
+              "end": 170
+            }
+          }
+        ],
+        "tags": [
+          "calendar"
+        ],
+        "evidence": "cell := Node{ID: cellID, Kind: Button, Text: strconv.Itoa(day), Disabled: ids[i] == \"\", Appearance: ButtonTool, Style: dayStyle,",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in ui/calendar.go"
+    }
+  ],
+  "suppressed": []
+}
