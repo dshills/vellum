@@ -1,0 +1,146 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a4c1d7aebbe3724de5c7d39e9a9c8f57",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "b628de61eb233c07f72f35b7661b9c1b0fdf0476",
+    "branch": "codex/mac-components-theming"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "b1231c7acbf56e99",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Reserved ID namespace not enforced",
+      "message": "The Inspector validates its own sections and properties, but it does not check that an editor's ID avoids the reserved namespace it documents (ID+\"/inspector/\"), nor that editor IDs are unique across the tree. Duplicate or colliding IDs are only caught, if at all, by Validate with a generic error.",
+      "suggestion": "Reject editor IDs with the prefix `prefix` and an empty editor ID explicitly, with a clear error.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/inspector.go",
+          "lines": {
+            "start": 46,
+            "end": 46
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "location-corrected"
+      ],
+      "evidence": "if !finite(width) || width \u003c 48 || width \u003e 320 {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7867,
+    "totalMs": 7877
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 13859,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 8979,
+        "output": 931,
+        "costUSD": 0.027268
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "4b465303a0eb0f06",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Icon image captured once",
+        "message": "The inspector is created lazily and its IconImage is read from m.artwork[ui.SymbolFolder] at that moment. If artwork is nil or not yet loaded, the icon is permanently nil because it is never refreshed. Also, m.name may be empty on first use.",
+        "suggestion": "Assign m.inspector.IconImage = m.artwork[ui.SymbolFolder] on every call, alongside the other per-frame refreshes.",
+        "confidence": 0.55,
+        "locations": [
+          {
+            "path": "drivers/cogent/cmd/gallery/mac_components.go",
+            "lines": {
+              "start": 114,
+              "end": 135
+            }
+          }
+        ],
+        "tags": [
+          "gallery"
+        ],
+        "evidence": "Disclosure: func(e ui.InspectorDisclosureEvent) {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/cmd/gallery/mac_components.go"
+    },
+    {
+      "finding": {
+        "id": "04d7f637763bf730",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Stale retained inspector state",
+        "message": "The gallery constructs the inspector once and then only refreshes Name and Width. The Visible checkbox state is stored in the retained inspector, so it survives, but the editor's callbacks capture m.inspector and index by position. The page also never resets m.inspector when the theme or artwork changes, so IconImage is captured once and can go stale.",
+        "suggestion": "Rebuild the inspector each time and keep checkbox and expansion state in gallery fields, or refresh IconImage on every call.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "drivers/cogent/cmd/gallery/mac_components.go",
+            "lines": {
+              "start": 123,
+              "end": 132
+            }
+          }
+        ],
+        "tags": [
+          "state",
+          "retention"
+        ],
+        "evidence": "Editor: ui.Node{ID: \"components/inspector-visible\", Kind: ui.Checkbox, Text: \"Visible\", Checked: true, Change: func(e ui.ChangeEvent) { m.inspector.Sections[1].Properties[0].Editor.Checked = e.Checked }}",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/cmd/gallery/mac_components.go"
+    }
+  ],
+  "suppressed": []
+}

@@ -1322,3 +1322,11 @@ Prism: `mac-split-button.json` (Anthropic Claude Sonnet 5.5, complete coverage).
 Prism requested safe error presentation in the example View; changed it to a visible error label and reran the gallery regression. Public API validation returns errors. Portable tests cover independent primary/menu paths and stale option/identity rejection; a real offscreen keyboard sequence tabs between segments and activates each exactly once.
 
 Focused checks: `mac-split-button-checks.json`, `mac-split-gallery-final-checks.json`.
+
+## Add retained Mac property inspector with mixed-value hints
+
+Prism: `mac-inspector.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Fixed Prism finding by explicitly rejecting editor descendants inside the reserved inspector namespace (also rejects empty IDs); full-tree validation already rejects duplicates. Added a regression. Editors receive property accessibility labels and mixed-value help. Focused native collapse/reopen verifies the same editor instance survives.
+
+Focused checks: `mac-inspector-checks.json`, `mac-inspector-final-checks.json`.

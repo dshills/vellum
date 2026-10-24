@@ -27,3 +27,13 @@ artwork. The disclosure anchors to the combined control and accepts cascading
 options. Tab reaches each segment; Return activates the focused segment and
 Down opens its menu. Disabled or removed options revoke old action closures.
 The Components → Split buttons page demonstrates regular and compact variants.
+
+## Inspector panel
+
+Retain `ui.Inspector`, pass `InspectorSection` and `InspectorProperty` values and
+call `View()`. Editors keep their own IDs, values and callbacks. Accept disclosure
+proposals by updating `Expanded`; sections retain child controls when collapsed.
+`Mixed` adds a hint beside the editor without replacing its accepted value.
+Set `LabelWidth` (48–320dp) to align rows. Header artwork uses immutable pixels.
+At most 32 sections/128 properties are accepted. No document-model logic is built
+in. The Components → Inspector panel page shows geometry and appearance sections.
