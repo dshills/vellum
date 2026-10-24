@@ -59,6 +59,26 @@ func (f *overflowToolbarFrame) SizeFromChildren(iter int, pass core.LayoutPasses
 	}
 	return size
 }
+
+// SizeUp intentionally advertises a small minimum so the toolbar can shrink.
+// Flex growth must instead subtract the intrinsic width of the visible items;
+// using that advertised minimum would allocate nearly the entire bar to a spacer.
+func (f *overflowToolbarFrame) SizeDownSetAllocs(iter int) {
+	if f.owner.node.ToolbarOverflow && len(f.widths) == len(f.owner.children) {
+		natural := float32(0)
+		count := 0
+		for i, child := range f.owner.children {
+			if child.widget.AsWidget().StateIs(states.Invisible) {
+				continue
+			}
+			natural += f.widths[i]
+			count++
+		}
+		natural += f.Styles.Gap.X.Dots * float32(max(0, count-1))
+		f.Geom.Size.Internal.X = natural
+	}
+	f.Frame.SizeDownSetAllocs(iter)
+}
 func (f *overflowToolbarFrame) SizeDown(iter int) bool {
 	if !f.owner.node.ToolbarOverflow {
 		return f.Frame.SizeDown(iter)

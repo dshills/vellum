@@ -131,6 +131,15 @@ func TestToolbarCustomizationDragRouting(t *testing.T) {
 				if _, e := m.Frame(testContext, "one"); e != nil {
 					t.Fatal(e)
 				}
+				unitSettle(t, m)
+				previewFrame, e := m.Capture(testContext, "one")
+				if e != nil {
+					t.Fatal(e)
+				}
+				marker := previewFrame.RGBAAt(animated.previewClip.Min.X+animated.previewClip.Dx()/2, int(animated.lineY))
+				if marker.B < 180 || marker.R > 100 {
+					t.Fatal("insertion marker not visible above modal", marker, animated.lineY, animated.previewClip)
+				}
 				if animated.alpha <= .4 || animated.alpha >= 1 {
 					t.Fatal("insertion fade did not interpolate", animated.alpha)
 				}

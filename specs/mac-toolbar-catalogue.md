@@ -146,3 +146,10 @@ source/target row control is consumed. The shared list capability is removed on
 all terminal paths; normal help then resumes. This prevents tooltip-stage
 retirement during a held drag. Native target-grip/checkbox/arrow regression
 coverage is separate from the packaged held-pointer observation.
+
+Visual qualification uses actual composed pixels and trailing-action rectangles,
+not descriptor presence alone. Fixed/flexible native widgets use nonpainting
+Space/Stretch leaves. Overflow growth subtracts the intrinsic widths of visible
+items rather than the adapter's deliberately small shrinkable minimum, so flex
+space cannot displace trailing actions or More. A dialog is itself a main stage:
+the insertion sprite belongs to that current stage, above the sheet surface.

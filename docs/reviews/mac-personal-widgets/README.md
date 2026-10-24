@@ -1175,3 +1175,21 @@ Right input produced by pinned desktop MouseButtonEvent's Control+Left mapping.
 Raw offscreen Source input does not perform that desktop conversion. Child menu
 priority, stale retirement, held capture cleanup, repeated focus tests and vet
 pass; native build succeeded. No remaining actionable Prism finding.
+
+## Visual corrections: trailing actions and modal marker pixels
+
+Visual inspection caught Mixed's trailing actions displaced by flex space. The
+shrinkable overflow frame advertised a small bottom-up minimum and incorrectly
+used it as content width during growth. SizeDownSetAllocs now supplies the sum of
+visible intrinsic widths plus gaps before native growth. Spacing uses the
+backend's nonpainting Space/Stretch leaves. Tests assert trailing geometry and
+sample the original full-color icon pixels, and the public gallery checks every
+Mixed action with overflow both off and on.
+
+A composed-pixel check also ensures the insertion marker is on the dialog's own
+main stage rather than the window stage below it. Prism Anthropic claude-sonnet-5-5
+reviewed all nine changed files; applied explicit Window/Dialog versus named popup
+stage selection instead of an enum-order comparison. Both-scale/light/dark marker
+pixels, capture/animation cleanup, responsive overflow, space/context regressions,
+gallery geometry, vet and native build passed. No backend rendering or release
+gate changes. No remaining actionable review finding.

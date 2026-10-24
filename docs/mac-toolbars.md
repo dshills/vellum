@@ -261,3 +261,8 @@ controls. Animation uses the existing native scene clock, with no drag timers.
 Help popups on source and target rows are suppressed during capture, so holding
 an insertion position cannot open a tooltip and cancel the drag. Ordinary help
 returns once the gesture ends.
+
+Space/Stretch render no surface. Flexible layout reserves every visible action's
+intrinsic width before sharing the remainder; trailing actions stay visible when
+they fit. The insertion preview is composed on the current dialog stage, above
+the sheet, with regression coverage for its actual blue pixels.

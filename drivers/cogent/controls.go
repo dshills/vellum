@@ -209,8 +209,15 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	case ui.ProgressGauge:
 		widget = core.NewMeter(parent).SetType(core.MeterSemicircle)
 	case ui.ToolbarSpace, ui.ToolbarFlexibleSpace:
-		frame := core.NewFrame(parent)
-		frame.Styler(func(s *styles.Style) {
+		// Native spacing leaves participate in flex allocation without painting a
+		// container surface or introducing another frame layout pass.
+		if r.node.Kind == ui.ToolbarFlexibleSpace {
+			widget = core.NewStretch(parent)
+		} else {
+			widget = core.NewSpace(parent)
+		}
+		widget.AsWidget().Styler(func(s *styles.Style) {
+			s.RenderBox = false
 			s.Padding.Zero()
 			s.Margin.Zero()
 			s.Border.Width.Zero()
@@ -224,7 +231,6 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 				s.Grow.X = 1
 			}
 		})
-		widget = frame
 	case ui.Separator:
 		widget = core.NewSeparator(parent)
 	case ui.Selector:

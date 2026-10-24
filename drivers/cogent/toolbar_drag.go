@@ -278,7 +278,7 @@ func (g *toolbarDragGesture) stopAnimation() {
 }
 func (g *toolbarDragGesture) preview(p image.Point) {
 	scene := g.scroll.Scene
-	if scene == nil || scene.Stage == nil || scene.Stage.Main == nil {
+	if scene == nil || scene.Stage == nil {
 		return
 	}
 	_, y, valid := g.destination(p)
@@ -298,7 +298,19 @@ func (g *toolbarDragGesture) preview(p image.Point) {
 		return
 	}
 	g.previewClip = clip
-	g.stage = scene.Stage.Main
+	// DialogStage is itself a main stage. Its parent Main is underneath the
+	// sheet, and only the current top main stage's sprite layer is composed.
+	switch scene.Stage.Type {
+	case core.WindowStage, core.DialogStage:
+		g.stage = scene.Stage
+	case core.MenuStage, core.TooltipStage, core.SnackbarStage, core.CompleterStage:
+		g.stage = scene.Stage.Main
+	default:
+		return
+	}
+	if g.stage == nil {
+		return
+	}
 	if !g.hasLine {
 		g.lineY = y
 		g.hasLine = true

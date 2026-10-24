@@ -118,6 +118,12 @@ func testMacToolbarsPublicManual(t *testing.T, dark bool) {
 	if vertical, viewport := find("toolbar-vertical").Bounds, find("toolbars").Bounds; vertical.Empty() || !vertical.In(viewport) {
 		t.Fatal("vertical example clipped in standard window", vertical, viewport)
 	}
+	for _, name := range []string{"New", "Open", "Save", "Undo", "Redo", "Delete"} {
+		box := find("toolbar-mixed/" + name).Bounds
+		if box.Empty() || !box.In(find("toolbar-mixed").Bounds) {
+			t.Fatal("spacers clipped a mixed toolbar action", name, box, find("toolbar-mixed").Bounds)
+		}
+	}
 	heights := []int{}
 	for _, size := range macToolbarSizes {
 		box := find("toolbar-" + size.name + "/New").Bounds
@@ -138,6 +144,14 @@ func testMacToolbarsPublicManual(t *testing.T, dark bool) {
 		}
 		current = settle()
 	}
+	setup(func() { model.overflowMenu = true })
+	for _, name := range []string{"New", "Open", "Save", "Undo", "Redo", "Delete"} {
+		action := find("toolbar-mixed/" + name)
+		if !action.Visible || action.Bounds.Empty() || !action.Bounds.In(find("toolbar-mixed").Bounds) {
+			t.Fatal("fitting overflow toolbar clipped an action beside flex space", name, action.Bounds, find("toolbar-mixed").Bounds)
+		}
+	}
+	setup(func() { model.overflowMenu = false })
 	for _, fullColor := range []bool{false, true} {
 		setup(func() { model.fullColor = fullColor })
 		if find("toolbar-Regular/Save").Incarnation != original {

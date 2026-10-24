@@ -31,6 +31,8 @@ window surface; scroll within Inputs to reach its sections. The ordinary macOS t
   Choose Customize… beside a horizontal toolbar to reorder actions by dragging the leading grips (or using arrows),
   show/hide items, or Restore Defaults. Changes are independent per toolbar and
   live; Done/Escape closes the panel and keeps them. Toolbar order and hidden actions persist across launches, separately for light and dark apps.
+  Right/Control-click a toolbar (or Shift-F10 on an action) for per-bar display
+  options and Customize Toolbar. Mixed demonstrates fixed and flexible spaces.
   Actions update a counter only; no document files are opened or changed.
 - **Sidebar:** choose an icon row to navigate. Section triangles collapse/expand
   groups; Tab visits section lists and arrows choose enabled rows. Archive is
