@@ -136,6 +136,9 @@ func prepareChoice(r *record, n ui.Node) error {
 				}
 				if label, ok := child.(*core.Text); ok {
 					label.Styler(func(s *styles.Style) {
+						if o := choiceOption(r, id); o.Badge != "" {
+							s.Grow.X = 1
+						}
 						// The row already paints the selection. Repainting its
 						// inherited translucent background darkens a label-sized box.
 						if r.node.Kind == ui.ListBox && r.node.Multiple {
@@ -145,6 +148,18 @@ func prepareChoice(r *record, n ui.Node) error {
 				}
 			}
 		}
+		button.Maker(func(p *tree.Plan) {
+			if choiceOption(r, id).Badge != "" {
+				tree.AddAt(p, "list-badge", func(w *core.Text) {
+					w.Styler(func(s *styles.Style) {
+						s.RenderBox = false
+						s.Padding.Set(units.Dp(1), units.Dp(5))
+						s.Font.Size.Dp(11)
+					})
+					w.Updater(func() { w.SetText(html.EscapeString(choiceOption(r, id).Badge)) })
+				})
+			}
+		})
 		c.buttons[id] = button
 		button.OnChange(func(e events.Event) {
 			if r.node.Kind == ui.ListBox && r.node.Multiple {
@@ -246,6 +261,10 @@ func syncChoice(r *record, previous ui.Node) error {
 		if r.node.Kind == ui.ListBox && r.node.Multiple {
 			b.IconOn = icons.None
 			b.IconOff = icons.None
+			if o.Icon != "" {
+				b.IconOn = nativeSymbol(o.Icon)
+				b.IconOff = b.IconOn
+			}
 			b.IconIndeterminate = icons.None
 		}
 		if dirty || previous.Orientation != r.node.Orientation || !reflect.DeepEqual(previous.Options, r.node.Options) {
@@ -292,6 +311,9 @@ func choiceAccessibility(r *record, parent string, b *accessibilityBridge, disab
 		guard := listBoxActionGuard(r, optionID, button)
 		if r.node.Kind == ui.ListBox {
 			n.Role = "list-option"
+			if o.Badge != "" {
+				n.Help = "Badge: " + o.Badge
+			}
 			n.RowIndex = len(nodes) + 1
 			n.activationGuard = guard
 		}
@@ -321,4 +343,13 @@ func choiceAccessibility(r *record, parent string, b *accessibilityBridge, disab
 		nodes = append(nodes, n)
 	}
 	return nodes, handlers
+}
+
+func choiceOption(r *record, id string) ui.Option {
+	for _, o := range r.node.Options {
+		if o.ID == id {
+			return o
+		}
+	}
+	return ui.Option{}
 }

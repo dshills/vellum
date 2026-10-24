@@ -60,6 +60,10 @@ func styleSourceRow(r *record, id string, s *styles.Style) {
 	s.Grow.Set(1, 0)
 	// Source-list membership is painted as a row selection, not a checked segment.
 	s.IconSize.Zero()
+	if choiceOption(r, id).Icon != "" {
+		s.IconSize.Set(units.Dp(16))
+		s.Gap.Set(units.Dp(6))
+	}
 	s.StateLayer = 0
 	s.Border.Width.Zero()
 	if s.Is(states.Focused) && sourceListHasActiveFocus(r) {

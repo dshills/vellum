@@ -38,7 +38,10 @@ const (
 // each option ID corresponds to the child page ID, in the same order.
 type Option struct {
 	ID, Label string
-	Disabled  bool
+	// Icon and Badge decorate multiple-selection ListBox source rows (including Sidebar navigation).
+	Icon     Symbol
+	Badge    string
+	Disabled bool
 	// MenuButton alone supports passive separators and controlled check actions.
 	// Separators retain a stable ID, but have no label, value or input behavior.
 	// Closable belongs only on Tabs and requires Node.TabClose.
@@ -203,6 +206,9 @@ func ValidateControl(n Node) error {
 		return fmt.Errorf("ui: TabClose belongs only on tabs")
 	}
 	for _, option := range n.Options {
+		if (option.Icon != "" || option.Badge != "") && (n.Kind != ListBox || !n.Multiple) {
+			return fmt.Errorf("ui: option icons and badges require a multiple ListBox")
+		}
 		if option.Closable && (n.Kind != Tabs || n.TabClose == nil) {
 			return fmt.Errorf("ui: closable tab requires Tabs and TabClose")
 		}

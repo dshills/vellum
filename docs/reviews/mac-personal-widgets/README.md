@@ -707,3 +707,21 @@ not a new live inactive-window capture. Other control classes, unstyled native
 borders and caret presentation are outside this bounded change. The user returned
 and requested completion of the current task followed by stopping; no further
 widget or qualification campaign is included.
+
+## Next widgets, phase 1: Sidebar
+
+Added owner-held Sidebar, bounded controlled sections/navigation, source-list
+icons/badges, and separate Sidebar/Inputs pages in the private Mac gallery.
+Mounted light/dark checks found a zero-height list under a disclosure; bounded
+minimum height fixes it. Final race tests prove trailing badge layout, keyboard
+navigation, in-place icon/badge removal and collapsed input cancellation. UI
+package race tests, existing list/activation regressions and gallery tests pass.
+
+Prism Anthropic claude-sonnet-5-5 reviewed the phase twice. Gallery validation now
+renders an error node and adornment documentation matches Multiple ListBox-only
+validation. Its speculative concern about Option comparability is inapplicable:
+Option has only comparable value fields, the code compiles, and full snapshot
+comparison intentionally revokes callbacks after item replacement. Final review
+has no retained findings; both raw outputs are retained. Physical pointer and
+human VoiceOver remain separate from automated routed evidence. No render,
+pacing or release-policy changes.

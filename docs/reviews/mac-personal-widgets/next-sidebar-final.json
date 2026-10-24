@@ -1,0 +1,85 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "59936611e5b1a4f81d5d27b0601831a9",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "244abc0683097dcfde0d26551baa739a28567134",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4108,
+    "totalMs": 4132
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 23077,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 13874,
+        "output": 322,
+        "costUSD": 0.030968
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "81805381f6a987a0",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Struct equality on Option for stale check",
+        "message": "The stale-check compares Option structs with ==, but Option contains fields that may be non-comparable (e.g., func fields such as Closable-related or other members in the truncated struct). If Option has any uncomparable field this fails to compile; also any change to the item (label, badge) silently revokes selection which may be intended but is fragile.",
+        "suggestion": "Compare only the relevant fields explicitly (ID, Disabled, Label) rather than whole-struct equality.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "ui/sidebar.go",
+            "lines": {
+              "start": 90,
+              "end": 93
+            }
+          }
+        ],
+        "tags": [
+          "correctness"
+        ],
+        "evidence": "for _, o := range current.Items {\n\t\t\t\t\tfor _, old := range options {\n\t\t\t\t\t\tif old == o \u0026\u0026 o.ID == e.TargetID",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in ui/sidebar.go"
+    }
+  ],
+  "suppressed": []
+}

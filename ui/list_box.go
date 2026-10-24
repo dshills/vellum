@@ -25,6 +25,14 @@ func validateListBox(n Node) error {
 	seen := make(map[string]bool, len(n.Options))
 	selected := n.SelectedID == ""
 	for _, o := range n.Options {
+		if len(o.Badge) > 32 || !utf8.ValidString(o.Badge) || strings.ContainsAny(o.Badge, "\x00\r\n") {
+			return fmt.Errorf("ui: list badge requires at most 32 UTF-8 bytes without line breaks")
+		}
+		if o.Icon != "" {
+			if err := validateIcon(Node{Kind: Icon, Icon: o.Icon}); err != nil {
+				return err
+			}
+		}
 		if strings.TrimSpace(o.ID) == "" || !utf8.ValidString(o.ID) || strings.ContainsRune(o.ID, 0) || seen[o.ID] || strings.TrimSpace(o.Label) == "" || !utf8.ValidString(o.Label) {
 			return fmt.Errorf("ui: list box requires unique nonblank UTF-8 item IDs and labels")
 		}

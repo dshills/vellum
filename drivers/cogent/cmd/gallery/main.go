@@ -271,7 +271,8 @@ func main() {
 	view := g.view
 	if *macWidgets {
 		g.inputHelpers.setAppearance(*macDark)
-		view = g.inputHelpers.windowView
+		macGallery := newMacWidgetsGallery(g.inputHelpers, *macDark)
+		view = macGallery.view
 	}
 	if *catalogue {
 		view = g.controlCatalogueView
