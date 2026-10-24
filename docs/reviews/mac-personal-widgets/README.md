@@ -643,3 +643,30 @@ their page subtree rather than the root Body. Driver Run refresh visibly acquire
 rootMu before applyWindowFocus. These paths do not synchronously re-enter the
 mutex as hypothesized; no additional source change is warranted. Both complete
 review outputs are retained. Native same-size confirmation follows packaging.
+
+## Focus visibility cancellation, coalescing and origin isolation
+
+Test/spec-only checkpoint; runtime source and the tested 87440e0 packages are
+unchanged. Six pending-intent transitions exercise disabled ancestry, disclosure
+collapse, same-ID native replacement, an empty request, moved native focus and
+invalid-request validation. Content expands before paint so an unwanted reveal
+would change the viewport. The replacement is explicitly focused; it remains
+outside the viewport rather than inheriting the retired editor's intent. Each
+obsolete intent is released and leaves the viewport at its prior scroll value.
+
+The first invalid-case fixture used Manual refresh and tried to recover after its
+terminal error, which is unsupported. The corrected case calls the real locked
+request validator on its originating owner, verifies refusal and cleared intent,
+and preserves the runner's failure policy. No product failure or recovery change
+is claimed from that fixture correction.
+
+Three requests before paint replace the one pending value; the latest target
+finishes focused and fully visible using raw geometry. A second software window
+reuses the same local IDs. Its explicit completed frame must leave the origin's
+pending pointer and the second window's scroll unchanged; the origin's later
+frame consumes its own intent and reveals its field. No physical pointer, human
+accessibility or native two-window qualification is inferred from software scenes.
+
+Focused race tests and driver vet pass. Prism Anthropic claude-sonnet-5-5 completed
+coverage of both changed files with no findings. No rebuild or repeated native
+campaign is required for this test-only change.

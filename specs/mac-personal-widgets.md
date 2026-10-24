@@ -205,3 +205,20 @@ requests, a different scene or window closure. No continuous focus lock, owner
 queue task, polling, renderer option, pacing or release-gate change is introduced.
 Focus-only requests use ordinary NeedsRender so they settle even without layout
 changes. Dialog-scene focus remains unchanged.
+
+## Focus visibility cancellation and coalescing evidence
+
+Additional routed Manual fixtures expand content while an accepted intent is
+pending, then disable its ancestor, collapse its disclosure, replace its native
+control under the same ID, clear the request or move native focus elsewhere.
+Each clears the intent without scrolling the obsolete target. The replacement
+is explicitly focused before paint, so identity cancellation is independent of
+its focus flag. Invalid-request cleanup is tested at the locked request validator;
+the runner's existing terminal invalid-descriptor policy is retained.
+
+Three requests before paint replace the one pending intent and leave only the
+latest target focused and fully visible. A second software window uses the same
+local IDs; painting it cannot consume the origin's pending intent or alter its
+scroll. The origin's later frame reveals its own field. These are automated
+routing/lifetime checks, not physical-pointer or native multi-window qualification.
+No runtime behavior or packaged binary changes in this coverage checkpoint.
