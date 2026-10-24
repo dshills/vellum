@@ -15,6 +15,11 @@ renders these elements and publishes their supported accessibility semantics.
 | On/off switch | `ui.Switch` | `Checked`, `Change` |
 | Toggle button | `ui.ToggleButton` | `Checked`, `Change` |
 | Action menu | `ui.MenuButton` | `Options`, `Change.SelectedID` action requests |
+| Sidebar navigator | `ui.Sidebar.View()` | Sections, stable item IDs, controlled navigation, disclosure, icons/badges |
+| Icon/thumbnail collection | `ui.CollectionView.View()` | Items, SelectedIDs, Change, Activate; responsive native grid |
+| Window-modal sheet | `ui.Sheet.View()` | Open, retained children, Confirm, Cancel, ReturnFocusID |
+| Shortcut recorder | `ui.ShortcutRecorder.View()` | Value, Validate, Change; local focused recording |
+| Capacity/rating indicator | `ui.LevelIndicator.View()` | Continuous/discrete capacity or controlled star rating |
 | Source list | `ui.ListBox` | `Options`, `SelectedID`, `Change`; or `Multiple`, `SelectedIDs`, `SelectionChange` |
 | Selection menu | `ui.Selector` | `Options`, `SelectedID`, `Change` |
 | Radio choices | `ui.RadioGroup` | `Options`, `SelectedID`, `Change`, `Orientation` |
@@ -469,3 +474,12 @@ Multi-selection ListBox supports Command-A to propose all enabled rows in catalo
 order, preserving focus. The existing SelectionChange callback accepts or rejects
 it through Apply. Command/Control/Option letter shortcuts do not act as list
 initial-letter navigation; ordinary letters and Shift-uppercase retain cycling.
+
+The next Mac widget batch is available in the private gallery's Sidebar, Sheet,
+Collection, Shortcuts and Levels pages; Inputs keeps the earlier gallery.
+Sidebar/Collection reuse source-list routing and accessibility. `Option.Icon` and
+`Option.Badge` decorate Multiple ListBox source rows only. The
+[independent consumer contract](../examples/sdk-contract/mac_widgets_next_test.go)
+uses public Go APIs for all five without importing a native driver.
+See the [Mac demo](mac-widget-demo.md) and individual specifications for tested
+scope and limitations. This source work is beyond the published alpha.3 assets.

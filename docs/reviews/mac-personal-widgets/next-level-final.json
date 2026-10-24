@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "7ae1dc0799d438b0951fd13dcb2821eb",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "b967009139664179c96be37a6506f0f2beb2c8fb",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a90c688e732cdb82",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Nil receiver path relies on validate's error",
+      "message": "A nil LevelIndicator returns p.validate() as its error. This depends on validate's nil check, which makes the error non-nil, but the pattern is fragile. The deferred revision increment also runs on the nil receiver path and would panic if the early return were ever bypassed.",
+      "suggestion": "Return an explicit error: `return Node{}, fmt.Errorf(\"ui: nil level indicator\")`.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/level_indicator.go",
+          "lines": {
+            "start": 108,
+            "end": 110
+          }
+        }
+      ],
+      "tags": [
+        "nil",
+        "location-corrected"
+      ],
+      "evidence": "if p == nil {\n\t\treturn Node{}, p.validate()\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3746,
+    "totalMs": 3784
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 55707,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 28631,
+        "output": 276,
+        "costUSD": 0.060022
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -807,3 +807,29 @@ The raw review is retained. Native input is local to a focused active window;
 OS-intercepted keys, global registration, non-ASCII/physical-layout-independent
 bindings and multi-stroke sequences are outside this version. No OS settings,
 render backend, pacing or release-policy changes.
+
+## Next widgets, phase 5: LevelIndicator and final integration
+
+Added passive continuous/discrete capacity and controlled star ratings, threshold
+colors plus readable value/status, explicit zero versus Unrated, light/dark and
+disabled presentation, bounded immutable preview caching and callback-generation
+revocation. Rating uses ordinary accessible buttons and existing keyboard routing;
+no new renderer, driver kind or pacing policy. The gallery now has six distinct
+pages (five new widgets plus Inputs), with a public control reference, usage/limit
+documentation and an independent driver-free consumer contract for all five.
+
+The complete UI package race tests and vet pass. Focused final native race tests
+cover Sidebar/Sheet/Collection/Shortcut plus existing managed inactive borders;
+all-page descriptor integration, native/gallery vet and gallery build pass.
+The initial aggregate runner's SDK filter matched no test; that result is not
+consumer evidence. The exact public consumer test was separately run under race
+with its actual name and passes (next-widgets-sdk-final). Level source-pixel tests
+cover fractions, thresholds, gaps, palette, immutable reuse and extreme ranges;
+ratings cover controlled/rejected/disabled/stale/invalid and zero/unrated behavior.
+
+Prism Anthropic claude-sonnet-5-5 reviewed twice. Preview construction now returns
+an error through View rather than panicking. Nil receiver validation was already
+safe (early return preceded defer and validate was nil-safe); the final path now
+returns an explicit error for clarity as suggested. Raw reviews are retained.
+Packaged native observations and their limits are recorded separately in the
+private delivery verification receipt. No public asset publication is included.

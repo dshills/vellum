@@ -1,7 +1,8 @@
 # Mac widget demo
 
-This private personal-use gallery includes color wells, token fields, font and
-path pickers, protected text entry, and the earlier Mac input controls.
+This private personal-use gallery includes Sidebar, Sheet, Collection, Shortcuts
+and Levels pages, plus the earlier controls on the Inputs page. All controls
+are reusable through public Go APIs.
 For application code, see the [public-API integration guide](mac-widget-integration.md).
 
 After native source preparation, from `drivers/cogent` run:
@@ -12,8 +13,33 @@ go run ./cmd/gallery -mac-widgets -mac-dark
 ```
 
 The packaged **Vellum Mac Widgets.app** starts the focused light gallery directly;
-**Vellum Mac Widgets Dark.app** starts the dark version. Scroll to reach all
-sections. The ordinary macOS title bar remains draggable.
+**Vellum Mac Widgets Dark.app** starts the dark version. Choose a page in the
+top tab strip; scroll within Inputs to reach its sections. The ordinary macOS title bar remains draggable.
+
+
+- **Sidebar:** choose an icon row to navigate. Section triangles collapse/expand
+  groups; Tab visits section lists and arrows choose enabled rows. Archive is
+  deliberately disabled. Badges show sample counts. This demonstration navigates
+  virtual locations only.
+- **Sheet:** choose Export drawing… to open a window-modal card. Cancel/Escape
+  dismisses, Export confirms once and increments the sample count. Return activates
+  the focused action or an unconsumed default; text editors keep their key handling.
+  Focus returns to Export drawing… after closing. No file is written.
+- **Collection:** resize the window to change the number of columns. Click selects;
+  Command-click toggles and Shift-click extends. Arrows follow the grid, Shift
+  extends, Command-A selects enabled items. Return or double-click increments the
+  opened-item counter. Rejection and disable switches demonstrate controlled state.
+- **Shortcuts:** activate Duplicate or Export's recorder, wait for Type shortcut…,
+  then enter a chord such as Command-Shift-K. Escape/Tab cancels and Delete clears.
+  Assigning the other action's chord demonstrates conflict rejection. The sample
+  reserves Command-Q/Command-W. Recorded values edit preferences only; they do not
+  register global shortcuts or change the app's commands. Reset restores samples.
+- **Levels:** move the sample capacity slider through warning at 75 / critical at 90; continuous
+  and segmented meters change together. Tab to a star and press Return/Space to
+  propose a rating. Zero is distinct from Clear/Unrated. Rejection and disable
+  controls keep application ownership visible.
+
+The earlier controls are on **Inputs**:
 
 - **Secure entry:** the synthetic `Vellum-demo` value is masked. Show/Hide changes visible glyphs; accessibility and native surrounding-text queries stay protected. Enter demo text and press Return to commit.
 - **Location:** use the ellipsis or segment menus to choose an ancestor. This changes the displayed virtual path only; relaunch to restore the sample.
@@ -88,3 +114,14 @@ selection for your return. This includes the shared secure/combo outlines and
 numeric field. Automated light/dark pixel and routing checks cover this behavior;
 live inactive-border pixels have not been independently captured. This does not
 change caret styling or the native defaults of other control classes.
+
+The newer pages also use custom rendering and existing native input/accessibility
+integration. Sidebar surfaces use fixed light/dark colors without translucency;
+arrow navigation stays within a section. Collection is bounded to 256 items and has
+no virtualization, marquee selection, item dragging or Quick Look. Sheets are
+same-window managed modal cards, without AppKit sheet attachment/animation.
+Shortcut recording is one chord, ASCII/named keys or F1–F24, local to the focused
+active window; OS-intercepted keys may never reach the app. Ratings use accessible
+star buttons with Tab/Return/Space, without pointer-drag or arrow adjustment.
+See the [control reference](controls.md) for public APIs and
+[independent integration example](../examples/sdk-contract/mac_widgets_next_test.go).

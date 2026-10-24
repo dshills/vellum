@@ -158,3 +158,29 @@ full ordinary-chip geometry and exactly-once removal. These checks do not qualif
 physical display scaling.
 See the [full control reference](controls.md) and
 [demo limitations](mac-widget-demo.md#current-limits).
+
+## Next Mac components
+
+Retain each of these on the application owner, like the earlier components.
+Render and mutate on that owner; sharing a live mutable component across windows
+or concurrent View calls is unsupported. `View()` returns ordinary managed nodes
+and an error; handle the error before composing your window.
+
+| Component | Owner accepts a proposal by | Contract |
+| --- | --- | --- |
+| `ui.Sidebar` | Setting SelectedID; updating the section's Collapsed flag | [Sidebar](../specs/mac-widgets-navigation.md) |
+| `ui.Sheet` | Setting Open=false in Confirm/Cancel, or leaving it open to correct input | [Sheet](../specs/mac-sheet.md) |
+| `ui.CollectionView` | Applying ListSelectionEvent to current SelectedIDs; handling Activate separately | [Collection](../specs/mac-collection-view.md) |
+| `ui.ShortcutRecorder` | Validating conflicts, then assigning ShortcutEvent.Value | [Shortcuts](../specs/mac-shortcut-recorder.md) |
+| `ui.LevelIndicator` | Assigning LevelEvent.Value and Unrated for an editable rating | [Levels](../specs/mac-level-indicator.md) |
+
+Capacity modes are passive and reject Change callbacks. Color thresholds and
+capacity/rating are numerical values, not progress/completion state. A recorder's
+`Value.Chord()` can be used by the application's existing command registry, but
+recording itself neither registers nor executes a command. Disabled or conflicted
+proposals do not silently replace accepted values.
+
+The [independent consumer test](../examples/sdk-contract/mac_widgets_next_test.go)
+composes all five in a valid tree and exercises accepted/rejected/disabled edits
+using only exported APIs, without importing a native driver. It is contract
+evidence, separate from routed native-driver tests and packaged live checks.
