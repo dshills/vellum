@@ -1226,3 +1226,16 @@ gallery catalogue/preferences regressions and focused vet/native build pass.
 Native AppKit interaction/visual observations are recorded separately with the
 personal package after launch. This is a single-window driver experiment; no
 portable toolbar API or renderer/pacing policy changed.
+
+### Native prototype client surface
+
+The packaged dark check exposed the existing standard Scene's light 8dp margin.
+The prototype alone now removes that outer inset so the application's root fills
+the ordinary AppKit client below the toolbar. No full-size-content style or
+header-coordinate approximation is used, and nil-prototype windows retain their
+previous geometry. Both-state/four-edge inset tests, adjacent titlebar/window
+policy race tests and vet pass. Prism Anthropic claude-sonnet-5-5 reviewed the full
+four-file correction with complete coverage and zero findings. Prior native
+checks passed real titlebar window movement, New action, modal disabling and
+restoration, narrow native overflow and Redo action, and a native close followed
+by a new-process launch. Rebuilt final light/dark visuals are checked separately.

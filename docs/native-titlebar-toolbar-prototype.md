@@ -5,7 +5,8 @@ This is an opt-in driver experiment using AppKit `NSToolbar` and
 hit testing, button sizing, overflow, hover feedback and native accessibility.
 It keeps GLFW's original content view, window delegate, first responder and GPU
 layer. Standard content stays below the native chrome; no guessed header padding
-or rendering/pacing option is enabled.
+or rendering/pacing option is enabled. The application root fills the client
+surface without the backend Scene’s default 8-point light margin.
 
 ## Try it
 

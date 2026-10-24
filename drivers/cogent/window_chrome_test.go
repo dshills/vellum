@@ -57,3 +57,24 @@ func TestRootScrollingPolicyPreservesDefaultAndExplicitScroll(t *testing.T) {
 		}
 	}
 }
+
+func TestTitlebarPrototypeClientSurfaceHasNoLightInset(t *testing.T) {
+	for _, enabled := range []bool{false, true} {
+		body := core.NewBody("native titlebar client")
+		body.Scene.Stage = body.NewWindow()
+		var prototype *preparedTitlebarToolbar
+		if enabled {
+			prototype = &preparedTitlebarToolbar{}
+		}
+		configureTitlebarToolbarContent(body, prototype)
+		body.Scene.Style()
+		padding := body.Scene.Styles.Padding
+		want := float32(8)
+		if enabled {
+			want = 0
+		}
+		if padding.Top.Value != want || padding.Right.Value != want || padding.Bottom.Value != want || padding.Left.Value != want {
+			t.Fatal("wrong native client inset", enabled, padding)
+		}
+	}
+}

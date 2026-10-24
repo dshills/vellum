@@ -353,6 +353,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				nativeMountServices(w.body, services)
 				configureInitialWindow(w.body)
 				configureWindowChromeContent(w.body, spec)
+				configureTitlebarToolbarContent(w.body, titlebar)
 				w.host = newAccessibilityHost(w)
 				configureRootScrolling(w.body, w.host, spec)
 				bindWindowScope(w.host, a, spec.Ref())
