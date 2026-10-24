@@ -640,7 +640,7 @@ func mountShallowScoped(parent tree.Node, n ui.Node, a *app.Application, scope a
 			r.widget.(*core.Text).AllocationLayout = err == nil && (value.TextAlign.Set || value.GrowX.Set || value.GrowY.Set)
 		}
 	})
-	if r.node.Kind == ui.Row || r.node.Kind == ui.TextField || r.node.Kind == ui.NumberField {
+	if r.node.Kind == ui.Row || r.node.Kind == ui.TextField || r.node.Kind == ui.NumberField || r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton {
 		r.widget.AsWidget().FinalStyler(func(s *styles.Style) { styleManagedInputFocus(r, s) })
 	}
 	return r, nil

@@ -81,3 +81,10 @@ The private package is ad-hoc signed and unnotarized. It uses this development
 machine's prepared native dependencies; it is not a new public release artifact.
 Automated offscreen event/geometry checks and live macOS observations are
 recorded separately in [checkpoint reviews](reviews/mac-personal-widgets/README.md).
+
+Explicitly styled input and button borders also return to their resting appearance
+when the native window becomes inactive, preserving keyboard focus and text
+selection for your return. This includes the shared secure/combo outlines and
+numeric field. Automated light/dark pixel and routing checks cover this behavior;
+live inactive-border pixels have not been independently captured. This does not
+change caret styling or the native defaults of other control classes.

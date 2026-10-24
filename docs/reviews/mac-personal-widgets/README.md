@@ -670,3 +670,40 @@ accessibility or native two-window qualification is inferred from software scene
 Focused race tests and driver vet pass. Prism Anthropic claude-sonnet-5-5 completed
 coverage of both changed files with no findings. No rebuild or repeated native
 campaign is required for this test-only change.
+
+## Inactive-window managed input borders
+
+The regression reproduced active focus borders after an inactive publication for
+combo editor/accessory focus, secure text, ordinary bordered/borderless text,
+compact numeric stepping and buttons in both light and dark themes. The adapter
+now uses the existing published native-window activation to restore explicitly
+managed resting borders. Reserved MaxBorder geometry and logical focus remain.
+
+The final focused race run covers those fourteen cases plus adjacent input focus,
+source-list activation, activation lifecycle/forwarding and focus visibility;
+driver vet and the native gallery build pass. Synthetic editing selection is
+settled before activation frame counting. Pixel assertions compare border/margin
+areas and exclude editable contents to avoid independently blinking carets. Each
+changed publication composes once, duplicate activation composes zero times,
+model mailbox work remains pending, selection and geometry survive, and the
+original border pixels return on reactivation. Early test-fixture revisions
+counted a pending selection frame or compared blinking editor content; these
+were corrected without changing runtime behavior to satisfy the fixture.
+
+Prism Anthropic claude-sonnet-5-5 completed coverage of all six changed files.
+Its one medium, confidence-0.5 finding hypothesized that alternate button mount
+or update paths could omit the final styler. Source inspection disproves that
+premise: mountScoped delegates to mountShallowScoped; reconciliation mounts new
+or replaced records through mountShallowScoped as well. Reused records preserve
+the existing widget and registered final styler, whose closure reads the current
+record node/theme. There is one registration site and no second condition or
+alternate registration/removal path to factor. The location-corrected finding
+points at the activation lookup rather than a demonstrated alternate mount.
+No additional product change is warranted; the raw review is retained.
+
+Native activation delivery evidence from the prior two-window checkpoint is
+reused. This checkpoint's inactive border pixels are automated software evidence,
+not a new live inactive-window capture. Other control classes, unstyled native
+borders and caret presentation are outside this bounded change. The user returned
+and requested completion of the current task followed by stopping; no further
+widget or qualification campaign is included.

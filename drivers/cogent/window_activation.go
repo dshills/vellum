@@ -146,9 +146,9 @@ func handleWindowActivation(w *nativeWindow, e events.Event) bool {
 	return true
 }
 func sourceListHasActiveFocus(r *record) bool {
-	if !r.widget.AsWidget().ContainsFocus() {
-		return false
-	}
+	return r.widget.AsWidget().ContainsFocus() && nativeWindowActive(r)
+}
+func nativeWindowActive(r *record) bool {
 	for node := r.widget.AsTree().Parent; !tree.IsNil(node); node = node.AsTree().Parent {
 		if v, ok := node.AsTree().Property(windowActivationProperty).(*windowActivation); ok {
 			return v.active()

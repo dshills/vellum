@@ -124,8 +124,9 @@ loses activation, retaining the keyboard-focused row and accepted selection. The
 existing native attachment focus callback carries only a bounded latest state;
 appearance is published and restyled on that window's render owner. Repeated
 identical notifications do not restyle, and retirement cancels queued work. This
-increment does not change other controls' window-activation cues, rendering,
-pacing or release policy.
+source-list checkpoint leaves rendering, pacing and release policy unchanged.
+Managed input/button borders now reuse the same published activation state as
+described below.
 
 Activation binding is idempotent for the same event source. A changed publication
 requests one originating composition; duplicate observations or a coalesced return
@@ -222,3 +223,24 @@ local IDs; painting it cannot consume the origin's pending intent or alter its
 scroll. The origin's later frame reveals its own field. These are automated
 routing/lifetime checks, not physical-pointer or native multi-window qualification.
 No runtime behavior or packaged binary changes in this coverage checkpoint.
+
+## Inactive-window managed input borders
+
+Explicitly styled TextField, NumberField, Button and MenuButton borders return
+to their declared resting border while the originating native window is inactive.
+Shared combo/secure-entry outlines follow the same rule, including accessory
+button focus. An ordinary explicitly borderless field loses its native underline
+while inactive and regains it on activation. Reserved maximum border geometry is
+unchanged, so activation preserves control allocation, native focus, editing
+selection and application values. No semantic edit or application mailbox drain
+is caused by the appearance signal. Duplicate activation does not request paint.
+
+Light/dark routed software regressions cover editor/accessory combo focus,
+secure entry, ordinary bordered/borderless text, compact numeric stepping and
+buttons. They compare painted border/margin pixels, excluding editable content
+whose caret can blink independently. Synthetic selection is settled before frame
+counting. Existing originating-window activation delivery/lifecycle coverage is
+reused. These are automated routing/pixel checks; live inactive input-border
+pixels have not been independently captured. Controls without explicit managed
+borders, caret appearance and other native control classes keep their existing
+policy. No public API, rendering backend, pacing or release gate changes.

@@ -32,7 +32,7 @@ func syncInputOutline(r *record) {
 		return
 	}
 	next := sharesInputOutline(r.node, r.theme)
-	focused := next && !controlDisabled(r) && r.widget.AsWidget().ContainsFocus()
+	focused := next && !controlDisabled(r) && r.widget.AsWidget().ContainsFocus() && nativeWindowActive(r)
 	if r.inputOutline.shared.Swap(next) != next || r.inputOutline.focused.Load() != focused {
 		r.widget.AsWidget().Update()
 	}
@@ -74,10 +74,18 @@ func styleManagedInputFocus(r *record, s *styles.Style) {
 		s.MaxBorder = s.Border
 		s.MaxBorder.Width.Set(units.Dp(max(s.Border.Width.Top.Value, 2)))
 		s.MaxBorder.Color.Set(colors.Scheme.Primary.Base)
-		focused := !controlDisabled(r) && r.widget.AsWidget().ContainsFocus()
+		focused := !controlDisabled(r) && r.widget.AsWidget().ContainsFocus() && nativeWindowActive(r)
 		r.inputOutline.focused.Store(focused)
 		if focused {
 			s.Border = s.MaxBorder
+		}
+		return
+	}
+	if r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton {
+		style, err := ui.ResolveStyle(r.node, r.theme)
+		if err == nil && style.Border.Set && !nativeWindowActive(r) {
+			restoreManagedBorder(s, style.Border.Value)
+			s.StateLayer = 0
 		}
 		return
 	}
@@ -91,8 +99,14 @@ func styleManagedInputFocus(r *record, s *styles.Style) {
 	if style.Background.Set {
 		s.StateLayer = 0
 	}
-	// Spinner already owns its outlined border and compact arrow geometry.
-	if r.node.Kind == ui.NumberField || !style.Border.Set {
+	// Spinner keeps its native maximum outline allowance and arrow geometry.
+	if r.node.Kind == ui.NumberField {
+		if style.Border.Set && !nativeWindowActive(r) {
+			restoreManagedBorder(s, style.Border.Value)
+		}
+		return
+	}
+	if !style.Border.Set {
 		return
 	}
 	border := style.Border.Value
@@ -105,21 +119,30 @@ func styleManagedInputFocus(r *record, s *styles.Style) {
 		shared = outline != nil && outline.shared.Load()
 	}
 	if border.Width == 0 && (!shared || !style.Background.Set || style.Background.Value.A != 0) {
+		if !nativeWindowActive(r) {
+			restoreManagedBorder(s, border)
+		}
 		return
 	}
 	// Native filled-field MaxBorder is a bottom underline. An explicit managed
 	// border also owns its focus shape; zero means no private editor outline.
-	s.Border.Width.Set(units.Dp(border.Width))
-	s.Border.Color.Set(image.NewUniform(border.Color))
-	s.Border.Style.Set(styles.BorderSolid)
+	restoreManagedBorder(s, border)
 	s.MaxBorder = s.Border
 	if border.Width > 0 {
 		s.MaxBorder.Width.Set(units.Dp(max(border.Width, 2)))
 		s.MaxBorder.Color.Set(colors.Scheme.Primary.Base)
-		if !controlDisabled(r) && s.Is(states.Focused) {
+		if !controlDisabled(r) && s.Is(states.Focused) && nativeWindowActive(r) {
 			s.Border = s.MaxBorder
 		}
 	} else if style.Background.Set && style.Background.Value.A == 0 {
 		s.RenderBox = false
 	}
+}
+
+// Change only the painted border. MaxBorder remains reserved by the native
+// control so activation never changes its content allocation or hit geometry.
+func restoreManagedBorder(s *styles.Style, border ui.Border) {
+	s.Border.Width.Set(units.Dp(border.Width))
+	s.Border.Color.Set(image.NewUniform(border.Color))
+	s.Border.Style.Set(styles.BorderSolid)
 }

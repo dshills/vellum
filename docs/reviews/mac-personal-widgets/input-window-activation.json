@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a7628408a127dd96e69ed0ece8eac1f0",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "ad7c3b1860d43c7316ba3f290127bc3a3584b827",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "87dcdf34a6fcd300",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Styler registration condition duplicated",
+      "message": "The Button/MenuButton branch in styleManagedInputFocus only restores the resting border when the window is inactive. When the window is active, the native focus/hover border is left untouched. That part is fine. However, the Button/MenuButton FinalStyler is installed only in mountShallowScoped. If buttons are created or remounted through other paths (e.g. the update/restyle path), they will not get the styler, so inactive borders will not apply. Verify that all mount paths share this condition.",
+      "suggestion": "Factor the kind condition into a shared helper (e.g. managesFocusStyle(kind)) and use it everywhere the FinalStyler is installed or removed.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/window_activation.go",
+          "lines": {
+            "start": 149,
+            "end": 149
+          }
+        }
+      ],
+      "tags": [
+        "consistency",
+        "location-corrected"
+      ],
+      "evidence": "return r.widget.AsWidget().ContainsFocus() \u0026\u0026 nativeWindowActive(r)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4088,
+    "totalMs": 4105
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 19072,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 10946,
+        "output": 362,
+        "costUSD": 0.025512
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
