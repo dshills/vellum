@@ -171,8 +171,8 @@ See [prototype scope and usage](../docs/native-titlebar-toolbar-prototype.md).
 
 ### Native customization and persistence
 
-An explicit stable CustomizationID enables AppKit's native palette, display-mode
-choices and autosaved configuration, independently of portable ToolbarLayout.
+An explicit stable CustomizationID enables AppKit's native palette, OS-supported display
+attributes and autosaved configuration, independently of portable ToolbarLayout.
 Its catalogue/commands remain immutable. IDs are bounded ASCII settings namespaces
 and light/dark gallery bars must not share one. AppKit owns the opaque user-default
 format; attachment must not overwrite restored order/display/visibility. Missing

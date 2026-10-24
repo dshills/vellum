@@ -1270,3 +1270,21 @@ artwork. Adjacent native window/focus policies, existing toolbar/preferences
 regressions, vet and native build pass. AppKit owns the opaque persisted format;
 real customization/autosave/relaunch observations are separate in the local app
 receipt. No portable widget contract, renderer or pacing policy changed.
+
+### Native customization round trip and observed style limits
+
+Packaged version18 passed native Save-first reorder, Open drag removal/re-add,
+fixed-space insertion and actual quit/new-process restoration with the same
+order/omission/spacer geometry. Native context-menu palette entry, empty-action
+recovery and default-set restoration passed without invoking source commands.
+Dark omission persisted independently and re-add restored command admission.
+Post-customization native overflow Redo reached the owner once; disabled Delete
+and managed-modal blocking/restoration remained correct. Both default item sets
+were restored for handoff.
+
+The tested macOS26 compact style supplies Remove/Customize and an icons-only
+palette, without a display picker. Documentation now states this observed limit
+and restricts live persistence qualification to order, omission and spaces.
+Prism Anthropic claude-sonnet-5-5 reviewed all four report/guide/spec changes with
+complete coverage and zero findings. No implementation source changed after the
+native checks, and no broad test campaign was repeated for documentation.

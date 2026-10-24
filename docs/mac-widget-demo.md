@@ -154,6 +154,10 @@ Use `-native-titlebar=false` to launch the content-only gallery from source.
 
 Use **Customize Titlebar…** to open the native macOS customization palette, or
 right/Control-click the titlebar toolbar. Drag tools to reorder/remove/re-add them
-and use native display options; AppKit remembers these across launches separately
+and use the options AppKit offers; it remembers the item layout across launches separately
 for light and dark. This button also recovers a hidden native toolbar. Full-color
 artwork is retained. Native customization requires macOS 15+.
+
+On the tested macOS26 compact titlebar, native customization remains icons-only;
+the content toolbar display buttons do not change native chrome. See the native
+prototype guide for platform/style limits and the verified persistence scope.

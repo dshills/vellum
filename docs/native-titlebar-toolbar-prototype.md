@@ -44,14 +44,18 @@ Right/Control-click the native titlebar toolbar and choose **Customize Toolbar�
 or click **Customize Titlebar…** in the gallery. This opens AppKit’s standard
 palette. Drag actions to reorder, remove them by dragging out, or drag missing
 actions back from the palette. Fixed and flexible spaces are available. Drag the
-default set onto the toolbar to restore its initial items. Native display options
-(Icons, Text, or Icons and Text) come from AppKit, with their normal OS appearance.
-The recovery button also shows a toolbar hidden through AppKit’s menu.
+default set onto the toolbar to restore its initial items. AppKit determines which display and visibility options the window style and OS
+offer. On the tested macOS26 compact style, the menu offers Remove Item and
+Customize Toolbar, and the palette has no display-mode picker. It keeps its
+native icons-only presentation; the content toolbar catalogue still provides
+all four display variants.
+The recovery button also shows a toolbar hidden by native configuration.
 
 AppKit autosaves the configuration under the toolbar’s stable identifier in the
 application’s user defaults. Light and dark demos use separate identifiers ending
-in `.light.v1` and `.dark.v1`. Order, omitted items, spaces, display mode and native
-visibility survive app relaunch. No content-toolbar JSON files or system settings
+in `.light.v1` and `.dark.v1`. Order, omitted items and spaces survive app relaunch. AppKit also owns saved
+display/visibility attributes where the current OS offers those choices; this
+checkpoint’s live round trip qualifies item order, omission and spacing. No content-toolbar JSON files or system settings
 are changed. New catalogue items are available in the palette; existing saved
 layouts are respected rather than reset on each launch. Unknown retired actions
 cannot be reconstructed by the delegate. Interactive layouts are capped at 32
