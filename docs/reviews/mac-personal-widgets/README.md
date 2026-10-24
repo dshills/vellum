@@ -1288,3 +1288,21 @@ and restricts live persistence qualification to order, omission and spaces.
 Prism Anthropic claude-sonnet-5-5 reviewed all four report/guide/spec changes with
 complete coverage and zero findings. No implementation source changed after the
 native checks, and no broad test campaign was repeated for documentation.
+
+## Scoped Mac theme foundation
+
+Prism Anthropic claude-sonnet-5-5 reviewed the full theme checkpoint with complete
+coverage. Its inheritedTheme concern was checked against every production record
+constructor. mountShallowScoped initializes both inherited/resolved themes and
+mountScoped uses it recursively. The one private grid editor record now also
+records its inherited theme. A new direct mount→reconcile-without-explicit-theme
+regression proves scope removal restores the original base while retaining the
+control. Do not fall back to a previous scoped theme: that would reintroduce the
+scope after removal. Existing nested/sibling/snapshot/atomic-rejection tests pass.
+
+Public UI race tests and focused native theme/style/menu/toolbar checks, gallery
+state/artwork retention tests and vet pass. Scoped changes close transient menus
+and retain compatible controls. Mac palette/accent values are local; no global
+color mutation, OS appearance change or image tint is introduced. The remaining
+five widget phases are planned separately in mac-composition-widgets.md. No
+remaining actionable review finding.

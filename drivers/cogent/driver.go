@@ -67,6 +67,7 @@ type record struct {
 	node            ui.Node
 	children        []*record
 	theme           ui.Theme
+	inheritedTheme  ui.Theme
 	control         *controlState
 	inputOutline    *inputOutlineState
 	focusVisibility atomic.Uint32 // 0 unpublished, 1 active input scope, 2 outside modal/tab scope
@@ -606,13 +607,20 @@ func mountShallowScoped(parent tree.Node, n ui.Node, a *app.Application, scope a
 	if len(themes) > 0 {
 		theme = themes[0]
 	}
+	inheritedTheme := theme
+	if n.Theme != nil {
+		if err := n.Theme.Validate(); err != nil {
+			return nil, err
+		}
+		theme = n.Theme.Clone()
+	}
 	if _, err := ui.ResolveStyle(n, theme); err != nil {
 		return nil, err
 	}
 	if _, err := scopedWindowContext(a, scope); err != nil {
 		return nil, err
 	}
-	r := &record{node: n, theme: theme, scope: scope}
+	r := &record{node: n, theme: theme, inheritedTheme: inheritedTheme, scope: scope}
 	if ext, ok := n.Custom.(ThemeExtension); n.Kind == ui.Extension && ok {
 		ext.SetTheme(theme.Clone())
 	}

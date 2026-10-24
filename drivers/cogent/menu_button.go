@@ -222,7 +222,9 @@ func openManagedMenu(r *record) {
 	scene := core.NewScene("vellum-action-menu")
 	core.StyleMenuScene(scene)
 	scene.FinalStyler(func(style *styles.Style) {
-		if background := r.theme.Kinds[ui.FormGroup].Background; background.Set {
+		if r.theme.Palette.Set {
+			style.Background = colors.Uniform(r.theme.Palette.Value.Popup)
+		} else if background := r.theme.Kinds[ui.FormGroup].Background; background.Set {
 			style.Background = colors.Uniform(background.Value)
 		}
 	})
@@ -276,8 +278,11 @@ func openManagedMenu(r *record) {
 			style.Min.Y = units.Dp(24)
 			style.Background = colors.Uniform(color.NRGBA{})
 			if style.Is(states.Focused) || style.Is(states.Hovered) || style.Is(states.Active) {
-				style.Background = colors.Uniform(color.NRGBA{R: 0, G: 112, B: 235, A: 255})
+				style.Background = colors.Uniform(managedAccent(r))
 				style.Color = colors.Uniform(color.NRGBA{R: 255, G: 255, B: 255, A: 255})
+				if r.theme.Palette.Set {
+					style.Color = colors.Uniform(r.theme.Palette.Value.AccentInk)
+				}
 			}
 		})
 		item.SetState(o.Disabled, states.Disabled)

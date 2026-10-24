@@ -15,7 +15,7 @@ import (
 func reconcileScoped(parent core.Widget, previous *record, n ui.Node, a *app.Application, scope app.WindowRef, themes ...ui.Theme) (*record, error) {
 	var theme ui.Theme
 	if previous != nil {
-		theme = previous.theme
+		theme = previous.inheritedTheme
 	}
 	if len(themes) > 0 {
 		theme = themes[0]
@@ -24,8 +24,15 @@ func reconcileScoped(parent core.Widget, previous *record, n ui.Node, a *app.App
 		return previous, err
 	}
 	theme = theme.Clone()
-	var validateStyle func(ui.Node) error
-	validateStyle = func(node ui.Node) error {
+	var validateStyle func(ui.Node, ui.Theme) error
+	validateStyle = func(node ui.Node, inherited ui.Theme) error {
+		theme := inherited
+		if node.Theme != nil {
+			if err := node.Theme.Validate(); err != nil {
+				return err
+			}
+			theme = node.Theme.Clone()
+		}
 		if err := validateNativeTree(node); err != nil {
 			return err
 		}
@@ -39,13 +46,13 @@ func reconcileScoped(parent core.Widget, previous *record, n ui.Node, a *app.App
 			return err
 		}
 		for _, child := range node.Children {
-			if err := validateStyle(child); err != nil {
+			if err := validateStyle(child, theme); err != nil {
 				return err
 			}
 		}
 		return nil
 	}
-	if err := validateStyle(n); err != nil {
+	if err := validateStyle(n, theme); err != nil {
 		return previous, err
 	}
 	if err := ui.Validate(n); err != nil {
@@ -77,19 +84,24 @@ func reconcileScoped(parent core.Widget, previous *record, n ui.Node, a *app.App
 	releaseTrees := prepareTreeReplacements(previous, n)
 	defer releaseTrees()
 	type plan struct {
-		r        *record
-		node     ui.Node
-		children []*plan
-		parent   tree.Node
+		r                *record
+		node             ui.Node
+		children         []*plan
+		parent           tree.Node
+		theme, inherited ui.Theme
 	}
 	used := map[*record]bool{}
 	var created []*record
-	var prepare func(tree.Node, ui.Node) (*plan, error)
-	prepare = func(p tree.Node, node ui.Node) (*plan, error) {
+	var prepare func(tree.Node, ui.Node, ui.Theme) (*plan, error)
+	prepare = func(p tree.Node, node ui.Node, inherited ui.Theme) (*plan, error) {
+		resolved := inherited
+		if node.Theme != nil {
+			resolved = node.Theme.Clone()
+		}
 		r := old[node.ID]
 		if r == nil || !compatible(r.node, node) {
 			var err error
-			r, err = mountShallowScoped(p, node, a, scope, theme)
+			r, err = mountShallowScoped(p, node, a, scope, inherited)
 			if err != nil {
 				return nil, err
 			}
@@ -103,9 +115,9 @@ func reconcileScoped(parent core.Widget, previous *record, n ui.Node, a *app.App
 		// A native host may be passed through an embedded Frame while children
 		// retain its concrete tree identity. Compare and move against that same
 		// identity, or every unchanged refresh looks like a parent transition.
-		next := &plan{r: r, node: node, parent: p.AsTree().This}
+		next := &plan{r: r, node: node, parent: p.AsTree().This, theme: resolved, inherited: inherited}
 		for _, child := range node.Children {
-			entry, err := prepare(childHost(r, child.ID), child)
+			entry, err := prepare(childHost(r, child.ID), child, resolved)
 			if err != nil {
 				return nil, err
 			}
@@ -113,7 +125,7 @@ func reconcileScoped(parent core.Widget, previous *record, n ui.Node, a *app.App
 		}
 		return next, nil
 	}
-	next, err := prepare(parent, n)
+	next, err := prepare(parent, n, theme)
 	if err != nil {
 		for _, r := range created {
 			if !tree.IsNil(r.widget) {
@@ -164,7 +176,8 @@ func reconcileScoped(parent core.Widget, previous *record, n ui.Node, a *app.App
 	}
 	var attach func(*plan)
 	attach = func(p *plan) {
-		if !reflect.DeepEqual(p.r.theme, theme) {
+		p.r.inheritedTheme = p.inherited
+		if !reflect.DeepEqual(p.r.theme, p.theme) {
 			if p.r.control != nil && p.r.control.menu != nil {
 				requestMenuClose(p.r)
 				flushMenuClose(p.r)
@@ -173,9 +186,9 @@ func reconcileScoped(parent core.Widget, previous *record, n ui.Node, a *app.App
 				p.r.control.grid.layoutPending.Store(true)
 				p.r.control.grid.layout.valid = false
 			}
-			p.r.theme = theme
+			p.r.theme = p.theme
 			if ext, ok := p.node.Custom.(ThemeExtension); p.node.Kind == ui.Extension && ok {
-				ext.SetTheme(theme.Clone())
+				ext.SetTheme(p.theme.Clone())
 			}
 			p.r.widget.AsWidget().Update()
 			changed = true

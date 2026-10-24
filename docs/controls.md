@@ -498,3 +498,10 @@ Sidebar/Collection reuse source-list routing and accessibility. `Option.Icon` an
 uses public Go APIs for all five without importing a native driver.
 See the [Mac demo](mac-widget-demo.md) and individual specifications for tested
 scope and limitations. This source work is beyond the published alpha.3 assets.
+
+## Scoped themes
+
+`Node.Theme` supplies a subtree theme that can change between owner Views without
+replacing compatible controls. `MacThemeWithAccent` adds reusable semantic palette
+and light/dark presets. See [Mac theming](mac-theming.md) for inheritance, explicit
+style precedence, map snapshots and native appearance limits.

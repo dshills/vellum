@@ -32,9 +32,12 @@ const (
 // A View returns a fresh description;
 // callbacks run on the application owner. Custom holds driver-specific content.
 type Node struct {
-	ID   string
-	Kind Kind
-	Text string
+	ID string
+	// Theme replaces inherited styling for this subtree. Nil inherits. Drivers
+	// snapshot maps at accepted View boundaries; never mutate them concurrently.
+	Theme *Theme
+	Kind  Kind
+	Text  string
 	// Placeholder is a non-value hint on TextField; Accessibility.Name remains its label.
 	Placeholder string
 	// Secure protects TextField visual/native accessibility exposure even when
@@ -130,8 +133,14 @@ func Validate(root Node) error {
 	canvases := map[*canvas.Scene]bool{}
 	sources := map[*placement.Source]bool{}
 	targets := map[*placement.Target]bool{}
-	var walk func(Node, int) error
-	walk = func(n Node, depth int) error {
+	var walk func(Node, int, Theme) error
+	walk = func(n Node, depth int, theme Theme) error {
+		if n.Theme != nil {
+			theme = *n.Theme
+			if err := theme.Validate(); err != nil {
+				return err
+			}
+		}
 		if depth >= 128 {
 			return fmt.Errorf("ui: hierarchy exceeds 128 levels")
 		}
@@ -202,7 +211,7 @@ func Validate(root Node) error {
 		if err := ValidateControl(n); err != nil {
 			return err
 		}
-		if _, err := ResolveStyle(n, Theme{}); err != nil {
+		if _, err := ResolveStyle(n, theme); err != nil {
 			return err
 		}
 		switch n.Kind {
@@ -215,13 +224,13 @@ func Validate(root Node) error {
 			return fmt.Errorf("ui: unknown kind %q", n.Kind)
 		}
 		for _, c := range n.Children {
-			if err := walk(c, depth+1); err != nil {
+			if err := walk(c, depth+1, theme); err != nil {
 				return err
 			}
 		}
 		return nil
 	}
-	if err := walk(root, 0); err != nil {
+	if err := walk(root, 0, Theme{}); err != nil {
 		return err
 	}
 	return nil

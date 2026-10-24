@@ -77,7 +77,7 @@ func styleManagedInputFocus(r *record, s *styles.Style) {
 		// changes while the native text client owns a selection or composition.
 		s.MaxBorder = s.Border
 		s.MaxBorder.Width.Set(units.Dp(max(s.Border.Width.Top.Value, 2)))
-		s.MaxBorder.Color.Set(colors.Scheme.Primary.Base)
+		s.MaxBorder.Color.Set(colors.Uniform(managedAccent(r)))
 		focused := !controlDisabled(r) && r.widget.AsWidget().ContainsFocus() && nativeWindowActive(r)
 		r.inputOutline.focused.Store(focused)
 		if focused {
@@ -95,7 +95,7 @@ func styleManagedInputFocus(r *record, s *styles.Style) {
 			restoreManagedBorder(s, border)
 			s.MaxBorder = s.Border
 			s.MaxBorder.Width.Set(units.Dp(max(border.Width, 2)))
-			s.MaxBorder.Color.Set(colors.Uniform(uiColorAccent))
+			s.MaxBorder.Color.Set(colors.Uniform(managedAccent(r)))
 			focused := s.Is(states.Focused) && r.widget.AsWidget().ContainsFocus() && nativeWindowActive(r) && r.focusVisibility.Load() != 2 && !controlDisabled(r)
 			if focused {
 				s.Border = s.MaxBorder
@@ -147,7 +147,7 @@ func styleManagedInputFocus(r *record, s *styles.Style) {
 	s.MaxBorder = s.Border
 	if border.Width > 0 {
 		s.MaxBorder.Width.Set(units.Dp(max(border.Width, 2)))
-		s.MaxBorder.Color.Set(colors.Scheme.Primary.Base)
+		s.MaxBorder.Color.Set(colors.Uniform(managedAccent(r)))
 		if !controlDisabled(r) && s.Is(states.Focused) && nativeWindowActive(r) {
 			s.Border = s.MaxBorder
 		}
@@ -162,4 +162,11 @@ func restoreManagedBorder(s *styles.Style, border ui.Border) {
 	s.Border.Width.Set(units.Dp(border.Width))
 	s.Border.Color.Set(image.NewUniform(border.Color))
 	s.Border.Style.Set(styles.BorderSolid)
+}
+
+func managedAccent(r *record) color.NRGBA {
+	if r != nil && r.theme.Palette.Set {
+		return r.theme.Palette.Value.Accent
+	}
+	return uiColorAccent
 }

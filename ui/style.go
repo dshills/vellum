@@ -176,12 +176,13 @@ func (s Style) Overlay(o Style) Style {
 // driver takes a Clone at startup; callers must not mutate a live driver theme.
 // No process-wide palette, font, or operating-system appearance is changed.
 type Theme struct {
+	Palette Optional[Palette]
 	Default Style
 	Kinds   map[Kind]Style
 }
 
 func (t Theme) Clone() Theme {
-	r := Theme{Default: t.Default}
+	r := Theme{Default: t.Default, Palette: t.Palette}
 	if t.Kinds != nil {
 		r.Kinds = make(map[Kind]Style, len(t.Kinds))
 		for k, s := range t.Kinds {
@@ -191,6 +192,11 @@ func (t Theme) Clone() Theme {
 	return r
 }
 func (t Theme) Validate() error {
+	if t.Palette.Set {
+		if err := t.Palette.Value.Validate(); err != nil {
+			return err
+		}
+	}
 	if err := t.Default.Validate(); err != nil {
 		return fmt.Errorf("ui: default theme: %w", err)
 	}

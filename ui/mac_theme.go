@@ -7,7 +7,12 @@ import "image/color"
 // the installed macOS font; other platforms may substitute a font. Colors are
 // fixed preview values, not dynamic NSColor, accent or high-contrast settings.
 // Caller node styles override this theme. Each call returns a fresh map.
-func MacTheme(dark bool) Theme {
+func MacTheme(dark bool) Theme { return MacThemeWithAccent(dark, color.NRGBA{}) }
+
+// MacThemeWithAccent is a reusable light/dark preset with a caller-selected
+// accent. Validate the result before use; custom accents must be opaque.
+func MacThemeWithAccent(dark bool, accent color.NRGBA) Theme {
+	palette := MacPalette(dark, accent)
 	ink := color.NRGBA{R: 35, G: 35, B: 37, A: 255}
 	field := color.NRGBA{R: 255, G: 255, B: 255, A: 255}
 	button := color.NRGBA{R: 249, G: 249, B: 250, A: 255}
@@ -31,7 +36,7 @@ func MacTheme(dark bool) Theme {
 	number.GrowX = Some(float32(0))
 	buttonStyle := control
 	buttonStyle.Background = Some(button)
-	return Theme{Default: Style{Foreground: Some(ink), Typography: Some(Typography{Family: "Helvetica Neue", Size: 13})}, Kinds: map[Kind]Style{
+	return Theme{Palette: Some(palette), Default: Style{Foreground: Some(ink), Typography: Some(Typography{Family: "Helvetica Neue", Size: 13})}, Kinds: map[Kind]Style{
 		Column:    {Gap: Some(float32(8)), Padding: Some(Insets{})},
 		Row:       {Gap: Some(float32(6)), Padding: Some(Insets{}), Align: Some(AlignCenter)},
 		FormGroup: {Gap: Some(float32(8)), Padding: Some(UniformInsets(12)), Background: Some(button), Border: Some(Border{Width: 1, Color: line}), CornerRadius: Some(float32(8))},

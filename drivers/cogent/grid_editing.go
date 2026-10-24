@@ -161,7 +161,7 @@ func syncGridEditing(g *gridBinding) error {
 	}
 	created := g.editing == nil
 	if created {
-		r := &record{node: ui.Node{ID: GridEditorID(g.r.node.ID), Kind: ui.TextField, Text: edit.Text, Accessibility: ui.Accessibility{Name: "Edit " + edit.ColumnID}}, theme: g.r.theme, scope: g.windowRef}
+		r := &record{node: ui.Node{ID: GridEditorID(g.r.node.ID), Kind: ui.TextField, Text: edit.Text, Accessibility: ui.Accessibility{Name: "Edit " + edit.ColumnID}}, theme: g.r.theme, inheritedTheme: g.r.theme, scope: g.windowRef}
 		// Change is a controlled compatibility seam. Origin boundaries/settlement
 		// publish the draft first; a later focus-loss callback is therefore a no-op.
 		r.node.Change = func(ui.ChangeEvent) {} // immutable compatibility notification; origin owns widget reads
