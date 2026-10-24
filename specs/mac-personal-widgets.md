@@ -142,3 +142,18 @@ The demo displays tag validation feedback above the tag controls, keeping it
 visible when entry focus scrolls near the viewport's bottom edge. Input validation
 messages omit the internal ui: package prefix; diagnostic/configuration errors
 and the reusable components' error values remain unchanged.
+
+## Full token-toolbar keyboard regression
+
+At the 32-token bound, the existing chip toolbar must reveal the last chip through
+End navigation and send one removal proposal with its full stable ID and text.
+The caller may then focus the newly enabled entry through a new FocusRequest.
+Regression coverage uses long mixed-script labels, a 320-logical-pixel field,
+light/dark themes and matched software window/DPI160 and DPI320 sizes. This is
+routed offscreen geometry/owner evidence, not physical high-DPI qualification.
+
+Known narrow-layout limitation: chip abbreviation is a fixed 24-rune budget, not
+viewport-responsive. A long chip may exceed a roughly 200-logical-pixel viewport
+and have clipped completed bounds. Preserve that finding in the integration
+guide; responsive chip sizing is follow-up work, not part of the passing
+matched-scale assertion. No public API, rendering policy or release gate changes.

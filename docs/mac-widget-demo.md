@@ -47,8 +47,10 @@ New controls reuse managed components rather than shared system color/font
 panels. Color recents are a caller-supplied palette (maximum 16). Token suggestions
 use the dropdown; there is no per-keystroke completion filtering, comma-triggered
 commit, inline chip editing or rearrangement. Long chips abbreviate their visible labels;
-accessibility and removal keep the full value. In this standalone demo, accepted
-tag acceptance, rejection and chip removal return focus to tag entry for repeated
+accessibility and removal keep the full value. Abbreviation is fixed rather than
+width-responsive; at very narrow widths a single chip can still be clipped.
+See the [integration limits](mac-widget-integration.md#limits) for the reproduced
+case. In this standalone demo, tag acceptance, rejection and chip removal return focus to tag entry for repeated
 entry. Tag validation feedback appears above the controls so it stays visible
 while correcting an entry near the bottom of the viewport. At 32 tags, focus advances to Drawing color; removing a tag enables entry
 again. Disable inputs cancels pending focus requests. This is demo focus policy.

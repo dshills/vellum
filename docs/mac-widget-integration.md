@@ -145,5 +145,12 @@ Appearance is custom rendered with explicit light/dark colors. Automatic OS them
 accent, high-contrast and locale discovery are not implemented. Panels stay in
 one native window. Font/color pickers do not own shared system panels, path
 controls do not access files, and token chips do not support inline editing or
-drag rearrangement. See the [full control reference](controls.md) and
+drag rearrangement. Chip abbreviation uses a fixed 24-rune budget rather than
+viewport-responsive truncation. A chip wider than its toolbar viewport can be
+clipped; a reproduced example uses the 400px software window at DPI320 (about
+200 logical pixels) with long mixed-script labels. Allow enough space for the
+chosen typography. The matched-scale regression uses a 320-logical-pixel field,
+32 long labels, both themes and DPI160/320; it verifies last-chip reveal and
+exactly-once keyboard removal. This does not qualify physical display scaling.
+See the [full control reference](controls.md) and
 [demo limitations](mac-widget-demo.md#current-limits).

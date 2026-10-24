@@ -520,3 +520,30 @@ All 146 local links in the four edited documents resolve; all 49 referenced publ
 identifiers exist in ui source. git diff --check passes. No runtime inputs changed,
 so the tested 07d38ba app package remains current. Prism Anthropic
 claude-sonnet-5-5 completed coverage of all four documents with no findings.
+
+## Full tag-toolbar keyboard access
+
+A new routed Manual regression fills all 32 tokens with long mixed-script labels,
+uses End to reveal/focus the last chip, requires its whole box inside the toolbar,
+and removes it with one Return. It checks the full accessible name, one full-value
+removal event, the caller's focus request reaching the re-enabled entry, and no
+redelivery after settling. Light/dark and matched DPI160/320 software windows pass.
+Existing token/toolbar tests pass under race and driver vet passes. No runtime
+source changed; this adds focused interaction evidence.
+
+The initial theme fixture lacked the explicit Manual default background and was
+rejected before mounting. After that correction, the fixed 400px window at DPI320
+exposed a real narrow-layout limitation (roughly 200 logical pixels): a long chip
+can have clipped bounds. The matched-scale regression scales the software window
+with DPI to retain the same 320-logical-pixel field. It does not dismiss the narrow
+finding; that reproduction and the fixed 24-rune abbreviation limit are now in
+the spec/integration guide. Native display scaling is not claimed.
+
+Prism Anthropic claude-sonnet-5-5 suggested cloning the test callback's token slice
+before removal. This scenario removes the last element: append(prefix, empty...)
+only changes the slice length and does not shift or overwrite the backing array.
+View captures each removal target as a Token value (shown := t), and fullLast is
+also a value. No rendered callback retains a slice header to these items. The
+owner callback runs serially; no data race or aliased shifted view occurs. Keep
+the ordinary owner-controlled removal pattern; no production fix is warranted by
+this hypothetical finding. All reviewed files have complete coverage.
