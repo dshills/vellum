@@ -1,7 +1,9 @@
 # Mac widget demo
 
-This private personal-use gallery includes Sidebar, Sheet, Collection, Shortcuts
-and Levels pages, a Toolbar catalogue, plus the earlier controls on the Inputs page. All controls
+This private personal-use gallery opens on Components: cascading menus, split
+buttons, an inspector, a column browser and a typed rule editor, with live scoped
+theming. It also includes Sidebar, Sheet, Collection, Shortcuts, Levels, Toolbars
+and the earlier controls on Inputs. All controls
 are reusable through public Go APIs.
 For application code, see the [public-API integration guide](mac-widget-integration.md).
 
@@ -14,10 +16,21 @@ go run ./cmd/gallery -mac-widgets -mac-dark
 
 The packaged **Vellum Mac Widgets.app** starts the focused light gallery directly;
 **Vellum Mac Widgets Dark.app** starts the dark version. Choose a page in the
-top tab strip. Each page fills the available width and uses its fixed light/dark
-window surface; scroll within Inputs to reach its sections. The ordinary macOS title bar remains draggable.
+top tab strip. On Components, choose a demonstration from the selector below the
+appearance controls. Light/Dark and Blue/Purple/Green change that page locally,
+retaining values and immutable full-color icons. The rest of each bundle keeps
+its startup appearance. Scroll inside a page to reach its controls. The ordinary macOS title bar remains draggable.
 
 
+- **Components:** choose Themes, Cascading menus, Split buttons, Inspector panel,
+  Column browser, or Filter / rule editor. Menus open Export submenus with
+  pointer/Right; Left closes a submenu and Escape cancels. Split buttons separate
+  Save from its options. Collapse inspector headings without losing editor
+  values. The column browser reveals child columns and accepts divider resizing;
+  scroll horizontally at narrow widths. Rule rows provide typed text/number/bool
+  values, Add Rule / Add Group, removal and All/Any groups. These are sample
+  model changes; no documents, searches or filesystem operations are performed.
+  [Public APIs and limits](mac-composition-widgets.md), [themes](mac-theming.md).
 - **Toolbars:** compare Small (26 pt), Regular (32 pt), and Large (40 pt) action
   heights. Full-color icons start enabled; turn them off to compare monochrome
   symbols. Switch Icons / Text / Icons and text / Icon above text without recreating

@@ -15,6 +15,11 @@ renders these elements and publishes their supported accessibility semantics.
 | On/off switch | `ui.Switch` | `Checked`, `Change` |
 | Toggle button | `ui.ToggleButton` | `Checked`, `Change` |
 | Action menu | `ui.MenuButton` | `Options`, `Change.SelectedID` action requests |
+| Cascading action menu | `ui.NewMenuBranch`, `ui.MenuButton` | Immutable branches, checks, shortcut captions, full-color artwork |
+| Split button | `ui.SplitButton.View()` | Independent primary and menu, small/regular |
+| Property inspector | `ui.Inspector.View()` | Aligned editors, retained section disclosure, mixed hints |
+| Column browser | `ui.ColumnBrowser.View()` | Controlled hierarchy paths, resizable columns, previews |
+| Filter / rule editor | `ui.RuleEditor.View()` | Typed criteria, bounded nested All/Any proposals |
 | Sidebar navigator | `ui.Sidebar.View()` | Sections, stable item IDs, controlled navigation, disclosure, icons/badges |
 | Icon/thumbnail collection | `ui.CollectionView.View()` | Items, SelectedIDs, Change, Activate; responsive native grid |
 | Window-modal sheet | `ui.Sheet.View()` | Open, retained children, Confirm, Cancel, ReturnFocusID |
@@ -505,3 +510,5 @@ scope and limitations. This source work is beyond the published alpha.3 assets.
 replacing compatible controls. `MacThemeWithAccent` adds reusable semantic palette
 and light/dark presets. See [Mac theming](mac-theming.md) for inheritance, explicit
 style precedence, map snapshots and native appearance limits.
+
+See [Mac composition widgets](mac-composition-widgets.md) and [scoped application themes](mac-theming.md) for public usage and current limits.

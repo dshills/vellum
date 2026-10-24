@@ -59,3 +59,26 @@ func TestMacComponentRuleEditsRetainAcrossTheme(t *testing.T) {
 		t.Fatal("theme lost rules or art")
 	}
 }
+
+func TestMacComponentMenuChecksAreIndependentOfActionCount(t *testing.T) {
+	m := newMacComponentsGallery(false)
+	m.page = "menus"
+	menuView := func() ui.Node {
+		t.Helper()
+		n := findGalleryDocumentNode(m.view(), "components/actions")
+		if n.ID != "components/actions" || n.Change == nil || len(n.Options) != 3 || n.Options[2].ID != "grid" {
+			t.Fatal("missing menu demonstration/check option")
+		}
+		return n
+	}
+	menu := menuView()
+	menu.Change(ui.ChangeEvent{SelectedID: "export-png"})
+	menu = menuView()
+	if menu.Options[2].Checked {
+		t.Fatal("export toggled grid")
+	}
+	menu.Change(ui.ChangeEvent{SelectedID: "grid", Checked: true})
+	if !menuView().Options[2].Checked {
+		t.Fatal("grid proposal not accepted")
+	}
+}

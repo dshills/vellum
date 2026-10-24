@@ -10,7 +10,7 @@ func TestMacWidgetsNextPagesUsePublicComponents(t *testing.T) {
 		inputs := newInputHelpersGallery()
 		inputs.setAppearance(dark)
 		m := newMacWidgetsGallery(inputs, dark)
-		pages := []string{"navigation", "sheets", "mac-collection-page", "shortcuts", "levels", "toolbars", "inputs"}
+		pages := []string{"mac-components", "navigation", "sheets", "mac-collection-page", "shortcuts", "levels", "toolbars", "inputs"}
 		for _, page := range pages {
 			m.page = page
 			n := m.view()

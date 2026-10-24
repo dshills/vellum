@@ -318,7 +318,7 @@ func main() {
 		if *macDark {
 			window.Chrome.Appearance = app.AppearanceDark
 		}
-		macGallery.page = "toolbars"
+		macGallery.page = "mac-components"
 	}
 	must(a.Open(window))
 	var titlebar *cogent.TitlebarToolbarPrototype

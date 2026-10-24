@@ -1,0 +1,50 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 3.099915958940983
+  },
+  {
+    "cwd": "examples/sdk-contract",
+    "argv": [
+      "go",
+      "test",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.5823979168199003
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestMacWidgetsNextPages|TestMacComponent|TestMacNativeTitlebar|TestMacToolbar",
+      "-count=1"
+    ],
+    "exit_code": 0,
+    "seconds": 8.825180625077337
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      ".",
+      "./cmd/gallery"
+    ],
+    "exit_code": 0,
+    "seconds": 4.821142500033602
+  }
+]

@@ -1346,3 +1346,11 @@ Prism: `mac-rule-editor-final.json` (Anthropic Claude Sonnet 5.5, complete cover
 Fixed initial review ID reuse with a retained monotonic bounded-memory counter and explicit exhaustion rejection, tested stale removal after replacement. Structural operations intentionally apply to the current same-ID/same-parent/same-kind node; typed value edits additionally recheck field/operator. Final review: edit already invokes Validate and compares current fields before indexing, verified by a nil-fields stale-Add regression. Fields contain only comparable values, so slices.Equal is complete. Retained one-owner/no-copy semantics are explicit; concurrent mutation is unsupported. Consuming rejected proposal IDs is deliberate to prevent later reuse; retries cap at 65 and uint64 exhaustion rejects. Independent SDK and native add/remove/retained-sibling checks pass.
 
 Focused checks: `mac-rule-editor-verified-checks.json`, `mac-rule-editor-identities-checks.json`, `mac-rule-editor-guard-checks.json`.
+
+## Integrate themed Mac component catalogue and personal demo guides
+
+Prism: `mac-components-integration.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism requested clearer regression failure guards; the menu test now checks node identity, callback, option length and stable grid ID before accessing it. All source and SDK tests pass, focused gallery and existing toolbar regressions pass, and driver/gallery vet passes. The Components page is first and startup-selected; native toolbar behavior remains unchanged.
+
+Focused checks: `mac-components-integration-checks.json`, `mac-components-menu-final-checks.json`.

@@ -63,3 +63,20 @@ rejection/stale callbacks, bounds, theme retention, keyboard behavior and cleanu
 Use independent consumer checks where APIs are added. Separate deterministic
 routing evidence from packaged native screenshots/input checks. Reuse passing
 checks when implementation has not changed; no exhaustive release campaign.
+
+## Implementation checkpoints
+
+All five managed widgets and the scoped theme foundation are implemented. The
+personal gallery starts on Components with original full-color document artwork.
+Portable tests and an independent SDK consumer validate the public API; focused
+offscreen tests exercise actual menus, segment keyboard paths, retained editor
+disclosure, column selection/divider changes and rule add/remove routing.
+Prism reports and dispositions live in `docs/reviews/mac-personal-widgets`.
+Packaged native inspection is recorded separately in the personal delivery.
+
+Column navigation currently uses Up/Down/typeahead within a column and Tab across
+columns/dividers; Finder Left/Right column shortcuts are deferred. Rule fields
+cover text, finite numbers within ±1e6 and booleans; no evaluation engine is added.
+Themes are app-local snapshots and gallery choices are not persisted or linked
+to system appearance/accessibility settings. Native titlebar configuration remains
+separate. All components retain the single-owner/caller-accepted state contract.

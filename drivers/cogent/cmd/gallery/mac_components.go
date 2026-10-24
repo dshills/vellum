@@ -13,6 +13,7 @@ type macComponentsGallery struct {
 	inspector *ui.Inspector
 	width     float32
 	splits    []*ui.SplitButton
+	menuGrid  bool
 	menu      *ui.MenuBranch
 	dark      bool
 	accent    string
@@ -91,7 +92,13 @@ func (m *macComponentsGallery) themePreview() ui.Node {
 func (m *macComponentsGallery) menuPreview() ui.Node {
 	return ui.Node{ID: "components/menu-demo", Kind: ui.FormGroup, Text: "Cascading action menus", Children: []ui.Node{
 		{ID: "components/menu-help", Kind: ui.Label, Text: "Open Export, then use Right / Left to navigate. Escape cancels. Shortcut captions do not install bindings."},
-		{ID: "components/actions", Kind: ui.MenuButton, Text: "Document actions", IconImage: m.artwork[ui.SymbolFolder], Options: []ui.Option{{ID: "export", Label: "Export", IconImage: m.artwork[ui.SymbolSave], Branch: m.menu}, {ID: "separator", Separator: true}, {ID: "grid", Label: "Show grid", Checkable: true, Checked: m.count%2 == 1}}, Change: func(e ui.ChangeEvent) { m.count++; m.status = "Menu action: " + e.SelectedID }},
+		{ID: "components/actions", Kind: ui.MenuButton, Text: "Document actions", IconImage: m.artwork[ui.SymbolFolder], Options: []ui.Option{{ID: "export", Label: "Export", IconImage: m.artwork[ui.SymbolSave], Branch: m.menu}, {ID: "separator", Separator: true}, {ID: "grid", Label: "Show grid", Checkable: true, Checked: m.menuGrid}}, Change: func(e ui.ChangeEvent) {
+			m.count++
+			m.status = "Menu action: " + e.SelectedID
+			if e.SelectedID == "grid" {
+				m.menuGrid = e.Checked
+			}
+		}},
 	}}
 }
 
