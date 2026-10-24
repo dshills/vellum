@@ -331,6 +331,14 @@ updates and reordering. Moving children out of a removed container happens
 before its private host is destroyed.
 
 Toolbar defaults horizontal; Orientation Vertical selects a vertical toolbar.
+`WithToolbarOverflow` opts a horizontal Buttons/Separators bar into a fitting
+prefix plus a managed More actions menu. It appends ToolbarOverflowID(root),
+sets ToolbarOverflow, and validates 1..64 flat items; use it after composing
+per-item presentation. Hidden actions retain native identity but are excluded
+from ordinary focus/AX routing; menus preserve labels, artwork and callbacks.
+Width, contents, disabling and lifetime changes revoke stale menu presentations.
+Ordinary toolbars, including editors and vertical bars, keep scrolling.
+
 Only its main axis scrolls when constrained. The cross axis retains natural
 control size subject to explicit style limits. Overflow uses the same retained
 controls in a native scrolling region, preserving private editing state. Keyboard

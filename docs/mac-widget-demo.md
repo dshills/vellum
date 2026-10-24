@@ -24,7 +24,9 @@ window surface; scroll within Inputs to reach its sections. The ordinary macOS t
   actions. The stacked option centers artwork over its caption in taller controls;
   scroll the page to see the lower examples.
   A mixed document bar shows per-item choices; a vertical bar demonstrates scrolling.
-  Narrow preview constrains horizontal bars to 280 pt. Tab enters actions; arrows,
+  Narrow preview constrains horizontal bars to 280 pt. Overflow menu starts on;
+  click the trailing » to see hidden actions with full-color icons and labels.
+  Turn Overflow menu off to compare scrolling. Tab enters actions; arrows,
   Home and End move/reveal enabled tools. Delete is intentionally disabled.
   Actions update a counter only; no document files are opened or changed.
 - **Sidebar:** choose an icon row to navigate. Section triangles collapse/expand

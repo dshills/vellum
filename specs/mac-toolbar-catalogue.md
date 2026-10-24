@@ -15,8 +15,11 @@ rendering, title-bar and release-policy scope remains unchanged.
   global disable and a 280 pt narrow preview are visible and interactive.
 - Each size has its own stable IDs; display changes keep those IDs. Every icon action has a name and
   tooltip. Callbacks update owner-held count/status once; no file or global action.
-- Retained overflow scrolls and reveals focused actions; no replacement menu or
-  item reparenting. Existing toolbar event routing and lifecycle remain in charge.
+- Horizontal examples enable WithToolbarOverflow by default. Actual width fits a
+  prefix, reserving a trailing More actions chevron when needed. Its flat menu
+  preserves labels, symbol/full-color artwork, stable IDs, disabled state and
+  callbacks. No native action reparenting/deletion occurs on width changes.
+- Overflow menu checkbox restores the scrolling comparison; vertical bars scroll.
 - Public Manual tests compare geometry in both appearances, verify stable native
   incarnations through all display modes, skip disabled Delete, reveal End/Home,
   and admit no action while disabled. Live observations stay separate.
@@ -38,3 +41,13 @@ each activate once, Return activates once, and leading/default restoration keeps
 identity and native icon sizing. Gallery Manual routing covers stacked narrow
 End/Home revelation with disabled skipping. Live screenshots/keyboard checks are
 recorded separately from these automated checks.
+
+Overflow menus are bounded to 64 Buttons/Separators in a horizontal toolbar.
+WithToolbarOverflow is applied after mixed item presentation is chosen. No nested
+editors, placement sources, context-menu hosts, vertical menus or title-bar merge.
+Hidden actions have no main-window focus/AX target; menu actions appear only for
+the active popup lifetime. Resize/content changes, disabling and removal revoke
+stale actions. Menu row artwork is 18 logical pixels, contained and never tinted.
+Checked items with artwork show a separate check indicator; plain checked items
+retain the existing marker. Menu option IconImage is immutable and exclusive with
+Icon. Separators cannot carry either artwork or action state.

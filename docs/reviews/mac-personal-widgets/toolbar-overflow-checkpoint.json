@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "9964dfa36d7b95e18c8e5f162fbd80cc",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "938480c5d2e7f5619b013eab6951a8c473467f84",
+    "branch": "codex/widget-expansion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a6d0385c2af58012",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Overflow owner property set lazily during layout",
+      "message": "SizeUp measures widths only when the frame lays out. In SizeDown, the check `len(f.widths) != len(f.owner.children)` silently falls back to non-overflow layout if children change. The overflow owner property is set only on the last child during SizeUp, so menuDescriptor on a freshly mounted More button may not see the owner before its first open. This leaves a race where menu options are unfiltered.",
+      "suggestion": "Set toolbarOverflowOwnerProperty at mount/sync time rather than during SizeUp, and ensure it is cleared on retire.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/toolbar_overflow.go",
+          "lines": {
+            "start": 46,
+            "end": 50
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle"
+      ],
+      "evidence": "f.widths = f.widths[:0]\n\tfor _, c := range f.owner.children {\n\t\tf.widths = append(f.widths, c.widget.AsWidget().Geom.Size.Actual.Total.X)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4295,
+    "totalMs": 4356
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 18,
+    "bytes": 58193,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 29994,
+        "output": 385,
+        "costUSD": 0.063838
+      }
+    ],
+    "widenedFiles": 5,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

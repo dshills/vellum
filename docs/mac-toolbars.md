@@ -21,8 +21,9 @@ The mixed bar combines a labeled New action, text-only Open, and icon actions.
 Separators divide file and history groups. Delete demonstrates disabled appearance
 and skipped keyboard navigation. Sample callbacks only update a visible status.
 
-Narrow preview caps horizontal toolbars at 280 pt, preserving the same controls
-in a scrolling viewport. The vertical icon bar has a 154 pt viewport. Tab follows
+Narrow preview caps horizontal toolbars at 280 pt. **Overflow menu** starts enabled:
+a trailing double chevron opens the actions that do not fit, with their labels
+and original artwork. Turn it off to compare retained scrolling overflow. The vertical icon bar has a 154 pt viewport. Tab follows
 ordinary control order, unconsumed orientation arrows move within the toolbar,
 and Home/End reveal the first/last enabled action. Text editors keep their own
 editing commands. Lock-key flags preserve ordinary navigation, including the
@@ -47,7 +48,9 @@ button := ui.Node{ID: "open", Kind: ui.Button, IconImage: artwork,
 
 Here `bytes` is the standard library package; the application supplies PNG bytes
 and `openDrawing`. No filesystem path or SVG string is loaded by the native button.
-ToggleButton and popup menu *items* do not support IconImage in this increment.
+MenuButton options also accept `IconImage` (or a bundled `Icon`), alongside their
+required label. Checked actions keep their check marker beside supplied artwork.
+ToggleButton does not support IconImage in this increment.
 
 Set `IconPlacement: ui.IconAboveText` on an ordinary Button with artwork and a
 nonblank caption. Full-color `IconImage` and monochrome `Icon` both work. Artwork
@@ -71,6 +74,36 @@ Empty placement or `ui.IconLeading` restores the usual inline content. Changing
 placement keeps the same native action, caption, keyboard focus, and callback;
 artwork and caption add no private accessibility targets. MenuButton and
 ToggleButton keep their inline presentation in this increment.
+
+Use `ui.WithToolbarOverflow(toolbar)` after composing a fresh horizontal toolbar.
+It adds the stable `ui.ToolbarOverflowID(toolbar.ID)` More actions button. The
+adapter measures actual controls and available content width on each layout,
+including display scaling, item gaps and padding. All actions remain visible when
+they fit; otherwise it reserves the chevron and keeps a fitting prefix. Hidden
+separators are normalized so the menu has no leading, trailing or doubled rules.
+The menu always shows captions, including names for icon-only actions, and
+preserves disabled state, order, full-color pixels and the original callback.
+
+```go
+tools := ui.WithToolbarOverflow(ui.Node{ID: "drawing-tools", Kind: ui.Toolbar,
+    Accessibility: ui.Accessibility{Name: "Drawing tools"},
+    Children: []ui.Node{{ID: "drawing-save", Kind: ui.Button, IconImage: artwork,
+        Text: "Save", IconPlacement: ui.IconAboveText, Activate: save,
+        Appearance: ui.ButtonTool}},
+})
+```
+
+The menu supports 1..64 horizontal Buttons/Separators. Do not reuse the reserved
+chevron child ID; call the helper once, after per-item presentation changes.
+Editors, nested toolbars, placement sources, context-menu hosts and vertical bars
+keep ordinary scrolling. Allow at least the chevron's intrinsic width plus bar
+padding; an arbitrarily smaller viewport can clip any control. Changing display
+mode or toolbar width revokes a menu whose contents change. Removal, disabling,
+Escape, outside click and window shutdown use managed-menu lifetime handling.
+Return/Space or Down opens More actions; the popup uses native menu keyboard
+navigation. Tab and toolbar arrows skip hidden controls, with End reaching More.
+Widening restores the same native controls. Overflow is a custom-rendered
+same-window menu, with no NSToolbar title-bar integration or customization palette.
 
 A regular monochrome action, independently consumable by an application:
 
@@ -101,7 +134,7 @@ font-relative sizing. Local styles leave hover and keyboard-focus feedback intac
 
 These are custom-rendered **content** toolbars. They do not install NSToolbar,
 provide title-bar merging, vibrancy, customization palettes, draggable items,
-or overflow menus. Explicit light/dark palettes and size
+or cross-window overflow menus. Explicit light/dark palettes and size
 metrics do not follow automatic NSControlSize or OS appearance changes. Artwork
 uses original full-color sample pixels or Vellum’s bundled vector symbols;
 neither extracts macOS app icons or uses dynamic SF Symbols.

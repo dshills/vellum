@@ -22,7 +22,17 @@ type chromeState struct {
 }
 
 func mountChrome(parent tree.Node, r *record) core.Widget {
-	outer := core.NewFrame(parent)
+	var outer *core.Frame
+	var widget core.Widget
+	if r.node.Kind == ui.Toolbar {
+		custom := tree.New[overflowToolbarFrame](parent)
+		custom.owner = r
+		outer = &custom.Frame
+		widget = custom
+	} else {
+		outer = core.NewFrame(parent)
+		widget = outer
+	}
 	c := &chromeState{host: outer}
 	r.control.chrome = c
 	outer.Styler(func(s *styles.Style) {
@@ -36,6 +46,10 @@ func mountChrome(parent tree.Node, r *record) core.Widget {
 			if r.node.Orientation == ui.Vertical {
 				s.Direction = styles.Column
 				s.Grow.Set(0, 1)
+			}
+			if r.node.ToolbarOverflow {
+				s.Overflow.Set(styles.OverflowHidden)
+				return
 			}
 			// Scroll keeps the same native controls and their private editing state.
 			s.Overflow.Set(styles.OverflowAuto, styles.OverflowVisible)
@@ -83,10 +97,13 @@ func mountChrome(parent tree.Node, r *record) core.Widget {
 			}
 		})
 	}
-	return outer
+	return widget
 }
 func syncChrome(r *record, previous ui.Node) {
 	c := r.control.chrome
+	if previous.ToolbarOverflow != r.node.ToolbarOverflow {
+		r.widget.AsWidget().Update()
+	}
 	if c.caption != nil {
 		// DisplayNone marks Invisible during Style; explicitly restore both ways
 		// before Update so the native walker can reach a returning caption.
@@ -138,7 +155,7 @@ func toolbarKey(r *record, e events.Event) {
 		e.SetHandled()
 		return
 	}
-	order := ui.FocusOrder(ui.FocusScope(r.node))
+	order := ui.FocusOrder(ui.FocusScope(accessibilityFocusDescriptor(r)))
 	if len(order) == 0 {
 		e.SetHandled()
 		return
@@ -266,6 +283,16 @@ func bindToolbarNavigation(root *record) {
 			} // skip unrelated native pools/subtrees
 			if owner.node.Kind == ui.Toolbar {
 				scope = owner
+			}
+			if scope != nil && scope.node.ToolbarOverflow && owner.node.Kind == ui.MenuButton && owner.node.ID == ui.ToolbarOverflowID(scope.node.ID) {
+				node.AsTree().SetProperty(toolbarOverflowOwnerProperty, scope)
+			}
+			if scope == nil || !scope.node.ToolbarOverflow {
+				if hidden, _ := node.AsTree().Property(toolbarOverflowHiddenProperty).(bool); hidden {
+					node.(core.Widget).AsWidget().SetState(false, states.Invisible)
+				}
+				node.AsTree().DeleteProperty(toolbarOverflowHiddenProperty)
+				node.AsTree().DeleteProperty(toolbarOverflowOwnerProperty)
 			}
 			if owner.node.Kind == ui.Dialog {
 				scope = nil

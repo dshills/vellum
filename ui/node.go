@@ -96,8 +96,10 @@ type Node struct {
 	// NumberButtons optionally selects compact up/down arrows on NumberField.
 	NumberButtons NumberFieldButtons
 	// Orientation applies to display/choice/toolbar/split controls; RadioGroup defaults vertical.
-	Orientation Orientation
-	Options     []Option
+	// ToolbarOverflow is set by WithToolbarOverflow for horizontal action bars.
+	ToolbarOverflow bool
+	Orientation     Orientation
+	Options         []Option
 	// Multiple/SelectedIDs/SelectionChange belong only on ListBox.
 	Collection      *CollectionLayout
 	Multiple        bool

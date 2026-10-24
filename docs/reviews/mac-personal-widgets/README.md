@@ -975,3 +975,43 @@ Gallery public Manual checks cover above-mode narrow overflow, End/Home, disable
 skipping and no disabled activation. Portable UI race suite, public SDK test,
 vet and native build pass. Packaged native observations remain in the local
 delivery receipt, separate from physical-pointer or human VoiceOver qualification.
+
+
+## Width-responsive toolbar overflow
+
+WithToolbarOverflow adds an ordinary managed MenuButton to a flat horizontal
+action toolbar. Native layout retains all action controls, fits a prefix with
+room for the trailing chevron, and excludes hidden originals from input/focus/AX.
+The menu uses stable action IDs, original callbacks, labels, immutable full-color
+artwork or symbols, and current disabled state. Vertical/editor toolbars retain
+scrolling. The gallery provides an Overflow menu comparison switch.
+
+Prism reviewed the complete changes three times with Anthropic Claude Sonnet 5.5
+(18 files, complete coverage, no high findings). Concrete feedback addressed:
+the concrete native frame is returned directly; focus handoff uses the pinned
+WidgetBase.Defer API after Scene update/render, with current visibility/focus
+checks; hidden actions are matched by ID with a shape guard. Filtered menu
+availability drives both focus and AX. The final owner-binding concern was
+addressed by binding the More button before initial layout, so its menu is empty
+and unavailable until measured visibility exists. Disposal clears owner/hidden
+properties. A direct pre-layout regression and native lifetime checks cover this.
+
+Other speculative findings are closed by the existing ownership and allocation
+contract: reconcile allocates every child before attach/order/sync and layout;
+failed prepare returns without publishing partial records. No application owner
+mutation can occur between synchronous SizeUp and SizeDown. Clearing visibility
+properties halfway through measurement would expose a transient, incorrect tree.
+Menu rows are freshly tree.New-allocated for every popup, never reused; regression
+checks different button identities and empty indicators after checked-to-unchecked
+reopening for both color and symbol artwork. Plain unchecked menus retain their
+original empty icon field (nativeSymbol(empty) is the nonempty sentinel `none`).
+
+Focused race checks cover both appearances, completed full-color menu pixels,
+icon/label spacing, exactly-once pointer activation, disabled items and a suffix
+containing only disabled actions, macOS lock-modifier keyboard navigation,
+width changes with retained controls, stale actions, popup cancellation on resize,
+and removal clearing image sources. Existing menu/context-menu/check routing and
+scrolling toolbar tests pass. Gallery public Manual tests compare both modes and
+both appearances; portable UI, independent SDK consumer, vet and native build
+pass. Packaged native observations are recorded separately in the local delivery
+receipt, without claiming human VoiceOver or physical-pointer qualification.

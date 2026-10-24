@@ -521,11 +521,14 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 	}
 	var visit func(*record, string, bool)
 	visit = func(r *record, parent string, disabled bool) {
+		if toolbarOverflowHidden(r) {
+			return
+		}
 		start := len(nodes)
 		n := r.node
 		disabled = disabled || n.Disabled
 		if n.Kind == ui.MenuButton {
-			disabled = disabled || !ui.MenuEnabled(n)
+			disabled = disabled || !menuAvailable(r)
 		}
 		if n.Kind == ui.Dialog && (!n.Open || disabled || (r.control != nil && r.control.dialog != nil && r.control.dialog.dismissed)) {
 			return
@@ -849,7 +852,7 @@ func containsAccessibilityAction(actions []string, kind string) bool {
 }
 func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 	n := r.node
-	if n.Disabled || (r.control != nil && (r.control.disabled || r.control.retired)) {
+	if toolbarOverflowHidden(r) || n.Disabled || (r.control != nil && (r.control.disabled || r.control.retired)) {
 		return false
 	}
 	if n.ContextMenu != nil && action.Kind == "show-menu" {
@@ -1436,6 +1439,7 @@ func accessibilityFocusDescriptor(root *record) ui.Node {
 		return ui.Node{}
 	}
 	n := root.node
+	n.Disabled = n.Disabled || toolbarOverflowHidden(root) || n.Kind == ui.MenuButton && !menuAvailable(root)
 	if n.Kind == ui.Dialog && root.control != nil && root.control.dialog != nil && root.control.dialog.dismissed {
 		n.Open = false
 	}

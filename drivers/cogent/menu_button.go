@@ -70,7 +70,11 @@ func (w *menuItem) Render() {
 }
 func menuDescriptor(r *record) ui.Node {
 	if r.node.Kind == ui.MenuButton {
-		return r.node
+		n := r.node
+		if owner, _ := r.widget.AsWidget().Property(toolbarOverflowOwnerProperty).(*record); owner != nil && owner.node.ToolbarOverflow {
+			n.Options = toolbarOverflowOptions(owner, n.Options)
+		}
+		return n
 	}
 	n := ui.Node{ID: r.node.ID, Kind: ui.MenuButton, Text: "Context actions", Disabled: r.node.Disabled}
 	if r.node.ContextMenu != nil {
@@ -107,7 +111,7 @@ func bindContextMenu(r *record, w core.Widget) {
 	})
 }
 func menuAvailable(r *record) bool {
-	if r.control == nil || r.control.retired || r.control.disabled || menuDescriptor(r).Change == nil {
+	if r.control == nil || r.control.retired || r.control.disabled || toolbarOverflowHidden(r) || menuDescriptor(r).Change == nil {
 		return false
 	}
 	for _, o := range menuDescriptor(r).Options {
@@ -134,7 +138,7 @@ func mountMenuButton(parent tree.Node, r *record) core.Widget {
 		})
 	})
 	b.OnFirst(events.KeyChord, func(e events.Event) {
-		if !e.IsHandled() && e.Modifiers() == 0 && e.KeyCode() == key.CodeDownArrow {
+		if !e.IsHandled() && e.Modifiers() & ^((1<<key.CapsLock)|(1<<key.NumLock)) == 0 && e.KeyCode() == key.CodeDownArrow {
 			e.SetHandled()
 			epoch := r.control.menu.epoch
 			postControl(r, func() {
@@ -165,7 +169,8 @@ func syncMenuButton(r *record, previous ui.Node) {
 		// A second indicator clips in a compact Mac field. Restore it with a label.
 		b := r.widget.(*core.Button)
 		indicator := nativeSymbol(ui.SymbolDown)
-		if r.node.Text == "" {
+		_, overflow := r.widget.AsWidget().Property(toolbarOverflowOwnerProperty).(*record)
+		if r.node.Text == "" || overflow {
 			indicator = ""
 		}
 		if b.Indicator != indicator {
@@ -227,9 +232,18 @@ func openManagedMenu(r *record) {
 		item.popup = p
 		item.SetName(o.ID)
 		item.SetText(html.EscapeString(o.Label))
-		if o.Checkable && o.Checked {
-			item.SetIcon(nativeSymbol(ui.SymbolCheck))
+		if o.Icon != "" {
+			item.SetIcon(nativeSymbol(o.Icon))
 		}
+		if o.Checkable && o.Checked {
+			if o.Icon != "" || o.IconImage != nil {
+				item.SetIndicator(nativeSymbol(ui.SymbolCheck))
+			} else {
+				item.SetIcon(nativeSymbol(ui.SymbolCheck))
+			}
+		}
+		installMenuArtwork(&item.Button, o)
+
 		item.FinalStyler(func(style *styles.Style) {
 			applyStyle(style, ui.Node{Kind: ui.Label, Style: itemStyle}, ui.Theme{})
 			style.Grow.Set(1, 0)
@@ -259,7 +273,8 @@ func openManagedMenu(r *record) {
 		item.OnFocus(func(events.Event) { postControl(r, func() { _ = r.control.a.Invalidate(r.control.window) }) })
 	}
 	scene.OnFirst(events.KeyChord, func(e events.Event) {
-		if e.KeyCode() == key.CodeEscape || (e.KeyCode() == key.CodeTab && (e.Modifiers() == 0 || e.Modifiers() == 1<<key.Shift)) {
+		modifiers := e.Modifiers() & ^((1 << key.CapsLock) | (1 << key.NumLock))
+		if e.KeyCode() == key.CodeEscape || (e.KeyCode() == key.CodeTab && (modifiers == 0 || modifiers == 1<<key.Shift)) {
 			if p.stage != nil {
 				p.stage.ClosePopup() // native event owns this window's render context
 			}

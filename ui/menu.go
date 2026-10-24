@@ -20,11 +20,16 @@ func validateMenuButton(n Node) error {
 	}
 	for _, o := range n.Options {
 		if o.Separator {
-			if o.Label != "" || o.Disabled || o.Checkable || o.Checked {
+			if o.Label != "" || o.Disabled || o.Checkable || o.Checked || o.Icon != "" || o.IconImage != nil {
 				return fmt.Errorf("ui: menu separator permits only a stable ID")
 			}
 		} else if o.Checked && !o.Checkable {
 			return fmt.Errorf("ui: checked menu action requires Checkable")
+		}
+		if !o.Separator {
+			if err := validateIcon(Node{Kind: Button, Text: o.Label, Icon: o.Icon, IconImage: o.IconImage}); err != nil {
+				return err
+			}
 		}
 		if len(o.ID) > 1024 || len(o.Label) > 4096 || (!o.Separator && strings.TrimSpace(o.Label) == "") || !utf8.ValidString(o.ID) || !utf8.ValidString(o.Label) || strings.ContainsRune(o.ID, 0) || strings.ContainsRune(o.Label, 0) {
 			return fmt.Errorf("ui: menu action requires bounded UTF-8 identity and label without NUL")

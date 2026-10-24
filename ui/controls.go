@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"strings"
+
+	"github.com/dshills/vellum/canvas"
 )
 
 const (
@@ -38,10 +40,14 @@ const (
 // each option ID corresponds to the child page ID, in the same order.
 type Option struct {
 	ID, Label string
-	// Icon and Badge decorate multiple-selection ListBox source rows (including Sidebar navigation).
-	Icon     Symbol
-	Badge    string
-	Disabled bool
+	// Icon decorates MenuButton actions and multiple-selection ListBox rows.
+	// Badge decorates only multiple-selection ListBox rows (including Sidebar navigation).
+	Icon Symbol
+	// IconImage decorates MenuButton actions with immutable full-color artwork.
+	// Menu options accept either Icon or IconImage; Badge remains ListBox-only.
+	IconImage *canvas.TiledImage
+	Badge     string
+	Disabled  bool
 	// MenuButton alone supports passive separators and controlled check actions.
 	// Separators retain a stable ID, but have no label, value or input behavior.
 	// Closable belongs only on Tabs and requires Node.TabClose.
@@ -214,8 +220,14 @@ func ValidateControl(n Node) error {
 	if n.Kind != Tabs && n.TabClose != nil {
 		return fmt.Errorf("ui: TabClose belongs only on tabs")
 	}
+	if err := validateToolbarOverflow(n); err != nil {
+		return err
+	}
 	for _, option := range n.Options {
-		if (option.Icon != "" || option.Badge != "") && (n.Kind != ListBox || !n.Multiple) {
+		if option.IconImage != nil && n.Kind != MenuButton {
+			return fmt.Errorf("ui: option IconImage requires MenuButton")
+		}
+		if ((option.Icon != "" && n.Kind != MenuButton) || option.Badge != "") && (n.Kind != ListBox || !n.Multiple) {
 			return fmt.Errorf("ui: option icons and badges require a multiple ListBox")
 		}
 		if option.Closable && (n.Kind != Tabs || n.TabClose == nil) {

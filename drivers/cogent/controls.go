@@ -977,6 +977,8 @@ func disposeControl(r *record) {
 		disposePlacement(r)
 		disposeShortcutRecorder(r)
 		disposeButtonImage(r)
+		r.widget.AsWidget().DeleteProperty(toolbarOverflowOwnerProperty)
+		r.widget.AsWidget().DeleteProperty(toolbarOverflowHiddenProperty)
 		r.control.retired = true
 		if r.control.tabs != nil {
 			r.control.tabs.pending.Store(nil)

@@ -64,6 +64,7 @@ func testMacToolbarsPublicManual(t *testing.T, dark bool) {
 	defer a.Close()
 
 	model := newMacToolbarGallery(dark)
+	model.overflowMenu = false // retain scrolling-toolbar comparison coverage
 	focus := ui.FocusRequest{ID: "toolbar-Small/New", Sequence: 1}
 	if e = a.Open(app.Window{ID: "gallery", Title: "Toolbars", Width: 660, Height: 780, View: func() ui.Node { n := model.view(); n.Focus = focus; return n }}); e != nil {
 		t.Fatal(e)
@@ -179,6 +180,34 @@ func testMacToolbarsPublicManual(t *testing.T, dark bool) {
 	send(key.CodeReturnEnter)
 	if model.count != 1 {
 		t.Fatal("disabled toolbar activated")
+	}
+	setup(func() { model.disabled = false; model.overflowMenu = true; model.narrow = true; focus.Sequence++ })
+	more := ui.ToolbarOverflowID("toolbar-Small")
+	if !find(more).Visible || find("toolbar-Small/Redo").Visible {
+		t.Fatal("gallery did not overflow stacked actions")
+	}
+	send(key.CodeEnd)
+	if current.FocusedID != more {
+		t.Fatal("gallery End did not reach overflow", current.FocusedID)
+	}
+	send(key.CodeDownArrow)
+	hasRedo, hasDelete := false, false
+	for _, el := range current.Elements {
+		if el.Name == "Redo" && el.Visible && el.Parent == more {
+			hasRedo = el.Enabled
+		}
+		if el.Name == "Delete" && el.Visible && el.Parent == more {
+			hasDelete = !el.Enabled
+		}
+	}
+	if !hasRedo || !hasDelete {
+		t.Fatal("gallery menu lost labels or disabled state")
+	}
+	send(key.CodeEscape)
+	setup(func() { model.overflowMenu = false; focus.Sequence++ })
+	send(key.CodeEnd)
+	if current.FocusedID != "toolbar-Small/Redo" {
+		t.Fatal("scrolling comparison did not restore hidden actions", current.FocusedID)
 	}
 	if _, e := m.Capture(ctx, "gallery"); e != nil {
 		t.Fatal(e)

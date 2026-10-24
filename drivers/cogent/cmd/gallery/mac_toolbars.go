@@ -15,6 +15,7 @@ type macToolbarGallery struct {
 	display          string
 	disabled, narrow bool
 	fullColor        bool
+	overflowMenu     bool
 	artwork          map[ui.Symbol]*canvas.TiledImage
 	artworkError     error
 	count            int
@@ -39,7 +40,7 @@ func (s macToolbarMetrics) actionHeight(display string) float32 {
 
 func newMacToolbarGallery(dark bool) *macToolbarGallery {
 	icons, err := toolbarColorIcons()
-	return &macToolbarGallery{dark: dark, display: "both", fullColor: true, artwork: icons, artworkError: err, last: "No action yet"}
+	return &macToolbarGallery{dark: dark, display: "both", fullColor: true, overflowMenu: true, artwork: icons, artworkError: err, last: "No action yet"}
 }
 func (m *macToolbarGallery) action(prefix, name string, icon ui.Symbol, size macToolbarMetrics, display string) ui.Node {
 	text, art := name, icon
@@ -124,11 +125,11 @@ func (m *macToolbarGallery) view() ui.Node {
 		}
 		modes = append(modes, n)
 	}
-	children := []ui.Node{{ID: "toolbar-title", Kind: ui.Label, Text: "Toolbars", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 20, Weight: 600})}}, {ID: "toolbar-help", Kind: ui.Label, Text: "Compare sizes and display modes. Actions update the status below; Delete is deliberately disabled."}, {ID: "toolbar-display", Kind: ui.Row, Children: modes}, {ID: "toolbar-options", Kind: ui.Row, Children: []ui.Node{{ID: "toolbar-color", Kind: ui.Checkbox, Text: "Full-color icons", Checked: m.fullColor, Change: func(e ui.ChangeEvent) { m.fullColor = e.Checked }}, {ID: "toolbar-narrow", Kind: ui.Checkbox, Text: "Narrow preview", Checked: m.narrow, Change: func(e ui.ChangeEvent) { m.narrow = e.Checked }}, {ID: "toolbar-disable", Kind: ui.Checkbox, Text: "Disable actions", Checked: m.disabled, Change: func(e ui.ChangeEvent) { m.disabled = e.Checked }}}}}
+	children := []ui.Node{{ID: "toolbar-title", Kind: ui.Label, Text: "Toolbars", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 20, Weight: 600})}}, {ID: "toolbar-help", Kind: ui.Label, Text: "Compare sizes and display modes. Actions update the status below; Delete is deliberately disabled."}, {ID: "toolbar-display", Kind: ui.Row, Children: modes}, {ID: "toolbar-options", Kind: ui.Row, Children: []ui.Node{{ID: "toolbar-color", Kind: ui.Checkbox, Text: "Full-color icons", Checked: m.fullColor, Change: func(e ui.ChangeEvent) { m.fullColor = e.Checked }}, {ID: "toolbar-overflow-menu", Kind: ui.Checkbox, Text: "Overflow menu", Checked: m.overflowMenu, Change: func(e ui.ChangeEvent) { m.overflowMenu = e.Checked }}, {ID: "toolbar-narrow", Kind: ui.Checkbox, Text: "Narrow preview", Checked: m.narrow, Change: func(e ui.ChangeEvent) { m.narrow = e.Checked }}, {ID: "toolbar-disable", Kind: ui.Checkbox, Text: "Disable actions", Checked: m.disabled, Change: func(e ui.ChangeEvent) { m.disabled = e.Checked }}}}}
 	children = append(children, ui.Node{ID: "toolbar-status", Kind: ui.Label, Text: fmt.Sprintf("%s · actions: %d", m.last, m.count)})
 	for _, size := range macToolbarSizes {
 		id := "toolbar-" + size.name
-		children = append(children, ui.Node{ID: id + "/label", Kind: ui.Label, Text: fmt.Sprintf("%s · %g pt controls", size.name, size.actionHeight(m.display))}, m.toolbar(id, size, m.display, false))
+		children = append(children, ui.Node{ID: id + "/label", Kind: ui.Label, Text: fmt.Sprintf("%s · %g pt controls", size.name, size.actionHeight(m.display))}, m.withOverflow(m.toolbar(id, size, m.display, false)))
 	}
 	mixed := m.toolbar("toolbar-mixed", macToolbarSizes[1], "icons", false)
 	mixed.Accessibility.Name = "Mixed document toolbar"
@@ -143,8 +144,8 @@ func (m *macToolbarGallery) view() ui.Node {
 	}
 	children = append(children, ui.Node{ID: "toolbar-extra-examples", Kind: ui.Row, Style: ui.Style{GrowX: ui.Some(float32(1)), Align: ui.Some(ui.AlignStart), Gap: ui.Some(float32(16))}, Children: []ui.Node{
 		{ID: "toolbar-mixed-column", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1)), Gap: ui.Some(float32(10))}, Children: []ui.Node{
-			{ID: "toolbar-mixed-label", Kind: ui.Label, Text: "Mixed · text, icons and labels together"}, mixed,
-			{ID: "toolbar-limits", Kind: ui.Label, Text: "Content toolbars with retained scrolling overflow. No title-bar integration, customization palette, or overflow menu."},
+			{ID: "toolbar-mixed-label", Kind: ui.Label, Text: "Mixed · text, icons and labels together"}, m.withOverflow(mixed),
+			{ID: "toolbar-limits", Kind: ui.Label, Text: "Horizontal actions overflow into More actions. Vertical bars scroll. No title-bar integration or customization palette."},
 		}},
 		{ID: "toolbar-vertical-column", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(0)), Gap: ui.Some(float32(10)), MinSize: ui.Some(ui.Size{Width: 72}), MaxSize: ui.Some(ui.Size{Width: 72})}, Children: []ui.Node{
 			{ID: "toolbar-vertical-label", Kind: ui.Label, Text: "Vertical"}, m.toolbar("toolbar-vertical", macToolbarSizes[1], "icons", true),
@@ -152,4 +153,11 @@ func (m *macToolbarGallery) view() ui.Node {
 	}})
 
 	return ui.Node{ID: "toolbars", Kind: ui.Scroll, Grow: true, Style: ui.Style{Padding: ui.Some(ui.UniformInsets(16)), Gap: ui.Some(float32(8)), Background: ui.Some(background)}, Children: children}
+}
+
+func (m *macToolbarGallery) withOverflow(n ui.Node) ui.Node {
+	if m.overflowMenu {
+		return ui.WithToolbarOverflow(n)
+	}
+	return n
 }

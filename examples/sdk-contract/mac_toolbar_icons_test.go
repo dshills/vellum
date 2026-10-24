@@ -25,7 +25,16 @@ func TestPublicFullColorToolbarAction(t *testing.T) {
 	if got := ui.FocusOrder(n); len(got) != 1 || got[0] != "open" {
 		t.Fatal(got)
 	}
-	n.Children[0].Activate()
+	overflow := ui.WithToolbarOverflow(n)
+	if err := ui.Validate(overflow); err != nil {
+		t.Fatal(err)
+	}
+	menu := overflow.Children[1]
+	if menu.ID != ui.ToolbarOverflowID("tools") || menu.Options[0].IconImage != source || menu.Options[0].Label != "Open" {
+		t.Fatal("public overflow lost artwork/label")
+	}
+	menu.Change(ui.ChangeEvent{SelectedID: "open"})
+
 	if calls != 1 {
 		t.Fatal(calls)
 	}
