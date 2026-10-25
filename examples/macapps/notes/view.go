@@ -9,6 +9,8 @@ import (
 	"github.com/dshills/vellum/ui"
 )
 
+const notesFont = "Helvetica Neue, emoji"
+
 var (
 	ink     = color.NRGBA{R: 35, G: 35, B: 37, A: 255}
 	muted   = color.NRGBA{R: 133, G: 133, B: 136, A: 255}
@@ -21,12 +23,13 @@ var (
 // Theme uses the shared Mac control metrics; the app's containers own spacing.
 func Theme() ui.Theme {
 	theme := ui.MacTheme(false)
+	theme.Default.Typography = ui.Some(ui.Typography{Family: notesFont, Size: 13})
 	theme.Kinds[ui.Row] = ui.Style{Padding: ui.Some(ui.Insets{}), Gap: ui.Some(float32(0)), Align: ui.Some(ui.AlignCenter)}
 	theme.Kinds[ui.Column] = ui.Style{Padding: ui.Some(ui.Insets{}), Gap: ui.Some(float32(0))}
 	return theme
 }
 func label(id, text string, size float32, weight int) ui.Node {
-	return ui.Node{ID: id, Kind: ui.Label, Text: text, Style: ui.Style{Padding: ui.Some(ui.Insets{}), Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: size, Weight: weight})}}
+	return ui.Node{ID: id, Kind: ui.Label, Text: text, Style: ui.Style{Padding: ui.Some(ui.Insets{}), Typography: ui.Some(ui.Typography{Family: notesFont, Size: size, Weight: weight})}}
 }
 func box(kind ui.Kind, id string, children ...ui.Node) ui.Node {
 	return ui.Node{ID: id, Kind: kind, Children: children}
@@ -166,7 +169,7 @@ func (m *Model) listView() ui.Node {
 			items.Children = append(items.Children, h)
 			lastGroup = group
 		}
-		button := ui.Node{ID: "note-select-" + v.ID, Kind: ui.Button, Text: displayTitle(v.Title), Appearance: ui.ButtonQuiet, Disabled: m.actionReady() != nil, Activate: func() { _ = m.Request(func() error { return m.Select(v.ID) }) }, Accessibility: ui.Accessibility{Name: "Open note: " + displayTitle(v.Title)}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 13, Weight: 600}), MinSize: ui.Some(ui.Size{Height: 16}), MaxSize: ui.Some(ui.Size{Height: 16}), Background: ui.Some(color.NRGBA{}), Padding: ui.Some(ui.Insets{}), TextAlign: ui.Some(ui.AlignStart), GrowX: ui.Some(float32(1)), Border: ui.Some(ui.Border{})}}
+		button := ui.Node{ID: "note-select-" + v.ID, Kind: ui.Button, Text: displayTitle(v.Title), Appearance: ui.ButtonQuiet, Disabled: m.actionReady() != nil, Activate: func() { _ = m.Request(func() error { return m.Select(v.ID) }) }, Accessibility: ui.Accessibility{Name: "Open note: " + displayTitle(v.Title)}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: notesFont, Size: 13, Weight: 600}), MinSize: ui.Some(ui.Size{Height: 16}), MaxSize: ui.Some(ui.Size{Height: 16}), Background: ui.Some(color.NRGBA{}), Padding: ui.Some(ui.Insets{}), TextAlign: ui.Some(ui.AlignStart), GrowX: ui.Some(float32(1)), Border: ui.Some(ui.Border{})}}
 		summary := label("note-preview-"+v.ID, preview(v.Body), 12, 400)
 		summary.Style.Foreground = ui.Some(muted)
 		summary.Style.GrowX = ui.Some(float32(1))
@@ -242,12 +245,12 @@ func (m *Model) documentView() ui.Node {
 		date.Style.GrowX = ui.Some(float32(1))
 		title := ui.Node{ID: "note-title-" + id, Kind: ui.TextField, Disabled: m.files != nil && m.files.blocked(), Text: selected.value.Title, Change: func(e ui.ChangeEvent) {
 			m.accept(m.titleChanged(id, e.Text))
-		}, Accessibility: ui.Accessibility{Name: "Note title"}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 20, Weight: 600}), MinSize: ui.Some(ui.Size{Height: 30}), MaxSize: ui.Some(ui.Size{Height: 30}), CornerRadius: ui.Some(float32(0)), GrowY: ui.Some(float32(0)), Padding: ui.Some(ui.Insets{}), Border: ui.Some(ui.Border{}), Background: ui.Some(white), GrowX: ui.Some(float32(1))}}
+		}, Accessibility: ui.Accessibility{Name: "Note title"}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: notesFont, Size: 20, Weight: 600}), MinSize: ui.Some(ui.Size{Height: 30}), MaxSize: ui.Some(ui.Size{Height: 30}), CornerRadius: ui.Some(float32(0)), GrowY: ui.Some(float32(0)), Padding: ui.Some(ui.Insets{}), Border: ui.Some(ui.Border{}), Background: ui.Some(white), GrowX: ui.Some(float32(1))}}
 		bodyHelp := "Plain text editor; changes remain only in this demonstration"
 		if m.files != nil {
 			bodyHelp = "Plain text editor; Command-S saves the local notebook"
 		}
-		body := ui.Node{ID: "note-editor-" + id, Kind: ui.MultilineText, Disabled: m.files != nil && m.files.blocked(), Editor: selected.editor, Grow: true, SoftWrap: true, Prose: true, Change: func(ui.ChangeEvent) { m.accept(m.BodyChanged(id)) }, Accessibility: ui.Accessibility{Name: "Note text", Help: bodyHelp}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 14}), Padding: ui.Some(ui.Insets{}), Border: ui.Some(ui.Border{}), Background: ui.Some(white)}}
+		body := ui.Node{ID: "note-editor-" + id, Kind: ui.MultilineText, Disabled: m.files != nil && m.files.blocked(), Editor: selected.editor, Grow: true, SoftWrap: true, Prose: true, Change: func(ui.ChangeEvent) { m.accept(m.BodyChanged(id)) }, Accessibility: ui.Accessibility{Name: "Note text", Help: bodyHelp}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: notesFont, Size: 14}), Padding: ui.Some(ui.Insets{}), Border: ui.Some(ui.Border{}), Background: ui.Some(white)}}
 		document := box(ui.Column, "note-paper", title, body)
 		if m.files == nil {
 			document.Children = append([]ui.Node{date}, document.Children...)

@@ -220,3 +220,7 @@ history. Resize invalidates old visual-line affinity. Buffer views retain one
 immutable wrap-input snapshot; teardown releases it with the view. No widget or
 application callbacks run from the buffer wrapping callback. Native physical
 input and human IME/VoiceOver acceptance remain separate from routed tests.
+
+For a prose node with explicit zero-width `Style.Border`, the caret and text
+selection indicate focus without adding the code editor's rounded outer focus
+box. Code editors and framed controls retain native keyboard-focus outlines.

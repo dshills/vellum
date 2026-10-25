@@ -46,6 +46,8 @@ type Typography struct {
 // Border is an app-local solid outline in device-independent pixels.
 // A zero width explicitly removes a native widget's resting outline.
 // Native keyboard-focus indicators retain precedence while a widget is focused.
+// A Prose multiline node with explicit zero Border instead uses caret/selection
+// focus feedback, matching an unframed document writing surface.
 type Border struct {
 	Width float32
 	Color color.NRGBA

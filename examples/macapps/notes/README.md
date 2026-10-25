@@ -145,6 +145,7 @@ accessibility help rather than filling the writing area's footer. These layout c
 application-owned. The separately approved prose option extends the existing SDK
 control presentation; the document and history paths are unchanged.
 The approved prose presentation uses the retained multiline editor with
-proportional text and no gutter. Bold emoji fallback and physical body-click
-focus remain explicit follow-up items until checked. The offscreen layout test
+proportional text and no gutter. The font stack explicitly includes emoji fallback for titles, rows and prose.
+A frameless body uses caret/selection focus feedback. Physical body-click focus
+remains unqualified through the computer-use coordinate tool. The offscreen layout test
 checks actual geometry at 1100×740 and 1380×900; it does not prove native fidelity.

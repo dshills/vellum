@@ -143,6 +143,12 @@ func mountEditor(parent tree.Node, r *record) core.Widget {
 	syncEditor(r)
 	w.Styler(func(s *styles.Style) {
 		w.SetProse(r.node.Prose)
+		if r.node.Prose && r.node.Style.Border.Set && r.node.Style.Border.Value.Width == 0 {
+			// A frameless writing surface uses its caret/selection to indicate focus.
+			// Keep native focus borders on code and other framed controls.
+			s.MaxBorder.Width.Zero()
+			s.Border.Radius.Zero()
+		}
 		if r.node.SoftWrap {
 			s.Text.WhiteSpace = text.WhiteSpacePreWrap
 		} else {

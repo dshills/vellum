@@ -1738,3 +1738,11 @@ Prism: `notes-prose-patch-order-final.json` (Anthropic Claude Sonnet 5.5, comple
 Prism complete coverage with no findings. Concrete Framework run40211314163 rejected the added patch index. Runtime patch bytes/digest are unchanged; renamed0111 to0107, retained0106 as the exact predecessor and asserted0107 last. All34 preparation tests pass. This corrects packaging metadata only and preserves strict order/hash checks.
 
 Focused checks: `notes-prose-patch-order-final-checks.json`.
+
+## Fix Notes emoji fallback and frameless prose focus appearance
+
+Prism: `notes-prose-native-polish.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism complete coverage. Its low-confidence conditional focus concern is resolved by the included real widget.Style focused/unfocused code/prose transition test and upstream WidgetBase.FinalStyler: focus copies MaxBorder.Width into Border.Width. Managed explicit zero resting Border then stays zero only for opted-in frameless Prose; code/native indicators remain. Exact SDK offscreen font probe confirms Helvetica Neue alone selects LastResort for emoji, while Helvetica Neue, emoji selects Apple Color Emoji for normal and semibold. Focused race/vet/layout checks pass. Native typing, range selection, save and app UndoRedo passed in build5; these presentation-only corrections will be checked in the rebuilt package.
+
+Focused checks: `notes-prose-native-polish-checks.json`.

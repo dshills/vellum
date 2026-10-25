@@ -1,7 +1,9 @@
 package cogent
 
 import (
+	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/text/textcore"
+	"github.com/dshills/vellum/ui"
 	"testing"
 )
 
@@ -52,5 +54,33 @@ func TestManagedProseRetainsBindingCompositionAndHistory(t *testing.T) {
 				t.Fatal("mode transition replaced editor")
 			}
 		})
+	}
+}
+
+func TestManagedProseFramelessFocusPreservesOtherIndicators(t *testing.T) {
+	_, _, _, r, _ := editorFixture(t, "Draft")
+	widget := r.widget
+	for _, prose := range []bool{false, true, false, true} {
+		n := r.node
+		n.Prose = prose
+		n.SoftWrap = true
+		n.Style.Border = ui.Some(ui.Border{})
+		if err := syncRecord(r, n); err != nil {
+			t.Fatal(err)
+		}
+		for _, focused := range []bool{true, false, true} {
+			widget.AsWidget().SetState(focused, states.Focused)
+			widget.(*textcore.Editor).Style()
+			width := widget.AsWidget().Styles.Border.Width.Top.Value
+			if prose && width != 0 {
+				t.Fatal("frameless prose gained an outer focus box", width)
+			}
+			if !prose && focused && width <= 0 {
+				t.Fatal("code editor lost native focus indicator")
+			}
+			if r.widget != widget {
+				t.Fatal("focus style replaced editor")
+			}
+		}
 	}
 }
