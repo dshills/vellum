@@ -1514,3 +1514,11 @@ Prism: `mac-native-font-reopen.json` (Anthropic Claude Sonnet 5.5, complete cove
 No Prism findings. Live no-zombie candidate passed open/Cancel/reopen, a second acceptance and third reopen; native family selection ArialMT and physical 24-point preset previewed while accepted picker remained Helvetica Neue 18, then physical Use Font accepted Arial 24 with exactly one action increment. Native crash reproduced before fix with NSZombie identifying NSFontPanelTableView reloadData after deallocation. Reuse avoids the redundant table rebuild, and confirmation title is now Use Font.
 
 Focused checks: `mac-native-font-reopen-checks.json`.
+
+## Honor document and outline navigation with native macOS lock flags
+
+Prism: `mac-documents-lock-modifiers.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+No Prism findings. Native Down navigation worked while Return was ignored; macOS reports NumLock for normal events. New document activation and outline unmodified key/double-click routing now ignore only CapsLock/NumLock. Full routed regressions exercise both flags, including selection, activation and disclosure lifetime. Other shortcut modifiers remain rejected.
+
+Focused checks: `mac-documents-lock-modifiers-checks.json`.

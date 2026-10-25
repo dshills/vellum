@@ -149,14 +149,14 @@ func bindOutlineChoice(r *record, id string, b *core.Switch) {
 		}
 	})
 	b.OnFirst(events.DoubleClick, func(e events.Event) {
-		if r.node.Outline != nil && e.Modifiers() == 0 {
+		if r.node.Outline != nil && e.Modifiers() & ^((1<<key.CapsLock)|(1<<key.NumLock)) == 0 {
 			e.SetHandled()
 			queueOutlineOpen(r, id, b)
 		}
 	})
 }
 func outlineViewKey(r *record, id string, b *core.Switch, e events.Event) bool {
-	if r.node.Outline == nil || !listBoxActionGuard(r, id, b)() || e.Modifiers() != 0 {
+	if r.node.Outline == nil || !listBoxActionGuard(r, id, b)() || e.Modifiers() & ^((1<<key.CapsLock)|(1<<key.NumLock)) != 0 {
 		return false
 	}
 	row := outlineViewRow(r, id)

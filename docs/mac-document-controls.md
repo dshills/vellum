@@ -105,3 +105,5 @@ The widget gallery starts a fresh Cocoa window session using a process-local arg
 Packaged-gallery restoration isolation runs in its native bootstrap before Cogent initializes GLFW in a Go dependency initializer. It is limited to the two widget-demo bundle identifiers.
 
 The Fonts panel reloads its default family list on first creation only. Reusing the existing AppKit panel preserves its internal table views; repeated native reloads caused a macOS 26 deallocated-table crash during reopen checks.
+
+Document activation and outline navigation ignore Caps Lock and Num Lock state, matching native macOS key events (which report Num Lock). Command/Control/Option-modified activation remains separate.

@@ -31,7 +31,7 @@ func TestDocumentListNativeSelectionActivationAndResize(t *testing.T) {
 	unitSettle(t, m)
 	w := m.implementation.find("one")
 	input := func(code key.Codes) {
-		if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.incarnation, Type: events.KeyChord, Code: code}); err != nil {
+		if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.incarnation, Type: events.KeyChord, Code: code, Modifiers: 1<<key.CapsLock | 1<<key.NumLock}); err != nil {
 			t.Fatal(err)
 		}
 		unitSettle(t, m)

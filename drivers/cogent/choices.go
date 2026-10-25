@@ -66,7 +66,7 @@ func choiceKey(r *record, id string, button *core.Switch, e events.Event) {
 	if outlineViewKey(r, id, button, e) {
 		return
 	}
-	if r.node.DocumentList != nil && e.KeyCode() == key.CodeReturnEnter && e.Modifiers() == 0 {
+	if r.node.DocumentList != nil && e.KeyCode() == key.CodeReturnEnter && e.Modifiers() & ^((1<<key.CapsLock)|(1<<key.NumLock)) == 0 {
 		e.SetHandled()
 		queueDocumentActivation(r, id, button)
 		return
