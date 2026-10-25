@@ -334,15 +334,31 @@ func EnqueueGridScroll(ctx context.Context, a *app.Application, model *virtual.G
 			PhysicalX: event.Delta.X, PhysicalY: event.Delta.Y, GenerationBefore: s.Generation, ViewportBefore: s.Viewport}
 	}
 	recordPresentationReceipt(b.window, tag)
-	source.Deque.Send(&tracedScrollEvent{MouseScroll: event})
+	source.Deque.Send(&tracedScrollEvent{MouseScroll: event, ctx: ctx, trace: b.trace, tag: tag})
 	return nil
 }
 
-type tracedScrollEvent struct{ *events.MouseScroll }
+type tracedScrollEvent struct {
+	*events.MouseScroll
+	ctx   context.Context
+	trace *core.FrameTrace
+	tag   uint64
+}
 
 func (e *tracedScrollEvent) Ready() bool                     { return true }
 func (e *tracedScrollEvent) Merge(events.DeferredEvent) bool { return false }
-func (e *tracedScrollEvent) FrameTraceEvent() events.Event   { return e.MouseScroll }
+
+// Dispatch observes cancellation synchronously before rendering can report a
+// competing failure. AfterFunc still handles cancellation while waiting or in
+// flight. The admitted event always reaches its original handler unchanged.
+func (e *tracedScrollEvent) FrameTraceEvent() events.Event {
+	if e.ctx != nil {
+		if err := e.ctx.Err(); err != nil {
+			e.trace.Fail(e.tag, err.Error())
+		}
+	}
+	return e.MouseScroll
+}
 
 func tracedGridIntent(g *gridBinding) (*core.FrameTrace, uint64) {
 	if g.host == nil || g.host.Scene == nil {

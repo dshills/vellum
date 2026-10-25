@@ -1,0 +1,30 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "-race",
+      ".",
+      "-run",
+      "TestFrameMetrics|TestTreeFrameMetrics",
+      "-count=20"
+    ],
+    "exit_code": 0,
+    "seconds": 35.687292041955516
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 6.5705919589381665
+  }
+]

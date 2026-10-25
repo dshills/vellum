@@ -14,3 +14,11 @@ Prism: `mac-v1-app-shell-final.json` (Anthropic Claude Sonnet 5.5, complete cove
 Prism complete coverage. The initial real menu retry finding is fixed with one bounded same-state retry and an in-flight cancellation/join regression. Final findings adjudicated: error scopes compile and propagate owner/preparation errors separately; availability is captured during dirty reconciliation, not native paint callbacks; attachment is enqueued before any state flush on the same native main FIFO, and the attach acknowledgment invalidates on owner. Atomic clear-before-load publication is directly tested. Native window isolation, ABA refusal, unchanged customization/modal/teardown tests and Notes command history pass. No backend, gate or publication changes.
 
 Focused checks: `mac-v1-shell-acceptance-checks.json`, `mac-v1-shell-review-fixes-checks.json`.
+
+## Observe canceled frame measurements before FIFO dispatch
+
+Prism: `mac-v1-cancellation.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism complete coverage with no findings. Deterministic delayed-notification test preserves the identical admitted event and earlier terminals; actual grid/tree metrics race checks pass 20 repetitions. Foreground first-paint observation remains in the upcoming native checkpoint; this commit does not claim it.
+
+Focused checks: `mac-v1-cancellation-checks.json`.
