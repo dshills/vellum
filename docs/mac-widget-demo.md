@@ -235,3 +235,5 @@ popover behavior. Dial proposals are continuous; application history is caller-o
 - **Find / Replace** (Components): Cmd-F opens/focuses search, Cmd-G and Shift-Cmd-G navigate; Escape closes. Try case/whole-word options, Replace All, then Undo/Redo. Small controls compares compact spacing. The document is disposable in-memory sample text.
 
 - **Search scope bar** (Components): type part of a filename, switch All Documents/Current Project/Selected Files and compare result counts. Archive is disabled. Small controls compares sizes. Arrow keys move scope focus and Return selects. All data is in memory.
+
+- **Gradient well** (Components): open Drawing gradient, drag color stops, edit position/angle/RGBA, add/remove stops and compare Small track. Up/Down chooses a stop; Left/Right adjusts. Show macOS Colors closes the inline editor and accepts its result for the selected stop.

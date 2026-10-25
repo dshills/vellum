@@ -96,6 +96,7 @@ type Node struct {
 	PlacementTarget *placement.Target // optional Canvas2D acceptance endpoint
 	// CalendarCell is immutable focus metadata emitted by Calendar.View.
 	CalendarCell *CalendarCell
+	Track        *TrackInput
 	AngleDial    *AngleDialInput
 	DocumentList *DocumentListLayout
 	Outline      *OutlineViewLayout

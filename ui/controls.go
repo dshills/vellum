@@ -151,6 +151,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if err := validateTrack(n); err != nil {
+		return err
+	}
 	if n.DocumentList != nil && n.Outline != nil {
 		return fmt.Errorf("ui: document and outline presentation are mutually exclusive")
 	}

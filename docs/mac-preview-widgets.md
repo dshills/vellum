@@ -47,3 +47,22 @@ focused items. SearchBox supplies query and clear through the same path.
 SelectedStyle/ItemStyle integrate the page's scoped accent. Selected state is
 announced in button help. Results, counts, filtering and persistence are owned
 by the application; no local filesystem/network search or debounce is implied.
+
+## Gradient well
+
+Retain `ui.GradientWell` with `GradientValue{Stops, Angle}`. Accept typed edits
+with `Value, err = edit.Apply(Value)`; Apply clones/reorders stops by position,
+preserving stable IDs and unrelated color channels. 2–16 stops, fractions 0..1,
+angle wraps at 360, byte sRGB interpolation over a checkerboard. Drag stops on the
+shared track; Up/Down chooses a stop, Left/Right moves it by 1%, Shift ten; numeric
+position/angle and the managed RGBA editor supply alternatives. Add chooses the
+largest existing gap; Remove retains at least two stops. Handles may cross and
+keep identity. Same-position stops keep their prior accepted slice order (stable sorting) and produce an ordered hard transition; the last equal-position stop supplies the color at that exact point.
+
+The well opens an anchored scrollable editor with small/regular track sizes.
+Optional NativeColor receives a stop identity, original color and owner-only
+Accept callback. The inline editor closes before opening a native panel. Publish
+Accept through a reserved completion; reopen/disable/removal revokes that result.
+The gallery uses actual AppKit Colors without editing any document. Values are
+live proposals; history and persistence stay application-owned. No perceptual
+color-space interpolation, radial gradients or imported gradient-file format.

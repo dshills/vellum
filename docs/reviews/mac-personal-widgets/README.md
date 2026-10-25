@@ -1546,3 +1546,11 @@ Prism: `preview-scopes.json` (Anthropic Claude Sonnet 5.5, complete coverage).
 Prism gallery error-path finding addressed with an error label instead of panic. Mutable-state finding reflects intentional owner-held controlled semantics: current-state checks preserve queued All-to-Project-to-All, now covered explicitly; comparing to captured View state would lose that return. Duplicate accepted-scope actions are intentionally no-ops. Tests cover independent query/scope merge, stale removal/disable, UTF8/query budgets, compact size, counts and empty gallery results. Public SDK check passed.
 
 Focused checks: `preview-scopes-checks.json`, `preview-scopes-reviewed-checks.json`.
+
+## Add a Mac gradient well with draggable stable color stops
+
+Prism: `preview-gradient.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Public typed gradient edits, cached full-color/checkerboard previews, anchored scrolling editor, shared captured scalar track, native color acceptance and independent SDK consumption. DPI160/320 pointer/release/loss/disable regressions pass. Prism: explicit finite/range validation for added stops added; stable equal-position prior order documented/tested. Busy-after-Publish finding is lifecycle-expected: completion fails when exact parent retires, so no live widget remains to reset; writing owner state from a worker would introduce a race. WindowRef.Context and copied request color are worker-safe. Native physical checks scheduled for final package.
+
+Focused checks: `preview-gradient-guards-checks.json`, `preview-gradient-reviewed-checks.json`.

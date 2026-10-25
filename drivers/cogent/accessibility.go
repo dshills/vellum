@@ -674,6 +674,18 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 				}
 			}
 		}
+		if t := n.Track; t != nil {
+			x.Role = "slider"
+			x.Value = t.ActiveValue()
+			lo, hi := t.Min, t.Max
+			x.Min = &lo
+			x.Max = &hi
+			for _, h := range t.Handles {
+				if h.ID == t.ActiveID {
+					x.Name += " — " + h.Label
+				}
+			}
+		}
 		if d := n.AngleDial; d != nil {
 			x.Role = "slider"
 			x.Value = d.Degrees
@@ -682,6 +694,9 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			x.Max = &maximum
 		}
 		if !disabled {
+			if n.Track != nil {
+				x.Actions = append(x.Actions, "set", "increment", "decrement")
+			}
 			if n.AngleDial != nil {
 				x.Actions = append(x.Actions, "set", "increment", "decrement")
 			}
@@ -956,6 +971,24 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 		return false
 	}
 
+	if t := n.Track; t != nil {
+		switch action.Kind {
+		case "increment", "press":
+			t.Adjust(t.Current(), 1)
+		case "decrement":
+			t.Adjust(t.Current(), -1)
+		case "set":
+			v, err := strconv.ParseFloat(action.Value, 32)
+			if err != nil || math.IsNaN(v) || math.IsInf(v, 0) {
+				return false
+			}
+			t.Set(t.Current(), (float32(v)-t.Min)/(t.Max-t.Min))
+		default:
+			return false
+		}
+		_ = r.control.a.Invalidate(r.control.window)
+		return true
+	}
 	if d := n.AngleDial; d != nil {
 		switch action.Kind {
 		case "increment":

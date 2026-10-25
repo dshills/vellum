@@ -4,6 +4,7 @@ import (
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/editor"
 	"github.com/dshills/vellum/ui"
+	"image/color"
 	"testing"
 )
 
@@ -40,6 +41,21 @@ func TestPublicSearchScopeContract(t *testing.T) {
 	bar := &ui.SearchScopeBar{ID: "scopes", Label: "Search", Value: ui.SearchScopeValue{ScopeID: "all"}, Items: []ui.SearchScopeItem{{ID: "all", Label: "All", Count: 0}}}
 	bar.Change = func(e ui.SearchScopeEvent) { bar.Value = e.Apply(bar.Value) }
 	if _, e := bar.View(); e != nil {
+		t.Fatal(e)
+	}
+}
+
+func TestPublicGradientWellContract(t *testing.T) {
+	g := &ui.GradientWell{ID: "gradient", Label: "Gradient", Value: ui.GradientValue{Stops: []ui.GradientStop{{ID: "a", Position: 0, Color: color.NRGBA{R: 255, A: 255}}, {ID: "b", Position: 1, Color: color.NRGBA{B: 255, A: 255}}}}}
+	g.Change = func(e ui.GradientEdit) {
+		v, err := e.Apply(g.Value)
+		if err != nil {
+			t.Error(err)
+		} else {
+			g.Value = v
+		}
+	}
+	if _, e := g.View(); e != nil {
 		t.Fatal(e)
 	}
 }
