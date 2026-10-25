@@ -64,6 +64,9 @@ func (m *macWidgetsGallery) view() ui.Node {
 		}
 	}
 	root := ui.Node{ID: "mac-widgets-root", Kind: ui.Column, Grow: true, Style: ui.Style{Background: ui.Some(background)}, Children: []ui.Node{{ID: "mac-widgets-pages", Kind: ui.Tabs, Grow: true, Style: ui.Style{Foreground: ui.MacTheme(m.dark).Default.Foreground}, SelectedID: m.page, Options: options, Change: func(e ui.ChangeEvent) { m.page = e.SelectedID }, Children: children}}}
+	if m.page == "mac-components" && m.components.page == "find-replace" && m.components.find != nil {
+		root.Focus = m.components.find.focus
+	}
 	if m.page == "inputs" {
 		root.Focus = m.inputs.focus
 	}

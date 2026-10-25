@@ -1530,3 +1530,11 @@ Prism: `preview-quicklook-final.json` (Anthropic Claude Sonnet 5.5, complete cov
 Quick Look public API, local file validation, responder ownership, native shutdown and same-display placement. Offscreen parser/routing, stale-item/hidden-item, optional service and independent SDK checks pass. Prism findings: Node.DocumentList/Outline point to detached eligibility-checked layouts, not raw owner callbacks; mutual exclusivity and else-if also added. The final responder finding is false: session.savedNext=parent.nextResponder is assigned before chain installation/updateController. Ownership is claimed only after foreign-preexistence guard and singleton creation. Native file was clang-formatted after review without semantic changes. Actual native panel check remains scheduled with final package.
 
 Focused checks: `preview-quicklook-final-checks.json`, `preview-quicklook-reviewed-checks.json`.
+
+## Add a Mac Find and Replace bar with journaled Unicode search
+
+Prism: `preview-find-reviewed.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism actionable findings addressed: bounded content-revision match cache; selection mapping for Replace All; explicit nonoverlap regression; ErrFindNoMatch prevents keyboard no-op attempts from incrementing gallery success counters. Last matcher finding explicitly states no bug and no change needed. Focused model, composition, cache/close lifetime, gallery shortcut/Undo and public SDK checks passed. Host command registry retains editor-first Escape handling. Physical checks scheduled for final package.
+
+Focused checks: `preview-find-reviewed-checks.json`, `preview-find-guards-checks.json`.

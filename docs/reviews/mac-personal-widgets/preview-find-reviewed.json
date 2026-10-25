@@ -1,0 +1,113 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f65321626e664dbea89c4d1311d379ea",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "08b7fc4fe3ba8d138f2e915d0dcc2ab15d140656",
+    "branch": "codex/mac-preview-controls"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "9459b973b6e14cd6",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Match loop review",
+      "message": "After a full match, j is set to 0 for nonoverlap, but when the word-boundary check fails it sets j = prefix[j-1]. That is fine. However, if a needle has length 1 and the match is rejected, prefix[0] is 0 so it works. The real issue: in the KMP loop, `ch == needle[j]` is evaluated after j may equal len(needle)-1 only; fine. No bug here beyond this.",
+      "suggestion": "No change needed.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "ui/find_bar.go",
+          "lines": {
+            "start": 78,
+            "end": 82
+          }
+        }
+      ],
+      "tags": [
+        "location-corrected"
+      ],
+      "evidence": "j = prefix[j-1]\n\t\t\t}\n\t\t}\n\t}\n\treturn out, nil",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "43fa6382cc57b344",
+      "severity": "medium",
+      "category": "bug",
+      "title": "No-match reported as success",
+      "message": "Next/Previous/Replace with an empty query or zero matches silently return nil, so the gallery reports 'Find operation complete' and increments the action count even though nothing happened.",
+      "suggestion": "Return a sentinel such as ErrNoMatch, or have callers distinguish no-op results.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/find_bar.go",
+          "lines": {
+            "start": 119,
+            "end": 122
+          }
+        }
+      ],
+      "tags": [
+        "location-corrected"
+      ],
+      "evidence": "matches, err := FindMatches(s.Text, q.Query, q.Options)\n\tif err != nil || len(matches) == 0 {\n\t\treturn err\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5320,
+    "totalMs": 5348
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 11,
+    "bytes": 35357,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 19822,
+        "output": 541,
+        "costUSD": 0.045054
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

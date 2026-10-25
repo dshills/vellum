@@ -231,3 +231,5 @@ change native chrome. Native panel ownership/cleanup is separate from managed
 popover behavior. Dial proposals are continuous; application history is caller-owned.
 
 - **Quick Look** (Components): select a sample in the list/outline and press Space, or use Quick Look sample. Actual macOS previews show disposable text/PNG files. Escape/Space closes. No personal files are read. [API and limits](mac-preview-widgets.md).
+
+- **Find / Replace** (Components): Cmd-F opens/focuses search, Cmd-G and Shift-Cmd-G navigate; Escape closes. Try case/whole-word options, Replace All, then Undo/Redo. Small controls compares compact spacing. The document is disposable in-memory sample text.

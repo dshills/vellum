@@ -10,6 +10,7 @@ renders these elements and publishes their supported accessibility semantics.
 | Label | `ui.Label` | `Text` |
 | Action button | `ui.Button` | `Text`, `Activate` |
 | Bundled icon | `ui.Icon` | `Icon`, optional alternate `Text`/accessible name |
+| Find / Replace bar | `ui.FindBar.View()` | Unicode matches, journaled replacement, compact/regular |
 | Native Quick Look | `app.Application.QuickLook()` | Local file previews with exact-parent lifetime |
 | Document list | `ui.DocumentList.View()` | Full-color metadata rows, controlled sort/width/selection, activation |
 | Mac outline | `ui.OutlineView.View()` | Parent hierarchy, disclosure, color icons/badges, hidden selection |

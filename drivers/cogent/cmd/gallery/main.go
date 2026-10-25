@@ -17,6 +17,7 @@ import (
 
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
+	"github.com/dshills/vellum/command"
 	"github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/drivers/cogent/internal/nativefixture"
 	"github.com/dshills/vellum/editor"
@@ -414,7 +415,11 @@ func main() {
 		must(runControlCatalogue(ctx, a, g, theme))
 		return
 	}
-	err = a.Run(ctx, cogent.Driver{Theme: theme, TitlebarToolbarPrototype: titlebar})
+	var galleryCommands *command.Registry
+	if macGallery != nil {
+		galleryCommands = macGallery.findCommands()
+	}
+	err = a.Run(ctx, cogent.Driver{Theme: theme, TitlebarToolbarPrototype: titlebar, Commands: galleryCommands})
 	if progressDone != nil {
 		cancel()
 		var checkErr error
