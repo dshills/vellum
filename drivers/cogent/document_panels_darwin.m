@@ -90,7 +90,7 @@ void vellumChooseDocumentPanel(uint64_t token,uint64_t parentToken,const char *j
  if(fontMode){NSFontManager *manager=NSFontManager.sharedFontManager;session.savedFont=manager.selectedFont;session.savedFontMultiple=manager.isMultiple;session.savedFontTarget=manager.target;session.savedFontAction=manager.action;session.savedFontEnabled=((NSFontPanel *)panel).enabled;session.font=font;}
  else{NSColorPanel *colors=(NSColorPanel *)panel;session.alpha=[o[@"ShowsAlpha"] boolValue];session.savedColor=colors.color;session.savedContinuous=colors.continuous;session.savedAlpha=colors.showsAlpha;}
  if(!vellumDocumentPanels)vellumDocumentPanels=[NSMutableDictionary new];vellumDocumentPanels[@(token)]=session;
- panel.title=o[@"Title"];panel.delegate=session;panel.hidesOnDeactivate=YES;panel.appearance=parent.effectiveAppearance;
+ panel.restorable=NO;panel.title=o[@"Title"];panel.delegate=session;panel.hidesOnDeactivate=YES;panel.appearance=parent.effectiveAppearance;
  if(fontMode){NSFontManager *manager=NSFontManager.sharedFontManager;manager.target=session;manager.action=@selector(changeFont:);[manager setSelectedFont:font isMultiple:NO];[(NSFontPanel *)panel setPanelFont:font isMultiple:NO];((NSFontPanel *)panel).enabled=YES;[(NSFontPanel *)panel reloadDefaultFontFamilies];}
  else{NSColorPanel *colors=(NSColorPanel *)panel;colors.showsAlpha=session.alpha;colors.continuous=YES;NSDictionary *c=o[@"Color"];colors.color=[NSColor colorWithSRGBRed:[c[@"R"] doubleValue]/255 green:[c[@"G"] doubleValue]/255 blue:[c[@"B"] doubleValue]/255 alpha:session.alpha?[c[@"A"] doubleValue]/255:1];[colors setTarget:session];[colors setAction:@selector(changed:)];}
  vellumSetPanelAccessory(panel,fontMode,vellumColorActions(session));

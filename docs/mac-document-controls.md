@@ -99,3 +99,5 @@ shares normalization (360 wraps to zero). Proposals are live; applications own
 undo transactions and acceptance/rejection. The gallery shows 64/96/128pt variants.
 
 AppKit can show a newly created shared panel using remembered visibility. The adapter takes ownership during that first creation; already existing foreign panels and visible owned panels remain refused.
+
+The widget gallery starts a fresh Cocoa window session using a process-local argument-domain override. It does not erase saved application state or preferences; toolbar customization still uses its own persistence. Cocoa cannot reconstruct an asynchronous chooser's worker, so adapter-owned panels are non-restorable. Apps using the services retain their own window-restoration policy.

@@ -1490,3 +1490,11 @@ Prism: `mac-native-panel-admission-final.json` (Anthropic Claude Sonnet 5.5, com
 Live first-open failure fixed by distinguishing preexisting panels from AppKit auto-shown first creation. Admission truth table retains foreign-panel and visible-owned refusal. Prism failure-path finding is addressed by createdPanel orderOut before registration and existing finish/cleanup after registration; ownership intentionally remains true for reuse of a panel created by this adapter. Cleanup failures retain bounded registration for shutdown retry. Resetting ownership would incorrectly strand an adapter-created shared singleton as foreign.
 
 Focused checks: `mac-native-panel-admission-checks.json`.
+
+## Prevent Cocoa from restoring orphaned gallery chooser sessions
+
+Prism: `mac-native-panel-restoration.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Native call-stack control identified NSColorPanel restoreWindowWithIdentifier during GLFW startup before user chooser. Gallery fresh-session override is process-local and preserves toolbar persistent preferences; owned chooser panels are non-restorable. Prism fixture finding is not actionable: no persistent defaults write occurs, the assertion requires an empty persistent domain, and the uniquely named object holds only volatile argument state. No persistent domain is created to remove. Diagnostic tracing code was removed before review.
+
+Focused checks: `mac-native-panel-restoration-checks.json`.
