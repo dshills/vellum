@@ -1,0 +1,25 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "gofmt",
+      "-w",
+      "cmd/gallery/mac_toolbar_preferences_test.go"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0037754590157419443
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-run",
+      "MacToolbar.*Preferences",
+      "./cmd/gallery"
+    ],
+    "exit_code": 0,
+    "seconds": 4.964464083081111
+  }
+]

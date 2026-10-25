@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"testing"
 
 	"github.com/dshills/vellum/ui"
@@ -40,7 +41,10 @@ func TestMacToolbarPreferencesRoundTripAndRestore(t *testing.T) {
 		t.Fatal("defaults not saved")
 	}
 	info, e := os.Stat(path)
-	if e != nil || info.Mode().Perm() != 0600 {
+	if e != nil {
+		t.Fatal("preference stat", e)
+	}
+	if runtime.GOOS != "windows" && info.Mode().Perm() != 0600 {
 		t.Fatal("unexpected preference file mode", info, e)
 	}
 	temps, _ := filepath.Glob(filepath.Join(filepath.Dir(path), ".toolbars-*.tmp"))

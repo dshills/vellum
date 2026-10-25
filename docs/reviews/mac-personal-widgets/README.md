@@ -1658,3 +1658,11 @@ Prism: `mac-stabilization-dependencies.json` (Anthropic Claude Sonnet 5.5, compl
 Prism completed coverage with no findings. Legacy Gio x/image/net pins now exceed GitHub patched thresholds; required x/sys/text and Go floor updated. Module checksums refreshed and mod verify/test/vet/build pass. Original 418 notice hashes verify and the 82-component native inventory has no rand component; the detected rand declaration is upstream itertools dev-dependency notice material. This supports classification, not exhaustive native binary security qualification. Do not rewrite original notices or dismiss the alert. Active driver pins and historical P0 evidence remain unchanged; default-branch alerts will not reflect this branch until merged.
 
 Focused checks: `mac-stabilization-prototype-final-checks.json`, `mac-stabilization-alert-applicability-checks.json`.
+
+## Keep toolbar preference mode assertion portable on Windows
+
+Prism: `mac-stabilization-ci-permissions.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Actual Windows runner reached and passed the first fixed test, then exposed an exact POSIX0600 assertion in the gallery preferences test. Stat errors and all persistence/order/color/migration/stale/temp-cleanup checks still execute on Windows. Exact Unix permission checks remain on Unix; Windows FileMode does not represent those bits. Focused race tests pass and Prism completed coverage without findings. No production save permissions or framework API changed. Notes work is excluded from this checkpoint.
+
+Focused checks: `mac-stabilization-ci-permissions-checks.json`.
