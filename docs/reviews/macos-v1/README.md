@@ -46,3 +46,7 @@ Prism: `mac-v1-final-acceptance.json` (Anthropic Claude Sonnet 5.5, complete cov
 Prism complete coverage with no findings. Final native cases pass on source48c57e8: file-panel focus handoff, exact note history/cleanup, independent window toolbars, disabled refusal, gallery pointer targeting and saved-notebook relaunch. Initial real focus failure and long service-call interruption remain recorded separately. Matching SDK, external module origins, starter, exact signed app ZIPs and checksums verified. Raw local journal is private. Human IME/VoiceOver and other hardware remain unqualified; public release and existing responsiveness policy unchanged. This report-only commit does not relabel runtime bytes.
 
 Focused checks: `mac-v1-dialog-focus-final-checks.json`, `mac-v1-cancellation-checks.json`, `mac-v1-delivery-contract-pass-checks.json`.
+
+## Refresh README for the merged macOS v1 candidate
+
+Prism: `mac-v1-readme.json` (Anthropic Claude Sonnet 5.5, complete coverage, no findings). Current source and historical public downloads are distinguished; Mac presentation, native shell, examples, verification and support limits are described. All35 local links, four entry points, three gallery flags and release-version consistency checked; receipt: `mac-v1-readme-checks.json`. Documentation only; existing runtime verification reused.
