@@ -1570,3 +1570,11 @@ Prism: `preview-integration.json` (Anthropic Claude Sonnet 5.5, complete coverag
 Integration passes root race/vet, full gallery package tests, selected native routing/lifetime/AX audits, independent SDK, and twelve light/dark raster variants including open gradient. Concrete visual findings fixed: page/query growth, unwrapped find count, transparent dark scope toolbar, seamless cached immutable gradient strip. Whole-word search now includes combining marks. Portable Quick Look fixtures use OS temp paths. Native controller follows Cocoa show/update ownership and restores retained responder; cleanup removes attachment/orderOut/exits fullscreen even on ownership refusal. Prism cleanup verification covered by source and existing idempotent grouped cleanup; compile finding is disproved by passing native tests/vet (TrackHandle is comparable and imports are present). Rendering/pacing policy unchanged. Authorized native ten-minute package check is next.
 
 Focused checks: `preview-integration-checks.json`, `preview-visual-checks.json`, `preview-polish-checks.json`, `preview-portable-final-checks.json`.
+
+## Fix Quick Look presentation ownership and focused Find dismissal
+
+Prism: `preview-live-fix-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+The first Prism reentrancy concern was addressed by deferring lost-controller cancellation until the main-queue controller transition completes. The follow-up speculation is not actionable: the deferred block checks finished before accessing ownership, same-turn hand-back is explicitly excluded by currentController == self, and finish sets finished before cleanup can updateController. An unfinished session cannot be replaced because singleton admission refuses while vellumPreviewSession exists. Lost control intentionally returns ErrCanceled under the documented cancellation contract, rather than a new public status. Focused race tests and native compilation passed; physical checks follow separately.
+
+Focused checks: `preview-live-fix-checks.json`, `preview-live-fix-final-checks.json`.

@@ -45,3 +45,11 @@ Two handles on one track, ordered lower/upper values, bounds/step, paired numeri
 fields, small/regular sizes, pointer capture and keyboard/accessibility alternatives.
 Handles clamp at each other; live proposals, no trailing click on release, cleanup
 on loss/removal/disable/shutdown. No new renderer or application history ownership.
+
+### Native verification follow-up
+
+Quick Look requires a visible main/key parent in the active application. The
+shared panel acquires its responder controller before presentation and owns its
+geometry; it is not reparented as a child window. Relinquishing preview control
+terminates the session. Find Escape is a window shortcut while the Find page and
+bar are active, so a focused native field cannot swallow it as its Abort key.

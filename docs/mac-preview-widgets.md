@@ -10,6 +10,9 @@ close returns nil. Caller/window/application cancellation revokes the session.
 Unavailable platforms return `ErrUnavailable`. Foreign preexisting Quick Look
 panels refuse rather than taking over another responder's state. One native
 auxiliary session is active at a time; Colors/Fonts and Quick Look don't overlap.
+The parent must be visible in the active application and be its main or key
+window. Background requests return `ErrUnavailable`; the service does not
+activate an unrelated window. AppKit owns preview geometry and animation.
 The actual AppKit panel provides its system navigation and supported formats.
 Full-screen preview and external preview-provider behavior are OS-owned; no
 cross-window handoff, editor, file chooser or file-writing API is added.
@@ -91,4 +94,7 @@ and the open gradient editor in light/dark. Actual AppKit provider rendering and
 physical pointer/shortcut checks are recorded separately with the packaged build.
 Quick Look installs a temporary responder after the exact parent, retains and
 restores the prior responder, and yields control before releasing references.
-Windowed close and fullscreen exit both use the same cleanup path.
+Windowed close and fullscreen exit both use the same cleanup path. Loss of
+preview control cancels and releases the session. `VELLUM_QUICK_LOOK_TRACE=1`
+adds lifecycle phase and visibility/key/controller booleans to stderr for local
+diagnostics; it does not log file names or paths.

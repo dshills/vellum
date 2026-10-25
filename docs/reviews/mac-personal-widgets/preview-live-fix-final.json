@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b4022e483cd2dc9af57ef4fc805d7d66",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "0656946613f0346c23967a2ea78a5e58680ab122",
+    "branch": "codex/mac-preview-controls"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "0d7be016c483d1c4",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Deferred finish on endPreviewPanelControl may misfire",
+      "message": "endPreviewPanelControl fires for normal transitions, including cleanup's own updateController, and also when the session is being torn down. The deferred block finishes the session with status 1 (cancel) whenever the controller isn't self. It can race with a legitimate flow, and is also executed after cleanup has nil'ed self.panel; the block captures the panel strongly, but cleanup/finish are idempotent only via the finished flag. Status 1 may be misreported as caller cancellation.",
+      "suggestion": "Use a dedicated status code for lost control instead of 1, and verify the session is still vellumPreviewSession before finishing. Test the hand-back case.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/quick_look_darwin.m",
+          "lines": {
+            "start": 103,
+            "end": 110
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle",
+        "appkit",
+        "location-corrected"
+      ],
+      "evidence": "  if (!self.finished) {\n    // Allow AppKit to finish the controller transition before cleanup invokes\n    // updateController. A same-turn hand-back to us keeps the session alive.\n    dispatch_async(dispatch_get_main_queue(), ^{\n      if (!self.finished \u0026\u0026 panel.currentController != self)\n        [self finish:1];\n    });\n  }",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4292,
+    "totalMs": 4305
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 16781,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 9572,
+        "output": 475,
+        "costUSD": 0.023894
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

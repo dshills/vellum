@@ -85,9 +85,6 @@ func (m *macWidgetsGallery) findCommands() *command.Registry {
 	}{{"find", "Find", "Meta+F", -1}, {"next", "Find Next", "Meta+G", int(ui.FindNext)}, {"previous", "Find Previous", "Meta+Shift+G", int(ui.FindPrevious)}, {"close", "Close Find", "Escape", -2}} {
 		c := entry
 		scope := command.WindowShortcuts
-		if c.action == -2 {
-			scope = command.AfterFocusShortcuts
-		}
 		e := r.Register(command.Command{ID: "gallery-find-" + c.id, Label: c.label, Shortcut: c.chord, ShortcutScope: scope, Available: func() error {
 			if e := active(); e != nil {
 				return e

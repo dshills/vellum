@@ -2,13 +2,19 @@
 #import "services_native.h"
 #import <Cocoa/Cocoa.h>
 #import <QuickLookUI/QuickLookUI.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+static void vellumQuickLookTrace(NSString *phase, QLPreviewPanel *panel) {
+  if (getenv("VELLUM_QUICK_LOOK_TRACE"))
+    fprintf(stderr, "Vellum Quick Look %s visible=%d key=%d controller=%d\n",
+            phase.UTF8String, panel.isVisible, panel.isKeyWindow,
+            panel.currentController != nil);
+}
 extern int vellumServiceActive(uint64_t);
 extern void vellumServiceResult(uint64_t, char *, int);
 extern void *vellumAXNativeWindow(uint64_t);
 extern int vellumDocumentPanelBusy(void);
-extern void vellumPositionOwnedPanel(NSPanel *, NSWindow *);
 static BOOL vellumOwnsPreview;
 @class VellumQuickLookSession;
 static VellumQuickLookSession *vellumPreviewSession;
@@ -81,16 +87,27 @@ char *vellumQuickLookRecipeFixture(const char *json) {
 - (void)beginPreviewPanelControl:(QLPreviewPanel *)panel {
   if (self.finished)
     return;
+  vellumQuickLookTrace(@"begin-control", panel);
   panel.dataSource = self;
   panel.delegate = self;
   [panel reloadData];
   panel.currentPreviewItemIndex = self.selected;
 }
 - (void)endPreviewPanelControl:(QLPreviewPanel *)panel {
+  vellumQuickLookTrace(@"end-control", panel);
   if (panel.dataSource == self)
     panel.dataSource = nil;
   if (panel.delegate == self)
     panel.delegate = nil;
+  // AppKit can relinquish a shared preview without a close-button callback.
+  if (!self.finished) {
+    // Allow AppKit to finish the controller transition before cleanup invokes
+    // updateController. A same-turn hand-back to us keeps the session alive.
+    dispatch_async(dispatch_get_main_queue(), ^{
+      if (!self.finished && panel.currentController != self)
+        [self finish:1];
+    });
+  }
 }
 - (NSInteger)numberOfPreviewItemsInPreviewPanel:(QLPreviewPanel *)panel {
   return self.finished ? 0 : self.items.count;
@@ -135,7 +152,6 @@ char *vellumQuickLookRecipeFixture(const char *json) {
     if (self.parent.nextResponder == self)
       self.parent.nextResponder = self.savedNext;
     self.nextResponder = nil;
-    [self.parent removeChildWindow:self.panel];
     if (self.panel.inFullScreenMode)
       [self.panel exitFullScreenModeWithOptions:nil];
     [self.panel orderOut:nil];
@@ -155,6 +171,8 @@ char *vellumQuickLookRecipeFixture(const char *json) {
 - (void)finish:(int)status {
   if (self.finished)
     return;
+  vellumQuickLookTrace([NSString stringWithFormat:@"finish-%d", status],
+                       self.panel);
   self.finished = YES;
   if ([self cleanup])
     status = 2;
@@ -182,7 +200,8 @@ void vellumQuickLook(uint64_t token, uint64_t parentToken, const char *json) {
             vellumServiceResult(token, "", 6);
             return;
           }
-          if (!parent.isVisible || parent.isMiniaturized) {
+          if (!parent.isVisible || parent.isMiniaturized || !NSApp.isActive ||
+              (NSApp.keyWindow != parent && NSApp.mainWindow != parent)) {
             vellumServiceResult(token, "", 2);
             return;
           }
@@ -230,15 +249,17 @@ void vellumQuickLook(uint64_t token, uint64_t parentToken, const char *json) {
             [session finish:1];
             return;
           }
-          [parent addChildWindow:panel ordered:NSWindowAbove];
-          vellumPositionOwnedPanel(panel, parent);
-          [panel makeKeyAndOrderFront:nil];
+          // Install the controller before asking Quick Look to show its
+          // content. Let QLPreviewPanel own its geometry and animation instead
+          // of imposing an AppKit child-window frame on its shared panel.
           [panel updateController];
           if (panel.currentController != session) {
             [session finish:5];
             return;
           }
-          vellumPositionOwnedPanel(panel, parent);
+          vellumQuickLookTrace(@"before-show", panel);
+          [panel makeKeyAndOrderFront:nil];
+          vellumQuickLookTrace(@"after-show", panel);
         } @catch (NSException *e) {
           if (vellumPreviewSession && vellumPreviewSession.token == token)
             [vellumPreviewSession finish:2];
