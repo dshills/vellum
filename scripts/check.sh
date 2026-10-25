@@ -45,3 +45,5 @@ go test -race -timeout=120s github.com/go-text/typesetting/font -run "^TestVellu
 (cd "$VELLUM_REPO_ROOT/examples/loadedtree" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
 
 (cd "$VELLUM_REPO_ROOT/examples/placement" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
+
+(cd "$VELLUM_REPO_ROOT/examples/personal-mac" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)

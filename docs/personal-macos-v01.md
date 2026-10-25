@@ -48,3 +48,34 @@ The native observer census counts each retained notification receipt and KVO
 registration, rather than just the observer object. Retirement attempts each
 unregistration independently, retains failed registrations for terminal failure
 and retry, and folds cleanup errors into existing service-shutdown status.
+
+## Private SDK and app instructions
+
+The source/API identity is `v0.1.0-personal.1`. The published alpha.3 tag/assets
+remain historical. New public distribution is blocked (`third_party_distribution_audit`
+is pending for this changed payload); no old exact-payload approval is reused.
+The existing native archive and original notices remain hash-bound inputs.
+
+Extract the SDK somewhere new, outside this checkout. It contains the prepared
+native sources and pinned ARM64 static library; do not run prepare.sh over that
+capsule. Source `drivers/cogent/env.sh`, then run the starter from
+`examples/personal-mac`. Alternatively, from the extracted SDK:
+
+```sh
+python3 scripts/new-app.py /absolute/new/my-app --module example.com/my-app
+cd /absolute/new/my-app
+go test ./...
+go run .
+```
+
+The new module's replacements must point inside the extracted SDK, never back to
+the original checkout. `scripts/check-sdk.py` verifies archive contents and this
+relocation/build route; `--runtime` additionally launches/closes its own native
+consumer and belongs in the authorized desktop window.
+
+Mac Widgets offers the frozen catalogue. Its light bundle follows system
+preferences by default; Components/System restores following after a local
+Light/Dark/accent override. The dark bundle is an explicit demonstration override.
+Apps are ad-hoc signed and unnotarized. ZIPs made from clean temporary staging
+avoid file-provider metadata being added to loose .app directories in Documents.
+Verify signatures after extraction of the actual delivered ZIP.

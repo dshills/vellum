@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "version": "v0.1.0-alpha.3",
+  "version": "v0.1.0-personal.1",
   "module": "github.com/dshills/vellum",
   "namespace_status": "selected",
   "license_status": "selected",
-  "third_party_distribution_audit": "approved",
+  "third_party_distribution_audit": "pending",
   "managed_replay": {
     "status": "experimental",
     "backend": "offscreen",
@@ -37,5 +37,11 @@
     "same_window_only": true,
     "physical_pointer_qualified": false,
     "demo": "examples/placement"
+  },
+  "personal_use": {
+    "status": "private-candidate",
+    "feature_frozen": true,
+    "contract": "specs/personal-macos-v01.md",
+    "public_publication_authorized": false
   }
 }

@@ -1618,3 +1618,11 @@ Prism: `personal-v01-integration-final.json` (Anthropic Claude Sonnet 5.5, compl
 All 789 native root methods pass in five bounded groups after the original monolithic 240-second package timeout; no assertions were weakened and the original failed invocation/log remains retained. Gallery, commands and internal native packages passed in the original recursive run; root race/vet, native vet, placement and independent SDK checks pass. The native observer census now counts KVO and notification registrations and retains failed removals. Prism requested support for a later Run after a failed stop, but the driver supports one native main loop per process; processRun is never reset after startup, so that hypothetical restart is refused. Existing main cleanup retries retirement and the terminal diagnostic exposes remaining registrations. Native bounded cycle/activity/idle checks follow on the final candidate; no full endurance/native-heap claim.
 
 Focused checks: `personal-v01-root-1-checks.json`, `personal-v01-root-2-checks.json`, `personal-v01-root-3-checks.json`, `personal-v01-root-4-checks.json`, `personal-v01-root-5-checks.json`, `personal-v01-integration-remainder-checks.json`, `personal-v01-lifecycle-checks.json`.
+
+## Prepare matching private macOS v0.1 SDK identity and public Mac starter
+
+Prism: `personal-v01-delivery-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism readability feedback was applied by separating the RangeEvent and Apply error names. The final concurrency finding is not actionable: app.Application.Close acquires a.mu, closeLocked is idempotent, and Application.Run itself uses context.AfterFunc(ctx, a.Close) plus deferred Close. The optional starter timer uses that existing supported cancellation path. Native toolbar and managed node callbacks execute on the application owner, so name/range/reset state has one owner; the timer only closes the application and never accesses that state. Race/compile/vet and script syntax checks pass. Personal metadata resets changed-payload audit to pending; public alpha.3 history remains unchanged. Final private export/extraction/native bytes acceptance follows from this clean checkpoint.
+
+Focused checks: `personal-v01-delivery-checks.json`, `personal-v01-delivery-final-checks.json`.

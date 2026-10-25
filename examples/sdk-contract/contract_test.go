@@ -23,7 +23,7 @@ import (
 )
 
 func TestControlledViewAndCommandContract(t *testing.T) {
-	if vellum.Version != "v0.1.0-alpha.3" {
+	if vellum.Version != "v0.1.0-personal.1" {
 		t.Fatal(vellum.Version)
 	}
 	checked := false

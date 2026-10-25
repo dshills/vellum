@@ -1,0 +1,45 @@
+[
+  {
+    "cwd": "examples/personal-mac",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.8605827081482857
+  },
+  {
+    "cwd": "examples/personal-mac",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.6030852920375764
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "sh",
+      "-n",
+      "scripts/check.sh"
+    ],
+    "exit_code": 0,
+    "seconds": 0.00394195900298655
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "sh",
+      "-n",
+      "scripts/check-example.sh"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0032665838953107595
+  }
+]

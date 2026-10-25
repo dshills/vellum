@@ -216,7 +216,7 @@ func main() {
 	textModal := flag.Bool("text-native-check", false, "run bounded text/editor/dialog native FIFO acceptance")
 	widgetDefault, darkDefault := macWidgetExecutableDefaults(os.Args[0])
 	macWidgets := flag.Bool("mac-widgets", widgetDefault, "open the focused Mac input widget gallery")
-	macSystem := flag.Bool("mac-system-appearance", false, "follow macOS appearance, accent and accessibility preferences for Mac widgets")
+	macSystem := flag.Bool("mac-system-appearance", widgetDefault && !darkDefault, "follow macOS appearance, accent and accessibility preferences for Mac widgets")
 	macDark := flag.Bool("mac-dark", darkDefault, "use the dark Mac appearance with mac-widgets")
 	nativeTitlebar := flag.Bool("native-titlebar", widgetDefault, "attach the single-window native AppKit toolbar prototype (mac-widgets only)")
 	flag.Parse()

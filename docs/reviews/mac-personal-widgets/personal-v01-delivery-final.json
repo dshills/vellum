@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "5b8254654c5f17f17912647c25ce10ac",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "9158486cfb251abdb2fbd47a396d6b8f9b67ea8d",
+    "branch": "codex/personal-macos-v01"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "8623b7f3f8e116fb",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Timer calls a.Close from another goroutine and then deferred Close runs again",
+      "message": "The reset closure calls a.Invalidate(ref.ID()) on the toolbar/UI thread, while the timer fires a.Close on another goroutine. Also `ranges`, `name` and `resets` are mutated from callbacks without synchronization. If Close is not safe to call concurrently with Run, this can race or deadlock. Additionally, the deferred a.Close runs a second time on return.",
+      "suggestion": "Confirm app.Close is idempotent and goroutine-safe; otherwise use a context with timeout passed to a.Run instead of a timer calling Close.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "examples/personal-mac/main.go",
+          "lines": {
+            "start": 78,
+            "end": 78
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "location-corrected"
+      ],
+      "evidence": "timer := time.AfterFunc(*exitAfter, a.Close)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3813,
+    "totalMs": 3851
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 14,
+    "bytes": 31743,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 20565,
+        "output": 340,
+        "costUSD": 0.04453
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

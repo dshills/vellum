@@ -11,7 +11,9 @@ app are experimental; the app is ad-hoc signed and unnotarized. Windows and Linu
 remain unqualified. Full production and numeric performance qualification remain
 separate from this preview under the [approved release plan](specs/macos-first-release-plan.md).
 
-The current source also includes newer macOS widget work for personal evaluation.
+Current source is the feature-frozen `v0.1.0-personal.1` private macOS candidate;
+see the [personal delivery ledger](docs/personal-macos-v01.md) and
+[small Mac starter](examples/personal-mac/README.md). It includes newer macOS widget work for personal evaluation.
 Those widgets are not included in the published alpha.3 assets. See the
 [Mac widget demo](docs/mac-widget-demo.md) and
 [public-API integration guide](docs/mac-widget-integration.md) to try them from source.

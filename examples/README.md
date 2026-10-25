@@ -7,6 +7,7 @@ the [development guide](../docs/development.md) before running native examples.
 | Module | Purpose |
 | --- | --- |
 | [hello](hello/README.md) | Minimal native application |
+| [personal-mac](personal-mac/README.md) | Frozen personal Mac starter: system appearance and full-color native toolbar |
 | [placement](placement/README.md) | Internal drawing test app: palette/canvas, selection, editing, files and Undo/Redo |
 | [macapps](macapps/README.md) | Calculator, Notes, Weather and Reminders demonstrations under `cmd/` |
 | [editor](editor/README.md) | Managed multiline editing and document persistence |
