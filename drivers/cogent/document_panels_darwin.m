@@ -10,6 +10,8 @@ extern void vellumDocumentPanelPreview(uint64_t token,char *text);
 extern void *vellumAXNativeWindow(uint64_t token);
 @class VellumDocumentPanelSession;
 static NSMutableDictionary<NSNumber *,VellumDocumentPanelSession *> *vellumDocumentPanels;
+extern int vellumQuickLookBusy(void);
+int vellumDocumentPanelBusy(void){return vellumDocumentPanels.count!=0;}
 static BOOL vellumOwnsColorPanel,vellumOwnsFontPanel;
 static BOOL vellumDocumentPanelMayUse(BOOL existed,BOOL owned,BOOL visible){return !existed||(owned&&!visible);}
 int vellumDocumentPanelAdmissionFixture(int existed,int owned,int visible){return vellumDocumentPanelMayUse(existed,owned,visible);}
@@ -19,6 +21,7 @@ static NSPoint vellumDocumentPanelPosition(NSRect parent,NSRect visible,NSSize s
  if(size.height>NSHeight(visible))y=NSMaxY(visible)-size.height;else y=fmax(NSMinY(visible),fmin(y,NSMaxY(visible)-size.height));
  return NSMakePoint(fmax(NSMinX(visible),fmin(x,NSMaxX(visible)-size.width)),y);
 }
+void vellumPositionOwnedPanel(NSPanel *panel,NSWindow *parent){NSScreen *screen=parent.screen?:NSScreen.mainScreen;if(screen)[panel setFrameOrigin:vellumDocumentPanelPosition(parent.frame,screen.visibleFrame,panel.frame.size)];}
 // Pure geometry fixture; no screen/window/panel is constructed offscreen.
 double vellumDocumentPanelPositionFixture(int axis,double px,double py,double pw,double ph,double vx,double vy,double vw,double vh,double width,double height){NSPoint p=vellumDocumentPanelPosition(NSMakeRect(px,py,pw,ph),NSMakeRect(vx,vy,vw,vh),NSMakeSize(width,height));return axis==0?p.x:p.y;}
 
@@ -79,7 +82,7 @@ void vellumChooseDocumentPanel(uint64_t token,uint64_t parentToken,const char *j
  NSWindow *parent=(__bridge NSWindow *)vellumAXNativeWindow(parentToken);if(!parent){vellumServiceResult(token,"",6);return;}if(!parent.isVisible||parent.isMiniaturized){vellumServiceResult(token,"",2);return;}
  NSString *kind=recipe[@"Kind"];BOOL fontMode=[kind isEqual:@"font"];
  BOOL existed=fontMode?NSFontPanel.sharedFontPanelExists:NSColorPanel.sharedColorPanelExists;BOOL owned=fontMode?vellumOwnsFontPanel:vellumOwnsColorPanel;
- if(vellumDocumentPanels.count||parent.attachedSheet||NSApp.modalWindow||(existed&&!owned)){vellumServiceResult(token,"",5);return;}
+ if(vellumDocumentPanels.count||vellumQuickLookBusy()||parent.attachedSheet||NSApp.modalWindow||(existed&&!owned)){vellumServiceResult(token,"",5);return;}
  NSDictionary *o=recipe[@"Options"];NSFont *font=fontMode?[NSFont fontWithName:o[@"Name"] size:[o[@"Size"] doubleValue]]:nil;if(fontMode&&!font){vellumServiceResult(token,"",2);return;}
  NSPanel *panel=fontMode?NSFontPanel.sharedFontPanel:NSColorPanel.sharedColorPanel;if(!existed)createdPanel=panel;
  // AppKit may immediately show a newly-created shared panel using its saved
@@ -95,7 +98,7 @@ void vellumChooseDocumentPanel(uint64_t token,uint64_t parentToken,const char *j
  if(!existed)[(NSFontPanel *)panel reloadDefaultFontFamilies];}
  else{NSColorPanel *colors=(NSColorPanel *)panel;colors.showsAlpha=session.alpha;colors.continuous=YES;NSDictionary *c=o[@"Color"];colors.color=[NSColor colorWithSRGBRed:[c[@"R"] doubleValue]/255 green:[c[@"G"] doubleValue]/255 blue:[c[@"B"] doubleValue]/255 alpha:session.alpha?[c[@"A"] doubleValue]/255:1];[colors setTarget:session];[colors setAction:@selector(changed:)];}
  vellumSetPanelAccessory(panel,fontMode,vellumPanelActions(session));
- NSScreen *screen=parent.screen?:NSScreen.mainScreen;if(screen)[panel setFrameOrigin:vellumDocumentPanelPosition(parent.frame,screen.visibleFrame,panel.frame.size)];
+ vellumPositionOwnedPanel(panel,parent);
  __weak VellumDocumentPanelSession *weakSession=session;session.parentObserver=[NSNotificationCenter.defaultCenter addObserverForName:NSWindowWillCloseNotification object:parent queue:nil usingBlock:^(NSNotification *note){[weakSession finish:6];}];
  if(!vellumServiceActive(token)){[session finish:1];return;}[parent addChildWindow:panel ordered:NSWindowAbove];[panel makeKeyAndOrderFront:nil];
  }@catch(NSException *e){VellumDocumentPanelSession *session=vellumDocumentPanels[@(token)];if(session)[session finish:2];else{if(createdPanel){@try{[createdPanel orderOut:nil];}@catch(NSException *ignored){}}vellumServiceResult(token,"",2);}}}});});}

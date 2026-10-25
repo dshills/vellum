@@ -25,7 +25,7 @@ its startup appearance. Scroll inside a page to reach its controls. The ordinary
 - **Components:** choose Themes, Cascading menus, Split buttons, Inspector panel,
   Column browser, Filter / rule editor, Image well, Searchable icon picker,
   Settings pane, Native alert, Calendar picker, Document list, Mac outline,
-  Native Colors panel, Native Fonts panel, or Circular angle dial. Menus open Export submenus with
+  Native Colors panel, Native Fonts panel, Circular angle dial, or Quick Look. Menus open Export submenus with
   pointer/Right; Left closes a submenu and Escape cancels. Split buttons separate
   Save from its options. Collapse inspector headings without losing editor
   values. The column browser reveals child columns and accepts divider resizing;
@@ -229,3 +229,5 @@ constitute an accepted edit. Their appearance follows the native parent window,
 which the light/dark bundle selects at launch; local subtree theme buttons do not
 change native chrome. Native panel ownership/cleanup is separate from managed
 popover behavior. Dial proposals are continuous; application history is caller-owned.
+
+- **Quick Look** (Components): select a sample in the list/outline and press Space, or use Quick Look sample. Actual macOS previews show disposable text/PNG files. Escape/Space closes. No personal files are read. [API and limits](mac-preview-widgets.md).

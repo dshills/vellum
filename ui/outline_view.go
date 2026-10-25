@@ -45,6 +45,7 @@ type OutlineViewLayout struct {
 	Rows       []OutlineViewRow
 	Disclosure func(OutlineDisclosureEvent)
 	Activate   func(OutlineEvent)
+	Preview    func(OutlineEvent)
 }
 
 func (l *OutlineViewLayout) SameSource(other *OutlineViewLayout) bool {
@@ -65,6 +66,7 @@ type OutlineView struct {
 	Change                   func(ListSelectionEvent)
 	Disclosure               func(OutlineDisclosureEvent)
 	Activate                 func(OutlineEvent)
+	Preview                  func(OutlineEvent)
 	ContextMenu              *ContextMenu
 	Style                    Style
 }
@@ -162,6 +164,13 @@ func (p *OutlineView) View() (Node, error) {
 		return ok && wasShown && row.Parent == old.Parent
 	}
 	layout := &OutlineViewLayout{source: p, Rows: rows}
+	if p.Preview != nil {
+		layout.Preview = func(e OutlineEvent) {
+			if p.Preview != nil && eligible(current(), e.ItemID) {
+				p.Preview(OutlineEvent{ID: id, ItemID: e.ItemID})
+			}
+		}
+	}
 	n := Node{ID: id, Kind: ListBox, Multiple: true, Disabled: p.Disabled, Outline: layout, ContextMenu: p.ContextMenu, Style: Style{GrowX: Some(float32(1)), MinSize: Some(Size{Height: 200}), MaxSize: Some(Size{Height: 400})}.Overlay(p.Style), Accessibility: Accessibility{Name: p.Label, Help: "Outline. Right expands or enters; Left collapses or moves to parent. Command/Shift selects; Return opens."}}
 	for _, row := range rows {
 		n.Options = append(n.Options, Option{ID: row.ID, Label: row.Label, Disabled: row.Disabled, Badge: row.Badge})

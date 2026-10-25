@@ -44,6 +44,7 @@ type DocumentListLayout struct {
 	Columns  []DocumentColumn
 	Rows     []DocumentRow
 	Activate func(DocumentEvent)
+	Preview  func(DocumentEvent)
 }
 type DocumentRow struct {
 	ID    string
@@ -74,6 +75,7 @@ type DocumentList struct {
 	SortChange  func(DocumentSortEvent)
 	Resize      func(DocumentResizeEvent)
 	Activate    func(DocumentEvent)
+	Preview     func(DocumentEvent)
 	Style       Style
 }
 
@@ -180,6 +182,13 @@ func (d *DocumentList) View() (Node, error) {
 		})
 	}
 	layout := &DocumentListLayout{source: d, Columns: cols}
+	if d.Preview != nil {
+		layout.Preview = func(e DocumentEvent) {
+			if eligible(e.ItemID) && d.Preview != nil {
+				d.Preview(DocumentEvent{ID: id, ItemID: e.ItemID})
+			}
+		}
+	}
 	list := Node{ID: DocumentListID(id), Kind: ListBox, Multiple: true, SelectedIDs: slices.Clone(d.SelectedIDs), Disabled: d.Disabled, Accessibility: Accessibility{Name: d.Label, Help: "Document list. Command-click toggles; Shift extends; Return opens."}, Style: Style{Padding: Some(Insets{}), GrowX: Some(float32(0)), MinSize: Some(Size{Height: 160}), MaxSize: Some(Size{Height: 320})}}
 	total := float32(0)
 	headers := []Node{}

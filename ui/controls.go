@@ -151,6 +151,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if n.DocumentList != nil && n.Outline != nil {
+		return fmt.Errorf("ui: document and outline presentation are mutually exclusive")
+	}
 	if d := n.AngleDial; d != nil {
 		if n.Kind != Button || d.source == nil || d.Set == nil || d.Adjust == nil || !finite(d.Degrees) || d.Degrees < 0 || d.Degrees >= 360 || n.Number != d.Degrees || !finite(d.Size) || d.Size < 64 || d.Size > 160 {
 			return fmt.Errorf("ui: invalid angle dial input")

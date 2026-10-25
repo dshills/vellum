@@ -1522,3 +1522,11 @@ Prism: `mac-documents-lock-modifiers.json` (Anthropic Claude Sonnet 5.5, complet
 No Prism findings. Native Down navigation worked while Return was ignored; macOS reports NumLock for normal events. New document activation and outline unmodified key/double-click routing now ignore only CapsLock/NumLock. Full routed regressions exercise both flags, including selection, activation and disclosure lifetime. Other shortcut modifiers remain rejected.
 
 Focused checks: `mac-documents-lock-modifiers-checks.json`.
+
+## Add native Quick Look previews with scoped document and outline actions
+
+Prism: `preview-quicklook-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Quick Look public API, local file validation, responder ownership, native shutdown and same-display placement. Offscreen parser/routing, stale-item/hidden-item, optional service and independent SDK checks pass. Prism findings: Node.DocumentList/Outline point to detached eligibility-checked layouts, not raw owner callbacks; mutual exclusivity and else-if also added. The final responder finding is false: session.savedNext=parent.nextResponder is assigned before chain installation/updateController. Ownership is claimed only after foreign-preexistence guard and singleton creation. Native file was clang-formatted after review without semantic changes. Actual native panel check remains scheduled with final package.
+
+Focused checks: `preview-quicklook-final-checks.json`, `preview-quicklook-reviewed-checks.json`.

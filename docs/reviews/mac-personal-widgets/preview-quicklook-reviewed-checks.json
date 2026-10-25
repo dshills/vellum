@@ -1,0 +1,33 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./app",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 3.430911166127771
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "./cmd/gallery",
+      "-run",
+      "TestQuickLook|TestDocumentListNative|TestMacOutlineNative",
+      "-count=1",
+      "-timeout",
+      "90s"
+    ],
+    "exit_code": 0,
+    "seconds": 31.60555454203859
+  }
+]
