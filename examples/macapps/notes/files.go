@@ -284,17 +284,17 @@ func (f *Files) promptView() ui.Node {
 		text = "Save changes before closing Notes?"
 	}
 	children := []ui.Node{{ID: "notes-file-prompt-text", Kind: ui.Label, Text: text},
-		{ID: "notes-file-save", Kind: ui.Button, Text: "Save", Activate: func() {
+		{ID: "notes-decision-save", Kind: ui.Button, Text: "Save", Activate: func() {
 			if current() {
 				f.settleIntent(prompt, true)
 			}
 		}},
-		{ID: "notes-file-discard", Kind: ui.Button, Text: "Discard Changes", Activate: func() {
+		{ID: "notes-decision-discard", Kind: ui.Button, Text: "Discard Changes", Activate: func() {
 			if current() {
 				f.settleIntent(prompt, false)
 			}
 		}},
-		{ID: "notes-file-cancel", Kind: ui.Button, Text: "Cancel", Activate: cancel}}
+		{ID: "notes-decision-cancel", Kind: ui.Button, Text: "Cancel", Activate: cancel}}
 	if prompt == "recovery" {
 		cancel = func() {
 			if current() {

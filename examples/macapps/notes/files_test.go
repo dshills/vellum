@@ -15,6 +15,7 @@ import (
 	"github.com/dshills/vellum/document"
 	"github.com/dshills/vellum/editor"
 	"github.com/dshills/vellum/history"
+	"github.com/dshills/vellum/ui"
 )
 
 type fileFixture struct {
@@ -548,4 +549,22 @@ func TestRecoveryMarkerFailureKeepsSavedBytesAndExplainsRefusedClose(t *testing.
 	if x.f.ref.Context().Err() == nil {
 		t.Fatal("close did not retry after storage repaired")
 	}
+}
+
+func TestAttachedNotesTreeHasUniqueIDsWithEveryFileDialog(t *testing.T) {
+	x := filesFixture(t, privateDirectory(t))
+	x.owner(t, func() {
+		b, err := x.m.CaptureNotebook()
+		if err != nil {
+			t.Fatal(err)
+		}
+		x.f.offer = &Recovery{Version: 1, Notebook: &b}
+		for _, prompt := range []string{"", "open", "close", "recovery"} {
+			x.f.prompt = prompt
+			if err := ui.Validate(x.m.View()); err != nil {
+				t.Fatalf("prompt %q: %v", prompt, err)
+			}
+		}
+		x.f.prompt = ""
+	})
 }

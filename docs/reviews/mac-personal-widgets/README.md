@@ -1682,3 +1682,11 @@ Prism: `mac-stabilization-ci-theme-identity.json` (Anthropic Claude Sonnet 5.5, 
 Concrete macOS CI failures were immutable replay manifest identity mismatches. Unset palette and false motion metadata are omitted; explicit palette (including zero) and active reduced motion remain serialized and distinct. Exact original native record authoring/replay and both workspace row counts across all batch sizes pass without regenerating or weakening records/goldens. Root race/vet pass. Prism complete; its conditional Go-version concern does not apply: root go.mod requires Go1.25.6 and Optional omitzero has already been used by Style since 93b4730. This is serialization compatibility, with no rendering/feature/gate change.
 
 Focused checks: `mac-stabilization-ci-replay-final-checks.json`.
+
+## Fix Notes launch by separating toolbar and dialog action identities
+
+Prism: `mac-stabilization-notes-launch.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+A bounded packaged-executable diagnostic exposed ui.Validate refusing duplicate notes-file-save identities between toolbar and closed dialog. Decision buttons now have a separate notes-decision namespace. The regression validates complete attached trees in closed/open/close/recovery states; all Notes race/vet checks pass. Prism complete with no findings. No storage/history/framework behavior changed; rebuilt package and native checks follow.
+
+Focused checks: `mac-stabilization-notes-launch-checks.json`.
