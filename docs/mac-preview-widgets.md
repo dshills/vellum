@@ -35,3 +35,15 @@ scalars, 10000 matches and 64 KiB replacement. Excessive queries refuse instead 
 partially replacing. Matches are nonoverlapping and cached by model identity, content revision, query and options; selection-only navigation reuses them. No regex, language-specific expansion or all-match highlighting.
 Use Small for 24pt or regular 30pt controls. Host command routing owns Cmd-F/G and
 Escape; the demo shows focused query entry, editor focus return and Undo/Redo.
+
+## Search scopes
+
+Retain `ui.SearchScopeBar` with stable Items, Value{ScopeID, Query}, and caller-owned
+counts (−1 hides the count). Accept Change via `Value = event.Apply(Value)` so
+queued query/scope proposals merge. Actions compare against current accepted state: an All→Project→All queue is preserved, while choosing the already accepted scope is a no-op. 1–16 scopes, <=4096-byte query, optional
+full-color IconImage, disabled items and Small (24pt) / regular (30pt). Arrows
+move enabled toolbar focus; Return/Space selects; narrow bars scroll to reveal
+focused items. SearchBox supplies query and clear through the same path.
+SelectedStyle/ItemStyle integrate the page's scoped accent. Selected state is
+announced in button help. Results, counts, filtering and persistence are owned
+by the application; no local filesystem/network search or debounce is implied.

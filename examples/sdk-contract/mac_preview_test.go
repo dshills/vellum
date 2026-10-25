@@ -35,3 +35,11 @@ func TestPublicFindBarContract(t *testing.T) {
 		t.Fatal(e)
 	}
 }
+
+func TestPublicSearchScopeContract(t *testing.T) {
+	bar := &ui.SearchScopeBar{ID: "scopes", Label: "Search", Value: ui.SearchScopeValue{ScopeID: "all"}, Items: []ui.SearchScopeItem{{ID: "all", Label: "All", Count: 0}}}
+	bar.Change = func(e ui.SearchScopeEvent) { bar.Value = e.Apply(bar.Value) }
+	if _, e := bar.View(); e != nil {
+		t.Fatal(e)
+	}
+}

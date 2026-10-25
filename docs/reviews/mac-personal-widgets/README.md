@@ -1538,3 +1538,11 @@ Prism: `preview-find-reviewed.json` (Anthropic Claude Sonnet 5.5, complete cover
 Prism actionable findings addressed: bounded content-revision match cache; selection mapping for Replace All; explicit nonoverlap regression; ErrFindNoMatch prevents keyboard no-op attempts from incrementing gallery success counters. Last matcher finding explicitly states no bug and no change needed. Focused model, composition, cache/close lifetime, gallery shortcut/Undo and public SDK checks passed. Host command registry retains editor-first Escape handling. Physical checks scheduled for final package.
 
 Focused checks: `preview-find-reviewed-checks.json`, `preview-find-guards-checks.json`.
+
+## Add a Mac search scope bar with full-color choices and live counts
+
+Prism: `preview-scopes.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism gallery error-path finding addressed with an error label instead of panic. Mutable-state finding reflects intentional owner-held controlled semantics: current-state checks preserve queued All-to-Project-to-All, now covered explicitly; comparing to captured View state would lose that return. Duplicate accepted-scope actions are intentionally no-ops. Tests cover independent query/scope merge, stale removal/disable, UTF8/query budgets, compact size, counts and empty gallery results. Public SDK check passed.
+
+Focused checks: `preview-scopes-checks.json`, `preview-scopes-reviewed-checks.json`.
