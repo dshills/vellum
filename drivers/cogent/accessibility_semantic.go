@@ -216,6 +216,9 @@ func (e *accessibilitySemanticWriter) node(n *accessibilityNode) {
 	e.quoted(n.Parent)
 	e.out.WriteString(`,"role":`)
 	e.quoted(n.Role)
+	if n.Secure {
+		e.out.WriteString(`,"secure":true`)
+	}
 	e.out.WriteString(`,"name":`)
 	e.quoted(n.Name)
 	e.out.WriteString(`,"help":`)
@@ -307,9 +310,6 @@ func (e *accessibilitySemanticWriter) node(n *accessibilityNode) {
 	if n.Min != nil {
 		e.out.WriteString(`,"min":`)
 		e.floating(float64(*n.Min), 32)
-	}
-	if n.Secure {
-		e.out.WriteString(`,"secure":true`)
 	}
 	if n.TextClient != 0 {
 		e.out.WriteString(`,"text_client":`)

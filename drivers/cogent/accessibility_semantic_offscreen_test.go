@@ -19,6 +19,7 @@ func TestAccessibilityBuiltinSemanticSchema(t *testing.T) {
 		{"DomainID", "string", "domain_id"},
 		{"Parent", "string", "parent"},
 		{"Role", "string", "role"},
+		{"Secure", "bool", "secure,omitempty"},
 		{"Name", "string", "name"},
 		{"Help", "string", "help"},
 		{"Value", "interface {}", "value,omitempty"},
@@ -77,6 +78,7 @@ func assertBuiltinEncoding(t *testing.T, nodes []accessibilityNode) {
 	}
 }
 func TestAccessibilityBuiltinSemanticStringsAndScalars(t *testing.T) {
+	assertBuiltinEncoding(t, []accessibilityNode{{ID: "secure", Role: "text-field", Secure: true, Name: "Synthetic protected entry", Actions: []string{}}})
 	all := make([]byte, 256)
 	for i := range all {
 		all[i] = byte(i)

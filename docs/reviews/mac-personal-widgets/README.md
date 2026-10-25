@@ -1466,3 +1466,11 @@ Prism: `mac-documents-integration.json` (Anthropic Claude Sonnet 5.5, complete c
 Prism: replaced nested append aliasing with an explicit sort-chevron child slice. The release-coordinate proposal shares the exact same admission helper and pre-dispatch capture/source/disabled guards as movement; capture loss unregisters the callback. A new real pointer regression proves a canceled header capture neither changes width nor sorts the adjacent header. Detached metadata validates source identity, columns and text/image bounds; SDK and all five light/dark gallery pages pass. Portable race/vet and focused native checks pass. The broader native suite exposed preexisting Secure-schema fixture drift and a stale menu-popup fixture, which are being repaired separately without weakening pending/publication guards. No rendering or release policy changed.
 
 Focused checks: `mac-documents-portable-checks.json`, `mac-documents-final-guards-checks.json`.
+
+## Repair existing accessibility wire audits and menu payload fixtures
+
+Prism: `mac-documents-a11y-repair.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+The full suite found preexisting Secure schema drift (field introduced in 4969acd) and stale tests that populated menuState.options instead of the current popup.options. Updated the exact-schema inventories, retaining unknown-field rejection and per-field mutation proof. Moved the existing Secure serialization to declaration order and added a Secure=true byte-for-byte builtin JSON check. Menu fixtures now populate the real popup snapshot and check row count before indexing; positive empty-action arrays and negative null-action rejection remain intact. All focused pending-proof, semantic, secure-field and Cocoa menu checks pass. Prism completed with no findings. The remaining native inventory is being resumed from the interrupted test; no performance, publication or distribution guard changed.
+
+Focused checks: `mac-documents-a11y-repair-checks.json`, `mac-documents-a11y-final-checks.json`.

@@ -87,7 +87,7 @@ func TestAccessibilityPendingProof(t *testing.T) {
 
 func TestAccessibilityPendingWireFieldAudit(t *testing.T) {
 	// This list intentionally requires a decision when any wire field is added.
-	fields := strings.Fields("ID DomainID Parent Role Name Help Value Disabled Focusable Focused Selected Actions Orientation RowIndex RowCount ColumnIndex ColumnCount GridGeneration GridScope GridIncarnation GridPending GridTargetGeneration GridFrame Level Expanded Min TextClient TextSelection TextFocus Max")
+	fields := strings.Fields("ID DomainID Parent Role Secure Name Help Value Disabled Focusable Focused Selected Actions Orientation RowIndex RowCount ColumnIndex ColumnCount GridGeneration GridScope GridIncarnation GridPending GridTargetGeneration GridFrame Level Expanded Min TextClient TextSelection TextFocus Max")
 	want := map[string]bool{}
 	for _, name := range fields {
 		want[name] = true

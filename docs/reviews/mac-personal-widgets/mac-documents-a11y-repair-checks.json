@@ -1,0 +1,35 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestAccessibilityPending|TestAccessibilityBuiltin|TestMenuButtonCocoa|TestMenuCheckActionCocoa|TestSecure",
+      "-count=1",
+      "-timeout",
+      "90s"
+    ],
+    "exit_code": 0,
+    "seconds": 15.690392249962315
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-list",
+      ".",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 3.203765792073682
+  }
+]
