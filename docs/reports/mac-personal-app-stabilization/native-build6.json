@@ -1,0 +1,22 @@
+{
+  "build": "6",
+  "source": "0402ec8e60f7a2b77005241cc6d94a527a94e4b3",
+  "desktop_authorization_cap_utc": [
+    "2026-10-25T17:20:05Z",
+    "2026-10-25T17:23:05Z"
+  ],
+  "checks": {
+    "launch_and_raise": "pass",
+    "native_emoji_title_body_list": "pass; color emoji visible with no fallback boxes",
+    "focused_prose_no_outer_box": "pass; visible insertion caret and selected-text highlight",
+    "proportional_font_no_gutter": "pass",
+    "native_paste_unicode": "pass",
+    "save_exact_unicode_file": "pass; n12 exact CRLF-free test body confirmed on disk",
+    "app_undo_redo": "pass; same n12 editor; empty Undo and exact-body clean Redo",
+    "cleanup": "pass; n12 removed via app; original n10 selected and saved; disk confirms7 notes and no n11/n12",
+    "left_running": "delivered bundle"
+  },
+  "coordinate_pointer": "unqualified; earlier CUA coordinate clicks missed intended focus; offscreen geometry tests are separate evidence",
+  "human_ime_voiceover": "unqualified by owner choice",
+  "global_settings": "unchanged"
+}

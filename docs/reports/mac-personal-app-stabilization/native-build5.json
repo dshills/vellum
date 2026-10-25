@@ -1,0 +1,26 @@
+{
+  "build": "5",
+  "source": "084c1e89422cb340f63b554d6810704d800d4685",
+  "desktop_window_utc": [
+    "2026-10-25T16:28:38Z",
+    "2026-10-25T16:33:38Z"
+  ],
+  "observed": {
+    "native_window_raise": "completed; initial background snapshot blank, raise painted content",
+    "prose_body": "proportional, no line-number gutter",
+    "title_to_body_tab_focus": "passed",
+    "native_paste_multiline_unicode": "passed; native AX exact text; emoji pixels failed fallback",
+    "save_command": "passed",
+    "app_undo_body": "passed; body empty, dirty",
+    "app_redo_body": "passed; same n11, exact body, saved revision",
+    "native_text_range_selection": "proportional selected through AX; visible highlight",
+    "coordinate_pointer": "unqualified; intended title click did not move focus",
+    "cleanup": "deleted only disposable n11, selected original n10, saved; disk confirms7 notes and no n11"
+  },
+  "findings": [
+    "Custom Helvetica Neue stack resolves emoji to LastResort; offscreen font probe confirms explicit emoji fallback resolves Apple Color Emoji for normal/semibold",
+    "Focused prose gets a large code-editor border; scoped frameless-prose style correction follows"
+  ],
+  "global_settings": "unchanged",
+  "human_ime_voiceover": "unqualified"
+}
