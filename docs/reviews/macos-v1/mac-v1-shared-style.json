@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "85465dd1a802214edbc6c0b680d2f50e",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "d5e6b05d4c6dbfc77727e905098ab73ce3393455",
+    "branch": "codex/macos-v1-candidate"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "c66615834bc3f5ae",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Control height assertion mixes pixels and Dp",
+      "message": "The test asserts heights between 26 and 34 pixels, while the docs describe the controls as about 28-32 Dp. If the display scale is not 1, the pixel/Dp mismatch could make the test flaky or fail on HiDPI. The bounds are also looser than the documented range.",
+      "suggestion": "Convert pixel bounds to Dp using the window scale, or fix the scale in the test config, then assert against the documented Dp range.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/mac_presentation_offscreen_test.go",
+          "lines": {
+            "start": 37,
+            "end": 57
+          }
+        }
+      ],
+      "tags": [
+        "test",
+        "hidpi"
+      ],
+      "evidence": "if bounds.Dy() \u003c 26 || bounds.Dy() \u003e 34 {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3983,
+    "totalMs": 3995
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 7,
+    "bytes": 14353,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 8792,
+        "output": 302,
+        "costUSD": 0.020604
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -55,6 +55,6 @@ The reports' `go.mod` is an archive boundary, not a dependency to import or test
 Optional personal `go.work` files are local development settings and are ignored;
 the module-local replacements remain the reproducible dependency setup.
 
-Keep changes focused. The current internal-app work does not expand the frozen
-framework APIs or enable experimental rendering. Include what changed, the checks
+Keep changes focused. The approved macOS-v1 work may extend framework APIs only within
+[its five-area contract](specs/macos-v1-candidate.md); experimental rendering stays disabled. Include what changed, the checks
 run, and any limitations in the commit or pull-request description.

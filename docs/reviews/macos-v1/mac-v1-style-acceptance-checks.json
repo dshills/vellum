@@ -1,0 +1,51 @@
+[
+  {
+    "cwd": "",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 2.82546649989672
+  },
+  {
+    "cwd": "",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.5267506251111627
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "-race",
+      ".",
+      "-run",
+      "TestMacSharedPresentationAllocatedControlsAndProse|TestMacField|TestManagedProse"
+    ],
+    "exit_code": 0,
+    "seconds": 3.791470707859844
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "-race",
+      "./notes"
+    ],
+    "exit_code": 0,
+    "seconds": 13.951593457954004
+  }
+]

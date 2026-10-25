@@ -2,6 +2,23 @@ package ui
 
 import "image/color"
 
+// MacFontFamily includes an explicit emoji fallback for custom font queries.
+// It uses installed macOS fonts without embedding or redistributing them.
+const MacFontFamily = "Helvetica Neue, emoji"
+
+// MacTypography provides a consistent application-local Mac font stack.
+func MacTypography(size float32, weight int) Typography {
+	return Typography{Family: MacFontFamily, Size: size, Weight: weight}
+}
+
+// MacProseStyle is an unframed writing surface for a MultilineText node with
+// Prose and SoftWrap enabled. Caret/selection indicate focus; text and history
+// remain in the caller's editor. Caller styles may override these values.
+func MacProseStyle(dark bool) Style {
+	p := MacPalette(dark, color.NRGBA{})
+	return Style{Typography: Some(MacTypography(14, 400)), Foreground: Some(p.Ink), Background: Some(p.Field), Padding: Some(Insets{}), Border: Some(Border{}), CornerRadius: Some(float32(0)), GrowX: Some(float32(1)), GrowY: Some(float32(1))}
+}
+
 // MacTheme returns application-local, compact Mac-style light/dark defaults.
 // These are custom-rendered controls, not AppKit NSControls. Helvetica Neue uses
 // the installed macOS font; other platforms may substitute a font. Colors are
@@ -26,17 +43,17 @@ func MacThemeWithAccent(dark bool, accent color.NRGBA) Theme {
 	control := Style{Padding: Some(Insets{Top: 5, Right: 8, Bottom: 5, Left: 8}), CornerRadius: Some(float32(5)), Border: Some(Border{Width: 1, Color: line})}
 	input := control
 	input.Background = Some(field)
-	input.MinSize = Some(Size{Width: 220, Height: 28})
+	input.MinSize = Some(Size{Width: 220, Height: 16})
 	input.MaxSize = Some(Size{})
 	input.GrowX = Some(float32(1))
 	input.GrowY = Some(float32(0))
 	number := input
-	number.MinSize = Some(Size{Width: 140, Height: 28})
+	number.MinSize = Some(Size{Width: 140, Height: 16})
 	number.MaxSize = Some(Size{Width: 160})
 	number.GrowX = Some(float32(0))
 	buttonStyle := control
 	buttonStyle.Background = Some(button)
-	return Theme{Palette: Some(palette), Default: Style{Foreground: Some(ink), Typography: Some(Typography{Family: "Helvetica Neue", Size: 13})}, Kinds: map[Kind]Style{
+	return Theme{Palette: Some(palette), Default: Style{Foreground: Some(ink), Typography: Some(MacTypography(13, 400))}, Kinds: map[Kind]Style{
 		Dialog:    {Background: Some(palette.Popup), Foreground: Some(palette.Ink), CornerRadius: Some(float32(8))},
 		Column:    {Gap: Some(float32(8)), Padding: Some(Insets{})},
 		Row:       {Gap: Some(float32(6)), Padding: Some(Insets{}), Align: Some(AlignCenter)},

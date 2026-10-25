@@ -9,7 +9,7 @@ import (
 	"github.com/dshills/vellum/ui"
 )
 
-const notesFont = "Helvetica Neue, emoji"
+const notesFont = ui.MacFontFamily
 
 var (
 	ink     = color.NRGBA{R: 35, G: 35, B: 37, A: 255}
@@ -23,7 +23,6 @@ var (
 // Theme uses the shared Mac control metrics; the app's containers own spacing.
 func Theme() ui.Theme {
 	theme := ui.MacTheme(false)
-	theme.Default.Typography = ui.Some(ui.Typography{Family: notesFont, Size: 13})
 	theme.Kinds[ui.Row] = ui.Style{Padding: ui.Some(ui.Insets{}), Gap: ui.Some(float32(0)), Align: ui.Some(ui.AlignCenter)}
 	theme.Kinds[ui.Column] = ui.Style{Padding: ui.Some(ui.Insets{}), Gap: ui.Some(float32(0))}
 	return theme
@@ -250,7 +249,7 @@ func (m *Model) documentView() ui.Node {
 		if m.files != nil {
 			bodyHelp = "Plain text editor; Command-S saves the local notebook"
 		}
-		body := ui.Node{ID: "note-editor-" + id, Kind: ui.MultilineText, Disabled: m.files != nil && m.files.blocked(), Editor: selected.editor, Grow: true, SoftWrap: true, Prose: true, Change: func(ui.ChangeEvent) { m.accept(m.BodyChanged(id)) }, Accessibility: ui.Accessibility{Name: "Note text", Help: bodyHelp}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: notesFont, Size: 14}), Padding: ui.Some(ui.Insets{}), Border: ui.Some(ui.Border{}), Background: ui.Some(white)}}
+		body := ui.Node{ID: "note-editor-" + id, Kind: ui.MultilineText, Disabled: m.files != nil && m.files.blocked(), Editor: selected.editor, Grow: true, SoftWrap: true, Prose: true, Change: func(ui.ChangeEvent) { m.accept(m.BodyChanged(id)) }, Accessibility: ui.Accessibility{Name: "Note text", Help: bodyHelp}, Style: ui.MacProseStyle(false)}
 		document := box(ui.Column, "note-paper", title, body)
 		if m.files == nil {
 			document.Children = append([]ui.Node{date}, document.Children...)
