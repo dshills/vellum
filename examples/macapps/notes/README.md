@@ -79,7 +79,7 @@ run exposed an unadmitted title paste before window Undo; the explicit native
 settlement wiring addresses that ordering. A renewed native check verified
 pending title admission before Undo and the matching Redo; a separate native
 accessibility body edit also survived app Undo/Redo with the same note identity.
-Physical body-click focus remains unqualified until the new package is checked.
+Physical body-click focus and proportional selection passed in the later v1 RC; see the [source-bound acceptance](../../../docs/reports/macos-v1/README.md).
 The writing area now opts into `Prose: true` and `SoftWrap: true` on the same
 public multiline editor, with proportional typography and no line-number gutter.
 Native rendering and pointer verification are
@@ -146,8 +146,9 @@ application-owned. The separately approved prose option extends the existing SDK
 control presentation; the document and history paths are unchanged.
 The approved prose presentation uses the retained multiline editor with
 proportional text and no gutter. The font stack explicitly includes emoji fallback for titles, rows and prose.
-A frameless body uses caret/selection focus feedback. Physical body-click focus
-remains unqualified through the computer-use coordinate tool. The offscreen layout test
+A frameless body uses caret/selection focus feedback. The later app-restricted
+native helper verified physical body-click focus and proportional selection; see
+the source-bound v1 RC report. The offscreen layout test
 checks actual geometry at 1100×740 and 1380×900; it does not prove native fidelity.
 
 ## Native v1 candidate shell
@@ -160,3 +161,14 @@ model view keeps its client toolbar unless its host calls `SetNativeToolbar(true
 No duplicate client toolbar is mounted in the native executable. Customize the
 native toolbar using its standard context menu; layout persistence is AppKit-owned.
 The body, file format and history limits are unchanged.
+
+## macOS v1 delivery
+
+Current v1 packages pair `Mac examples source.zip` with
+`vellum-v1.0.0-private-sdk.tar.gz`. Follow the [independent build guide](../../../docs/building-macos-apps.md)
+and [v1 support/API scope](../../../docs/macos-v1.md). The app's native toolbar
+uses full-color original artwork and the same command/history/file settlement
+paths. Native Open cancellation returns keyboard input to the live parent.
+Source compatibility applies to the framework's named stable APIs; this example
+model is application code, outside the framework compatibility promise. Human
+IME/VoiceOver remain unqualified; final package results identify their exact source.

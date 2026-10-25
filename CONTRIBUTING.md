@@ -55,6 +55,7 @@ The reports' `go.mod` is an archive boundary, not a dependency to import or test
 Optional personal `go.work` files are local development settings and are ignored;
 the module-local replacements remain the reproducible dependency setup.
 
-Keep changes focused. The approved macOS-v1 work may extend framework APIs only within
-[its five-area contract](specs/macos-v1-candidate.md); experimental rendering stays disabled. Include what changed, the checks
-run, and any limitations in the commit or pull-request description.
+Keep changes focused. The current [macOS v1 closeout](specs/macos-v1-release.md)
+freezes features and experimental rendering/pacing. Preserve the
+[stable v1 API contract](specs/stable-api.md) when maintaining supported APIs.
+Include changes, checks and limitations in commit or pull-request descriptions.

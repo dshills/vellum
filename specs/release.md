@@ -1,26 +1,25 @@
 # SDK versioning, compatibility and release artifacts
 
-**Developer-preview policy, approved 22 October 2026:** the
-[first-release plan](macos-first-release-plan.md) governs the macOS preview.
-Numeric latency/cadence qualification and full endurance/platform certification
-below remain future full-qualification work, with historical failures preserved.
-Correctness, bounded resources, required workflows, independent SDK consumption
-and applicable distribution rights remain preview blockers. This does not mark
-M3–M7 complete or authorize public publication/signing.
+Current source/API identity is **`v1.0.0`**, recorded by `release/version.json`
+and `vellum.Version`. The [macOS v1 closeout](macos-v1-release.md) authorizes
+private personal-use packaging and the [stable API contract](stable-api.md).
+It does not authorize public tags, release assets, signing identities or notarization.
 
+The root module is `github.com/dshills/vellum`, the native module is
+`github.com/dshills/vellum/drivers/cogent`, and Vellum's own code uses MIT.
+Third-party components retain original notices. Current changed-payload audit
+status remains pending; historical alpha.3 exact-payload approval is not reused.
 
-`release/version.json` and the public `vellum.Version` constant identify
-`v0.1.0-alpha.3`. This is a developer-preview candidate packaging/API version; no Git tag or remote
-release is created by these tools. The owner selected `github.com/dshills/vellum`
-and the MIT license for Vellum's own code. The native module is
-`github.com/dshills/vellum/drivers/cogent`; example module paths also match their
-repository directories. Root and module-local LICENSE files record this choice.
-The third-party/native distribution audit remains pending. The Go module graph notice inventory does not establish
-complete embedded Rust/native binary/font redistribution rights.
-
-Release metadata also records the experimental, explicitly opted-in Mac semantic
-automation protocol version. It does not change the alpha SDK version or target
-qualification status; source revision identifies this added public contract.
+The published alpha.3 preview, personal-v0.1 and v1 RC records are historical.
+Numeric optimization goals, full platform/endurance qualification and broader
+hardware remain outside this bounded personal release. Existing correctness,
+resource bounds, independent SDK origins and distribution guards remain intact.
+Experimental replay/automation protocol versions retain their separate limits.
+The `personal_use` metadata block is explicitly historical and identifies the
+older personal-v0.1 candidate; `macos_v1` and `api_compatibility` describe the current
+v1 release. `support.darwin: personal-use` is a bounded runtime-scope label, not a
+public distribution approval; the public tooling gates still require the separate
+exact-payload audit and notice checks.
 
 ## Mac distribution input inventory
 
@@ -233,13 +232,12 @@ This version change does not certify native runtime, performance or distribution
 
 ## API compatibility
 
-The root package identifies the version; focused `app`, `ui`, `command`, `tasks`,
-`workbench`, `canvas` and `virtual` packages own framework contracts. The native
-Cogent driver remains a separate module and an experimental implementation.
-Alpha exported APIs may change. Changes require updated specifications, consumer
-scenarios and release metadata; compatible stable-release promises start only
-after that contract is deliberately adopted. A source revision/dirty status in a
-private archive distinguishes builds sharing the same alpha version.
+The [stable v1 contract](stable-api.md) names the root packages and macOS driver
+facade that receive source-compatibility guarantees, the experimental exclusions,
+additive-change/default behavior policy and major-version migration requirement.
+Release source and SDK manifests identify the exact baseline. Native platform and
+human acceptance remain limited to the [Mac support guide](../docs/macos-v1.md).
+This deliberately replaces the former alpha-only compatibility policy.
 
 The independent `examples/sdk-contract` module exercises public controlled views,
 style omission versus explicit zero, command availability/shortcuts, window-scoped

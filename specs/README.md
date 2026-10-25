@@ -56,3 +56,6 @@ measurement and matched 10k/100k wide/deep workloads.
 - [Named Canvas2D objects](canvas-accessibility.md): stable semantic identities, completed clipped frames and owner-held selection.
 
 - [macOS application examples](macos-app-examples.md): runnable Calculator, Notes, Weather and Reminders with public APIs and separate visual acceptance.
+
+- [Stable v1 API compatibility](stable-api.md): named core/native facade and experimental exclusions.
+- [macOS v1 private release closeout](macos-v1-release.md): frozen CI, documentation and packaging scope.

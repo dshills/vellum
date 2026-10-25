@@ -11,19 +11,22 @@ Full-color toolbar and picker artwork remains untinted.
 
 ## Current status
 
-**`main` contains the feature-frozen `v1.0.0-rc.1` macOS candidate.** Matching SDK,
-Notes, Mac Widgets and two-window shell packages have been built for private
-personal evaluation. The [candidate guide](docs/macos-v1.md) describes the API and
-support contract; the [acceptance report](docs/reports/macos-v1/README.md) records
-exact build identities, checks and remaining limits.
+**Current source identifies `v1.0.0` for private personal macOS use.** The
+[stable API contract](specs/stable-api.md) defines source-compatibility guarantees
+and experimental exclusions. Matching SDK, Notes, Mac Widgets and two-window
+shell packages follow the [release closeout](specs/macos-v1-release.md). The
+[Mac guide](docs/macos-v1.md) describes supported behavior; the
+[completed RC report](docs/reports/macos-v1/README.md) retains its exact build
+identities and verification limits. Final v1 results are recorded in the
+[release report](docs/reports/macos-v1-release/README.md).
 
 The latest published download is still the older
 [v0.1.0-alpha.3 developer preview](https://github.com/dshills/vellum/releases/tag/v0.1.0-alpha.3).
 Its SDK and Placement app do not contain the current Notes and widget work.
-The v1 candidate has no published release assets or stable-v1 qualification.
-Candidate apps are ad-hoc signed and unnotarized.
+The v1 packages are private; no public v1 tags or downloadable assets are
+published by this closeout. Apps are ad-hoc signed and unnotarized.
 
-Current native acceptance covers the recorded Apple Silicon macOS host. Human
+Native acceptance covers the recorded Apple Silicon macOS host. Human
 IME candidate behavior and VoiceOver usability remain unqualified, as do other
 macOS/hardware/display configurations and Windows/Linux. Wayland is unsupported.
 Replay, automation, diagnostics and broader GPU/workbench workloads remain
@@ -53,7 +56,7 @@ and [framework contract](specs/framework.md) for behavior and subsystem limits.
 
 Install the Go version declared in [go.mod](go.mod), Python 3, Git, `patch`, and
 Xcode Command Line Tools. Native applications require a supported GPU; current
-candidate testing targets Apple Silicon macOS.
+personal-use testing targets Apple Silicon macOS.
 
 ```sh
 git clone https://github.com/dshills/vellum.git
@@ -71,7 +74,7 @@ export VELLUM_CACHE_DIR=/tmp/vellum-go-cache
 Preparation verifies dependency sources and applies driver-owned patches. The
 native driver and example modules use explicit local replacements. Build from
 the checkout with this workflow, or use the independently extracted SDK route in
-the [candidate guide](docs/macos-v1.md#consume-the-private-sdk).
+the [Mac guide](docs/macos-v1.md#consume-the-private-sdk).
 
 ## Example applications
 
@@ -125,7 +128,7 @@ describes packaging and relocation.
 
 ## Verification
 
-The candidate's automated checks include portable race/vet, focused native
+The release's automated checks include portable race/vet, focused native
 routing/lifetime regressions, 20 repeated grid/tree cancellation checks, an
 independent SDK consumer and a generated starter build. App ZIP extractions and
 installed launch copies have strict signature and signed-byte verification.
@@ -181,7 +184,7 @@ workflow is `scripts/check.sh`; see [CONTRIBUTING](CONTRIBUTING.md) and the
 
 Vellum's own code is [MIT licensed](LICENSE). Third-party components retain their
 original licenses and notices. The approved alpha.3 distribution decision covers
-that exact payload and notice bundle. Current candidate artifacts remain private;
+that exact payload and notice bundle. Current v1 artifacts remain private;
 new public assets require the applicable audit, notice checks and publication
 approval. See the [release contract](specs/release.md) and
 [release metadata](release/version.json).

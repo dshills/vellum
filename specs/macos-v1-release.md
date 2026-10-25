@@ -1,0 +1,11 @@
+# macOS v1 private release closeout
+
+Approved25 October2026: close CI, adopt the stable API/documentation contract and produce final macOS v1 SDK/apps, then relaunch Notes. Baseline is `b633872`, following the completed RC. Features, backend, rendering/pacing options and existing release responsiveness policy remain frozen.
+
+1. CI checkpoint: resolve observed required-workflow failures with focused tests; preserve test selection and runtime assertions/deadlines. Review with Prism/Anthropic Claude Sonnet5.5 and commit. Final workflow success must refer to the final release source, not an earlier passing revision.
+2. API/documentation checkpoint: adopt [stable API scope](stable-api.md), align current metadata/version/docs, retain named experimental APIs and hardware/human limits, run portable and affected consumer/tooling checks, review and commit. No API removals or new controls.
+3. Packaging checkpoint: from clean committed source export a private SDK with the unchanged hash-pinned native capsule and notice inputs, verify independent consumer/starter origins and builds, package matching Notes/Mac Widgets/shell apps, verify exact ZIP bytes/signatures/checksums, record final CI, review and commit evidence. Save/close the existing Notes window normally, relaunch the verified final package and record its actual startup/saved-notebook result. Report-only commits do not relabel built bytes.
+
+The deliverable is `v1.0.0` for private personal use on the recorded Apple Silicon macOS26.6.2 configuration. Human IME and VoiceOver remain unqualified by prior owner choice; additional OS/hardware/displays and public distribution are outside this closeout. The changed-payload distribution audit stays pending. Do not create public tags/releases/assets, use a signing identity or notarize. Ad-hoc signing remains the private-package policy. No historical exact-payload audit approval is extended.
+
+Reuse unchanged RC physical/input/history/soak evidence. Desktop actions are limited to the requested final app relaunch and app-local smoke; preserve notebook data, clipboard and global preferences. Actual new correctness defects block delivery; optional polish stays in the backlog. This contract governs current closeout; older candidate/preview phase documents retain their original scope and results.

@@ -1,0 +1,75 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 1.6155134581495076
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.2536221658810973
+  },
+  {
+    "cwd": "examples/sdk-contract",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.4849134578835219
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 10.284990542102605
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 8.27345412503928
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/release-sdk_test.py"
+    ],
+    "exit_code": 0,
+    "seconds": 1.83819912513718
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/check-sdk_test.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.2589418750721961
+  }
+]

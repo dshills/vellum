@@ -1,8 +1,10 @@
 # Documentation
 
 Start with the [project overview](../README.md), [development guide](development.md)
-and [implementation status](implementation.md). For current Mac work, follow the
-[delivery plan](../specs/macos-delivery.md).
+and [implementation status](implementation.md). For current Mac use, follow the
+[v1 support guide](macos-v1.md), [stable API contract](../specs/stable-api.md)
+and [release closeout](../specs/macos-v1-release.md). The older delivery plan
+retains broader qualification work.
 
 - [Mac input widgets](mac-widget-integration.md): public API setup, themes, owner values and focus helpers.
 - [Mac widget demo](mac-widget-demo.md): run the private light/dark gallery.

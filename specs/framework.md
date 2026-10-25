@@ -1,8 +1,10 @@
 # Framework contract
 
-This describes the implemented experimental framework. It preserves the API and
-limits documented with the five implementation phases; unresolved foundation
-checks still prevent a production-ready claim. See [implementation status](../docs/implementation.md).
+This describes the implemented framework contracts and resource limits. Stable
+source compatibility is scoped by [the v1 API contract](stable-api.md); experimental
+subsystems and runtime/platform qualification retain their named boundaries.
+See [current Mac support](../docs/macos-v1.md) and the historical
+[implementation ledger](../docs/implementation.md).
 
 ## Application ownership and delivery
 

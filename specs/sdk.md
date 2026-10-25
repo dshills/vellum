@@ -1,13 +1,11 @@
 # Local SDK consumption and performance measurements
 
-**Developer-preview policy, approved 22 October 2026:** the
-[first-release plan](macos-first-release-plan.md) governs the macOS preview.
-Numeric latency/cadence qualification and full endurance/platform certification
-below remain future full-qualification work, with historical failures preserved.
-Correctness, bounded resources, required workflows, independent SDK consumption
-and applicable distribution rights remain preview blockers. This does not mark
-M3–M7 complete or authorize public publication/signing.
-
+Current private macOS v1 delivery follows the [release closeout](macos-v1-release.md)
+and [stable API contract](stable-api.md). The older developer-preview and personal
+SDK records retain their exact source identities. Existing inventory, dependency,
+consumer-origin and distribution guards below remain in force. Broader numeric
+performance/platform qualification remains separate from this bounded personal
+release; this pass neither changes its existing policy nor marks M3–M7 complete.
 
 The root framework module stays standard-library-only. The native adapter is a
 separate module, `github.com/dshills/vellum/drivers/cogent`, matching its repository

@@ -4,28 +4,28 @@ Start from an identified personal SDK and an independent application module. The
 [small Mac starter](../examples/personal-mac/README.md) shows one controlled
 window and a full-color native toolbar. The [Notes consumer](../examples/macapps/notes/README.md)
 adds real local files, shared history and recovery using the same public APIs.
-No gallery internals or private driver packages are required. The original frozen
-personal SDK still supports the small starter; current Notes needs the private
-prose snapshot because its multiline node explicitly selects `Prose: true`.
+No gallery internals or private driver packages are required. The matching private v1 SDK includes prose presentation, the native app shell
+and the explicitly scoped [stable API contract](../specs/stable-api.md). Older
+SDKs retain their historical capabilities; use the paired v1 source and SDK.
 
 ## Run the independent Notes source
 
-The private Notes delivery pairs `Notes source.zip` with the exact
-`vellum-notes-prose-private-sdk.tar.gz`. This private snapshot adds the explicitly
-approved prose presentation to the personal-v0.1 base; it is not a published
-SDK release. Its manifest records the exact source commit and archive digest.
-Extract both next to each
-other. Module replacements in `notes-source/go.mod` point into that SDK, rather
-than back to a development checkout. Use Go 1.25.6 and macOS development tools:
+The private v1 delivery pairs `Mac examples source.zip` with
+`vellum-v1.0.0-private-sdk.tar.gz`. Its manifest pins the source commit and SDK
+hash. Extract both beside each other. Replacements in
+`macapps-source/go.mod` point into that SDK, never a development checkout.
+Use Go1.25.6 and macOS development tools:
 
 ```sh
-tar -xzf vellum-notes-prose-private-sdk.tar.gz
-unzip 'Notes source.zip'
-. ./vellum-v0.1.0-personal.1/drivers/cogent/env.sh
-cd notes-source
+tar -xzf vellum-v1.0.0-private-sdk.tar.gz
+unzip 'Mac examples source.zip'
+. ./vellum-v1.0.0/drivers/cogent/env.sh
+cd macapps-source
 go test -race ./...
 go vet ./...
 go run ./cmd/notes -data-dir /absolute/private/notes
+# The same source archive also contains the independent two-window shell.
+# go run ./cmd/macshell
 ```
 
 The default executable directory is Application Support/Vellum Notes on macOS.

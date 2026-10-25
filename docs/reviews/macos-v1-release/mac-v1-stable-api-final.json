@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b02e13d44af7214b5a25709f23632204",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "0391fb7040624404f0b518740597dae2f24e0e2a",
+    "branch": "codex/macos-v1-release"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "fe4cdf1ec8a7347c",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Version bumped to stable v1.0.0 while closeout report says CI/package verification incomplete",
+      "message": "The code and metadata declare stable `v1.0.0` (vellum.Version, release/version.json, README), yet the release report states closeout is in progress, CI is unconfirmed, and no final package pass is claimed. Stable identity and API-compatibility promises are being adopted before the release gates are verified.",
+      "suggestion": "Keep the version as a release candidate until final CI and package verification complete, or land the version bump in the packaging checkpoint after results are recorded.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reports/macos-v1-release/README.md",
+          "lines": {
+            "start": 3,
+            "end": 3
+          }
+        }
+      ],
+      "tags": [
+        "release",
+        "docs-consistency"
+      ],
+      "evidence": "Baseline `b633872`; current closeout is in progress. The text-backend cold-compile CI failure is repaired locally with unchanged execution assertions/deadlines. Final workflow success and exact private v1 package results will be recorded after observation; no final CI/package pass is claimed here.",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4026,
+    "totalMs": 4057
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 17,
+    "bytes": 42848,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 18339,
+        "output": 387,
+        "costUSD": 0.040548
+      }
+    ],
+    "widenedFiles": 9,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

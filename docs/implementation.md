@@ -1,14 +1,12 @@
 # Framework implementation phases
 
-Current status: [v0.1.0-alpha.3](https://github.com/dshills/vellum/releases/tag/v0.1.0-alpha.3)
-was published on 23 October 2026 as an experimental Apple Silicon macOS developer
-preview. Its bounded acceptance and exact-payload distribution decision do not
-establish production readiness or full performance/platform qualification. See
-the [preview ledger](macos-preview-release.md) and published release limits.
-
-Newer personal-use Mac widget work is separate from those published assets; see
-the [widget demo](mac-widget-demo.md), [integration guide](mac-widget-integration.md)
-and [control index](controls.md).
+Current source identifies `v1.0.0` for private personal macOS use. See the
+[stable API contract](../specs/stable-api.md), [Mac support guide](macos-v1.md)
+and [final closeout report](reports/macos-v1-release/README.md). The completed
+[v1 RC acceptance](reports/macos-v1/README.md) remains source-bound historical evidence.
+The published [alpha.3 preview](https://github.com/dshills/vellum/releases/tag/v0.1.0-alpha.3)
+does not include current widgets/Notes. Public v1 assets, broader hardware and
+human IME/VoiceOver remain outside the current delivery claim.
 
 The phase entries below retain their historical checkpoint scope, including
 then-pending checks and publication statements. They do not redefine the current
