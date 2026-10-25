@@ -1,0 +1,302 @@
+{
+  "schema": 1,
+  "identity": "v0.1.0-personal.1",
+  "distribution": "private personal use",
+  "baseline": "929541a030ab14974c9a3c016867f52014e25ff0",
+  "architecture": "arm64",
+  "qualified_os": "macOS 26.6.2 local machine only",
+  "rendering": "existing default Cogent/WebGPU/Metal; experimental rendering and pacing disabled",
+  "controls": [
+    {
+      "element": "Label",
+      "api": "`ui.Label`"
+    },
+    {
+      "element": "Action button",
+      "api": "`ui.Button`"
+    },
+    {
+      "element": "Bundled icon",
+      "api": "`ui.Icon`"
+    },
+    {
+      "element": "Range slider",
+      "api": "`ui.RangeSlider.View()`"
+    },
+    {
+      "element": "Gradient well/editor",
+      "api": "`ui.GradientWell.View()`"
+    },
+    {
+      "element": "Search scope bar",
+      "api": "`ui.SearchScopeBar.View()`"
+    },
+    {
+      "element": "Find / Replace bar",
+      "api": "`ui.FindBar.View()`"
+    },
+    {
+      "element": "Native Quick Look",
+      "api": "`app.Application.QuickLook()`"
+    },
+    {
+      "element": "Document list",
+      "api": "`ui.DocumentList.View()`"
+    },
+    {
+      "element": "Mac outline",
+      "api": "`ui.OutlineView.View()`"
+    },
+    {
+      "element": "Native Colors panel",
+      "api": "`app.Application.ColorPanels()`"
+    },
+    {
+      "element": "Native Fonts panel",
+      "api": "`app.Application.FontPanels()`"
+    },
+    {
+      "element": "Circular angle dial",
+      "api": "`ui.AngleDial.View()`"
+    },
+    {
+      "element": "Image well",
+      "api": "`ui.ImageWell.View()`"
+    },
+    {
+      "element": "Searchable icon picker",
+      "api": "`ui.IconPicker.View()`"
+    },
+    {
+      "element": "Settings pane",
+      "api": "`ui.SettingsPane.View()`"
+    },
+    {
+      "element": "Calendar",
+      "api": "`ui.Calendar.View()`"
+    },
+    {
+      "element": "Native alert service",
+      "api": "`app.Application.Alerts()`"
+    },
+    {
+      "element": "Image preview",
+      "api": "`ui.Image`"
+    },
+    {
+      "element": "Checkbox",
+      "api": "`ui.Checkbox`"
+    },
+    {
+      "element": "On/off switch",
+      "api": "`ui.Switch`"
+    },
+    {
+      "element": "Toggle button",
+      "api": "`ui.ToggleButton`"
+    },
+    {
+      "element": "Action menu",
+      "api": "`ui.MenuButton`"
+    },
+    {
+      "element": "Cascading action menu",
+      "api": "`ui.NewMenuBranch`, `ui.MenuButton`"
+    },
+    {
+      "element": "Split button",
+      "api": "`ui.SplitButton.View()`"
+    },
+    {
+      "element": "Property inspector",
+      "api": "`ui.Inspector.View()`"
+    },
+    {
+      "element": "Column browser",
+      "api": "`ui.ColumnBrowser.View()`"
+    },
+    {
+      "element": "Filter / rule editor",
+      "api": "`ui.RuleEditor.View()`"
+    },
+    {
+      "element": "Sidebar navigator",
+      "api": "`ui.Sidebar.View()`"
+    },
+    {
+      "element": "Icon/thumbnail collection",
+      "api": "`ui.CollectionView.View()`"
+    },
+    {
+      "element": "Window-modal sheet",
+      "api": "`ui.Sheet.View()`"
+    },
+    {
+      "element": "Shortcut recorder",
+      "api": "`ui.ShortcutRecorder.View()`"
+    },
+    {
+      "element": "Capacity/rating indicator",
+      "api": "`ui.LevelIndicator.View()`"
+    },
+    {
+      "element": "Source list",
+      "api": "`ui.ListBox`"
+    },
+    {
+      "element": "Selection menu",
+      "api": "`ui.Selector`"
+    },
+    {
+      "element": "Radio choices",
+      "api": "`ui.RadioGroup`"
+    },
+    {
+      "element": "Segmented choices",
+      "api": "`ui.SegmentedControl`"
+    },
+    {
+      "element": "Slider",
+      "api": "`ui.Slider`"
+    },
+    {
+      "element": "Inline color picker",
+      "api": "`ui.ColorPicker.View()`"
+    },
+    {
+      "element": "Color well",
+      "api": "`ui.ColorWell.View()`"
+    },
+    {
+      "element": "Token field",
+      "api": "`ui.TokenField.View()`"
+    },
+    {
+      "element": "Font picker",
+      "api": "`ui.FontPicker.View()`"
+    },
+    {
+      "element": "Path control",
+      "api": "`ui.PathControl.View()`"
+    },
+    {
+      "element": "Protected field",
+      "api": "`ui.SecureField.View()`"
+    },
+    {
+      "element": "Search input",
+      "api": "`ui.SearchBox.View()`"
+    },
+    {
+      "element": "Editable choices",
+      "api": "`ui.ComboBox.View()`"
+    },
+    {
+      "element": "Date/time picker",
+      "api": "`ui.DateTimePicker.View()`"
+    },
+    {
+      "element": "Numeric field",
+      "api": "`ui.NumberField`"
+    },
+    {
+      "element": "Single-line field",
+      "api": "`ui.TextField`"
+    },
+    {
+      "element": "Document editor",
+      "api": "`ui.MultilineText`"
+    },
+    {
+      "element": "Progress bar",
+      "api": "`ui.ProgressBar`"
+    },
+    {
+      "element": "Circular progress",
+      "api": "`ui.ProgressRing`, `ui.ProgressGauge`"
+    },
+    {
+      "element": "Retained canvas",
+      "api": "`ui.Canvas2D`"
+    },
+    {
+      "element": "Decorative separator",
+      "api": "`ui.Separator`"
+    },
+    {
+      "element": "Managed data grid",
+      "api": "`ui.DataGrid`"
+    },
+    {
+      "element": "Managed outline",
+      "api": "`ui.DataTree`"
+    },
+    {
+      "element": "Tabs / closable document tabs",
+      "api": "`ui.Tabs`"
+    },
+    {
+      "element": "Scroll container",
+      "api": "`ui.Scroll`"
+    },
+    {
+      "element": "Modal dialog",
+      "api": "`ui.Dialog`"
+    },
+    {
+      "element": "Toolbar",
+      "api": "`ui.Toolbar`"
+    },
+    {
+      "element": "Status bar",
+      "api": "`ui.StatusBar`"
+    },
+    {
+      "element": "Anchored panel",
+      "api": "`ui.Popover.View()`"
+    },
+    {
+      "element": "Contextual actions",
+      "api": "`ui.Node.ContextMenu`, `ui.ContextMenu`"
+    },
+    {
+      "element": "Breadcrumb",
+      "api": "`ui.Breadcrumb.View()`"
+    },
+    {
+      "element": "Labeled input",
+      "api": "`ui.FormField.View()`"
+    },
+    {
+      "element": "Inline feedback",
+      "api": "`ui.InlineNotice.View()`"
+    },
+    {
+      "element": "Labeled form group",
+      "api": "`ui.FormGroup`"
+    },
+    {
+      "element": "Collapsible section",
+      "api": "`ui.Disclosure`"
+    },
+    {
+      "element": "Adjustable split pane",
+      "api": "`ui.SplitPane`"
+    },
+    {
+      "element": "Horizontal/vertical layout",
+      "api": "`ui.Row`, `ui.Column`"
+    },
+    {
+      "element": "Custom driver extension",
+      "api": "`ui.Extension`"
+    }
+  ],
+  "excluded": [
+    "New widget types",
+    "Metal backend rewrite",
+    "Cross-platform or Intel qualification",
+    "Public publication, signing identity use or notarization",
+    "A new numeric performance release gate"
+  ]
+}

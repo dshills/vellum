@@ -1586,3 +1586,11 @@ Prism: `preview-native-completion.json` (Anthropic Claude Sonnet 5.5, complete c
 Prism completed coverage with no retained actionable findings. Native text/PNG preview rendering, navigation, closing and physical focused Find Escape were observed in the private diagnostic. The final additional regression reproduces Cogent character-space input and busy-state refresh; it passes alongside physical-code routing, document/outline and native-panel checks. OS-owned Quick Look geometry replaces the invisible child-window presentation; a hidden AppKit dismissal succeeds and parent focus restoration is conditional on preview ownership. Unrelated generic list behavior is unchanged. Final clean packaged-app checks are recorded separately.
 
 Focused checks: `preview-native-completion-checks.json`, `preview-native-completion-regression-checks.json`, `preview-native-final-routing-checks.json`.
+
+## Freeze the personal macOS v0.1 catalogue and five-phase finish contract
+
+Prism: `personal-v01-scope-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism identified a second Markdown table accidentally included in the generated catalogue; extraction now stops at the first table boundary. Final review has complete coverage and no findings. The 71-entry catalogue is unique and the arm64/macOS 26.6.2 identity matches the actual host. Human accessibility/IME and unavailable hardware remain separate acceptance, with no new performance gate or public publication.
+
+Focused checks: `personal-v01-scope-checks.json`.

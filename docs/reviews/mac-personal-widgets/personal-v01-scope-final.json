@@ -1,0 +1,85 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "6647d62ada4fdf37fe6a93189786ffa2",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "929541a030ab14974c9a3c016867f52014e25ff0",
+    "branch": "codex/personal-macos-v01"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3045,
+    "totalMs": 3055
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 13032,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 7277,
+        "output": 231,
+        "costUSD": 0.016864
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "855b69340afcb2d6",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Approval date appears implausible",
+        "message": "The spec records owner approval on a specific date (25 October 2026) that may be in the future relative to the baseline commit. If it is a typo, the approval record is unreliable and the contract's authority is undermined.",
+        "suggestion": "Verify and correct the approval date, or reference the actual approval record.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "specs/personal-macos-v01.md",
+            "lines": {
+              "start": 3,
+              "end": 3
+            }
+          }
+        ],
+        "tags": [
+          "docs",
+          "accuracy"
+        ],
+        "evidence": "Owner approved all five finish areas on 25 October 2026.",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in specs/personal-macos-v01.md"
+    }
+  ],
+  "suppressed": []
+}
