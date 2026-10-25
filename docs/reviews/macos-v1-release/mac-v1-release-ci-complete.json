@@ -1,0 +1,85 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f96154acb485530db136cee2ee541c83",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "b633872dfe828f93e31b1dbb0798a62fb4edee39",
+    "branch": "codex/macos-v1-release"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3838,
+    "totalMs": 3845
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 6698,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5172,
+        "output": 294,
+        "costUSD": 0.013284
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "eb871694f3e353b8",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Unmatched test filter silently passes",
+        "message": "Compiled test binaries run with cwd set to the package directory, but a `-test.run` filter matching no tests in a package (e.g. ./events or ./text/lines) still passes with 'no tests to run'. Previously the same was true, but now there is no guard, so a missing or renamed test is silently skipped even though the test file claims it refuses to skip.",
+        "suggestion": "Run with -test.v and verify output contains '--- PASS', or run with -test.list first to confirm that matching tests exist per package.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "scripts/check-text-backend.py",
+            "lines": {
+              "start": 53,
+              "end": 53
+            }
+          }
+        ],
+        "tags": [
+          "testing"
+        ],
+        "evidence": "-test.run=\" + TEXT_TESTS,",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in scripts/check-text-backend.py"
+    }
+  ],
+  "suppressed": []
+}

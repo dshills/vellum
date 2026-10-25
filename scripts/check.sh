@@ -8,6 +8,7 @@ if [ ! -f drivers/cogent/build/upstream/go.mod ] || [ ! -f drivers/cogent/build/
  exit 1
 fi
 python3 drivers/cogent/prepare_test.py
+python3 scripts/check-text-backend_test.py
 python3 scripts/check-text-backend.py
 python3 scripts/check-editor-accessibility_test.py
 python3 scripts/benchmark-native_test.py
