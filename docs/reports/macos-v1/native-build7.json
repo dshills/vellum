@@ -1,0 +1,64 @@
+{
+  "source_commit": "18854e59b8ceaa3aa90b3b43594254fdc6abd168",
+  "build": 7,
+  "host": {
+    "os": "macOS26.6.2",
+    "build": "25G83",
+    "architecture": "arm64"
+  },
+  "window_authorization_started_utc": "2026-10-25 19:24:40 UTC",
+  "observed": [
+    {
+      "check": "normal foreground first paint",
+      "result": "pass",
+      "method": "CUA screenshot after Raise, native helper foreground activation",
+      "limits": "single ordinary Notes foreground observation, no latency qualification"
+    },
+    {
+      "check": "original-color native toolbar",
+      "result": "pass",
+      "method": "active-window screenshot"
+    },
+    {
+      "check": "physical New toolbar button",
+      "result": "pass",
+      "method": "authorized CGEvent helper physical click",
+      "detail": "one new n13, count7\u21928"
+    },
+    {
+      "check": "title and prose unicode",
+      "result": "pass",
+      "method": "Tab and clipboard-restoring CUA paste",
+      "detail": "emoji and accented text preserved"
+    },
+    {
+      "check": "proportional physical selection",
+      "result": "pass",
+      "method": "helper drag x565..688 at y108, CUA selected text and screenshot",
+      "selected": "Mac prose selection"
+    },
+    {
+      "check": "Undo/Redo replacement",
+      "result": "pass",
+      "method": "CmdZ/ShiftCmdZ and actual AX document values"
+    },
+    {
+      "check": "physical Save",
+      "result": "pass",
+      "method": "helper click x179y20, AX Saved notebook"
+    },
+    {
+      "check": "native Open Escape focus",
+      "result": "failed",
+      "detail": "panel canceled, app foreground but subsequent editor input absent; corrected in48c57e8, final package check pending"
+    },
+    {
+      "check": "two-window fixture",
+      "result": "incomplete",
+      "detail": "CUA call returned B AX tree after2840.7475sec; no physical isolation pass claimed"
+    }
+  ],
+  "interruption": "Desktop action window expired during long computer-use service call. No further desktop actions until renewed authorization.",
+  "human_ime": "unqualified",
+  "human_voiceover": "unqualified"
+}

@@ -1,0 +1,185 @@
+{
+  "source_commit": "48c57e81cf5bc2226df87a38fce0a1327fba32df",
+  "sdk_sha256": "e8fdc97fddbb21e1163208ffaaffecf952ad153551680ca99cefc8bbcbae228e",
+  "native_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "version": "v1.0.0-rc.1",
+  "private": true,
+  "notarized": false,
+  "apps": [
+    {
+      "name": "Vellum Notes",
+      "bundle": "com.dshills.vellum.notes.personal",
+      "zip": "Vellum Notes.zip",
+      "zip_sha256": "6d80e391fb42a67c394f819da407318ba03d2e21034725e64810ba0646da4d8c",
+      "binary_sha256": "c8ce2c963c4563a54b2fbf00c35e38a27e2e8a4b719a4ae0a4ce558fc43d44ac",
+      "signature_verified": true
+    },
+    {
+      "name": "Vellum Mac Widgets",
+      "bundle": "com.dshills.vellum.widgets.v1",
+      "zip": "Vellum Mac Widgets.zip",
+      "zip_sha256": "dd9d6ab35baa373ed8a9c5133c22f00eda07b451c8e42aac5b83addfedbbfbe5",
+      "binary_sha256": "4938d6340561559d05639064b5265f547443d463386957f87c482791701c82cc",
+      "signature_verified": true
+    },
+    {
+      "name": "Vellum Mac Shell",
+      "bundle": "com.dshills.vellum.macshell.v1",
+      "zip": "Vellum Mac Shell.zip",
+      "zip_sha256": "d9d095a7cb76b42f8735d1e9244c26fea3f6140c2548238fa56e05665d5bf183",
+      "binary_sha256": "5e529016b2844a985136dbee2253bccc7cb3ab3b93df400ba7cd713c0b5deec6",
+      "signature_verified": true
+    }
+  ],
+  "checks": [
+    {
+      "name": "sdk-export",
+      "exit_code": 0,
+      "seconds": 5.513304541818798
+    },
+    {
+      "name": "module-origins",
+      "exit_code": 0,
+      "seconds": 0.017067665932700038
+    },
+    {
+      "name": "integrity",
+      "exit_code": 0,
+      "seconds": 1.4414557910058647
+    },
+    {
+      "name": "consumer-race",
+      "exit_code": 0,
+      "seconds": 31.015409167157486
+    },
+    {
+      "name": "consumer-vet",
+      "exit_code": 0,
+      "seconds": 22.182116500101984
+    },
+    {
+      "name": "starter-generate",
+      "exit_code": 0,
+      "seconds": 0.10507970792241395
+    },
+    {
+      "name": "starter-test",
+      "exit_code": 0,
+      "seconds": 2.399792332900688
+    },
+    {
+      "name": "starter-build",
+      "exit_code": 0,
+      "seconds": 3.7130689579062164
+    },
+    {
+      "name": "build-0",
+      "exit_code": 0,
+      "seconds": 3.776484082918614
+    },
+    {
+      "name": "package-0",
+      "exit_code": 0,
+      "seconds": 0.6278142088558525
+    },
+    {
+      "name": "zip-0",
+      "exit_code": 0,
+      "seconds": 1.3255479580257088
+    },
+    {
+      "name": "extract-0",
+      "exit_code": 0,
+      "seconds": 0.18567333300597966
+    },
+    {
+      "name": "signature-0",
+      "exit_code": 0,
+      "seconds": 0.07551204203628004
+    },
+    {
+      "name": "install-0",
+      "exit_code": 0,
+      "seconds": 0.12708429200574756
+    },
+    {
+      "name": "installed-signature-0",
+      "exit_code": 0,
+      "seconds": 0.07425354211591184
+    },
+    {
+      "name": "build-1",
+      "exit_code": 0,
+      "seconds": 4.513897833181545
+    },
+    {
+      "name": "package-1",
+      "exit_code": 0,
+      "seconds": 0.6553228341508657
+    },
+    {
+      "name": "zip-1",
+      "exit_code": 0,
+      "seconds": 1.3370228330604732
+    },
+    {
+      "name": "extract-1",
+      "exit_code": 0,
+      "seconds": 0.18360191700048745
+    },
+    {
+      "name": "signature-1",
+      "exit_code": 0,
+      "seconds": 0.07420691708102822
+    },
+    {
+      "name": "install-1",
+      "exit_code": 0,
+      "seconds": 0.1400262920651585
+    },
+    {
+      "name": "installed-signature-1",
+      "exit_code": 0,
+      "seconds": 0.07522154110483825
+    },
+    {
+      "name": "build-2",
+      "exit_code": 0,
+      "seconds": 3.7795475418679416
+    },
+    {
+      "name": "package-2",
+      "exit_code": 0,
+      "seconds": 0.6359443748369813
+    },
+    {
+      "name": "zip-2",
+      "exit_code": 0,
+      "seconds": 1.3069971250370145
+    },
+    {
+      "name": "extract-2",
+      "exit_code": 0,
+      "seconds": 0.2061777920462191
+    },
+    {
+      "name": "signature-2",
+      "exit_code": 0,
+      "seconds": 0.07707050000317395
+    },
+    {
+      "name": "install-2",
+      "exit_code": 0,
+      "seconds": 0.1304527500178665
+    },
+    {
+      "name": "installed-signature-2",
+      "exit_code": 0,
+      "seconds": 0.07416866696439683
+    }
+  ],
+  "module_origins_count": 9,
+  "native_final": "passed within named cases",
+  "human_ime": "unqualified",
+  "human_voiceover": "unqualified"
+}

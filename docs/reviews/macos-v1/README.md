@@ -38,3 +38,11 @@ Prism: `mac-v1-dialog-focus-final.json` (Anthropic Claude Sonnet 5.5, complete c
 Prism complete coverage. Added exact main-window identity for nil-key completion and tested production identity/state combinations in response to its first review. Final timing concern is reserved for actual packaged native verification: parent or nil-key completion is accepted only with active/visible/nonminimized/exact-main guards. Scalar fixture is explicitly policy-only; it does not establish responder delivery or closed-window behavior. The live repro and follow-up outcomes are recorded separately. Focused race/vet checks pass; backend and release gate unchanged.
 
 Focused checks: `mac-v1-dialog-focus-final-checks.json`.
+
+## Record private macOS v1 candidate delivery and native acceptance
+
+Prism: `mac-v1-final-acceptance.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism complete coverage with no findings. Final native cases pass on source48c57e8: file-panel focus handoff, exact note history/cleanup, independent window toolbars, disabled refusal, gallery pointer targeting and saved-notebook relaunch. Initial real focus failure and long service-call interruption remain recorded separately. Matching SDK, external module origins, starter, exact signed app ZIPs and checksums verified. Raw local journal is private. Human IME/VoiceOver and other hardware remain unqualified; public release and existing responsiveness policy unchanged. This report-only commit does not relabel runtime bytes.
+
+Focused checks: `mac-v1-dialog-focus-final-checks.json`, `mac-v1-cancellation-checks.json`, `mac-v1-delivery-contract-pass-checks.json`.

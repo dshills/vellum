@@ -1,0 +1,51 @@
+{
+  "version": "v1.0.0-rc.1",
+  "runtime_source_commit": "48c57e81cf5bc2226df87a38fce0a1327fba32df",
+  "host": {
+    "os": "macOS26.6.2",
+    "build": "25G83",
+    "arch": "arm64"
+  },
+  "desktop_authorization_started_utc": "2026-10-25 20:22:08 UTC",
+  "last_action_utc": "2026-10-25T20:26:34.453198+00:00",
+  "method": "Explicitly authorized app/path-restricted macOS CGEvent/AX helper; no system input/accessibility settings changed. Initial CUA paste restored clipboard; final helper never used clipboard.",
+  "cases": [
+    {
+      "check": "Native Open cancellation and keyboard focus",
+      "result": "pass",
+      "source": "48c57e81cf5bc2226df87a38fce0a1327fba32df",
+      "method": "Physical click focuses prose; CmdO opens owned panel; Escape; physical Space without refocus changes editor at current caret. AX confirms editor focused and value changed. Undo returns exact prior text."
+    },
+    {
+      "check": "Native titlebar history",
+      "result": "pass",
+      "method": "Physical Delete of disposable n13; native Undo restores same ID/body and count8; native Redo removes it; Save then normal close/relaunch retains count7 and prior n10 selection."
+    },
+    {
+      "check": "Two-window toolbar isolation",
+      "result": "pass",
+      "method": "A physical Edit gives A1/B0; disable A keeps B enabled. B Edit gives B1; close A; B Edit gives B2. Disable B and physically click its Edit; value remains B2 and native item AXEnabled=0."
+    },
+    {
+      "check": "Full gallery compact field targeting",
+      "result": "pass",
+      "method": "Physical click and Right key focus Theme preview name; AX cursor location2, value Untitled unchanged; normal close."
+    },
+    {
+      "check": "Normal shutdown and final relaunch",
+      "result": "pass",
+      "method": "Normal native close requests; immediate launch was correctly refused while previous process was still draining. Later launch succeeds as a new process; reconciled Notes tree shows saved original seven notes. Final verified Notes bundle remains foreground."
+    }
+  ],
+  "raw_local_journal_sha256": "cd4a675b90f325938b041f84dbce728669e193833d1e24e379d62ce9222b8cf4",
+  "raw_local_only": true,
+  "initial_source": "18854e59b8ceaa3aa90b3b43594254fdc6abd168",
+  "initial_results_reference": "native-build7.json",
+  "human_ime": "unqualified",
+  "human_voiceover": "unqualified",
+  "other_hosts_displays": "unqualified",
+  "cross_platform": "unqualified",
+  "public_distribution": "not authorized/pending audit",
+  "backend_and_release_gate": "unchanged",
+  "known_nonproduct_interruption": "Initial CUA app-selection call returned after2840.7475sec; first desktop window expired. Final native helper checks completed in renewed eight-minute window."
+}

@@ -1,0 +1,85 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "0ad84770e6d68a762b8e6c2b6c72158c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "48c57e81cf5bc2226df87a38fce0a1327fba32df",
+    "branch": "codex/macos-v1-candidate"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3912,
+    "totalMs": 3932
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 15284,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 8184,
+        "output": 333,
+        "costUSD": 0.019698
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "13d75de831780d84",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Final pass claims not backed by verifiable artifacts",
+        "message": "The report says Notes was left with 'original count7', but Undo/Redo/Save steps recorded in the acceptance JSON have no recorded evidence of verification beyond the narrative. More importantly, the README says 'Physical A/B isolation and disabled refusal pass in final package' while the build7 file records the two-window fixture as incomplete; this is reconciled only by a different later run, so the provenance is weak.",
+        "suggestion": "Add per-case evidence hashes or journal references to the final acceptance cases, as the raw journal is local-only and unverifiable.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "docs/reports/macos-v1/delivery-verification.json",
+            "lines": {
+              "start": 183,
+              "end": 23
+            }
+          }
+        ],
+        "tags": [
+          "evidence",
+          "traceability"
+        ],
+        "evidence": "\"native_final\": \"passed within named cases\"",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/macos-v1/delivery-verification.json"
+    }
+  ],
+  "suppressed": []
+}
