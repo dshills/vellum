@@ -11,12 +11,14 @@ app are experimental; the app is ad-hoc signed and unnotarized. Windows and Linu
 remain unqualified. Full production and numeric performance qualification remain
 separate from this preview under the [approved release plan](specs/macos-first-release-plan.md).
 
-Current source is the feature-frozen `v0.1.0-personal.1` private macOS candidate;
-see the [personal delivery ledger](docs/personal-macos-v01.md) and
-[small Mac starter](examples/personal-mac/README.md). It includes newer macOS widget work for personal evaluation.
-Those widgets are not included in the published alpha.3 assets. See the
-[Mac widget demo](docs/mac-widget-demo.md) and
-[public-API integration guide](docs/mac-widget-integration.md) to try them from source.
+Current source is the feature-frozen `v1.0.0-rc.1` private macOS candidate;
+see the [v1 candidate support and delivery guide](docs/macos-v1.md) and
+[small Mac starter](examples/personal-mac/README.md). The candidate adds shared
+Mac presentation, prose editing, independent native window toolbars and command
+menus. Published alpha.3 assets remain historical. Human IME/VoiceOver usability
+and hardware outside the recorded Apple Silicon host remain unqualified.
+See the [Mac widget demo](docs/mac-widget-demo.md) and
+[app-shell API guide](docs/macos-app-shell.md) to try the current source.
 
 ## What is available
 

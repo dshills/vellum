@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "24b74c64ee32c10f97a1e8a4e4b5b10a",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "99de0b4bcc274b3d5d69931543a41b11629525d7",
+    "branch": "codex/macos-v1-candidate"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "7bf6477585131f99",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Hardcoded version in test and possible stale version references",
+      "message": "The version bump to v1.0.0-rc.1 is not reflected in other release metadata that may pin the old version string (for example release/personal-macos-v01.json, which docs/macos-v1.md references as the frozen catalogue, and any other tests or scripts that check vellum.Version). Those checks would fail or report a stale identity. The contract test also hardcodes the version string and will need editing on every bump.",
+      "suggestion": "Grep the repo for v0.1.0-personal.1 and update every consumer (manifests, scripts, tests). Compare against release/version.json instead of hardcoding the string in the test.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/sdk-contract/contract_test.go",
+          "lines": {
+            "start": 26,
+            "end": 26
+          }
+        }
+      ],
+      "tags": [
+        "release",
+        "consistency"
+      ],
+      "evidence": "if vellum.Version != \"v1.0.0-rc.1\" {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3722,
+    "totalMs": 3737
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 12406,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 7173,
+        "output": 347,
+        "costUSD": 0.017816
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -2,6 +2,6 @@
 // descriptions, workers and docking live in its focused subpackages.
 package vellum
 
-// Version is the framework API version. Alpha releases may change exported
+// Version is the framework API version. Prerelease candidates may change exported
 // contracts; see specs/release.md for the compatibility policy.
-const Version = "v0.1.0-personal.1"
+const Version = "v1.0.0-rc.1"

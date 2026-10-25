@@ -22,3 +22,11 @@ Prism: `mac-v1-cancellation.json` (Anthropic Claude Sonnet 5.5, complete coverag
 Prism complete coverage with no findings. Deterministic delayed-notification test preserves the identical admitted event and earlier terminals; actual grid/tree metrics race checks pass 20 repetitions. Foreground first-paint observation remains in the upcoming native checkpoint; this commit does not claim it.
 
 Focused checks: `mac-v1-cancellation-checks.json`.
+
+## Define private macOS v1 candidate support and delivery
+
+Prism: `mac-v1-candidate-contract-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism complete coverage. Preserved the historical personal_use contract in response to its initial finding. Final stale-reference concern is not a defect: the frozen personal-v0.1 catalogue and immutable historical records retain their source identities. A search of active Go consumers found the SDK contract version assertion, now updated; root metadata consistency and independent SDK tests pass. The independent consumer intentionally pins the candidate API version instead of reading repository files. Native evidence remains pending until actual observation; public audit and human qualification remain unchanged.
+
+Focused checks: `mac-v1-delivery-contract-pass-checks.json`.
