@@ -1,0 +1,59 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./editor",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 2.127709958003834
+  },
+  {
+    "cwd": "examples/sdk-contract",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 1.9297157919500023
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestManagedEditor|TestManagedTextField|TestNativeAccessibilityText|TestNativeAccessibilityEditor|TestNativeSecure|TestQuickLook|TestRangeTrack|TestGradientTrack|TestInputFocus",
+      "-count=1",
+      "-timeout",
+      "120s"
+    ],
+    "exit_code": 0,
+    "seconds": 15.566017542034388
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./internal/textinput",
+      "-count=1",
+      "-timeout",
+      "90s"
+    ],
+    "exit_code": 0,
+    "seconds": 2.929418583167717
+  }
+]

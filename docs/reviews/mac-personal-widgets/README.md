@@ -1602,3 +1602,11 @@ Prism: `personal-v01-mac-behavior-clear.json` (Anthropic Claude Sonnet 5.5, comp
 Final Prism review has complete coverage. Its ordering finding is contradicted by Driver.refresh: appearance.deliver executes inside the application owner before TakeDirty and before n := window.View(), so the view observes updated state. systemAppearanceState.delivered suppresses repeated delivery across multiple windows. The full ordinary-queue and no-window/later-refresh regressions pass. Earlier token construction finding was a source-redactor false positive; the nonsecret private field was renamed so the Add(1) assignment is visible. Contrast/accent and explicit-appearance accessibility propagation were hardened. Focused race, native compile, toolbar drag/retirement, gallery state and vet checks pass. Native initial observation remains part of the final bounded session.
 
 Focused checks: `personal-v01-appearance-final-checks.json`, `personal-v01-appearance-guards-checks.json`, `personal-v01-appearance-owner-final-checks.json`.
+
+## Renew personal Mac Unicode composition focus and accessibility acceptance
+
+Prism: `personal-v01-input.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism completed coverage with no findings. Public Unicode/combining/emoji/RTL/CRLF replacement, composition refusal/cancellation and exact one-step Undo/Redo pass. Existing native editor/field admission, UTF-16 geometry, secure AX and focus/FIFO regression methods pass under race detection, as does the textinput package. The authored checklist explicitly leaves real-provider IME and human VoiceOver unqualified; native/physical sample checks follow in the approved final desktop window. No global input or accessibility settings changed.
+
+Focused checks: `personal-v01-input-checks.json`.
