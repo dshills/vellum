@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/ui"
 )
 
 func TestProbeDeadlineReachesBlockingCheck(t *testing.T) {
@@ -272,5 +273,42 @@ func TestOrdinaryDeadlineRetainsTwentyMinuteCap(t *testing.T) {
 	}
 	if (config{cycles: 10, every: 25, timeout: time.Minute, composed: true}).validate() == nil {
 		t.Fatal("invalid sample interval admitted")
+	}
+}
+
+func TestCanvasExtensionIdentitySurvivesPreferenceRefresh(t *testing.T) {
+	for _, composed := range []bool{false, true} {
+		a, err := app.New(app.Config{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		_, _, _, suite, ref, err := openMode(a, "probe", "Probe", composed)
+		if err != nil {
+			a.Close()
+			t.Fatal(err)
+		}
+		view := a.Windows()[0].View
+		if composed {
+			view = suite.Dock.Panels[0].View
+		}
+		var find func(ui.Node) *readyCanvas
+		find = func(n ui.Node) *readyCanvas {
+			if p, ok := n.Custom.(*readyCanvas); ok {
+				return p
+			}
+			for _, c := range n.Children {
+				if p := find(c); p != nil {
+					return p
+				}
+			}
+			return nil
+		}
+		original := find(view())
+		a.Invalidate(ref.ID())
+		refreshed := find(view())
+		if original == nil || original != refreshed {
+			t.Errorf("composed=%t: refresh replaced canvas adapter", composed)
+		}
+		a.Close()
 	}
 }

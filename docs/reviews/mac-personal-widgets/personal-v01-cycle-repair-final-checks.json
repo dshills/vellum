@@ -1,0 +1,37 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "gofmt",
+      "-w",
+      "cmd/window-cycle-smoke/main_test.go"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0061143748462200165
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "vellum_native_checks",
+      "./cmd/window-cycle-smoke"
+    ],
+    "exit_code": 0,
+    "seconds": 4.082842709030956
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "vellum_native_checks",
+      "./cmd/window-cycle-smoke"
+    ],
+    "exit_code": 0,
+    "seconds": 13.795251250034198
+  }
+]

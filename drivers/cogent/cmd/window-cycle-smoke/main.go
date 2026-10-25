@@ -268,11 +268,12 @@ func openMode(a *app.Application, id, title string, composed bool) (*cogent.GPUC
 	m.Fit()
 	g := &cogent.GPUCanvas{Owner: a, Window: id, Model: m}
 	shown := &atomic.Bool{}
+	probe := &readyCanvas{g, shown}
 	text := "controlled field"
 	checked := false
 	var suite *acceptance.Workspace
 	if composed {
-		suite, err = acceptance.New(a, id, &readyCanvas{g, shown})
+		suite, err = acceptance.New(a, id, probe)
 		if err != nil {
 			return nil, nil, nil, nil, app.WindowRef{}, err
 		}
@@ -286,7 +287,7 @@ func openMode(a *app.Application, id, title string, composed bool) (*cogent.GPUC
 			return suite.View()
 		}
 		children := []ui.Node{{ID: "label", Kind: ui.Label, Text: title}, {ID: "field", Kind: ui.TextField, Text: text, Change: func(e ui.ChangeEvent) { text = e.Text }}, {ID: "check", Kind: ui.Checkbox, Text: "Controlled flag", Checked: checked, Change: func(e ui.ChangeEvent) { checked = e.Checked }}, {ID: "button", Kind: ui.Button, Text: "Temporary action", Activate: func() {}}}
-		children = append(children, ui.Node{ID: "canvas", Kind: ui.Extension, Grow: true, Custom: &readyCanvas{g, shown}})
+		children = append(children, ui.Node{ID: "canvas", Kind: ui.Extension, Grow: true, Custom: probe})
 		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: children}
 	}})
 	return g, m, shown, suite, ref, err

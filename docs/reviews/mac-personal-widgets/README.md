@@ -1626,3 +1626,11 @@ Prism: `personal-v01-delivery-final.json` (Anthropic Claude Sonnet 5.5, complete
 Prism readability feedback was applied by separating the RangeEvent and Apply error names. The final concurrency finding is not actionable: app.Application.Close acquires a.mu, closeLocked is idempotent, and Application.Run itself uses context.AfterFunc(ctx, a.Close) plus deferred Close. The optional starter timer uses that existing supported cancellation path. Native toolbar and managed node callbacks execute on the application owner, so name/range/reset state has one owner; the timer only closes the application and never accesses that state. Race/compile/vet and script syntax checks pass. Personal metadata resets changed-payload audit to pending; public alpha.3 history remains unchanged. Final private export/extraction/native bytes acceptance follows from this clean checkpoint.
 
 Focused checks: `personal-v01-delivery-checks.json`, `personal-v01-delivery-final-checks.json`.
+
+## Retain native cycle canvas identity across preference refresh
+
+Prism: `personal-v01-cycle-repair-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+The exact extracted-SDK native run exposed a preexisting fixture lifetime bug: the simple survivor allocated a new readyCanvas wrapper in every View. System-preference delivery invalidated the survivor and reconciliation correctly refused to mount its still-live GPUCanvas twice. Retain one wrapper per opening; composed panels share that same setup identity. The focused race regression covers both view routes and existing cycle tests/vet pass. Prism complete with no findings. Original failed native evidence is retained; corrected native qualification remains pending. No application features or release assertions changed.
+
+Focused checks: `personal-v01-cycle-repair-final-checks.json`.
