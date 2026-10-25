@@ -1706,3 +1706,11 @@ Prism: `notes-visual-polish.json` (Anthropic Claude Sonnet 5.5, complete coverag
 Prism complete coverage. Its sidebar-width finding is disproved by measured output: 190 Dp is the content width plus 10 Dp padding on each side, yielding the tested 210 Dp allocation. Both viewport cases and focused race/vet pass. No editor engine change is part of this app-only checkpoint; the separately approved prose correction follows.
 
 Focused checks: `notes-visual-layout-final-checks.json`.
+
+## Run visual geometry CI paints on their owning event loop
+
+Prism: `mac-stabilization-ci-visual-owner.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism reports no findings. Framework run 40207189028 raced direct test-thread rendering with WindowPaint after context unlock. Use the existing paint completion barrier for three paints, retaining every assertion. Five focused race repetitions pass, and clean prepare verifies the pinned patch and all later stage inputs/outputs. No runtime rendering or gate change.
+
+Focused checks: `mac-stabilization-ci-visual-owner-checks.json`.

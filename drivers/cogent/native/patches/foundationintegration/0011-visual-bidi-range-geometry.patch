@@ -589,7 +589,7 @@
 +}
 --- a/core/textfield_visual_test.go
 +++ b/core/textfield_visual_test.go
-@@ -0,0 +1,315 @@
+@@ -0,0 +1,317 @@
 +package core
 +
 +import (
@@ -740,8 +740,10 @@
 +		tf.SetEditingSelection(4, 7)
 +		tf.NeedsRender()
 +		b.AsyncUnlock()
++		// Paint through the owning event loop. Calling renderWindow here races
++		// its post-unlock flags with an already queued WindowPaint handler.
 +		for range 3 {
-+			rw.renderWindow()
++			b.waitNoEvents(rw)
 +		}
 +		// Save the actual raster output for visual inspection; no self-generated golden.
 +		if dir := os.Getenv("VELLUM_VISUAL_EVIDENCE"); dir != "" {

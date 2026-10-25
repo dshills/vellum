@@ -1,0 +1,16 @@
+[
+  {
+    "cwd": "drivers/cogent/build/upstream",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./core",
+      "-run",
+      "^TestVellumRenderedGeometryScrollAndWrap$",
+      "-count=5"
+    ],
+    "exit_code": 0,
+    "seconds": 17.878066667122766
+  }
+]
