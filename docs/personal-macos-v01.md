@@ -10,7 +10,7 @@ contain the current widget work.
 | Phase | Status | Evidence |
 | --- | --- | --- |
 | 1 Scope | Contract and catalogue frozen | This contract; baseline 929541a |
-| 2 Mac behavior | Pending | System observation and supported native toolbar API |
+| 2 Mac behavior | Implemented; focused race/owner/theme checks pass, native initial sample pending | Notification-driven system preferences, reduced-motion insertion, compatible TitlebarToolbar entry point |
 | 3 Input/accessibility | Pending | Focused tests plus bounded native session; human IME/VoiceOver separate |
 | 4 Integration | Pending | Stable-candidate suite and bounded native resource/lifecycle checks |
 | 5 Delivery | Pending | Matching private SDK/app, external consumer and final extracted bytes |

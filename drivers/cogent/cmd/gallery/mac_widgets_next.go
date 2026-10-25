@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	cogent "github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/ui"
 	"image/color"
 )
@@ -71,4 +72,35 @@ func (m *macWidgetsGallery) view() ui.Node {
 		root.Focus = m.inputs.focus
 	}
 	return root
+}
+
+// acceptSystemAppearance executes on the application owner. It preserves the
+// retained controls and their values; scoped explicit appearance remains explicit.
+func (m *macWidgetsGallery) acceptSystemAppearance(v cogent.SystemAppearance) {
+	m.dark = v.Dark
+	m.components.system = v
+	if m.components.followSystem {
+		m.components.dark = v.Dark
+	}
+	m.sidebar.Dark = v.Dark
+	m.collection.dark = v.Dark
+	m.collection.systemTheme = cogent.MacSystemTheme(v)
+	m.toolbars.systemTheme = cogent.MacSystemTheme(v)
+	m.toolbars.dark = v.Dark
+	if m.inputs != nil {
+		m.inputs.setAppearance(v.Dark)
+	}
+	cs := m.toolbars.customizer.Style
+	cs.Background = cogent.MacSystemTheme(v).Kinds[ui.FormGroup].Background
+	cs.Foreground = cogent.MacSystemTheme(v).Default.Foreground
+	cs.Border = cogent.MacSystemTheme(v).Kinds[ui.FormGroup].Border
+	m.toolbars.customizer.Style = cs
+	m.level.continuous.Dark = v.Dark
+	m.level.discrete.Dark = v.Dark
+	m.level.rating.Dark = v.Dark
+	s := m.sheet.sheet.Style
+	s.Background = cogent.MacSystemTheme(v).Kinds[ui.FormGroup].Background
+	s.Foreground = cogent.MacSystemTheme(v).Default.Foreground
+	s.Border = cogent.MacSystemTheme(v).Kinds[ui.FormGroup].Border
+	m.sheet.sheet.Style = s
 }

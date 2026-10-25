@@ -1,0 +1,60 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestSystemAppearance|TestMacSystemTheme|TestSupportedTitlebar|TestReducedMotionToolbar|TestTitlebar|TestScopedTheme|TestToolbarCustomizationDragRouting",
+      "-count=1",
+      "-timeout",
+      "90s"
+    ],
+    "exit_code": 0,
+    "seconds": 65.06162591697648
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestGallerySystemAppearance",
+      "-count=1",
+      "-timeout",
+      "90s"
+    ],
+    "exit_code": 0,
+    "seconds": 14.989537333138287
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      ".",
+      "./cmd/gallery"
+    ],
+    "exit_code": 0,
+    "seconds": 9.370922749862075
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 0.14456783304922283
+  }
+]

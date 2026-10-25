@@ -12,6 +12,8 @@ import (
 // The toolbar catalogue composes only existing public nodes and local styles.
 // Applications can copy these recipes without depending on gallery internals.
 type macToolbarGallery struct {
+	systemTheme ui.Theme
+
 	customizeNative  func()
 	preferencesPath  string
 	preferencesError error
@@ -95,6 +97,9 @@ func (m *macToolbarGallery) toolbar(id string, size macToolbarMetrics, display s
 		display = m.toolbarDisplay(id, display)
 	}
 	theme := ui.MacTheme(m.dark)
+	if m.systemTheme.Palette.Set {
+		theme = m.systemTheme
+	}
 	style := ui.Style{GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(0)), Padding: ui.Some(ui.UniformInsets(5)), Gap: ui.Some(float32(4)), Background: theme.Kinds[ui.FormGroup].Background, Border: theme.Kinds[ui.FormGroup].Border, CornerRadius: ui.Some(float32(8)), Align: ui.Some(ui.AlignCenter)}
 	orientation := ui.Horizontal
 	if m.narrow {

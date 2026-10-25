@@ -1,0 +1,20 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestSystemAppearance|TestMacSystemTheme|TestReducedMotionToolbar",
+      "-count=1",
+      "-timeout",
+      "90s"
+    ],
+    "exit_code": 0,
+    "seconds": 16.434009957825765
+  }
+]

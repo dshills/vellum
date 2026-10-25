@@ -40,8 +40,9 @@ func bindToolbarDragTooltipGuard(widget core.Widget) {
 
 // Application-owner publication; native routing never reads the customizer.
 type toolbarDragScope struct {
-	handle *ui.ToolbarReorderHandle
-	input  *workbenchInputScope
+	reducedMotion bool
+	handle        *ui.ToolbarReorderHandle
+	input         *workbenchInputScope
 }
 type toolbarDragBinding struct {
 	r      *record
@@ -89,7 +90,7 @@ func syncToolbarDragVisibility(r *record, visible bool, scopes []*tabCloseScope)
 	b := r.control.toolbarDrag
 	old := b.scope.Load()
 	h := r.node.ToolbarReorder
-	if old != nil && old.handle == h && old.input.visible == visible && old.input.disabled == r.control.disabled && slices.Equal(old.input.scopes, scopes) {
+	if old != nil && old.handle == h && old.reducedMotion == r.theme.ReducedMotion && old.input.visible == visible && old.input.disabled == r.control.disabled && slices.Equal(old.input.scopes, scopes) {
 		return
 	}
 	if old != nil {
@@ -100,7 +101,7 @@ func syncToolbarDragVisibility(r *record, visible bool, scopes []*tabCloseScope)
 		b.scope.Store(nil)
 		return
 	}
-	b.scope.Store(&toolbarDragScope{h, &workbenchInputScope{visible: visible, disabled: r.control.disabled, scopes: slices.Clone(scopes)}})
+	b.scope.Store(&toolbarDragScope{reducedMotion: r.theme.ReducedMotion, handle: h, input: &workbenchInputScope{visible: visible, disabled: r.control.disabled, scopes: slices.Clone(scopes)}})
 }
 func disposeToolbarDrag(r *record) {
 	if b := r.control.toolbarDrag; b != nil {
@@ -320,6 +321,14 @@ func (g *toolbarDragGesture) preview(p image.Point) {
 	g.fromAlpha = g.alpha
 	g.targetY = y
 	g.elapsed = 0
+	if g.scope.reducedMotion {
+		g.stopAnimation()
+		g.lineY = y
+		g.alpha = 1
+		g.publishLine()
+		scene.NeedsRender()
+		return
+	}
 	g.publishLine()
 	if g.animation == nil {
 		a := &core.Animation{Widget: &g.scroll.WidgetBase}

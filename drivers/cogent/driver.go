@@ -33,6 +33,15 @@ type Extension interface {
 type ThemeExtension interface{ SetTheme(ui.Theme) }
 
 type Driver struct {
+	// FollowSystemAppearance opts into notification-driven Mac presets. Explicit node
+	// themes/styles still override them. No polling or system setting changes.
+	FollowSystemAppearance bool
+	// OnSystemAppearance receives coalesced preferences on the application owner.
+	OnSystemAppearance func(SystemAppearance)
+	// TitlebarToolbar is the supported personal-macOS attachment. The older
+	// Prototype field remains a compatibility alias; supplying both is an error.
+	TitlebarToolbar *TitlebarToolbar
+
 	// TitlebarToolbarPrototype opts into a real AppKit toolbar for one window.
 	// Experimental driver-only API; nil preserves existing window chrome.
 	TitlebarToolbarPrototype *TitlebarToolbarPrototype
@@ -97,6 +106,9 @@ type nativeWindow struct {
 }
 
 func (d Driver) Run(ctx context.Context, a *app.Application) error {
+	if err := validateSystemAppearanceSupport(d.FollowSystemAppearance || d.OnSystemAppearance != nil); err != nil {
+		return err
+	}
 	if d.DesktopSession != nil && d.FrameMetrics != nil {
 		return ErrDesktopSession
 	}
@@ -118,7 +130,14 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			return err
 		}
 	}
-	titlebar, err := prepareTitlebarToolbar(a, d.TitlebarToolbarPrototype)
+	if d.TitlebarToolbar != nil && d.TitlebarToolbarPrototype != nil {
+		return fmt.Errorf("cogent: use only one titlebar toolbar field")
+	}
+	titlebarSpec := d.TitlebarToolbar
+	if titlebarSpec == nil {
+		titlebarSpec = d.TitlebarToolbarPrototype
+	}
+	titlebar, err := prepareTitlebarToolbar(a, titlebarSpec)
 	if err != nil {
 		return err
 	}
@@ -127,6 +146,11 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 	}
 	if !processRun.CompareAndSwap(false, true) {
 		return fmt.Errorf("cogent: native main loop runs once per process")
+	}
+	var appearance *systemAppearanceState
+	if d.FollowSystemAppearance || d.OnSystemAppearance != nil {
+		appearance = registerSystemAppearance(a, d.OnSystemAppearance)
+		defer appearance.close()
 	}
 	var started atomic.Bool
 	defer func() {
@@ -206,6 +230,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			if w.closing.Load() {
 				return
 			}
+			appearance.deliver()
 			if !a.TakeDirty(w.window.Ref()) {
 				return
 			}
@@ -223,7 +248,13 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				return
 			}
 			var err error
-			w.root, err = reconcileScoped(w.host, w.root, n, a, w.window.Ref(), d.Theme)
+			theme := d.Theme
+			if d.FollowSystemAppearance {
+				if value := appearance.snapshot(); value.Known {
+					theme = MacSystemTheme(value)
+				}
+			}
+			w.root, err = reconcileScoped(w.host, w.root, n, a, w.window.Ref(), theme)
 			if err != nil {
 				failWindow(w, err)
 				return
@@ -369,6 +400,9 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			mu.Unlock()
 			launch = append(launch, w)
 			w.body.OnShow(func(events.Event) {
+				if appearance != nil {
+					nativeStartSystemAppearance(appearance.id)
+				}
 				rw := w.body.Scene.RenderWindow()
 				if rw == nil || rw.SystemWindow == nil {
 					if !w.closing.Load() && w.window.Ref().Context().Err() == nil {

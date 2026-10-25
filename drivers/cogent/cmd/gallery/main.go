@@ -216,6 +216,7 @@ func main() {
 	textModal := flag.Bool("text-native-check", false, "run bounded text/editor/dialog native FIFO acceptance")
 	widgetDefault, darkDefault := macWidgetExecutableDefaults(os.Args[0])
 	macWidgets := flag.Bool("mac-widgets", widgetDefault, "open the focused Mac input widget gallery")
+	macSystem := flag.Bool("mac-system-appearance", false, "follow macOS appearance, accent and accessibility preferences for Mac widgets")
 	macDark := flag.Bool("mac-dark", darkDefault, "use the dark Mac appearance with mac-widgets")
 	nativeTitlebar := flag.Bool("native-titlebar", widgetDefault, "attach the single-window native AppKit toolbar prototype (mac-widgets only)")
 	flag.Parse()
@@ -314,7 +315,7 @@ func main() {
 		// Keep native title-bar appearance and dragging under the OS default policy.
 		window.Chrome = app.WindowChrome{}
 	}
-	if *nativeTitlebar {
+	if *nativeTitlebar && !*macSystem {
 		window.Chrome.Appearance = app.AppearanceLight
 		if *macDark {
 			window.Chrome.Appearance = app.AppearanceDark
@@ -390,6 +391,9 @@ func main() {
 	theme := ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Size: 16}), Foreground: ui.Some(color.NRGBA{R: 32, G: 36, B: 42, A: 255})}, Kinds: map[ui.Kind]ui.Style{ui.Column: {Gap: ui.Some(float32(8))}}}
 	if *macWidgets {
 		theme = ui.MacTheme(*macDark)
+		if *macSystem {
+			macGallery.components.followSystem = true
+		}
 	}
 	if *textModal {
 		must(runTextCatalogue(ctx, a, g, theme))
@@ -419,7 +423,11 @@ func main() {
 	if macGallery != nil {
 		galleryCommands = macGallery.findCommands()
 	}
-	err = a.Run(ctx, cogent.Driver{Theme: theme, TitlebarToolbarPrototype: titlebar, Commands: galleryCommands})
+	var appearanceChanged func(cogent.SystemAppearance)
+	if *macSystem && macGallery != nil {
+		appearanceChanged = macGallery.acceptSystemAppearance
+	}
+	err = a.Run(ctx, cogent.Driver{Theme: theme, FollowSystemAppearance: *macSystem, OnSystemAppearance: appearanceChanged, TitlebarToolbar: titlebar, Commands: galleryCommands})
 	if progressDone != nil {
 		cancel()
 		var checkErr error

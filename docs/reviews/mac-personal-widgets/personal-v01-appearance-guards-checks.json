@@ -1,0 +1,38 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestSystemAppearance|TestMacSystemTheme|TestSupportedTitlebar|TestReducedMotionToolbar",
+      "-count=1",
+      "-timeout",
+      "90s"
+    ],
+    "exit_code": 0,
+    "seconds": 16.45930491690524
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestGallerySystemAppearance",
+      "-count=1",
+      "-timeout",
+      "90s"
+    ],
+    "exit_code": 0,
+    "seconds": 14.67763016698882
+  }
+]

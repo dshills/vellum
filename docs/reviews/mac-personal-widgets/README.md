@@ -1594,3 +1594,11 @@ Prism: `personal-v01-scope-final.json` (Anthropic Claude Sonnet 5.5, complete co
 Prism identified a second Markdown table accidentally included in the generated catalogue; extraction now stops at the first table boundary. Final review has complete coverage and no findings. The 71-entry catalogue is unique and the arm64/macOS 26.6.2 identity matches the actual host. Human accessibility/IME and unavailable hardware remain separate acceptance, with no new performance gate or public publication.
 
 Focused checks: `personal-v01-scope-checks.json`.
+
+## Integrate macOS system appearance accessibility preferences and supported toolbar API
+
+Prism: `personal-v01-mac-behavior-clear.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Final Prism review has complete coverage. Its ordering finding is contradicted by Driver.refresh: appearance.deliver executes inside the application owner before TakeDirty and before n := window.View(), so the view observes updated state. systemAppearanceState.delivered suppresses repeated delivery across multiple windows. The full ordinary-queue and no-window/later-refresh regressions pass. Earlier token construction finding was a source-redactor false positive; the nonsecret private field was renamed so the Add(1) assignment is visible. Contrast/accent and explicit-appearance accessibility propagation were hardened. Focused race, native compile, toolbar drag/retirement, gallery state and vet checks pass. Native initial observation remains part of the final bounded session.
+
+Focused checks: `personal-v01-appearance-final-checks.json`, `personal-v01-appearance-guards-checks.json`, `personal-v01-appearance-owner-final-checks.json`.

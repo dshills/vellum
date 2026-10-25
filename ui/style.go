@@ -176,13 +176,16 @@ func (s Style) Overlay(o Style) Style {
 // driver takes a Clone at startup; callers must not mutate a live driver theme.
 // No process-wide palette, font, or operating-system appearance is changed.
 type Theme struct {
+	// ReducedMotion disables decorative managed transitions without disabling input.
+	ReducedMotion bool
+
 	Palette Optional[Palette]
 	Default Style
 	Kinds   map[Kind]Style
 }
 
 func (t Theme) Clone() Theme {
-	r := Theme{Default: t.Default, Palette: t.Palette}
+	r := Theme{Default: t.Default, Palette: t.Palette, ReducedMotion: t.ReducedMotion}
 	if t.Kinds != nil {
 		r.Kinds = make(map[Kind]Style, len(t.Kinds))
 		for k, s := range t.Kinds {

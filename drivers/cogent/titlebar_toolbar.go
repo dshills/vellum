@@ -15,7 +15,12 @@ import (
 	"github.com/dshills/vellum/ui"
 )
 
-// TitlebarToolbarPrototype is an experimental, immutable macOS attachment for
+// TitlebarToolbar is the supported personal-macOS native toolbar attachment.
+// It retains the documented one-standard-window, immutable-catalogue limits.
+// Customization requires macOS 15+; original-color icons and autosave are AppKit-owned.
+type TitlebarToolbar = TitlebarToolbarPrototype
+
+// TitlebarToolbarPrototype is the compatibility name for the native toolbar, an, immutable macOS attachment for
 // one registered window opening. It is deliberately separate from portable
 // ui.Toolbar. Configure before Driver.Run; do not mutate during Run. Additional
 // windows/reopened lifetimes and ChromeUnified are refused in this prototype.

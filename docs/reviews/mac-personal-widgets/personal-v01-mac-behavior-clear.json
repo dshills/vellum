@@ -1,0 +1,117 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "1ff2334c128b92a73c48efc42c47f346",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "9f9536a3db391548226e9595655e580b4d22da75",
+    "branch": "codex/personal-macos-v01"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "69e1ffc5d3ac15bb",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Callback delivered inside refresh before dirty check",
+      "message": "The owner callback is delivered only inside the dirty-window refresh path. Invalidate(\"\") must mark windows dirty for this to run. If TakeDirty is false for a given window, deliver still runs first (good), but if no window exists, delivery is delayed. More importantly, deliver is called from every window's refresh and invokes the user callback in the middle of the render pass, which may mutate state after the view was built.",
+      "suggestion": "Deliver the callback before the view is built and ensure it runs once per change, or via a.Do outside the refresh.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 233,
+            "end": 251
+          }
+        }
+      ],
+      "tags": [
+        "ordering"
+      ],
+      "evidence": "appearance.deliver()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7339,
+    "totalMs": 7377
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 20,
+    "bytes": 56252,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 29545,
+        "output": 588,
+        "costUSD": 0.06497
+      }
+    ],
+    "widenedFiles": 9,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "faf2031b1ee16871",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Stale observer blocks new token",
+        "message": "vellumStartSystemAppearance returns early if an observer already exists, even with a different token. After a stop dispatch queued asynchronously, a new Run's start can run before or after; ordering with stop for older token can leave the new token without an observer (start ignored because the old observer still exists). Also the observer is only started on OnShow of each window, and a second token never replaces the first.",
+        "suggestion": "In start, if the existing observer has a different token, stop it and replace it.",
+        "confidence": 0.55,
+        "locations": [
+          {
+            "path": "drivers/cogent/system_appearance_darwin.m",
+            "lines": {
+              "start": 98,
+              "end": 105
+            }
+          }
+        ],
+        "tags": [
+          "lifecycle"
+        ],
+        "evidence": "if appearanceObserver.token == token {\n      [appearanceObserver stop];",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/system_appearance_darwin.m"
+    }
+  ],
+  "suppressed": []
+}

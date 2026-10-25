@@ -119,3 +119,11 @@ No changes to renderer, frame scheduling or release qualification are required.
 
 Apple references: [NSToolbar](https://developer.apple.com/documentation/appkit/nstoolbar)
 and [NSToolbarDelegate](https://developer.apple.com/documentation/appkit/nstoolbardelegate).
+
+## Personal macOS v0.1 supported entry point
+
+Use `cogent.TitlebarToolbar` and `Driver.TitlebarToolbar` for the frozen personal
+Mac API. `TitlebarToolbarPrototype` and its Driver field remain compatible names;
+supplying both fields is an error. This naming does not expand the existing
+one-standard-window, immutable action catalogue or macOS 15+ customization limits.
+The native toolbar is still independent of portable `ui.Toolbar`.

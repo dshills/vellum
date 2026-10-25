@@ -3,11 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/dshills/vellum/canvas"
+	cogent "github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/ui"
 	"image/color"
 )
 
 type macComponentsGallery struct {
+	followSystem bool
+	system       cogent.SystemAppearance
+
 	ranges     *macRangeGallery
 	gradient   *ui.GradientWell
 	scopes     *macScopeGallery
@@ -43,6 +47,9 @@ func newMacComponentsGallery(dark bool) *macComponentsGallery {
 	return &macComponentsGallery{menu: branch, dark: dark, accent: "blue", page: "theme", name: "Untitled", status: "No action yet", artwork: artwork}
 }
 func (m *macComponentsGallery) theme() ui.Theme {
+	if m.followSystem && m.system.Known {
+		return cogent.MacSystemTheme(m.system)
+	}
 	accent := color.NRGBA{G: 112, B: 245, A: 255}
 	switch m.accent {
 	case "purple":
@@ -50,12 +57,21 @@ func (m *macComponentsGallery) theme() ui.Theme {
 	case "green":
 		accent = color.NRGBA{R: 25, G: 125, B: 80, A: 255}
 	}
+	if m.system.Known {
+		v := m.system
+		v.Dark = m.dark
+		v.Accent = accent
+		return cogent.MacSystemTheme(v)
+	}
 	return ui.MacThemeWithAccent(m.dark, accent)
 }
 func (m *macComponentsGallery) view() ui.Node {
 	theme := m.theme()
 	palette := theme.Palette.Value
 	appearance := []ui.Node{}
+	if m.system.Known {
+		appearance = append(appearance, ui.Node{ID: "components/appearance/system", Kind: ui.Button, Text: "System", Activate: func() { m.followSystem = true; m.dark = m.system.Dark }})
+	}
 	for _, choice := range []struct {
 		label string
 		dark  bool
@@ -65,10 +81,11 @@ func (m *macComponentsGallery) view() ui.Node {
 			style.Background = ui.Some(palette.Accent)
 			style.Foreground = ui.Some(palette.AccentInk)
 		}
-		appearance = append(appearance, ui.Node{ID: "components/appearance/" + choice.label, Kind: ui.Button, Text: choice.label, Style: style, Activate: func() { m.dark = choice.dark }})
+		appearance = append(appearance, ui.Node{ID: "components/appearance/" + choice.label, Kind: ui.Button, Text: choice.label, Style: style, Activate: func() { m.followSystem = false; m.dark = choice.dark }})
 	}
 	appearance = append(appearance, ui.Node{ID: "components/accent", Kind: ui.Selector, SelectedID: m.accent, Options: []ui.Option{{ID: "blue", Label: "Blue accent"}, {ID: "purple", Label: "Purple accent"}, {ID: "green", Label: "Green accent"}}, Accessibility: ui.Accessibility{Name: "Component accent"}, Change: func(e ui.ChangeEvent) {
 		if e.SelectedID == "blue" || e.SelectedID == "purple" || e.SelectedID == "green" {
+			m.followSystem = false
 			m.accent = e.SelectedID
 		}
 	}})

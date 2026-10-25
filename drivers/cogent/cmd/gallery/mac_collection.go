@@ -11,6 +11,8 @@ import (
 )
 
 type macCollectionGallery struct {
+	systemTheme ui.Theme
+
 	collection       *ui.CollectionView
 	reject, disabled bool
 	requests, opens  int
@@ -54,6 +56,9 @@ func (m *macCollectionGallery) view() ui.Node {
 		return ui.Node{ID: "collection-error", Kind: ui.Label, Text: err.Error()}
 	}
 	theme := ui.MacTheme(m.dark)
+	if m.systemTheme.Palette.Set {
+		theme = m.systemTheme
+	}
 	grid.Style = theme.Kinds[ui.ListBox].Overlay(ui.Style{GrowX: ui.Some(float32(1)), MaxSize: ui.Some(ui.Size{Height: 360})})
 	return ui.Node{ID: "mac-collection-page", Kind: ui.Column, Grow: true, Style: ui.Style{Gap: ui.Some(float32(12)), Padding: ui.Some(ui.Insets{Top: 16, Left: 16, Right: 16, Bottom: 16})}, Children: []ui.Node{
 		{ID: "collection-title", Kind: ui.Label, Text: "Documents", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 20, Weight: 600})}},

@@ -37,3 +37,27 @@ selectors with 1–64 options use the same themed popup, check, cancellation and
 stale-action path as managed action menus. Larger selector catalogues retain the
 legacy chooser popup and its startup/window palette; their closed control still
 uses the scoped theme. Selection values/callback kinds remain `ui.Selector`.
+
+## Following macOS preferences
+
+Opt in with `cogent.Driver{FollowSystemAppearance: true}`. AppKit notifications
+observe light/dark appearance, control accent, increased contrast, reduced motion
+and reduced transparency. There is one application observer, no polling, and no
+system setting changes. Changes replace one detached snapshot, wake existing
+windows and deliver through an application-owner refresh, including when the
+ordinary Post queue is full. Observer tokens and callbacks retire on shutdown.
+
+`OnSystemAppearance func(cogent.SystemAppearance)` optionally receives coalesced
+owner callbacks. Use `cogent.MacSystemTheme(snapshot)` for explicitly scoped Mac
+content. Presets use opaque surfaces, increase semantic border/text contrast and
+set `Theme.ReducedMotion`; managed toolbar insertion feedback becomes immediate
+while capture/reorder still works. Application-authored animation should honor
+`SystemAppearance.ReduceMotion` too. Full-color image data is not modified.
+Explicit node styles and nested theme overrides retain precedence.
+
+The gallery's `-mac-system-appearance` option follows preferences. Components gains
+a System choice; Light/Dark/accent choices remain explicit local overrides. The
+observer is Mac+cgo only; requesting it elsewhere returns an unsupported error.
+System-change routing is tested by injecting detached observations rather than
+changing the user's global preferences. Native initial observation is checked
+separately; human accessibility acceptance is not inferred from these tests.
