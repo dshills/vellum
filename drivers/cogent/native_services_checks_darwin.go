@@ -55,6 +55,9 @@ type NativeServiceFilePanelCheck struct {
 type NativeServiceWindowCheck = nativeServiceWindowSnapshot
 
 type NativeServiceCheckState struct {
+	// AppearanceObservers is the current owned AppKit preference registration count (KVO plus notification receipts).
+	AppearanceObservers int
+
 	Windows         []NativeServiceWindowCheck
 	MainThread      bool
 	CleanupObserved bool

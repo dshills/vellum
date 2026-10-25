@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 extern int vellumServiceActive(uint64_t token);
+extern int vellumSystemAppearanceObserverCount(void);
 extern void vellumServiceResult(uint64_t token, char *text, int status);
 
 static NSDictionary *checkSnapshot(BOOL cleanup) {
@@ -29,7 +30,7 @@ static NSDictionary *checkSnapshot(BOOL cleanup) {
         [windows addObject:state];
         if (window.isVisible) [titles addObject:window.title ?: @""];
     }
-    return @{@"MainThread":@(NSThread.isMainThread),@"CleanupObserved":@(cleanup),@"WindowTitles":titles,@"Windows":windows,@"Menu":menu,@"Tray":tray,@"FilePanels":panels};
+    return @{@"AppearanceObservers":@(vellumSystemAppearanceObserverCount()),@"MainThread":@(NSThread.isMainThread),@"CleanupObserved":@(cleanup),@"WindowTitles":titles,@"Windows":windows,@"Menu":menu,@"Tray":tray,@"FilePanels":panels};
 }
 static char *checkWire(NSDictionary *snapshot) {
     NSData *data=snapshot ? [NSJSONSerialization dataWithJSONObject:snapshot options:0 error:nil] : nil;

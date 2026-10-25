@@ -1,0 +1,51 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestSystemAppearance|TestNative.*Cleanup|TestNative.*Shutdown|TestQuickLook|TestDocumentPanel|TestService",
+      "-count=1",
+      "-timeout",
+      "90s"
+    ],
+    "exit_code": 0,
+    "seconds": 16.3887795410119
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "vellum_native_checks",
+      "./cmd/window-cycle-smoke",
+      "-run",
+      "TestConfig|TestSoak|TestLifetime|TestMemory",
+      "-count=1",
+      "-timeout",
+      "90s"
+    ],
+    "exit_code": 0,
+    "seconds": 16.474979999940842
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "build",
+      "-tags",
+      "vellum_native_checks",
+      "-o",
+      "/private/tmp/vellum-personal-v01-cycle",
+      "./cmd/window-cycle-smoke"
+    ],
+    "exit_code": 0,
+    "seconds": 3.8342167078517377
+  }
+]

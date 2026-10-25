@@ -12,7 +12,7 @@ contain the current widget work.
 | 1 Scope | Contract and catalogue frozen | This contract; baseline 929541a |
 | 2 Mac behavior | Implemented; focused race/owner/theme checks pass, native initial sample pending | Notification-driven system preferences, reduced-motion insertion, compatible TitlebarToolbar entry point |
 | 3 Input/accessibility | Automated renewal prepared; native/human outcomes pending | [Input acceptance script](personal-macos-input-checklist.md), public Unicode/composition/history consumer, existing native AX/FIFO regressions |
-| 4 Integration | Pending | Stable-candidate suite and bounded native resource/lifecycle checks |
+| 4 Integration | Prepared; final native outcome pending | Existing cycle fixture now optionally exercises system preferences and requires zero terminal native observers; one full offscreen suite and bounded native checks |
 | 5 Delivery | Pending | Matching private SDK/app, external consumer and final extracted bytes |
 
 ## Honest support boundary
@@ -27,3 +27,24 @@ caller-owned gradient/range history retain their documented limits.
 Human-only input/accessibility cases and unsupported hardware need explicit
 results. They are not inferred from successful semantic or routed event tests.
 The final package is a private personal-use candidate, not a new public release.
+
+## Bounded final native script
+
+Use the existing native cycle runner with `-system-appearance -composed
+-same-name -cycles=10 -sample-every=1 -timeout=4m`, then the existing workbench
+`-endurance=10m` activity mode and document-safety fixture. The personal scope
+uses these bounded checks, not renewed 1,000-cycle/eight-hour production
+certification. Record actual observer delivery and terminal count, window/service
+retirement, source identity and any sampled memory growth. An unexplained failure
+stops qualification of that scope; do not dilute its assertion to obtain a pass.
+
+Within the owner-approved 30-minute desktop window, also check the final gallery's
+system observation, explicit theme override, new widget keys/drag, native panels,
+window minimize/restore and resize. Use the current display configuration only;
+physical scale/display changes and human IME/VoiceOver stay unqualified unless
+separately performed. Preserve global settings and normal clipboard contents.
+
+The native observer census counts each retained notification receipt and KVO
+registration, rather than just the observer object. Retirement attempts each
+unregistration independently, retains failed registrations for terminal failure
+and retry, and folds cleanup errors into existing service-shutdown status.

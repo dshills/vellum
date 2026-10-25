@@ -100,6 +100,8 @@ func main() {
 }
 func run() error {
 	var c config
+	systemAppearance := flag.Bool("system-appearance", false, "exercise notification-driven Mac preferences and require terminal observer retirement")
+	var appearanceObservations atomic.Uint64
 	flag.IntVar(&c.cycles, "cycles", 1000, "completed native open/readback/close cycles, 1..1000")
 	flag.IntVar(&c.every, "sample-every", 25, "post-GC Go/RSS observation interval")
 	flag.DurationVar(&c.timeout, "timeout", 12*time.Minute, "cooperative native loop deadline")
@@ -153,7 +155,11 @@ func run() error {
 		finished <- e
 		a.Close()
 	}()
-	runErr := a.Run(ctx, cogent.Driver{OnError: func(e error) {
+	var appearanceChanged func(cogent.SystemAppearance)
+	if *systemAppearance {
+		appearanceChanged = func(cogent.SystemAppearance) { appearanceObservations.Add(1) }
+	}
+	runErr := a.Run(ctx, cogent.Driver{FollowSystemAppearance: *systemAppearance, OnSystemAppearance: appearanceChanged, OnError: func(e error) {
 		select {
 		case failures <- e:
 		default:
@@ -172,8 +178,11 @@ func run() error {
 	}
 	done, samples := p.snapshot()
 	cleanup, observed := cogent.NativeServiceCleanupObservation()
-	if !observed || !cleanup.MainThread || !cleanup.CleanupObserved || !cleanup.CallbacksStopped || cleanup.PendingCallbacks != 0 || cleanup.NativeOutstanding != 0 || cleanup.AccessibilityWindows != 0 || len(cleanup.WindowTitles) != 0 {
+	if !observed || !cleanup.MainThread || !cleanup.CleanupObserved || !cleanup.CallbacksStopped || cleanup.PendingCallbacks != 0 || cleanup.AppearanceObservers != 0 || cleanup.NativeOutstanding != 0 || cleanup.AccessibilityWindows != 0 || len(cleanup.WindowTitles) != 0 {
 		err = errors.Join(err, fmt.Errorf("native terminal inventory: observed=%t state=%+v", observed, cleanup))
+	}
+	if *systemAppearance && appearanceObservations.Load() == 0 {
+		err = errors.Join(err, errors.New("no native system appearance observation reached the owner"))
 	}
 	if done != c.cycles {
 		err = errors.Join(err, fmt.Errorf("completed %d of %d cycles", done, c.cycles))
@@ -182,7 +191,7 @@ func run() error {
 	if errors.Join(runErr, err) == nil {
 		result = "PASS_NATIVE_WINDOW_CYCLES"
 	}
-	report := map[string]any{"event": "vellum.window-cycle.result", "result": result, "requested_cycles": c.cycles, "completed_cycles": done, "samples": samples, "native_cleanup": cleanup, "heap_profile_requested": c.heapProfile != "", "rss_definition": "ps resident pages, bytes; not private footprint or native allocation attribution", "samples_after_forced_gc": true, "rss_guard_bytes": uint64(1 << 30), "go_heap_guard_bytes": uint64(512 << 20), "geometry_persistence_disabled_in_fixture": true, "historical_id_tombstones_retained": false, "same_name_mode": c.sameName, "same_name_replacements_verified": func() int {
+	report := map[string]any{"event": "vellum.window-cycle.result", "system_appearance_requested": *systemAppearance, "system_appearance_observations": appearanceObservations.Load(), "result": result, "requested_cycles": c.cycles, "completed_cycles": done, "samples": samples, "native_cleanup": cleanup, "heap_profile_requested": c.heapProfile != "", "rss_definition": "ps resident pages, bytes; not private footprint or native allocation attribution", "samples_after_forced_gc": true, "rss_guard_bytes": uint64(1 << 30), "go_heap_guard_bytes": uint64(512 << 20), "geometry_persistence_disabled_in_fixture": true, "historical_id_tombstones_retained": false, "same_name_mode": c.sameName, "same_name_replacements_verified": func() int {
 		if c.sameName {
 			return max(0, done-1)
 		}

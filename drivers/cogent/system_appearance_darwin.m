@@ -12,7 +12,7 @@ static char appearanceContext;
 @property(strong) id workspaceNotification;
 @property BOOL observing;
 - (void)sample;
-- (void)stop;
+- (int)stop;
 @end
 @implementation VellumSystemAppearanceObserver
 - (void)sample {
@@ -55,21 +55,38 @@ static char appearanceContext;
                          change:change
                         context:context];
 }
-- (void)stop {
+- (int)stop {
+  int status = 0;
   if (self.observing) {
-    [self.application removeObserver:self
-                          forKeyPath:@"effectiveAppearance"
-                             context:&appearanceContext];
-    self.observing = NO;
+    @try {
+      [self.application removeObserver:self
+                            forKeyPath:@"effectiveAppearance"
+                               context:&appearanceContext];
+      self.observing = NO;
+    } @catch (NSException *exception) {
+      status = 2;
+    }
   }
-  for (id token in self.notifications)
-    [NSNotificationCenter.defaultCenter removeObserver:token];
-  [self.notifications removeAllObjects];
-  if (self.workspaceNotification)
-    [NSWorkspace.sharedWorkspace.notificationCenter
-        removeObserver:self.workspaceNotification];
-  self.workspaceNotification = nil;
-  self.application = nil;
+  for (id token in self.notifications.copy) {
+    @try {
+      [NSNotificationCenter.defaultCenter removeObserver:token];
+      [self.notifications removeObjectIdenticalTo:token];
+    } @catch (NSException *exception) {
+      status = 2;
+    }
+  }
+  if (self.workspaceNotification) {
+    @try {
+      [NSWorkspace.sharedWorkspace.notificationCenter
+          removeObserver:self.workspaceNotification];
+      self.workspaceNotification = nil;
+    } @catch (NSException *exception) {
+      status = 2;
+    }
+  }
+  if (!status)
+    self.application = nil;
+  return status;
 }
 @end
 static VellumSystemAppearanceObserver *appearanceObserver;
@@ -119,10 +136,22 @@ void vellumStartSystemAppearance(uint64_t token) {
 void vellumStopSystemAppearance(uint64_t token) {
   dispatch_async(dispatch_get_main_queue(), ^{
     if (appearanceObserver.token == token) {
-      [appearanceObserver stop];
-      appearanceObserver = nil;
+      if (![appearanceObserver stop])
+        appearanceObserver = nil;
     }
   });
 }
 
-void vellumStopAllSystemAppearance(void) { [appearanceObserver stop]; appearanceObserver=nil; }
+int vellumStopAllSystemAppearance(void) {
+  int status = [appearanceObserver stop];
+  if (!status)
+    appearanceObserver = nil;
+  return status;
+}
+int vellumSystemAppearanceObserverCount(void) {
+  return appearanceObserver
+             ? (appearanceObserver.observing ? 1 : 0) +
+                   (int)appearanceObserver.notifications.count +
+                   (appearanceObserver.workspaceNotification ? 1 : 0)
+             : 0;
+}

@@ -1610,3 +1610,11 @@ Prism: `personal-v01-input.json` (Anthropic Claude Sonnet 5.5, complete coverage
 Prism completed coverage with no findings. Public Unicode/combining/emoji/RTL/CRLF replacement, composition refusal/cancellation and exact one-step Undo/Redo pass. Existing native editor/field admission, UTF-16 geometry, secure AX and focus/FIFO regression methods pass under race detection, as does the textinput package. The authored checklist explicitly leaves real-provider IME and human VoiceOver unqualified; native/physical sample checks follow in the approved final desktop window. No global input or accessibility settings changed.
 
 Focused checks: `personal-v01-input-checks.json`.
+
+## Qualify integrated Mac controls and track native preference registration retirement
+
+Prism: `personal-v01-integration-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+All 789 native root methods pass in five bounded groups after the original monolithic 240-second package timeout; no assertions were weakened and the original failed invocation/log remains retained. Gallery, commands and internal native packages passed in the original recursive run; root race/vet, native vet, placement and independent SDK checks pass. The native observer census now counts KVO and notification registrations and retains failed removals. Prism requested support for a later Run after a failed stop, but the driver supports one native main loop per process; processRun is never reset after startup, so that hypothetical restart is refused. Existing main cleanup retries retirement and the terminal diagnostic exposes remaining registrations. Native bounded cycle/activity/idle checks follow on the final candidate; no full endurance/native-heap claim.
+
+Focused checks: `personal-v01-root-1-checks.json`, `personal-v01-root-2-checks.json`, `personal-v01-root-3-checks.json`, `personal-v01-root-4-checks.json`, `personal-v01-root-5-checks.json`, `personal-v01-integration-remainder-checks.json`, `personal-v01-lifecycle-checks.json`.

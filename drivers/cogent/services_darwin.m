@@ -241,11 +241,11 @@ void vellumSetMenu(uint64_t token, const char *json) {
     });
     });
 }
-extern void vellumStopAllSystemAppearance(void);
+extern int vellumStopAllSystemAppearance(void);
 int vellumShutdownOnMain(void) {
-    vellumStopAllSystemAppearance();
     @autoreleasepool {
-        int status=vellumCancelAllAlerts();
+        int status=vellumStopAllSystemAppearance();
+        if(vellumCancelAllAlerts())status=2;
  if(vellumCancelAllDocumentPanels())status=2;
  if(vellumCancelAllQuickLook())status=2;
         for (NSSavePanel *panel in vellumPanels.allValues.copy) {
