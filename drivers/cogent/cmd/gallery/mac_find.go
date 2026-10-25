@@ -57,7 +57,7 @@ func (m *macComponentsGallery) findView() ui.Node {
 	if e != nil {
 		panic(e)
 	}
-	return ui.Node{ID: "preview/find-page", Kind: ui.Column, Children: []ui.Node{{ID: "preview/find-help", Kind: ui.Label, Text: "⌘F opens Find; ⌘G / ⇧⌘G navigate; Escape closes. Literal Unicode search. Replace All is one undoable editor operation."}, {ID: "preview/find-controls", Kind: ui.Row, Children: []ui.Node{{ID: "preview/find-open", Kind: ui.Button, Text: "Find…", IconImage: m.artwork[ui.SymbolDocument], Activate: f.open}, {ID: "preview/find-small", Kind: ui.Checkbox, Text: "Small controls", Checked: f.bar.Small, Change: func(e ui.ChangeEvent) { f.bar.Small = e.Checked }}, {ID: "preview/find-undo", Kind: ui.Button, Text: "Undo", Activate: func() {
+	return ui.Node{ID: "preview/find-page", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}, Children: []ui.Node{{ID: "preview/find-help", Kind: ui.Label, Text: "⌘F opens Find; ⌘G / ⇧⌘G navigate; Escape closes. Literal Unicode search. Replace All is one undoable editor operation."}, {ID: "preview/find-controls", Kind: ui.Row, Children: []ui.Node{{ID: "preview/find-open", Kind: ui.Button, Text: "Find…", IconImage: m.artwork[ui.SymbolDocument], Activate: f.open}, {ID: "preview/find-small", Kind: ui.Checkbox, Text: "Small controls", Checked: f.bar.Small, Change: func(e ui.ChangeEvent) { f.bar.Small = e.Checked }}, {ID: "preview/find-undo", Kind: ui.Button, Text: "Undo", Activate: func() {
 		if e := f.model.Journal().Undo(); e != nil {
 			m.status = e.Error()
 		}
@@ -65,7 +65,7 @@ func (m *macComponentsGallery) findView() ui.Node {
 		if e := f.model.Journal().Redo(); e != nil {
 			m.status = e.Error()
 		}
-	}}}}, n, {ID: "preview/find-editor", Kind: ui.MultilineText, Editor: f.model, SoftWrap: true, Style: ui.Style{MinSize: ui.Some(ui.Size{Height: 200})}}}}
+	}}}}, n, {ID: "preview/find-editor", Kind: ui.MultilineText, Editor: f.model, SoftWrap: true, Style: ui.Style{GrowX: ui.Some(float32(1)), MinSize: ui.Some(ui.Size{Height: 200})}}}}
 }
 func (f *macFindGallery) open() {
 	f.bar.Open = true

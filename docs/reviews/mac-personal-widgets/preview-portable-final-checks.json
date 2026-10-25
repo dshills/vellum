@@ -1,0 +1,25 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./app",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 1.7282089169602841
+  },
+  {
+    "cwd": "examples/sdk-contract",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 1.853635000064969
+  }
+]

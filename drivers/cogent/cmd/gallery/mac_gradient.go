@@ -56,5 +56,5 @@ func (m *macComponentsGallery) gradientView() ui.Node {
 	if e != nil {
 		return ui.Node{ID: "preview/gradient-error", Kind: ui.Label, Text: e.Error()}
 	}
-	return ui.Node{ID: "preview/gradient-page", Kind: ui.Column, Children: []ui.Node{{ID: "preview/gradient-help", Kind: ui.Label, Text: "Open the gradient well. Drag its colored stops, edit position/angle, add/remove stops, and adjust RGBA. Up/Down chooses a stop; Left/Right changes its position. Native Colors closes the inline editor and applies to that same stop."}, {ID: "preview/gradient-small", Kind: ui.Checkbox, Text: "Small track", Checked: m.gradient.Small, Change: func(e ui.ChangeEvent) { m.gradient.Small = e.Checked }}, n}}
+	return ui.Node{ID: "preview/gradient-page", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}, Children: []ui.Node{{ID: "preview/gradient-help", Kind: ui.Label, Text: "Open the gradient well. Drag its colored stops, edit position/angle, add/remove stops, and adjust RGBA. Up/Down chooses a stop; Left/Right changes its position. Native Colors closes the inline editor and applies to that same stop."}, {ID: "preview/gradient-small", Kind: ui.Checkbox, Text: "Small track", Checked: m.gradient.Small, Change: func(e ui.ChangeEvent) { m.gradient.Small = e.Checked }}, n}}
 }

@@ -1,0 +1,49 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 2.6867212920915335
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestMacComponentsOffscreenSurfacesAndJoinedSegments|TestMacFind|TestGallerySearchScopes",
+      "-count=1",
+      "-timeout",
+      "120s"
+    ],
+    "exit_code": 0,
+    "seconds": 17.793377666035667
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestGradientTrack|TestRangeTrack|TestQuickLook",
+      "-count=1",
+      "-timeout",
+      "90s"
+    ],
+    "exit_code": 0,
+    "seconds": 18.187905750004575
+  }
+]

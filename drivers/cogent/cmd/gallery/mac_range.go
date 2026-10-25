@@ -42,5 +42,5 @@ func (m *macComponentsGallery) rangeView() ui.Node {
 		}
 		children = append(children, n)
 	}
-	return ui.Node{ID: "preview/range-page", Kind: ui.Column, Children: children}
+	return ui.Node{ID: "preview/range-page", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}, Children: children}
 }

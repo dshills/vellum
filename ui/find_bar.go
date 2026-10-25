@@ -54,7 +54,7 @@ func FindMatches(text, query string, o FindOptions) ([]editor.Range, error) {
 		}
 		prefix[i] = j
 	}
-	word := func(r rune) bool { return unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' }
+	word := func(r rune) bool { return unicode.IsLetter(r) || unicode.IsDigit(r) || unicode.IsMark(r) || r == '_' }
 	out := []editor.Range{}
 	j := 0
 	for i, ch := range source {
@@ -224,7 +224,7 @@ func (f *FindBar) View() (Node, error) {
 		label = "Find and replace"
 	}
 	id := f.ID
-	root := Node{ID: id, Kind: Column, Accessibility: Accessibility{Name: label}, Style: Style{Gap: Some(float32(6))}.Overlay(f.Style)}
+	root := Node{ID: id, Kind: Column, Accessibility: Accessibility{Name: label}, Style: Style{Gap: Some(float32(6)), GrowX: Some(float32(1))}.Overlay(f.Style)}
 	if !f.Open {
 		f.cacheModel = nil
 		f.cacheMatches = nil
@@ -273,7 +273,7 @@ func (f *FindBar) View() (Node, error) {
 	action := func(suffix, label string, a FindAction) Node {
 		return Node{ID: id + "/find/" + suffix, Kind: Button, Text: label, Appearance: ButtonTool, Style: style, Disabled: f.Disabled || f.Request == nil || len(matches) == 0 || err != nil || snapshot.Composing, Activate: func() { request(a) }}
 	}
-	row := Node{ID: id + "/find/row", Kind: Row, Children: []Node{{ID: FindBarInputID(id), Kind: TextField, Text: f.Query, Placeholder: "Find", Style: Style{MinSize: Some(Size{Height: height, Width: 130}), GrowX: Some(float32(1))}, Accessibility: Accessibility{Name: "Find text"}, Disabled: f.Disabled || f.Change == nil, Change: func(e ChangeEvent) { change("query", e.Text, false) }}, action("previous", "Previous", FindPrevious), action("next", "Next", FindNext), {ID: id + "/find/count", Kind: Label, Text: count}, {ID: id + "/find/close", Kind: Button, Text: "Done", Appearance: ButtonTool, Style: style, Disabled: f.Disabled || f.Close == nil, Activate: func() {
+	row := Node{ID: id + "/find/row", Kind: Row, Style: Style{GrowX: Some(float32(1)), Align: Some(AlignCenter)}, Children: []Node{{ID: FindBarInputID(id), Kind: TextField, Text: f.Query, Placeholder: "Find", Style: Style{MinSize: Some(Size{Height: height, Width: 130}), GrowX: Some(float32(1))}, Accessibility: Accessibility{Name: "Find text"}, Disabled: f.Disabled || f.Change == nil, Change: func(e ChangeEvent) { change("query", e.Text, false) }}, action("previous", "Previous", FindPrevious), action("next", "Next", FindNext), {ID: id + "/find/count", Kind: Label, Text: count, Style: Style{MinSize: Some(Size{Width: 110}), MaxSize: Some(Size{Width: 110}), GrowX: Some(float32(0)), TextAlign: Some(AlignCenter)}}, {ID: id + "/find/close", Kind: Button, Text: "Done", Appearance: ButtonTool, Style: style, Disabled: f.Disabled || f.Close == nil, Activate: func() {
 		if live() && f.Close != nil {
 			f.Close()
 		}

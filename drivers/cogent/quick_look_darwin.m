@@ -67,7 +67,7 @@ char *vellumQuickLookRecipeFixture(const char *json) {
 @property BOOL finished;
 @property(strong) QLPreviewPanel *panel;
 @property(weak) NSWindow *parent;
-@property(weak) NSResponder *savedNext;
+@property(strong) NSResponder *savedNext;
 @property(strong) NSArray<VellumQuickLookItem *> *items;
 @property NSInteger selected;
 @property(strong) id parentObserver;
@@ -136,6 +136,8 @@ char *vellumQuickLookRecipeFixture(const char *json) {
       self.parent.nextResponder = self.savedNext;
     self.nextResponder = nil;
     [self.parent removeChildWindow:self.panel];
+    if (self.panel.inFullScreenMode)
+      [self.panel exitFullScreenModeWithOptions:nil];
     [self.panel orderOut:nil];
     [self.panel updateController];
   } @catch (NSException *e) {
@@ -216,11 +218,6 @@ void vellumQuickLook(uint64_t token, uint64_t parentToken, const char *json) {
           parent.nextResponder = session;
           panel.restorable = NO;
           panel.appearance = parent.effectiveAppearance;
-          [panel updateController];
-          if (panel.currentController != session) {
-            [session finish:5];
-            return;
-          }
           __weak VellumQuickLookSession *weak = session;
           session.parentObserver = [NSNotificationCenter.defaultCenter
               addObserverForName:NSWindowWillCloseNotification
@@ -236,6 +233,12 @@ void vellumQuickLook(uint64_t token, uint64_t parentToken, const char *json) {
           [parent addChildWindow:panel ordered:NSWindowAbove];
           vellumPositionOwnedPanel(panel, parent);
           [panel makeKeyAndOrderFront:nil];
+          [panel updateController];
+          if (panel.currentController != session) {
+            [session finish:5];
+            return;
+          }
+          vellumPositionOwnedPanel(panel, parent);
         } @catch (NSException *e) {
           if (vellumPreviewSession && vellumPreviewSession.token == token)
             [vellumPreviewSession finish:2];

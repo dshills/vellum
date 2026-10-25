@@ -25,7 +25,7 @@ its startup appearance. Scroll inside a page to reach its controls. The ordinary
 - **Components:** choose Themes, Cascading menus, Split buttons, Inspector panel,
   Column browser, Filter / rule editor, Image well, Searchable icon picker,
   Settings pane, Native alert, Calendar picker, Document list, Mac outline,
-  Native Colors panel, Native Fonts panel, Circular angle dial, or Quick Look. Menus open Export submenus with
+  Native Colors panel, Native Fonts panel, Circular angle dial, Quick Look, Find / Replace, Search scope bar, Gradient well, or Range slider. Menus open Export submenus with
   pointer/Right; Left closes a submenu and Escape cancels. Split buttons separate
   Save from its options. Collapse inspector headings without losing editor
   values. The column browser reveals child columns and accepts divider resizing;
@@ -145,8 +145,8 @@ chosen light/dark appearance. Sample edits are not saved between launches.
 
 ## Current limits
 
-New controls reuse managed components rather than shared system color/font
-panels. Color recents are a caller-supplied palette (maximum 16). Token suggestions
+The gallery includes both managed controls and actual native Quick Look, Colors,
+Fonts and alert services. Managed color/font alternatives remain available. Color recents are a caller-supplied palette (maximum 16). Token suggestions
 use the dropdown; there is no per-keystroke completion filtering, comma-triggered
 commit, inline chip editing or rearrangement. Long chips abbreviate their visible labels;
 accessibility and removal keep the full value. Abbreviation is fixed rather than

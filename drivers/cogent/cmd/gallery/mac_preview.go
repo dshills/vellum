@@ -41,13 +41,13 @@ func (m *macComponentsGallery) quickLookView() ui.Node {
 	p.outline.Disabled = p.busy
 	list, e := p.list.View()
 	if e != nil {
-		panic(e)
+		return ui.Node{ID: "preview/quick-look-error", Kind: ui.Label, Text: e.Error()}
 	}
 	outline, e := p.outline.View()
 	if e != nil {
-		panic(e)
+		return ui.Node{ID: "preview/quick-look-error", Kind: ui.Label, Text: e.Error()}
 	}
-	return ui.Node{ID: "preview/page", Kind: ui.Column, Children: []ui.Node{{ID: "preview/help", Kind: ui.Label, Text: "Select a sample and press Space for actual macOS Quick Look. Escape/Space closes it. The samples are temporary text and full-color PNG files; no personal files are read."}, list, {ID: "preview/open", Kind: ui.Button, Text: "Quick Look sample", IconImage: m.artwork[ui.SymbolDocument], Disabled: p.busy, Activate: func() {
+	return ui.Node{ID: "preview/page", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}, Children: []ui.Node{{ID: "preview/help", Kind: ui.Label, Text: "Select a sample and press Space for actual macOS Quick Look. Escape/Space closes it. The samples are temporary text and full-color PNG files; no personal files are read."}, list, {ID: "preview/open", Kind: ui.Button, Text: "Quick Look sample", IconImage: m.artwork[ui.SymbolDocument], Disabled: p.busy, Activate: func() {
 		id := "note"
 		if len(p.list.SelectedIDs) > 0 {
 			id = p.list.SelectedIDs[0]

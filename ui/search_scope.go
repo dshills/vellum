@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/dshills/vellum/canvas"
+	"image/color"
 	"strings"
 	"unicode/utf8"
 )
@@ -79,7 +80,7 @@ func (s *SearchScopeBar) View() (Node, error) {
 		height = 24
 	}
 	fieldStyle := Style{MinSize: Some(Size{Height: height})}
-	query := &SearchBox{ID: id + "/scope/query", Label: s.Label, Text: s.Value.Query, Placeholder: "Search documents", Disabled: !available(), InputStyle: fieldStyle, ClearStyle: fieldStyle, Change: func(e SearchEvent) {
+	query := &SearchBox{ID: id + "/scope/query", Label: s.Label, Text: s.Value.Query, Placeholder: "Search documents", Disabled: !available(), Style: Style{GrowX: Some(float32(1))}, InputStyle: Style{MinSize: Some(Size{Width: 180, Height: height})}, ClearStyle: fieldStyle, Change: func(e SearchEvent) {
 		if available() && len(e.Text) <= 4096 && utf8.ValidString(e.Text) && !strings.ContainsRune(e.Text, 0) {
 			s.Change(SearchScopeEvent{ID: id, Kind: SearchScopeQuery, Query: e.Text})
 		}
@@ -88,7 +89,7 @@ func (s *SearchScopeBar) View() (Node, error) {
 	if err != nil {
 		return Node{}, err
 	}
-	scopes := Node{ID: id + "/scope/items", Kind: Toolbar, Accessibility: Accessibility{Name: "Search in"}, Style: Style{Gap: Some(float32(4)), Padding: Some(Insets{})}}
+	scopes := Node{ID: id + "/scope/items", Kind: Toolbar, Accessibility: Accessibility{Name: "Search in"}, Style: Style{Background: Some(color.NRGBA{}), GrowX: Some(float32(1)), Gap: Some(float32(4)), Padding: Some(Insets{})}}
 	for _, item := range s.Items {
 		item := item
 		selected := s.Value.ScopeID == item.ID
@@ -116,6 +117,6 @@ func (s *SearchScopeBar) View() (Node, error) {
 			}
 		}})
 	}
-	n := Node{ID: id, Kind: Column, Style: Style{Gap: Some(float32(6))}.Overlay(s.Style), Accessibility: Accessibility{Name: s.Label}, Children: []Node{search, scopes}}
+	n := Node{ID: id, Kind: Column, Style: Style{Gap: Some(float32(6)), GrowX: Some(float32(1))}.Overlay(s.Style), Accessibility: Accessibility{Name: s.Label}, Children: []Node{search, scopes}}
 	return n, Validate(n)
 }

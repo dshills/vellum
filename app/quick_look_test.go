@@ -2,6 +2,8 @@ package app
 
 import (
 	"context"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -12,7 +14,7 @@ func (quickLookTestServices) PreviewFiles(context.Context, WindowRef, QuickLookO
 	return nil
 }
 func TestQuickLookOptionsAndOptionalService(t *testing.T) {
-	good := QuickLookOptions{Items: []QuickLookItem{{ID: "a", Path: "/tmp/a.txt", Title: "A"}}, SelectedID: "a"}
+	good := QuickLookOptions{Items: []QuickLookItem{{ID: "a", Path: filepath.Join(os.TempDir(), "a.txt"), Title: "A"}}, SelectedID: "a"}
 	if good.Validate() != nil {
 		t.Fatal("valid")
 	}

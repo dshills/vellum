@@ -63,5 +63,5 @@ func (m *macComponentsGallery) scopeView() ui.Node {
 	if e != nil {
 		return ui.Node{ID: "preview/scopes-error", Kind: ui.Label, Text: e.Error()}
 	}
-	return ui.Node{ID: "preview/scopes-page", Kind: ui.Column, Children: []ui.Node{{ID: "preview/scopes-help", Kind: ui.Label, Text: "Finder-style scope choices with original-color artwork and query-dependent counts. Arrows move toolbar focus; Return chooses. Sample data only, no disk search."}, {ID: "preview/scopes-small", Kind: ui.Checkbox, Text: "Small controls", Checked: p.bar.Small, Change: func(e ui.ChangeEvent) { p.bar.Small = e.Checked }}, bar, {ID: "preview/scopes-summary", Kind: ui.Label, Text: fmt.Sprintf("%d matching sample documents", len(items))}, results}}
+	return ui.Node{ID: "preview/scopes-page", Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}, Children: []ui.Node{{ID: "preview/scopes-help", Kind: ui.Label, Text: "Finder-style scope choices with original-color artwork and query-dependent counts. Arrows move toolbar focus; Return chooses. Sample data only, no disk search."}, {ID: "preview/scopes-small", Kind: ui.Checkbox, Text: "Small controls", Checked: p.bar.Small, Change: func(e ui.ChangeEvent) { p.bar.Small = e.Checked }}, bar, {ID: "preview/scopes-summary", Kind: ui.Label, Text: fmt.Sprintf("%d matching sample documents", len(items))}, results}}
 }

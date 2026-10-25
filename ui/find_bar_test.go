@@ -111,3 +111,10 @@ func TestFindNoMatchDoesNotCommit(t *testing.T) {
 		t.Fatal("no match changed model")
 	}
 }
+
+func TestFindWholeWordDoesNotSplitCombiningMark(t *testing.T) {
+	matches, e := FindMatches("e\u0301 e", "e", FindOptions{WholeWord: true})
+	if e != nil || len(matches) != 1 || matches[0].Start != 3 {
+		t.Fatal(matches, e)
+	}
+}

@@ -30,7 +30,7 @@ Call `request.Apply(model)` on the owner, or handle the request in your search
 engine. FindNext/Previous wrap; FindReplace replaces a selected match or selects
 the next; FindReplaceAll is one undoable journal edit and maps the existing selection through replacements. IME composition refuses.
 Search is literal Unicode simple folding with scalar offsets and optional word
-boundaries (letters/digits/underscore), bounded to 4 MiB documents, 1024 query
+boundaries (letters/digits/combining marks/underscore), bounded to 4 MiB documents, 1024 query
 scalars, 10000 matches and 64 KiB replacement. Excessive queries refuse instead of
 partially replacing. Matches are nonoverlapping and cached by model identity, content revision, query and options; selection-only navigation reuses them. No regex, language-specific expansion or all-match highlighting.
 Use Small for 24pt or regular 30pt controls. Host command routing owns Cmd-F/G and
@@ -81,3 +81,14 @@ Home/End requests its limits. When thumbs overlap, use Up/Down or numeric fields
 to choose the endpoint. The track exposes the active handle as an accessible slider;
 the two labeled numeric fields expose each endpoint independently. Default regular
 track is 320×40pt and small 240×32pt; Width may be 200–600pt. Horizontal only.
+
+## Verification boundary
+
+Portable race tests cover public models, Unicode offsets/undo, bounded values and
+callback revocation. Native offscreen routing separately covers scaled captured
+pointer gestures and release behavior; gallery raster checks cover all five pages
+and the open gradient editor in light/dark. Actual AppKit provider rendering and
+physical pointer/shortcut checks are recorded separately with the packaged build.
+Quick Look installs a temporary responder after the exact parent, retains and
+restores the prior responder, and yields control before releasing references.
+Windowed close and fullscreen exit both use the same cleanup path.

@@ -5,11 +5,13 @@ import (
 	"github.com/dshills/vellum/editor"
 	"github.com/dshills/vellum/ui"
 	"image/color"
+	"os"
+	"path/filepath"
 	"testing"
 )
 
 func TestPublicQuickLookContract(t *testing.T) {
-	o := app.QuickLookOptions{Items: []app.QuickLookItem{{ID: "a", Path: "/tmp/a.txt", Title: "A"}}, SelectedID: "a"}
+	o := app.QuickLookOptions{Items: []app.QuickLookItem{{ID: "a", Path: filepath.Join(os.TempDir(), "a.txt"), Title: "A"}}, SelectedID: "a"}
 	if o.Validate() != nil {
 		t.Fatal("options")
 	}

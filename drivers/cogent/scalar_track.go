@@ -40,6 +40,8 @@ func bindScalarTrack(r *record, b *core.Button) {
 					s.RenderBox = false
 				}
 			})
+			var strip *image.NRGBA
+			var stripHandles []ui.TrackHandle
 			w.SetDraw(func(pc *paint.Painter) {
 				t := r.node.Track
 				if t == nil {
@@ -59,19 +61,23 @@ func bindScalarTrack(r *record, b *core.Button) {
 				span := 1 - 2*inset
 				pc.Stroke.Color = nil
 				if t.Gradient {
-					for i := 0; i < 128; i++ {
-						c := t.ColorAt(float32(i) / 127)
-						for y := 0; y < 2; y++ {
-							base := uint16(232)
-							if (i/4+y)%2 != 0 {
-								base = 190
+					if strip == nil || !slices.Equal(stripHandles, t.Handles) {
+						strip = image.NewNRGBA(image.Rect(0, 0, 640, 32))
+						stripHandles = slices.Clone(t.Handles)
+						for x := 0; x < 640; x++ {
+							c := t.ColorAt(float32(x) / 639)
+							for y := 0; y < 32; y++ {
+								base := uint16(232)
+								if (x/16+y/16)%2 != 0 {
+									base = 190
+								}
+								blend := func(v uint8) uint8 { return uint8((uint16(v)*uint16(c.A) + base*(255-uint16(c.A)) + 127) / 255) }
+								strip.SetNRGBA(x, y, color.NRGBA{R: blend(c.R), G: blend(c.G), B: blend(c.B), A: 255})
 							}
-							blend := func(v uint8) uint8 { return uint8((uint16(v)*uint16(c.A) + base*(255-uint16(c.A)) + 127) / 255) }
-							pc.Fill.Color = colors.Uniform(color.NRGBA{R: blend(c.R), G: blend(c.G), B: blend(c.B), A: 255})
-							pc.Rectangle(inset+float32(i)/128*span, .1+float32(y)*.2, span/128+.001, .2)
-							pc.Draw()
 						}
 					}
+					pc.DrawImageScaled(strip, strip, inset, .1, span, .4)
+
 				} else {
 					pc.Fill.Color = line
 					pc.Rectangle(inset, .44, span, .12)

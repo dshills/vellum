@@ -115,9 +115,23 @@ func TestMacComponentsOffscreenSurfacesAndJoinedSegments(t *testing.T) {
 				t.Fatal("offscreen readiness bound")
 				return cogent.ManualWindowSnapshot{}
 			}
-			for _, page := range []string{"theme", "menus", "split", "inspector", "browser", "rules", "image-well", "icon-picker", "icon-picker-open", "settings", "alerts", "calendar", "documents", "outline", "native-colors", "native-fonts", "angle-dial"} {
+			for _, page := range []string{"theme", "menus", "split", "inspector", "browser", "rules", "image-well", "icon-picker", "icon-picker-open", "settings", "alerts", "calendar", "documents", "outline", "native-colors", "native-fonts", "angle-dial", "quick-look", "find-replace", "search-scopes", "gradient", "gradient-open", "range-slider"} {
+				if requested := os.Getenv("VELLUM_COMPONENT_PAGES"); requested != "" {
+					wanted := false
+					for _, name := range strings.Split(requested, ",") {
+						wanted = wanted || name == page
+					}
+					if !wanted {
+						continue
+					}
+				}
 				if err := a.Do(func() {
 					model.page = page
+					if page == "gradient-open" {
+						model.page = "gradient"
+						root := model.gradientView()
+						findGalleryDocumentNode(root, ui.GradientWellButtonID("preview/gradient")).Activate()
+					}
 					if page == "icon-picker-open" {
 						model.page = "icon-picker"
 						model.essentials.iconPickerView()
@@ -209,6 +223,25 @@ func TestMacComponentsOffscreenSurfacesAndJoinedSegments(t *testing.T) {
 				}
 				if page == "rules" && find(ui.RuleControlID("components/rules", "name-rule", "value")).Bounds.Empty() {
 					t.Fatal("rule editor clipped")
+				}
+				if page == "gradient-open" && find(ui.GradientTrackID("preview/gradient")).Bounds.Empty() {
+					t.Fatal("gradient track clipped")
+				}
+				if page == "range-slider" {
+					for _, id := range []string{ui.RangeTrackID("preview/range/regular"), ui.RangeTrackID("preview/range/small"), ui.RangeFieldID("preview/range/regular", ui.RangeLower), ui.RangeFieldID("preview/range/small", ui.RangeUpper)} {
+						if find(id).Bounds.Empty() {
+							t.Fatal("range input clipped", id)
+						}
+					}
+				}
+				if page == "find-replace" && find(ui.FindBarInputID("preview/find")).Bounds.Empty() {
+					t.Fatal("find query clipped")
+				}
+				if page == "search-scopes" && find(ui.SearchInputID("preview/scopes/scope/query")).Bounds.Dx() < 200 {
+					t.Fatal("scope query compressed")
+				}
+				if page == "find-replace" && find("preview/find/find/count").Bounds.Dx() < 100 {
+					t.Fatal("find count wrapped")
 				}
 				capture, err := m.Capture(ctx, "components")
 				if err != nil || capture.Bounds().Empty() {

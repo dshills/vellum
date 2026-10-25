@@ -1562,3 +1562,11 @@ Prism: `preview-range.json` (Anthropic Claude Sonnet 5.5, complete coverage).
 No actionable Prism findings: the reported pointer composite literal and macRangeGallery field usage are valid Go and compile/test successfully. Both endpoint routes, scale160/320, final-release coordinate, release deduplication, capture loss, keyboard and AX decrement pass. Public tests cover finite bounds, step snapping, endpoint crossing clamp, equal values, current-handle queued proposals and disabled-epoch revocation. SDK contract consumes the widget independently. Horizontal regular/small track and full-color gallery artwork; no history or renderer ownership added.
 
 Focused checks: `preview-range-checks.json`.
+
+## Polish and qualify the five Mac preview widgets together
+
+Prism: `preview-integration.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Integration passes root race/vet, full gallery package tests, selected native routing/lifetime/AX audits, independent SDK, and twelve light/dark raster variants including open gradient. Concrete visual findings fixed: page/query growth, unwrapped find count, transparent dark scope toolbar, seamless cached immutable gradient strip. Whole-word search now includes combining marks. Portable Quick Look fixtures use OS temp paths. Native controller follows Cocoa show/update ownership and restores retained responder; cleanup removes attachment/orderOut/exits fullscreen even on ownership refusal. Prism cleanup verification covered by source and existing idempotent grouped cleanup; compile finding is disproved by passing native tests/vet (TrackHandle is comparable and imports are present). Rendering/pacing policy unchanged. Authorized native ten-minute package check is next.
+
+Focused checks: `preview-integration-checks.json`, `preview-visual-checks.json`, `preview-polish-checks.json`, `preview-portable-final-checks.json`.
