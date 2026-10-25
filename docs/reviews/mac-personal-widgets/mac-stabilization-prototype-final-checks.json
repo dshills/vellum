@@ -1,0 +1,54 @@
+[
+  {
+    "cwd": "prototypes/p0/gio",
+    "argv": [
+      "go",
+      "mod",
+      "tidy"
+    ],
+    "exit_code": 0,
+    "seconds": 3.5373889999464154
+  },
+  {
+    "cwd": "prototypes/p0/gio",
+    "argv": [
+      "go",
+      "mod",
+      "verify"
+    ],
+    "exit_code": 0,
+    "seconds": 1.058085500029847
+  },
+  {
+    "cwd": "prototypes/p0/gio",
+    "argv": [
+      "go",
+      "test",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 10.667955124983564
+  },
+  {
+    "cwd": "prototypes/p0/gio",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.5220168330706656
+  },
+  {
+    "cwd": "prototypes/p0/gio",
+    "argv": [
+      "go",
+      "build",
+      "-o",
+      "/private/tmp/vellum-gio-patched-prototype",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 1.0984558751806617
+  }
+]

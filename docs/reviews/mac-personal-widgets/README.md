@@ -1650,3 +1650,11 @@ Prism: `mac-stabilization-ci.json` (Anthropic Claude Sonnet 5.5, complete covera
 Reproduced merged-main CI failures from runs 40199510072 and 40199510071. Dynamic setter messaging uses the platform BOOL typedef, guarded by OS availability and selector support; it does not assume a hard-coded ABI width. Prism comment adjacency feedback was applied; the suggested KVC/NSInvocation conversion is unnecessary for this known setter signature. Portable race/vet and focused native toolbar race/compile/vet pass. Windows fixture retains all invalid-path/stale-identity assertions using native absolute TempDir paths. Remote macos-14/Windows validation follows on this reviewed checkpoint. Framework features remain frozen.
 
 Focused checks: `mac-stabilization-ci-checks.json`.
+
+## Patch legacy Gio dependencies and classify copied native notice alert
+
+Prism: `mac-stabilization-dependencies.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism completed coverage with no findings. Legacy Gio x/image/net pins now exceed GitHub patched thresholds; required x/sys/text and Go floor updated. Module checksums refreshed and mod verify/test/vet/build pass. Original 418 notice hashes verify and the 82-component native inventory has no rand component; the detected rand declaration is upstream itertools dev-dependency notice material. This supports classification, not exhaustive native binary security qualification. Do not rewrite original notices or dismiss the alert. Active driver pins and historical P0 evidence remain unchanged; default-branch alerts will not reflect this branch until merged.
+
+Focused checks: `mac-stabilization-prototype-final-checks.json`, `mac-stabilization-alert-applicability-checks.json`.

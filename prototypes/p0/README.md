@@ -55,3 +55,11 @@ After opening/focusing a Cogent editor, allow its next frame to apply the deferr
 `evidence/manifest.json` records pins, platform scope, source/artifact hashes and verification. Selected screenshots, native accessibility snapshots, package lists, native-library lists and logs are retained. Earlier diagnostic logs are explicitly labeled in the manifest; they include prototype bugs that were fixed. Do not use them as evidence of the final behavior.
 
 The native automation cursor query differs between Gio and Cogent/GLFW: Cogent's injected pointer clicks landed at the physical cursor location rather than the injected event coordinate. Keyboard interaction was used to verify Cogent. Real mouse scrolling/selection/resizing in Cogent still requires manual validation. Native accessibility snapshots exposed window chrome only for both candidates. Neither is accepted for production.
+
+## Maintained prototype dependency patch
+
+On 25 October 2026, the Gio module was updated to patched x/image 0.44.0 and
+x/net 0.57.0, with their required x/sys/x/text versions and a Go 1.25 module floor.
+The original P0 evidence retains its original dependency identities. This
+maintenance patch does not requalify the discarded prototype or change the
+active framework backend. See [alert applicability](../../docs/security/dependency-alerts-2026-10-25.md).
