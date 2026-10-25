@@ -1,0 +1,45 @@
+[
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "gofmt",
+      "-w",
+      "notes/files_test.go"
+    ],
+    "exit_code": 0,
+    "seconds": 0.004173082998022437
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 2.584950084099546
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.7203714170027524
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "build",
+      "-o",
+      "/private/tmp/vellum-notes-durable-candidate",
+      "./cmd/notes"
+    ],
+    "exit_code": 0,
+    "seconds": 4.5710872078780085
+  }
+]

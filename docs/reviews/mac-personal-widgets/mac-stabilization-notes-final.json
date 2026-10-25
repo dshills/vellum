@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a1cfdbad98c5014b351395b59d2ebcd0",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "7d37a118cfd30f2de3c0893ac25411ef73c0e38a",
+    "branch": "codex/mac-personal-app-stabilization"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "737380336c442a86",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Partial attach leaves model wired on error",
+      "message": "The checkpoint goroutine in AttachFiles is started after the commands are registered. If command registration fails, AttachFiles returns early with m.files already set to f, so the model is left half-wired. Retries are then rejected by the m.files != nil check, and the model's blocked() checks still point at this Files. The failure path also never closes the sessions.",
+      "suggestion": "Set m.files only after registration succeeds, or reset m.files = nil on error paths.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "examples/macapps/notes/files.go",
+          "lines": {
+            "start": 102,
+            "end": 102
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle",
+        "location-corrected"
+      ],
+      "evidence": "if err := a.PostWindow(ref, f.Checkpoint); errors.Is(err, app.ErrClosed) || errors.Is(err, app.ErrWindowClosed) || errors.Is(err, app.ErrInvalidWindowRef) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "d49928277faf5308",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Close request ignored while blocked",
+      "message": "A close request made while a recovery prompt is open, or while any file operation is busy, is silently swallowed, because the window refuses to close. When the recovery prompt is showing, the user cannot close the window with the window button and has to use the prompt's button instead. The user also gets no feedback.",
+      "suggestion": "Set a status message when the close is refused, and treat close during the recovery prompt as the 'Close without changing files' choice.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "examples/macapps/notes/files.go",
+          "lines": {
+            "start": 196,
+            "end": 199
+          }
+        }
+      ],
+      "tags": [
+        "ux",
+        "location-corrected"
+      ],
+      "evidence": "func (f *Files) RequestClose() bool {\n\tif f.blocked() || f.model.pending {\n\t\treturn false\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5745,
+    "totalMs": 5788
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 63829,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 33032,
+        "output": 636,
+        "costUSD": 0.072424
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

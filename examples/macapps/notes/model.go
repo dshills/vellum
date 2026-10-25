@@ -1,4 +1,4 @@
-// Package notes is a bounded, in-memory native Notes-style Vellum consumer.
+// Package notes is a bounded Notes-style Vellum consumer.
 package notes
 
 import (
@@ -40,8 +40,9 @@ type note struct {
 type folder struct{ id, name string }
 
 // Model and its Commands belong to one application UI owner. There is no
-// account access, persistence, network service or background goroutine.
+// account access or network service. Optional Files owns persistence workers.
 type Model struct {
+	files                                            *Files
 	notes                                            []*note
 	folders                                          []folder
 	selected, selectedFolder, query, status, touched string
@@ -140,7 +141,7 @@ func (m *Model) Request(action func() error) error {
 	if action == nil {
 		return ErrInvalid
 	}
-	if m.pending {
+	if m.pending || m.files != nil && m.files.blocked() {
 		return ErrPending
 	}
 	if m.settlement == nil {
@@ -179,6 +180,9 @@ func (m *Model) Request(action func() error) error {
 }
 
 func (m *Model) actionReady() error {
+	if m.files != nil && m.files.blocked() {
+		return ErrPending
+	}
 	if m.pending {
 		return ErrPending
 	}
@@ -218,6 +222,9 @@ func (m *Model) accept(err error) {
 }
 
 func (m *Model) ready() error {
+	if m.files != nil && m.files.blocked() {
+		return ErrPending
+	}
 	for _, n := range m.notes {
 		if n.editor.Snapshot().Composing {
 			return editor.ErrComposition

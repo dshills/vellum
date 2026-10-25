@@ -1,0 +1,117 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "75b75476e29fd62c76589b761ac79ef8",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "7d37a118cfd30f2de3c0893ac25411ef73c0e38a",
+    "branch": "codex/mac-personal-app-stabilization"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "62f5e30a677eccd8",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Checkpoint goroutine exits permanently on a posting error",
+      "message": "Any non-queue-full error from PostWindow permanently stops the autosave ticker goroutine, so recovery capture silently ceases for the rest of the session. A transient failure disables crash recovery with no user notice.",
+      "suggestion": "Only exit when ctx is done or the window/app is closed; otherwise retry on the next tick and surface the error via status.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/macapps/notes/files.go",
+          "lines": {
+            "start": 85,
+            "end": 87
+          }
+        }
+      ],
+      "tags": [
+        "recovery",
+        "goroutine",
+        "location-corrected"
+      ],
+      "evidence": "if err := a.PostWindow(ref, f.Checkpoint); err != nil \u0026\u0026 !errors.Is(err, app.ErrQueueFull) {\n\t\t\t\t\treturn\n\t\t\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "174253828c6460b0",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Recovery restore may leave stale history semantics",
+      "message": "Restore Recovery installs the notebook while the user is looking at a recovery prompt, but `f.lastRecovery` is not reset and the model is not checked for settlement/pending state. Also the Restore button calls journal.Replace(false...) which appears not to reset session history; the README claims fresh session history, and the test only asserts UndoCount==0 on fresh start.",
+      "suggestion": "Verify Replace(false) marks the journal dirty with cleared history, and add tests covering restore after prior edits.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/macapps/notes/files.go",
+          "lines": {
+            "start": 271,
+            "end": 271
+          }
+        }
+      ],
+      "tags": [
+        "recovery",
+        "history",
+        "location-corrected"
+      ],
+      "evidence": "if err := f.model.journal.Replace(false, func() error { return f.model.installNotebook(b) }); err != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5997,
+    "totalMs": 6040
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 61966,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 32179,
+        "output": 632,
+        "costUSD": 0.070678
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

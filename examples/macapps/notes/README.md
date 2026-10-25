@@ -1,11 +1,14 @@
 # Notes
 
-A native Go example consuming only Vellum's public `ui`, `editor`, `command`
-and `history` APIs. It has a folder sidebar, note list, title field and plain-text
+A native Go example consuming Vellum's public `ui`, `editor`, `command`,
+`history`, `document` and application lifecycle APIs. It has a folder sidebar, note list, title field and plain-text
 editor. Folder/note selection, title/body search, new/edit/delete, pinning and
-Undo/Redo work against fictional in-memory sample notes. No Apple Notes data,
-accounts, cloud sync, files, clipboard fixtures or network services are accessed.
-The displayed dates are fixed sample dates, not the computer's clock.
+Undo/Redo start from fictional sample notes and can be saved as a local notebook. No Apple Notes data,
+accounts, cloud sync, clipboard fixtures or network services are accessed. Only this
+app's private notebook/recovery files and explicitly selected notebook files
+are read or written.
+The portable in-memory view retains fixed sample dates. The durable executable
+uses “Local note” labels instead of presenting fictional timestamps as real.
 
 `New`, `Model.View`, `Theme` and `Model.Commands` are the consumer interface.
 Use `app.ChromeUnified` on the native window; the view reserves the measured
@@ -81,3 +84,52 @@ and line-number gutter also remain a material visual mismatch without a public
 editor-presentation API. Native rendering and pointer verification are
 coordinated separately by the main development agent; this package alone makes
 no pixel-identical or native-acceptance claim.
+
+## Durable executable
+
+Run `go run ./cmd/notes` from `examples/macapps`. The default private directory is
+`~/Library/Application Support/Vellum Notes` on macOS. `-data-dir /absolute/private/path`
+selects a separate notebook/recovery slot for testing. The directory must be
+private (0700); one process holds its permanent lock inode. Invalid files or
+unavailable storage stop startup without overwriting those files.
+
+Command-S saves to `Notebook.vellumnotes` initially; Command-Shift-S chooses a new
+file destination; Command-O opens a notebook. Matching accessible toolbar buttons
+use the same commands. Save As switches the current destination; a later launch
+starts with the default local notebook, so use Open to return to an external file.
+Saving a new fictional sample notebook is explicit; a clean sample journal is
+not labeled as an already saved disk file. The whole notebook includes stable
+note IDs, next ID, folders/selection and exact plain UTF-8 body bytes. Undo/Redo
+remains available after Save and tracks the saved revision; history is not
+serialized across launches. Open replaces the complete notebook and clears
+session history only after validated decoding and stale-revision checks.
+
+Input settles through the existing search/title/body boundary before file or
+close actions. Unsaved Open/Close offers Save, Discard Changes or Cancel.
+Failed/canceled saves keep the notebook dirty and do not close it. Atomic writes
+use `document.FileStore`; an error after replacement is reported and never
+misrepresented as acknowledged success. New note/delete/pin/content history
+continues to use the same application journal.
+
+Every two seconds, an idle owner may capture a changed committed notebook to a
+separate recovery session. Native composition, pending input, file IO and a
+recovery decision postpone capture. Recovery never marks the main notebook saved.
+After interruption, startup explicitly offers Restore, Discard or Close without
+changing files. Restored content is dirty with fresh session history and saves
+to the default local notebook. Successful save/open or explicit discard writes
+an atomic clean marker. Recovery is the last completed snapshot, not a guarantee
+that the newest keystroke survives force quit, power loss or blocked IO.
+
+Regression tests cover exact Unicode/CRLF persistence, identity and Undo/Redo,
+malformed/duplicate/oversized documents, atomic replacement and failures,
+stale-save refusal, native input settlement, composition-preserving recovery,
+restore/discard/close and owned worker retirement. Native UI observations and
+physical pointer evidence are recorded separately. No human IME or VoiceOver
+qualification is implied.
+
+If the main save succeeds but writing the recovery clean marker fails, saved
+bytes remain intact and the app shows a Recovery error while keeping the window
+open. Retry close after storage is repaired. This avoids silently acknowledging
+a recovery-file operation that failed. Scheduler and file-worker shutdown have
+a three-second retirement bound; a failure retains the repository lock until
+process exit.

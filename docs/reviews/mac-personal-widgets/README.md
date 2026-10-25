@@ -1666,3 +1666,11 @@ Prism: `mac-stabilization-ci-permissions.json` (Anthropic Claude Sonnet 5.5, com
 Actual Windows runner reached and passed the first fixed test, then exposed an exact POSIX0600 assertion in the gallery preferences test. Stat errors and all persistence/order/color/migration/stale/temp-cleanup checks still execute on Windows. Exact Unix permission checks remain on Unix; Windows FileMode does not represent those bits. Focused race tests pass and Prism completed coverage without findings. No production save permissions or framework API changed. Notes work is excluded from this checkpoint.
 
 Focused checks: `mac-stabilization-ci-permissions-checks.json`.
+
+## Make Notes a durable public-API consumer with guarded files and recovery
+
+Prism: `mac-stabilization-notes-checkpoint.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism reviewed the complete app-only implementation. Concrete feedback fixed: batch command registration preflight before model attachment, exact owner/window admission, cloned recovery offer, pending-action guard, explicit recovery-prompt close, bounded scheduler/worker retirement and readable data-dir errors. Tests prove saved data/error feedback on recovery-marker failure, safe retry, Unicode identity/CRLF, atomic saves, stale results, native settlement deduplication, prior-history clearing on restore, composition refusal, concurrent directory exclusion and canceled workers. Final queue-full comment is not lost-data advancement: the bounded owner post is retried every interval and lastRecovery advances only after an acknowledged snapshot; delayed recovery is explicitly documented. Private directories are refused if permissions are broad, not silently chmodded; user-selected SaveAs destinations intentionally use normal document semantics and are documented. Framework APIs/features/backend policy are unchanged. Physical/native package checks follow; no human IME/VoiceOver claim.
+
+Focused checks: `mac-stabilization-notes-acceptance-checks.json`, `mac-stabilization-notes-guards-checks.json`, `mac-stabilization-notes-attachment-checks.json`, `mac-stabilization-notes-shutdown-checks.json`.

@@ -47,6 +47,9 @@ func (m *Model) View() ui.Node {
 	content := box(ui.Row, "notes-content", m.sidebarView(), divider("folders-divider"), m.listView(), divider("list-divider"), m.documentView())
 	content.Grow = true
 	root := box(ui.Column, "notes-root", header, content)
+	if m.files != nil {
+		root.Children = append(root.Children, m.files.promptView())
+	}
 	root.Grow = true
 	root.Style.Background = ui.Some(white)
 	// A removed note cannot leave a stale focus target in the admitted tree.
@@ -97,7 +100,11 @@ func (m *Model) sidebarView() ui.Node {
 	space := box(ui.Column, "folders-space")
 	space.Style.GrowY = ui.Some(float32(1))
 	children = append(children, space)
-	footer := label("notes-demo-label", "In-memory sample notes", 11, 400)
+	footerText := "In-memory sample notes"
+	if m.files != nil {
+		footerText = "Local notebook"
+	}
+	footer := label("notes-demo-label", footerText, 11, 400)
 	footer.Style.Foreground = ui.Some(muted)
 	children = append(children, footer)
 	n := box(ui.Column, "notes-folders", children...)
@@ -130,7 +137,7 @@ func (m *Model) listView() ui.Node {
 	for i := range header.Children {
 		header.Children[i].Style.GrowX = ui.Some(float32(1))
 	}
-	search := ui.Node{ID: "notes-search", Kind: ui.TextField, Text: m.query, Change: func(e ui.ChangeEvent) { m.accept(m.SetSearch(e.Text)) }, Accessibility: ui.Accessibility{Name: "Search notes", Help: "Search titles and text in the selected folder"}, Style: ui.Style{GrowX: ui.Some(float32(1)), CornerRadius: ui.Some(float32(16)), MinSize: ui.Some(ui.Size{Height: 30})}}
+	search := ui.Node{ID: "notes-search", Kind: ui.TextField, Disabled: m.files != nil && m.files.blocked(), Text: m.query, Change: func(e ui.ChangeEvent) { m.accept(m.SetSearch(e.Text)) }, Accessibility: ui.Accessibility{Name: "Search notes", Help: "Search titles and text in the selected folder"}, Style: ui.Style{GrowX: ui.Some(float32(1)), CornerRadius: ui.Some(float32(16)), MinSize: ui.Some(ui.Size{Height: 30})}}
 	searchBox := box(ui.Column, "notes-search-box", search)
 	searchBox.Style.Padding = ui.Some(ui.Insets{Left: 12, Right: 12, Bottom: 12})
 	searchBox.Style.GrowX = ui.Some(float32(1))
@@ -156,7 +163,11 @@ func (m *Model) listView() ui.Node {
 		summary := label("note-preview-"+v.ID, preview(v.Body), 12, 400)
 		summary.Style.Foreground = ui.Some(muted)
 		summary.Style.GrowX = ui.Some(float32(1))
-		date := label("note-date-"+v.ID, "10/19/26", 11, 400)
+		dateText := "10/19/26"
+		if m.files != nil {
+			dateText = "Local note"
+		}
+		date := label("note-date-"+v.ID, dateText, 11, 400)
 		date.Style.Foreground = ui.Some(muted)
 		date.Style.GrowX = ui.Some(float32(1))
 		card := box(ui.Column, "note-card-"+v.ID, button, date, summary)
@@ -188,6 +199,18 @@ func (m *Model) documentView() ui.Node {
 	redo := action("notes-redo", "Redo", ui.SymbolRedo, func() { _ = m.Request(m.Redo) })
 	redo.Disabled = busy || m.settlement == nil && m.History().RedoCount == 0
 	toolbar := box(ui.Row, "notes-toolbar", deleteNote, newNote, spacer("notes-tool-space"), undo, redo)
+	if m.files != nil {
+		for _, v := range []struct {
+			id, label string
+			icon      ui.Symbol
+			run       func() error
+		}{{"open", "Open Notebook…", ui.SymbolOpen, m.files.Open}, {"save", "Save Notebook", ui.SymbolSave, func() error { return m.files.Save(false) }}, {"save-as", "Save Notebook As…", ui.SymbolSave, func() error { return m.files.Save(true) }}} {
+			v := v
+			n := action("notes-file-"+v.id, v.label, v.icon, func() { _ = m.Request(v.run) })
+			n.Disabled = busy
+			toolbar.Children = append(toolbar.Children, n)
+		}
+	}
 	toolbar.Style = ui.Style{Padding: ui.Some(ui.Insets{Left: 16, Right: 16, Top: 9, Bottom: 9}), Gap: ui.Some(float32(6)), Align: ui.Some(ui.AlignCenter), GrowX: ui.Some(float32(1))}
 	if selected != nil {
 		id := selected.value.ID
@@ -202,16 +225,24 @@ func (m *Model) documentView() ui.Node {
 		content.Children = append(content.Children, empty)
 	} else {
 		id := selected.value.ID
-		date := label("notes-edited-date", "October 19, 2026 at 9:41 AM", 12, 400)
+		dateText := "October 19, 2026 at 9:41 AM"
+		if m.files != nil {
+			dateText = "Local plain-text notebook"
+		}
+		date := label("notes-edited-date", dateText, 12, 400)
 		date.Style.Foreground = ui.Some(muted)
 		date.Style.TextAlign = ui.Some(ui.AlignCenter)
 		date.Style.GrowX = ui.Some(float32(1))
-		title := ui.Node{ID: "note-title-" + id, Kind: ui.TextField, Text: selected.value.Title, Change: func(e ui.ChangeEvent) {
+		title := ui.Node{ID: "note-title-" + id, Kind: ui.TextField, Disabled: m.files != nil && m.files.blocked(), Text: selected.value.Title, Change: func(e ui.ChangeEvent) {
 			m.accept(m.titleChanged(id, e.Text))
 		}, Accessibility: ui.Accessibility{Name: "Note title"}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 24, Weight: 700}), Padding: ui.Some(ui.Insets{}), Border: ui.Some(ui.Border{}), Background: ui.Some(white), GrowX: ui.Some(float32(1))}}
 		// The adapter currently retains its body font and line-number gutter.
 		// Matching Notes' prose editor requires a public editor-presentation API.
-		body := ui.Node{ID: "note-editor-" + id, Kind: ui.MultilineText, Editor: selected.editor, Grow: true, SoftWrap: true, Change: func(ui.ChangeEvent) { m.accept(m.BodyChanged(id)) }, Accessibility: ui.Accessibility{Name: "Note text", Help: "Plain text editor; changes remain only in this demonstration"}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 14}), Padding: ui.Some(ui.Insets{}), Border: ui.Some(ui.Border{}), Background: ui.Some(white)}}
+		bodyHelp := "Plain text editor; changes remain only in this demonstration"
+		if m.files != nil {
+			bodyHelp = "Plain text editor; Command-S saves the local notebook"
+		}
+		body := ui.Node{ID: "note-editor-" + id, Kind: ui.MultilineText, Disabled: m.files != nil && m.files.blocked(), Editor: selected.editor, Grow: true, SoftWrap: true, Change: func(ui.ChangeEvent) { m.accept(m.BodyChanged(id)) }, Accessibility: ui.Accessibility{Name: "Note text", Help: bodyHelp}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 14}), Padding: ui.Some(ui.Insets{}), Border: ui.Some(ui.Border{}), Background: ui.Some(white)}}
 		document := box(ui.Column, "note-paper", date, title, body)
 		document.Style = ui.Style{Padding: ui.Some(ui.Insets{Left: 28, Right: 28, Bottom: 20}), Gap: ui.Some(float32(15)), GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(1))}
 		content.Children = append(content.Children, document)
@@ -219,6 +250,9 @@ func (m *Model) documentView() ui.Node {
 	status := m.status
 	if status == "" {
 		status = "Sample notes · changes are not saved"
+		if m.files != nil {
+			status = m.files.status()
+		}
 	}
 	footer := label("notes-status", status, 11, 400)
 	footer.Style.Foreground = ui.Some(muted)

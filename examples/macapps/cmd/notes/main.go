@@ -3,9 +3,12 @@ package main
 
 import (
 	"context"
+	"errors"
+	"flag"
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/drivers/cogent"
@@ -20,6 +23,25 @@ func main() {
 }
 
 func run() error {
+	directory := flag.String("data-dir", "", "private notebook directory (defaults to Application Support/Vellum Notes)")
+	flag.Parse()
+	if *directory == "" {
+		base, err := os.UserConfigDir()
+		if err != nil {
+			return err
+		}
+		*directory = filepath.Join(base, "Vellum Notes")
+	}
+	repository, err := notes.OpenRepository(*directory)
+	if err != nil {
+		return err
+	}
+	releaseLock := true
+	defer func() {
+		if releaseLock {
+			_ = repository.Close()
+		}
+	}()
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 	a, err := app.New(app.Config{})
@@ -28,8 +50,18 @@ func run() error {
 	}
 	defer a.Close()
 	m := notes.New()
+	offer, err := repository.Load(m)
+	if err != nil {
+		return fmt.Errorf("notes files preserved; startup refused: %w", err)
+	}
+	var files *notes.Files
 	const window = "notes"
-	ref, err := a.OpenWindow(app.Window{ID: window, Title: "Vellum Notes", Width: 1100, Height: 740, View: m.View, Chrome: app.WindowChrome{Style: app.ChromeUnified, Appearance: app.AppearanceLight}})
+	ref, err := a.OpenWindow(app.Window{ID: window, Title: "Vellum Notes", Width: 1100, Height: 740, View: m.View, Chrome: app.WindowChrome{Style: app.ChromeUnified, Appearance: app.AppearanceLight}, CloseRequest: func() bool {
+		if files == nil {
+			return false
+		}
+		return files.RequestClose()
+	}})
 	if err != nil {
 		return err
 	}
@@ -74,5 +106,14 @@ func run() error {
 	}); err != nil {
 		return err
 	}
-	return a.Run(ctx, cogent.Driver{Theme: notes.Theme(), Commands: m.Commands(), OnError: func(err error) { fmt.Fprintln(os.Stderr, err) }})
+	files, err = notes.AttachFiles(a, ref, m, repository, offer)
+	if err != nil {
+		return err
+	}
+	runErr := a.Run(ctx, cogent.Driver{Theme: notes.Theme(), Commands: m.Commands(), OnError: func(err error) { fmt.Fprintln(os.Stderr, err) }})
+	stopErr := files.Stop()
+	if stopErr != nil {
+		releaseLock = false
+	}
+	return errors.Join(runErr, stopErr)
 }
