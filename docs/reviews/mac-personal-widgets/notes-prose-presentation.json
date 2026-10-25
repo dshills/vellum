@@ -1,0 +1,114 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "c64b5b164b0ac3e120db3490266267e4",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "aa05780c1a602d6603d7e48eece5813185fdce14",
+    "branch": "codex/mac-personal-app-stabilization"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6189,
+    "totalMs": 6232
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 15,
+    "bytes": 35125,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 18889,
+        "output": 650,
+        "costUSD": 0.044278
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "db2d95c62e0b74aa",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Prose rendering ignores tabs and span styles",
+        "message": "In prose mode the rendering replaces the row's rich text with plain text styled only by `sty`, discarding per-span styling. In addition, wrapped-row geometry uses tab handling that is skipped in prose mode, so tabs in a proportional editor render with default glyph widths.",
+        "suggestion": "Handle tab characters explicitly in prose mode, e.g. expand them to spaces or pass a tab width to the shaper, and add a test with tabs.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/proseeditor/0111-prose-editor-presentation.patch",
+            "lines": {
+              "start": 225,
+              "end": 232
+            }
+          }
+        ],
+        "tags": [
+          "rendering",
+          "tabs"
+        ],
+        "evidence": "tx = rich.NewText(sty, tx.Join())",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/proseeditor/0111-prose-editor-presentation.patch"
+    },
+    {
+      "finding": {
+        "id": "febf3ff3c2c05ce6",
+        "severity": "medium",
+        "category": "performance",
+        "title": "Full relayout shaping under buffer lock on each width change",
+        "message": "Each source line is shaped through WrapLines while the buffer lock is held, and SetProseWrap re-lays out all lines on every key change (every width change during a live resize). For large documents this makes layout O(document) shaping work under a lock, and resizing can stall the UI.",
+        "suggestion": "Cache wrap results per line keyed by the text and width, and debounce or defer relayout during interactive resize.",
+        "confidence": 0.45,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/proseeditor/0111-prose-editor-presentation.patch",
+            "lines": {
+              "start": 394,
+              "end": 394
+            }
+          }
+        ],
+        "tags": [
+          "performance",
+          "locking"
+        ],
+        "evidence": "shaped := sh.WrapLines(rich.NewText(sty, txt), sty, \u0026style, math32.Vec2(width, float32(len(txt)+1)*max(float32(16), style.LineHeightDots(sty))))",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/proseeditor/0111-prose-editor-presentation.patch"
+    }
+  ],
+  "suppressed": []
+}

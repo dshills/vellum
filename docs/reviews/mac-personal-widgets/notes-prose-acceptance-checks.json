@@ -1,0 +1,88 @@
+[
+  {
+    "cwd": "",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 2.8158874169457704
+  },
+  {
+    "cwd": "",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.4962255829013884
+  },
+  {
+    "cwd": "drivers/cogent/build/upstream",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "-race",
+      "./text/textcore",
+      "-run",
+      "TestVellumProseMeasuredWrapAndRetainedGeometry|TestVellumEditorBodyGutterTypography",
+      "-v"
+    ],
+    "exit_code": 0,
+    "seconds": 4.601338416803628
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      ".",
+      "-run",
+      "TestManagedProseRetainsBindingCompositionAndHistory|TestManagedEditorTypographyPreservesNativeFamily|TestManagedEditorCompositionHistoryExactBytes"
+    ],
+    "exit_code": 0,
+    "seconds": 14.753117416985333
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 12.06473566708155
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 9.50339512503706
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "-race",
+      "./notes",
+      "-run",
+      "TestNotesMacLayout"
+    ],
+    "exit_code": 0,
+    "seconds": 14.328988375142217
+  }
+]

@@ -142,6 +142,7 @@ func mountEditor(parent tree.Node, r *record) core.Widget {
 	r.control.editor = &editorBinding{model: r.node.Editor, buffer: b}
 	syncEditor(r)
 	w.Styler(func(s *styles.Style) {
+		w.SetProse(r.node.Prose)
 		if r.node.SoftWrap {
 			s.Text.WhiteSpace = text.WhiteSpacePreWrap
 		} else {

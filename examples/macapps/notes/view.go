@@ -243,13 +243,11 @@ func (m *Model) documentView() ui.Node {
 		title := ui.Node{ID: "note-title-" + id, Kind: ui.TextField, Disabled: m.files != nil && m.files.blocked(), Text: selected.value.Title, Change: func(e ui.ChangeEvent) {
 			m.accept(m.titleChanged(id, e.Text))
 		}, Accessibility: ui.Accessibility{Name: "Note title"}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 20, Weight: 600}), MinSize: ui.Some(ui.Size{Height: 30}), MaxSize: ui.Some(ui.Size{Height: 30}), CornerRadius: ui.Some(float32(0)), GrowY: ui.Some(float32(0)), Padding: ui.Some(ui.Insets{}), Border: ui.Some(ui.Border{}), Background: ui.Some(white), GrowX: ui.Some(float32(1))}}
-		// The adapter currently retains its body font and line-number gutter.
-		// Matching Notes' prose editor requires a public editor-presentation API.
 		bodyHelp := "Plain text editor; changes remain only in this demonstration"
 		if m.files != nil {
 			bodyHelp = "Plain text editor; Command-S saves the local notebook"
 		}
-		body := ui.Node{ID: "note-editor-" + id, Kind: ui.MultilineText, Disabled: m.files != nil && m.files.blocked(), Editor: selected.editor, Grow: true, SoftWrap: true, Change: func(ui.ChangeEvent) { m.accept(m.BodyChanged(id)) }, Accessibility: ui.Accessibility{Name: "Note text", Help: bodyHelp}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 14}), Padding: ui.Some(ui.Insets{}), Border: ui.Some(ui.Border{}), Background: ui.Some(white)}}
+		body := ui.Node{ID: "note-editor-" + id, Kind: ui.MultilineText, Disabled: m.files != nil && m.files.blocked(), Editor: selected.editor, Grow: true, SoftWrap: true, Prose: true, Change: func(ui.ChangeEvent) { m.accept(m.BodyChanged(id)) }, Accessibility: ui.Accessibility{Name: "Note text", Help: bodyHelp}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 14}), Padding: ui.Some(ui.Insets{}), Border: ui.Some(ui.Border{}), Background: ui.Some(white)}}
 		document := box(ui.Column, "note-paper", title, body)
 		if m.files == nil {
 			document.Children = append([]ui.Node{date}, document.Children...)

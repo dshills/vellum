@@ -1714,3 +1714,11 @@ Prism: `mac-stabilization-ci-visual-owner.json` (Anthropic Claude Sonnet 5.5, co
 Prism reports no findings. Framework run 40207189028 raced direct test-thread rendering with WindowPaint after context unlock. Use the existing paint completion barrier for three paints, retaining every assertion. Five focused race repetitions pass, and clean prepare verifies the pinned patch and all later stage inputs/outputs. No runtime rendering or gate change.
 
 Focused checks: `mac-stabilization-ci-visual-owner-checks.json`.
+
+## Add proportional prose presentation to retained multiline editors
+
+Prism: `notes-prose-presentation.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism complete coverage with no findings. Owner explicitly approved this limited exception to the framework freeze. Default code typography remains unchanged; prose selects proportional shaping and no gutter on the same exact buffer/model/native input and history path. Focused checks verify source-preserving grapheme wraps, variable advances, actual pointer/caret mapping, width/DPI changes and visual-affinity invalidation. Native composition/CRLF UndoRedo and retained bindings pass, as do required portable race/vet and all example model checks. Clean native preparation verifies stage input/output digests. Physical and human input evidence remains separate.
+
+Focused checks: `notes-prose-acceptance-checks.json`.

@@ -79,9 +79,10 @@ run exposed an unadmitted title paste before window Undo; the explicit native
 settlement wiring addresses that ordering. A renewed native check verified
 pending title admission before Undo and the matching Redo; a separate native
 accessibility body edit also survived app Undo/Redo with the same note identity.
-Physical body-click focus remains unqualified. The editor's monospace body font
-and line-number gutter also remain a material visual mismatch without a public
-editor-presentation API. Native rendering and pointer verification are
+Physical body-click focus remains unqualified until the new package is checked.
+The writing area now opts into `Prose: true` and `SoftWrap: true` on the same
+public multiline editor, with proportional typography and no line-number gutter.
+Native rendering and pointer verification are
 coordinated separately by the main development agent; this package alone makes
 no pixel-identical or native-acceptance claim.
 
@@ -140,8 +141,10 @@ The app uses shared Mac control metrics, compact folder rows with a trailing cou
 column, a 28 Dp search field, denser note cards, one-pixel dividers and a smaller
 editable heading. The former blank 52 Dp client header is removed with the switch
 to standard native chrome. Saved-path detail is available in the status
-accessibility help rather than filling the writing area's footer. These are
-application presentation changes; the SDK and text/history paths are unchanged.
-The proportional prose editor, hidden gutter, bold emoji fallback and physical
-body-click focus remain explicit follow-up items. The offscreen layout test
+accessibility help rather than filling the writing area's footer. These layout changes are
+application-owned. The separately approved prose option extends the existing SDK
+control presentation; the document and history paths are unchanged.
+The approved prose presentation uses the retained multiline editor with
+proportional text and no gutter. Bold emoji fallback and physical body-click
+focus remain explicit follow-up items until checked. The offscreen layout test
 checks actual geometry at 1100×740 and 1380×900; it does not prove native fidelity.

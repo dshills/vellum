@@ -38,3 +38,10 @@ standard native chrome with no client header reservation. Assert allocated
 geometry in offscreen regressions before packaging. The code-editor body font
 and gutter require a separate scope decision; they are not represented as solved
 by app styling. No new framework controls or renderer policies are introduced.
+
+The owner explicitly approved the focused prose-editor exception on 25 October:
+existing `MultilineText` may opt into proportional typography without the code
+gutter. Keep the existing document model, native input, settlement and app Undo
+path. This exception does not reopen widget or rendering-policy scope. The Notes
+consumer must use an accurately identified private SDK snapshot containing that
+change; the earlier frozen SDK cannot compile the new presentation option.

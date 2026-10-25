@@ -203,3 +203,20 @@ full software routing and the independently validated failed native prefix in
 Unicode edits, grapheme deletion and one Undo/Redo journal. The complete native
 text/modal record remains open after actual drawable unavailability. Go FIFO
 establishes no live IME, physical input or native pixels.
+
+## Optional plain prose presentation
+
+`ui.MultilineText` accepts `Prose: true` together with `SoftWrap: true`. This
+explicit opt-in honors `Style.Typography` for proportional body text and removes
+the line-number gutter. The zero value preserves existing code editors. Prose
+on another kind, or without wrapping, is refused. This is plain text rather than
+rich formatting. Code-specific fixed-column tab layout is not offered in prose.
+
+Wrapping uses measured pixel widths and grapheme-safe shape boundaries. Native
+caret/selection geometry and painting use the same proportional glyph advances.
+Changing presentation, font or available width must preserve exact document
+bytes, directional selection, composition, binding identity and application
+history. Resize invalidates old visual-line affinity. Buffer views retain one
+immutable wrap-input snapshot; teardown releases it with the view. No widget or
+application callbacks run from the buffer wrapping callback. Native physical
+input and human IME/VoiceOver acceptance remain separate from routed tests.

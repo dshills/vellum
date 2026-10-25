@@ -78,6 +78,10 @@ type Node struct {
 	// TabInserts makes Tab insert a literal tab in MultilineText; otherwise Tab moves focus.
 	TabInserts bool
 	// SoftWrap wraps visual lines without changing document bytes.
+	// Prose uses proportional Typography and hides the code gutter on
+	// MultilineText. It requires SoftWrap; rich formatting is not implied.
+	// False preserves the code editor's existing presentation.
+	Prose               bool `json:",omitempty"`
 	SoftWrap            bool
 	Disabled            bool
 	Grow                bool

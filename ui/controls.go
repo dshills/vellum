@@ -151,6 +151,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if n.Prose && (n.Kind != MultilineText || !n.SoftWrap) {
+		return fmt.Errorf("ui: Prose requires a soft-wrapped MultilineText editor")
+	}
 	if err := validateTrack(n); err != nil {
 		return err
 	}

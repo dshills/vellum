@@ -1392,6 +1392,17 @@
               "sha256": "0b2d7466463f1cd828a20a966c255c59a76fb27066d070357b885a77e1314793"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/proseeditor",
+          "inputs": "native/patches/proseeditor/original-hashes.json",
+          "outputs": "native/patches/proseeditor/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/proseeditor/0111-prose-editor-presentation.patch",
+              "sha256": "21480216011ef80aaeab31a68508e3a24ec0274bc0832ae2be6bf70798c75061"
+            }
+          ]
         }
       ]
     },

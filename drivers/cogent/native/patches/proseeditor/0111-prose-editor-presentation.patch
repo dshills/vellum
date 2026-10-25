@@ -1,0 +1,422 @@
+--- a/text/lines/view.go
++++ b/text/lines/view.go
+@@ -15,6 +15,11 @@
+ // the original [Lines.lines] source lines, with wrapping according to
+ // the view width. Views are managed by the Lines.
+ type view struct {
++	// proseWrap contains an immutable, pixel-measured plain-text wrap function.
++	// It retains no widgets. The view releases it when removed.
++	proseWrap    func([]rune) []int
++	proseWrapKey string
++
+ 	// width is the current line width in rune characters, used for line wrapping.
+ 	width int
+ 
+--- a/text/lines/layout.go
++++ b/text/lines/layout.go
+@@ -26,7 +26,13 @@
+ 	vw.lineToVline = slicesx.SetLength(vw.lineToVline, n)
+ 	nln := 0
+ 	for ln, mu := range ls.markup {
+-		muls, vst := ls.layoutViewLine(ln, vw.width, ls.lines[ln], mu)
++		var muls []rich.Text
++		var vst []textpos.Pos
++		if vw.proseWrap != nil {
++			muls, vst = ls.layoutProseViewLine(ln, ls.lines[ln], vw.proseWrap)
++		} else {
++			muls, vst = ls.layoutViewLine(ln, vw.width, ls.lines[ln], mu)
++		}
+ 		vw.lineToVline[ln] = len(vw.vlineStarts)
+ 		vw.markup = append(vw.markup, muls...)
+ 		vw.vlineStarts = append(vw.vlineStarts, vst...)
+--- a/text/lines/prose_vellum.go
++++ b/text/lines/prose_vellum.go
+@@ -0,0 +1,43 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package lines
++
++import (
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/textpos"
++)
++
++// SetProseWrap installs immutable shaping inputs for a single plain-text view.
++// The callback receives source runes under the buffer lock; it must not enter
++// Lines or any widget. It returns strictly increasing grapheme-safe offsets.
++// The key changes with the measured pixel width and font metrics.
++func (ls *Lines) SetProseWrap(vid int, key string, wrap func([]rune) []int) bool {
++	ls.Lock()
++	defer ls.Unlock()
++	vw := ls.view(vid)
++	if vw == nil || vw.proseWrapKey == key {
++		return false
++	}
++	vw.proseWrapKey = key
++	vw.proseWrap = wrap
++	ls.layoutViewLines(vw)
++	return true
++}
++func (ls *Lines) layoutProseViewLine(ln int, txt []rune, wrap func([]rune) []int) ([]rich.Text, []textpos.Pos) {
++	starts := []int{0}
++	for _, p := range wrap(txt) {
++		if p > starts[len(starts)-1] && p < len(txt) {
++			starts = append(starts, p)
++		}
++	}
++	markup := make([]rich.Text, len(starts))
++	positions := make([]textpos.Pos, len(starts))
++	for i, start := range starts {
++		end := len(txt)
++		if i+1 < len(starts) {
++			end = starts[i+1]
++		}
++		markup[i] = rich.NewText(ls.fontStyle, txt[start:end])
++		positions[i] = textpos.Pos{Line: ln, Char: start}
++	}
++	return markup, positions
++}
+--- a/text/textcore/base.go
++++ b/text/textcore/base.go
+@@ -186,6 +186,7 @@
+ 	lastRecenter                           int
+ 	lastAutoInsert                         rune
+ 	lastFilename                           string
++	prose                                  bool
+ 	nativeListener                         func(EditorEditingState)
+ 	nativeComposition                      *editorNativeComposition
+ 	visualState                            editorVisualState
+--- a/text/textcore/layout.go
++++ b/text/textcore/layout.go
+@@ -19,14 +19,16 @@
+ // (subject to other styling constraints).
+ const maxGrowLines = 25
+ 
+-// bodyRichText keeps document shaping monospaced without changing the widget's
+-// UI typography, which is also used by line-number chrome. NewRichText returns
++// bodyRichText preserves the legacy monospaced document unless prose is
++// explicitly selected. UI typography also styles line-number chrome. NewRichText returns
+ // fresh values; neither widget style nor previously submitted rich text aliases
+ // these normalized body styles.
+ func (ed *Base) bodyRichText() (*rich.Style, *text.Style) {
+ 	sty, tsty := ed.Styles.NewRichText()
+-	sty.Family = rich.Monospace
+-	tsty.CustomFont = ""
++	if !ed.prose {
++		sty.Family = rich.Monospace
++		tsty.CustomFont = ""
++	}
+ 	return sty, tsty
+ }
+ 
+@@ -37,8 +39,10 @@
+ 	sty, tsty := ed.bodyRichText()
+ 	lno := true
+ 	if ed.Lines != nil {
+-		lno = ed.Lines.Settings.LineNumbers
+-		ed.Lines.SetFontStyle(sty)
++		lno = ed.Lines.Settings.LineNumbers && !ed.prose
++		if !ed.prose {
++			ed.Lines.SetFontStyle(sty)
++		}
+ 	}
+ 	if lno {
+ 		ed.hasLineNumbers = true
+@@ -93,7 +97,8 @@
+ 
+ 	// todo: may want to support horizontal scroll and min width
+ 	ed.linesSize.X = ed.visSize.X - ed.lineNumberOffset // width
+-	buf.SetWidth(ed.viewId, ed.linesSize.X)             // inexpensive if same, does update
++	ed.configureProseWrap()
++	buf.SetWidth(ed.viewId, max(1, ed.linesSize.X)) // inexpensive if same, does update
+ 	ed.linesSize.Y = buf.ViewLines(ed.viewId)
+ 	ed.totalSize.X = ed.charSize.X * float32(ed.visSize.X)
+ 	ed.totalSize.Y = ed.charSize.Y * float32(ed.linesSize.Y)
+--- a/text/textcore/render.go
++++ b/text/textcore/render.go
+@@ -19,6 +19,7 @@
+ 	"cogentcore.org/core/styles/states"
+ 	"cogentcore.org/core/text/rich"
+ 	"cogentcore.org/core/text/shaped"
++	"cogentcore.org/core/text/text"
+ 	"cogentcore.org/core/text/textpos"
+ )
+ 
+@@ -173,7 +174,11 @@
+ 	sz := ed.charSize
+ 	sz.X *= float32(ed.linesSize.X)
+ 	vlr := buf.ViewLineRegionNoLock(ed.viewId, ln)
+-	vseli := vlr.Intersect(vsel, ed.linesSize.X)
++	columns := ed.linesSize.X
++	if ed.prose {
++		columns = max(columns, len(buf.ViewMarkupLine(ed.viewId, ln).Join())+1)
++	}
++	vseli := vlr.Intersect(vsel, columns)
+ 	tx := buf.ViewMarkupLine(ed.viewId, ln)
+ 	ts := ed.Lines.Settings.TabSize
+ 	indent := 0
+@@ -201,12 +206,14 @@
+ 	rendSpan := func(lns *shaped.Lines, pos math32.Vector2, coff int, tabWidth float32) {
+ 		lns.SelectReset()
+ 		lns.HighlightReset()
+-		lns.SetGlyphXAdvance(math32.ToFixed(ed.charSize.X))
++		if !ed.prose {
++			lns.SetGlyphXAdvance(math32.ToFixed(ed.charSize.X))
++		}
+ 		if !vseli.IsNil() {
+ 			lns.SelectRegion(textpos.Range{Start: vseli.Start.Char - coff, End: vseli.End.Char - coff})
+ 		}
+ 		for _, hlrg := range hlts {
+-			hlsi := vlr.Intersect(hlrg, ed.linesSize.X)
++			hlsi := vlr.Intersect(hlrg, columns)
+ 			if !hlsi.IsNil() {
+ 				lns.HighlightRegion(textpos.Range{Start: hlsi.Start.Char - coff, End: hlsi.End.Char - coff})
+ 			}
+@@ -215,6 +222,15 @@
+ 		pc.DrawText(lns, pos)
+ 	}
+ 
++	if ed.prose {
++		// Pixel wrapping is already encoded by the view. Shape each complete row
++		// once without a second wrap or fixed glyph advances. Native geometry,
++		// selection and painting all consume this same result.
++		tsty.WhiteSpace = text.WrapNever
++		tx = rich.NewText(sty, tx.Join())
++		rendSpan(shapeSpan(tx, sz), rpos, 0, 0)
++		return
++	}
+ 	for si := range tx { // tabs encoded as single chars at start
+ 		sn, rn := rich.SpanLen(tx[si])
+ 		if rn == 1 && tx[si][sn] == '\t' {
+--- a/text/textcore/prose_vellum.go
++++ b/text/textcore/prose_vellum.go
+@@ -0,0 +1,65 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package textcore
++
++import (
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/text"
++	"fmt"
++)
++
++// SetProse switches only presentation; it never replaces text, selection,
++// composition or the document buffer. Code-editor behavior is the default.
++func (ed *Base) SetProse(prose bool) {
++	if ed.prose == prose {
++		return
++	}
++	ed.prose = prose
++	ed.nativeLayoutRevision = 0
++	ed.visualState.interaction = nil
++	ed.visualState.offset = -1
++	ed.visualState.vertical = false
++	ed.NeedsLayout()
++}
++func (ed *Base) configureProseWrap() {
++	if ed.Lines == nil {
++		return
++	}
++	if !ed.prose {
++		ed.Lines.SetProseWrap(ed.viewId, "", nil)
++		return
++	}
++	if ed.Scene == nil || ed.Scene.TextShaper() == nil {
++		return
++	}
++	sty, tsty := ed.bodyRichText()
++	// Capture detached metrics, not ed or its scene, in the buffer callback.
++	sh := ed.Scene.TextShaper()
++	width := max(float32(1), ed.visSizeAlloc.X)
++	key := fmt.Sprintf("%v/%v/%v/%v/%v/%v/%v", sty.Family, sty.Size, sty.Weight, sty.Slant, tsty.CustomFont, tsty.FontSize.Dots, width)
++	tsty.WhiteSpace = text.WhiteSpacePreWrap
++	changed := ed.Lines.SetProseWrap(ed.viewId, key, func(txt []rune) []int {
++		if len(txt) == 0 {
++			return nil
++		}
++		style := *tsty // WrapLines may populate font metrics; never share mutable inputs.
++		shaped := sh.WrapLines(rich.NewText(sty, txt), sty, &style, math32.Vec2(width, float32(len(txt)+1)*max(float32(16), style.LineHeightDots(sty))))
++		starts := make([]int, 0, len(shaped.Lines))
++		for i, line := range shaped.Lines {
++			if i == 0 {
++				continue
++			}
++			start := len(txt)
++			for _, run := range line.Runs {
++				start = min(start, run.Runes().Start)
++			}
++			starts = append(starts, start)
++		}
++		return starts
++	})
++	if changed {
++		ed.visualState.offset = -1
++		ed.visualState.vertical = false
++		ed.nativeLayoutRevision = 0
++	}
++}
+--- a/text/textcore/prose_vellum_test.go
++++ b/text/textcore/prose_vellum_test.go
+@@ -0,0 +1,162 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++//go:build offscreen
++
++package textcore
++
++import (
++	"context"
++	"errors"
++	"fmt"
++	"image"
++	"io/fs"
++	"slices"
++	"strings"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/core"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/text/fonts"
++	"cogentcore.org/core/text/lines"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/shaped"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"cogentcore.org/core/text/textpos"
++)
++
++func TestVellumProseMeasuredWrapAndRetainedGeometry(t *testing.T) {
++	for _, dpi := range []float32{160, 200} {
++		t.Run(fmt.Sprintf("%g dpi", dpi), func(t *testing.T) {
++			clock := &ownedFixtureClock{now: time.Unix(1730000000, 0).UTC()}
++			body := core.NewBody("prose presentation")
++			ed := NewEditor(body)
++			old := ed.Lines
++			source := "iiii WWWW " + strings.Repeat("a wide word WWW and thin iii ", 10) + "\nEmoji 😀 é אבג\n" + strings.Repeat("é", 80) + "\n"
++			ed.SetLines(lines.NewLinesExact().SetString(source))
++			old.Close()
++			prose := false
++			width := float32(320)
++			ed.Styler(func(s *styles.Style) {
++				ed.SetProse(prose)
++				s.Font.Family = rich.Custom
++				s.Font.CustomFont = "Noto Sans"
++				s.Font.Size = units.Dp(14)
++				s.Grow.Set(1, 1)
++				s.Max.X.Dp(width)
++			})
++			m, err := body.NewWindow().RunManual(context.Background(), core.ManualWindowConfig{Size: image.Pt(360, 240), LogicalDPI: dpi, EventCapacity: 64, Now: func() time.Time { return clock.now }, AfterFunc: clock.After, NewShaper: func() (shaped.Shaper, error) { return shapedgt.NewShaperWithFonts([]fs.FS{fonts.Default}), nil }})
++			if err != nil {
++				t.Fatal(err)
++			}
++			defer func() {
++				if err := m.Close(context.Background()); err != nil && !errors.Is(err, core.ErrManualCallback) && !errors.Is(err, lines.ErrManualViews) {
++					t.Error(err)
++				}
++			}()
++			ownedDrain(t, m)
++			buffer := ed.Lines
++			if !ed.SetEditingSelection(2, 7) {
++				t.Fatal("selection")
++			}
++			ed.NeedsRender()
++			ownedDrain(t, m)
++			accepted := ed.EditingState()
++			for _, mode := range []bool{true, false, true} {
++				prose = mode
++				ed.Update()
++				ownedDrain(t, m)
++				state := ed.EditingState()
++				if ed.Lines != buffer || state.Text != accepted.Text || state.Anchor != accepted.Anchor || state.Focus != accepted.Focus {
++					t.Fatal("presentation changed document/selection", state, accepted)
++				}
++				if (ed.LineNumberPixels() == 0) != mode {
++					t.Fatal("gutter did not follow presentation", mode, ed.LineNumberPixels())
++				}
++				font, _ := ed.lineRenders[0].lns.Source.Span(0)
++				if (font.Family == rich.Custom) != mode {
++					t.Fatal("document family", mode, font)
++				}
++				if !mode {
++					continue
++				}
++				geometry := ed.NativeTextGeometry()
++				if len(geometry.Carets) < 10 {
++					t.Fatal("missing rendered geometry")
++				}
++				caret := func(offset int) shaped.Caret {
++					t.Helper()
++					for _, c := range geometry.Carets {
++						if c.Rune == offset && c.Line == 0 {
++							return c
++						}
++					}
++					t.Fatal("missing caret", offset)
++					return shaped.Caret{}
++				}
++				narrow := caret(1).Pos.X - caret(0).Pos.X
++				wide := caret(6).Pos.X - caret(5).Pos.X
++				if wide <= narrow*1.5 {
++					t.Fatal("glyph advances are still fixed", narrow, wide)
++				}
++				for _, c := range geometry.Carets {
++					if c.Pos.X > geometry.Viewport.Max.X+1 {
++						t.Fatal("pixel wrapping overflow", c, geometry.Viewport)
++					}
++				}
++				// Every view fragment maps back to exactly the original source runes.
++				var fragments strings.Builder
++				previous := -1
++				for row := 0; row < buffer.ViewLines(ed.viewId); row++ {
++					pos := buffer.PosFromView(ed.viewId, textpos.Pos{Line: row})
++					raw := []rune(strings.Split(source, "\n")[pos.Line])
++					if !slices.Contains(textpos.GraphemeBounds(raw), pos.Char) {
++						t.Fatal("wrap split a grapheme", pos)
++					}
++					if previous != -1 && pos.Line != previous {
++						fragments.WriteByte('\n')
++					}
++					fragments.WriteString(string(buffer.ViewMarkupLine(ed.viewId, row).Join()))
++					previous = pos.Line
++				}
++				if fragments.String() != strings.TrimSuffix(source, "\n")+"\n" {
++					t.Fatal("wrapping altered/skipped source", fragments.String())
++				}
++				c := caret(2)
++				point := c.Pos.Sub(math32.FromPoint(ed.Scene.SceneGeom.Pos)).Sub(math32.FromPoint(ed.Geom.ContentBBox.Min))
++				point.Y += c.Height / 2
++				got := ed.PixelToCursor(image.Pt(int(point.X), int(point.Y)))
++				if ed.nativeOffset(got) != 2 {
++					t.Fatal("pointer/caret mapping", got, ed.nativeOffset(got))
++				}
++				if !ed.SetEditingSelection(0, 0) || !ed.cursorVisual(1, false) || ed.EditingState().Cursor != 1 {
++					t.Fatal("visual arrow did not use proportional geometry")
++				}
++				ed.SetEditingSelection(accepted.Anchor, accepted.Focus)
++			}
++			if !ed.SetEditingSelection(40, 40) || !ed.cursorVisual(1, false) {
++				t.Fatal("wrapped affinity setup")
++			}
++			cursor := ed.EditingState().Cursor
++			originalRows := buffer.ViewLines(ed.viewId)
++			width = 180
++			ed.Update()
++			ownedDrain(t, m)
++			if rows := buffer.ViewLines(ed.viewId); rows <= originalRows {
++				t.Fatal("pixel width did not reflow source", originalRows, rows)
++			}
++			wantLine := buffer.PosToView(ed.viewId, ed.nativePos(cursor)).Line
++			if ed.EditingState().VisualLine != wantLine {
++				t.Fatal("retained stale visual affinity after reflow", ed.EditingState(), wantLine)
++			}
++			width = 320
++			ed.Update()
++			ownedDrain(t, m)
++			if buffer.ViewLines(ed.viewId) != originalRows || ed.EditingState().Text != source {
++				t.Fatal("restored width changed document or retained stale wraps")
++			}
++
++		})
++	}
++}
