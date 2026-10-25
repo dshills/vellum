@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "7186f123addae68585915a521faa463d",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "a22693609257142dfd11f7dfad40750d01fdfcba",
+    "branch": "codex/mac-document-controls"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "44a73ca00335881a",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Clamping ignores a panel larger than the display",
+      "message": "The clamp is fmax(min, fmin(x, max-size)). When the panel is larger than the visible frame, max-size is below the visible minimum, so the result is pinned to the minimum. That keeps the origin visible but lets the panel extend beyond the display's top or right edge. The test doesn't cover this case.",
+      "suggestion": "Handle oversize panels explicitly, e.g. cap the size to the visible frame, and add a test where the panel is larger than the display.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/document_panels_darwin.m",
+          "lines": {
+            "start": 16,
+            "end": 16
+          }
+        }
+      ],
+      "tags": [
+        "geometry"
+      ],
+      "evidence": "return NSMakePoint(fmax(NSMinX(visible),fmin(x,NSMaxX(visible)-size.width)),fmax(NSMinY(visible),fmin(y,NSMaxY(visible)-size.height)));",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3678,
+    "totalMs": 3693
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 9028,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 6461,
+        "output": 355,
+        "costUSD": 0.016472
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

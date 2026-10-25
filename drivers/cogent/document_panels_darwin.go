@@ -9,6 +9,7 @@ package cogent
 void vellumChooseDocumentPanel(uint64_t token,uint64_t parent,const char *json);
 void vellumCancelDocumentPanel(uint64_t token);
 char *vellumDocumentPanelRecipeFixture(const char *json);
+double vellumDocumentPanelPositionFixture(int axis,double px,double py,double pw,double ph,double vx,double vy,double vw,double vh,double width,double height);
 */
 import "C"
 import (
@@ -145,4 +146,11 @@ func nativeChooseFontPanel(ctx context.Context, owner *app.Application, parent a
 			o.Preview(value)
 		}
 	})
+}
+
+func nativeDocumentPanelPositionFixture(parent, visible [4]float64, size [2]float64) (float64, float64) {
+	point := func(axis C.int) float64 {
+		return float64(C.vellumDocumentPanelPositionFixture(axis, C.double(parent[0]), C.double(parent[1]), C.double(parent[2]), C.double(parent[3]), C.double(visible[0]), C.double(visible[1]), C.double(visible[2]), C.double(visible[3]), C.double(size[0]), C.double(size[1])))
+	}
+	return point(0), point(1)
 }

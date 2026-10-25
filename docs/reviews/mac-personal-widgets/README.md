@@ -1474,3 +1474,11 @@ Prism: `mac-documents-a11y-repair.json` (Anthropic Claude Sonnet 5.5, complete c
 The full suite found preexisting Secure schema drift (field introduced in 4969acd) and stale tests that populated menuState.options instead of the current popup.options. Updated the exact-schema inventories, retaining unknown-field rejection and per-field mutation proof. Moved the existing Secure serialization to declaration order and added a Secure=true byte-for-byte builtin JSON check. Menu fixtures now populate the real popup snapshot and check row count before indexing; positive empty-action arrays and negative null-action rejection remain intact. All focused pending-proof, semantic, secure-field and Cocoa menu checks pass. Prism completed with no findings. The remaining native inventory is being resumed from the interrupted test; no performance, publication or distribution guard changed.
 
 Focused checks: `mac-documents-a11y-repair-checks.json`, `mac-documents-a11y-final-checks.json`.
+
+## Keep native Colors and Fonts panels on their parent display
+
+Prism: `mac-native-panel-placement.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Live candidate check confirmed actual Colors presentation, coalesced opacity preview (alpha128 while accepted well stayed255), and clean quit with that uncommitted session open. It also exposed the shared panel opening on a different monitor. Both native panels now center on the exact parent and clamp against its visible display in Cocoa coordinates. Prism oversize concern is handled explicitly: preserve AppKit minimum sizes and anchor the top-left/titlebar when a display is smaller; this is documented and covered by an added fixture. Offset/negative origins, edge clamps, oversize and all native session protocol tests pass offscreen. No activation, lifecycle, renderer or release-gate policy changed.
+
+Focused checks: `mac-native-panel-placement-checks.json`, `mac-native-panel-placement-final-checks.json`.

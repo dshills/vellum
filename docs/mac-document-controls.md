@@ -51,7 +51,11 @@ no target/action getters to restore a foreign owner safely. Do not mix direct
 AppKit ownership of the shared panel with this service. Parent closure, context
 cancellation and shutdown revoke the session, remove observers/child attachment,
 hide the panel and restore its prior appearance/accessory state. Hidden/minimized
-parents refuse without activating another Space. Other platforms return unavailable.
+parents refuse without activating another Space. Each session centers on the
+parent and clamps to its display’s visible frame, including offset/negative
+display origins. If a display is smaller than AppKit’s minimum panel size, the
+minimum is preserved and the top-left/titlebar stays reachable; the body can
+extend below/right of that unusually small display. The shared panel’s old position is not reused across parents. Other platforms return unavailable.
 Offscreen tests compile the native path and cover request/reply parsing, exact
 parent revocation and bounded preview delivery without creating any native panel.
 Actual AppKit interaction is checked separately after the final package.

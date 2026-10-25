@@ -11,6 +11,14 @@ extern void *vellumAXNativeWindow(uint64_t token);
 @class VellumDocumentPanelSession;
 static NSMutableDictionary<NSNumber *,VellumDocumentPanelSession *> *vellumDocumentPanels;
 static BOOL vellumOwnsColorPanel,vellumOwnsFontPanel;
+static NSPoint vellumDocumentPanelPosition(NSRect parent,NSRect visible,NSSize size){
+ CGFloat x=NSMidX(parent)-size.width/2,y=NSMidY(parent)-size.height/2;
+ if(size.height>NSHeight(visible))y=NSMaxY(visible)-size.height;else y=fmax(NSMinY(visible),fmin(y,NSMaxY(visible)-size.height));
+ return NSMakePoint(fmax(NSMinX(visible),fmin(x,NSMaxX(visible)-size.width)),y);
+}
+// Pure geometry fixture; no screen/window/panel is constructed offscreen.
+double vellumDocumentPanelPositionFixture(int axis,double px,double py,double pw,double ph,double vx,double vy,double vw,double vh,double width,double height){NSPoint p=vellumDocumentPanelPosition(NSMakeRect(px,py,pw,ph),NSMakeRect(vx,vy,vw,vh),NSMakeSize(width,height));return axis==0?p.x:p.y;}
+
 static NSString *vellumPanelApplyTitle(NSString *kind){return [kind isEqual:@"font"]?@"Use Font":@"Use Color";}
 static NSView *vellumPanelAccessory(NSPanel *panel,BOOL font){return font?((NSFontPanel *)panel).accessoryView:((NSColorPanel *)panel).accessoryView;}
 static void vellumSetPanelAccessory(NSPanel *panel,BOOL font,NSView *view){if(font)((NSFontPanel *)panel).accessoryView=view;else ((NSColorPanel *)panel).accessoryView=view;}
@@ -78,6 +86,7 @@ void vellumChooseDocumentPanel(uint64_t token,uint64_t parentToken,const char *j
  if(fontMode){NSFontManager *manager=NSFontManager.sharedFontManager;manager.target=session;manager.action=@selector(changeFont:);[manager setSelectedFont:font isMultiple:NO];[(NSFontPanel *)panel setPanelFont:font isMultiple:NO];((NSFontPanel *)panel).enabled=YES;[(NSFontPanel *)panel reloadDefaultFontFamilies];}
  else{NSColorPanel *colors=(NSColorPanel *)panel;colors.showsAlpha=session.alpha;colors.continuous=YES;NSDictionary *c=o[@"Color"];colors.color=[NSColor colorWithSRGBRed:[c[@"R"] doubleValue]/255 green:[c[@"G"] doubleValue]/255 blue:[c[@"B"] doubleValue]/255 alpha:session.alpha?[c[@"A"] doubleValue]/255:1];[colors setTarget:session];[colors setAction:@selector(changed:)];}
  vellumSetPanelAccessory(panel,fontMode,vellumColorActions(session));
+ NSScreen *screen=parent.screen?:NSScreen.mainScreen;if(screen)[panel setFrameOrigin:vellumDocumentPanelPosition(parent.frame,screen.visibleFrame,panel.frame.size)];
  __weak VellumDocumentPanelSession *weakSession=session;session.parentObserver=[NSNotificationCenter.defaultCenter addObserverForName:NSWindowWillCloseNotification object:parent queue:nil usingBlock:^(NSNotification *note){[weakSession finish:6];}];
  if(!vellumServiceActive(token)){[session finish:1];return;}[parent addChildWindow:panel ordered:NSWindowAbove];[panel makeKeyAndOrderFront:nil];
  }@catch(NSException *e){VellumDocumentPanelSession *session=vellumDocumentPanels[@(token)];if(session)[session finish:2];else vellumServiceResult(token,"",2);}}});});}

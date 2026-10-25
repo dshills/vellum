@@ -106,3 +106,21 @@ func TestNativeFontPanelRecipeWithoutPresentation(t *testing.T) {
 		}
 	}
 }
+
+func TestNativeDocumentPanelPositionUsesParentDisplay(t *testing.T) {
+	for _, tc := range []struct {
+		parent, visible [4]float64
+		size            [2]float64
+		want            [2]float64
+	}{
+		{[4]float64{3386, 100, 668, 789}, [4]float64{3200, 0, 1920, 1440}, [2]float64{250, 397}, [2]float64{3595, 296}},
+		{[4]float64{5050, 1300, 668, 789}, [4]float64{3200, 0, 1920, 1440}, [2]float64{250, 397}, [2]float64{4870, 1043}},
+		{[4]float64{-1900, -1050, 668, 789}, [4]float64{-1920, -1080, 1920, 1080}, [2]float64{250, 397}, [2]float64{-1691, -854}},
+		{[4]float64{0, 0, 668, 789}, [4]float64{0, 0, 200, 200}, [2]float64{250, 397}, [2]float64{0, -197}},
+	} {
+		x, y := nativeDocumentPanelPositionFixture(tc.parent, tc.visible, tc.size)
+		if x != tc.want[0] || y != tc.want[1] {
+			t.Fatal("panel escaped parent display", x, y, tc)
+		}
+	}
+}
