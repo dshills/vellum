@@ -1722,3 +1722,11 @@ Prism: `notes-prose-presentation.json` (Anthropic Claude Sonnet 5.5, complete co
 Prism complete coverage with no findings. Owner explicitly approved this limited exception to the framework freeze. Default code typography remains unchanged; prose selects proportional shaping and no gutter on the same exact buffer/model/native input and history path. Focused checks verify source-preserving grapheme wraps, variable advances, actual pointer/caret mapping, width/DPI changes and visual-affinity invalidation. Native composition/CRLF UndoRedo and retained bindings pass, as do required portable race/vet and all example model checks. Clean native preparation verifies stage input/output digests. Physical and human input evidence remains separate.
 
 Focused checks: `notes-prose-acceptance-checks.json`.
+
+## Document independent macOS Notes consumer and prose SDK workflow
+
+Prism: `mac-stabilization-developer-guide.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism complete coverage with no findings. Eight local walkthrough links resolve. Guide describes verified public APIs, source-origin and native-linker requirements, owner-side settlement, detached async files/recovery and current private prose snapshot. It does not claim public distribution or human input qualification. The source implementation and independent build are verified in their associated checkpoints.
+
+Focused checks: `notes-prose-acceptance-checks.json`.

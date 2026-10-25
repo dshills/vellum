@@ -31,3 +31,5 @@ are retained; current document links and tooling use the reorganized paths.
 
 - [Native macOS application examples](../examples/macapps/README.md): independently runnable Go consumers and their working interactions.
 - [Native application checkpoint](reports/macos-app-examples/README.md): verification and remaining visual acceptance.
+
+- [Build a personal macOS application](building-macos-apps.md): independent SDK consumer, controlled state, commands, durable Notes files/recovery and packaging.

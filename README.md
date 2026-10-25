@@ -145,3 +145,5 @@ alpha.3 payload and its notice bundle. That decision does not cover future chang
 payloads; new public artifacts still require the applicable audit, notice checks
 and publication approval. See the [published release and limitations](https://github.com/dshills/vellum/releases/tag/v0.1.0-alpha.3),
 [release contract](specs/release.md) and [release metadata](release/version.json).
+
+For an application-oriented walkthrough, see [building a personal macOS app](docs/building-macos-apps.md). The Notes example now supports local notebook save/open, recovery and shared Undo/Redo while framework features remain frozen.
