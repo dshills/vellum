@@ -203,3 +203,9 @@ func TestNativeShutdownUnblocksUndispatchedBackgroundOperation(t *testing.T) {
 		t.Fatal("shutdown retained native callback state")
 	}
 }
+
+func TestNativeFilePanelRestorationDoesNotStealFocus(t *testing.T) {
+	if !nativeServicePanelRestoreFixture() {
+		t.Fatal("inactive, hidden, minimized or unrelated key windows must refuse restoration")
+	}
+}

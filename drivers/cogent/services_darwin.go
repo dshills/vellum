@@ -13,6 +13,7 @@ void vellumCancelFile(uint64_t token);
 void vellumSetMenu(uint64_t token, const char *json);
 void vellumShutdown(void);
 int vellumServiceDismissFixture(void);
+int vellumServicePanelRestoreFixture(void);
 char *vellumServiceMenuObservationFixture(void);
 */
 import "C"
@@ -41,6 +42,8 @@ type nativeOperation struct {
 }
 
 var serviceToken atomic.Uint64
+
+func nativeServicePanelRestoreFixture() bool { return C.vellumServicePanelRestoreFixture() == 1 }
 
 func nativeServiceDismissFixture() bool { return C.vellumServiceDismissFixture() == 1 }
 

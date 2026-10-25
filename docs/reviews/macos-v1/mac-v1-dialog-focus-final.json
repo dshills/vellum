@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "d8e684835478d627e41f10460d7a29a9",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "18854e59b8ceaa3aa90b3b43594254fdc6abd168",
+    "branch": "codex/macos-v1-candidate"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "707d657d4c1d22ea",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Restore decision depends on key window state at completion time",
+      "message": "The restore check runs in the completion handler, after AppKit has typically already dismissed the sheet/panel and moved key status. At that point NSApp.keyWindow is often the parent or nil, so the heuristic is unreliable. When the panel is app-modal (not a sheet), key may be the panel only transiently. The result is that restoration may be skipped when needed, or applied in unintended states.",
+      "suggestion": "Capture whether the panel owned focus at a deterministic time, or verify behavior on a real window, and document or test the ordering. Consider restoring only when key is nil or the parent.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/services_darwin.m",
+          "lines": {
+            "start": 200,
+            "end": 200
+          }
+        }
+      ],
+      "tags": [
+        "appkit",
+        "focus",
+        "location-corrected"
+      ],
+      "evidence": "if (vellumPanelMayRestore(NSApp.isActive, origin.isVisible, origin.isMiniaturized, NSApp.keyWindow, panel, origin, NSApp.mainWindow)) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "d6def10e56a89a1d",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Test covers only predicate, not restoration behavior",
+      "message": "The fixture only tests a pure predicate with dummy NSObjects. It does not exercise the completion handler, the weak parent capture, the orderOut/makeKeyAndOrderFront calls, or the first-responder restore. The test name overstates what it verifies, and regressions in the real wiring would go undetected.",
+      "suggestion": "Rename the test to reflect predicate coverage, or add an integration test that drives a real NSWindow with a panel.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/services_darwin_test.go",
+          "lines": {
+            "start": 207,
+            "end": 209
+          }
+        }
+      ],
+      "tags": [
+        "test-coverage"
+      ],
+      "evidence": "func TestNativeFilePanelRestorationDoesNotStealFocus(t *testing.T) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6080,
+    "totalMs": 6087
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 7398,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5515,
+        "output": 680,
+        "costUSD": 0.01783
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

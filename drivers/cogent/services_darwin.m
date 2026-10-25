@@ -15,6 +15,29 @@ extern int vellumCancelAllDocumentPanels(void);
 extern int vellumCancelAllQuickLook(void);
 static NSMutableDictionary<NSNumber *, NSSavePanel *> *vellumPanels;
 
+// Restore only the exact live parent when our panel owned keyboard focus.
+// Never activate another app, resurrect a closed/minimized window, or steal
+// input from a different key window chosen while the panel was open.
+static BOOL vellumPanelMayRestore(BOOL active, BOOL visible, BOOL minimized,
+ id key, id panel, id parent, id main) {
+ return parent && active && visible && !minimized &&
+  (key == panel || key == parent || (!key && main == parent));
+}
+int vellumServicePanelRestoreFixture(void) {
+ @autoreleasepool {
+  id panel=[NSObject new],parent=[NSObject new],other=[NSObject new];
+  NSArray *keys=@[panel,parent,other,NSNull.null];
+  for(int flags=0;flags<8;flags++) for(int k=0;k<4;k++) for(int m=0;m<2;m++) {
+   id key=k==3?nil:keys[k],main=m?parent:other;
+   BOOL got=vellumPanelMayRestore((flags&1)!=0,(flags&2)!=0,(flags&4)!=0,key,panel,parent,main);
+   BOOL want=flags==3 && (k<2 || (k==3 && m==1));
+   if(got!=want)return 0;
+  }
+  if(vellumPanelMayRestore(YES,YES,NO,nil,panel,nil,nil))return 0;
+  return 1;
+ }
+}
+
 @interface VellumMenuTarget : NSObject
 @property uint64_t token;
 - (void)invoke:(NSMenuItem *)item;
@@ -166,11 +189,21 @@ void vellumChooseFile(uint64_t token, const char *json) {
         if (!vellumPanels) vellumPanels = [NSMutableDictionary new];
         if (!vellumServiceActive(token)) { vellumServiceResult(token, "", 2); return; }
         vellumPanels[@(token)] = panel;
+        __weak NSWindow *parent = NSApp.keyWindow;
+        __weak NSResponder *responder = parent.firstResponder;
         [panel beginWithCompletionHandler:^(NSModalResponse response) {
           @autoreleasepool {
             @try {
             NSString *path = response == NSModalResponseOK ? panel.URL.path : @"";
             int status = response == NSModalResponseOK ? (path ? 0 : 2) : 1;
+            NSWindow *origin = parent;
+            if (vellumPanelMayRestore(NSApp.isActive, origin.isVisible, origin.isMiniaturized, NSApp.keyWindow, panel, origin, NSApp.mainWindow)) {
+              [panel orderOut:nil];
+              [origin makeKeyAndOrderFront:nil];
+              NSResponder *saved = responder;
+              if ([saved isKindOfClass:NSView.class] && ((NSView *)saved).window == origin)
+                [origin makeFirstResponder:saved];
+            }
             vellumServiceResult(token, (char *)(path ?: @"").UTF8String, status);
             } @catch (NSException *exception) { vellumServiceResult(token, "", 2); }
             @finally { [vellumPanels removeObjectForKey:@(token)]; }

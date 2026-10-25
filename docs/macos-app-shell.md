@@ -46,3 +46,11 @@ existing text settlement/history/file paths. `go run ./cmd/macshell` from
 use public Vellum APIs and original Vellum sample artwork. No AppKit icons are
 copied. Automated isolation tests do not substitute for physical interaction or
 human IME/VoiceOver acceptance.
+
+Native Open/Save panel completion returns keyboard focus to its exact visible,
+nonminimized parent and live responder only while the app is active and no other
+window has taken key status. A nil key window is accepted only while that exact
+parent remains the application main window. It does not activate background apps or reopen
+retired windows. The physical Notes cancellation check covers the ordinary path. Scalar identity
+and state fixtures cover refusal policy; they do not simulate closing an actual
+NSWindow or native responder delivery.

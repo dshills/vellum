@@ -1,0 +1,29 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "-race",
+      ".",
+      "-run",
+      "TestNativeFilePanel|TestNativeMenu|TestCommandMenu|TestService|TestTitlebar"
+    ],
+    "exit_code": 0,
+    "seconds": 17.193046333035454
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 7.079898874973878
+  }
+]
