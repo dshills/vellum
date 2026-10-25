@@ -26,3 +26,15 @@ Existing full portable race/vet and focused native compilation cover CI fixes.
 Remote CI verifies the older macOS SDK and actual Windows behavior; local tests
 do not claim those environments. Native pointer checks are separate from routed
 regressions. Use disposable app files in live checks; preserve global settings.
+
+## Notes visual correction, 25 October 2026
+
+Use the owner's Apple Notes comparison for proportions and presentation only; do
+not copy personal reference contents into fixtures, reports or reviews. Correct
+the existing app's compact folder/count rows, list density and selection colors,
+search sizing, dividers, title sizing and unused header space. Keep document
+bytes, stable control/editor identities, settlement and history unchanged. Use
+standard native chrome with no client header reservation. Assert allocated
+geometry in offscreen regressions before packaging. The code-editor body font
+and gutter require a separate scope decision; they are not represented as solved
+by app styling. No new framework controls or renderer policies are introduced.

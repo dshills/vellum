@@ -1,0 +1,122 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "66ae0b398b7d0284a980cc94818c54d1",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "35ca1ac4e9a33ddce2b75eeaad15cde4597e6e5a",
+    "branch": "codex/mac-personal-app-stabilization"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "46ea938a4c372fe1",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Test expects sidebar width 210 but the view sets 190",
+      "message": "The sidebar is now 190 Dp wide (Min/MaxSize Width 190), but the test asserts a.Dx() == 210. The test will fail unless the allocated width differs by exactly 20, which is unlikely.",
+      "suggestion": "Assert 190, or derive the expected width from the style constant.",
+      "confidence": 0.8,
+      "locations": [
+        {
+          "path": "examples/macapps/notes/viewport_offscreen_test.go",
+          "lines": {
+            "start": 146,
+            "end": 146
+          }
+        }
+      ],
+      "tags": [
+        "test",
+        "location-corrected"
+      ],
+      "evidence": "if a, b := get(\"notes-folders\"), get(\"notes-list\"); a.Max.X \u003e= b.Min.X || a.Dx() != 210 || b.Dx() != 320 {",
+      "fix": {
+        "before": "if a, b := get(\"notes-folders\"), get(\"notes-list\"); a.Max.X \u003e= b.Min.X || a.Dx() != 210 || b.Dx() != 320 {",
+        "after": "if a, b := get(\"notes-folders\"), get(\"notes-list\"); a.Max.X \u003e= b.Min.X || a.Dx() != 190 || b.Dx() != 320 {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 13690,
+    "totalMs": 13734
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 34097,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 19252,
+        "output": 786,
+        "costUSD": 0.046364
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "fdbd4ae369f2d751",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Search field height 16 with padding clips text",
+        "message": "The search field has a max height of 16 with 4 Dp vertical padding, leaving about 8 Dp for text at 13 pt. The text will clip, and the test's 32 Dp bound does not catch it. Similarly, tool action buttons use MaxSize height 16 with 6 Dp padding, and the note title button is capped at 16 Dp.",
+        "suggestion": "Set the field height to about 28 Dp (as the README states) and include padding in the sizing, or drop the MaxSize cap.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "examples/macapps/notes/view.go",
+            "lines": {
+              "start": 150,
+              "end": 150
+            }
+          }
+        ],
+        "tags": [
+          "layout"
+        ],
+        "evidence": "MinSize: ui.Some(ui.Size{Height: 16}), MaxSize: ui.Some(ui.Size{Height: 16}), Padding: ui.Some(ui.Insets{Left: 8, Right: 8, Top: 4, Bottom: 4})",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in examples/macapps/notes/view.go"
+    }
+  ],
+  "suppressed": []
+}

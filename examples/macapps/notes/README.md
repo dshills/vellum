@@ -11,8 +11,8 @@ The portable in-memory view retains fixed sample dates. The durable executable
 uses “Local note” labels instead of presenting fictional timestamps as real.
 
 `New`, `Model.View`, `Theme` and `Model.Commands` are the consumer interface.
-Use `app.ChromeUnified` on the native window; the view reserves the measured
-52 Dp native toolbar before its first interactive content. Install the returned
+Use `app.ChromeStandard` on the native window so macOS owns the draggable title
+bar and window buttons. The view begins directly below native chrome. Install the returned
 registry on the window. Its window-scope Meta+Z and
 Meta+Shift+Z shortcuts intentionally handle the unified app history before the
 focused text control's own fallback. Do not replace them with a second Undo
@@ -58,7 +58,7 @@ on 19 October 2026. Reference captures remain in the development artifact area;
 no Apple screenshots, personal Notes contents, icons or product imagery are
 redistributed by this example. The app uses Vellum's bundled symbols.
 
-The source's light three-column hierarchy, amber folder selection, grouped note
+The source's light three-column hierarchy, subtle folder selection with amber text, pale amber note selection, grouped note
 list, fine dividers and bold editable title are represented. Fidelity gaps are
 explicit: plain text has a separate title control; rich inline formatting,
 attachments/thumbnails, drawing, tables, math, collaboration, account controls,
@@ -133,3 +133,15 @@ open. Retry close after storage is repaired. This avoids silently acknowledging
 a recovery-file operation that failed. Scheduler and file-worker shutdown have
 a three-second retirement bound; a failure retains the repository lock until
 process exit.
+
+## Visual correction from the owner comparison
+
+The app uses shared Mac control metrics, compact folder rows with a trailing count
+column, a 28 Dp search field, denser note cards, one-pixel dividers and a smaller
+editable heading. The former blank 52 Dp client header is removed with the switch
+to standard native chrome. Saved-path detail is available in the status
+accessibility help rather than filling the writing area's footer. These are
+application presentation changes; the SDK and text/history paths are unchanged.
+The proportional prose editor, hidden gutter, bold emoji fallback and physical
+body-click focus remain explicit follow-up items. The offscreen layout test
+checks actual geometry at 1100×740 and 1380×900; it does not prove native fidelity.

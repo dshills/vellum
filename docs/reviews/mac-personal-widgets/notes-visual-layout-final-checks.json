@@ -1,0 +1,41 @@
+[
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "-race",
+      "./notes",
+      "-run",
+      "TestNotesMacLayout",
+      "-v"
+    ],
+    "exit_code": 0,
+    "seconds": 5.917976999888197
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./notes",
+      "./cmd/notes"
+    ],
+    "exit_code": 0,
+    "seconds": 2.3601214999798685
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "vet",
+      "./notes",
+      "./cmd/notes"
+    ],
+    "exit_code": 0,
+    "seconds": 0.49762758309952915
+  }
+]

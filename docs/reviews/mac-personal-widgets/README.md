@@ -1698,3 +1698,11 @@ Prism: `mac-stabilization-notes-clean-recovery.json` (Anthropic Claude Sonnet 5.
 Native checks verified exact Unicode main bytes and saved revision replay, then exposed an obsolete recovery snapshot after Undo checkpoint followed by clean Redo. The periodic owner now clears acknowledged dirty recovery when it sees a clean revision. Focused save/Undo/checkpoint/Redo/checkpoint regression passes under race/vet. Prism completed coverage with no findings. Interrupted-session native restore/save and normal close also succeeded on build2. Rebuild final package with this small app-only correction; no framework or gate changes.
 
 Focused checks: `mac-stabilization-notes-clean-recovery-checks.json`.
+
+## Polish Notes column proportions and compact macOS controls
+
+Prism: `notes-visual-polish.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism complete coverage. Its sidebar-width finding is disproved by measured output: 190 Dp is the content width plus 10 Dp padding on each side, yielding the tested 210 Dp allocation. Both viewport cases and focused race/vet pass. No editor engine change is part of this app-only checkpoint; the separately approved prose correction follows.
+
+Focused checks: `notes-visual-layout-final-checks.json`.

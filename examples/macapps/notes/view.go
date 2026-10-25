@@ -15,14 +15,15 @@ var (
 	white   = color.NRGBA{R: 255, G: 255, B: 255, A: 255}
 	sidebar = color.NRGBA{R: 246, G: 246, B: 247, A: 255}
 	line    = color.NRGBA{R: 229, G: 229, B: 231, A: 255}
-	amber   = color.NRGBA{R: 239, G: 178, B: 45, A: 255}
+	amber   = color.NRGBA{R: 255, G: 227, B: 146, A: 255}
 )
 
+// Theme uses the shared Mac control metrics; the app's containers own spacing.
 func Theme() ui.Theme {
-	return ui.Theme{Default: ui.Style{Foreground: ui.Some(ink), Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 13})}, Kinds: map[ui.Kind]ui.Style{
-		ui.Row: {Padding: ui.Some(ui.Insets{}), Gap: ui.Some(float32(0))}, ui.Column: {Padding: ui.Some(ui.Insets{}), Gap: ui.Some(float32(0))},
-		ui.Button: {CornerRadius: ui.Some(float32(7))},
-	}}
+	theme := ui.MacTheme(false)
+	theme.Kinds[ui.Row] = ui.Style{Padding: ui.Some(ui.Insets{}), Gap: ui.Some(float32(0)), Align: ui.Some(ui.AlignCenter)}
+	theme.Kinds[ui.Column] = ui.Style{Padding: ui.Some(ui.Insets{}), Gap: ui.Some(float32(0))}
+	return theme
 }
 func label(id, text string, size float32, weight int) ui.Node {
 	return ui.Node{ID: id, Kind: ui.Label, Text: text, Style: ui.Style{Padding: ui.Some(ui.Insets{}), Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: size, Weight: weight})}}
@@ -34,19 +35,15 @@ func spacer(id string) ui.Node {
 	return ui.Node{ID: id, Kind: ui.Column, Style: ui.Style{GrowX: ui.Some(float32(1))}}
 }
 func action(id, name string, symbol ui.Symbol, f func()) ui.Node {
-	return ui.Node{ID: id, Kind: ui.Button, Icon: symbol, Activate: f, Appearance: ui.ButtonTool, Accessibility: ui.Accessibility{Name: name}, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 32, Height: 32}), CornerRadius: ui.Some(float32(16)), Border: ui.Some(ui.Border{})}}
+	return ui.Node{ID: id, Kind: ui.Button, Icon: symbol, Activate: f, Appearance: ui.ButtonTool, Accessibility: ui.Accessibility{Name: name}, Style: ui.Style{Padding: ui.Some(ui.UniformInsets(6)), MinSize: ui.Some(ui.Size{Width: 16, Height: 16}), MaxSize: ui.Some(ui.Size{Height: 16}), Background: ui.Some(color.NRGBA{}), CornerRadius: ui.Some(float32(7)), Border: ui.Some(ui.Border{})}}
 }
 
 // View returns a fresh tree. Each note retains its own public editor model and
 // editor identity, so selection never reuses a native binding for another note.
 func (m *Model) View() ui.Node {
-	// ChromeUnified exposes the whole client surface. Its measured native
-	// toolbar owns the first 52 Dp, including dragging and traffic-light buttons.
-	header := box(ui.Column, "notes-native-header")
-	header.Style = ui.Style{MinSize: ui.Some(ui.Size{Height: 52}), MaxSize: ui.Some(ui.Size{Height: 52}), GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(0)), Background: ui.Some(sidebar)}
 	content := box(ui.Row, "notes-content", m.sidebarView(), divider("folders-divider"), m.listView(), divider("list-divider"), m.documentView())
 	content.Grow = true
-	root := box(ui.Column, "notes-root", header, content)
+	root := box(ui.Column, "notes-root", content)
 	if m.files != nil {
 		root.Children = append(root.Children, m.files.promptView())
 	}
@@ -59,7 +56,7 @@ func (m *Model) View() ui.Node {
 	return root
 }
 func divider(id string) ui.Node {
-	return ui.Node{ID: id, Kind: ui.Separator, Orientation: ui.Vertical, Style: ui.Style{Foreground: ui.Some(line), GrowY: ui.Some(float32(1))}}
+	return ui.Node{ID: id, Kind: ui.Column, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 1}), MaxSize: ui.Some(ui.Size{Width: 1}), Background: ui.Some(line), GrowY: ui.Some(float32(1))}}
 }
 func (m *Model) folderCount(id string) int {
 	n := 0
@@ -90,12 +87,22 @@ func (m *Model) sidebarView() ui.Node {
 	folders := append([]folder{{"all", "All Notes"}}, m.folders...)
 	for _, f := range folders {
 		f := f
-		n := ui.Node{ID: "folder-" + f.id, Kind: ui.Button, Text: fmt.Sprintf("%s     %d", f.name, m.folderCount(f.id)), Icon: ui.SymbolOpen, Appearance: ui.ButtonQuiet, Disabled: m.actionReady() != nil, Activate: func() { _ = m.Request(func() error { return m.SelectFolder(f.id) }) }, Accessibility: ui.Accessibility{Name: fmt.Sprintf("%s folder, %d notes", f.name, m.folderCount(f.id))}, Style: ui.Style{GrowX: ui.Some(float32(1)), TextAlign: ui.Some(ui.AlignStart), Padding: ui.Some(ui.Insets{Top: 8, Right: 8, Bottom: 8, Left: 9}), CornerRadius: ui.Some(float32(7)), Border: ui.Some(ui.Border{})}}
+		n := ui.Node{ID: "folder-" + f.id, Kind: ui.Button, Text: f.name, Icon: ui.SymbolFolder, Appearance: ui.ButtonQuiet, Disabled: m.actionReady() != nil, Activate: func() { _ = m.Request(func() error { return m.SelectFolder(f.id) }) }, Accessibility: ui.Accessibility{Name: fmt.Sprintf("%s folder, %d notes", f.name, m.folderCount(f.id))}, Style: ui.Style{GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(0)), TextAlign: ui.Some(ui.AlignStart), Padding: ui.Some(ui.Insets{Top: 4, Right: 4, Bottom: 4, Left: 8}), MinSize: ui.Some(ui.Size{Height: 30}), MaxSize: ui.Some(ui.Size{Height: 30}), Background: ui.Some(color.NRGBA{}), Border: ui.Some(ui.Border{})}}
+		count := label("folder-count-"+f.id, fmt.Sprint(m.folderCount(f.id)), 13, 400)
+		count.Style.Foreground = ui.Some(muted)
+		count.Style.TextAlign = ui.Some(ui.AlignEnd)
+		count.Style.MinSize = ui.Some(ui.Size{Width: 24})
+		count.Style.MaxSize = ui.Some(ui.Size{Width: 24})
+		countBox := box(ui.Column, "folder-count-box-"+f.id, count)
+		countBox.Style = ui.Style{MinSize: ui.Some(ui.Size{Width: 24}), MaxSize: ui.Some(ui.Size{Width: 24}), GrowX: ui.Some(float32(0))}
+		row := box(ui.Row, "folder-row-"+f.id, n, spacer("folder-space-"+f.id), countBox)
+		row.Style = ui.Style{GrowX: ui.Some(float32(1)), MinSize: ui.Some(ui.Size{Height: 30}), MaxSize: ui.Some(ui.Size{Height: 30}), CornerRadius: ui.Some(float32(6))}
 		if f.id == m.selectedFolder {
-			n.Style.Background = ui.Some(amber)
-			n.Style.Foreground = ui.Some(white)
+			row.Style.Background = ui.Some(color.NRGBA{R: 235, G: 234, B: 231, A: 255})
+			n.Style.Foreground = ui.Some(color.NRGBA{R: 176, G: 117, B: 0, A: 255})
+			row.Children[0] = n
 		}
-		children = append(children, n)
+		children = append(children, row)
 	}
 	space := box(ui.Column, "folders-space")
 	space.Style.GrowY = ui.Some(float32(1))
@@ -108,13 +115,13 @@ func (m *Model) sidebarView() ui.Node {
 	footer.Style.Foreground = ui.Some(muted)
 	children = append(children, footer)
 	n := box(ui.Column, "notes-folders", children...)
-	n.Style = ui.Style{Padding: ui.Some(ui.UniformInsets(12)), Gap: ui.Some(float32(3)), Background: ui.Some(sidebar), MinSize: ui.Some(ui.Size{Width: 220}), MaxSize: ui.Some(ui.Size{Width: 220}), GrowY: ui.Some(float32(1))}
+	n.Style = ui.Style{Padding: ui.Some(ui.Insets{Left: 10, Right: 10, Bottom: 12}), Gap: ui.Some(float32(2)), Background: ui.Some(sidebar), MinSize: ui.Some(ui.Size{Width: 190}), MaxSize: ui.Some(ui.Size{Width: 190}), GrowY: ui.Some(float32(1))}
 	return n
 }
 func preview(body string) string {
 	body = strings.Join(strings.Fields(body), " ")
-	if utf8.RuneCountInString(body) > 38 {
-		return string([]rune(body)[:38]) + "…"
+	if utf8.RuneCountInString(body) > 46 {
+		return string([]rune(body)[:46]) + "…"
 	}
 	if body == "" {
 		return "No additional text"
@@ -126,20 +133,20 @@ func displayTitle(title string) string {
 		return "New Note"
 	}
 	r := []rune(title)
-	if len(r) > 29 {
-		return string(r[:29]) + "…"
+	if len(r) > 36 {
+		return string(r[:36]) + "…"
 	}
 	return title
 }
 func (m *Model) listView() ui.Node {
 	header := box(ui.Column, "notes-list-header", label("notes-folder-name", m.folderName(), 15, 600), label("notes-folder-count", fmt.Sprintf("%d notes", m.folderCount(m.selectedFolder)), 11, 400))
-	header.Style = ui.Style{Padding: ui.Some(ui.Insets{Left: 16, Top: 13, Right: 14, Bottom: 12}), Gap: ui.Some(float32(2)), GrowX: ui.Some(float32(1))}
+	header.Style = ui.Style{Padding: ui.Some(ui.Insets{Left: 16, Top: 12, Right: 14, Bottom: 10}), Gap: ui.Some(float32(2)), GrowX: ui.Some(float32(1))}
 	for i := range header.Children {
 		header.Children[i].Style.GrowX = ui.Some(float32(1))
 	}
-	search := ui.Node{ID: "notes-search", Kind: ui.TextField, Disabled: m.files != nil && m.files.blocked(), Text: m.query, Change: func(e ui.ChangeEvent) { m.accept(m.SetSearch(e.Text)) }, Accessibility: ui.Accessibility{Name: "Search notes", Help: "Search titles and text in the selected folder"}, Style: ui.Style{GrowX: ui.Some(float32(1)), CornerRadius: ui.Some(float32(16)), MinSize: ui.Some(ui.Size{Height: 30})}}
+	search := ui.Node{ID: "notes-search", Kind: ui.TextField, Placeholder: "Search notes", Disabled: m.files != nil && m.files.blocked(), Text: m.query, Change: func(e ui.ChangeEvent) { m.accept(m.SetSearch(e.Text)) }, Accessibility: ui.Accessibility{Name: "Search notes", Help: "Search titles and text in the selected folder"}, Style: ui.Style{GrowX: ui.Some(float32(1)), CornerRadius: ui.Some(float32(7)), MinSize: ui.Some(ui.Size{Height: 16}), MaxSize: ui.Some(ui.Size{Height: 16}), Padding: ui.Some(ui.Insets{Left: 8, Right: 8, Top: 4, Bottom: 4}), GrowY: ui.Some(float32(0)), Background: ui.Some(white)}}
 	searchBox := box(ui.Column, "notes-search-box", search)
-	searchBox.Style.Padding = ui.Some(ui.Insets{Left: 12, Right: 12, Bottom: 12})
+	searchBox.Style.Padding = ui.Some(ui.Insets{Left: 12, Right: 12, Bottom: 4})
 	searchBox.Style.GrowX = ui.Some(float32(1))
 	items := box(ui.Column, "notes-list-rows")
 	items.Style.Padding = ui.Some(ui.Insets{Left: 8, Right: 8, Bottom: 12})
@@ -154,12 +161,12 @@ func (m *Model) listView() ui.Node {
 		}
 		if group != lastGroup {
 			h := label("notes-group-"+v.ID, group, 12, 600)
-			h.Style.Padding = ui.Some(ui.Insets{Top: 12, Bottom: 10, Left: 8})
+			h.Style.Padding = ui.Some(ui.Insets{Top: 14, Bottom: 7, Left: 8})
 			h.Style.GrowX = ui.Some(float32(1))
 			items.Children = append(items.Children, h)
 			lastGroup = group
 		}
-		button := ui.Node{ID: "note-select-" + v.ID, Kind: ui.Button, Text: displayTitle(v.Title), Appearance: ui.ButtonQuiet, Disabled: m.actionReady() != nil, Activate: func() { _ = m.Request(func() error { return m.Select(v.ID) }) }, Accessibility: ui.Accessibility{Name: "Open note: " + displayTitle(v.Title)}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 13, Weight: 600}), Padding: ui.Some(ui.Insets{}), TextAlign: ui.Some(ui.AlignStart), GrowX: ui.Some(float32(1)), Border: ui.Some(ui.Border{})}}
+		button := ui.Node{ID: "note-select-" + v.ID, Kind: ui.Button, Text: displayTitle(v.Title), Appearance: ui.ButtonQuiet, Disabled: m.actionReady() != nil, Activate: func() { _ = m.Request(func() error { return m.Select(v.ID) }) }, Accessibility: ui.Accessibility{Name: "Open note: " + displayTitle(v.Title)}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 13, Weight: 600}), MinSize: ui.Some(ui.Size{Height: 16}), MaxSize: ui.Some(ui.Size{Height: 16}), Background: ui.Some(color.NRGBA{}), Padding: ui.Some(ui.Insets{}), TextAlign: ui.Some(ui.AlignStart), GrowX: ui.Some(float32(1)), Border: ui.Some(ui.Border{})}}
 		summary := label("note-preview-"+v.ID, preview(v.Body), 12, 400)
 		summary.Style.Foreground = ui.Some(muted)
 		summary.Style.GrowX = ui.Some(float32(1))
@@ -171,11 +178,11 @@ func (m *Model) listView() ui.Node {
 		date.Style.Foreground = ui.Some(muted)
 		date.Style.GrowX = ui.Some(float32(1))
 		card := box(ui.Column, "note-card-"+v.ID, button, date, summary)
-		card.Style = ui.Style{Padding: ui.Some(ui.Insets{Top: 10, Right: 10, Bottom: 12, Left: 12}), Gap: ui.Some(float32(4)), CornerRadius: ui.Some(float32(8)), GrowX: ui.Some(float32(1))}
+		card.Style = ui.Style{Padding: ui.Some(ui.Insets{Top: 6, Right: 12, Bottom: 6, Left: 16}), Gap: ui.Some(float32(1)), CornerRadius: ui.Some(float32(8)), GrowX: ui.Some(float32(1))}
 		if v.ID == m.selected {
-			card.Style.Background = ui.Some(color.NRGBA{R: 231, G: 231, B: 233, A: 255})
+			card.Style.Background = ui.Some(amber)
 		}
-		items.Children = append(items.Children, card, ui.Node{ID: "note-line-" + v.ID, Kind: ui.Separator, Style: ui.Style{Foreground: ui.Some(line)}})
+		items.Children = append(items.Children, card, ui.Node{ID: "note-line-" + v.ID, Kind: ui.Column, Style: ui.Style{MinSize: ui.Some(ui.Size{Height: 1}), MaxSize: ui.Some(ui.Size{Height: 1}), GrowX: ui.Some(float32(1)), Background: ui.Some(line)}})
 	}
 	if len(visible) == 0 {
 		empty := label("notes-empty-search", "No notes found", 13, 400)
@@ -184,7 +191,7 @@ func (m *Model) listView() ui.Node {
 	}
 	scroll := ui.Node{ID: "notes-list-scroll", Kind: ui.Scroll, Grow: true, Children: []ui.Node{items}}
 	n := box(ui.Column, "notes-list", header, searchBox, scroll)
-	n.Style = ui.Style{MinSize: ui.Some(ui.Size{Width: 280}), MaxSize: ui.Some(ui.Size{Width: 280}), GrowY: ui.Some(float32(1)), Background: ui.Some(white)}
+	n.Style = ui.Style{MinSize: ui.Some(ui.Size{Width: 320}), MaxSize: ui.Some(ui.Size{Width: 320}), GrowY: ui.Some(float32(1)), Background: ui.Some(white)}
 	return n
 }
 func (m *Model) documentView() ui.Node {
@@ -211,10 +218,10 @@ func (m *Model) documentView() ui.Node {
 			toolbar.Children = append(toolbar.Children, n)
 		}
 	}
-	toolbar.Style = ui.Style{Padding: ui.Some(ui.Insets{Left: 16, Right: 16, Top: 9, Bottom: 9}), Gap: ui.Some(float32(6)), Align: ui.Some(ui.AlignCenter), GrowX: ui.Some(float32(1))}
+	toolbar.Style = ui.Style{Padding: ui.Some(ui.Insets{Left: 18, Right: 18, Top: 7, Bottom: 7}), Gap: ui.Some(float32(6)), Align: ui.Some(ui.AlignCenter), GrowX: ui.Some(float32(1))}
 	if selected != nil {
 		id := selected.value.ID
-		pin := ui.Node{ID: "notes-pin", Kind: ui.ToggleButton, Text: "Pin", Checked: selected.value.Pinned, Disabled: busy, Change: func(e ui.ChangeEvent) { _ = m.Request(func() error { return m.SetPinned(id, e.Checked) }) }, Accessibility: ui.Accessibility{Name: "Pin selected note"}, Style: ui.Style{CornerRadius: ui.Some(float32(16)), Border: ui.Some(ui.Border{})}}
+		pin := ui.Node{ID: "notes-pin", Kind: ui.ToggleButton, Text: "Pin", Checked: selected.value.Pinned, Disabled: busy, Change: func(e ui.ChangeEvent) { _ = m.Request(func() error { return m.SetPinned(id, e.Checked) }) }, Accessibility: ui.Accessibility{Name: "Pin selected note"}, Style: ui.Style{Padding: ui.Some(ui.Insets{Left: 9, Right: 9, Top: 5, Bottom: 5}), CornerRadius: ui.Some(float32(7)), MinSize: ui.Some(ui.Size{Height: 30}), MaxSize: ui.Some(ui.Size{Height: 30}), Border: ui.Some(ui.Border{})}}
 		toolbar.Children = append(toolbar.Children, pin)
 	}
 	content := box(ui.Column, "notes-document", toolbar)
@@ -235,7 +242,7 @@ func (m *Model) documentView() ui.Node {
 		date.Style.GrowX = ui.Some(float32(1))
 		title := ui.Node{ID: "note-title-" + id, Kind: ui.TextField, Disabled: m.files != nil && m.files.blocked(), Text: selected.value.Title, Change: func(e ui.ChangeEvent) {
 			m.accept(m.titleChanged(id, e.Text))
-		}, Accessibility: ui.Accessibility{Name: "Note title"}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 24, Weight: 700}), Padding: ui.Some(ui.Insets{}), Border: ui.Some(ui.Border{}), Background: ui.Some(white), GrowX: ui.Some(float32(1))}}
+		}, Accessibility: ui.Accessibility{Name: "Note title"}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 20, Weight: 600}), MinSize: ui.Some(ui.Size{Height: 30}), MaxSize: ui.Some(ui.Size{Height: 30}), CornerRadius: ui.Some(float32(0)), GrowY: ui.Some(float32(0)), Padding: ui.Some(ui.Insets{}), Border: ui.Some(ui.Border{}), Background: ui.Some(white), GrowX: ui.Some(float32(1))}}
 		// The adapter currently retains its body font and line-number gutter.
 		// Matching Notes' prose editor requires a public editor-presentation API.
 		bodyHelp := "Plain text editor; changes remain only in this demonstration"
@@ -243,8 +250,11 @@ func (m *Model) documentView() ui.Node {
 			bodyHelp = "Plain text editor; Command-S saves the local notebook"
 		}
 		body := ui.Node{ID: "note-editor-" + id, Kind: ui.MultilineText, Disabled: m.files != nil && m.files.blocked(), Editor: selected.editor, Grow: true, SoftWrap: true, Change: func(ui.ChangeEvent) { m.accept(m.BodyChanged(id)) }, Accessibility: ui.Accessibility{Name: "Note text", Help: bodyHelp}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 14}), Padding: ui.Some(ui.Insets{}), Border: ui.Some(ui.Border{}), Background: ui.Some(white)}}
-		document := box(ui.Column, "note-paper", date, title, body)
-		document.Style = ui.Style{Padding: ui.Some(ui.Insets{Left: 28, Right: 28, Bottom: 20}), Gap: ui.Some(float32(15)), GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(1))}
+		document := box(ui.Column, "note-paper", title, body)
+		if m.files == nil {
+			document.Children = append([]ui.Node{date}, document.Children...)
+		}
+		document.Style = ui.Style{Padding: ui.Some(ui.Insets{Left: 24, Right: 24, Top: 16, Bottom: 20}), Gap: ui.Some(float32(10)), GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(1))}
 		content.Children = append(content.Children, document)
 	}
 	status := m.status
@@ -254,9 +264,17 @@ func (m *Model) documentView() ui.Node {
 			status = m.files.status()
 		}
 	}
+	fullStatus := status
+	if strings.HasPrefix(status, "Saved · ") {
+		status = "Saved"
+	}
+	if strings.HasPrefix(status, "Opened · ") {
+		status = "Opened notebook"
+	}
 	footer := label("notes-status", status, 11, 400)
+	footer.Accessibility = ui.Accessibility{Name: status, Help: fullStatus}
 	footer.Style.Foreground = ui.Some(muted)
-	footer.Style.Padding = ui.Some(ui.Insets{Left: 28, Right: 16, Top: 8, Bottom: 12})
+	footer.Style.Padding = ui.Some(ui.Insets{Left: 24, Right: 16, Top: 6, Bottom: 10})
 	content.Children = append(content.Children, footer)
 	return content
 }

@@ -56,7 +56,7 @@ func run() error {
 	}
 	var files *notes.Files
 	const window = "notes"
-	ref, err := a.OpenWindow(app.Window{ID: window, Title: "Vellum Notes", Width: 1100, Height: 740, View: m.View, Chrome: app.WindowChrome{Style: app.ChromeUnified, Appearance: app.AppearanceLight}, CloseRequest: func() bool {
+	ref, err := a.OpenWindow(app.Window{ID: window, Title: "Vellum Notes", Width: 1100, Height: 740, View: m.View, Chrome: app.WindowChrome{Style: app.ChromeStandard, Appearance: app.AppearanceLight}, CloseRequest: func() bool {
 		if files == nil {
 			return false
 		}
