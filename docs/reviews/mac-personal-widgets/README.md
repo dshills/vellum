@@ -1498,3 +1498,11 @@ Prism: `mac-native-panel-restoration.json` (Anthropic Claude Sonnet 5.5, complet
 Native call-stack control identified NSColorPanel restoreWindowWithIdentifier during GLFW startup before user chooser. Gallery fresh-session override is process-local and preserves toolbar persistent preferences; owned chooser panels are non-restorable. Prism fixture finding is not actionable: no persistent defaults write occurs, the assertion requires an empty persistent domain, and the uniquely named object holds only volatile argument state. No persistent domain is created to remove. Diagnostic tracing code was removed before review.
 
 Focused checks: `mac-native-panel-restoration-checks.json`.
+
+## Isolate gallery restoration before GLFW dependency initialization
+
+Prism: `mac-native-panel-bootstrap.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Confirmed upstream desktop dependency initializes GLFW before Go main. Native constructor applies process-local fresh-session policy only for the two packaged widget bundle IDs. Prism build finding is not applicable: both cgo fixture declaration and its sole test caller have darwin && cgo constraints; rg confirms no configureMacWidgetRestoration references remain. No non-Darwin callers need a stub.
+
+Focused checks: `mac-native-panel-bootstrap-checks.json`.

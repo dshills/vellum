@@ -218,9 +218,6 @@ func main() {
 	macDark := flag.Bool("mac-dark", darkDefault, "use the dark Mac appearance with mac-widgets")
 	nativeTitlebar := flag.Bool("native-titlebar", widgetDefault, "attach the single-window native AppKit toolbar prototype (mac-widgets only)")
 	flag.Parse()
-	if *macWidgets {
-		configureMacWidgetRestoration()
-	}
 	if *nativeTitlebar && !*macWidgets {
 		must(errors.New("native-titlebar requires mac-widgets"))
 	}

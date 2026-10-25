@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "57cc902443aa34648c6724646e8059c0",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "297f29c9d8b7fce0275f182850b37f6073c89312",
+    "branch": "codex/mac-document-controls"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "8fc9a8d614ab1499",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Removing the non-darwin stub file may break builds",
+      "message": "The deleted mac_restoration_other.go defined configureMacWidgetRestoration for non-darwin or non-cgo builds, and the darwin Go version was removed too. If the remaining mac_restoration_darwin.go has no `!cgo` constraint, a darwin build with CGO disabled would fail on the cgo import. Any other caller of configureMacWidgetRestoration would also fail to compile. The fixture function now exists only in the darwin file, so non-darwin builds may lack galleryRestorationFixture unless it is defined elsewhere.",
+      "suggestion": "Confirm no remaining references to configureMacWidgetRestoration. Ensure a non-darwin/non-cgo stub of galleryRestorationFixture still exists, since the deleted _other.go file provided the fallback stubs.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_restoration_darwin.go",
+          "lines": {
+            "start": 11,
+            "end": 11
+          }
+        }
+      ],
+      "tags": [
+        "build",
+        "cgo",
+        "location-corrected"
+      ],
+      "evidence": "func galleryRestorationFixture() bool { return C.vellumGalleryRestorationFixture() != 0 }",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4162,
+    "totalMs": 4170
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 4875,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 4564,
+        "output": 440,
+        "costUSD": 0.013528
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
