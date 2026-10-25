@@ -63,7 +63,7 @@ func choiceKey(r *record, id string, button *core.Switch, e events.Event) {
 	if e.IsHandled() || !choiceLive(r, id, button) {
 		return
 	}
-	if e.KeyCode() == key.CodeSpacebar && e.Modifiers() & ^((1<<key.CapsLock)|(1<<key.NumLock)) == 0 && ((r.node.DocumentList != nil && r.node.DocumentList.Preview != nil) || (r.node.Outline != nil && r.node.Outline.Preview != nil)) {
+	if (e.KeyCode() == key.CodeSpacebar || e.KeyCode() == key.CodeUnknown && e.KeyRune() == ' ') && e.Modifiers() & ^((1<<key.CapsLock)|(1<<key.NumLock)) == 0 && ((r.node.DocumentList != nil && r.node.DocumentList.Preview != nil) || (r.node.Outline != nil && r.node.Outline.Preview != nil)) {
 		e.SetHandled()
 		guard := listBoxActionGuard(r, id, button)
 		doc, outline := r.node.DocumentList, r.node.Outline
@@ -76,6 +76,7 @@ func choiceKey(r *record, id string, button *core.Switch, e events.Event) {
 			} else if outline != nil && outline.SameSource(r.node.Outline) && r.node.Outline.Preview != nil {
 				r.node.Outline.Preview(ui.OutlineEvent{ID: r.node.ID, ItemID: id})
 			}
+			requestControlRestore(r)
 		})
 		return
 	}

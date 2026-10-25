@@ -1578,3 +1578,11 @@ Prism: `preview-live-fix-final.json` (Anthropic Claude Sonnet 5.5, complete cove
 The first Prism reentrancy concern was addressed by deferring lost-controller cancellation until the main-queue controller transition completes. The follow-up speculation is not actionable: the deferred block checks finished before accessing ownership, same-turn hand-back is explicitly excluded by currentController == self, and finish sets finished before cleanup can updateController. An unfinished session cannot be replaced because singleton admission refuses while vellumPreviewSession exists. Lost control intentionally returns ErrCanceled under the documented cancellation contract, rather than a new public status. Focused race tests and native compilation passed; physical checks follow separately.
 
 Focused checks: `preview-live-fix-checks.json`, `preview-live-fix-final-checks.json`.
+
+## Complete native Quick Look dismissal focus and printable Space routing
+
+Prism: `preview-native-completion.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism completed coverage with no retained actionable findings. Native text/PNG preview rendering, navigation, closing and physical focused Find Escape were observed in the private diagnostic. The final additional regression reproduces Cogent character-space input and busy-state refresh; it passes alongside physical-code routing, document/outline and native-panel checks. OS-owned Quick Look geometry replaces the invisible child-window presentation; a hidden AppKit dismissal succeeds and parent focus restoration is conditional on preview ownership. Unrelated generic list behavior is unchanged. Final clean packaged-app checks are recorded separately.
+
+Focused checks: `preview-native-completion-checks.json`, `preview-native-completion-regression-checks.json`, `preview-native-final-routing-checks.json`.

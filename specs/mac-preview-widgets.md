@@ -49,7 +49,19 @@ on loss/removal/disable/shutdown. No new renderer or application history ownersh
 ### Native verification follow-up
 
 Quick Look requires a visible main/key parent in the active application. The
-shared panel acquires its responder controller before presentation and owns its
+shared panel acquires its responder controller during presentation and owns its
 geometry; it is not reparented as a child window. Relinquishing preview control
 terminates the session. Find Escape is a window shortcut while the Find page and
 bar are active, so a focused native field cannot swallow it as its Abort key.
+
+Normal AppKit dismissal of an invisible preview completes successfully. Losing
+control while still visible cancels. Cleanup restores the exact parent as key
+only when the preview owned focus in the active application; it never steals
+focus from another application or window. Space preview also requests a managed
+control refresh, as Return activation does.
+
+Printable native Space arrives as a character chord with an unknown physical
+code in Cogent. Preview routing accepts that plain-space representation as well
+as the explicit Spacebar code, masks lock modifiers, and consumes it without a
+selection toggle or Return activation. Both representations have regression
+coverage, including immediate busy-state publication.

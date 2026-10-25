@@ -95,6 +95,8 @@ physical pointer/shortcut checks are recorded separately with the packaged build
 Quick Look installs a temporary responder after the exact parent, retains and
 restores the prior responder, and yields control before releasing references.
 Windowed close and fullscreen exit both use the same cleanup path. Loss of
-preview control cancels and releases the session. `VELLUM_QUICK_LOOK_TRACE=1`
+preview control while still visible cancels and releases the session; an
+AppKit-dismissed hidden panel completes normally. Cleanup restores keyboard
+focus to the exact parent if the preview owned it in the active application. `VELLUM_QUICK_LOOK_TRACE=1`
 adds lifecycle phase and visibility/key/controller booleans to stderr for local
 diagnostics; it does not log file names or paths.

@@ -105,7 +105,7 @@ char *vellumQuickLookRecipeFixture(const char *json) {
     // updateController. A same-turn hand-back to us keeps the session alive.
     dispatch_async(dispatch_get_main_queue(), ^{
       if (!self.finished && panel.currentController != self)
-        [self finish:1];
+        [self finish:panel.isVisible ? 1 : 0];
     });
   }
 }
@@ -149,6 +149,8 @@ char *vellumQuickLookRecipeFixture(const char *json) {
     result = 2;
   } @
   try {
+    BOOL restoreFocus =
+        NSApp.isActive && (!NSApp.keyWindow || NSApp.keyWindow == self.panel);
     if (self.parent.nextResponder == self)
       self.parent.nextResponder = self.savedNext;
     self.nextResponder = nil;
@@ -156,6 +158,11 @@ char *vellumQuickLookRecipeFixture(const char *json) {
       [self.panel exitFullScreenModeWithOptions:nil];
     [self.panel orderOut:nil];
     [self.panel updateController];
+    // Return keyboard input to the exact parent only when this preview owned
+    // focus. Never steal it from another key window or another application.
+    if (restoreFocus && self.parent.isVisible && !self.parent.isMiniaturized &&
+        (!NSApp.keyWindow || NSApp.keyWindow == self.panel))
+      [self.parent makeKeyAndOrderFront:nil];
   } @catch (NSException *e) {
     result = 2;
   }
@@ -249,16 +256,15 @@ void vellumQuickLook(uint64_t token, uint64_t parentToken, const char *json) {
             [session finish:1];
             return;
           }
-          // Install the controller before asking Quick Look to show its
-          // content. Let QLPreviewPanel own its geometry and animation instead
-          // of imposing an AppKit child-window frame on its shared panel.
+          // AppKit searches the responder chain once the shared panel is
+          // visible. Keep its presentation geometry and animation OS-owned.
+          vellumQuickLookTrace(@"before-show", panel);
+          [panel makeKeyAndOrderFront:nil];
           [panel updateController];
           if (panel.currentController != session) {
             [session finish:5];
             return;
           }
-          vellumQuickLookTrace(@"before-show", panel);
-          [panel makeKeyAndOrderFront:nil];
           vellumQuickLookTrace(@"after-show", panel);
         } @catch (NSException *e) {
           if (vellumPreviewSession && vellumPreviewSession.token == token)
