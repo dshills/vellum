@@ -59,3 +59,18 @@ func TestPublicGradientWellContract(t *testing.T) {
 		t.Fatal(e)
 	}
 }
+
+func TestPublicRangeSliderContract(t *testing.T) {
+	r := &ui.RangeSlider{ID: "range", Label: "Range", Numeric: ui.Numeric{Min: 0, Max: 100, Step: 1}, Value: ui.RangeValue{Lower: 10, Upper: 90}, TickCount: 5}
+	r.Change = func(e ui.RangeEvent) {
+		v, err := e.Apply(r.Value, r.Numeric)
+		if err != nil {
+			t.Error(err)
+		} else {
+			r.Value = v
+		}
+	}
+	if _, e := r.View(); e != nil {
+		t.Fatal(e)
+	}
+}

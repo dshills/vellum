@@ -66,3 +66,18 @@ Accept through a reserved completion; reopen/disable/removal revokes that result
 The gallery uses actual AppKit Colors without editing any document. Values are
 live proposals; history and persistence stay application-owned. No perceptual
 color-space interpolation, radial gradients or imported gradient-file format.
+
+## Range slider
+
+Retain `ui.RangeSlider` with Value{Lower, Upper}, Numeric bounds/Step, optional
+IconImage, Small, Width and TickCount (0 or 2–21). Accept Change with
+`Value, err = event.Apply(Value, Numeric)`; endpoint proposals merge with current
+state, snap relative to Min and clamp at the other handle. Equal values are valid.
+The shared track captures a pointer, converts actual painted bounds under DPI and
+scrolling, consumes release, and cancels on loss/disable/source or geometry changes.
+Live proposals do not create undo transactions. Caller rejection restores accepted
+values. Up/Down selects one endpoint, Left/Right changes one step (Shift ten),
+Home/End requests its limits. When thumbs overlap, use Up/Down or numeric fields
+to choose the endpoint. The track exposes the active handle as an accessible slider;
+the two labeled numeric fields expose each endpoint independently. Default regular
+track is 320×40pt and small 240×32pt; Width may be 200–600pt. Horizontal only.

@@ -16,6 +16,7 @@ type TrackHandle struct {
 	Color     color.NRGBA
 }
 type TrackInput struct {
+	Ticks                         int
 	Current                       func() string
 	source                        trackOrigin
 	epoch                         uint64
@@ -32,7 +33,7 @@ func (t *TrackInput) SameSource(other *TrackInput) bool {
 	if t == nil || other == nil {
 		return t == other
 	}
-	if t.source == nil || t.source != other.source || t.epoch != other.epoch || t.ID != other.ID || len(t.Handles) != len(other.Handles) {
+	if t.source == nil || t.source != other.source || t.epoch != other.epoch || t.ID != other.ID || t.Min != other.Min || t.Max != other.Max || t.Step != other.Step || t.Width != other.Width || t.Height != other.Height || len(t.Handles) != len(other.Handles) {
 		return false
 	}
 	for _, h := range t.Handles {
@@ -77,7 +78,7 @@ func validateTrack(n Node) error {
 	if t == nil {
 		return nil
 	}
-	if n.Kind != Button || n.ID != t.ID || n.AngleDial != nil || n.ColumnResize != nil || n.PlacementSource != nil || n.ShortcutRecorder != nil || t.source == nil || t.Set == nil || t.Adjust == nil || t.Select == nil || t.Current == nil || len(t.Handles) < 2 || len(t.Handles) > 16 || t.Width < 200 || t.Width > 600 || t.Height < 24 || t.Height > 64 || !finite(t.Width) || !finite(t.Height) || !finite(t.Min) || !finite(t.Max) || !finite(t.Step) || t.Min >= t.Max || t.Step <= 0 || t.Step > t.Max-t.Min || !finite(t.ActiveValue()) || n.Number != t.ActiveValue() {
+	if n.Kind != Button || n.ID != t.ID || n.AngleDial != nil || n.ColumnResize != nil || n.PlacementSource != nil || n.ShortcutRecorder != nil || t.source == nil || t.Set == nil || t.Adjust == nil || t.Select == nil || t.Current == nil || len(t.Handles) < 2 || len(t.Handles) > 16 || t.Width < 200 || t.Width > 600 || t.Ticks < 0 || t.Ticks == 1 || t.Ticks > 21 || t.Height < 24 || t.Height > 64 || !finite(t.Width) || !finite(t.Height) || !finite(t.Min) || !finite(t.Max) || !finite(t.Step) || t.Min >= t.Max || t.Step <= 0 || t.Step > t.Max-t.Min || !finite(t.ActiveValue()) || n.Number != t.ActiveValue() {
 		return fmt.Errorf("ui: invalid generated scalar track")
 	}
 	found := false

@@ -1554,3 +1554,11 @@ Prism: `preview-gradient.json` (Anthropic Claude Sonnet 5.5, complete coverage).
 Public typed gradient edits, cached full-color/checkerboard previews, anchored scrolling editor, shared captured scalar track, native color acceptance and independent SDK consumption. DPI160/320 pointer/release/loss/disable regressions pass. Prism: explicit finite/range validation for added stops added; stable equal-position prior order documented/tested. Busy-after-Publish finding is lifecycle-expected: completion fails when exact parent retires, so no live widget remains to reset; writing owner state from a worker would introduce a race. WindowRef.Context and copied request color are worker-safe. Native physical checks scheduled for final package.
 
 Focused checks: `preview-gradient-guards-checks.json`, `preview-gradient-reviewed-checks.json`.
+
+## Add a two-handle Mac range slider with shared capture and numeric input
+
+Prism: `preview-range.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+No actionable Prism findings: the reported pointer composite literal and macRangeGallery field usage are valid Go and compile/test successfully. Both endpoint routes, scale160/320, final-release coordinate, release deduplication, capture loss, keyboard and AX decrement pass. Public tests cover finite bounds, step snapping, endpoint crossing clamp, equal values, current-handle queued proposals and disabled-epoch revocation. SDK contract consumes the widget independently. Horizontal regular/small track and full-color gallery artwork; no history or renderer ownership added.
+
+Focused checks: `preview-range-checks.json`.

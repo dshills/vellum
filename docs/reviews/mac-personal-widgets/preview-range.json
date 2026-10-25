@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "2eb3cc0a874acaa587d37ca0d1982038",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "6df3734fb79181858939fe0f7d6683e14e2598a2",
+    "branch": "codex/mac-preview-controls"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "5dd26198d45e9ee9",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible type mismatch for ranges field",
+      "message": "The gallery state is stored in `m.ranges`, but that field is declared as `*macRangeGallery`. The code checks `m.ranges == nil`, then builds `p := \u0026macRangeGallery{...}`. However, the type of `m.ranges` in the diff is not `[]*ui.RangeSlider`, which is what the first line of the function body needs. Later, `for _, r := range p.ranges` uses `p`, which is correct. The `m.ranges == nil` check and the assignment are consistent with the struct field, so the compile problem is limited to the composite literal `[]*ui.RangeSlider{{ID: ...}}`. That literal is valid for pointer elements, so this finding has low confidence.",
+      "suggestion": "Confirm that the package builds, and that the `ranges` field type matches the way it is used.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_range.go",
+          "lines": {
+            "start": 33,
+            "end": 33
+          }
+        }
+      ],
+      "tags": [
+        "compile",
+        "location-corrected"
+      ],
+      "evidence": "m.ranges = p",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4934,
+    "totalMs": 4957
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 11,
+    "bytes": 31144,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 17610,
+        "output": 398,
+        "costUSD": 0.0392
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

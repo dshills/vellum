@@ -237,3 +237,5 @@ popover behavior. Dial proposals are continuous; application history is caller-o
 - **Search scope bar** (Components): type part of a filename, switch All Documents/Current Project/Selected Files and compare result counts. Archive is disabled. Small controls compares sizes. Arrow keys move scope focus and Return selects. All data is in memory.
 
 - **Gradient well** (Components): open Drawing gradient, drag color stops, edit position/angle/RGBA, add/remove stops and compare Small track. Up/Down chooses a stop; Left/Right adjusts. Show macOS Colors closes the inline editor and accepts its result for the selected stop.
+
+- **Range slider** (Components): drag Distance and Temperature endpoints, use Up/Down to select a handle then Left/Right (Shift ten), or edit labeled values. Equal endpoints are allowed; they cannot cross. Reject changes and Disable ranges demonstrate controlled state.

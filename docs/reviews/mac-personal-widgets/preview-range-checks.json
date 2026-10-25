@@ -1,0 +1,43 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 2.7167224171571434
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "./cmd/gallery",
+      "-run",
+      "TestRangeTrack|TestGradientTrack|TestQuickLook|TestMacFind|TestGallerySearchScopes",
+      "-count=1",
+      "-timeout",
+      "90s"
+    ],
+    "exit_code": 0,
+    "seconds": 27.014835624955595
+  },
+  {
+    "cwd": "examples/sdk-contract",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 2.004232499981299
+  }
+]

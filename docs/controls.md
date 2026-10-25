@@ -10,6 +10,7 @@ renders these elements and publishes their supported accessibility semantics.
 | Label | `ui.Label` | `Text` |
 | Action button | `ui.Button` | `Text`, `Activate` |
 | Bundled icon | `ui.Icon` | `Icon`, optional alternate `Text`/accessible name |
+| Range slider | `ui.RangeSlider.View()` | Two handles, ordered endpoints, ticks, numeric/keyboard/AX |
 | Gradient well/editor | `ui.GradientWell.View()` | Stable color stops, drag positions, RGBA/angle, native Colors option |
 | Search scope bar | `ui.SearchScopeBar.View()` | Controlled scope/query, counts, full-color artwork |
 | Find / Replace bar | `ui.FindBar.View()` | Unicode matches, journaled replacement, compact/regular |

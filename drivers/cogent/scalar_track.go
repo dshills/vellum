@@ -80,6 +80,17 @@ func bindScalarTrack(r *record, b *core.Button) {
 					pc.Rectangle(inset+t.Handles[0].Position*span, .44, (t.Handles[len(t.Handles)-1].Position-t.Handles[0].Position)*span, .12)
 					pc.Draw()
 				}
+				if t.Ticks > 1 {
+					pc.Fill.Color = nil
+					pc.Stroke.Color = line
+					pc.Stroke.Width.Dp(1)
+					for i := 0; i < t.Ticks; i++ {
+						x := inset + float32(i)/float32(t.Ticks-1)*span
+						pc.Line(x, .78, x, .9)
+						pc.Draw()
+					}
+					pc.Stroke.Color = nil
+				}
 				for _, h := range t.Handles {
 					cx, cy := inset+h.Position*span, float32(.5)
 					if t.Gradient {
@@ -218,5 +229,5 @@ func scalarTrackChanged(a, b *ui.TrackInput) bool {
 	if a == nil || b == nil {
 		return a != b
 	}
-	return !a.SameSource(b) || a.ActiveID != b.ActiveID || a.Min != b.Min || a.Max != b.Max || a.Step != b.Step || a.Width != b.Width || a.Height != b.Height || a.Gradient != b.Gradient || !slices.Equal(a.Handles, b.Handles)
+	return !a.SameSource(b) || a.ActiveID != b.ActiveID || a.Min != b.Min || a.Max != b.Max || a.Step != b.Step || a.Width != b.Width || a.Height != b.Height || a.Gradient != b.Gradient || a.Ticks != b.Ticks || !slices.Equal(a.Handles, b.Handles)
 }
