@@ -1482,3 +1482,11 @@ Prism: `mac-native-panel-placement.json` (Anthropic Claude Sonnet 5.5, complete 
 Live candidate check confirmed actual Colors presentation, coalesced opacity preview (alpha128 while accepted well stayed255), and clean quit with that uncommitted session open. It also exposed the shared panel opening on a different monitor. Both native panels now center on the exact parent and clamp against its visible display in Cocoa coordinates. Prism oversize concern is handled explicitly: preserve AppKit minimum sizes and anchor the top-left/titlebar when a display is smaller; this is documented and covered by an added fixture. Offset/negative origins, edge clamps, oversize and all native session protocol tests pass offscreen. No activation, lifecycle, renderer or release-gate policy changed.
 
 Focused checks: `mac-native-panel-placement-checks.json`, `mac-native-panel-placement-final-checks.json`.
+
+## Adopt newly created native panels before checking saved visibility
+
+Prism: `mac-native-panel-admission-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Live first-open failure fixed by distinguishing preexisting panels from AppKit auto-shown first creation. Admission truth table retains foreign-panel and visible-owned refusal. Prism failure-path finding is addressed by createdPanel orderOut before registration and existing finish/cleanup after registration; ownership intentionally remains true for reuse of a panel created by this adapter. Cleanup failures retain bounded registration for shutdown retry. Resetting ownership would incorrectly strand an adapter-created shared singleton as foreign.
+
+Focused checks: `mac-native-panel-admission-checks.json`.

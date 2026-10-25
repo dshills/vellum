@@ -6,6 +6,7 @@ package cogent
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+int vellumDocumentPanelAdmissionFixture(int existed,int owned,int visible);
 void vellumChooseDocumentPanel(uint64_t token,uint64_t parent,const char *json);
 void vellumCancelDocumentPanel(uint64_t token);
 char *vellumDocumentPanelRecipeFixture(const char *json);
@@ -153,4 +154,14 @@ func nativeDocumentPanelPositionFixture(parent, visible [4]float64, size [2]floa
 		return float64(C.vellumDocumentPanelPositionFixture(axis, C.double(parent[0]), C.double(parent[1]), C.double(parent[2]), C.double(parent[3]), C.double(visible[0]), C.double(visible[1]), C.double(visible[2]), C.double(visible[3]), C.double(size[0]), C.double(size[1])))
 	}
 	return point(0), point(1)
+}
+
+func nativeDocumentPanelAdmissionFixture(existed, owned, visible bool) bool {
+	b := func(v bool) C.int {
+		if v {
+			return 1
+		}
+		return 0
+	}
+	return C.vellumDocumentPanelAdmissionFixture(b(existed), b(owned), b(visible)) != 0
 }

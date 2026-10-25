@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "5a064d092caf34f999da638c3509a8e4",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "df5b6648e709481f483beff84877078ca894d833",
+    "branch": "codex/mac-document-controls"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "1183e4b013e6a866",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Ownership flag set before setup can fail; flag not reset on exception",
+      "message": "A newly created panel can be shown by AppKit from remembered visibility. The cleanup orderOut for createdPanel only runs in the exception path when no session exists. The early returns for a rejected recipe do not apply, but the later failure paths (a session exception, or finish) rely on the session cleanup to hide the panel. If the session was created and ownership flags were set, a failure before the panel is configured leaves an owned, visible panel. The ownership flag is also set before the session is registered, so an exception in between leaks ownership.",
+      "suggestion": "Set vellumOwnsFontPanel/vellumOwnsColorPanel only after the session is registered, or reset it in the catch path together with the orderOut for createdPanel.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/document_panels_darwin.m",
+          "lines": {
+            "start": 99,
+            "end": 99
+          }
+        }
+      ],
+      "tags": [
+        "resource-leak",
+        "error-handling"
+      ],
+      "evidence": "if(!vellumServiceActive(token)){[session finish:1];return;}[parent addChildWindow:panel ordered:NSWindowAbove];[panel makeKeyAndOrderFront:nil];",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4293,
+    "totalMs": 4302
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 10348,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 7156,
+        "output": 439,
+        "costUSD": 0.018702
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

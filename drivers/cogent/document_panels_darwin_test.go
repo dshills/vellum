@@ -124,3 +124,15 @@ func TestNativeDocumentPanelPositionUsesParentDisplay(t *testing.T) {
 		}
 	}
 }
+
+func TestNativeDocumentPanelNewRestoredVisibilityAdmission(t *testing.T) {
+	for _, tc := range []struct{ existed, owned, visible, want bool }{
+		{false, false, false, true}, {false, false, true, true},
+		{true, false, false, false}, {true, false, true, false},
+		{true, true, false, true}, {true, true, true, false},
+	} {
+		if got := nativeDocumentPanelAdmissionFixture(tc.existed, tc.owned, tc.visible); got != tc.want {
+			t.Fatalf("admission %+v got %v", tc, got)
+		}
+	}
+}

@@ -97,3 +97,5 @@ last step. Return/Space and accessibility Increment advance; Decrement and Set a
 available through the slider accessibility role. The accompanying numeric field
 shares normalization (360 wraps to zero). Proposals are live; applications own
 undo transactions and acceptance/rejection. The gallery shows 64/96/128pt variants.
+
+AppKit can show a newly created shared panel using remembered visibility. The adapter takes ownership during that first creation; already existing foreign panels and visible owned panels remain refused.
