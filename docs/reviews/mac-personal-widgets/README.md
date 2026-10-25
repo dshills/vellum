@@ -1690,3 +1690,11 @@ Prism: `mac-stabilization-notes-launch.json` (Anthropic Claude Sonnet 5.5, compl
 A bounded packaged-executable diagnostic exposed ui.Validate refusing duplicate notes-file-save identities between toolbar and closed dialog. Decision buttons now have a separate notes-decision namespace. The regression validates complete attached trees in closed/open/close/recovery states; all Notes race/vet checks pass. Prism complete with no findings. No storage/history/framework behavior changed; rebuilt package and native checks follow.
 
 Focused checks: `mac-stabilization-notes-launch-checks.json`.
+
+## Clear obsolete recovery when Undo Redo returns to a saved revision
+
+Prism: `mac-stabilization-notes-clean-recovery.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Native checks verified exact Unicode main bytes and saved revision replay, then exposed an obsolete recovery snapshot after Undo checkpoint followed by clean Redo. The periodic owner now clears acknowledged dirty recovery when it sees a clean revision. Focused save/Undo/checkpoint/Redo/checkpoint regression passes under race/vet. Prism completed coverage with no findings. Interrupted-session native restore/save and normal close also succeeded on build2. Rebuild final package with this small app-only correction; no framework or gate changes.
+
+Focused checks: `mac-stabilization-notes-clean-recovery-checks.json`.

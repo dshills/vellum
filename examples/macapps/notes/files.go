@@ -196,7 +196,17 @@ func (f *Files) recovered(r document.Result) {
 // Checkpoint captures committed model data; it never settles or commits native
 // marked text. The next interval retries a busy/composing/failed capture.
 func (f *Files) Checkpoint() {
-	if f.blocked() || f.model.pending || !f.model.History().Dirty || f.lastRecovery == f.model.History().Revision {
+	if f.blocked() || f.model.pending {
+		return
+	}
+	if !f.model.History().Dirty {
+		if f.lastRecovery != 0 {
+			f.clear = true
+			f.startRecovery()
+		}
+		return
+	}
+	if f.lastRecovery == f.model.History().Revision {
 		return
 	}
 	if err := f.model.ready(); err != nil {

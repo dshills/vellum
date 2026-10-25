@@ -568,3 +568,36 @@ func TestAttachedNotesTreeHasUniqueIDsWithEveryFileDialog(t *testing.T) {
 		x.f.prompt = ""
 	})
 }
+
+func TestRedoToSavedRevisionClearsEarlierDirtyRecovery(t *testing.T) {
+	x := filesFixture(t, privateDirectory(t))
+	x.owner(t, func() {
+		_ = x.m.Update(x.m.Selected(), "Saved", "saved body")
+		if err := x.f.Save(false); err != nil {
+			t.Fatal(err)
+		}
+	})
+	x.finish(t)
+	x.owner(t, func() {
+		if err := x.m.Undo(); err != nil {
+			t.Fatal(err)
+		}
+		x.f.Checkpoint()
+	})
+	x.finish(t)
+	x.owner(t, func() {
+		if err := x.m.Redo(); err != nil || x.m.History().Dirty {
+			t.Fatal("redo saved state", err)
+		}
+		x.f.Checkpoint()
+	})
+	x.finish(t)
+	data, err := os.ReadFile(x.r.RecoveryPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := decodeRecovery(data)
+	if err != nil || r.Notebook != nil {
+		t.Fatal("clean redo retained obsolete recovery", err)
+	}
+}

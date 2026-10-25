@@ -1,0 +1,34 @@
+[
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "gofmt",
+      "-w",
+      "notes/files.go",
+      "notes/files_test.go"
+    ],
+    "exit_code": 0,
+    "seconds": 0.005180375184863806
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./notes"
+    ],
+    "exit_code": 0,
+    "seconds": 1.978035458130762
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "vet",
+      "./notes"
+    ],
+    "exit_code": 0,
+    "seconds": 0.11834545922465622
+  }
+]
