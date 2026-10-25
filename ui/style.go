@@ -177,9 +177,10 @@ func (s Style) Overlay(o Style) Style {
 // No process-wide palette, font, or operating-system appearance is changed.
 type Theme struct {
 	// ReducedMotion disables decorative managed transitions without disabling input.
-	ReducedMotion bool
+	// Its zero value is omitted to preserve existing serialized theme fingerprints.
+	ReducedMotion bool `json:",omitempty"`
 
-	Palette Optional[Palette]
+	Palette Optional[Palette] `json:",omitzero"`
 	Default Style
 	Kinds   map[Kind]Style
 }

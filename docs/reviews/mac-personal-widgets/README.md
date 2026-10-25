@@ -1674,3 +1674,11 @@ Prism: `mac-stabilization-notes-checkpoint.json` (Anthropic Claude Sonnet 5.5, c
 Prism reviewed the complete app-only implementation. Concrete feedback fixed: batch command registration preflight before model attachment, exact owner/window admission, cloned recovery offer, pending-action guard, explicit recovery-prompt close, bounded scheduler/worker retirement and readable data-dir errors. Tests prove saved data/error feedback on recovery-marker failure, safe retry, Unicode identity/CRLF, atomic saves, stale results, native settlement deduplication, prior-history clearing on restore, composition refusal, concurrent directory exclusion and canceled workers. Final queue-full comment is not lost-data advancement: the bounded owner post is retried every interval and lastRecovery advances only after an acknowledged snapshot; delayed recovery is explicitly documented. Private directories are refused if permissions are broad, not silently chmodded; user-selected SaveAs destinations intentionally use normal document semantics and are documented. Framework APIs/features/backend policy are unchanged. Physical/native package checks follow; no human IME/VoiceOver claim.
 
 Focused checks: `mac-stabilization-notes-acceptance-checks.json`, `mac-stabilization-notes-guards-checks.json`, `mac-stabilization-notes-attachment-checks.json`, `mac-stabilization-notes-shutdown-checks.json`.
+
+## Preserve frozen replay fingerprints for unused theme options
+
+Prism: `mac-stabilization-ci-theme-identity.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Concrete macOS CI failures were immutable replay manifest identity mismatches. Unset palette and false motion metadata are omitted; explicit palette (including zero) and active reduced motion remain serialized and distinct. Exact original native record authoring/replay and both workspace row counts across all batch sizes pass without regenerating or weakening records/goldens. Root race/vet pass. Prism complete; its conditional Go-version concern does not apply: root go.mod requires Go1.25.6 and Optional omitzero has already been used by Style since 93b4730. This is serialization compatibility, with no rendering/feature/gate change.
+
+Focused checks: `mac-stabilization-ci-replay-final-checks.json`.

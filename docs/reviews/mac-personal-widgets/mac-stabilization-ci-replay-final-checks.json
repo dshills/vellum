@@ -1,0 +1,64 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "gofmt",
+      "-w",
+      "ui/style.go",
+      "ui/theme_compatibility_test.go"
+    ],
+    "exit_code": 0,
+    "seconds": 0.004022875102236867
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 3.3652268750593066
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.5473152499180287
+  },
+  {
+    "cwd": "examples/replay",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestActualNativeRecordReplaysAcrossEventBatches|TestBundledNativeRecordMatchesAuthoringFixture",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 15.896188374841586
+  },
+  {
+    "cwd": "examples/replay",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestFrozenWorkspaceRecordsAcrossBatches",
+      "./workspace"
+    ],
+    "exit_code": 0,
+    "seconds": 142.6579494168982
+  }
+]
