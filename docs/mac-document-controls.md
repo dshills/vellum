@@ -103,3 +103,5 @@ AppKit can show a newly created shared panel using remembered visibility. The ad
 The widget gallery starts a fresh Cocoa window session using a process-local argument-domain override. It does not erase saved application state or preferences; toolbar customization still uses its own persistence. Cocoa cannot reconstruct an asynchronous chooser's worker, so adapter-owned panels are non-restorable. Apps using the services retain their own window-restoration policy.
 
 Packaged-gallery restoration isolation runs in its native bootstrap before Cogent initializes GLFW in a Go dependency initializer. It is limited to the two widget-demo bundle identifiers.
+
+The Fonts panel reloads its default family list on first creation only. Reusing the existing AppKit panel preserves its internal table views; repeated native reloads caused a macOS 26 deallocated-table crash during reopen checks.

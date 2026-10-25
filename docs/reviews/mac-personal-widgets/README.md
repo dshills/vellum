@@ -1506,3 +1506,11 @@ Prism: `mac-native-panel-bootstrap.json` (Anthropic Claude Sonnet 5.5, complete 
 Confirmed upstream desktop dependency initializes GLFW before Go main. Native constructor applies process-local fresh-session policy only for the two packaged widget bundle IDs. Prism build finding is not applicable: both cgo fixture declaration and its sole test caller have darwin && cgo constraints; rg confirms no configureMacWidgetRestoration references remain. No non-Darwin callers need a stub.
 
 Focused checks: `mac-native-panel-bootstrap-checks.json`.
+
+## Keep AppKit font tables intact when reopening the chooser
+
+Prism: `mac-native-font-reopen.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+No Prism findings. Live no-zombie candidate passed open/Cancel/reopen, a second acceptance and third reopen; native family selection ArialMT and physical 24-point preset previewed while accepted picker remained Helvetica Neue 18, then physical Use Font accepted Arial 24 with exactly one action increment. Native crash reproduced before fix with NSZombie identifying NSFontPanelTableView reloadData after deallocation. Reuse avoids the redundant table rebuild, and confirmation title is now Use Font.
+
+Focused checks: `mac-native-font-reopen-checks.json`.

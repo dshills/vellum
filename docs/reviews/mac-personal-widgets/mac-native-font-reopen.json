@@ -1,0 +1,113 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "98ef022b0a503019446f933f75ab4176",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "06016f3f5b282315d1ff89e42a2182bd1e37a50f",
+    "branch": "codex/mac-document-controls"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6386,
+    "totalMs": 6399
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 2,
+    "bytes": 12135,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 7527,
+        "output": 796,
+        "costUSD": 0.023014
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "620a73779251580b",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Undefined helper / ordering dependency for apply title",
+        "message": "vellumPanelApplyTitle is called but not defined in the visible diff, and session.kind is set in a redacted line before this call. If the helper is not declared earlier in the file, the build fails. Also the session.kind must be set before vellumPanelActions is called, otherwise the title will be wrong or nil.",
+        "suggestion": "Verify vellumPanelApplyTitle is declared before use and handles nil kind with a default title; ensure session.kind is assigned before calling vellumPanelActions.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "drivers/cogent/document_panels_darwin.m",
+            "lines": {
+              "start": 58,
+              "end": 58
+            }
+          }
+        ],
+        "tags": [
+          "correctness"
+        ],
+        "evidence": "NSButton *apply=[NSButton buttonWithTitle:vellumPanelApplyTitle(session.kind) target:session action:@selector(apply:)];",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/document_panels_darwin.m"
+    },
+    {
+      "finding": {
+        "id": "84370e55ffd37969",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Inline comment and reload condition based on `existed`",
+        "message": "The `//` comment is placed mid-line on the same line as the `if(fontMode){...}` code. Because the whole file uses minified single-line statements, the comment may swallow subsequent code on that physical line. Here the comment starts after `enabled=YES;` and the next statement is on a new line, so it compiles, but it is fragile. More importantly, the reload now only happens when the panel did not exist before this call. If the first font session ran and the panel was later reused, the family list is never refreshed, which the docs claim is acceptable but could leave stale collections.",
+        "suggestion": "Move the comment to its own line above the `if(fontMode)` statement, and consider tracking a static flag for 'reloaded once' rather than relying on `existed`, since `existed` is true when another owner created the panel earlier and never reloaded it.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "drivers/cogent/document_panels_darwin.m",
+            "lines": {
+              "start": 81,
+              "end": 82
+            }
+          }
+        ],
+        "tags": [
+          "maintainability",
+          "correctness"
+        ],
+        "evidence": "// Rebuilding the shared panel on every reuse invalidates AppKit table views on macOS 26.\n+ if(!existed)[(NSFontPanel *)panel reloadDefaultFontFamilies];}",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/document_panels_darwin.m"
+    }
+  ],
+  "suppressed": []
+}
