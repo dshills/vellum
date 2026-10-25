@@ -280,10 +280,11 @@ class PreparationChecks(unittest.TestCase):
         core, font = manifest["dependencies"]
         self.assertEqual(core["module"], "cogentcore.org/core")
         numbers = [int(Path(patch["file"]).name[:4]) for stage in core["stages"] for patch in stage["patches"]]
-        self.assertEqual(numbers, list(range(1, 107)))
+        self.assertEqual(numbers, list(range(1, 108)))
         index105 = next(i for i, stage in enumerate(core["stages"]) if any(Path(patch["file"]).name == "0105-acknowledged-skipped-drawable.patch" for patch in stage["patches"]))
         stage105 = core["stages"][index105]
-        self.assertEqual(Path(core["stages"][-1]["patches"][0]["file"]).name, "0106-group-source-detail-storage.patch")
+        self.assertEqual(Path(core["stages"][-2]["patches"][0]["file"]).name, "0106-group-source-detail-storage.patch")
+        self.assertEqual(Path(core["stages"][-1]["patches"][0]["file"]).name, "0107-prose-editor-presentation.patch")
         self.assertEqual(Path(stage105["patches"][0]["file"]).name, "0105-acknowledged-skipped-drawable.patch")
         original = json.loads((ROOT / stage105["inputs"]).read_text())
         result = json.loads((ROOT / stage105["outputs"]).read_text())

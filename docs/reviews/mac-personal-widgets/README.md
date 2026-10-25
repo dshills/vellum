@@ -1730,3 +1730,11 @@ Prism: `mac-stabilization-developer-guide.json` (Anthropic Claude Sonnet 5.5, co
 Prism complete coverage with no findings. Eight local walkthrough links resolve. Guide describes verified public APIs, source-origin and native-linker requirements, owner-side settlement, detached async files/recovery and current private prose snapshot. It does not claim public distribution or human input qualification. The source implementation and independent build are verified in their associated checkpoints.
 
 Focused checks: `notes-prose-acceptance-checks.json`.
+
+## Keep the prose native patch in the pinned contiguous sequence
+
+Prism: `notes-prose-patch-order-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism complete coverage with no findings. Concrete Framework run40211314163 rejected the added patch index. Runtime patch bytes/digest are unchanged; renamed0111 to0107, retained0106 as the exact predecessor and asserted0107 last. All34 preparation tests pass. This corrects packaging metadata only and preserves strict order/hash checks.
+
+Focused checks: `notes-prose-patch-order-final-checks.json`.

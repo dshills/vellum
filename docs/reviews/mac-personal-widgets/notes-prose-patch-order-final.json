@@ -1,0 +1,111 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "afa0364395c4b1b56431d421e8f0e974",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "675ccd0d1ed7e3ea1b9743c90a3f4b9d9d5ab9ac",
+    "branch": "codex/mac-personal-app-stabilization"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6224,
+    "totalMs": 6248
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 17328,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 10684,
+        "output": 712,
+        "costUSD": 0.028488
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "55c68aa9e9bcd7c4",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Early return on same key can leave stale wrap callback",
+        "message": "SetProseWrap returns early when the key equals the stored key. Since the wrap closure captures the text shaper and style, an unchanged key will not reinstall it, so it can go stale. Also, disabling passes an empty key, which matches the initial empty key. If a view was ever initialized with a nil wrap and key \"\", that is fine, but on a resize where width is equal and the shaper was replaced, the callback keeps the old shaper.",
+        "suggestion": "Also compare whether wrap nil-ness changed, and include the shaper identity in the key, or always replace the callback and only relayout when the key changes.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "text/lines/prose_vellum.go",
+            "lines": {
+              "start": 33,
+              "end": 37
+            }
+          }
+        ],
+        "tags": [
+          "state"
+        ],
+        "evidence": "if vw == nil || vw.proseWrapKey == key {\n\t\treturn false\n\t}",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "path not in diff"
+    },
+    {
+      "finding": {
+        "id": "b57cc4be666baefe",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Wrap offsets derived from min over runs may be wrong",
+        "message": "If a wrapped line has no runs (e.g. a whitespace-only line), start defaults to len(txt), which gets filtered out downstream, silently dropping a wrap break. In addition, run.Runes().Start may be relative to the shaped text rather than the source, and this is not verified for bidi (RTL) text, where runs on a line are not in logical order and the min may not be the line start.",
+        "suggestion": "Compute line start from the line's own rune range (e.g. the first logical rune of the line) rather than min over visual runs, and handle empty-run lines explicitly.",
+        "confidence": 0.55,
+        "locations": [
+          {
+            "path": "text/textcore/prose_vellum.go",
+            "lines": {
+              "start": 45,
+              "end": 52
+            }
+          }
+        ],
+        "tags": [
+          "bidi"
+        ],
+        "evidence": "\t\tstart := len(txt)\n\t\t\tfor _, run := range line.Runs {\n\t\t\t\tstart = min(start, run.Runes().Start)\n\t\t\t}",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "path not in diff"
+    }
+  ],
+  "suppressed": []
+}
