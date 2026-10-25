@@ -1,0 +1,194 @@
+{
+  "version": "v1.0.0",
+  "build": "9",
+  "source_commit": "382e0e47e08044f18106b34b35f503a169bbfec0",
+  "sdk_sha256": "680728b78331698e253cb9f59d53557bac1259d7b71071ff903e208d4e254cdc",
+  "native_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "private": true,
+  "notarized": false,
+  "supported_host": {
+    "os": "macOS26.6.2",
+    "build": "25G83",
+    "arch": "arm64"
+  },
+  "api_contract": "specs/stable-api.md",
+  "apps": [
+    {
+      "name": "Vellum Notes",
+      "bundle": "com.dshills.vellum.notes.personal",
+      "zip": "Vellum Notes.zip",
+      "zip_sha256": "c6f6342c73d83d42779801bde7eafe456bbb0287c0bfa1e58f9ff733130f57ae",
+      "binary_sha256": "264934a276839a56cdcb0e9db6408df7d8ffaa890c74486e1a4a367efd052692",
+      "signature_verified": true
+    },
+    {
+      "name": "Vellum Mac Widgets",
+      "bundle": "com.dshills.vellum.widgets.v1",
+      "zip": "Vellum Mac Widgets.zip",
+      "zip_sha256": "c7b04eb762cd3b941bfcf46812274fbfae311f44fd5d9b7f6dfaae225a88d04c",
+      "binary_sha256": "7d3443822eb1e62e68f0b186aa8d7360abf011a9d8ea5279aa0e27b0b8c50122",
+      "signature_verified": true
+    },
+    {
+      "name": "Vellum Mac Shell",
+      "bundle": "com.dshills.vellum.macshell.v1",
+      "zip": "Vellum Mac Shell.zip",
+      "zip_sha256": "2152190bfe1a9af8eaf62c976f279439a25a8ffb762588d2c92d9fd3d5f3d9f3",
+      "binary_sha256": "e97a442ba747a5c1686717923d7ac42c275fa4904db49f1c30d2ce24c225c5c8",
+      "signature_verified": true
+    }
+  ],
+  "module_origins_verified": 9,
+  "checks": [
+    {
+      "name": "sdk-export",
+      "exit_code": 0,
+      "seconds": 4.865146999945864
+    },
+    {
+      "name": "module-origins",
+      "exit_code": 0,
+      "seconds": 0.015016040997579694
+    },
+    {
+      "name": "integrity",
+      "exit_code": 0,
+      "seconds": 1.2557663330808282
+    },
+    {
+      "name": "consumer-race",
+      "exit_code": 0,
+      "seconds": 28.356072958093137
+    },
+    {
+      "name": "consumer-vet",
+      "exit_code": 0,
+      "seconds": 21.89457895886153
+    },
+    {
+      "name": "starter-generate",
+      "exit_code": 0,
+      "seconds": 0.10835345811210573
+    },
+    {
+      "name": "starter-test",
+      "exit_code": 0,
+      "seconds": 2.4951545000076294
+    },
+    {
+      "name": "starter-build",
+      "exit_code": 0,
+      "seconds": 3.829488249961287
+    },
+    {
+      "name": "build-0",
+      "exit_code": 0,
+      "seconds": 3.5774366669356823
+    },
+    {
+      "name": "package-0",
+      "exit_code": 0,
+      "seconds": 0.6214449999388307
+    },
+    {
+      "name": "zip-0",
+      "exit_code": 0,
+      "seconds": 1.288318125065416
+    },
+    {
+      "name": "extract-0",
+      "exit_code": 0,
+      "seconds": 0.18112458405084908
+    },
+    {
+      "name": "signature-0",
+      "exit_code": 0,
+      "seconds": 0.07515716715715826
+    },
+    {
+      "name": "install-0",
+      "exit_code": 0,
+      "seconds": 0.1071797909680754
+    },
+    {
+      "name": "installed-signature-0",
+      "exit_code": 0,
+      "seconds": 0.07458458305336535
+    },
+    {
+      "name": "build-1",
+      "exit_code": 0,
+      "seconds": 4.343698292039335
+    },
+    {
+      "name": "package-1",
+      "exit_code": 0,
+      "seconds": 0.5935909170657396
+    },
+    {
+      "name": "zip-1",
+      "exit_code": 0,
+      "seconds": 1.2902454168070108
+    },
+    {
+      "name": "extract-1",
+      "exit_code": 0,
+      "seconds": 0.17467645788565278
+    },
+    {
+      "name": "signature-1",
+      "exit_code": 0,
+      "seconds": 0.07363674999214709
+    },
+    {
+      "name": "install-1",
+      "exit_code": 0,
+      "seconds": 0.10149895795620978
+    },
+    {
+      "name": "installed-signature-1",
+      "exit_code": 0,
+      "seconds": 0.07345441589131951
+    },
+    {
+      "name": "build-2",
+      "exit_code": 0,
+      "seconds": 3.6624168751295656
+    },
+    {
+      "name": "package-2",
+      "exit_code": 0,
+      "seconds": 0.5986452091019601
+    },
+    {
+      "name": "zip-2",
+      "exit_code": 0,
+      "seconds": 1.2560801671352237
+    },
+    {
+      "name": "extract-2",
+      "exit_code": 0,
+      "seconds": 0.19538704212754965
+    },
+    {
+      "name": "signature-2",
+      "exit_code": 0,
+      "seconds": 0.0721280409488827
+    },
+    {
+      "name": "install-2",
+      "exit_code": 0,
+      "seconds": 0.11017870903015137
+    },
+    {
+      "name": "installed-signature-2",
+      "exit_code": 0,
+      "seconds": 0.07360041700303555
+    }
+  ],
+  "required_ci": "both workflows succeeded on exact packaged source",
+  "native_relaunch": "passed: Notes v1.0.0 build9, existing notebook unchanged",
+  "human_ime": "unqualified",
+  "human_voiceover": "unqualified",
+  "verification_order": "Packaging and native launch verification ran while remote CI was in progress. Both workflows subsequently passed on the same exact source; final handoff occurs after both results. CI gated handoff, not execution of the launch check."
+}

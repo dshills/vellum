@@ -1,0 +1,29 @@
+{
+  "source_commit": "382e0e47e08044f18106b34b35f503a169bbfec0",
+  "workflows": [
+    {
+      "name": "Framework",
+      "run_id": 40232563478,
+      "conclusion": "success",
+      "url": "https://github.com/dshills/vellum/actions/runs/40232563478",
+      "started_at": "2026-10-25T20:49:22Z",
+      "run_updated_at": "2026-10-25T21:30:42Z"
+    },
+    {
+      "name": "Platform adapters",
+      "run_id": 40232563469,
+      "conclusion": "success",
+      "url": "https://github.com/dshills/vellum/actions/runs/40232563469",
+      "started_at": "2026-10-25T20:49:22Z",
+      "run_updated_at": "2026-10-25T20:55:33Z"
+    }
+  ],
+  "platform_scope": "X11 software-GPU smoke and Windows build/unit pass. Interactive qualification job intentionally skipped; no broader platform qualification claimed.",
+  "original_failure": {
+    "run_id": 40231586819,
+    "source_commit": "b633872dfe828f93e31b1dbb0798a62fb4edee39",
+    "reason": "check-text-backend cold compilation exceeded120s aggregate subprocess deadline",
+    "repair": "separate300s per-package compilation from unchanged90s test execution/120s outer bound; exact package/test selection, race/offscreen/count and package cwd preserved; missing required binaries refuse"
+  },
+  "verification_order": "Packaging and native launch verification ran while remote CI was in progress. Both workflows subsequently passed on the same exact source; final handoff occurs after both results. CI gated handoff, not execution of the launch check."
+}
