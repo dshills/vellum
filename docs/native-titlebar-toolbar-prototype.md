@@ -1,3 +1,7 @@
+The supported per-window factory and live command-state route are documented in
+[macOS application shell](macos-app-shell.md). The legacy singular entry points
+retain the prototype limits described below for compatibility.
+
 # Native macOS titlebar toolbar prototype
 
 This is an opt-in driver experiment using AppKit `NSToolbar` and

@@ -41,6 +41,10 @@ type Driver struct {
 	// TitlebarToolbar is the supported personal-macOS attachment. The older
 	// Prototype field remains a compatibility alias; supplying both is an error.
 	TitlebarToolbar *TitlebarToolbar
+	// TitlebarToolbars is called once on the owner for each window opening,
+	// including later/reopened windows. Nil returned spec leaves that window bare.
+	// It cannot be combined with either legacy single-window field.
+	TitlebarToolbars func(app.WindowRef) (*TitlebarToolbar, error)
 
 	// TitlebarToolbarPrototype opts into a real AppKit toolbar for one window.
 	// Experimental driver-only API; nil preserves existing window chrome.
@@ -49,8 +53,11 @@ type Driver struct {
 	// It cannot be combined with FrameMetrics. Ordinary applications leave it nil.
 	DesktopSession *DesktopSession
 	Commands       *command.Registry
-	OnError        func(error)
-	Theme          ui.Theme
+	// CommandMenus installs native application menus from Commands and refreshes
+	// labels/enabled state after invalidation. Menu groups are process-wide on Mac.
+	CommandMenus []app.MenuGroup
+	OnError      func(error)
+	Theme        ui.Theme
 	// ContinuousRendering opts into refresh-rate paint ticks; default uses invalidation.
 	ContinuousRendering bool
 	// ExperimentalDisplayBackpressure is a Mac-only display credit trial. Zero
@@ -130,19 +137,59 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			return err
 		}
 	}
-	if d.TitlebarToolbar != nil && d.TitlebarToolbarPrototype != nil {
+	if d.TitlebarToolbar != nil && d.TitlebarToolbarPrototype != nil || d.TitlebarToolbars != nil && (d.TitlebarToolbar != nil || d.TitlebarToolbarPrototype != nil) {
 		return fmt.Errorf("cogent: use only one titlebar toolbar field")
 	}
 	titlebarSpec := d.TitlebarToolbar
 	if titlebarSpec == nil {
 		titlebarSpec = d.TitlebarToolbarPrototype
 	}
-	titlebar, err := prepareTitlebarToolbar(a, titlebarSpec)
-	if err != nil {
+	var titlebar *preparedTitlebarToolbar
+	var preparation error
+	if err := a.Do(func() { titlebar, preparation = prepareTitlebarToolbar(a, titlebarSpec) }); err != nil {
 		return err
+	}
+	if preparation != nil {
+		return preparation
+	}
+	if titlebar != nil {
+		titlebar.onError = d.OnError
 	}
 	if err := validateTitlebarToolbarSupport(titlebar); err != nil {
 		return err
+	}
+	preparedToolbars := map[app.WindowRef]*preparedTitlebarToolbar{}
+	if d.TitlebarToolbars != nil {
+		if err := validateTitlebarToolbarSupport(&preparedTitlebarToolbar{}); err != nil {
+			return err
+		}
+		var preparation error
+		if err := a.Do(func() {
+			for _, window := range a.Windows() {
+				var p *preparedTitlebarToolbar
+				p, preparation = preparePerWindowTitlebar(a, window.Ref(), d.TitlebarToolbars, d.Commands)
+				if preparation != nil {
+					return
+				}
+				if preparation = validateTitlebarToolbarSupport(p); preparation != nil {
+					return
+				}
+				preparedToolbars[window.Ref()] = p
+			}
+		}); err != nil {
+			return err
+		}
+		if preparation != nil {
+			return preparation
+		}
+	}
+
+	var menus []app.MenuGroup
+	if err := a.Do(func() { menus, preparation = prepareCommandMenus(d.CommandMenus, d.Commands) }); err != nil {
+		return err
+	}
+	if preparation != nil {
+		return preparation
 	}
 	if !processRun.CompareAndSwap(false, true) {
 		return fmt.Errorf("cogent: native main loop runs once per process")
@@ -181,6 +228,8 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 		return out
 	}
 	services := &platformServices{owner: a, commands: d.Commands, onError: d.OnError}
+	menuPump := newCommandMenuPump(services, menus)
+	defer menuPump.close()
 	removeServiceCleanup, err := configureServiceCleanup(services)
 	if err != nil {
 		return err
@@ -277,6 +326,12 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				return
 			}
 			syncAccessibility(w, a)
+			menuPump.capture()
+			if bridge := windowAccessibilityBridge(w); bridge != nil {
+				if binding := bridge.titlebar.Load(); binding != nil {
+					binding.refreshAvailability()
+				}
+			}
 		})
 	}
 	var topologyMu sync.Mutex
@@ -357,6 +412,29 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				return
 			}
 			w := &nativeWindow{window: spec}
+			windowTitlebar := titlebar
+			if d.TitlebarToolbars != nil {
+				if p, ok := preparedToolbars[spec.Ref()]; ok {
+					windowTitlebar = p
+					delete(preparedToolbars, spec.Ref())
+				} else {
+					var preparation error
+					if err := a.Do(func() {
+						windowTitlebar, preparation = preparePerWindowTitlebar(a, spec.Ref(), d.TitlebarToolbars, d.Commands)
+					}); err != nil {
+						fail(err)
+						return
+					}
+					if preparation != nil {
+						fail(preparation)
+						return
+					}
+					if err := validateTitlebarToolbarSupport(windowTitlebar); err != nil {
+						fail(err)
+						return
+					}
+				}
+			}
 			buildErr := a.Do(func() {
 				w.body = core.NewBody(spec.Title)
 				if d.PresentationMetrics != nil {
@@ -385,7 +463,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				nativeMountServices(w.body, services)
 				configureInitialWindow(w.body)
 				configureWindowChromeContent(w.body, spec)
-				configureTitlebarToolbarContent(w.body, titlebar)
+				configureTitlebarToolbarContent(w.body, windowTitlebar)
 				w.host = newAccessibilityHost(w)
 				configureRootScrolling(w.body, w.host, spec)
 				bindWindowScope(w.host, a, spec.Ref())
@@ -464,6 +542,11 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 						return
 					}
 					syncAccessibility(w, a)
+					if d.TitlebarToolbars != nil {
+						if err := startWindowTitlebar(w, windowTitlebar, d.OnError, func(err error) { failWindow(w, err) }); err != nil {
+							failWindow(w, err)
+						}
+					}
 				}); err != nil {
 					failWindow(w, err)
 					return
@@ -476,11 +559,19 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					return
 				}
 				a.SetServices(services)
+				if menuPump != nil {
+					menuPump.ready.Store(true)
+					_ = a.Invalidate("")
+				}
 				wake()
 			})
 			w.body.Scene.OnFirst(events.Custom, func(e events.Event) { custom(w, e) })
-			if d.Commands != nil {
-				bindCommandShortcutsScoped(w.body.Scene, a, spec.Ref(), d.Commands, d.OnError)
+			windowCommands := d.Commands
+			if windowTitlebar != nil && windowTitlebar.registry != nil {
+				windowCommands = windowTitlebar.registry
+			}
+			if windowCommands != nil {
+				bindCommandShortcutsScoped(w.body.Scene, a, spec.Ref(), windowCommands, d.OnError)
 			}
 			bindCloseRequest(w, a, d.OnError)
 			w.body.OnClose(func(events.Event) {

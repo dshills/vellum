@@ -337,6 +337,13 @@ static Class vellumAXSubclass(Class base,Class methods,const char *prefix){
  for(unsigned int i=0;i<count;i++)class_addMethod(cls,method_getName(list[i]),method_getImplementation(list[i]),method_getTypeEncoding(list[i]));
  free(list);objc_registerClassPair(cls);return cls;
 }
+// Native-main-only borrowed lookup; async toolbar work never retains a window
+// pointer across dispatch or revives a retired accessibility attachment.
+void *vellumAXWindowForToken(uint64_t token) {
+ if(![NSThread isMainThread])return NULL;
+ VellumAXState *state=vellumAXStates[@(token)];
+ return state&&!state.closed ? (__bridge void *)state.window : NULL;
+}
 int vellumAXAttach(uint64_t token,void *viewPtr,void *windowPtr){
  @autoreleasepool{
  NSView *view=(__bridge NSView *)viewPtr;NSWindow *window=(__bridge NSWindow *)windowPtr;

@@ -128,7 +128,7 @@ static void vellumTitlebarDisplayCustomization(NSToolbar *toolbar, BOOL enabled)
 }
 @end
 
-// Native main owns this one-entry registry. Async requests resolve their token
+// Native main owns this bounded, per-window-token registry. Async requests resolve their token
 // at execution, so they cannot retain or resurrect a retired attachment.
 static NSMutableDictionary<NSNumber *,VellumTitlebarOwner *> *vellumTitlebars;
 int vellumTitlebarAttach(uint64_t token,void *pointer,const char *json,const char *identifier) {
@@ -139,7 +139,7 @@ int vellumTitlebarAttach(uint64_t token,void *pointer,const char *json,const cha
    // Reliable palette scope revocation uses the documented macOS15+ KVO.
    if(customizable) { if(@available(macOS 15.0,*)) {} else return 0; }
    NSWindow *window=(__bridge NSWindow *)pointer;
-   if(!window.contentView || window.toolbar || !(window.styleMask&NSWindowStyleMaskTitled) || vellumTitlebars.count>=1)return 0;
+   if(!window.contentView || window.toolbar || !(window.styleMask&NSWindowStyleMaskTitled) || vellumTitlebars.count>=32)return 0;
    NSData *data=[[NSString stringWithUTF8String:json]dataUsingEncoding:NSUTF8StringEncoding];
    NSArray *items=[NSJSONSerialization JSONObjectWithData:data options:0 error:NULL];
    if(![items isKindOfClass:[NSArray class]] || items.count==0 || items.count>16)return 0;
@@ -208,4 +208,36 @@ void vellumTitlebarDetach(uint64_t token) {
 
 int vellumTitlebarCustomizationSupported(void) {
  if(@available(macOS 15.0,*))return 1;return 0;
+}
+
+extern void *vellumAXWindowForToken(uint64_t);
+extern int vellumTitlebarIsLive(uint64_t);
+extern void vellumTitlebarAttached(uint64_t,int);
+extern char *vellumTitlebarStateJSON(uint64_t);
+void vellumTitlebarRequestAttach(uint64_t token,const char *json,const char *identifier) {
+ NSString *payload=json?[[NSString alloc]initWithUTF8String:json]:nil;
+ NSString *settings=identifier?[[NSString alloc]initWithUTF8String:identifier]:nil;
+ dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{
+  if(!vellumTitlebarIsLive(token))return;
+  void *window=vellumAXWindowForToken(token);
+  int success=window&&payload&&settings ? vellumTitlebarAttach(token,window,payload.UTF8String,settings.UTF8String):0;
+  if(!success)vellumTitlebarDetach(token);
+  vellumTitlebarAttached(token,success);
+ }});
+}
+void vellumTitlebarStateChanged(uint64_t token) {
+ dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{
+  char *json=vellumTitlebarStateJSON(token);if(!json)return;
+  NSData *data=[[NSString stringWithUTF8String:json]dataUsingEncoding:NSUTF8StringEncoding];free(json);
+  VellumTitlebarOwner *owner=vellumTitlebars[@(token)];if(!owner||owner.closed)return;
+  NSArray *states=[NSJSONSerialization JSONObjectWithData:data options:0 error:NULL];
+  if(![states isKindOfClass:NSArray.class]||states.count>16)return;
+  NSMutableDictionary *catalogue=[owner.catalogue mutableCopy];
+  for(NSDictionary *state in states){
+   NSString *key=[@"com.vellum.titlebar.prototype." stringByAppendingString:state[@"id"]];
+   NSMutableDictionary *entry=[catalogue[key] mutableCopy];if(!entry)continue;
+   entry[@"disabled"]=state[@"disabled"];catalogue[key]=entry;
+  }
+  owner.catalogue=catalogue;[owner refreshEnabled];
+ }});
 }

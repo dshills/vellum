@@ -236,6 +236,7 @@ func nativeSetMenu(ctx context.Context, groups []nativeMenuGroup, service *platf
 	ids := []string{}
 	type item struct {
 		Label    string
+		Shortcut string
 		Index    int
 		Disabled bool
 	}
@@ -247,7 +248,7 @@ func nativeSetMenu(ctx context.Context, groups []nativeMenuGroup, service *platf
 	for _, g := range groups {
 		v := group{Label: g.Label, Items: []item{}}
 		for _, i := range g.Items {
-			v.Items = append(v.Items, item{Label: i.Label, Index: len(ids), Disabled: i.Disabled})
+			v.Items = append(v.Items, item{Label: i.Label, Shortcut: i.Shortcut, Index: len(ids), Disabled: i.Disabled})
 			ids = append(ids, i.Command)
 		}
 		payload = append(payload, v)

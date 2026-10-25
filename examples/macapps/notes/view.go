@@ -226,7 +226,10 @@ func (m *Model) documentView() ui.Node {
 		pin := ui.Node{ID: "notes-pin", Kind: ui.ToggleButton, Text: "Pin", Checked: selected.value.Pinned, Disabled: busy, Change: func(e ui.ChangeEvent) { _ = m.Request(func() error { return m.SetPinned(id, e.Checked) }) }, Accessibility: ui.Accessibility{Name: "Pin selected note"}, Style: ui.Style{Padding: ui.Some(ui.Insets{Left: 9, Right: 9, Top: 5, Bottom: 5}), CornerRadius: ui.Some(float32(7)), MinSize: ui.Some(ui.Size{Height: 30}), MaxSize: ui.Some(ui.Size{Height: 30}), Border: ui.Some(ui.Border{})}}
 		toolbar.Children = append(toolbar.Children, pin)
 	}
-	content := box(ui.Column, "notes-document", toolbar)
+	content := box(ui.Column, "notes-document")
+	if !m.nativeToolbar {
+		content.Children = append(content.Children, toolbar)
+	}
 	content.Style = ui.Style{GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(1)), MinSize: ui.Some(ui.Size{Width: 340}), Background: ui.Some(white)}
 	if selected == nil {
 		empty := label("notes-empty-document", "No Note Selected", 22, 500)

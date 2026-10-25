@@ -298,3 +298,29 @@ func TestEveryFolderAndEmptyStateProduceValidAccessibleTrees(t *testing.T) {
 		t.Fatal("empty document state omitted")
 	}
 }
+
+func TestNativeShellKeepsInputAndUnifiedCommands(t *testing.T) {
+	m := New()
+	before := m.Items()
+	m.SetNativeToolbar(true)
+	view := m.View()
+	if err := ui.Validate(view); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := find(view, "notes-toolbar"); ok {
+		t.Fatal("native shell duplicated client toolbar")
+	}
+	if _, ok := find(view, "note-editor-n1"); !ok {
+		t.Fatal("native shell removed editor")
+	}
+	if err := m.Commands().Invoke(context.Background(), "notes.delete"); err != nil {
+		t.Fatal(err)
+	}
+	if len(m.Items()) != len(before)-1 {
+		t.Fatal("native delete bypassed model")
+	}
+	must(t, m.Undo())
+	if !slices.Equal(before, m.Items()) {
+		t.Fatal("native command history diverged")
+	}
+}

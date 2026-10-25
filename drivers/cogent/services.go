@@ -13,6 +13,7 @@ import (
 
 type nativeMenuItem struct {
 	Label, Command string
+	Shortcut       string
 	Disabled       bool
 }
 type nativeMenuGroup struct {
@@ -142,7 +143,11 @@ func (s *platformServices) SetMenu(ctx context.Context, groups []app.MenuGroup) 
 					menu = nil
 					return
 				}
-				g.Items = append(g.Items, nativeMenuItem{Label: cmd.Label, Command: id, Disabled: s.commands.Enabled(id) != nil})
+				shortcut := cmd.Shortcut
+				if cmd.ShortcutScope == command.AfterFocusShortcuts {
+					shortcut = ""
+				}
+				g.Items = append(g.Items, nativeMenuItem{Label: cmd.Label, Command: id, Shortcut: shortcut, Disabled: s.commands.Enabled(id) != nil})
 			}
 			menu = append(menu, g)
 		}

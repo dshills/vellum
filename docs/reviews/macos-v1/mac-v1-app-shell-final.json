@@ -1,0 +1,139 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "7c1b3f832bb10b3a20751fbb175b73a6",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "6c6e95a987e4abf4541d79a8926abcd66a3412a1",
+    "branch": "codex/macos-v1-candidate"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "cf9f4cba58d2f47c",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Shadowed/reused preparation variable",
+      "message": "The new Run code redeclares `var preparation error` in an inner scope for the per-window block. The final menus block then reuses the outer `preparation`, which is the same variable used for the legacy titlebar. This works only by accident, and it is fragile. A bigger problem is that the legacy `prepareTitlebarToolbar` now runs inside `a.Do`, so the Offscreen/other-platform refusal ordering is unchanged but a failure of `a.Do` is conflated.",
+      "suggestion": "Use distinct, narrowly scoped error variables for each prepare step.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 188,
+            "end": 188
+          }
+        }
+      ],
+      "tags": [
+        "maintainability",
+        "location-corrected"
+      ],
+      "evidence": "if err := a.Do(func() { menus, preparation = prepareCommandMenus(d.CommandMenus, d.Commands) }); err != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "02c647ef61f24ff3",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Availability callbacks run on every sync",
+      "message": "Bit masks are assigned for every non-Disabled button, but statically Disabled buttons have no bit, so they are never part of the state updates. That is fine. However `bits` is `1 \u003c\u003c index` with index up to 15 and items up to 16, so fine. A bigger issue is that `enabled()` calls the user `Available` callback and `registry.Enabled`, which may be slow, for each refresh from every paint sync, with no throttling.",
+      "suggestion": "Throttle the refresh, or compute it only on invalidation rather than on every sync.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/titlebar_toolbar.go",
+          "lines": {
+            "start": 338,
+            "end": 436
+          }
+        }
+      ],
+      "tags": [
+        "performance"
+      ],
+      "evidence": "for id, bit := range b.config.bits {\n\t\tenabled := b.config.enabled(id)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "4b0d71b7c38cd4be",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Availability changes before attach are lost",
+      "message": "After a successful state change, `availability` is stored only when `changed`. If the native toolbar is not attached yet (attach is asynchronous), updates are stored but `updateQueued` is never flushed after attach. The `.m` attach path never pulls the latest availability, so the toolbar can stay in its initial state until the next change. Also, the wire JSON uses the initial disabled state computed at prepare time and may be stale by attach.",
+      "suggestion": "After a successful attach, trigger `vellumTitlebarStateChanged(token)` or have the native side pull the current availability.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/titlebar_toolbar.go",
+          "lines": {
+            "start": 407,
+            "end": 409
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "location-corrected"
+      ],
+      "evidence": "if b.token != 0 \u0026\u0026 b.updateQueued.CompareAndSwap(false, true) {\n\t\tnativeTitlebarStateChanged(b.token)\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 8941,
+    "totalMs": 9023
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 24,
+    "bytes": 83336,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 41681,
+        "output": 1023,
+        "costUSD": 0.093592
+      }
+    ],
+    "widenedFiles": 8,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

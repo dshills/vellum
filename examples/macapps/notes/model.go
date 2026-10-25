@@ -52,6 +52,7 @@ type Model struct {
 	focus                                            ui.FocusRequest
 	settlement                                       func(func(error)) error
 	pending                                          bool
+	nativeToolbar                                    bool
 	pendingInputError                                error
 }
 
@@ -73,6 +74,32 @@ func New() *Model {
 		m.notes = append(m.notes, &note{value: value, editor: e})
 	}
 	for _, c := range []command.Command{
+		{ID: "notes.delete", Label: "Delete Note", Available: func() error {
+			if err := m.actionReady(); err != nil {
+				return err
+			}
+			if m.lookup(m.selected) == nil {
+				return ErrInvalid
+			}
+			return nil
+		}, Execute: func(context.Context) error { return m.Request(func() error { return m.Delete(m.selected) }) }},
+		{ID: "notes.pin", Label: "Pin or Unpin Note", Available: func() error {
+			if err := m.actionReady(); err != nil {
+				return err
+			}
+			if m.lookup(m.selected) == nil {
+				return ErrInvalid
+			}
+			return nil
+		}, Execute: func(context.Context) error {
+			return m.Request(func() error {
+				n := m.lookup(m.selected)
+				if n == nil {
+					return ErrInvalid
+				}
+				return m.SetPinned(n.value.ID, !n.value.Pinned)
+			})
+		}},
 		{ID: "notes.new", Label: "New Note", Shortcut: "Meta+N", Available: func() error {
 			if len(m.notes) >= MaxNotes {
 				return ErrLimit
@@ -566,3 +593,7 @@ func (m *Model) Redo() error {
 	m.accept(err)
 	return err
 }
+
+// SetNativeToolbar selects the host-owned native app shell; it does not alter
+// notes, history or input IDs. Configure on the application owner before View.
+func (m *Model) SetNativeToolbar(enabled bool) { m.nativeToolbar = enabled }

@@ -13,3 +13,6 @@ func validateTitlebarToolbarSupport(p *preparedTitlebarToolbar) error {
 func titlebarToolbarAllowed(*accessibilityBridge, bool) {}
 
 func nativeTitlebarCustomize(uint64) {}
+
+func nativeTitlebarRequestAttach(uint64, string, string) {}
+func nativeTitlebarStateChanged(uint64)                  {}

@@ -12,11 +12,13 @@ import (
 	"unicode/utf8"
 
 	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/command"
 	"github.com/dshills/vellum/ui"
 )
 
 // TitlebarToolbar is the supported personal-macOS native toolbar attachment.
-// It retains the documented one-standard-window, immutable-catalogue limits.
+// The singular Driver field retains one-window compatibility; the plural factory
+// supports independent standard-chrome openings with immutable catalogues.
 // Customization requires macOS 15+; original-color icons and autosave are AppKit-owned.
 type TitlebarToolbar = TitlebarToolbarPrototype
 
@@ -34,6 +36,9 @@ type TitlebarToolbarPrototype struct {
 	// independent of WindowRef. Use different IDs for independently saved bars.
 	// ASCII letters, digits, dot, underscore and hyphen; at most 128 bytes.
 	CustomizationID string
+	// Commands optionally supplies the same registry used by this window's keys.
+	// The per-window Driver.TitlebarToolbars route inherits Driver.Commands if nil.
+	Commands *command.Registry
 }
 
 // TitlebarToolbarItem supports Button, ToolbarSpace and ToolbarFlexibleSpace.
@@ -48,6 +53,11 @@ type TitlebarToolbarItem struct {
 	PNG      []byte
 	Disabled bool
 	Activate func()
+	// Command references Commands instead of Activate; the two are exclusive.
+	Command string
+	// Available is evaluated only on the application owner, during refresh and
+	// again immediately before activation. Call Invalidate after state changes.
+	Available func() error
 }
 
 type titlebarWireItem struct {
@@ -62,6 +72,12 @@ type preparedTitlebarToolbar struct {
 	customizationID string
 	wire            string
 	actions         map[string]func()
+	registry        *command.Registry
+	commands        map[string]string
+	available       map[string]func() error
+	bits            map[string]uint32
+	initialMask     uint32
+	onError         func(error)
 }
 
 func toolbarPrototypeText(s string) bool {
@@ -76,6 +92,10 @@ func toolbarPrototypeText(s string) bool {
 	return true
 }
 func prepareTitlebarToolbar(a *app.Application, spec *TitlebarToolbarPrototype) (*preparedTitlebarToolbar, error) {
+	return prepareTitlebarToolbarScoped(a, spec, true)
+}
+
+func prepareTitlebarToolbarScoped(a *app.Application, spec *TitlebarToolbar, legacy bool) (*preparedTitlebarToolbar, error) {
 	if spec == nil {
 		return nil, nil
 	}
@@ -83,7 +103,13 @@ func prepareTitlebarToolbar(a *app.Application, spec *TitlebarToolbarPrototype) 
 		return nil, err
 	}
 	windows := a.Windows()
-	if len(windows) != 1 || windows[0].Ref() != spec.Window || windows[0].Chrome.Style != app.ChromeStandard {
+	var found bool
+	for _, w := range windows {
+		if w.Ref() == spec.Window {
+			found = w.Chrome.Style == app.ChromeStandard
+		}
+	}
+	if !found || legacy && len(windows) != 1 {
 		return nil, fmt.Errorf("cogent: titlebar prototype requires one standard-chrome window opening")
 	}
 	if len(spec.Items) == 0 || len(spec.Items) > 16 {
@@ -97,11 +123,11 @@ func prepareTitlebarToolbar(a *app.Application, spec *TitlebarToolbarPrototype) 
 			return nil, fmt.Errorf("cogent: invalid titlebar customization ID")
 		}
 	}
-	p := &preparedTitlebarToolbar{ref: spec.Window, customizationID: spec.CustomizationID, actions: map[string]func(){}}
+	p := &preparedTitlebarToolbar{ref: spec.Window, customizationID: spec.CustomizationID, actions: map[string]func(){}, registry: spec.Commands, commands: map[string]string{}, available: map[string]func() error{}, bits: map[string]uint32{}}
 	wire := make([]titlebarWireItem, 0, len(spec.Items))
 	seen := map[string]bool{}
 	buttons := 0
-	for _, item := range spec.Items {
+	for index, item := range spec.Items {
 		if !toolbarPrototypeText(item.ID) || seen[item.ID] {
 			return nil, fmt.Errorf("cogent: invalid or duplicate titlebar item ID")
 		}
@@ -109,7 +135,20 @@ func prepareTitlebarToolbar(a *app.Application, spec *TitlebarToolbarPrototype) 
 		w := titlebarWireItem{ID: item.ID, Label: item.Label, Disabled: item.Disabled}
 		switch item.Kind {
 		case ui.Button:
-			if !toolbarPrototypeText(item.Label) || item.Activate == nil || len(item.PNG) == 0 || len(item.PNG) > 64<<10 {
+			if item.Command != "" {
+				if item.Activate != nil || p.registry == nil {
+					return nil, fmt.Errorf("cogent: toolbar Command requires a registry and no Activate callback")
+				}
+				cmd, ok := p.registry.Lookup(item.Command)
+				if !ok {
+					return nil, fmt.Errorf("cogent: unknown toolbar command %q", item.Command)
+				}
+				if item.Label == "" {
+					item.Label = cmd.Label
+					w.Label = item.Label
+				}
+			}
+			if !toolbarPrototypeText(item.Label) || item.Activate == nil && item.Command == "" || len(item.PNG) == 0 || len(item.PNG) > 64<<10 {
 				return nil, fmt.Errorf("cogent: titlebar button requires label, bounded PNG and action")
 			}
 			config, err := png.DecodeConfig(bytes.NewReader(item.PNG))
@@ -123,10 +162,21 @@ func prepareTitlebarToolbar(a *app.Application, spec *TitlebarToolbarPrototype) 
 			w.PNG = bytes.Clone(item.PNG)
 			buttons++
 			if !item.Disabled {
-				p.actions[item.ID] = item.Activate
+				p.bits[item.ID] = 1 << index
+				if item.Command != "" {
+					p.commands[item.ID] = item.Command
+				} else {
+					p.actions[item.ID] = item.Activate
+				}
+				p.available[item.ID] = item.Available
+				if p.enabled(item.ID) {
+					p.initialMask |= 1 << index
+				} else {
+					w.Disabled = true
+				}
 			}
 		case ui.ToolbarSpace, ui.ToolbarFlexibleSpace:
-			if item.Label != "" || len(item.PNG) != 0 || item.Activate != nil || item.Disabled {
+			if item.Label != "" || len(item.PNG) != 0 || item.Activate != nil || item.Command != "" || item.Available != nil || item.Disabled {
 				return nil, fmt.Errorf("cogent: titlebar spaces are decoration only")
 			}
 			w.Kind = "space"
@@ -152,7 +202,14 @@ func (p *preparedTitlebarToolbar) accepts(ref app.WindowRef) bool { return p == 
 
 // A new immutable permission identity revokes queued input across modal round
 // trips. No UI model is read by the native-main callback.
-type titlebarPermission struct{ allowed bool }
+type titlebarPermission struct {
+	allowed bool
+	mask    uint32
+}
+type titlebarAvailability struct {
+	mask uint32
+	json string
+}
 type titlebarToolbarBinding struct {
 	owner                       *app.Application
 	scopeMu                     sync.Mutex
@@ -160,10 +217,17 @@ type titlebarToolbarBinding struct {
 	config                      *preparedTitlebarToolbar
 	permission                  atomic.Pointer[titlebarPermission]
 	closed                      atomic.Bool
+	token                       uint64
+	enabled                     uint32 // scopeMu
+	availability                atomic.Pointer[titlebarAvailability]
+	updateQueued                atomic.Bool
+	onError                     func(error) // immutable before publication
+	attachFailed                atomic.Bool
+	onAttachError               func(error)
 }
 
 func newTitlebarToolbarBinding(a *app.Application, p *preparedTitlebarToolbar) *titlebarToolbarBinding {
-	b := &titlebarToolbarBinding{owner: a, config: p}
+	b := &titlebarToolbarBinding{owner: a, config: p, enabled: p.initialMask, onError: p.onError}
 	b.permission.Store(&titlebarPermission{})
 	return b
 }
@@ -181,7 +245,7 @@ func (b *titlebarToolbarBinding) setAllowed(allowed bool) bool {
 	return true
 }
 func (b *titlebarToolbarBinding) publishPermissionLocked() {
-	b.permission.Store(&titlebarPermission{allowed: b.managedAllowed && !b.customizing && !b.closed.Load()})
+	b.permission.Store(&titlebarPermission{allowed: b.managedAllowed && !b.customizing && !b.closed.Load(), mask: b.enabled})
 }
 
 // setCustomizing returns admission, including an already-satisfied request;
@@ -225,14 +289,23 @@ func (b *titlebarToolbarBinding) deliver(id string) bool {
 		return false
 	}
 	permission := b.permission.Load()
-	if permission == nil || !permission.allowed || b.config.actions[id] == nil {
+	if permission == nil || !permission.allowed || b.config.bits[id] == 0 || permission.mask&b.config.bits[id] == 0 {
 		return false
 	}
 	return b.owner.PostWindow(b.config.ref, func() {
 		if b.closed.Load() || b.permission.Load() != permission {
 			return
 		}
-		b.config.actions[id]()
+		if !b.config.enabled(id) {
+			return
+		}
+		if commandID := b.config.commands[id]; commandID != "" {
+			if err := b.config.registry.Invoke(b.config.ref.Context(), commandID); err != nil && b.onError != nil {
+				b.onError(err)
+			}
+		} else {
+			b.config.actions[id]()
+		}
 		_ = b.owner.Invalidate(b.config.ref.ID())
 	}) == nil
 }
@@ -279,4 +352,101 @@ func titlebarBindingForToken(token uint64) *titlebarToolbarBinding {
 		return nil
 	}
 	return b.titlebar.Load()
+}
+
+// enabled is owner-only. Native callbacks use detached permission snapshots.
+func (p *preparedTitlebarToolbar) enabled(id string) bool {
+	if p.bits[id] == 0 {
+		return false
+	}
+	if f := p.available[id]; f != nil && f() != nil {
+		return false
+	}
+	if id := p.commands[id]; id != "" {
+		return p.registry.Enabled(id) == nil
+	}
+	return true
+}
+func (b *titlebarToolbarBinding) refreshAvailability() {
+	if b != nil && b.attachFailed.Swap(false) {
+		b.close()
+		if b.onAttachError != nil {
+			b.onAttachError(fmt.Errorf("cogent: native toolbar attachment failed"))
+		}
+	}
+	if b == nil || b.closed.Load() {
+		return
+	}
+	var mask uint32
+	items := make([]struct {
+		ID       string `json:"id"`
+		Disabled bool   `json:"disabled"`
+	}, 0, len(b.config.bits))
+	for id, bit := range b.config.bits {
+		enabled := b.config.enabled(id)
+		if enabled {
+			mask |= bit
+		}
+		items = append(items, struct {
+			ID       string `json:"id"`
+			Disabled bool   `json:"disabled"`
+		}{id, !enabled})
+	}
+	b.scopeMu.Lock()
+	changed := b.enabled != mask
+	b.enabled = mask
+	if changed {
+		b.publishPermissionLocked()
+	}
+	b.scopeMu.Unlock()
+	if !changed {
+		return
+	}
+	data, _ := json.Marshal(items)
+	b.availability.Store(&titlebarAvailability{mask: mask, json: string(data)})
+	if b.token != 0 && b.updateQueued.CompareAndSwap(false, true) {
+		nativeTitlebarStateChanged(b.token)
+	}
+}
+
+// preparePerWindowTitlebar calls the factory once on the application owner.
+func preparePerWindowTitlebar(a *app.Application, ref app.WindowRef, factory func(app.WindowRef) (*TitlebarToolbar, error), fallback *command.Registry) (*preparedTitlebarToolbar, error) {
+	spec, err := factory(ref)
+	if err != nil || spec == nil {
+		return nil, err
+	}
+	copy := *spec
+	if copy.Window != ref {
+		return nil, app.ErrInvalidWindowRef
+	}
+	if copy.Commands == nil {
+		copy.Commands = fallback
+	}
+	return prepareTitlebarToolbarScoped(a, &copy, false)
+}
+func startWindowTitlebar(w *nativeWindow, p *preparedTitlebarToolbar, onError, onAttachError func(error)) error {
+	if p == nil {
+		return nil
+	}
+	b := windowAccessibilityBridge(w)
+	if b == nil || b.closed.Load() {
+		return app.ErrWindowClosed
+	}
+	binding := newTitlebarToolbarBinding(b.owner, p)
+	binding.token = b.token
+	binding.onError = onError
+	binding.onAttachError = onAttachError
+	if !b.titlebar.CompareAndSwap(nil, binding) {
+		return fmt.Errorf("cogent: window already has a native toolbar")
+	}
+	nativeTitlebarRequestAttach(b.token, p.wire, p.customizationID)
+	return nil
+}
+
+// Clear before loading: a producer publishing before this clear is included in
+// the load; one publishing after it can queue the next flush. No live update is
+// dropped, and a retired binding has no future work to acknowledge.
+func (b *titlebarToolbarBinding) takeAvailability() *titlebarAvailability {
+	b.updateQueued.Store(false)
+	return b.availability.Load()
 }

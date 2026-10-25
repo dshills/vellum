@@ -1,0 +1,40 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "-race",
+      ".",
+      "-run",
+      "TestTitlebar|TestCommandMenu|TestMenu|TestServices|TestNativeMenu"
+    ],
+    "exit_code": 0,
+    "seconds": 18.56199387507513
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 6.814256916986778
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 9.998968624975532
+  }
+]

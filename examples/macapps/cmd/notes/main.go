@@ -50,6 +50,7 @@ func run() error {
 	}
 	defer a.Close()
 	m := notes.New()
+	m.SetNativeToolbar(true)
 	offer, err := repository.Load(m)
 	if err != nil {
 		return fmt.Errorf("notes files preserved; startup refused: %w", err)
@@ -110,7 +111,7 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	runErr := a.Run(ctx, cogent.Driver{Theme: notes.Theme(), Commands: m.Commands(), OnError: func(err error) { fmt.Fprintln(os.Stderr, err) }})
+	runErr := a.Run(ctx, cogent.Driver{Theme: notes.Theme(), Commands: m.Commands(), CommandMenus: nativeNotesMenus(), TitlebarToolbars: func(opening app.WindowRef) (*cogent.TitlebarToolbar, error) { return nativeNotesToolbar(opening, m) }, OnError: func(err error) { fmt.Fprintln(os.Stderr, err) }})
 	stopErr := files.Stop()
 	if stopErr != nil {
 		releaseLock = false

@@ -227,6 +227,13 @@ void vellumSetMenu(uint64_t token, const char *json) {
                     vellumServiceResult(token, "", 2); return;
                 }
                 NSMenuItem *entry = [[NSMenuItem alloc] initWithTitle:item[@"Label"] action:@selector(invoke:) keyEquivalent:@""];
+                NSString *shortcut=item[@"Shortcut"];
+                if([shortcut isKindOfClass:NSString.class] && shortcut.length<=128) {
+                 NSArray<NSString *> *parts=[shortcut componentsSeparatedByString:@"+"];NSString *key=parts.lastObject.lowercaseString;
+                 NSEventModifierFlags flags=0;
+                 for(NSString *part in parts) {if([part caseInsensitiveCompare:@"Meta"]==NSOrderedSame)flags|=NSEventModifierFlagCommand;else if([part caseInsensitiveCompare:@"Ctrl"]==NSOrderedSame)flags|=NSEventModifierFlagControl;else if([part caseInsensitiveCompare:@"Shift"]==NSOrderedSame)flags|=NSEventModifierFlagShift;else if([part caseInsensitiveCompare:@"Alt"]==NSOrderedSame)flags|=NSEventModifierFlagOption;}
+                 if(key.length==1 && flags) {entry.keyEquivalent=key;entry.keyEquivalentModifierMask=flags;}
+                }
                 entry.target = target; entry.tag = [item[@"Index"] integerValue];
                 entry.enabled = ![item[@"Disabled"] boolValue]; [submenu addItem:entry];
             }

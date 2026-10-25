@@ -149,3 +149,14 @@ proportional text and no gutter. The font stack explicitly includes emoji fallba
 A frameless body uses caret/selection focus feedback. Physical body-click focus
 remains unqualified through the computer-use coordinate tool. The offscreen layout test
 checks actual geometry at 1100×740 and 1380×900; it does not prove native fidelity.
+
+## Native v1 candidate shell
+
+The executable now uses the per-window `Driver.TitlebarToolbars` factory with
+original-color sample icons. New/Open/Save/Undo/Redo/Delete/Pin invoke the same
+registry and input-settlement path as keyboard shortcuts and the native File,
+Edit and Note menus. Availability refreshes after invalidation. The portable
+model view keeps its client toolbar unless its host calls `SetNativeToolbar(true)`.
+No duplicate client toolbar is mounted in the native executable. Customize the
+native toolbar using its standard context menu; layout persistence is AppKit-owned.
+The body, file format and history limits are unchanged.

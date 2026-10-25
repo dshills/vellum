@@ -28,3 +28,15 @@ Record unsupported or unqualified cases rather than implying v1 acceptance.
 Actual advertised crashes, hangs, data loss, incorrect history, stale callbacks
 or teardown failures require fixes before candidate delivery. Cosmetic follow-up
 and public distribution work belong in an explicit backlog.
+
+## App-shell API boundary
+
+Phase2 adds the per-window `Driver.TitlebarToolbars` factory and optional
+`Driver.CommandMenus`, preserving both singular legacy fields. Factories bind
+exact WindowRefs and may return independent command registries. Native toolbars
+keep an immutable item catalogue and dynamic owner-checked command availability.
+Menus remain process-wide and use the shared registry; active-document routing
+for independent registries is caller-owned. Concurrent toolbar attachments are
+bounded at32 and item catalogues at16; customization may show at most32 items.
+One coalesced availability update per toolbar and one menu refresh worker bound
+pending work. Closing/reopening a window cannot revive its previous callbacks.
