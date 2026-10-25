@@ -1,0 +1,60 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "gofmt",
+      "-w",
+      "ui/image_well_test.go"
+    ],
+    "exit_code": 0,
+    "seconds": 0.02899800008162856
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 3.0497443329077214
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.2531321251299232
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "Titlebar",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 17.54671295802109
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 6.7946919170208275
+  }
+]

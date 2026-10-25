@@ -1642,3 +1642,11 @@ Prism: `personal-v01-acceptance-clear.json` (Anthropic Claude Sonnet 5.5, comple
 All eight distinct native invocations pass and all 789 grouped native root methods pass; exact app ZIPs verify, the light app is launched from those extracted bytes, and the independent SDK consumer renders verified GPU output. Source/artifacts bind to clean a693e71; acceptance edits are docs only. Prism inventory questions were addressed explicitly: hidden untitled AppKit shell attribution remains unqualified; Dispatching=1 is the active report callback; four soak memory samples precede close/advance and are not terminal samples. The final low-confidence count finding is not a failed check: the array contains exactly eight unique names, verified mechanically, and the README now maps them one-to-one. Inspector output is nested within its editor-ax invocation, and phase timing versus process elapsed time is explained. Original failure and all review rounds remain retained. Owner explicitly leaves real IME/VoiceOver unqualified. Separate Dark launch, final physical Find result, other hardware and full native allocation/performance qualification are not claimed. No features, release gates, global settings or public publication changed.
 
 Focused checks: `personal-v01-acceptance-final-checks.json`.
+
+## Fix older macOS SDK toolbar compile and Windows image drop fixture
+
+Prism: `mac-stabilization-ci.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Reproduced merged-main CI failures from runs 40199510072 and 40199510071. Dynamic setter messaging uses the platform BOOL typedef, guarded by OS availability and selector support; it does not assume a hard-coded ABI width. Prism comment adjacency feedback was applied; the suggested KVC/NSInvocation conversion is unnecessary for this known setter signature. Portable race/vet and focused native toolbar race/compile/vet pass. Windows fixture retains all invalid-path/stale-identity assertions using native absolute TempDir paths. Remote macos-14/Windows validation follows on this reviewed checkpoint. Framework features remain frozen.
+
+Focused checks: `mac-stabilization-ci-checks.json`.

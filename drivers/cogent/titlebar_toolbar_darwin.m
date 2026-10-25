@@ -2,12 +2,22 @@
 
 // Copyright (c) 2026 Davin Hills. SPDX-License-Identifier: MIT.
 #import <Cocoa/Cocoa.h>
+#import <objc/message.h>
 #include <stdint.h>
 extern int vellumTitlebarAction(uint64_t token,const char *identifier);
 extern int vellumTitlebarCustomizationScope(uint64_t token,int customizing);
 extern void vellumTitlebarItemsChanged(uint64_t token);
 static char vellumTitlebarPaletteContext;
 @class VellumTitlebarOwner;
+
+// Send the macOS 15 setter dynamically so builds using older SDK headers
+// retain the same behavior when run on a supported newer macOS.
+static void vellumTitlebarDisplayCustomization(NSToolbar *toolbar, BOOL enabled) {
+ if(@available(macOS 15.0,*)) {
+  SEL setter=NSSelectorFromString(@"setAllowsDisplayModeCustomization:");
+  if([toolbar respondsToSelector:setter])((void (*)(id,SEL,BOOL))objc_msgSend)(toolbar,setter,enabled);
+ }
+}
 
 // Intercept AppKit's own palette entry, including the standard context menu.
 // No replacement of NSWindow/GLFW's delegate, view, or responder is involved.
@@ -106,7 +116,7 @@ static char vellumTitlebarPaletteContext;
   if(entry) { item.enabled=!self.closed && self.allowed && !self.customizing && ![entry[@"disabled"] boolValue];item.menuFormRepresentation.enabled=item.enabled; }
  }
  self.toolbar.allowsUserCustomization=!self.closed && self.allowed && self.customizable;
- if(@available(macOS 15.0,*))self.toolbar.allowsDisplayModeCustomization=!self.closed && self.allowed && self.customizable;
+ vellumTitlebarDisplayCustomization(self.toolbar,!self.closed && self.allowed && self.customizable);
 }
 - (void)updateCustomization:(BOOL)customizing {
  if(self.closed || self.customizing==customizing)return;
@@ -151,7 +161,7 @@ int vellumTitlebarAttach(uint64_t token,void *pointer,const char *json,const cha
    owner.toolbar=toolbar;toolbar.owner=owner;toolbar.delegate=owner;
    toolbar.displayMode=NSToolbarDisplayModeIconOnly;
    toolbar.allowsUserCustomization=customizable;toolbar.autosavesConfiguration=customizable;
-   if(@available(macOS 15.0,*))toolbar.allowsDisplayModeCustomization=customizable;
+   vellumTitlebarDisplayCustomization(toolbar,customizable);
    if(customizable) {
     [toolbar addObserver:owner forKeyPath:@"customizationPaletteIsRunning" options:0 context:&vellumTitlebarPaletteContext];owner.observingPalette=YES;
    }

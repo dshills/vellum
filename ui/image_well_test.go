@@ -3,6 +3,7 @@ package ui
 import (
 	"github.com/dshills/vellum/canvas"
 	"image"
+	"path/filepath"
 	"testing"
 )
 
@@ -15,19 +16,21 @@ func TestImageWellControlledPathsAndStaleRequests(t *testing.T) {
 		t.Fatal(err)
 	}
 	drop := n.Children[1].FileDrop
-	for _, paths := range [][]string{{"/tmp/a.txt"}, {"relative.png"}, {"/tmp/a.png", "/tmp/b.png"}} {
+	directory := t.TempDir()
+	path := func(name string) string { return filepath.Join(directory, name) }
+	for _, paths := range [][]string{{path("a.txt")}, {"relative.png"}, {path("a.png"), path("b.png")}} {
 		if drop(FileDropEvent{Paths: paths}) {
 			t.Fatal("invalid drop admitted")
 		}
 	}
-	if calls != 0 || !drop(FileDropEvent{Paths: []string{"/tmp/A.PNG"}}) || calls != 1 {
+	if calls != 0 || !drop(FileDropEvent{Paths: []string{path("A.PNG")}}) || calls != 1 {
 		t.Fatal("path request", calls)
 	}
 	if n.Children[1].Children[0].Image != art {
 		t.Fatal("color source replaced")
 	}
 	w.Busy = true
-	drop(FileDropEvent{Paths: []string{"/tmp/a.png"}})
+	drop(FileDropEvent{Paths: []string{path("a.png")}})
 	if calls != 1 {
 		t.Fatal("busy drop admitted")
 	}

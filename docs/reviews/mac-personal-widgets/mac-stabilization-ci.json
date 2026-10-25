@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "6fffa08cae8fa272d8a33ac2a4aeadf0",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "39250c6e1c2711d99b876816843b1bbfea8da053",
+    "branch": "codex/mac-personal-app-stabilization"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "35ccebf94e8c3d4e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Raw objc_msgSend cast and misplaced helper",
+      "message": "The helper is defined between the comment that explains the VellumTitlebarToolbar interception and the @interface itself, which separates the comment from the code it describes. The dynamic objc_msgSend call also bypasses compile-time checking, and the cast assumes BOOL has the same ABI size on every architecture. This is generally fine on arm64 and x86_64, but fragile.",
+      "suggestion": "Move the helper above the intercept comment, or use KVC (setValue:forKey:@\"allowsDisplayModeCustomization\") or an NSInvocation as a safer dynamic call.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/titlebar_toolbar_darwin.m",
+          "lines": {
+            "start": 15,
+            "end": 20
+          }
+        }
+      ],
+      "tags": [
+        "objc",
+        "maintainability"
+      ],
+      "evidence": "if([toolbar respondsToSelector:setter])((void (*)(id,SEL,BOOL))objc_msgSend)(toolbar,setter,enabled);",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3986,
+    "totalMs": 4000
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 6387,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5162,
+        "output": 382,
+        "costUSD": 0.014144
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
