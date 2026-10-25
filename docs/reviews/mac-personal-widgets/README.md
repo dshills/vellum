@@ -1634,3 +1634,11 @@ Prism: `personal-v01-cycle-repair-final.json` (Anthropic Claude Sonnet 5.5, comp
 The exact extracted-SDK native run exposed a preexisting fixture lifetime bug: the simple survivor allocated a new readyCanvas wrapper in every View. System-preference delivery invalidated the survivor and reconciliation correctly refused to mount its still-live GPUCanvas twice. Retain one wrapper per opening; composed panels share that same setup identity. The focused race regression covers both view routes and existing cycle tests/vet pass. Prism complete with no findings. Original failed native evidence is retained; corrected native qualification remains pending. No application features or release assertions changed.
 
 Focused checks: `personal-v01-cycle-repair-final-checks.json`.
+
+## Complete bounded personal macOS v0.1 acceptance and private delivery
+
+Prism: `personal-v01-acceptance-clear.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+All eight distinct native invocations pass and all 789 grouped native root methods pass; exact app ZIPs verify, the light app is launched from those extracted bytes, and the independent SDK consumer renders verified GPU output. Source/artifacts bind to clean a693e71; acceptance edits are docs only. Prism inventory questions were addressed explicitly: hidden untitled AppKit shell attribution remains unqualified; Dispatching=1 is the active report callback; four soak memory samples precede close/advance and are not terminal samples. The final low-confidence count finding is not a failed check: the array contains exactly eight unique names, verified mechanically, and the README now maps them one-to-one. Inspector output is nested within its editor-ax invocation, and phase timing versus process elapsed time is explained. Original failure and all review rounds remain retained. Owner explicitly leaves real IME/VoiceOver unqualified. Separate Dark launch, final physical Find result, other hardware and full native allocation/performance qualification are not claimed. No features, release gates, global settings or public publication changed.
+
+Focused checks: `personal-v01-acceptance-final-checks.json`.

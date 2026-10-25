@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "3638aebc5eeacc85be56a4121ee2c8c6",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "a693e711821d1829d44d057bed6482ab04c1f6ea",
+    "branch": "codex/personal-macos-v01"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "8974bbac9a442149",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Native check count/naming inconsistent with narrative",
+      "message": "The acceptance record claims 8 unique native checks, but the doc and JSON's native_checks array lists cycle, soak, endurance, document, editor-ax, text, starter and sdk-runtime. The README, however, lists 'text/modal FIFO' and 'external editor AX' as separately scripted items, so the count of eight does not obviously reconcile with the narrative (the soak is described as 320s but runs 332s). The 'editor_external_ax' entry duplicates 'editor-ax', which makes it ambiguous which invocations count.",
+      "suggestion": "Make the check names in README match native_checks one-to-one, and mark the editor_external_ax summary as the output of the editor-ax check.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reports/personal-macos-v01/acceptance.json",
+          "lines": {
+            "start": 681,
+            "end": 681
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "consistency",
+        "location-corrected"
+      ],
+      "evidence": "\"native_check_count\": 8,",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4206,
+    "totalMs": 4232
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 35600,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 16608,
+        "output": 371,
+        "costUSD": 0.036926
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
