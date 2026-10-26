@@ -24,7 +24,13 @@ This is an explicit facade whitelist. Other native exports, backend extension in
 
 Source compatibility does not promise pixel-identical AppKit controls, arbitrary-workload performance, cross-window placement, unrestricted data sizes or qualification of every hardware/display combination. Use the [Mac support guide](../docs/macos-v1.md), [framework contract](framework.md), per-control specifications and their existing limits. The supported personal-use configuration is Apple Silicon on the recorded macOS26.6.2 host. Other configurations remain unqualified. Human IME and VoiceOver usability remain explicitly unqualified under the owner's existing choice.
 
-Root and native driver are separate Go modules. This private SDK retains explicit replacement origins and no public module tags are created. Public Go module release would require separately coordinated root/driver version tags and authorization. SDK consumers must preserve every generated native-linker replacement.
+Root and native driver are separate Go modules. The owner-authorized
+26 October source release creates the public root `v1.0.0` tag. Native apps
+continue to build from the tagged checkout with explicit local replacements;
+no independently consumable native-driver tag or prepared public SDK is released.
+The private SDK retains its recorded identity and replacement origins. Separate
+native-module releases require coordinated version tags and authorization. SDK
+consumers must preserve every generated native-linker replacement.
 
 ## Verification and change review
 

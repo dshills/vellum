@@ -53,20 +53,26 @@ API or release qualification.
 
 ## Current status
 
-**Current source identifies `v1.0.0` for private personal macOS use.** The
-[stable API contract](specs/stable-api.md) defines source-compatibility guarantees
-and experimental exclusions. Matching SDK, Notes, Mac Widgets and two-window
-shell packages follow the [release closeout](specs/macos-v1-release.md). The
-[Mac guide](docs/macos-v1.md) describes supported behavior; the
-[completed RC report](docs/reports/macos-v1/README.md) retains its exact build
-identities and verification limits. Final v1 results are recorded in the
-[release report](docs/reports/macos-v1-release/README.md).
+**Latest tagged source release: [v1.0.0](https://github.com/dshills/vellum/releases/tag/v1.0.0).**
+This release provides the Go framework source, macOS examples and build tools
+for personal use. Read the [release notes](release/notes/v1.0.0.md) for highlights
+and the [stable API contract](specs/stable-api.md) for compatibility guarantees
+and experimental exclusions. See the showcase apps above for current UI examples.
 
-The latest published download is still the older
+Build native apps from the tagged checkout using Quick start below. GitHub's
+source ZIP/tar archives are checkout source, not prepared SDKs or installed apps;
+run the pinned dependency preparation step before native builds. The separately
+versioned native driver is consumed through the checkout's local replacements.
+This release creates the root `v1.0.0` tag; it does not add native-module tags.
+
+The latest prebuilt native download remains the older
 [v0.1.0-alpha.3 developer preview](https://github.com/dshills/vellum/releases/tag/v0.1.0-alpha.3).
-Its SDK and Placement app do not contain the current Notes and widget work.
-The v1 packages are private; no public v1 tags or downloadable assets are
-published by this closeout. Apps are ad-hoc signed and unnotarized.
+Its SDK and Placement app do not contain the current Notes, widget or showcase
+work. Current v1 SDK/app bundles remain private; the changed-payload distribution
+audit is pending. No native binaries or prepared SDK assets accompany the source
+release. Private apps are ad-hoc signed and unnotarized. The
+[Mac guide](docs/macos-v1.md) and [private release report](docs/reports/macos-v1-release/README.md)
+retain their exact build identities, supported behavior and verification limits.
 
 Native acceptance covers the recorded Apple Silicon macOS host. Human
 IME candidate behavior and VoiceOver usability remain unqualified, as do other
@@ -104,7 +110,7 @@ Xcode Command Line Tools. Native applications require a supported GPU; current
 personal-use testing targets Apple Silicon macOS.
 
 ```sh
-git clone https://github.com/dshills/vellum.git
+git clone --branch v1.0.0 --depth 1 https://github.com/dshills/vellum.git
 cd vellum
 
 # Prepare pinned native sources and the local build environment.
@@ -232,7 +238,7 @@ workflow is `scripts/check.sh`; see [CONTRIBUTING](CONTRIBUTING.md) and the
 
 Vellum's own code is [MIT licensed](LICENSE). Third-party components retain their
 original licenses and notices. The approved alpha.3 distribution decision covers
-that exact payload and notice bundle. Current v1 artifacts remain private;
-new public assets require the applicable audit, notice checks and publication
+that exact payload and notice bundle. The v1.0.0 source tag is public; current native SDK/app bundles remain private.
+New public native assets require the applicable audit, notice checks and publication
 approval. See the [release contract](specs/release.md) and
 [release metadata](release/version.json).

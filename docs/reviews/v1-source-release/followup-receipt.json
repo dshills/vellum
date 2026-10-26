@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "README.md,docs/macos-v1.md,docs/reviews/v1-source-release/README.md,docs/reviews/v1-source-release/initial-prism.json,docs/reviews/v1-source-release/initial-receipt.json,docs/reviews/v1-source-release/version-check.json,release/notes/v1.0.0.md,release/version.json,specs/macos-v1-release.md,specs/release.md,specs/stable-api.md",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "6",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/v1-source-release-final/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/v1-source-release-final/prism.json"
+  ],
+  "cwd": "/Users/dshills/Development/projects/Vellum",
+  "started_utc": "2026-10-26T20:25:12.967458+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 1,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 80572,
+  "group": 80572,
+  "owned": {
+    "created": true,
+    "pid": 80572,
+    "group": 80572,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 1,
+    "errors": [],
+    "observation": {
+      "group": 80572,
+      "members": [],
+      "observation_sha256": "0189df0b50459578ef5d4c9e121000d6db9b929fc5c513c9a1110795f61f0ef8"
+    }
+  },
+  "seconds": 3.0841530829202384,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

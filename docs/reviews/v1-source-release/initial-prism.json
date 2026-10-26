@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "537e0c5dc49c450bd3e09f33a2d119d4",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "bf329dfed53fb5fb6c7ed196e7fbfd38d32eee10",
+    "branch": "codex/release-v1-source"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "1d9c747cef3ed73b",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Conflicting publication authorization flags in version.json",
+      "message": "The macos_v1 and personal_use blocks still declare public_publication_authorized false, while the new source_release block says true. Any tooling or reader checking the flag gets contradictory answers, and the contract in specs/macos-v1-release.md still says \"Do not create public tags/releases/assets\" in its body.",
+      "suggestion": "Add a note to the macos_v1 block that it covers native packages only (for example rename it to native_public_publication_authorized), and reconcile the closeout contract text so it does not forbid the public tag.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "release/version.json",
+          "lines": {
+            "start": 55,
+            "end": 89
+          }
+        }
+      ],
+      "tags": [
+        "consistency",
+        "release-metadata"
+      ],
+      "evidence": "\"public_publication_authorized\": false",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3501,
+    "totalMs": 3518
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 7,
+    "bytes": 21051,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 9659,
+        "output": 302,
+        "costUSD": 0.022338
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

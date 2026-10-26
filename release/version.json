@@ -44,7 +44,8 @@
     "contract": "specs/personal-macos-v01.md",
     "public_publication_authorized": false,
     "historical": true,
-    "version": "v0.1.0-personal.1"
+    "version": "v0.1.0-personal.1",
+    "publication_scope": "historical-personal-v0.1-artifacts"
   },
   "macos_v1": {
     "status": "private-release",
@@ -54,7 +55,8 @@
     "human_ime": "unqualified",
     "human_voiceover": "unqualified",
     "experimental_rendering": false,
-    "public_publication_authorized": false
+    "public_publication_authorized": false,
+    "publication_scope": "native-sdk-and-app-assets"
   },
   "api_compatibility": {
     "status": "stable-v1",
@@ -79,5 +81,13 @@
       "github.com/dshills/vellum/replay",
       "github.com/dshills/vellum/automation"
     ]
+  },
+  "source_release": {
+    "tag": "v1.0.0",
+    "kind": "source-only",
+    "release_notes": "release/notes/v1.0.0.md",
+    "native_assets": false,
+    "native_module_tags": false,
+    "source_publication_authorized": true
   }
 }

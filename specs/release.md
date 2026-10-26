@@ -3,7 +3,13 @@
 Current source/API identity is **`v1.0.0`**, recorded by `release/version.json`
 and `vellum.Version`. The [macOS v1 closeout](macos-v1-release.md) authorizes
 private personal-use packaging and the [stable API contract](stable-api.md).
-It does not authorize public tags, release assets, signing identities or notarization.
+The owner separately requested a tagged release on 26 October 2026, authorizing
+the public root `v1.0.0` source tag and GitHub release described in
+[the release notes](../release/notes/v1.0.0.md). GitHub source archives contain the
+already-public checkout source. This source release does not ship prepared SDKs,
+native libraries or app bundles, create native-module tags, change audit approval,
+use signing identities or notarize. The existing native/SDK public packaging gates
+below remain unchanged; `source_release` records this narrower authorization.
 
 The root module is `github.com/dshills/vellum`, the native module is
 `github.com/dshills/vellum/drivers/cogent`, and Vellum's own code uses MIT.
