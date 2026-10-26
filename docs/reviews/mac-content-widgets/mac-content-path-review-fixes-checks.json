@@ -1,0 +1,30 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestFilePickerRejects"
+    ],
+    "exit_code": 0,
+    "seconds": 15.290552249876782
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      ".",
+      "./cmd/gallery"
+    ],
+    "exit_code": 0,
+    "seconds": 11.948076667031273
+  }
+]

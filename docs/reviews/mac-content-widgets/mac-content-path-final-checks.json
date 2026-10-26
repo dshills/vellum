@@ -1,0 +1,30 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui",
+      "./app"
+    ],
+    "exit_code": 0,
+    "seconds": 3.4256008330266923
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-timeout=120s",
+      ".",
+      "-run",
+      "^TestPathPicker"
+    ],
+    "exit_code": 0,
+    "seconds": 17.213222165824845
+  }
+]

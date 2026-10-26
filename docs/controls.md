@@ -602,3 +602,12 @@ It proposes changes through stable item IDs; the app owns state/history. Up to12
 items; Tab/Space and normal text-field editing are supported. Disabled/removed
 items and stale root identities refuse callbacks. No clocks or storage are owned.
 See [the content-widget contract](../specs/mac-content-widgets.md).
+
+`ui.FilePickerField` provides a controlled path with original-color artwork,
+Browse/Clear/Reveal and single-path dropping. Request runs on the owner; use
+optional `Application.Paths()` services on workers for an exact-parent file or
+folder chooser and Finder reveal. Existing Services implementations are unchanged.
+Metadata checks do not read content; the native chooser verifies regular files
+or directories before returning. Drop admission requires app worker validation.
+Cancel preserves the accepted path; filesystem syscalls cannot be interrupted
+mid-call and an already-dispatched Finder reveal cannot be rolled back.

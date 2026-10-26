@@ -14,6 +14,7 @@ extern int vellumCancelAllAlerts(void);
 extern int vellumCancelAllDocumentPanels(void);
 extern int vellumCancelAllQuickLook(void);
 extern int vellumCancelAllShares(void);
+extern int vellumCancelAllPaths(void);
 static NSMutableDictionary<NSNumber *, NSSavePanel *> *vellumPanels;
 
 // Restore only the exact live parent when our panel owned keyboard focus.
@@ -290,6 +291,7 @@ int vellumShutdownOnMain(void) {
  if(vellumCancelAllDocumentPanels())status=2;
  if(vellumCancelAllQuickLook())status=2;
  if(vellumCancelAllShares())status=2;
+ if(vellumCancelAllPaths())status=2;
         for (NSSavePanel *panel in vellumPanels.allValues.copy) {
             if (vellumDismissPanel(panel)) status=2;
         }

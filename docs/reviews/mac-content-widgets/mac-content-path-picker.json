@@ -1,0 +1,142 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "7fb6b1a4e8dd75605e73d803b952f98c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "e8d28712e5f8367d4a7f110995eeece96f317576",
+    "branch": "codex/mac-content-widgets"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "e614647a11da4677",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Overlapping requests orphan prior ticket",
+      "message": "A second Browse/Reveal/Drop request overwrites filePickerTicket without cancelling the earlier one. The earlier goroutine's publish is then silently dropped and its native sheet is left running. Busy is only recomputed in view(), so a rapid second click or a drop between renders can trigger this.",
+      "suggestion": "Refuse a new request while filePickerTicket is non-nil, or cancel the previous ticket first, inside Request.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_file_picker.go",
+          "lines": {
+            "start": 46,
+            "end": 48
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "location-corrected"
+      ],
+      "evidence": "if m.filePickerTicket != ticket {\n\t\t\t\t\t\treturn\n\t\t\t\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "43b4db2f7688e5b9",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Ticket may never clear if publish is dropped",
+      "message": "The goroutine reads and writes shared state (p.Extensions is copied but e, p, m are used) off the owner thread. Only the Publish callback is safe, yet the unprotected goroutine body reads only captured values, so this is OK. However, if ReserveWindowCompletion succeeds and the goroutine never publishes (e.g. window closed), filePickerTicket stays set, keeping the field Busy until Err() is non-nil.",
+      "suggestion": "Clear filePickerTicket when the ticket errors, or rely solely on the Err() check consistently.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_file_picker.go",
+          "lines": {
+            "start": 15,
+            "end": 24
+          }
+        }
+      ],
+      "tags": [
+        "state"
+      ],
+      "evidence": "ticket, err := a.ReserveWindowCompletion(w, nil)\n\t\t\tif err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t\tm.filePickerTicket = ticket",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 15409,
+    "totalMs": 15435
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 34950,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 19359,
+        "output": 976,
+        "costUSD": 0.048478
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "d90226f87e516795",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Length check after copy/validation",
+        "message": "Path length is checked after CopyFileDropPaths, and ValidatePickerPath also does this, so oversized or malformed paths may be processed before the size check. The order is inconsistent, and the chosen-path check in the Go driver returns different errors than app.ErrServiceTooLarge.",
+        "suggestion": "Check len(path) first, before any copying or validation.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "ui/file_picker_field.go",
+            "lines": {
+              "start": 62,
+              "end": 32
+            }
+          }
+        ],
+        "tags": [
+          "validation"
+        ],
+        "evidence": "if _, e := ui.CopyFileDropPaths([]string{path}); e != nil {\n\t\treturn e\n\t}\n\tif len(path) \u003e 4096 {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in ui/file_picker_field.go"
+    }
+  ],
+  "suppressed": []
+}
