@@ -593,3 +593,12 @@ input-source settings or human IME qualification are implied.
 All five additions are demonstrated in `go run ./cmd/gallery -mac-widgets` from
 the prepared driver module, under Components: Help tags, Links, Native Share,
 File drop zone, and Command palette. The accepted v1 build9 app ZIPs are unchanged.
+
+## Mac content widget additions
+
+`ui.Checklist` composes compact completion controls, optional inline editable
+names, caller-formatted due labels, priorities and original-color category icons.
+It proposes changes through stable item IDs; the app owns state/history. Up to128
+items; Tab/Space and normal text-field editing are supported. Disabled/removed
+items and stale root identities refuse callbacks. No clocks or storage are owned.
+See [the content-widget contract](../specs/mac-content-widgets.md).
