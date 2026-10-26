@@ -1,0 +1,140 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "0cb69b50ee91217feb0804407f3af602",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "1f848def0e1d52f4fef10f6359a6315823fc03cf",
+    "branch": "codex/mac-widget-v11"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "b5a758c8ffbf39bc",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible nil dereference of m.essentials",
+      "message": "The Share callback derefs m.essentials, which is only set in view() on construction; also the goroutine reads and writes m.shareTicket/m.status from the closure on a worker only inside Publish, which is fine, but `err` is captured and shared... In particular w.Context() is read on the worker, and `m.essentials` could be nil if the view was never built, causing a panic.",
+      "suggestion": "Guard `m.essentials == nil` before dereferencing.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_share.go",
+          "lines": {
+            "start": 11,
+            "end": 24
+          }
+        }
+      ],
+      "tags": [
+        "nil"
+      ],
+      "evidence": "if m.shareActive() {\n\t\t\treturn\n\t\t}\n\t\ta, w := m.essentials.application, m.essentials.window",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "7b206dfc4c6fd9fe",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Blocking os.Stat ignores context cancellation",
+      "message": "File sizes are not counted toward the 64 KiB total, only the path length, and Stat is done before native dispatch: TOCTOU is acknowledged. Also a symlink to a directory is followed by os.Stat; Lstat is not used, fine, but file items are stat'ed on the calling goroutine with no context cancellation, so a hung network filesystem blocks beyond ctx cancellation.",
+      "suggestion": "Run os.Stat in a goroutine selected against scope.Done(), or document the limitation.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/share.go",
+          "lines": {
+            "start": 14,
+            "end": 14
+          }
+        }
+      ],
+      "tags": [
+        "io",
+        "cancellation"
+      ],
+      "evidence": "if err := o.Validate(); err != nil {\n\t\treturn app.ShareResult{}, err\n\t}\n\tscope, end, err := s.panelContext(ctx, parent)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "75299462e2c02d24",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Shutdown path may race with deferred finish of committed share",
+      "message": "vellumCancelAllShares is called from shutdown on the main thread, but finish: is invoked with a selected-service session in flight; after finish, cleanup sets vellumShareSession=nil only when it matches. If a committed session is already cleaned, fine, but when selected, the dispatch_async finish may run after shutdown, calling vellumServiceResult against a torn-down service. The return value also reports failure (2) whenever the session survives.",
+      "suggestion": "Make shutdown idempotent: mark finished synchronously and ensure the later dispatched finish: is a no-op and does not call into torn-down service state.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/share_darwin.m",
+          "lines": {
+            "start": 91,
+            "end": 91
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle",
+        "shutdown",
+        "location-corrected"
+      ],
+      "evidence": "int vellumCancelAllShares(void){@try{if(vellumShareSession.finished){if(![vellumShareSession cleanup])return 2;}else [vellumShareSession finish:1];return vellumShareSession?2:0;}@catch(NSException *e){return 2;}}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 8852,
+    "totalMs": 8886
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 19,
+    "bytes": 48042,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 26047,
+        "output": 1078,
+        "costUSD": 0.062874
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

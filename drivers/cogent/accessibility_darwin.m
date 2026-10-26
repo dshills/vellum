@@ -597,9 +597,10 @@ static BOOL vellumAXCommitSnapshot(VellumAXState *state,NSDictionary *snapshot,B
  }
  return YES;
 }
+extern void vellumShareAnchorChanged(uint64_t);
 void vellumAXUpdate(uint64_t token,const char *json){
  vellumAXWithJSONPayload(json,^(NSData *payload){
-  dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{NSDictionary *snapshot=[NSJSONSerialization JSONObjectWithData:payload options:0 error:nil];vellumAXCommitSnapshot(vellumAXStates[@(token)],snapshot,YES);}});
+  dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{NSDictionary *snapshot=[NSJSONSerialization JSONObjectWithData:payload options:0 error:nil];vellumAXCommitSnapshot(vellumAXStates[@(token)],snapshot,YES);vellumShareAnchorChanged(token);}});
  });
 }
 // A Go-proven pending-only publication keeps the exact validated membership,
@@ -654,7 +655,7 @@ static void vellumAXApplyGeometry(VellumAXState *state,NSDictionary *bounds){
 }
 void vellumAXGeometry(uint64_t token,const char *json){
  vellumAXWithJSONPayload(json,^(NSData *payload){
-  dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{NSDictionary *bounds=[NSJSONSerialization JSONObjectWithData:payload options:0 error:nil];vellumAXApplyGeometry(vellumAXStates[@(token)],bounds);}});
+  dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{NSDictionary *bounds=[NSJSONSerialization JSONObjectWithData:payload options:0 error:nil];vellumAXApplyGeometry(vellumAXStates[@(token)],bounds);vellumShareAnchorChanged(token);}});
  });
 }
 // Synchronous CGO transaction fixture. It never registers an attachment, creates
@@ -893,3 +894,16 @@ char *vellumWindowVisibilityObserverFixture(void) {
 // Native-main-only lookup for a lifetime-bound service. No window name, key
 // window fallback or cross-application pointer can retarget an old request.
 void *vellumAXNativeWindow(uint64_t token){if(!NSThread.isMainThread)return NULL;VellumAXState *state=vellumAXStates[@(token)];if(!state||state.closed)return NULL;return (__bridge void *)state.window;}
+
+// Sharing uses the same clipped, scale-correct ordinary-control geometry as AX.
+// Only the native main queue may resolve a managed anchor into an AppKit view.
+BOOL vellumAXShareAnchor(uint64_t token,NSString *identifier,NSView **outView,NSRect *outRect){
+ if(!NSThread.isMainThread)return NO;
+ VellumAXState *state=vellumAXStates[@(token)];VellumAXElement *e=state.elements[identifier];
+ if(!state||state.closed||!e.live||![e.node[@"role"] isEqual:@"button"]||!state.view||!state.window)return NO;
+ NSRect screen=e.accessibilityFrame;
+ if(NSIsEmptyRect(screen))return NO;
+ NSRect window=[state.window convertRectFromScreen:screen];NSRect rect=[state.view convertRect:window fromView:nil];rect=NSIntersectionRect(rect,state.view.visibleRect);
+ if(NSIsEmptyRect(rect))return NO;
+ *outView=state.view;*outRect=rect;return YES;
+}

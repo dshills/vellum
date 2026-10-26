@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "80a52606afb7cdbe194cf81bb5c0e16c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "1f848def0e1d52f4fef10f6359a6315823fc03cf",
+    "branch": "codex/mac-widget-v11"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "51fdc53e86d3cdfd",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "File item checks live only in one driver",
+      "message": "File items count the length of the path string toward the 64 KiB payload limit, which is fine, but Items elements use Kind validation after size checks, and AnchorID/Items count validation happens only when len(o.Items)\u003c=16. The more significant gap: file validation only checks absolute path, so the app-layer Validate allows paths with NUL bytes only via the earlier check; however no check prevents the 'file' path from being a directory at Validate time, relying on the driver. Non-darwin services may skip it.",
+      "suggestion": "Document or enforce regular-file checks in a shared helper so every ShareServices implementation gets them.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "app/share.go",
+          "lines": {
+            "start": 40,
+            "end": 44
+          }
+        }
+      ],
+      "tags": [
+        "validation"
+      ],
+      "evidence": "total += len(item.Value)\n\t\tif total \u003e 64\u003c\u003c10 {\n\t\t\treturn ErrServiceTooLarge\n\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "c2ac8f74bbffdaae",
+      "severity": "medium",
+      "category": "bug",
+      "title": "shareBusy can stick if Publish fails",
+      "message": "shareBusy is set to true before the goroutine, and is reset only inside ticket.Publish. If Publish fails (window closed, ticket invalid), the error is discarded and shareBusy stays true forever, permanently disabling the button. Also m.status/m.count are mutated only in Publish, but the goroutine reads captured `err` variables shadowed per scope; ok.",
+      "suggestion": "Handle Publish error (e.g. reset shareBusy on the owner path or when Publish returns an error), or release the ticket on failure.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_share.go",
+          "lines": {
+            "start": 23,
+            "end": 24
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "state",
+        "location-corrected"
+      ],
+      "evidence": "m.shareBusy = true\n\t\tgo func() {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7816,
+    "totalMs": 7868
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 18,
+    "bytes": 45486,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 24819,
+        "output": 669,
+        "costUSD": 0.056328
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

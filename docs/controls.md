@@ -547,3 +547,19 @@ actions. Actions run on the owner; use a worker with `Application.URLs().OpenURL
 or clipboard services. The optional native URL service is macOS-only initially;
 other hosts return ErrUnavailable. OS acceptance does not prove page loading,
 and cancellation cannot undo an already dispatched browser open.
+
+`ui.ShareButton` uses the familiar upward-arrow share symbol, or caller-provided
+full-color artwork. Dispatch `Application.Sharing().Share` from a worker using
+the event ID as AnchorID and the exact parent WindowRef. The actual AppKit picker
+retains its system service icons. It is anchored using clipped native AX geometry
+with display scaling accounted for; missing/retired/moved anchors cancel or refuse.
+Payloads contain 1..16 explicit text/HTTP(S)/regular-file items, at most 64 KiB
+in total. No folders are enumerated. Cancellation/parent close/shutdown clean up
+uncommitted pickers; selecting a service hands control to that OS service and
+cannot be rolled back. Success records selection, never delivery. Requires macOS
+13+; other hosts return ErrUnavailable. Automated tests do not send content. Regular-file metadata checks run synchronously
+on the service worker; cancellation cannot interrupt an in-progress filesystem
+syscall, including a slow mounted/network filesystem.
+
+Native design reference: [Apple sharing picker](https://developer.apple.com/documentation/appkit/nssharingservicepicker),
+[anchoring](https://developer.apple.com/documentation/appkit/nssharingservicepicker/show%28relativeto%3Aof%3Apreferrededge%3A%29).

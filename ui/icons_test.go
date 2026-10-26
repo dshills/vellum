@@ -8,7 +8,7 @@ import (
 
 func TestIconsPortableContract(t *testing.T) {
 	list := Symbols()
-	if len(list) != 37 {
+	if len(list) != 38 {
 		t.Fatal("public symbol catalog", list)
 	}
 	for _, symbol := range list {

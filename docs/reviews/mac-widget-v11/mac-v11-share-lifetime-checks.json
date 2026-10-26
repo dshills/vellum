@@ -1,0 +1,28 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./app"
+    ],
+    "exit_code": 0,
+    "seconds": 1.6972421249374747
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestMacShareBusyExpires"
+    ],
+    "exit_code": 0,
+    "seconds": 15.283710666932166
+  }
+]

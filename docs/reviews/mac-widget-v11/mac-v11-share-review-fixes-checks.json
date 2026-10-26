@@ -1,0 +1,33 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-timeout=120s",
+      ".",
+      "-run",
+      "^TestNativeShare"
+    ],
+    "exit_code": 0,
+    "seconds": 19.239782541058958
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestMacShareBusyExpires"
+    ],
+    "exit_code": 0,
+    "seconds": 16.892929500201717
+  }
+]
