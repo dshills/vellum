@@ -492,6 +492,9 @@ func syncSemantics(r *record) {
 	r.widget.AsTree().SetProperty(SemanticsProperty, sem)
 	r.widget.AsTree().SetProperty(disabledProperty, r.node.Disabled)
 	r.widget.AsWidget().Tooltip = html.EscapeString(r.node.Accessibility.Help)
+	if r.node.Tooltip != "" {
+		r.widget.AsWidget().Tooltip = html.EscapeString(r.node.Tooltip)
+	}
 	r.widget.AsWidget().SetState(disabled, states.Disabled)
 	if r.control != nil && r.control.dialog != nil {
 		r.control.dialog.host.SetProperty(disabledProperty, disabled)
@@ -1013,6 +1016,7 @@ func disposeControl(r *record) {
 	if r == nil {
 		return
 	}
+	closeHelpTag(r)
 	if r.control != nil {
 		disposePlacement(r)
 		disposeShortcutRecorder(r)

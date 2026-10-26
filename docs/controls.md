@@ -532,3 +532,11 @@ See [Mac composition widgets](mac-composition-widgets.md) and [scoped applicatio
 
 See [Mac document controls](mac-document-controls.md) for the new list, outline,
 native panel services and circular dial, including bounds and ownership limits.
+
+## Post-v1 additions
+
+`ui.WithTooltip(node, text)` attaches a bounded plain-text help tag. Hover waits
+for the existing platform long-hover threshold; F1 on a focused host also opens
+it. Escape, focus loss and target retirement dismiss it. It creates no focus
+stop and preserves explicit accessibility help. Styling follows the scoped Mac
+light/dark palette. See [the five-widget contract](../specs/mac-widget-v11.md).

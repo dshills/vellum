@@ -1,0 +1,18 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-timeout=120s",
+      ".",
+      "-run",
+      "^TestHelpTag"
+    ],
+    "exit_code": 0,
+    "seconds": 15.729863999877125
+  }
+]

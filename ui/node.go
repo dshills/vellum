@@ -40,6 +40,8 @@ type Node struct {
 	Text  string
 	// Placeholder is a non-value hint on TextField; Accessibility.Name remains its label.
 	Placeholder string
+	// Tooltip is bounded plain-text hover/F1 help. Empty retains Accessibility.Help hover behavior.
+	Tooltip string `json:",omitempty"`
 	// Secure protects TextField visual/native accessibility exposure even when
 	// Reveal is explicitly requested. Reveal belongs only on a Secure field.
 	Secure, Reveal bool
@@ -183,6 +185,9 @@ func Validate(root Node) error {
 		}
 		if strings.HasPrefix(n.ID, "tab-close:") {
 			return fmt.Errorf("ui: ID %q uses reserved tab-close: prefix", n.ID)
+		}
+		if err := validateTooltip(n.Tooltip); err != nil {
+			return err
 		}
 		seen[n.ID] = true
 		if n.Canvas != nil {

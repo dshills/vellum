@@ -81,6 +81,7 @@ type Driver struct {
 }
 type record struct {
 	scope           app.WindowRef
+	helpTag         *core.Scene
 	widget          core.Widget
 	node            ui.Node
 	children        []*record
@@ -785,6 +786,7 @@ func mountShallowScoped(parent tree.Node, n ui.Node, a *app.Application, scope a
 	}
 	bindWindowScope(r.widget, a, scope)
 	r.widget.AsWidget().SetName(n.ID)
+	bindHelpTag(r)
 	bindToolbarDragTooltipGuard(r.widget)
 	syncSemantics(r)
 	bindFileDrop(r, a, scope.ID())
@@ -828,6 +830,9 @@ func syncRecordVisible(r *record, n ui.Node, visible bool, scopes []*tabCloseSco
 		return err
 	}
 	previous := r.node
+	if !visible || n.Disabled || n.Tooltip != previous.Tooltip || n.Theme != previous.Theme {
+		closeHelpTag(r)
+	}
 	r.node = n
 	syncInputOutline(r)
 	disabledChanged := r.widget.AsWidget().IsDisabled() != controlDisabled(r)
@@ -865,6 +870,9 @@ func syncRecordVisible(r *record, n ui.Node, visible bool, scopes []*tabCloseSco
 		}
 	}
 	syncSemantics(r)
+	if controlDisabled(r) {
+		closeHelpTag(r)
+	}
 	if err := syncControl(r, previous); err != nil {
 		return err
 	}

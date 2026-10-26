@@ -1,0 +1,126 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "23dabacbb026029c81d9416fbf49d77b",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "282507b21d754ef457381cbb6d8d43de41e16d05",
+    "branch": "codex/mac-widget-v11"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "89033dcb95243030",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Help tag close ordering and lifecycle coverage",
+      "message": "closeHelpTag is called before the nil check. It is nil-safe, so this is harmless today, but the ordering is fragile. A more significant problem is that help tag state is only closed on dispose, not on widget unmount paths that skip disposeControl.",
+      "suggestion": "Place closeHelpTag after the nil check, and make sure every record removal path calls disposeControl.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/controls.go",
+          "lines": {
+            "start": 1015,
+            "end": 1018
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle"
+      ],
+      "evidence": "closeHelpTag(r)\n\tif r == nil {",
+      "fix": {
+        "before": "closeHelpTag(r)\n\tif r == nil {",
+        "after": "if r == nil {\n\t\treturn\n\t}\n\tcloseHelpTag(r)\n\tif false {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6275,
+    "totalMs": 6302
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 11,
+    "bytes": 22129,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 13224,
+        "output": 674,
+        "costUSD": 0.033188
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "3ead9d567ddd03a0",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Tooltip text may be double-escaped",
+        "message": "The tooltip is escaped, but Text rendering may treat content as HTML-ish markup. If it is rendered literally, users will see double-escaped text such as \"\u0026amp;\" for \"\u0026\". This is inconsistent with the spec's plain-text requirement, and the test uses \"\u003cplain\u003e \u0026 safely\".",
+        "suggestion": "Verify how core.Text interprets the string. Escape only if it parses markup; otherwise set the text directly, or disable markup parsing.",
+        "confidence": 0.55,
+        "locations": [
+          {
+            "path": "drivers/cogent/help_tag.go",
+            "lines": {
+              "start": 55,
+              "end": 55
+            }
+          }
+        ],
+        "tags": [
+          "correctness",
+          "rendering"
+        ],
+        "evidence": "core.NewText(sc).SetText(html.EscapeString(r.node.Tooltip))",
+        "fix": {
+          "before": "core.NewText(sc).SetText(html.EscapeString(r.node.Tooltip))",
+          "after": "core.NewText(sc).SetText(r.node.Tooltip)"
+        },
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/help_tag.go"
+    }
+  ],
+  "suppressed": []
+}

@@ -1,0 +1,69 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 2.410403416957706
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.8904055000748485
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-timeout=120s",
+      ".",
+      "-run",
+      "^TestHelpTag"
+    ],
+    "exit_code": 0,
+    "seconds": 15.540554374922067
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestMacComponents"
+    ],
+    "exit_code": 0,
+    "seconds": 18.94752687495202
+  },
+  {
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.27999554201960564
+  }
+]
