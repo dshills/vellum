@@ -27,6 +27,11 @@ func accessibilityBuiltinSemantic(nodes []accessibilityNode) (string, bool) {
 func accessibilityBuiltinSemanticHinted(nodes []accessibilityNode, hint int) (string, bool) {
 	for i := range nodes {
 		n := &nodes[i]
+		// Native descriptors extend the fixed scalar schema; retain the canonical
+		// standard encoder instead of silently omitting their presentation metadata.
+		if n.NativeContent != nil {
+			return "", false
+		}
 		switch v := n.Value.(type) {
 		case nil, string, bool, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr:
 		case float32:

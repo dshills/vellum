@@ -165,6 +165,11 @@ func detachAccessibilityNodes(nodes []accessibilityNode) {
 	maximumStorage := make([]float32, maximums)
 	for i := range nodes {
 		n := &nodes[i]
+		if n.NativeContent != nil {
+			copy := *n.NativeContent
+			n.NativeContent = &copy
+		}
+
 		count := len(n.Actions)
 		copy(actionStorage, n.Actions)
 		n.Actions = actionStorage[:count:count]

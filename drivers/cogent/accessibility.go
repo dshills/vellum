@@ -30,37 +30,38 @@ type accessibilityNode struct {
 	// Workbench namespace wrapping qualifies this exact pending host focus.
 	activationGuard      func() bool // Go-only originating managed input lease
 	pressFocusID         string
-	ID                   string      `json:"id"`
-	DomainID             string      `json:"domain_id"`
-	Parent               string      `json:"parent"`
-	Role                 string      `json:"role"`
-	Secure               bool        `json:"secure,omitempty"`
-	Name                 string      `json:"name"`
-	Help                 string      `json:"help"`
-	Value                any         `json:"value,omitempty"`
-	Disabled             bool        `json:"disabled"`
-	Focusable            bool        `json:"focusable"`
-	Focused              bool        `json:"focused"`
-	Selected             bool        `json:"selected"`
-	Actions              []string    `json:"actions"`
-	Orientation          string      `json:"orientation,omitempty"`
-	RowIndex             int         `json:"row_index,omitempty"`
-	RowCount             int         `json:"row_count,omitempty"`
-	ColumnIndex          int         `json:"column_index,omitempty"`
-	ColumnCount          int         `json:"column_count,omitempty"`
-	GridGeneration       uint64      `json:"grid_generation,omitempty"`
-	GridScope            string      `json:"grid_scope,omitempty"`
-	GridIncarnation      uint64      `json:"grid_incarnation,omitempty"`
-	GridPending          bool        `json:"grid_pending,omitempty"`
-	GridTargetGeneration uint64      `json:"grid_target_generation,omitempty"`
-	GridFrame            *[4]float32 `json:"grid_frame,omitempty"`
-	Level                int         `json:"level,omitempty"`
-	Expanded             *bool       `json:"expanded,omitempty"`
-	Min                  *float32    `json:"min,omitempty"`
-	TextClient           uint64      `json:"text_client,omitempty"`
-	TextSelection        *[2]int     `json:"text_selection,omitempty"`
-	TextFocus            int         `json:"text_focus,omitempty"`
-	Max                  *float32    `json:"max,omitempty"`
+	ID                   string                 `json:"id"`
+	DomainID             string                 `json:"domain_id"`
+	Parent               string                 `json:"parent"`
+	Role                 string                 `json:"role"`
+	Secure               bool                   `json:"secure,omitempty"`
+	Name                 string                 `json:"name"`
+	Help                 string                 `json:"help"`
+	Value                any                    `json:"value,omitempty"`
+	Disabled             bool                   `json:"disabled"`
+	Focusable            bool                   `json:"focusable"`
+	Focused              bool                   `json:"focused"`
+	Selected             bool                   `json:"selected"`
+	Actions              []string               `json:"actions"`
+	Orientation          string                 `json:"orientation,omitempty"`
+	RowIndex             int                    `json:"row_index,omitempty"`
+	RowCount             int                    `json:"row_count,omitempty"`
+	ColumnIndex          int                    `json:"column_index,omitempty"`
+	ColumnCount          int                    `json:"column_count,omitempty"`
+	GridGeneration       uint64                 `json:"grid_generation,omitempty"`
+	GridScope            string                 `json:"grid_scope,omitempty"`
+	GridIncarnation      uint64                 `json:"grid_incarnation,omitempty"`
+	GridPending          bool                   `json:"grid_pending,omitempty"`
+	GridTargetGeneration uint64                 `json:"grid_target_generation,omitempty"`
+	GridFrame            *[4]float32            `json:"grid_frame,omitempty"`
+	Level                int                    `json:"level,omitempty"`
+	Expanded             *bool                  `json:"expanded,omitempty"`
+	Min                  *float32               `json:"min,omitempty"`
+	TextClient           uint64                 `json:"text_client,omitempty"`
+	TextSelection        *[2]int                `json:"text_selection,omitempty"`
+	TextFocus            int                    `json:"text_focus,omitempty"`
+	NativeContent        *ui.NativeContentInput `json:"native_content,omitempty"`
+	Max                  *float32               `json:"max,omitempty"`
 }
 type accessibilityAction struct {
 	Kind  string
@@ -560,6 +561,10 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 					}
 				}
 			}
+		}
+		if n.NativeContent != nil && !disabled {
+			copy := *n.NativeContent
+			x.NativeContent = &copy
 		}
 		switch extension := n.Custom.(type) {
 		case *VirtualTable:
@@ -1356,6 +1361,15 @@ func accessibilityBoundsIncludingScoped(root *record, includeScoped bool) map[st
 			widget = r.control.dialog.host
 		}
 		bounds(accessibilityManagedID(r.node.ID), widget)
+		if r.node.NativeContent != nil && !accessibilityTreeNil(widget) {
+			wb := widget.AsWidget()
+			x, y := float32(0), float32(0)
+			if wb.Scene != nil {
+				x = float32(wb.Scene.SceneGeom.Pos.X)
+				y = float32(wb.Scene.SceneGeom.Pos.Y)
+			}
+			out["native-frame:"+accessibilityManagedID(r.node.ID)] = [4]float32{wb.Geom.Pos.Total.X + x, wb.Geom.Pos.Total.Y + y, wb.Geom.Size.Actual.Total.X, wb.Geom.Size.Actual.Total.Y}
+		}
 		menuPopupBounds(r, bounds)
 		if r.node.Kind == ui.Tabs && r.control != nil && r.control.tabs != nil {
 			for _, o := range r.node.Options {

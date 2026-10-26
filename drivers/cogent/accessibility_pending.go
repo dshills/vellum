@@ -134,7 +134,7 @@ func accessibilitySameWireNode(a, b accessibilityNode) bool {
 		!accessibilitySameScalar(a.Value, b.Value) || a.Disabled != b.Disabled || a.Focusable != b.Focusable || a.Focused != b.Focused || a.Selected != b.Selected ||
 		a.Orientation != b.Orientation || a.RowIndex != b.RowIndex || a.RowCount != b.RowCount || a.ColumnIndex != b.ColumnIndex || a.ColumnCount != b.ColumnCount ||
 		a.GridGeneration != b.GridGeneration || a.GridScope != b.GridScope || a.GridIncarnation != b.GridIncarnation || a.GridPending != b.GridPending || a.GridTargetGeneration != b.GridTargetGeneration ||
-		a.Level != b.Level || a.TextClient != b.TextClient || a.TextFocus != b.TextFocus ||
+		!accessibilitySamePointer(a.NativeContent, b.NativeContent) || a.Level != b.Level || a.TextClient != b.TextClient || a.TextFocus != b.TextFocus ||
 		!accessibilitySamePointer(a.Expanded, b.Expanded) || !accessibilitySamePointer(a.TextSelection, b.TextSelection) ||
 		!accessibilitySameFloatPointer(a.Min, b.Min) || !accessibilitySameFloatPointer(a.Max, b.Max) || (a.Actions == nil) != (b.Actions == nil) || len(a.Actions) != len(b.Actions) ||
 		(a.GridFrame == nil) != (b.GridFrame == nil) {

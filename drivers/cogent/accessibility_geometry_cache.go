@@ -14,6 +14,12 @@ func (b *accessibilityBridge) updateGeometryMembership(nodes []accessibilityNode
 		if node.GridScope != "" {
 			continue
 		}
+		if node.NativeContent != nil {
+			count++
+			if _, ok := b.geometryMembers["native-frame:"+node.ID]; !ok {
+				changed = true
+			}
+		}
 		count++
 		if _, ok := b.geometryMembers[node.ID]; !ok {
 			changed = true
@@ -26,6 +32,9 @@ func (b *accessibilityBridge) updateGeometryMembership(nodes []accessibilityNode
 	for _, node := range nodes {
 		if node.GridScope == "" {
 			members[node.ID] = struct{}{}
+			if node.NativeContent != nil {
+				members["native-frame:"+node.ID] = struct{}{}
+			}
 		}
 	}
 	b.geometryMembers = members

@@ -164,6 +164,11 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		})
 		widget = button
 		button.OnFirst(events.MouseDown, func(e events.Event) { beginPlacement(r, e) })
+	case ui.NativeContent:
+		frame := core.NewFrame(parent)
+		core.NewText(frame).SetText(r.node.Text)
+		frame.Styler(func(s *styles.Style) { s.SetAbilities(true, abilities.Focusable); s.Padding.Zero() })
+		widget = frame
 	case ui.Canvas2D:
 		widget = mountManagedCanvas(parent, r)
 	case ui.MenuButton:

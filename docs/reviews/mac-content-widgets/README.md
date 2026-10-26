@@ -22,3 +22,11 @@ Prism: `mac-content-date-range.json` (Anthropic Claude Sonnet 5.5, complete cove
 Fixed civil-equivalent time representation resets and guarded callbacks against stale accepted values and calendar months. Hardened calendar decoration against short or unrelated node IDs. Regression tests cover these review findings; no physical pointer qualification is claimed.
 
 Focused checks: `mac-content-date-range-checks.json`, `mac-content-range-final-checks.json`.
+
+## Add embedded Mac PDF viewer with bounded native lifecycle
+
+Prism: `mac-content-pdf-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Fixed Prism thumbnail constraint finding. Addressed the serialized-worker observation with two bounded jobs; two blocked OS reads/decoders can still delay loading, explicitly documented. The native run reproduced omitted optimized-wire metadata, repaired by canonical JSON fallback with copy/equality/schema regressions. Final actual-window check passed load/removal/recreation/removal with zero hosts/workers. This is automated native evidence, not physical pointer or human accessibility qualification.
+
+Focused checks: `mac-content-pdf-ready-checks.json`, `mac-content-pdf-final-checks.json`.

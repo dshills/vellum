@@ -35,9 +35,10 @@ type Node struct {
 	ID string
 	// Theme replaces inherited styling for this subtree. Nil inherits. Drivers
 	// snapshot maps at accepted View boundaries; never mutate them concurrently.
-	Theme *Theme
-	Kind  Kind
-	Text  string
+	Theme         *Theme
+	Kind          Kind
+	NativeContent *NativeContentInput
+	Text          string
 	// Placeholder is a non-value hint on TextField; Accessibility.Name remains its label.
 	Placeholder string
 	// Tooltip is bounded plain-text hover/F1 help. Empty retains Accessibility.Help hover behavior.
@@ -242,7 +243,7 @@ func Validate(root Node) error {
 		}
 		switch n.Kind {
 		case Column, Row, Tabs, Scroll, Dialog, Toolbar, StatusBar, FormGroup, SplitPane, Disclosure:
-		case Label, Button, Icon, Image, Extension, Canvas2D, Checkbox, Switch, ToggleButton, ProgressBar, ProgressRing, ProgressGauge, Separator, ToolbarSpace, ToolbarFlexibleSpace, MenuButton, Selector, ListBox, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
+		case Label, Button, Icon, Image, Extension, NativeContent, Canvas2D, Checkbox, Switch, ToggleButton, ProgressBar, ProgressRing, ProgressGauge, Separator, ToolbarSpace, ToolbarFlexibleSpace, MenuButton, Selector, ListBox, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
 			if len(n.Children) != 0 {
 				return fmt.Errorf("ui: leaf %q has children", n.ID)
 			}

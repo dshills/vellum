@@ -122,7 +122,7 @@ func IsContainer(kind Kind) bool {
 }
 func IsFocusable(kind Kind) bool {
 	switch kind {
-	case Button, Canvas2D, Checkbox, Switch, ToggleButton, MenuButton, Selector, ListBox, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs, SplitPane, Disclosure:
+	case NativeContent, Button, Canvas2D, Checkbox, Switch, ToggleButton, MenuButton, Selector, ListBox, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs, SplitPane, Disclosure:
 		return true
 	}
 	return false
@@ -151,6 +151,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if err := validateNativeContent(n); err != nil {
+		return err
+	}
 	if n.Prose && (n.Kind != MultilineText || !n.SoftWrap) {
 		return fmt.Errorf("ui: Prose requires a soft-wrapped MultilineText editor")
 	}

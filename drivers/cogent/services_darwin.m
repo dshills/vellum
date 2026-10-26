@@ -284,9 +284,11 @@ void vellumSetMenu(uint64_t token, const char *json) {
     });
 }
 extern int vellumStopAllSystemAppearance(void);
+extern void vellumNativeContentShutdown(void);
 int vellumShutdownOnMain(void) {
     @autoreleasepool {
         int status=vellumStopAllSystemAppearance();
+        vellumNativeContentShutdown();
         if(vellumCancelAllAlerts())status=2;
  if(vellumCancelAllDocumentPanels())status=2;
  if(vellumCancelAllQuickLook())status=2;

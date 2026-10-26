@@ -620,3 +620,35 @@ Events use local noon in the start endpoint's exact location; time-of-day is not
 part of the range. Min/Max are civil bounds interpreted in that location.
 `StandardDateRangePresets(today)` uses an explicit clock and civil AddDate across
 DST. No date enumeration or timer is created for long ranges; at most12 presets.
+
+## Embedded PDF documents (macOS)
+
+`ui.PDFViewer.View` exposes an explicit local file through PDFKit: native
+selection/copy, page navigation, zoom/fit, optional initial thumbnail sidebar
+and bounded incremental Find. `Revision` reloads an unchanged path. Empty paths
+show a prompt; malformed/locked/oversize documents show a native error. The
+Mac Components gallery has an Open PDF button and full-color header artwork.
+
+The AppKit view follows accepted visible node membership and exact window
+lifetime, with separate unclipped layout and clipped presentation frames scaled
+from device pixels. Hiding, disabling, source replacement, a modal projection,
+removal or closing releases the document and transient state. Theme changes
+preserve the loaded document. Up to eight hosts share two bounded loading jobs;
+new requests coalesce by live host, and stale completions cannot install. Reads
+are regular-file-only and capped at 64 MiB; documents at 1024 pages. These are
+admission limits, not a hard bound on PDFKit decoder memory/time. An already
+blocked local-filesystem read or decoder can finish after cancellation without
+retaining a window/view. Two blocked OS reads/decoders can delay all other
+loads until the OS returns; no additional workers are spawned. Native controls render above the existing backend;
+managed paint/capture cannot include their pixels, and arbitrary overlapping
+managed popovers are unsupported. Window-modal projection hides the hosts.
+
+Unsupported/offscreen drivers display a placeholder. AppKit accessibility children
+are exposed, but physical input and human VoiceOver qualification are separate.
+Run `go run ./cmd/native-content-smoke` from the prepared native driver for a
+bounded actual-window synthetic embedding/removal check. This does not verify
+physical pointer gestures. No user files, clipboard or global settings are
+modified by that check. PDF links/remote navigation/print delegate requests are
+ignored. Native context menus are platform-owned; use trusted local documents.
+
+Platform reference: [Apple PDFView](https://developer.apple.com/documentation/pdfkit/pdfview).

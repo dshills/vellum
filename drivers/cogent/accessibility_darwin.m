@@ -53,6 +53,11 @@
 extern void vellumWindowVisibility(uint64_t token,int visible);
 extern int vellumAXAction(uint64_t token,uint64_t generation,char *id,char *kind,char *value);
 extern void vellumAXResult(uint64_t request,char *json);
+extern void vellumNativeContentSync(uint64_t);
+extern void vellumNativeContentCloseWindow(uint64_t);
+extern NSArray *vellumNativeContentChildren(uint64_t,NSString *);
+extern id vellumNativeContentFocused(uint64_t);
+extern id vellumNativeContentHit(uint64_t,NSPoint);
 @class VellumAXState;
 static char vellumAXKey;
 static NSMutableDictionary<NSNumber *,VellumAXState *> *vellumAXStates;
@@ -227,7 +232,7 @@ static NSRect vellumAXClipRect(NSRect r,NSRect viewport){if(r.size.width==0){if(
 - (NSInteger)accessibilityIndex{return MAX(0,[self.node[@"row_index"] integerValue]-1);}
 - (NSInteger)accessibilityDisclosureLevel{return MAX(0,[self.node[@"level"] integerValue]-1);}
 - (id)accessibilityParent{return self.parentElement;}
-- (NSArray *)accessibilityChildren{return self.childElements?:@[];}
+- (NSArray *)accessibilityChildren{NSArray *native=self.node[@"native_content"]?vellumNativeContentChildren(self.state.token,self.node[@"id"]):nil;return native?:self.childElements?:@[];}
 - (NSArray *)accessibilityVisibleChildren{if([self.node[@"role"] isEqual:@"list-box"])return self.accessibilityVisibleRows;return self.accessibilityChildren;}
 - (NSArray *)accessibilityRows{return [self.childElements filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VellumAXElement *x,NSDictionary *bindings){return [x.node[@"role"] isEqual:@"row"]||[x.node[@"role"] isEqual:@"tree-row"]||[x.node[@"role"] isEqual:@"grid-row"]||[x.node[@"role"] isEqual:@"list-option"];}]];}
 - (NSInteger)accessibilityRowCount{if(self.node[@"row_count"])return [self.node[@"row_count"] integerValue];NSInteger count=0;for(VellumAXElement *row in self.accessibilityRows)count=MAX(count,[row.node[@"row_count"] integerValue]);return count;}
@@ -324,10 +329,10 @@ static VellumAXElement *vellumAXHitTree(NSArray *elements,NSPoint point){
 - (BOOL)isAccessibilityElement{return NO;}
 - (NSArray *)accessibilityChildren{return vellumAXState(self).roots?:@[];}
 - (NSArray *)accessibilityChildrenInNavigationOrder{return self.accessibilityChildren;}
-- (id)accessibilityFocusedUIElement{return vellumAXFocused(vellumAXState(self));}
+- (id)accessibilityFocusedUIElement{VellumAXState *s=vellumAXState(self);return vellumNativeContentFocused(s.token)?:vellumAXFocused(s);}
 - (id)accessibilityHitTest:(NSPoint)point{
  VellumAXState *state=vellumAXState(self);
- return vellumAXHitTree(state.roots,point)?:self;
+ return vellumNativeContentHit(state.token,point)?:vellumAXHitTree(state.roots,point)?:self;
 }
 @end
 static Class vellumAXSubclass(Class base,Class methods,const char *prefix){
@@ -373,7 +378,7 @@ void vellumAXDetach(uint64_t token){
  // Go-owned main callbacks have no ambient Cocoa pool. Drain the temporary
  // allValues array here so it cannot retain every retired element and node.
  @autoreleasepool{
- VellumAXState *state=vellumAXStates[@(token)];if(!state||state.closed)return;state.closed=YES;
+ VellumAXState *state=vellumAXStates[@(token)];if(!state||state.closed)return;vellumNativeContentCloseWindow(token);state.closed=YES;
  [state.visibility invalidate];state.visibility=nil;
  for(VellumAXElement *x in state.elements.allValues){x.live=NO;x.parentElement=nil;x.childElements=@[];}
  [state.geometry removeAllObjects];[state.textGeometry removeAllObjects];
@@ -557,7 +562,10 @@ static BOOL vellumAXCanReuse(VellumAXElement *old,NSDictionary *node,NSDictionar
 // Called synchronously on the native owner by publication; inert fixtures use
 // the same transaction without NSWindow creation or notifications.
 static void vellumAXPruneGeometry(VellumAXState *state,NSDictionary *members){
- for(NSString *identifier in state.geometry.allKeys)if(!members[identifier])[state.geometry removeObjectForKey:identifier];
+ for(NSString *identifier in state.geometry.allKeys){
+ BOOL raw=[identifier hasPrefix:@"native-frame:"];NSString *key=raw?[identifier substringFromIndex:13]:identifier;
+ VellumAXElement *member=members[key];if(!member||(raw&&!member.node[@"native_content"]))[state.geometry removeObjectForKey:identifier];
+ }
  for(NSString *identifier in state.textGeometry.allKeys)if(!members[identifier])[state.textGeometry removeObjectForKey:identifier];
 }
 static BOOL vellumAXCommitSnapshot(VellumAXState *state,NSDictionary *snapshot,BOOL notify){
@@ -600,7 +608,7 @@ static BOOL vellumAXCommitSnapshot(VellumAXState *state,NSDictionary *snapshot,B
 extern void vellumShareAnchorChanged(uint64_t);
 void vellumAXUpdate(uint64_t token,const char *json){
  vellumAXWithJSONPayload(json,^(NSData *payload){
-  dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{NSDictionary *snapshot=[NSJSONSerialization JSONObjectWithData:payload options:0 error:nil];vellumAXCommitSnapshot(vellumAXStates[@(token)],snapshot,YES);vellumShareAnchorChanged(token);}});
+  dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{NSDictionary *snapshot=[NSJSONSerialization JSONObjectWithData:payload options:0 error:nil];vellumAXCommitSnapshot(vellumAXStates[@(token)],snapshot,YES);vellumShareAnchorChanged(token);vellumNativeContentSync(token);}});
  });
 }
 // A Go-proven pending-only publication keeps the exact validated membership,
@@ -655,7 +663,7 @@ static void vellumAXApplyGeometry(VellumAXState *state,NSDictionary *bounds){
 }
 void vellumAXGeometry(uint64_t token,const char *json){
  vellumAXWithJSONPayload(json,^(NSData *payload){
-  dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{NSDictionary *bounds=[NSJSONSerialization JSONObjectWithData:payload options:0 error:nil];vellumAXApplyGeometry(vellumAXStates[@(token)],bounds);vellumShareAnchorChanged(token);}});
+  dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{NSDictionary *bounds=[NSJSONSerialization JSONObjectWithData:payload options:0 error:nil];vellumAXApplyGeometry(vellumAXStates[@(token)],bounds);vellumShareAnchorChanged(token);vellumNativeContentSync(token);}});
  });
 }
 // Synchronous CGO transaction fixture. It never registers an attachment, creates
@@ -907,3 +915,23 @@ BOOL vellumAXShareAnchor(uint64_t token,NSString *identifier,NSView **outView,NS
  if(NSIsEmptyRect(rect))return NO;
  *outView=state.view;*outRect=rect;return YES;
 }
+
+// Native-main borrowed values; no NSWindow/NSView escapes an owner callback.
+NSView *vellumAXNativeParent(uint64_t token){VellumAXState *s=vellumAXStates[@(token)];return s&&!s.closed?s.view:nil;}
+NSArray *vellumAXNativeItems(uint64_t token){
+ VellumAXState *s=vellumAXStates[@(token)];if(!s||s.closed)return @[];NSMutableArray *items=[NSMutableArray new];
+ for(NSArray *row in s.hierarchy){VellumAXElement *e=s.elements[row[0]];if(e.node[@"native_content"]&&![e.node[@"disabled"] boolValue]){
+  NSArray *clip=s.geometry[e.node[@"id"]],*raw=s.geometry[[@"native-frame:" stringByAppendingString:e.node[@"id"]]];
+  if(clip.count==4&&raw.count==4)[items addObject:@{@"id":e.node[@"id"],@"config":e.node[@"native_content"],@"clip":clip,@"raw":raw,@"focused":e.node[@"focused"]?:@NO}];
+ }}return items;
+}
+void vellumAXNativeExit(uint64_t token,NSString *identifier,BOOL reverse){
+ VellumAXState *s=vellumAXStates[@(token)];NSInteger n=s.hierarchy.count,index=-1;
+ for(NSInteger i=0;i<n;i++)if([s.hierarchy[i][0] isEqual:identifier]){index=i;break;}
+ if(index<0)return;
+ for(NSInteger step=1;step<n;step++){NSInteger i=(index+(reverse?-step:step)+n)%n;VellumAXElement *e=s.elements[s.hierarchy[i][0]];
+  if([e.node[@"focusable"] boolValue]&&[e isAccessibilityEnabled]){[s.window makeFirstResponder:s.view];[e request:@"focus" value:@""];return;}
+ }
+}
+
+NSDictionary *vellumAXNativeDiagnostics(uint64_t token){VellumAXState *s=vellumAXStates[@(token)];NSMutableArray *nodes=[NSMutableArray new];for(VellumAXElement *e in s.elements.allValues)if(e.node[@"native_content"])[nodes addObject:@{@"id":e.node[@"id"],@"clip":s.geometry[e.node[@"id"]]?:@[],@"raw":s.geometry[[@"native-frame:" stringByAppendingString:e.node[@"id"]]]?:@[]}];return @{@"nodes":nodes,@"semantic_count":@(s.elements.count),@"view":NSStringFromRect(s.view.bounds),@"visible":NSStringFromRect(s.view.visibleRect)};}

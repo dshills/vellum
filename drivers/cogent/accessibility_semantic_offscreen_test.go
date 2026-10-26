@@ -45,6 +45,7 @@ func TestAccessibilityBuiltinSemanticSchema(t *testing.T) {
 		{"TextClient", "uint64", "text_client,omitempty"},
 		{"TextSelection", "*[2]int", "text_selection,omitempty"},
 		{"TextFocus", "int", "text_focus,omitempty"},
+		{"NativeContent", "*ui.NativeContentInput", "native_content,omitempty"},
 		{"Max", "*float32", "max,omitempty"}}
 	typ := reflect.TypeOf(accessibilityNode{})
 	var actual [][3]string
