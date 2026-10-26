@@ -8,6 +8,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/dshills/vellum/ui"
 )
 
 func pendingAXNodes(nodes []accessibilityNode, target uint64) []accessibilityNode {
@@ -87,7 +89,7 @@ func TestAccessibilityPendingProof(t *testing.T) {
 
 func TestAccessibilityPendingWireFieldAudit(t *testing.T) {
 	// This list intentionally requires a decision when any wire field is added.
-	fields := strings.Fields("ID DomainID Parent Role Secure Name Help Value Disabled Focusable Focused Selected Actions Orientation RowIndex RowCount ColumnIndex ColumnCount GridGeneration GridScope GridIncarnation GridPending GridTargetGeneration GridFrame Level Expanded Min TextClient TextSelection TextFocus Max")
+	fields := strings.Fields("ID DomainID Parent Role Secure Name Help Value Disabled Focusable Focused Selected Actions Orientation RowIndex RowCount ColumnIndex ColumnCount GridGeneration GridScope GridIncarnation GridPending GridTargetGeneration GridFrame Level Expanded Min TextClient TextSelection TextFocus NativeContent Max")
 	want := map[string]bool{}
 	for _, name := range fields {
 		want[name] = true
@@ -136,6 +138,12 @@ func TestAccessibilityPendingWireFieldAudit(t *testing.T) {
 					item.SetInt(item.Int() + 1)
 				case reflect.Float32:
 					item.SetFloat(item.Float() + 1)
+				case reflect.Struct:
+					descriptor, ok := p.Interface().(*ui.NativeContentInput)
+					if !ok {
+						t.Fatal("unreviewed struct pointer field")
+					}
+					descriptor.Type = "pdf"
 				default:
 					t.Fatal("unreviewed pointer field")
 				}
@@ -233,5 +241,49 @@ func TestAccessibilityPendingEpochExhaustionPermanentlyRevokesProof(t *testing.T
 		if !b.pendingExhausted || (b.pendingBaseline != nil || b.readyBaseline != nil) {
 			t.Fatal("a later owned ready/pending publication revived an exhausted proof")
 		}
+	}
+}
+
+// Native content is ordinary wire state. A sibling's unchanged descriptor may
+// accompany a pending grid patch; any descriptor change needs full publication.
+func TestAccessibilityPendingNativeContentRequiresFullPublication(t *testing.T) {
+	descriptor := ui.NativeContentInput{Type: "media", Path: "/tmp/synthetic.wav", Revision: 7, PosterPNG: "fixture"}
+	previous := append([]accessibilityNode{{ID: "native", Actions: []string{}, NativeContent: &descriptor}}, gridAXCompleted("g", "", 7, 9)...)
+	next := pendingAXNodes(previous, 10)
+	if next[0].NativeContent == previous[0].NativeContent || !accessibilitySameWireNode(previous[0], next[0]) {
+		t.Fatal("descriptor must compare by value and be detached")
+	}
+	if accessibilityPendingPatch(previous, next, 17) == "" {
+		t.Fatal("unchanged native sibling rejected")
+	}
+	for name, mutate := range map[string]func(*ui.NativeContentInput){
+		"type":       func(c *ui.NativeContentInput) { c.Type = "pdf" },
+		"path":       func(c *ui.NativeContentInput) { c.Path += ".changed" },
+		"revision":   func(c *ui.NativeContentInput) { c.Revision++ },
+		"muted":      func(c *ui.NativeContentInput) { c.InitialMuted = !c.InitialMuted },
+		"poster":     func(c *ui.NativeContentInput) { c.PosterPNG += "changed" },
+		"thumbnails": func(c *ui.NativeContentInput) { c.Thumbnails = !c.Thumbnails },
+		"appearance": func(c *ui.NativeContentInput) { c.Dark = !c.Dark },
+	} {
+		t.Run(name, func(t *testing.T) {
+			changed := cloneAccessibilityNodes(next)
+			mutate(changed[0].NativeContent)
+			if accessibilitySameWireNode(next[0], changed[0]) || accessibilityPendingPatch(previous, changed, 17) != "" {
+				t.Fatal("changed native descriptor admitted as pending-only update")
+			}
+			if *previous[0].NativeContent != descriptor || *next[0].NativeContent != descriptor {
+				t.Fatal("mutation escaped detached descriptor")
+			}
+		})
+	}
+	removed := cloneAccessibilityNodes(next)
+	removed[0].NativeContent = nil
+	if accessibilityPendingPatch(previous, removed, 17) != "" {
+		t.Fatal("descriptor removal admitted as pending-only update")
+	}
+	absent := cloneAccessibilityNodes(previous)
+	absent[0].NativeContent = nil
+	if accessibilityPendingPatch(absent, next, 17) != "" {
+		t.Fatal("descriptor addition admitted as pending-only update")
 	}
 }

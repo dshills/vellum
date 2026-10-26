@@ -1,0 +1,18 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "^TestAccessibilityPendingWireFieldAudit$",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 1,
+    "seconds": 4.345680624945089
+  }
+]

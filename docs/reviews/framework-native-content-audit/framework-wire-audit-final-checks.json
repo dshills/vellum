@@ -1,0 +1,30 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "^TestAccessibility(Pending|BuiltinSemantic|Snapshot|SharedBaseline)|^TestNativeContent",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 19.73964804201387
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 12.101724832784384
+  }
+]
