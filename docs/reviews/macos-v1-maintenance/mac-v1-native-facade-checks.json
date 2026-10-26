@@ -1,0 +1,30 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-timeout=120s",
+      ".",
+      "-run",
+      "^Test(Titlebar|SystemAppearance|ManagedEditorSettlement|ManagedGridInline.*Settle|ReviewFieldSettlement)"
+    ],
+    "exit_code": 0,
+    "seconds": 21.124307041987777
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 14.959126666886732
+  }
+]

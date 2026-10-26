@@ -14,3 +14,11 @@ Prism: `mac-v1-api-workflow-steps.json` (Anthropic Claude Sonnet 5.5, complete c
 Prism reports no findings with complete coverage. Only the workflow command grouping changes: test and vet run in independently failing steps. The existing e2530b1 API source/baseline passed the initial Mac/Linux/Windows matrix (40258277100). Its passing focused Go checks are reused because no Go source changed. The corrected workflow still needs its own CI observation; no native app or accepted release bytes changed.
 
 Focused checks: `mac-v1-api-guard-cgo-checks.json`.
+
+## Check the stable Mac facade from an external Go consumer
+
+Prism: `mac-v1-native-facade.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism reports no findings with complete coverage. External-package compile assertions cover only the adopted native facade whitelist, including both field read/write directions, Run/app.Driver, settlement signatures, appearance, customization and the retained toolbar alias. The fixture is never executed and cannot open windows or touch settings. Existing toolbar/appearance/settlement regressions and native offscreen vet pass. Runtime implementation and signatures are unchanged; stale package and legacy/plural toolbar comments are corrected. This does not extend the root semantic snapshot to the entire native package or establish behavior/default/error/physical-platform qualification. Accepted v1 build9 archives remain unchanged.
+
+Focused checks: `mac-v1-native-facade-checks.json`.

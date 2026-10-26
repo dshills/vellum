@@ -1,5 +1,7 @@
 // Package cogent implements Vellum's native driver using pinned Cogent Core.
-// It is experimental; one process main loop owns multiple desktop windows.
+// The macOS v1 compatibility contract names its stable application facade;
+// other backend, diagnostic and automation exports remain experimental.
+// One process main loop owns multiple desktop windows.
 package cogent
 
 import (
@@ -46,8 +48,8 @@ type Driver struct {
 	// It cannot be combined with either legacy single-window field.
 	TitlebarToolbars func(app.WindowRef) (*TitlebarToolbar, error)
 
-	// TitlebarToolbarPrototype opts into a real AppKit toolbar for one window.
-	// Experimental driver-only API; nil preserves existing window chrome.
+	// TitlebarToolbarPrototype is the retained compatibility field for one
+	// native AppKit toolbar; nil preserves existing window chrome.
 	TitlebarToolbarPrototype *TitlebarToolbarPrototype
 	// DesktopSession opts into bounded native integration routing and frame barriers.
 	// It cannot be combined with FrameMetrics. Ordinary applications leave it nil.

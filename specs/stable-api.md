@@ -41,3 +41,11 @@ an explicit metadata-checked exception; its type/removal and other constants
 remain guarded. Native facade, behavior, errors and file-format obligations still
 use their existing consumer/runtime tests and review. The tool adds no framework
 dependency, feature, platform claim or change to the shipped private release.
+
+The native facade has an external-package compile contract in
+`drivers/cogent/stable_facade_contract_test.go`. It checks the whitelisted public
+field reads/writes, function/method signatures, `app.Driver` implementation and
+legacy toolbar alias in both directions. The fixture does not call native APIs or
+qualify behavior, defaults, error values or additional platforms; existing native
+and lifecycle tests retain those obligations. It deliberately does not lock
+experimental exports or extend the root export baseline to the whole driver.

@@ -41,12 +41,17 @@ the developer tool, not those platforms' native framework runtime.
 
 1. The guard passed [its first three-host CI matrix](https://github.com/dshills/vellum/actions/runs/40258277100)
    at e2530b1. The subsequent test/vet step split is separately reviewed to prevent
-   Windows shell error masking; inspect its follow-up CI before merging this branch.
+   Windows shell error masking; [its follow-up matrix also passed](https://github.com/dshills/vellum/actions/runs/40258446890)
+   at d7e0652. Remaining existing Framework/Platform workflows must be observed
+   before integration.
    Fix only reproduced guard defects, preserving its assertions and scope.
 2. Improve repeatable private packaging/developer handoff where a concrete gap
    exists; keep the accepted build9 archives unchanged.
-3. Consider an independently scoped native-facade compatibility check after the
-   root guard is qualified. Avoid broadening the stable facade or UI features.
+3. An external native-facade consumer now checks the existing whitelist's field
+   reads/writes, function/method signatures, app.Driver implementation and retained
+   toolbar alias. Stale package/toolbar comments are corrected. This is compile
+   evidence alongside focused offscreen regressions, not a full native semantic
+   baseline or new physical/human qualification. No runtime implementation changed.
 4. Reuse unchanged verification, do not start new performance/qualification
    campaigns, and preserve notebook data and global system preferences.
 

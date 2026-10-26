@@ -22,10 +22,12 @@ import (
 // Customization requires macOS 15+; original-color icons and autosave are AppKit-owned.
 type TitlebarToolbar = TitlebarToolbarPrototype
 
-// TitlebarToolbarPrototype is the compatibility name for the native toolbar, an, immutable macOS attachment for
-// one registered window opening. It is deliberately separate from portable
-// ui.Toolbar. Configure before Driver.Run; do not mutate during Run. Additional
-// windows/reopened lifetimes and ChromeUnified are refused in this prototype.
+// TitlebarToolbarPrototype is the compatibility name for an immutable macOS
+// toolbar attachment to one registered window opening. It is deliberately
+// separate from portable ui.Toolbar. Configure before Driver.Run; do not mutate
+// during Run. The legacy singular Driver fields refuse additional or reopened
+// windows; Driver.TitlebarToolbars supplies a fresh attachment for each opening.
+// ChromeUnified is refused by both routes.
 // AppKit owns placement, overflow, accessibility, and native button appearance.
 // A nonempty CustomizationID enables AppKit customization and autosave on macOS
 // 15+. An empty ID retains the original noncustomizable, unsaved prototype.
