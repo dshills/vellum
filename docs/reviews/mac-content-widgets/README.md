@@ -14,3 +14,11 @@ Prism: `mac-content-path-picker.json` (Anthropic Claude Sonnet 5.5, complete cov
 Prism coverage is complete. Overlapping requests are now refused synchronously using the same completion Err-based active predicate as View; mode switches and late results are scoped to the captured kind. A regression proves overlap refusal and busy retirement without showing a chooser. The ticket-retention finding is bounded and not a stuck-busy defect: revoked completion Err automatically becomes nonnil and View/Request consistently derive availability from it. Native chooser recipes and real cancellation cleanup use a fake panel, with no OS presentation; no Finder action is executed by tests. Root/native/gallery/vet/API checks pass. Existing Services and accepted v1 archives remain unchanged.
 
 Focused checks: `mac-content-path-picker-checks.json`, `mac-content-path-final-checks.json`, `mac-content-path-review-fixes-checks.json`.
+
+## Add Mac date-range picker with shared calendar and civil-date presets
+
+Prism: `mac-content-date-range.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Fixed civil-equivalent time representation resets and guarded callbacks against stale accepted values and calendar months. Hardened calendar decoration against short or unrelated node IDs. Regression tests cover these review findings; no physical pointer qualification is claimed.
+
+Focused checks: `mac-content-date-range-checks.json`, `mac-content-range-final-checks.json`.

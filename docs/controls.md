@@ -611,3 +611,12 @@ Metadata checks do not read content; the native chooser verifies regular files
 or directories before returning. Drop admission requires app worker validation.
 Cancel preserves the accepted path; filesystem syscalls cannot be interrupted
 mid-call and an already-dispatched Finder reveal cannot be rolled back.
+
+`ui.DateRangePicker` combines paired ISO civil-date fields with a shared calendar,
+selected-span highlighting, endpoint emphasis and caller-provided presets. A
+calendar click starts a draft; the second proposes an ordered inclusive span.
+Cancel selection discards the draft. Field edits reject reversed endpoints.
+Events use local noon in the start endpoint's exact location; time-of-day is not
+part of the range. Min/Max are civil bounds interpreted in that location.
+`StandardDateRangePresets(today)` uses an explicit clock and civil AddDate across
+DST. No date enumeration or timer is created for long ranges; at most12 presets.
