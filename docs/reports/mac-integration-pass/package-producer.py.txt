@@ -1,0 +1,46 @@
+from pathlib import Path
+import json,os,subprocess,sys,time,hashlib,shutil,tempfile,importlib.util
+sys.dont_write_bytecode=True
+r=Path('/Users/dshills/Development/projects/Vellum');x=Path('/Users/dshills/Documents/ChatGPT/Go Native UI');z=x/'artifacts/mac-integration-pass';delivery=x/'deliveries/mac-integration-pass';delivery.mkdir(exist_ok=False)
+assert not subprocess.check_output(['git','status','--porcelain'],cwd=r,text=True),'committed clean source required'
+head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=r,text=True).strip()
+sys.path.insert(0,str(r/'scripts'));from sdk_environment import child_environment
+spec=importlib.util.spec_from_file_location('sdkcheck',r/'scripts/check-sdk.py');checker=importlib.util.module_from_spec(spec);spec.loader.exec_module(checker)
+env=child_environment();env.update(PATH='/private/tmp/vellum-preview-cache/mod/golang.org/toolchain@v0.0.1-go1.25.6.darwin-arm64/bin:'+os.environ['PATH'],GOCACHE='/private/tmp/vellum-preview-cache/build',GOMODCACHE='/private/tmp/vellum-preview-cache/mod',GOPATH='/private/tmp/vellum-preview-cache/gopath',VELLUM_CACHE_DIR='/private/tmp/vellum-preview-cache',CGO_LDFLAGS_ALLOW='-Wl,-rpath,@executable_path/native')
+checks=[]
+def run(name,argv,cwd=r,timeout=300):
+ start=time.monotonic()
+ with (z/(name+'.stdout')).open('w') as out,(z/(name+'.stderr')).open('w') as err:
+  p=subprocess.run([str(a) for a in argv],cwd=cwd,env=env,stdout=out,stderr=err,timeout=timeout)
+ record={'name':name,'exit_code':p.returncode,'seconds':time.monotonic()-start};checks.append(record);(z/'packaging-checks.json').write_text(json.dumps(checks,indent=2)+'\n');print(json.dumps(record),flush=True)
+ assert p.returncode==0,(name,(z/(name+'.stderr')).read_text()[-2000:])
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+previous=json.loads((x/'artifacts/macos-v1-release/package-result.json').read_text());lib=Path(previous['sdk_directory'])/'drivers/cogent/build/libs-darwin'
+pin='786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883';assert sha(lib/'arm64/libwgpu_native.a')==pin
+archive=delivery/'vellum-v1.0.0-mac-integration-sdk.tar.gz'
+run('sdk-export',[sys.executable,'-B',r/'scripts/release-sdk.py','--output',archive,'--macos-gpu-library',lib/'arm64/libwgpu_native.a','--macos-gpu-sha256',pin,'--macos-gpu-provenance',lib/'PROVENANCE.json'])
+result=json.loads((z/'sdk-export.stdout').read_text());verified=checker.verify_archive(archive,result['sha256']);assert verified['manifest']['source']=={'commit':head,'clean':True}
+base=Path(tempfile.mkdtemp(prefix='vellum integration final ',dir='/private/tmp'));sdk=checker.extract_verified(archive,base/'sdk',verified)
+run('sdk-consumer',[sys.executable,'-B',r/'scripts/check-sdk.py','--archive',archive,'--sha256',sha(archive)],timeout=600)
+run('reminders-relocated-test',['go','test','-race','-tags','offscreen','./reminders'],sdk/'examples/macapps')
+run('reminders-relocated-vet',['go','vet','-tags','offscreen','./reminders','./cmd/reminders'],sdk/'examples/macapps')
+run('origins',['go','list','-m','-json','all'],sdk/'examples/macapps');origins=checker.check_origin(checker.decode_objects((z/'origins.stdout').read_text()),sdk,verified['manifest']['release']['module'],verified['manifest']['native_gpu'])
+apps=[]
+for i,(name,bundle,cwd,target) in enumerate([
+ ('Vellum Mac Widgets','com.dshills.vellum.widgets.integration',sdk/'drivers/cogent','./cmd/gallery'),
+ ('Vellum Reminders','com.dshills.vellum.reminders.integration',sdk/'examples/macapps','./cmd/reminders')]):
+ binary=base/('binary-'+str(i));run('build-'+str(i),['go','build','-o',binary,target],cwd)
+ notices=base/('notices-'+str(i));shutil.copytree(x/'artifacts/macos-preview-release/alpha3-final-notices',notices)
+ inventory=json.loads((notices/'INVENTORY.json').read_text());inventory['artifact_sha256']=sha(binary);inventory['scope']='Conservative original notice superset for private Mac integration build; hash-bound presence, no public audit approval.';(notices/'INVENTORY.json').write_text(json.dumps(inventory,indent=2)+'\n')
+ app=base/'stage'/(name+'.app');app.parent.mkdir(exist_ok=True)
+ run('package-'+str(i),[sys.executable,'-B',r/'scripts/package-app.py','--binary',binary,'--output',app,'--name',name,'--identifier',bundle,'--version','1.0.0','--build-version','12','--notice-bundle',notices,'--sign-identity','-'])
+ zipped=delivery/(name+'.zip');run('zip-'+str(i),['/usr/bin/ditto','-c','-k','--norsrc','--noextattr','--keepParent',app,zipped])
+ exact=base/('exact-'+str(i));exact.mkdir();run('extract-'+str(i),['/usr/bin/ditto','-x','-k',zipped,exact]);run('signature-'+str(i),['/usr/bin/codesign','--verify','--deep','--strict',exact/app.name])
+ installed=Path('/private/tmp/vellum-mac-integration-apps')/app.name;assert not installed.exists(),'exclusive install path required';installed.parent.mkdir(exist_ok=True)
+ run('install-'+str(i),['/usr/bin/ditto','--norsrc','--noextattr',exact/app.name,installed]);run('installed-signature-'+str(i),['/usr/bin/codesign','--verify','--deep','--strict',installed])
+ digest=sha(installed/'Contents/MacOS'/name);assert digest==sha(exact/app.name/'Contents/MacOS'/name)==sha(app/'Contents/MacOS'/name)
+ apps.append({'name':name,'identifier':bundle,'app':str(installed),'archive':zipped.name,'archive_sha256':sha(zipped),'signed_binary_sha256':digest,'signature_verified':True})
+manifest={'schema':1,'source_commit':head,'source_clean':True,'version':'1.0.0','build':'12','private':True,'notarized':False,'sdk':archive.name,'sdk_sha256':sha(archive),'native_archive_sha256':pin,'sdk_directory':str(sdk),'module_origins':origins,'apps':apps,'checks':checks,'native_interactions':'pending final package checks; see handoff','accepted_v1_build9':'unchanged'}
+(delivery/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n');(z/'package-result.json').write_text(json.dumps(manifest,indent=2)+'\n')
+(delivery/'SHA256SUMS').write_text(''.join(sha(p)+'  '+p.name+'\n' for p in sorted(delivery.iterdir()) if p.name.endswith(('.zip','.tar.gz'))))
+print(json.dumps({'delivery':str(delivery),'source':head,'apps':apps}),flush=True)

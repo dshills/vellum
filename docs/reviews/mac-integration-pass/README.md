@@ -30,3 +30,11 @@ Prism: `mac-integration-consumer.json` (Anthropic Claude Sonnet 5.5, complete co
 Prism complete. The ticket.Err concern is not reproduced: the public completion contract keeps Err nil while reserved or published-but-undrained; only terminal revocation/error changes it. Added an explicit published-ready overlap regression, alongside window close and configuration-change refusal. A separate sticky boolean would lose automatic revocation accounting. The fake chooser is explicitly one-shot and now refuses accidental reuse before channel closure; dropped files do not call it. Independent consumer race/vet, executable history/date examples and owner-only/cancellation regressions pass.
 
 Focused checks: `mac-integration-consumer-ready-checks.json`, `mac-integration-consumer-final-checks.json`.
+
+## Package and verify private Mac content integration apps and SDK
+
+Prism: `mac-integration-delivery-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism complete with no actionable findings. The discarded mixed-evidence observation has an invalid location/quote; the report already explicitly distinguishes native pointer actions, AX Undo/Redo and automated-only range filtering, with no uniform physical qualification claim. Replaced the preliminary pending-native marker with native-final.json after bounded package checks. PDF Copy passed with original clipboard restored, Finder fixture drop accepted once, and fictional Reminders completion/Undo/Redo passed. SDK origin/relocation, independent consumer race/vet/build, relocated Reminders checks and installed/archive integrity pass. Artifacts remain pinned to clean source 9521ead; this evidence checkpoint does not relabel their bytes. Accepted build9 and all release/backend/API policies remain unchanged.
+
+Focused checks: `mac-integration-packaging-checks.json`, `mac-integration-final-integrity-checks.json`.

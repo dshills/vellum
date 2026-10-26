@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "source_commit": "9521ead5716d4968614ff8039dfa76d47c5bc149",
+  "source_clean": true,
+  "version": "1.0.0",
+  "build": "12",
+  "private": true,
+  "notarized": false,
+  "sdk": "vellum-v1.0.0-mac-integration-sdk.tar.gz",
+  "sdk_sha256": "79f08e1743cbd4c416edaf6b646aaa4b184d781f733f776f8415b567bcf5b9f8",
+  "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "sdk_directory": "/private/tmp/vellum integration final b8voxfqv/sdk/vellum-v1.0.0",
+  "module_origins": {
+    "cogentcore.org/core": "drivers/cogent/build/upstream",
+    "github.com/dshills/vellum": ".",
+    "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+    "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+    "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+    "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+    "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+    "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+    "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+  },
+  "apps": [
+    {
+      "name": "Vellum Mac Widgets",
+      "identifier": "com.dshills.vellum.widgets.integration",
+      "app": "/private/tmp/vellum-mac-integration-apps/Vellum Mac Widgets.app",
+      "archive": "Vellum Mac Widgets.zip",
+      "archive_sha256": "01d8e2c3288ec4ee7c27c19a850b1e2f3906608167601db105c18a6d13f8208c",
+      "signed_binary_sha256": "a3739954fe21e6a61941c8a5b8ffdcfcdb643c5662bb2f70bc47217ddbbe4cda",
+      "signature_verified": true
+    },
+    {
+      "name": "Vellum Reminders",
+      "identifier": "com.dshills.vellum.reminders.integration",
+      "app": "/private/tmp/vellum-mac-integration-apps/Vellum Reminders.app",
+      "archive": "Vellum Reminders.zip",
+      "archive_sha256": "304cd2eba5f76407f30025139861ebc44e9773e0da4ce642b39de1b78a64c4b4",
+      "signed_binary_sha256": "9544ed8d837e53422f578f2b4ede4f08e675be240107648b4a0ded55f99c2d13",
+      "signature_verified": true
+    }
+  ],
+  "checks": [
+    {
+      "name": "sdk-export",
+      "exit_code": 0,
+      "seconds": 9.51457729190588
+    },
+    {
+      "name": "sdk-consumer",
+      "exit_code": 0,
+      "seconds": 77.10720891691744
+    },
+    {
+      "name": "reminders-relocated-test",
+      "exit_code": 0,
+      "seconds": 31.314318457851186
+    },
+    {
+      "name": "reminders-relocated-vet",
+      "exit_code": 0,
+      "seconds": 23.63229375006631
+    },
+    {
+      "name": "origins",
+      "exit_code": 0,
+      "seconds": 0.01901304186321795
+    },
+    {
+      "name": "build-0",
+      "exit_code": 0,
+      "seconds": 19.22801254200749
+    },
+    {
+      "name": "package-0",
+      "exit_code": 0,
+      "seconds": 0.6353839579969645
+    },
+    {
+      "name": "zip-0",
+      "exit_code": 0,
+      "seconds": 1.3791107500437647
+    },
+    {
+      "name": "extract-0",
+      "exit_code": 0,
+      "seconds": 0.1857484169304371
+    },
+    {
+      "name": "signature-0",
+      "exit_code": 0,
+      "seconds": 0.07761295908130705
+    },
+    {
+      "name": "install-0",
+      "exit_code": 0,
+      "seconds": 0.10848845797590911
+    },
+    {
+      "name": "installed-signature-0",
+      "exit_code": 0,
+      "seconds": 0.07698095799423754
+    },
+    {
+      "name": "build-1",
+      "exit_code": 0,
+      "seconds": 3.4440049999393523
+    },
+    {
+      "name": "package-1",
+      "exit_code": 0,
+      "seconds": 0.634972000028938
+    },
+    {
+      "name": "zip-1",
+      "exit_code": 0,
+      "seconds": 1.3460472500883043
+    },
+    {
+      "name": "extract-1",
+      "exit_code": 0,
+      "seconds": 0.1775056249462068
+    },
+    {
+      "name": "signature-1",
+      "exit_code": 0,
+      "seconds": 0.07737154210917652
+    },
+    {
+      "name": "install-1",
+      "exit_code": 0,
+      "seconds": 0.13390912488102913
+    },
+    {
+      "name": "installed-signature-1",
+      "exit_code": 0,
+      "seconds": 0.0759589581284672
+    }
+  ],
+  "accepted_v1_build9": "unchanged",
+  "native_interaction_report": "native-final.json"
+}

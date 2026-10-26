@@ -1,0 +1,85 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "7f3e657ff09bc59e1929ae10a8e43b4a",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "9521ead5716d4968614ff8039dfa76d47c5bc149",
+    "branch": "codex/mac-integration-polish"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4562,
+    "totalMs": 4595
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 35499,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 18213,
+        "output": 330,
+        "costUSD": 0.039726
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "5b414813671bb5c5",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Mixed evidence methods labeled as one kind",
+        "message": "The evidence_kind says results come from physical mouse-helper input, but the Reminders row records AX Undo/Redo and a failed AX attempt. The report gives overall wording \"pass\" while the Reminders range filter is automated only. Readers may over-trust the final package qualification.",
+        "suggestion": "Split per-row evidence into explicit method fields (mouse vs AX vs automated) and make the top-level evidence_kind not claim uniform physical input.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "docs/reports/mac-integration-pass/native-final.json",
+            "lines": {
+              "start": 42,
+              "end": 9
+            }
+          }
+        ],
+        "tags": [
+          "evidence",
+          "docs"
+        ],
+        "evidence": "\"observed\": \"Native mouse click completed Croissants (r1), Groceries 6 to 5, completed 1 to 2, Undo enabled.",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/mac-integration-pass/native-final.json"
+    }
+  ],
+  "suppressed": []
+}

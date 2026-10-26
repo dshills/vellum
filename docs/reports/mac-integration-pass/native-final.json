@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "source_commit": "9521ead5716d4968614ff8039dfa76d47c5bc149",
+  "app_build": "12",
+  "evidence_kind": "bounded human-observed screenshots/AX results after native mouse-helper input; AX actions distinguished below",
+  "results": [
+    {
+      "area": "PDF appearance and Find",
+      "result": "pass",
+      "observed": "One-line title, opaque toolbar without managed-placeholder bleed, readable Find field. AX Next changed page 1/2 to 2/2; Find page one returned to page 1/2; selected result remained visible after Zoom/Fit."
+    },
+    {
+      "area": "PDF mouse selection and Copy",
+      "result": "pass",
+      "method": "native mouse drag and Command-C",
+      "observed": "First drag retained only the earlier search selection and failed the full-line comparison; clipboard restored. Retry from the left text margin selected the full fixture line. fixture_text_copied=true and original_clipboard_restored=true. No preexisting clipboard content or format data recorded."
+    },
+    {
+      "area": "PDF keyboard focus",
+      "result": "bounded pass",
+      "observed": "Native Command-F then Tab left PDF for the Components selector; Shift-Tab returned to the PDF selection. Exhaustive traversal and human usability remain unqualified."
+    },
+    {
+      "area": "Dark appearance",
+      "result": "pass",
+      "method": "app-scoped Dark action and screenshot",
+      "observed": "Managed component and native PDF toolbar used Dark appearance; PDF paper remained white and loaded source/selection persisted. Global OS appearance unchanged."
+    },
+    {
+      "area": "Finder file drop",
+      "result": "pass",
+      "method": "native fixture-only cross-window mouse drag",
+      "observed": "Initial container-centred attempt was occluded by raised Finder and left state unchanged. Helper retargeted visible file button and raised destination during drag. Path became /private/tmp/vellum-integration-fixtures/reference.txt, Reveal/Clear enabled, status Path accepted and action count 1 to 2. No application code change required."
+    },
+    {
+      "area": "Reminders checklist and history",
+      "result": "pass",
+      "observed": "Native mouse click completed Croissants (r1), Groceries 6 to 5, completed 1 to 2, Undo enabled. AX Undo restored the same r1 unchecked, Groceries 6 and completed 1; AX Redo removed it from active rows again, Groceries 5 and completed 2. Final screenshot showed the Redo state. A final batched Undo/Scheduled AX attempt had no observed change and is not counted as evidence."
+    },
+    {
+      "area": "Reminders scheduled range filter",
+      "result": "automated only",
+      "observed": "Focused model/routing/offscreen tests passed at checkpoint 3, including pending-input settlement and calendar guards. Not physically requalified in final package."
+    },
+    {
+      "area": "Earlier media/date/Browse/Reveal checks",
+      "result": "reused",
+      "observed": "See interactions.md for physical media play/seek/volume, two calendar clicks with accepted range, Browse and Finder Reveal. Unchanged interaction implementations reused; these were not rerun in final package."
+    }
+  ],
+  "delivery": "Both exact packaged apps launched and left running. Reminders is fictional/in-memory; no user notebook or Apple Reminders data accessed.",
+  "limitations": [
+    "Human VoiceOver/IME remain unqualified.",
+    "Other hardware, exhaustive keyboard traversal and every native content combination are unqualified.",
+    "Offscreen capture excludes embedded native pixels; arbitrary managed popover overlap remains unsupported.",
+    "Media paths are mutable and OS decoder resource cost is not hard-capped.",
+    "Ad-hoc signed, unnotarized private delivery; no public release publication."
+  ]
+}

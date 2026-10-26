@@ -1,0 +1,127 @@
+import AppKit
+import ApplicationServices
+import Foundation
+
+var heldPoint: CGPoint? = nil
+func fail(_ s: String) -> Never { if let p=heldPoint { CGEvent(mouseEventSource:nil,mouseType:.leftMouseUp,mouseCursorPosition:p,mouseButton:.left)?.post(tap:.cghidEventTap); heldPoint=nil }; fputs(s + " frontmost=" + (NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? "nil") + "\n", stderr); exit(1) }
+func attr(_ e: AXUIElement, _ key: String) -> CFTypeRef? { var value: CFTypeRef?; guard AXUIElementCopyAttributeValue(e,key as CFString,&value) == .success else { return nil }; return value }
+let selection=ProcessInfo.processInfo.environment["VELLUM_INTEGRATION_APP"] ?? "widgets"
+guard ["widgets","reminders"].contains(selection) else {fail("not an authorized integration app")}
+let bundleID=selection=="widgets" ? "com.dshills.vellum.widgets.integration":"com.dshills.vellum.reminders.integration"
+let name=selection=="widgets" ? "Vellum Mac Widgets":"Vellum Reminders",windowTitle=name
+let expected=URL(fileURLWithPath:"/private/tmp/vellum-mac-integration-apps/"+name+".app").resolvingSymlinksInPath().path
+if CommandLine.arguments.dropFirst().first == "launch" {
+ guard NSRunningApplication.runningApplications(withBundleIdentifier:bundleID).isEmpty else {fail("candidate already running")}
+ guard NSWorkspace.shared.open(URL(fileURLWithPath:expected)) else {fail("launch refused")}
+ print("launched \(expected)");exit(0)
+}
+let apps = NSRunningApplication.runningApplications(withBundleIdentifier:bundleID)
+guard apps.count == 1, let target = apps.first else { fail("expected exactly one widget process") }
+guard target.bundleURL?.resolvingSymlinksInPath().path == expected else { fail("unexpected widget executable bundle: "+(target.bundleURL?.resolvingSymlinksInPath().path ?? "nil")) }
+let root = AXUIElementCreateApplication(target.processIdentifier)
+AXUIElementSetMessagingTimeout(root,2.0)
+guard let windows = attr(root,kAXWindowsAttribute) as? [AXUIElement] else { fail("cannot inspect owned windows") }
+let matches = windows.filter { (attr($0,kAXTitleAttribute) as? String) == windowTitle }
+guard matches.count == 1 else { fail("expected exactly one widget window") }
+let window = matches[0]
+guard let pv = attr(window,kAXPositionAttribute), let sv = attr(window,kAXSizeAttribute) else { fail("no native window geometry") }
+var pos=CGPoint.zero; var size=CGSize.zero
+AXValueGetValue(pv as! AXValue,.cgPoint,&pos); AXValueGetValue(sv as! AXValue,.cgSize,&size)
+let frame=CGRect(origin:pos,size:size)
+let args=Array(CommandLine.arguments.dropFirst()); guard let mode=args.first else { fail("inspect | drag x1 y1 x2 y2 | click x y | scroll x y delta") }
+func pause(_ seconds: Double) { RunLoop.current.run(until:Date(timeIntervalSinceNow:seconds)) }
+func front() -> Bool { NSWorkspace.shared.frontmostApplication?.processIdentifier == target.processIdentifier }
+func status(_ node: AXUIElement, _ depth: Int = 0) -> String { if depth > 12 { return "" }; if (attr(node,kAXIdentifierAttribute) as? String) == "node:bWVzc2FnZQ" { return (attr(node,kAXValueAttribute) as? String) ?? (attr(node,kAXTitleAttribute) as? String) ?? "" }; for c in ((attr(node,kAXChildrenAttribute) as? [AXUIElement]) ?? []).prefix(512) { let found=status(c,depth+1); if !found.isEmpty { return found } }; return "" }
+func report(_ data:[String:Any]) { let b=try! JSONSerialization.data(withJSONObject:data,options:[.sortedKeys]); print(String(data:b,encoding:.utf8)!) }
+var result:[String:Any] = ["pid":target.processIdentifier,"mode":mode,"window":["x":pos.x,"y":pos.y,"width":size.width,"height":size.height],"frontmost":front(),"status_before":status(window)]
+if mode == "bounds" {
+ guard args.count == 2,args[1].hasPrefix("node:") else {fail("bounds restricted to managed control identifiers")}
+ func locate(_ node:AXUIElement,_ depth:Int=0)->AXUIElement? {if depth>24{return nil};if (attr(node,kAXIdentifierAttribute) as? String)==args[1]{return node};for c in ((attr(node,kAXChildrenAttribute) as? [AXUIElement]) ?? []).prefix(512){if let found=locate(c,depth+1){return found}};return nil}
+ guard let element=locate(window),let pv=attr(element,kAXPositionAttribute),let sv=attr(element,kAXSizeAttribute) else {fail("preview target not found")}
+ var ep=CGPoint.zero;var es=CGSize.zero;AXValueGetValue(pv as! AXValue,.cgPoint,&ep);AXValueGetValue(sv as! AXValue,.cgSize,&es)
+ result["target_bounds_relative"]=["x":ep.x-pos.x,"y":ep.y-pos.y,"width":es.width,"height":es.height];result["target_value"]=(attr(element,kAXValueAttribute) as? String) ?? String(describing:attr(element,kAXValueAttribute));report(result);exit(0)
+}
+if mode == "tree" {
+ var rows:[[String:Any]]=[]
+ func walk(_ n:AXUIElement,_ depth:Int=0) {
+  if depth>20 || rows.count>=240{return}
+  var row:[String:Any]=["depth":depth]
+  for k in [kAXRoleAttribute,kAXTitleAttribute,kAXDescriptionAttribute,kAXIdentifierAttribute,kAXValueAttribute,kAXFocusedAttribute,kAXEnabledAttribute,kAXSelectedTextAttribute,kAXSelectedTextRangeAttribute] {
+   if let v=attr(n,k) {row[k]=String(describing:v)}
+  }
+  if let pv=attr(n,kAXPositionAttribute),let sv=attr(n,kAXSizeAttribute) {var p=CGPoint.zero;var s=CGSize.zero;AXValueGetValue(pv as! AXValue,.cgPoint,&p);AXValueGetValue(sv as! AXValue,.cgSize,&s);row["bounds"]=[p.x-pos.x,p.y-pos.y,s.width,s.height]}
+  rows.append(row)
+  for c in ((attr(n,kAXChildrenAttribute) as? [AXUIElement]) ?? []).prefix(240) {walk(c,depth+1)}
+ }
+ walk(window);result["tree"]=rows;
+ if let f=attr(root,kAXFocusedUIElementAttribute) {let focus=f as! AXUIElement;var fields:[String:String]=[:];for k in [kAXRoleAttribute,kAXTitleAttribute,kAXIdentifierAttribute,kAXValueAttribute,kAXSelectedTextRangeAttribute]{if let v=attr(focus,k){fields[k]=String(describing:v)}};result["focused_element"]=fields};result["window_titles"]=windows.compactMap{attr($0,kAXTitleAttribute) as? String};report(result);exit(0)
+}
+if mode == "inspect" { result["target_active"]=target.isActive; result["target_hidden"]=target.isHidden; result["bundle"]=target.bundleURL?.path ?? "nil"; result["frontmost_bundle"]=NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? "nil"; result["onscreen_windows"]=(CGWindowListCopyWindowInfo([.optionOnScreenOnly,.excludeDesktopElements],kCGNullWindowID) as? [[String:Any]] ?? []).filter { ($0[kCGWindowOwnerPID as String] as? Int32) == target.processIdentifier }; report(result); exit(0) }
+if mode == "fixture-drop" {
+ guard selection=="widgets",AXIsProcessTrusted() else {fail("fixture drop restricted to widget app")}
+ func locate(_ node:AXUIElement,_ test:(AXUIElement)->Bool,_ depth:Int=0)->AXUIElement?{if depth>24{return nil};if test(node){return node};for child in (attr(node,kAXChildrenAttribute) as? [AXUIElement] ?? []).prefix(512){if let found=locate(child,test,depth+1){return found}};return nil}
+ func rect(_ e:AXUIElement)->CGRect?{guard let p=attr(e,kAXPositionAttribute),let s=attr(e,kAXSizeAttribute) else{return nil};var point=CGPoint.zero;var size=CGSize.zero;AXValueGetValue(p as! AXValue,.cgPoint,&point);AXValueGetValue(s as! AXValue,.cgSize,&size);return CGRect(origin:point,size:size)}
+ guard let targetField=locate(window,{(attr($0,kAXIdentifierAttribute) as? String)=="node:ZmlsZS1waWNrZXIvcGF0aC9waWNrZXIvcGF0aA"}),let destination=rect(targetField) else{fail("file field not visible")}
+ let finderApps=NSRunningApplication.runningApplications(withBundleIdentifier:"com.apple.finder");guard finderApps.count==1,let finder=finderApps.first else{fail("Finder missing")}
+ let finderRoot=AXUIElementCreateApplication(finder.processIdentifier);guard let fw=attr(finderRoot,kAXWindowsAttribute) as? [AXUIElement] else{fail("Finder windows missing")}
+ let matching=fw.filter{(attr($0,kAXTitleAttribute) as? String)=="vellum-integration-fixtures"};guard matching.count==1 else{fail("exact fixture folder missing")}
+ let sourceWindow=matching[0];guard let sourceFile=locate(sourceWindow,{(attr($0,kAXRoleAttribute) as? String)=="AXImage" && ((attr($0,kAXTitleAttribute) as? String)=="reference.txt" || (attr($0,kAXDescriptionAttribute) as? String)=="reference.txt")}),let sourceRect=rect(sourceFile),let sourceFrame=rect(sourceWindow) else{fail("exact fixture file missing")}
+ let from=CGPoint(x:sourceRect.midX,y:sourceRect.midY),to=CGPoint(x:destination.midX,y:destination.midY);guard sourceFrame.contains(from),frame.contains(to) else{fail("drag endpoints outside admitted windows")}
+ _=finder.activate(options:[]);_ = AXUIElementPerformAction(sourceWindow,kAXRaiseAction as CFString);pause(0.2)
+ func allowedFront()->Bool{let pid=NSWorkspace.shared.frontmostApplication?.processIdentifier;return pid==finder.processIdentifier||pid==target.processIdentifier}
+ func mouse(_ type:CGEventType,_ point:CGPoint){guard allowedFront(),let event=CGEvent(mouseEventSource:nil,mouseType:type,mouseCursorPosition:point,mouseButton:.left) else{fail("fixture drag focus changed")};event.setIntegerValueField(.mouseEventClickState,value:1);event.post(tap:.cghidEventTap);if type == .leftMouseDown || type == .leftMouseDragged{heldPoint=point};if type == .leftMouseUp{heldPoint=nil}}
+ mouse(.mouseMoved,from);mouse(.leftMouseDown,from);pause(0.2);for i in 1...32{let f=Double(i)/32;mouse(.leftMouseDragged,CGPoint(x:from.x+(to.x-from.x)*f,y:from.y+(to.y-from.y)*f));if i==8{_ = AXUIElementPerformAction(window,kAXRaiseAction as CFString)};pause(0.025)};mouse(.leftMouseUp,to);pause(0.4);report(["mode":mode,"fixture":"reference.txt","input_posted":true]);exit(0)
+}
+guard AXIsProcessTrusted() else { fail("native helper lacks existing Accessibility trust") }
+_ = target.activate(options:[]); if mode == "activate" {_ = AXUIElementPerformAction(window,kAXRaiseAction as CFString)}; pause(0.25)
+guard front() else { fail("widget app is not foreground; refusing input") }
+if mode == "close-window" {
+ guard let button=attr(window,kAXCloseButtonAttribute) else {fail("no close button")}
+ guard AXUIElementPerformAction(button as! AXUIElement,kAXPressAction as CFString) == .success else {fail("close refused")}
+ print("close requested for exact window");exit(0)
+}
+if mode == "activate" { result["frontmost_after"]=front();result["status_after"]=status(window);report(result);exit(0) }
+if mode == "copy-check" {
+ guard selection=="widgets",args.count==1,front() else {fail("copy test refused")}
+ let pb=NSPasteboard.general;let items=pb.pasteboardItems ?? [];guard items.count<=16 else {fail("clipboard preservation capacity exceeded")};var saved:[NSPasteboardItem]=[];var bytes=0
+ for item in items {guard item.types.count<=32 else {fail("clipboard type capacity exceeded")};let copy=NSPasteboardItem();for type in item.types {guard let data=item.data(forType:type) else {fail("clipboard provider unavailable before copy")};bytes+=data.count;guard bytes<=4*1024*1024,copy.setData(data,forType:type) else {fail("clipboard preservation bound exceeded")}};saved.append(copy)}
+ let before=pb.changeCount;guard let down=CGEvent(keyboardEventSource:nil,virtualKey:8,keyDown:true),let up=CGEvent(keyboardEventSource:nil,virtualKey:8,keyDown:false) else{fail("copy event unavailable")}
+ down.flags = .maskCommand;up.flags = .maskCommand;down.post(tap:.cghidEventTap);up.post(tap:.cghidEventTap);pause(0.25)
+ let changed=pb.changeCount;let copied=changed != before && (pb.string(forType:.string) ?? "").contains("Vellum integration page one")
+ var restored=true;if changed != before {if pb.changeCount==changed {pb.clearContents();restored=saved.isEmpty || pb.writeObjects(saved)}else{restored=false}}
+ report(["mode":mode,"fixture_text_copied":copied,"original_clipboard_restored":restored]);exit(copied && restored ? 0:1)
+}
+let testKeys:[String:(CGKeyCode,CGEventFlags)] = ["key-space":(49,[]),"key-cmdf":(3,.maskCommand),"key-cmdg":(5,.maskCommand),"key-shiftcmdg":(5,.maskCommand.union(.maskShift)),"key-return":(36,[]),"key-left":(123,[]),"key-right":(124,[]),"key-up":(126,[]),"key-down":(125,[]),"key-escape":(53,[]),"key-tab":(48,[]),"key-selectall":(0,.maskCommand),"key-undo":(6,.maskCommand),"key-redo":(6,.maskCommand.union(.maskShift)),"key-save":(1,.maskCommand),"key-open":(31,.maskCommand),"key-close":(13,.maskCommand)]
+if let (code,flags)=testKeys[mode] {
+ guard args.count==1,front() else {fail("key refused")}
+ let source=CGEventSource(stateID:.hidSystemState)!
+ for down in [true,false] {guard front(),let event=CGEvent(keyboardEventSource:source,virtualKey:code,keyDown:down) else {fail("key focus lost")};event.flags=flags;event.post(tap:.cghidEventTap);pause(0.05)}
+ pause(0.3);result["input_posted"]=true;result["frontmost_after"]=front();report(result);exit(0)
+}
+func point(_ i:Int) -> CGPoint { guard args.count > i+1,let x=Double(args[i]),let y=Double(args[i+1]),x.isFinite,y.isFinite,x>=0,y>=0,x<size.width,y<size.height else { fail("point outside admitted window") }; return CGPoint(x:pos.x+x,y:pos.y+y) }
+guard ["drag","escape-drag","click","shift-click","hold-drag"].contains(mode) else {fail("mode not admitted for widgets")}
+let source=CGEventSource(stateID:.hidSystemState)!
+func post(_ kind:CGEventType,_ point:CGPoint) { guard front() else { fail("focus changed; refusing further input") }; guard let e=CGEvent(mouseEventSource:source,mouseType:kind,mouseCursorPosition:point,mouseButton:.left) else { fail("event creation failed") }; e.flags = mode=="option-click" ? .maskAlternate : (mode.hasPrefix("shift-") ? .maskShift : []); e.setIntegerValueField(.mouseEventClickState,value:1); e.post(tap:.cghidEventTap); if kind == .leftMouseDown || kind == .leftMouseDragged { heldPoint=point }; if kind == .leftMouseUp { heldPoint=nil } }
+if mode == "hold-drag" || mode == "drag" || mode == "escape-drag" || mode == "shift-drag" || mode == "shift-hold-drag" || mode == "shift-escape-drag" {
+ guard args.count == 5 else { fail("drag needs four coordinates") }
+ let a=point(1),b=point(3);post(.mouseMoved,a);pause(0.15);post(.leftMouseDown,a);pause(0.15)
+ for i in 1...24 { let f=Double(i)/24;post(.leftMouseDragged,CGPoint(x:a.x+(b.x-a.x)*f,y:a.y+(b.y-a.y)*f));pause(0.025) }
+ if mode == "shift-hold-drag" || mode == "hold-drag" { pause(4) }
+ if mode == "escape-drag" || mode == "shift-escape-drag" {
+  guard front() else { fail("focus changed") }
+  CGEvent(keyboardEventSource:source,virtualKey:53,keyDown:true)?.post(tap:.cghidEventTap)
+  CGEvent(keyboardEventSource:source,virtualKey:53,keyDown:false)?.post(tap:.cghidEventTap)
+  pause(0.15)
+ }
+ post(.leftMouseUp,b)
+ result["from"]=[a.x,a.y];result["to"]=[b.x,b.y]
+} else if mode == "backspace" {
+ guard args.count == 1, front() else { fail("backspace refused") }
+ CGEvent(keyboardEventSource:source,virtualKey:51,keyDown:true)?.post(tap:.cghidEventTap)
+ CGEvent(keyboardEventSource:source,virtualKey:51,keyDown:false)?.post(tap:.cghidEventTap)
+} else if mode == "click" || mode == "shift-click" || mode == "option-click" {
+ guard args.count == 3 else { fail("click needs coordinates") };let p=point(1);post(.mouseMoved,p);pause(0.15);post(.leftMouseDown,p);pause(0.1);post(.leftMouseUp,p)
+} else if mode == "scroll" {
+ guard args.count == 4, let delta=Int32(args[3]),abs(Int64(delta)) <= 200 else { fail("bounded scroll needs coordinates and delta") };let p=point(1);post(.mouseMoved,p);pause(0.15);guard front(),let e=CGEvent(scrollWheelEvent2Source:source,units:.line,wheelCount:1,wheel1:delta,wheel2:0,wheel3:0) else { fail("scroll event refused") };e.location=p;result["event_delta"]=e.getIntegerValueField(.scrollWheelEventDeltaAxis1);result["event_point_delta"]=e.getIntegerValueField(.scrollWheelEventPointDeltaAxis1);e.post(tap:.cghidEventTap);result["delta"]=delta
+} else { fail("unknown action") }
+pause(0.35);result["frontmost_after"]=front();result["input_posted"]=true;result["status_after"]=status(window);report(result)
