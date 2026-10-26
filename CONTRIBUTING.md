@@ -59,3 +59,14 @@ Keep changes focused. The current [macOS v1 closeout](specs/macos-v1-release.md)
 freezes features and experimental rendering/pacing. Preserve the
 [stable v1 API contract](specs/stable-api.md) when maintaining supported APIs.
 Include changes, checks and limitations in commit or pull-request descriptions.
+
+Before changing a stable root API, run the separate developer guard:
+
+```sh
+(cd tools/apicompat && go test -race ./... && go vet ./...)
+(cd tools/apicompat && go run . check -root ../.. -baseline ../../release/api/v1)
+```
+
+The baseline is reviewed release data; checks never regenerate it. Follow the
+[guard's scope and conservative findings](tools/apicompat/README.md). Behavioral
+and native-facade changes retain their existing testing/review requirements.

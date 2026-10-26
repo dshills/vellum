@@ -1,0 +1,36 @@
+name: Stable root API
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  api:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    env:
+      CGO_ENABLED: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Guard tests and static checks
+        working-directory: tools/apicompat
+        run: |
+          go test ./...
+          go vet ./...
+      - name: Race checks
+        if: runner.os != 'Windows'
+        working-directory: tools/apicompat
+        env:
+          CGO_ENABLED: "1"
+        run: go test -race ./...
+      - name: Check reviewed v1 root API baseline
+        working-directory: tools/apicompat
+        run: go run . check -root ../.. -baseline ../../release/api/v1

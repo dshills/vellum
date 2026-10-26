@@ -1,0 +1,38 @@
+[
+  {
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 1.8740399170201272
+  },
+  {
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.14174795802682638
+  },
+  {
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.635306959040463
+  }
+]

@@ -29,3 +29,15 @@ Root and native driver are separate Go modules. This private SDK retains explici
 ## Verification and change review
 
 The final pass compares source changes against the accepted RC: no exported declarations are removed or reshaped; the API version constant changes deliberately. Existing root tests and the independent sdk-contract/Notes/shell consumers exercise public usage. Run focused tests for actual changes, review checkpoints with Prism using Anthropic Claude Sonnet5.5, and bind final SDK/app manifests to committed source. The final CI report records exact workflow outcomes. New compatibility obligations guide subsequent v1 maintenance; existing historical reports remain immutable.
+
+## Root source compatibility guard
+
+The [developer-only API checker](../tools/apicompat/README.md) compares the thirteen
+stable root packages with the reviewed [v1 baseline](../release/api/README.md).
+Checks are read-only and refuse missing packages, invalid policy/origins or a
+corrupted baseline. Its generic-constraint check is conservative because the
+pinned upstream semantic diff misses some narrowings. The root Version value is
+an explicit metadata-checked exception; its type/removal and other constants
+remain guarded. Native facade, behavior, errors and file-format obligations still
+use their existing consumer/runtime tests and review. The tool adds no framework
+dependency, feature, platform claim or change to the shipped private release.
