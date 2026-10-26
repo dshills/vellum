@@ -99,3 +99,23 @@ func TestNativeContentWorkbenchRawGeometryUsesSemanticNamespace(t *testing.T) {
 		t.Fatal("native source missing")
 	}
 }
+
+func TestNativeContentTitleGetsWidthBeforeSourceSelection(t *testing.T) {
+	for _, path := range []string{"", "/tmp/reference.pdf"} {
+		t.Run(path, func(t *testing.T) {
+			p := ui.PDFViewer{ID: "pdf", Label: "PDF document", Path: path}
+			m, _ := simpleManual(t, manualConfig(t, 1812), func() ui.Node {
+				n, e := p.View()
+				if e != nil {
+					t.Fatal(e)
+				}
+				return n
+			})
+			unitSettle(t, m)
+			_, title := imageManualElement(t, m, "pdf/label/text")
+			if title.Bounds.Dx() < 100 || title.Bounds.Dy() > 35 {
+				t.Fatal("title collapsed into a narrow column", title.Bounds)
+			}
+		})
+	}
+}

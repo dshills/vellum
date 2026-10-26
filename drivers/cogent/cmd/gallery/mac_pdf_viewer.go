@@ -22,6 +22,7 @@ func (m *macComponentsGallery) pdfViewerView() ui.Node {
 			return
 		}
 		m.pdfTicket = t
+		m.status = "Opening PDF…"
 		go func() {
 			s, e := a.Paths()
 			var path string
@@ -35,7 +36,11 @@ func (m *macComponentsGallery) pdfViewerView() ui.Node {
 				m.pdfTicket = nil
 				if e == nil {
 					m.pdfPath = path
-				} else if e != app.ErrCanceled {
+					m.status = "PDF opened"
+					m.count++
+				} else if e == app.ErrCanceled {
+					m.status = "Open canceled"
+				} else {
 					m.status = e.Error()
 				}
 				a.Invalidate(w.ID())

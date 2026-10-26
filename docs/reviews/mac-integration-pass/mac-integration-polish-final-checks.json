@@ -1,0 +1,111 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 0.3457676670514047
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.4005265000741929
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestNativeContent|TestNativePDF|TestNativeMedia"
+    ],
+    "exit_code": 0,
+    "seconds": 1.36216100002639
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestMacComponent"
+    ],
+    "exit_code": 0,
+    "seconds": 0.5872287501115352
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      ".",
+      "./cmd/gallery",
+      "./cmd/native-content-smoke"
+    ],
+    "exit_code": 0,
+    "seconds": 1.0006279579829425
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "build",
+      "-o",
+      "/private/tmp/vellum-polished-content-smoke",
+      "./cmd/native-content-smoke"
+    ],
+    "exit_code": 0,
+    "seconds": 5.036219666944817
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "/private/tmp/vellum-polished-content-smoke"
+    ],
+    "exit_code": 0,
+    "seconds": 1.4344261249061674
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "/private/tmp/vellum-polished-content-smoke",
+      "-width",
+      "340"
+    ],
+    "exit_code": 0,
+    "seconds": 0.8417414580471814
+  },
+  {
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.36462887516245246
+  }
+]

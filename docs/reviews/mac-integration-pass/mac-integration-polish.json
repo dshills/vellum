@@ -1,0 +1,117 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "2cbb1a32a01258b092cac7b5963cf299",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "8a0f1a42213de5739682c87ace6edcff86707464",
+    "branch": "codex/mac-integration-polish"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "d18710052ac8fc2f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Layer background resolved only at sync time",
+      "message": "The layer background is resolved once, at sync time. It is not refreshed when the system appearance or theme changes, so the opaque background can go stale. The sync also runs on every frame and forces layoutSubtreeIfNeeded each time, which is costly.",
+      "suggestion": "Set the background only when the dark flag changes. Call layoutSubtreeIfNeeded only when the frame changes.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/native_content_darwin.m",
+          "lines": {
+            "start": 345,
+            "end": 345
+          }
+        }
+      ],
+      "tags": [
+        "appearance",
+        "performance",
+        "location-corrected"
+      ],
+      "evidence": "[h.clip.appearance performAsCurrentDrawingAppearance:^{h.clip.layer.backgroundColor=NSColor.windowBackgroundColor.CGColor;}];",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "90c75cfa521ced84",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Search match filter may reject valid matches",
+      "message": "The new filter drops matches whose selection.string does not contain the search text. PDFKit selections can span ligatures or differ in normalization, so valid matches may be discarded and the first match never selected or revealed. The matches counter is also not reset reliably for stale results.",
+      "suggestion": "Drop the string-containment check. Guard against stale results with a per-search generation token instead.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/native_content_darwin.m",
+          "lines": {
+            "start": 138,
+            "end": 138
+          }
+        }
+      ],
+      "tags": [
+        "pdfkit",
+        "search",
+        "location-corrected"
+      ],
+      "evidence": "if(++self.matches==1){[self.pdf setCurrentSelection:selection animate:NO];[self revealSelection];}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 12058,
+    "totalMs": 12086
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 7,
+    "bytes": 36020,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 20113,
+        "output": 586,
+        "costUSD": 0.046086
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

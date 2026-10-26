@@ -7,10 +7,12 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/drivers/cogent/internal/nativefixture"
 	"github.com/dshills/vellum/ui"
 	"image"
 	"image/color"
@@ -39,6 +41,16 @@ func pdf() []byte {
 	return []byte(b.String())
 }
 func run() error {
+	width := flag.Int("width", 760, "bounded native viewport width (340 or 760)")
+	flag.Parse()
+	if *width != 340 && *width != 760 {
+		return fmt.Errorf("width must be 340 or 760")
+	}
+	restore, e := nativefixture.IsolateGeometry()
+	if e != nil {
+		return e
+	}
+	defer restore()
 	dir, e := os.MkdirTemp("", "vellum-native-content-")
 	if e != nil {
 		return e
@@ -78,7 +90,7 @@ func run() error {
 	pixels.SetNRGBA(1, 0, color.NRGBA{G: 160, B: 230, A: 255})
 	poster, _ := canvas.NewTiledImage(pixels)
 	player := ui.MediaPlayer{PosterImage: poster, ID: "media", Label: "Synthetic silent audio", Path: wavPath, InitialMuted: true}
-	ref, e := a.OpenWindow(app.Window{ID: "native-content-smoke", Title: "Vellum synthetic content check", Width: 760, Height: 600, View: func() ui.Node {
+	ref, e := a.OpenWindow(app.Window{ID: "native-content-smoke", Title: "Vellum synthetic content check", Width: float32(*width), Height: 600, View: func() ui.Node {
 		n := ui.Node{ID: "root", Kind: ui.Column, Grow: true}
 		if visible {
 			var v ui.Node
@@ -115,9 +127,12 @@ func run() error {
 						Class            string `json:"class"`
 						Loaded, Attached bool
 						Pages            int
+						SearchWidth      float64 `json:"search_width"`
+						Compact          bool    `json:"compact_toolbar"`
+						Opaque           bool    `json:"opaque_background"`
 					}
 				}
-				if e == nil && json.Unmarshal([]byte(wire), &v) == nil && len(v.Hosts) == count && (count == 0 || v.Hosts[0].Loaded && v.Hosts[0].Attached && v.Hosts[0].Class == kind && (kind != "PDFView" || v.Hosts[0].Pages == 1) && (kind != "AVPlayerView" || v.Hosts[0].Rate == 0 && v.Hosts[0].Muted && v.Hosts[0].Poster)) {
+				if e == nil && json.Unmarshal([]byte(wire), &v) == nil && len(v.Hosts) == count && (count == 0 || v.Hosts[0].Loaded && v.Hosts[0].Attached && v.Hosts[0].Opaque && v.Hosts[0].Class == kind && (kind != "PDFView" || v.Hosts[0].Pages == 1 && v.Hosts[0].SearchWidth >= 120 && v.Hosts[0].Compact == (*width == 340)) && (kind != "AVPlayerView" || v.Hosts[0].Rate == 0 && v.Hosts[0].Muted && v.Hosts[0].Poster)) {
 					fmt.Println(wire)
 					return nil
 				}

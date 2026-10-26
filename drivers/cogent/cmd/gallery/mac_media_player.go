@@ -27,6 +27,7 @@ func (m *macComponentsGallery) mediaPlayerView() ui.Node {
 			return
 		}
 		m.mediaTicket = t
+		m.status = "Opening media…"
 		go func() {
 			s, e := a.Paths()
 			var path string
@@ -40,7 +41,11 @@ func (m *macComponentsGallery) mediaPlayerView() ui.Node {
 				m.mediaTicket = nil
 				if e == nil {
 					m.mediaPath = path
-				} else if e != app.ErrCanceled {
+					m.status = "Media opened"
+					m.count++
+				} else if e == app.ErrCanceled {
+					m.status = "Open canceled"
+				} else {
 					m.status = e.Error()
 				}
 				a.Invalidate(w.ID())

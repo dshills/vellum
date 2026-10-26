@@ -1,0 +1,47 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      ".",
+      "-run",
+      "TestNativeContent|TestNativePDF"
+    ],
+    "exit_code": 0,
+    "seconds": 22.121987542137504
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "build",
+      "-o",
+      "/private/tmp/vellum-polished-content-smoke",
+      "./cmd/native-content-smoke"
+    ],
+    "exit_code": 0,
+    "seconds": 15.899694583145902
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "/private/tmp/vellum-polished-content-smoke"
+    ],
+    "exit_code": 0,
+    "seconds": 1.674323916900903
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "/private/tmp/vellum-polished-content-smoke",
+      "-width",
+      "340"
+    ],
+    "exit_code": 0,
+    "seconds": 0.8423972919117659
+  }
+]

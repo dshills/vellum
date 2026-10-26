@@ -688,3 +688,10 @@ and human accessibility checks, which remain unqualified. Native overlays are
 not part of Vellum offscreen captures or arbitrary managed popover stacking.
 
 Platform reference: [Apple AVPlayerView](https://developer.apple.com/documentation/avkit/avplayerview).
+
+The PDF toolbar keeps a usable Find width; below480 native points it places Find
+on a second row. Native backgrounds are opaque in the selected scoped appearance,
+so offscreen fallback text cannot show through controls. Find and Zoom/Fit reveal
+the accepted selection with an explicit page-coordinate rectangle. Content titles
+fill their row even before a source is chosen. These corrections preserve source
+identity, user state and the existing rendering/presentation backend.

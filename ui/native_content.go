@@ -71,10 +71,10 @@ func (p *PDFViewer) View() (Node, error) {
 
 // A content title is a label with decorative artwork, not a disabled action.
 func nativeContentHeader(id, label string, icon *canvas.TiledImage) Node {
-	row := Node{ID: id + "/label", Kind: Row, Style: Style{Gap: Some(float32(8)), Align: Some(AlignCenter)}}
+	row := Node{ID: id + "/label", Kind: Row, Style: Style{Gap: Some(float32(8)), Align: Some(AlignCenter), GrowX: Some(float32(1))}}
 	if icon != nil {
 		row.Children = append(row.Children, Node{ID: id + "/label/icon", Kind: Image, Image: icon, Fit: ImageContain, Style: Style{MinSize: Some(Size{Width: 24, Height: 24}), MaxSize: Some(Size{Width: 24, Height: 24})}})
 	}
-	row.Children = append(row.Children, Node{ID: id + "/label/text", Kind: Label, Text: label, Style: Style{Typography: Some(MacTypography(13, 600))}})
+	row.Children = append(row.Children, Node{ID: id + "/label/text", Kind: Label, Text: label, Style: Style{Typography: Some(MacTypography(13, 600)), GrowX: Some(float32(1))}})
 	return row
 }

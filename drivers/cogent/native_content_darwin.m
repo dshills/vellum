@@ -35,6 +35,24 @@ extern void vellumServiceResult(uint64_t,const char *,int);
 - (void)update:(NSDictionary *)config;
 @end
 
+// Stack layout adapts without replacing the document, native controls or focus.
+@interface VellumPDFBar : NSStackView
+@end
+@implementation VellumPDFBar
+- (void)layout {
+ BOOL compact=self.superview.bounds.size.width<480;
+ NSUserInterfaceLayoutOrientation direction=compact?NSUserInterfaceLayoutOrientationVertical:NSUserInterfaceLayoutOrientationHorizontal;
+ if(self.orientation!=direction){self.orientation=direction;self.alignment=compact?NSLayoutAttributeLeading:NSLayoutAttributeCenterY;}
+ [super layout];
+}
+@end
+
+@class VellumPDFController;
+@interface VellumPDFFindDelegate : NSObject <PDFDocumentDelegate>
+@property(weak) VellumPDFController *owner;
+@property(strong) NSObject *token;
+@end
+
 @interface VellumPDFController : NSObject <VellumContentController,PDFViewDelegate,PDFDocumentDelegate,NSSearchFieldDelegate>
 @property(strong) NSView *view;
 @property(strong) PDFView *pdf;
@@ -47,6 +65,10 @@ extern void vellumServiceResult(uint64_t,const char *,int);
 @property NSUInteger matches;
 @property BOOL showThumbnails;
 @property(strong) NSLayoutConstraint *pdfLeading;
+@property(strong) VellumPDFBar *toolbar;
+@property(strong) VellumPDFFindDelegate *findDelegate;
+@property(strong) NSObject *findToken;
+- (void)found:(PDFSelection *)selection token:(NSObject *)token;
 @end
 
 static NSButton *vellumContentButton(NSString *label,NSString *symbol,id target,SEL action){
@@ -62,20 +84,25 @@ static NSButton *vellumContentButton(NSString *label,NSString *symbol,id target,
  _pdf.autoScales=YES;_pdf.displayMode=kPDFDisplaySinglePageContinuous;_pdf.displayDirection=kPDFDisplayDirectionVertical;
  _thumbnails=[[PDFThumbnailView alloc]initWithFrame:NSZeroRect];_thumbnails.translatesAutoresizingMaskIntoConstraints=NO;_thumbnails.PDFView=_pdf;_thumbnails.thumbnailSize=NSMakeSize(72,96);
  _showThumbnails=[config[@"thumbnails"] boolValue];_thumbnails.hidden=!_showThumbnails;
- _search=[[NSSearchField alloc]initWithFrame:NSMakeRect(0,0,120,24)];_search.placeholderString=@"Find in PDF";_search.accessibilityLabel=@"Find in PDF";_search.delegate=self;_search.target=self;_search.action=@selector(find:);
+ _search=[[NSSearchField alloc]initWithFrame:NSMakeRect(0,0,120,24)];_search.translatesAutoresizingMaskIntoConstraints=NO;_search.placeholderString=@"Find in PDF";_search.accessibilityLabel=@"Find in PDF";_search.delegate=self;_search.target=self;_search.action=@selector(find:);
  _pageLabel=[NSTextField labelWithString:@"—"];_pageLabel.accessibilityLabel=@"PDF page";
- NSStackView *toolbar=[NSStackView stackViewWithViews:@[
+ NSStackView *actions=[NSStackView stackViewWithViews:@[
   vellumContentButton(@"Thumbnails",@"sidebar.left",self,@selector(toggleThumbnails:)),
   vellumContentButton(@"Previous page",@"chevron.up",self,@selector(previous:)),
   vellumContentButton(@"Next page",@"chevron.down",self,@selector(next:)),_pageLabel,
   vellumContentButton(@"Zoom out",@"minus.magnifyingglass",self,@selector(zoomOut:)),
   vellumContentButton(@"Zoom in",@"plus.magnifyingglass",self,@selector(zoomIn:)),
-  vellumContentButton(@"Fit",nil,self,@selector(fit:)),_search]];
+  vellumContentButton(@"Fit",nil,self,@selector(fit:))]];
+ actions.orientation=NSUserInterfaceLayoutOrientationHorizontal;actions.spacing=4;
+ [actions setContentHuggingPriority:NSLayoutPriorityDefaultHigh forOrientation:NSLayoutConstraintOrientationHorizontal];
+ [_search.widthAnchor constraintGreaterThanOrEqualToConstant:120].active=YES;[_search.heightAnchor constraintEqualToConstant:24].active=YES;
+ [_search setContentHuggingPriority:NSLayoutPriorityDefaultLow forOrientation:NSLayoutConstraintOrientationHorizontal];
+ VellumPDFBar *toolbar=[VellumPDFBar new];self.toolbar=toolbar;[toolbar addArrangedSubview:actions];[toolbar addArrangedSubview:_search];
  toolbar.translatesAutoresizingMaskIntoConstraints=NO;toolbar.spacing=5;toolbar.orientation=NSUserInterfaceLayoutOrientationHorizontal;
  [_view addSubview:toolbar];[_view addSubview:_pdf];[_view addSubview:_thumbnails];
  _status=[NSTextField wrappingLabelWithString:@"Loading local PDF…"];_status.translatesAutoresizingMaskIntoConstraints=NO;[_view addSubview:_status];
  [NSLayoutConstraint activateConstraints:@[
-  [toolbar.topAnchor constraintEqualToAnchor:_view.topAnchor constant:6],[toolbar.leadingAnchor constraintEqualToAnchor:_view.leadingAnchor constant:6],[toolbar.trailingAnchor constraintLessThanOrEqualToAnchor:_view.trailingAnchor constant:-6],
+  [toolbar.topAnchor constraintEqualToAnchor:_view.topAnchor constant:6],[toolbar.leadingAnchor constraintEqualToAnchor:_view.leadingAnchor constant:6],[toolbar.trailingAnchor constraintEqualToAnchor:_view.trailingAnchor constant:-6],
   [_pdf.topAnchor constraintEqualToAnchor:toolbar.bottomAnchor constant:6],[_pdf.bottomAnchor constraintEqualToAnchor:_view.bottomAnchor],[_pdf.trailingAnchor constraintEqualToAnchor:_view.trailingAnchor],
   [_thumbnails.leadingAnchor constraintEqualToAnchor:_view.leadingAnchor],[_thumbnails.topAnchor constraintEqualToAnchor:_pdf.topAnchor],[_thumbnails.bottomAnchor constraintEqualToAnchor:_view.bottomAnchor],[_thumbnails.widthAnchor constraintEqualToConstant:96],
   [_status.centerXAnchor constraintEqualToAnchor:_view.centerXAnchor],[_status.centerYAnchor constraintEqualToAnchor:_view.centerYAnchor],[_status.widthAnchor constraintLessThanOrEqualToAnchor:_view.widthAnchor constant:-24]]];
@@ -90,27 +117,32 @@ static NSButton *vellumContentButton(NSString *label,NSString *symbol,id target,
 }
 - (void)update:(NSDictionary *)config {}
 - (NSView *)focusView{return self.pdf;}
-- (NSDictionary *)inspection{return @{@"class":@"PDFView",@"pages":@(self.pdf.document.pageCount),@"loaded":(self.pdf.document?@YES:@NO),@"status":self.status.stringValue?:@""};}
+- (NSDictionary *)inspection{return @{@"search_width":@(self.search.frame.size.width),@"compact_toolbar":(self.toolbar.orientation==NSUserInterfaceLayoutOrientationVertical?@YES:@NO),@"page":self.pageLabel.stringValue,@"scale":@(self.pdf.scaleFactor),@"class":@"PDFView",@"pages":@(self.pdf.document.pageCount),@"loaded":(self.pdf.document?@YES:@NO),@"status":self.status.stringValue?:@""};}
 - (void)install:(id)document error:(NSString *)error {
- if(self.stopped)return;[self.pdf.document cancelFindString];self.pdf.document.delegate=nil;self.matches=0;self.pdf.document=document;self.pdf.document.delegate=self;
+ if(self.stopped)return;[self.pdf.document cancelFindString];self.pdf.document.delegate=nil;self.matches=0;self.findDelegate=nil;self.findToken=nil;self.pdf.document=document;
  self.status.stringValue=error?:@"";self.status.hidden=document!=nil;[self updatePage];
 }
 - (void)updatePage {PDFDocument *d=self.pdf.document;NSUInteger i=d?[d indexForPage:self.pdf.currentPage]:NSNotFound;self.pageLabel.stringValue=i!=NSNotFound?[NSString stringWithFormat:@"%lu / %lu",(unsigned long)i+1,(unsigned long)d.pageCount]:@"—";}
 - (void)previous:(id)sender{[self.pdf goToPreviousPage:sender];}
 - (void)next:(id)sender{[self.pdf goToNextPage:sender];}
-- (void)zoomOut:(id)sender{[self.pdf zoomOut:sender];}
-- (void)zoomIn:(id)sender{[self.pdf zoomIn:sender];}
-- (void)fit:(id)sender{self.pdf.autoScales=YES;}
+- (void)zoomOut:(id)sender{[self.pdf zoomOut:sender];[self revealSelection];}
+- (void)zoomIn:(id)sender{[self.pdf zoomIn:sender];[self revealSelection];}
+- (void)fit:(id)sender{self.pdf.autoScales=YES;[self revealSelection];}
 - (void)toggleThumbnails:(id)sender{self.showThumbnails=!self.showThumbnails;self.thumbnails.hidden=!self.showThumbnails;[self updateThumbnailConstraint];}
 - (void)find:(id)sender {
- PDFDocument *d=self.pdf.document;[d cancelFindString];self.matches=0;
- NSString *text=self.search.stringValue;if(!self.stopped&&text.length&&text.length<=256)[d beginFindString:text withOptions:NSCaseInsensitiveSearch];
+ PDFDocument *d=self.pdf.document;[d cancelFindString];d.delegate=nil;self.matches=0;self.findToken=[NSObject new];self.findDelegate=nil;self.pdf.currentSelection=nil;
+ NSString *text=self.search.stringValue;if(self.stopped||text.length==0||text.length>256)return;
+ VellumPDFFindDelegate *delegate=[VellumPDFFindDelegate new];delegate.owner=self;delegate.token=self.findToken;self.findDelegate=delegate;d.delegate=delegate;
+ [d beginFindString:text withOptions:NSCaseInsensitiveSearch];
 }
-- (void)didMatchString:(PDFSelection *)selection {
- // PDFKit delivers searches on its native run loop. Do not retain selections
- // or an unbounded result list. New searches cancel the previous search.
- if(self.stopped||selection.pages.firstObject.document!=self.pdf.document)return;
- if(++self.matches==1){[self.pdf setCurrentSelection:selection animate:YES];[self.pdf scrollSelectionToVisible:self];}
+- (void)revealSelection {
+ PDFSelection *selection=self.pdf.currentSelection;PDFPage *page=selection.pages.firstObject;
+ if(!page||page.document!=self.pdf.document)return;
+ [self.pdf layoutDocumentView];[self.pdf goToRect:NSInsetRect([selection boundsForPage:page],-12,-18) onPage:page];
+}
+- (void)found:(PDFSelection *)selection token:(NSObject *)token {
+ if(!NSThread.isMainThread||self.stopped||token!=self.findToken||selection.pages.firstObject.document!=self.pdf.document)return;
+ if(++self.matches==1){[self.pdf setCurrentSelection:selection animate:NO];[self revealSelection];}
  if(self.matches>=200)[self.pdf.document cancelFindString];
 }
 - (void)controlTextDidChange:(NSNotification *)n {if(n.object==self.search)[self find:self.search];}
@@ -127,10 +159,18 @@ static NSButton *vellumContentButton(NSString *label,NSString *symbol,id target,
 - (void)PDFViewOpenPDF:(PDFView *)sender forRemoteGoToAction:(PDFActionRemoteGoTo *)action {}
 - (void)stop {
  if(self.stopped)return;self.stopped=YES;[self.pdf.document cancelFindString];self.pdf.document.delegate=nil;self.pdf.delegate=nil;
- self.pdf.document=nil;self.thumbnails.PDFView=nil;self.search.delegate=nil;self.search.target=nil;
+ self.findDelegate=nil;self.findToken=nil;self.pdf.document=nil;self.thumbnails.PDFView=nil;self.search.delegate=nil;self.search.target=nil;
  if(self.observer)[[NSNotificationCenter defaultCenter]removeObserver:self.observer];self.observer=nil;
 }
 - (void)dealloc {if(_observer)[[NSNotificationCenter defaultCenter]removeObserver:_observer];}
+@end
+
+@implementation VellumPDFFindDelegate
+- (void)didMatchString:(PDFSelection *)selection {
+ __weak VellumPDFController *owner=self.owner;NSObject *token=self.token;
+ void (^deliver)(void)=^{[owner found:selection token:token];};
+ if(NSThread.isMainThread)deliver();else dispatch_async(dispatch_get_main_queue(),deliver);
+}
 @end
 
 @interface VellumMediaController : NSObject <VellumContentController>
@@ -314,8 +354,12 @@ void vellumNativeContentSync(uint64_t token){
    h.clip=[[VellumContentClip alloc]initWithFrame:clip];h.clip.coordinateFlipped=parent.isFlipped;h.clip.wantsLayer=YES;h.clip.layer.masksToBounds=YES;
    h.controller=[config[@"type"] isEqual:@"media"]?[[VellumMediaController alloc]initWithConfig:config]:[[VellumPDFController alloc]initWithConfig:config];[h.clip addSubview:h.controller.view];[parent addSubview:h.clip positioned:NSWindowAbove relativeTo:nil];vellumContentHosts[key]=h;vellumContentMonitor();
   }
-  [h.controller update:config];h.config=config;h.clip.frame=clip;h.controller.view.frame=vellumContentLocalFrame(raw,clip);
-  h.controller.view.appearance=[NSAppearance appearanceNamed:[config[@"dark"] boolValue]?NSAppearanceNameDarkAqua:NSAppearanceNameAqua];
+  BOOL appearanceChanged=!h.clip.appearance||[h.config[@"dark"] boolValue]!=[config[@"dark"] boolValue];
+  NSRect local=vellumContentLocalFrame(raw,clip);BOOL geometryChanged=!NSEqualRects(h.clip.frame,clip)||!NSEqualRects(h.controller.view.frame,local);
+  [h.controller update:config];h.config=config;h.clip.frame=clip;h.controller.view.frame=local;
+  if(appearanceChanged){h.clip.appearance=[NSAppearance appearanceNamed:[config[@"dark"] boolValue]?NSAppearanceNameDarkAqua:NSAppearanceNameAqua];h.controller.view.appearance=h.clip.appearance;
+   [h.clip.appearance performAsCurrentDrawingAppearance:^{h.clip.layer.backgroundColor=NSColor.windowBackgroundColor.CGColor;}];}
+  if(geometryChanged||appearanceChanged)[h.controller.view layoutSubtreeIfNeeded];
   BOOL focus=[item[@"focused"] boolValue];if(focus&&!h.focused)[parent.window makeFirstResponder:h.controller.focusView];h.focused=focus;
  }
  for(NSString *key in vellumContentHosts.allKeys.copy)if(vellumContentHosts[key].token==token&&![wanted containsObject:key])vellumContentRemove(key);
@@ -327,7 +371,7 @@ NSArray *vellumNativeContentChildren(uint64_t token,NSString *identifier){Vellum
 id vellumNativeContentFocused(uint64_t token){for(VellumContentHost *h in vellumContentHosts.allValues)if(h.token==token&&vellumContentContains(h.clip,h.clip.window.firstResponder))return h.clip.window.firstResponder;return nil;}
 id vellumNativeContentHit(uint64_t token,NSPoint point){for(VellumContentHost *h in vellumContentHosts.allValues)if(h.token==token){NSPoint p=[h.clip convertPoint:[h.clip.window convertPointFromScreen:point] fromView:nil];if(NSPointInRect(p,h.clip.bounds))return [h.controller.view accessibilityHitTest:point];}return nil;}
 void vellumNativeContentProbe(uint64_t parent,uint64_t request){dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{
- NSMutableArray *hosts=[NSMutableArray new];for(VellumContentHost *h in vellumContentHosts.allValues)if(h.token==parent){NSMutableDictionary *v=[h.controller.inspection mutableCopy];v[@"id"]=h.identifier;v[@"frame"]=NSStringFromRect(h.clip.frame);v[@"attached"]=(h.clip.window?@YES:@NO);[hosts addObject:v];}
+ NSMutableArray *hosts=[NSMutableArray new];for(VellumContentHost *h in vellumContentHosts.allValues)if(h.token==parent){NSMutableDictionary *v=[h.controller.inspection mutableCopy];v[@"id"]=h.identifier;v[@"frame"]=NSStringFromRect(h.clip.frame);v[@"attached"]=(h.clip.window?@YES:@NO);v[@"opaque_background"]=(h.clip.layer.backgroundColor&&CGColorGetAlpha(h.clip.layer.backgroundColor)>=0.99?@YES:@NO);[hosts addObject:v];}
  NSData *data=[NSJSONSerialization dataWithJSONObject:@{@"hosts":hosts,@"workers":@(vellumContentWorkers),@"geometry":vellumAXNativeDiagnostics(parent)} options:0 error:nil];vellumServiceResult(request,[[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding] UTF8String],0);
  }});}
 int vellumPDFDecodeFixture(const char *path,int want){@autoreleasepool{VellumContentJob *j=[VellumContentJob new];j.config=@{@"path":[NSString stringWithUTF8String:path]};NSString *error=nil;PDFDocument *d=vellumContentReadPDF(j,&error);return want>0?d.pageCount==want:(!d&&error!=nil);}}
