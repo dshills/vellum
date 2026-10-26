@@ -573,3 +573,23 @@ payload limits apply. Extensions are simple filename suffixes, not MIME/security
 validation. A routed rejection is consumed to prevent ancestor admission and to
 render feedback. Finder pre-drop cursor/acceptance cannot predict validation
 with the current backend; feedback follows the drop, not hover.
+
+`ui.CommandPalette` is a retained owner-side command-search panel built on the
+existing Mac Sheet/focus lifecycle. It supports up to256 stable items, grouped
+results, shortcut captions, original-color icons and live text search. MaxResults
+defaults to20 (maximum50); refine search for later matches. A moving five-row
+window keeps the selected match visible while typing focus stays in the search
+field; Previous/Next provides pointer browsing. Up/Down skips unavailable items,
+Return executes once, Escape closes and restores the parent button. IME
+composition keeps its native keys. Availability is rechecked immediately before
+execution, and the panel closes before invoking the application's command path.
+Use `command.Registry.Invoke` in Invoke to preserve domain/history validation.
+Execution errors leave the panel closed: OnError lets the app present them, and
+Message retains the bounded error for app-owned status UI. Errors do not
+automatically reopen the panel. Shortcut strings are
+captions; applications install actual bindings. No new global shortcuts, native
+input-source settings or human IME qualification are implied.
+
+All five additions are demonstrated in `go run ./cmd/gallery -mac-widgets` from
+the prepared driver module, under Components: Help tags, Links, Native Share,
+File drop zone, and Command palette. The accepted v1 build9 app ZIPs are unchanged.

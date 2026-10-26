@@ -1,0 +1,116 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a458ce5d0a718a369762a086ec1447eb",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "6d555ee672d059447605024f62ea01227d1b2b12",
+    "branch": "codex/mac-widget-v11"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "723fe6c97f98571e",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Return with an empty selection reports a misleading error",
+      "message": "On Accept, the palette key handler calls setQuery(e.Text) and then runs the selected item. If selected(rs) is empty, which happens when no enabled rows match, run(\"\") sets the message to \"Choose a matching command\". That is fine. The bigger problem is that setQuery clears SelectedID when the text changes, so pressing Return in the same event as a text change silently discards the user's arrow-key selection. This is a minor race.",
+      "suggestion": "Only call run when the selection is non-empty, and preserve the selection if the query is unchanged.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "ui/command_palette.go",
+          "lines": {
+            "start": 280,
+            "end": 280
+          }
+        }
+      ],
+      "tags": [
+        "selection",
+        "location-corrected"
+      ],
+      "evidence": "p.run(p.selected(rs))",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "a0bd8d921bed907b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Paging wraps around and may not scroll the window",
+      "message": "The Previous/Next buttons call move(±5), which steps through enabled items modulo their count. When the selection is near an end, the selection wraps around to the opposite end, so Previous at the top jumps to the bottom. The buttons are disabled only by window bounds, so wrapping or short steps can leave the window unchanged or jump unexpectedly. Next may also move less than a page when disabled rows are present.",
+      "suggestion": "Add a clamped paging helper that does not wrap, and move by window start rather than by enabled-item index.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "ui/command_palette.go",
+          "lines": {
+            "start": 335,
+            "end": 335
+          }
+        }
+      ],
+      "tags": [
+        "navigation",
+        "wraparound",
+        "location-corrected"
+      ],
+      "evidence": "p.move(-5)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6567,
+    "totalMs": 6595
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 34636,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 18990,
+        "output": 594,
+        "costUSD": 0.04392
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

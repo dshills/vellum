@@ -1,0 +1,42 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui",
+      "-run",
+      "TestCommandPalette"
+    ],
+    "exit_code": 0,
+    "seconds": 2.573413541074842
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-timeout=120s",
+      ".",
+      "-run",
+      "^TestCommandPalette"
+    ],
+    "exit_code": 0,
+    "seconds": 18.792439707787707
+  },
+  {
+    "cwd": "examples/sdk-contract",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 1.9487244579941034
+  }
+]

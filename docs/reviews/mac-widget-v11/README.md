@@ -30,3 +30,11 @@ Prism: `mac-v11-drop-zone.json` (Anthropic Claude Sonnet 5.5, complete coverage)
 Prism coverage is complete. Chooser cancellation now skips admission and preserves existing feedback, with regression tests. Its UTF-8 growth concern is not reproduced: replacement is the one-byte ASCII question mark and cannot grow a truncated byte buffer; split/invalid UTF-8 and NUL vectors now verify the 512-byte valid-text bound. Root race/vet, existing transformed native file-drop routing, rejected-drop consumption/ancestor protection, gallery checks and stable API comparison pass. The component reads no files and retains no paths. Finder pre-drop acceptance remains a documented existing backend limit; actual physical Finder behavior is not newly verified.
 
 Focused checks: `mac-v11-drop-zone-checks.json`, `mac-v11-drop-review-fixes-checks.json`.
+
+## Add reusable Mac command palette with live search and command routing
+
+Prism: `mac-v11-command-palette-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Both Prism reviews have complete coverage. Corrected pointer paging to clamp by real result rows, retain unavailable-only pages and continue arrow navigation relative to the browsed page, with regressions. Unchanged query preserves the current choice; empty Return is inert. Execution closes before app invocation; errors go to app OnError/Message and do not reopen implicitly, now documented/tested. Native live-search, exactly-once Return, Escape, focus restoration and related focus/text/geometry routing pass. Independent public consumers exercise all five additions and stable v1 comparison reports additions only. The native gallery build passed before final paging corrections; no exact final-package/physical pointer or sharing-transfer result is claimed by that build. Accepted private v1 archives/backend/performance/distribution remain unchanged.
+
+Focused checks: `mac-v11-command-palette-checks.json`, `mac-v11-palette-review-fixes-checks.json`, `mac-v11-palette-final-checks.json`, `mac-v11-final-integration-checks.json`.

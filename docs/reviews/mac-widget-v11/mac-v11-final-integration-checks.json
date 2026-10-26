@@ -1,0 +1,30 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-timeout=120s",
+      ".",
+      "-run",
+      "^Test(HelpTag|NativeURLRecipe|NativeShare|DropZone|FileDrop|CommandPalette|ReviewFieldSettlement|MacInputFocusOutline|AccessibilityGeometryCache)"
+    ],
+    "exit_code": 0,
+    "seconds": 4.887667291099206
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "build",
+      "-o",
+      "build/vellum-widget-extensions",
+      "./cmd/gallery"
+    ],
+    "exit_code": 0,
+    "seconds": 14.476010416867211
+  }
+]

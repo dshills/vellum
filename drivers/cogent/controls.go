@@ -43,6 +43,7 @@ type Semantics struct {
 type fieldChangeEpoch struct{ marker byte }
 
 type controlState struct {
+	paletteInput      atomic.Pointer[ui.PaletteInput]
 	toolbarDrag       *toolbarDragBinding
 	shortcut          *shortcutRecorderBinding
 	a                 *app.Application
@@ -315,6 +316,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		return nil, false, nil
 	}
 	r.widget = widget
+	bindPaletteInput(r)
 	if button, ok := widget.(*core.Button); ok {
 		installButtonImage(r, button)
 		bindCalendarCell(r, button)
@@ -511,6 +513,7 @@ func syncControl(r *record, previous ui.Node) error {
 	// reconcile attaches the full topology before syncRecord visits parents then
 	// children; parent semantic properties are current before this snapshot.
 	r.control.disabled = controlDisabled(r)
+	r.control.paletteInput.Store(r.node.PaletteInput)
 	syncShortcutRecorder(r)
 	syncToolbarDrag(r)
 	if err := syncPlacement(r); err != nil {

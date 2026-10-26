@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "8cfefab89f14b706aba9fc7b17da3481",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "6d555ee672d059447605024f62ea01227d1b2b12",
+    "branch": "codex/mac-widget-v11"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "8f20834324294483",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Arrow navigation after paging loses position",
+      "message": "After the user pages with Previous/Next, SelectedID is set from the browsed page, and move() clears browsing and recomputes from selected(rows). If SelectedID is empty (an all-unavailable page), selection resets to index 0 and Up/Down jumps to the wrong place. It also silently ignores the browsed window.",
+      "suggestion": "Keep the browsing state while moving, or derive the starting index from the browsed window instead of resetting to the first enabled item.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/command_palette.go",
+          "lines": {
+            "start": 195,
+            "end": 195
+          }
+        }
+      ],
+      "tags": [
+        "navigation",
+        "location-corrected"
+      ],
+      "evidence": "index = (index + delta) % len(enabled)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "5cad84aa341ab550",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Execution error message is set on an already closed palette",
+      "message": "close() calls Dismiss, then Invoke runs. A panic or reentrant mutation in Dismiss or Invoke can leave state inconsistent. The panel is already closed when the error is shown, so p.message is set on a closed palette and never displayed. The user receives no in-panel feedback, contrary to the docs claiming errors are reported via Message.",
+      "suggestion": "Document that errors surface only via OnError/Message after close, or keep the palette open on failure by reopening or invoking before closing.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/command_palette.go",
+          "lines": {
+            "start": 230,
+            "end": 231
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "location-corrected"
+      ],
+      "evidence": "p.close()\n\t\tif err := fn(event); err != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5427,
+    "totalMs": 5470
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 37557,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 20487,
+        "output": 567,
+        "costUSD": 0.046644
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
