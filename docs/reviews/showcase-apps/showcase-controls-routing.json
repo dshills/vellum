@@ -1,0 +1,37 @@
+[
+  {
+    "cwd": "examples/showcase",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 14.134225625079125
+  },
+  {
+    "cwd": "examples/showcase",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 10.744805540889502
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "bash",
+      "-n",
+      "scripts/check-example.sh"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0038544160779565573
+  }
+]

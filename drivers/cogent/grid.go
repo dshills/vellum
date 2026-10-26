@@ -832,16 +832,44 @@ func (g *gridBinding) installTextStyle(w *core.Text) {
 		s.Border.Width.Zero()
 		// Membership uses the normal selected background; the active cell has
 		// a separate inside border even when its row is toggled out of the set.
-		if cursor, _ := w.Property("vellum.grid.cursor").(bool); cursor {
+		cursor, _ := w.Property("vellum.grid.cursor").(bool)
+		if cursor {
 			s.Border.Style.Set(styles.BorderSolid)
 			s.Border.Width.Set(units.Px(1))
 			s.Border.Color.Set(colors.Scheme.Primary.Base)
 		}
+		g.applyScopedCellStyle(s, w.StateIs(states.Selected), cursor)
 		s.Grow.SetZero()
 		s.Text.WhiteSpace = text.WhiteSpacePre
 		s.SetAbilities(false, abilities.Focusable, abilities.Selectable, abilities.Clickable, abilities.Activatable, abilities.DoubleClickable, abilities.TripleClickable, abilities.Draggable, abilities.LongPressable, abilities.LongHoverable, abilities.Slideable)
 	})
 }
+
+// Mac-themed grids use their scoped palette, rather than the process-global
+// light selection scheme. Preserve default rendering for unthemed consumers.
+func (g *gridBinding) applyScopedCellStyle(s *styles.Style, selected, cursor bool) {
+	if g == nil || g.r == nil || !g.r.theme.Palette.Set {
+		return
+	}
+	p := g.r.theme.Palette.Value
+	s.Padding.Set(units.Dp(6), units.Dp(6))
+	if selected {
+		s.Background = image.NewUniform(p.Accent)
+		s.Color = image.NewUniform(p.AccentInk)
+	}
+	// Read-only row selection has one continuous highlight. An editable grid
+	// retains the cell cursor needed to identify its editing destination.
+	if cursor && selected && g.projection.State.Config.RowSelection && !g.projection.State.Config.CellEditing {
+		s.Border.Width.Zero()
+	} else if cursor {
+		c := p.Accent
+		if selected {
+			c = p.AccentInk
+		}
+		s.Border.Color.Set(image.NewUniform(c))
+	}
+}
+
 func (g *gridBinding) place(w *core.Text, p *gridPane, rect, clip virtual.GridRect, value string, selected, cursor bool) {
 	if w.Parent != p {
 		tree.MoveToParent(w, p)

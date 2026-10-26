@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "docs/controls.md,docs/reviews/showcase-apps/README.md,docs/reviews/showcase-apps/grid-polish-checks.json,docs/reviews/showcase-apps/showcase-controls-routing.json,docs/reviews/showcase-apps/showcase-models.json,docs/reviews/showcase-apps/showcase-packaging.json,docs/screenshots/README.md,drivers/cogent/grid.go,drivers/cogent/grid_mac_style_offscreen_test.go,drivers/cogent/grid_surface.go,examples/showcase/LICENSE,examples/showcase/README.md,examples/showcase/cmd/artwork/main.go,examples/showcase/cmd/forma/main.go,examples/showcase/cmd/luma/main.go,examples/showcase/cmd/pulse/main.go,examples/showcase/demo/app_icons.go,examples/showcase/demo/art.go,examples/showcase/demo/common.go,examples/showcase/demo/forma.go,examples/showcase/demo/luma.go,examples/showcase/demo/models_test.go,examples/showcase/demo/pulse.go,examples/showcase/demo/routing_offscreen_test.go,examples/showcase/go.mod,examples/showcase/go.sum,examples/showcase/package.py,scripts/check-example.sh,specs/showcase-apps.md",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "6",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/showcase-final-source/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/showcase-final-source/prism.json"
+  ],
+  "cwd": "/Users/dshills/Development/projects/Vellum",
+  "started_utc": "2026-10-26T20:09:06.817089+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 0,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 66195,
+  "group": 66195,
+  "owned": {
+    "created": true,
+    "pid": 66195,
+    "group": 66195,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 0,
+    "errors": [],
+    "observation": {
+      "group": 66195,
+      "members": [],
+      "observation_sha256": "65c2f6c42d1bb0f81355243367a7ecbaa641ca4ea83fe70f58b884ebc5167828"
+    }
+  },
+  "seconds": 2.578801249852404,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

@@ -147,6 +147,7 @@ func gridSurfaceCellStyle(p *gridPane, selected, cursor bool) (styles.Style, boo
 		s.Border.Width.Set(units.Px(1))
 		s.Border.Color.Set(colors.Scheme.Primary.Base)
 	}
+	p.binding.applyScopedCellStyle(&s, selected, cursor)
 	s.Grow.SetZero()
 	s.Text.WhiteSpace = text.WhiteSpacePre
 	s.Abilities = 0

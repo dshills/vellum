@@ -695,3 +695,12 @@ so offscreen fallback text cannot show through controls. Find and Zoom/Fit revea
 the accepted selection with an explicit page-coordinate rectangle. Content titles
 fill their row even before a source is chosen. These corrections preserve source
 identity, user state and the existing rendering/presentation backend.
+
+### Scoped Mac table appearance
+
+With a scoped semantic palette, managed grids use its Accent/AccentInk for
+selected rows and inset cell text. Read-only selected rows have a continuous
+highlight; editable grids and unselected active cells retain their cell cursor.
+Grids without a semantic palette keep their established appearance. This style
+repair applies to both existing grid render routes; selection identities,
+virtualization, editing and input routing are unchanged.

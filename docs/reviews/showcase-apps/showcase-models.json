@@ -1,0 +1,23 @@
+[
+  {
+    "cwd": "examples/showcase",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 19.800770374946296
+  },
+  {
+    "cwd": "examples/showcase",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 11.099114042008296
+  }
+]

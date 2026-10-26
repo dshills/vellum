@@ -31,3 +31,12 @@ mkdir -p build
 for VELLUM_APP_NAME in calculator notes weather reminders; do
  go build -o "build/vellum-$VELLUM_APP_NAME" "./cmd/$VELLUM_APP_NAME"
 done
+
+# Public-API macOS showcase consumers. Tests/builds do not launch UI windows.
+cd "$VELLUM_REPO_ROOT/examples/showcase"
+go test -race ./...
+go vet ./...
+mkdir -p build
+for VELLUM_SHOWCASE_NAME in forma luma pulse; do
+ go build -o "build/vellum-$VELLUM_SHOWCASE_NAME" "./cmd/$VELLUM_SHOWCASE_NAME"
+done
