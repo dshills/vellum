@@ -22,3 +22,11 @@ Prism: `mac-v1-native-facade.json` (Anthropic Claude Sonnet 5.5, complete covera
 Prism reports no findings with complete coverage. External-package compile assertions cover only the adopted native facade whitelist, including both field read/write directions, Run/app.Driver, settlement signatures, appearance, customization and the retained toolbar alias. The fixture is never executed and cannot open windows or touch settings. Existing toolbar/appearance/settlement regressions and native offscreen vet pass. Runtime implementation and signatures are unchanged; stale package and legacy/plural toolbar comments are corrected. This does not extend the root semantic snapshot to the entire native package or establish behavior/default/error/physical-platform qualification. Accepted v1 build9 archives remain unchanged.
 
 Focused checks: `mac-v1-native-facade-checks.json`.
+
+## Record green v1 maintenance CI and integration handoff
+
+Prism: `mac-v1-maintenance-ci.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism reports no findings with complete coverage. The final maintenance source 20659c9 passed Framework 40258851542, Stable root API 40258851606 and Platform adapters 40258851622. This checkpoint changes reports only and reuses the exact passing focused checks; it does not claim a future main CI result or change the accepted private 382e0e4/build9 packages. No broad campaign was repeated and no distribution or human/hardware qualification claim was expanded.
+
+Focused checks: `mac-v1-api-guard-cgo-checks.json`, `mac-v1-native-facade-checks.json`.
