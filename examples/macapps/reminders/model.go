@@ -48,6 +48,9 @@ type Model struct {
 	inputLifetime                                        context.Context
 	pending                                              *inputAction
 	closed                                               bool
+	checklists                                           map[string]*ui.Checklist
+	schedule                                             *ui.DateRangePicker
+	rangeActive, rangeExpanded                           bool
 }
 
 func New() *Model {
@@ -299,7 +302,7 @@ func (m *Model) Visible() []Reminder {
 	query := strings.ToLower(strings.TrimSpace(m.query))
 	out := make([]Reminder, 0, len(m.items))
 	for _, r := range m.items {
-		if m.matches(r, m.selected, m.showCompleted) && (query == "" || strings.Contains(strings.ToLower(r.Title+"\n"+r.Notes), query)) {
+		if m.inScheduleRange(r) && m.matches(r, m.selected, m.showCompleted) && (query == "" || strings.Contains(strings.ToLower(r.Title+"\n"+r.Notes), query)) {
 			out = append(out, r)
 		}
 	}

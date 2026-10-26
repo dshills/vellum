@@ -70,7 +70,7 @@ func (m *Model) accent() color.NRGBA {
 // View returns a fresh declarative tree. All edits use the same model and
 // bounded command/history path as keyboard-accessible controls.
 func (m *Model) View() ui.Node {
-	content := box(ui.Column, "reminders-content", m.toolbar(), m.heading(), m.rows(), m.composerView())
+	content := box(ui.Column, "reminders-content", m.toolbar(), m.heading(), m.scheduleView(), m.rows(), m.composerView())
 	content.Style = ui.Style{Padding: ui.Some(ui.Insets{Top: nativeHeaderReserve + 10, Right: 28, Bottom: 20, Left: 28}), Gap: ui.Some(float32(10)), GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(1)), Background: ui.Some(white)}
 	root := box(ui.Row, "reminders-root", m.sidebarView(), content)
 	root.Style.Grow = ui.Some(float32(1))
@@ -86,8 +86,9 @@ func (m *Model) View() ui.Node {
 }
 
 func disableButtons(n *ui.Node) {
-	if n.Kind == ui.Button {
+	if ui.IsFocusable(n.Kind) && n.Kind != ui.TextField && n.Kind != ui.MultilineText {
 		n.Disabled = true
+		n.CalendarCell = nil // Disabled calendar actions cannot retain enabled navigation metadata.
 	}
 	for i := range n.Children {
 		disableButtons(&n.Children[i])
@@ -154,13 +155,14 @@ func (m *Model) sidebarView() ui.Node {
 }
 
 func (m *Model) toolbar() ui.Node {
-	undo := button("reminders-undo", "", "Undo", ui.SymbolUndo, func() { _ = m.Undo() })
+	undo := coloredAction(button("reminders-undo", "", "Undo", ui.SymbolUndo, func() { _ = m.Undo() }), ui.SymbolUndo)
 	undo.Disabled = m.History().UndoCount == 0 && m.editing == ""
-	redo := button("reminders-redo", "", "Redo", ui.SymbolRedo, func() { _ = m.Redo() })
+	redo := coloredAction(button("reminders-redo", "", "Redo", ui.SymbolRedo, func() { _ = m.Redo() }), ui.SymbolRedo)
 	redo.Disabled = m.History().RedoCount == 0
 	add := button("reminders-new", "New Reminder", "Add a new reminder", ui.SymbolAdd, func() {
 		_ = m.AfterInput(func() error { m.focus.ID = "reminders-new-title"; m.focus.Sequence++; return nil })
 	})
+	add = coloredAction(add, ui.SymbolAdd)
 	add.Disabled = len(m.items) >= MaxReminders
 	n := box(ui.Row, "reminders-toolbar", undo, redo, growSpacer("reminders-toolbar-space"), add)
 	n.Style.Gap = ui.Some(float32(5))
@@ -202,6 +204,18 @@ func (m *Model) heading() ui.Node {
 }
 
 func (m *Model) rows() ui.Node {
+	live := map[string]bool{}
+	for _, r := range m.items {
+		live[r.ID] = true
+	}
+	for id, c := range m.checklists {
+		c.Disabled = true
+		if !live[id] {
+			c.Items = nil
+			c.Change = nil
+			delete(m.checklists, id)
+		}
+	}
 	rows := []ui.Node{}
 	previous := ""
 	visible := m.Visible()
@@ -224,23 +238,15 @@ func (m *Model) rows() ui.Node {
 	return n
 }
 func (m *Model) reminderRow(r Reminder) ui.Node {
-	icon := ui.SymbolCircle
-	state := "Incomplete. Mark complete"
-	fg := muted
-	if r.Completed {
-		icon = ui.SymbolCircleCheck
-		state = "Completed. Mark incomplete"
-		fg = m.accent()
+	checklist := m.checklistFor(r)
+	view, err := checklist.View()
+	if err != nil {
+		panic(err)
 	}
-	toggle := button("complete-"+r.ID, "", r.Title+". "+state, icon, func() { _ = m.AfterInput(func() error { return m.SetCompleted(r.ID, !r.Completed) }) })
-	toggle.Style = ui.Style{Foreground: ui.Some(fg), Padding: ui.Some(ui.Insets{}), MinSize: ui.Some(ui.Size{Width: 28, Height: 28})}
-	title := button("title-"+r.ID, r.Title, "Edit "+r.Title, "", func() { m.openDetails(r.ID) })
-	title.Style = ui.Style{Foreground: ui.Some(ink), Padding: ui.Some(ui.Insets{}), TextAlign: ui.Some(ui.AlignStart), Typography: ui.Some(ui.Typography{Family: "Helvetica Neue", Size: 14})}
-	title.Style.GrowX = ui.Some(float32(1))
-	if r.Completed {
-		title.Style.Foreground = ui.Some(muted)
-	}
-	text := box(ui.Column, "text-"+r.ID, title)
+	// Keep the full application title in native semantics even when the small
+	// reusable checklist's display bound abbreviates it.
+	setChecklistName(&view, ui.ChecklistNameID(checklist.ID, r.ID), r.Title)
+	text := box(ui.Column, "text-"+r.ID, view)
 	text.Style.GrowX = ui.Some(float32(1))
 	text.Style.Gap = ui.Some(float32(2))
 	parts := []string{}
@@ -251,9 +257,6 @@ func (m *Model) reminderRow(r Reminder) ui.Node {
 		}
 		parts = append(parts, due)
 	}
-	if r.Priority != "" {
-		parts = append(parts, strings.ToUpper(r.Priority[:1])+r.Priority[1:]+" Priority")
-	}
 	if r.Flagged {
 		parts = append(parts, "Flagged")
 	}
@@ -261,17 +264,16 @@ func (m *Model) reminderRow(r Reminder) ui.Node {
 		parts = append(parts, r.Assignee)
 	}
 	if len(parts) > 0 {
-		text.Children = append(text.Children, label("metadata-"+r.ID, strings.Join(parts, " · "), 11, 0, muted))
+		text.Children = append(text.Children, label("metadata-"+r.ID, strings.Join(parts, " · "), 12, 0, muted))
 	}
 	if r.Notes != "" {
-		text.Children = append(text.Children, label("notes-"+r.ID, r.Notes, 11, 0, muted))
+		text.Children = append(text.Children, label("notes-"+r.ID, r.Notes, 12, 0, muted))
 	}
-	details := button("details-"+r.ID, "", "Details for "+r.Title, ui.SymbolInfo, func() { m.openDetails(r.ID) })
+	details := button("details-"+r.ID, "", "Edit "+r.Title, ui.SymbolInfo, func() { m.openDetails(r.ID) })
 	details.Style.Foreground = ui.Some(m.accent())
-	row := box(ui.Row, "row-"+r.ID, toggle, text, details)
-	row.Style = ui.Style{Padding: ui.Some(ui.Insets{Top: 8, Bottom: 8}), Gap: ui.Some(float32(8)), GrowX: ui.Some(float32(1)), Align: ui.Some(ui.AlignCenter)}
-	n := box(ui.Column, "reminder-"+r.ID, row, ui.Node{ID: "rule-" + r.ID, Kind: ui.Separator})
-	return n
+	row := box(ui.Row, "row-"+r.ID, text, details)
+	row.Style = ui.Style{Padding: ui.Some(ui.Insets{Top: 4, Bottom: 4}), Gap: ui.Some(float32(8)), GrowX: ui.Some(float32(1)), Align: ui.Some(ui.AlignCenter)}
+	return box(ui.Column, "reminder-"+r.ID, row, ui.Node{ID: "rule-" + r.ID, Kind: ui.Separator})
 }
 
 func (m *Model) composerView() ui.Node {

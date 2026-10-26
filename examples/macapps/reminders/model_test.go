@@ -205,19 +205,19 @@ func TestFiltersSearchAndSmartListCreation(t *testing.T) {
 func TestAccessibleCallbacksAndModalCancelSave(t *testing.T) {
 	m := New()
 	checkView(t, m)
-	complete := find(t, m.View(), "complete-r1")
-	if !strings.Contains(complete.Accessibility.Name, "Incomplete") {
+	complete := find(t, m.View(), ui.ChecklistCheckID(checklistID("r1"), "r1"))
+	if complete.Kind != ui.ToggleButton || complete.Checked {
 		t.Fatal("completion action lacks accessible state")
 	}
-	complete.Activate()
+	complete.Change(ui.ChangeEvent{Checked: true})
 	if !item(t, m, "r1").Completed || m.History().UndoCount != 1 {
 		t.Fatal("completion action missed history")
 	}
 	find(t, m.View(), "reminders-show-completed").Activate()
-	if !strings.Contains(find(t, m.View(), "complete-r1").Accessibility.Name, "Completed") {
+	if !find(t, m.View(), ui.ChecklistCheckID(checklistID("r1"), "r1")).Checked {
 		t.Fatal("completed action lacks state")
 	}
-	find(t, m.View(), "title-r1").Activate()
+	find(t, m.View(), "details-r1").Activate()
 	checkView(t, m)
 	if got := ui.FocusOrder(m.View()); slices.Contains(got, "reminders-new-title") || !slices.Contains(got, "details-title") {
 		t.Fatalf("modal focus escaped: %v", got)

@@ -43,7 +43,7 @@ needs no `SettleEditor` binding.
 - Type a title and choose Add Reminder; New Reminder focuses that input.
 - Complete or reopen a reminder with the circle action. Show/Hide includes or
   excludes completed reminders; the Completed filter always shows them.
-- Choose a reminder title or information action to edit its title, notes, due
+- Choose a reminder’s information action to edit its title, notes, due
   date, priority, and flag. Done creates one atomic history change; Cancel and
   native dialog dismissal discard the draft.
 - Undo/Redo creation, completion/reopening, flag changes, and detail edits. Redo
@@ -66,8 +66,8 @@ dates use an explicit `YYYY-MM-DD` field and notes use a single-line editor.
 
 Vellum's bundled symbols are used in place of Apple's SF Symbols. Smart-list
 tile labels provide the hit target; their decorative count/icon area does not.
-Completion controls are accessible buttons with state in their names rather
-than platform checkbox controls. Exact Tahoe glass materials, native sidebar
+Completion uses the public checklist’s managed checkbox semantics and checked
+value; its rows are not an AppKit NSButton list. Exact Tahoe glass materials, native sidebar
 vibrancy, and Apple's app-specific layout behavior are outside this example.
 
 The unified-chrome demo reserves 52 device-independent pixels for the native
@@ -89,3 +89,20 @@ actions, field validation, canceled lifetimes, and late completion after closure
 These are automated model/routing checks. Physical pointer, native rendering,
 and platform accessibility verification must be reported separately by the
 demo-suite host.
+
+## Reusable content widgets
+
+Completion rows now consume public `ui.Checklist` instances keyed by stable reminder
+identity. Their proposals pass through the existing input settlement and history
+path: one accepted completion is one Undo/Redo operation. Details remain available
+from the information button. Titles up to512 UTF-8 bytes stay in the app model;
+the checklist's256-byte display bound abbreviates only the label while accessibility
+keeps the full title. Retained components are disabled/cleared when removed or closed.
+The toolbar uses original full-color Vellum artwork.
+
+On Scheduled, expand Date range filter to use public `ui.DateRangePicker` fields,
+calendar and presets; All scheduled dates removes the filter. The range is view
+state and creates no reminder history entry. Open range fields join the native
+input settlement boundary before structural actions. This example still uses
+fictional in-memory reminders, the fixed Today date, and explicit ISO due-date
+editing in Details. It never touches Apple's Reminders/EventKit or user notebooks.

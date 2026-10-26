@@ -1,0 +1,51 @@
+[
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./reminders"
+    ],
+    "exit_code": 0,
+    "seconds": 2.313118000049144
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./reminders"
+    ],
+    "exit_code": 0,
+    "seconds": 18.74822025001049
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./reminders",
+      "./cmd/reminders"
+    ],
+    "exit_code": 0,
+    "seconds": 11.68242095806636
+  },
+  {
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "build",
+      "-o",
+      "/private/tmp/vellum-integrated-reminders",
+      "./cmd/reminders"
+    ],
+    "exit_code": 0,
+    "seconds": 5.466832916950807
+  }
+]

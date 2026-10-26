@@ -3,6 +3,7 @@ package reminders
 import (
 	"context"
 	"errors"
+	"github.com/dshills/vellum/ui"
 )
 
 var (
@@ -53,6 +54,18 @@ func (m *Model) SetInputBoundary(lifetime context.Context, boundary InputBoundar
 // It must run on the UI owner after the native host stops dispatching.
 func (m *Model) Close() {
 	m.closed = true
+	for _, c := range m.checklists {
+		c.Disabled = true
+		c.Change = nil
+		c.Items = nil
+	}
+	m.checklists = nil
+	if m.schedule != nil {
+		m.schedule.Disabled = true
+		m.schedule.Change = nil
+		m.schedule.Invalid = nil
+	}
+	m.schedule = nil
 	if op := m.pending; op != nil {
 		op.done = true
 		op.action = nil
@@ -119,6 +132,9 @@ func (m *Model) AfterInput(action func() error) error {
 	}
 	ctx, cancel := context.WithCancel(m.inputLifetime)
 	op := &inputAction{ctx: ctx, cancel: cancel, action: action, fields: []string{"reminders-search", "reminders-new-title"}}
+	if m.selected == "scheduled" && m.rangeExpanded && m.schedule != nil {
+		op.fields = append(op.fields, ui.DateRangeStartID(m.schedule.ID), ui.DateRangeEndID(m.schedule.ID))
+	}
 	if m.editing != "" {
 		op.fields = append(op.fields, "details-title", "details-notes", "details-date")
 	}
