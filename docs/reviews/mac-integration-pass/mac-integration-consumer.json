@@ -1,0 +1,113 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a56b957bce31be30648424d66e3b6e57",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "9eb8f9e263b3aa7c4f393225b5a4aecddf7c157c",
+    "branch": "codex/mac-integration-polish"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "604c882678ea0554",
+      "severity": "medium",
+      "category": "bug",
+      "title": "busy() inferred from ticket error is fragile",
+      "message": "The goroutine reads s.closed and s.ticket and writes other Session state only inside the Publish callback, which is fine. But busy() relies on ticket.Err()==nil to mean in-flight; after the ticket completes or aborts without Publish running, behavior depends on Err semantics. A published-but-undrained ticket also reports busy only if Err is nil, so an overlapping request could pass in the gap, which risks double reservation.",
+      "suggestion": "Track in-flight state explicitly on the owner: set a boolean when reserving and clear it in the Publish callback and in Close, rather than inferring it from ticket.Err().",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "examples/sdk-contract/contentexample/session.go",
+          "lines": {
+            "start": 50,
+            "end": 136
+          }
+        }
+      ],
+      "tags": [
+        "concurrency"
+      ],
+      "evidence": "if s.closed || s.ticket != ticket {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "51abc1484d654ddb",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Chooser closes channel on every call",
+      "message": "Tests read s.ticket and s.Field.Path from the test goroutine while the worker goroutine is running; the worker only touches captured locals, so this is OK, but the test closes `c.finished` via defer in ChoosePath, which panics on a second call (for example the drop test with a swapped chooser, or a repeat call). Fragile under -race and reuse.",
+      "suggestion": "Use sync.Once for closing finished, or create a fresh channel per call.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/sdk-contract/contentexample/session_test.go",
+          "lines": {
+            "start": 31,
+            "end": 84
+          }
+        }
+      ],
+      "tags": [
+        "test"
+      ],
+      "evidence": "ticket := s.ticket",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7350,
+    "totalMs": 7378
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 20272,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 11584,
+        "output": 610,
+        "costUSD": 0.029268
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

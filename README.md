@@ -52,7 +52,7 @@ experimental. See the [support matrix](docs/macos-v1.md#supported-api-contract).
   local semantic automation, with separate physical/native acceptance.
 
 Browse the [widget demo](docs/mac-widget-demo.md),
-[control contracts](docs/controls.md), [app-shell APIs](docs/macos-app-shell.md),
+[control contracts](docs/controls.md), [content integration examples](docs/mac-content-integration.md), [app-shell APIs](docs/macos-app-shell.md),
 and [framework contract](specs/framework.md) for behavior and subsystem limits.
 
 ## Quick start on macOS
@@ -94,7 +94,7 @@ After preparation, run these commands from the repository root with
 | [Hello](examples/hello/README.md) | `(cd examples/hello && go run .)` | Minimal public-API application |
 | [Calculator](examples/macapps/calculator/README.md) | `(cd examples/macapps && go run ./cmd/calculator)` | Fixed-size calculator with arithmetic and keyboard input |
 | [Weather](examples/macapps/weather/README.md) | `(cd examples/macapps && go run ./cmd/weather)` | Sample cities, forecasts and unit selection |
-| [Reminders](examples/macapps/reminders/README.md) | `(cd examples/macapps && go run ./cmd/reminders)` | Lists, details and completion |
+| [Reminders](examples/macapps/reminders/README.md) | `(cd examples/macapps && go run ./cmd/reminders)` | Public checklists, scheduled date ranges, details and Undo/Redo |
 | [Workbench](drivers/cogent/cmd/workbench/) | `(cd drivers/cogent && go run ./cmd/workbench)` | Docking and composed UI |
 
 The macOS-style examples approximate familiar application layouts and use sample

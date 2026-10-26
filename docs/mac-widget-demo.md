@@ -5,7 +5,8 @@ buttons, an inspector, a column browser and a typed rule editor, with live scope
 theming. It also includes Sidebar, Sheet, Collection, Shortcuts, Levels, Toolbars
 and the earlier controls on Inputs. All controls
 are reusable through public Go APIs.
-For application code, see the [public-API integration guide](mac-widget-integration.md).
+For application code, see the [public-API integration guide](mac-widget-integration.md) and
+[content/history/async examples](mac-content-integration.md).
 
 After native source preparation, from `drivers/cogent` run:
 

@@ -22,3 +22,11 @@ Prism: `mac-integration-reminders.json` (Anthropic Claude Sonnet 5.5, complete c
 Prism complete. Addressed the duplicated pending-input concern with separate calendar/preset action guards and disabled nontext actions, clearing enabled calendar navigation metadata. Controlled date-field Change deliberately stays admitted during FIFO settlement; blindly disabling the entire picker would drop valid pending text. A regression proves both calendar refusal and accepted settled dates. Existing bounded stable-identity history, native viewport allocation and full-title preservation pass. The example remains fictional/in-memory with no user data access.
 
 Focused checks: `mac-integration-reminders-checks.json`, `mac-integration-reminders-final-checks.json`.
+
+## Add public Mac content history and asynchronous lifecycle examples
+
+Prism: `mac-integration-consumer.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism complete. The ticket.Err concern is not reproduced: the public completion contract keeps Err nil while reserved or published-but-undrained; only terminal revocation/error changes it. Added an explicit published-ready overlap regression, alongside window close and configuration-change refusal. A separate sticky boolean would lose automatic revocation accounting. The fake chooser is explicitly one-shot and now refuses accidental reuse before channel closure; dropped files do not call it. Independent consumer race/vet, executable history/date examples and owner-only/cancellation regressions pass.
+
+Focused checks: `mac-integration-consumer-ready-checks.json`, `mac-integration-consumer-final-checks.json`.
