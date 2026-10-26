@@ -1,0 +1,119 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "bf9ae534821d589e28bc6f3d576c7f92",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "6747650d5b9aa2d55f453a0c5614c45fe95a406d",
+    "branch": "codex/mac-widget-v11"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "8727c43d453decac",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Divergent URL validators between Go and Objective-C",
+      "message": "Go validation (net/url.Parse) and the native recipe (NSURL URLWithString) use different parsers. A URL that passes Go validation may be rejected natively, or the reverse. The two validators can disagree on edge cases such as IPv6 hosts or percent-encoding, and NSURL may normalize in ways that change the host. This is a security-sensitive check with two non-identical implementations.",
+      "suggestion": "Treat the native check as authoritative, and add shared test vectors that run through both validators to prove they agree.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/url.go",
+          "lines": {
+            "start": 9,
+            "end": 18
+          }
+        }
+      ],
+      "tags": [
+        "security",
+        "validation"
+      ],
+      "evidence": "if err := ui.ValidateLinkURL(value); err != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7040,
+    "totalMs": 7065
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 11,
+    "bytes": 19092,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 11720,
+        "output": 641,
+        "costUSD": 0.02985
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "0ec2cac4df341063",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Native result delivered possibly before registration / duplicate on cancel",
+        "message": "vellumOpenURL reports a result synchronously from the calling thread for invalid URLs, and vellumCancelOpenURL sends a result for a token even if the operation already completed. Duplicate or early results for a token may race with nativeOperationRun registration, or be delivered twice. After a dispatched open completes, a later cancel emits another result for a stale token.",
+        "suggestion": "Make result delivery idempotent per token, and have cancel check vellumServiceActive(token) before sending a result. Deliver the invalid-URL result asynchronously or confirm the token is registered before the native call.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "drivers/cogent/url_darwin.m",
+            "lines": {
+              "start": 19,
+              "end": 29
+            }
+          }
+        ],
+        "tags": [
+          "cgo",
+          "race"
+        ],
+        "evidence": "vellumServiceResult(token,\"\",2);return;}",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/url_darwin.m"
+    }
+  ],
+  "suppressed": []
+}

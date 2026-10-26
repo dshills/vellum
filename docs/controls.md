@@ -540,3 +540,10 @@ for the existing platform long-hover threshold; F1 on a focused host also opens
 it. Escape, focus loss and target retirement dismiss it. It creates no focus
 stop and preserves explicit accessibility help. Styling follows the scoped Mac
 light/dark palette. See [the five-widget contract](../specs/mac-widget-v11.md).
+
+`ui.Link` is a compact accent-colored text action with optional original-color
+artwork, HTTP(S) URL validation, keyboard activation and Open/Copy Link context
+actions. Actions run on the owner; use a worker with `Application.URLs().OpenURL`
+or clipboard services. The optional native URL service is macOS-only initially;
+other hosts return ErrUnavailable. OS acceptance does not prove page loading,
+and cancellation cannot undo an already dispatched browser open.
