@@ -2,6 +2,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import <PDFKit/PDFKit.h>
+#import <AVKit/AVKit.h>
+#import <AVFoundation/AVFoundation.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -30,6 +32,7 @@ extern void vellumServiceResult(uint64_t,const char *,int);
 - (void)install:(id)document error:(NSString *)error;
 - (void)stop;
 - (BOOL)command:(NSString *)key;
+- (void)update:(NSDictionary *)config;
 @end
 
 @interface VellumPDFController : NSObject <VellumContentController,PDFViewDelegate,PDFDocumentDelegate,NSSearchFieldDelegate>
@@ -85,6 +88,7 @@ static NSButton *vellumContentButton(NSString *label,NSString *symbol,id target,
  if(!self.pdfLeading){self.pdfLeading=[self.pdf.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor];self.pdfLeading.active=YES;}
  self.pdfLeading.constant=self.showThumbnails?96:0;
 }
+- (void)update:(NSDictionary *)config {}
 - (NSView *)focusView{return self.pdf;}
 - (NSDictionary *)inspection{return @{@"class":@"PDFView",@"pages":@(self.pdf.document.pageCount),@"loaded":(self.pdf.document?@YES:@NO),@"status":self.status.stringValue?:@""};}
 - (void)install:(id)document error:(NSString *)error {
@@ -129,6 +133,80 @@ static NSButton *vellumContentButton(NSString *label,NSString *symbol,id target,
 - (void)dealloc {if(_observer)[[NSNotificationCenter defaultCenter]removeObserver:_observer];}
 @end
 
+@interface VellumMediaController : NSObject <VellumContentController>
+@property(strong) NSView *view;
+@property(strong) AVPlayerView *playerView;
+@property(strong) AVPlayer *player;
+@property(strong) NSTextField *status;
+@property(strong) NSImageView *poster;
+@property(strong) id timeObserver;
+@property BOOL stopped;
+@property BOOL muted;
+@property BOOL started;
+@property(copy) NSString *encodedPoster;
+@end
+@implementation VellumMediaController
+- (instancetype)initWithConfig:(NSDictionary *)config {
+ self=[super init];if(!self)return nil;_muted=[config[@"initial_muted"] boolValue];
+ _view=[[NSView alloc]initWithFrame:NSMakeRect(0,0,600,400)];
+ _playerView=[[AVPlayerView alloc]initWithFrame:_view.bounds];_playerView.autoresizingMask=NSViewWidthSizable|NSViewHeightSizable;
+ _playerView.controlsStyle=AVPlayerViewControlsStyleInline;_playerView.videoGravity=AVLayerVideoGravityResizeAspect;
+ _playerView.showsSharingServiceButton=NO;_playerView.showsFullScreenToggleButton=NO;_playerView.allowsPictureInPicturePlayback=NO;
+ if(@available(macOS 13.0,*)){_playerView.allowsVideoFrameAnalysis=NO;_playerView.allowsMagnification=NO;}
+ [_view addSubview:_playerView];
+ [self update:config];
+ _status=[NSTextField wrappingLabelWithString:@"Loading local media…"];_status.translatesAutoresizingMaskIntoConstraints=NO;[_view addSubview:_status];
+ [NSLayoutConstraint activateConstraints:@[[_status.centerXAnchor constraintEqualToAnchor:_view.centerXAnchor],[_status.centerYAnchor constraintEqualToAnchor:_view.centerYAnchor],[_status.widthAnchor constraintLessThanOrEqualToAnchor:_view.widthAnchor constant:-24]]];return self;
+}
+- (void)update:(NSDictionary *)config {
+ NSString *encoded=config[@"poster_png"]?:@"";if([self.encodedPoster isEqual:encoded])return;self.encodedPoster=encoded;
+ [self.poster removeFromSuperview];self.poster=nil;
+ NSData *data=encoded.length<=350000?[[NSData alloc]initWithBase64EncodedString:encoded options:0]:nil;
+ if(data.length&&data.length<=262144){self.poster=[[NSImageView alloc]initWithFrame:self.playerView.contentOverlayView.bounds];self.poster.image=[[NSImage alloc]initWithData:data];self.poster.imageScaling=NSImageScaleProportionallyUpOrDown;self.poster.autoresizingMask=NSViewWidthSizable|NSViewHeightSizable;self.poster.hidden=self.started;[self.playerView.contentOverlayView addSubview:self.poster];}
+}
+- (NSView *)focusView{return self.playerView;}
+- (NSDictionary *)inspection{return @{@"class":@"AVPlayerView",@"loaded":(self.player.currentItem&&self.player.currentItem.status==AVPlayerItemStatusReadyToPlay?@YES:@NO),@"rate":@(self.player.rate),@"muted":(self.player.muted?@YES:@NO),@"poster":(self.poster.image?@YES:@NO),@"status":self.status.stringValue?:@""};}
+- (void)install:(id)document error:(NSString *)error {
+ if(self.stopped)return;
+ if(error||!document){self.status.stringValue=error?:@"Cannot load local media.";return;}
+ AVPlayerItem *item=[AVPlayerItem playerItemWithAsset:document];self.player=[AVPlayer playerWithPlayerItem:item];self.player.muted=self.muted;self.playerView.player=self.player;
+ [self.player pause];self.status.stringValue=@"";self.status.hidden=YES;
+ __weak VellumMediaController *weak=self;
+ self.timeObserver=[self.player addPeriodicTimeObserverForInterval:CMTimeMake(1,4) queue:dispatch_get_main_queue() usingBlock:^(CMTime time){VellumMediaController *live=weak;if(live&&!live.stopped&&live.player.rate>0){live.started=YES;live.poster.hidden=YES;}}];
+ [item addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionInitial|NSKeyValueObservingOptionNew context:NULL];
+}
+- (void)observeValueForKeyPath:(NSString *)key ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+ if(![key isEqual:@"status"]){[super observeValueForKeyPath:key ofObject:object change:change context:context];return;}
+ __weak VellumMediaController *weak=self;dispatch_async(dispatch_get_main_queue(),^{VellumMediaController *live=weak;if(!live||live.stopped||object!=live.player.currentItem)return;
+  if(live.player.currentItem.status==AVPlayerItemStatusFailed){live.status.stringValue=@"This local media file cannot be played.";live.status.hidden=NO;}
+ });
+}
+- (BOOL)command:(NSString *)key{return NO;}
+- (void)stop {
+ if(self.stopped)return;self.stopped=YES;[self.player pause];
+ AVPlayerItem *item=self.player.currentItem;if(item)[item removeObserver:self forKeyPath:@"status"];
+ [item cancelPendingSeeks];[item.asset cancelLoading];
+ if(self.timeObserver)[self.player removeTimeObserver:self.timeObserver];self.timeObserver=nil;
+ self.playerView.player=nil;[self.player replaceCurrentItemWithPlayerItem:nil];self.player=nil;self.poster.image=nil;
+}
+@end
+
+static AVURLAsset *vellumContentReadMedia(VellumContentJob *job,NSString **error){
+ const char *path=[job.config[@"path"] fileSystemRepresentation];int fd=open(path,O_RDONLY|O_NONBLOCK|O_CLOEXEC);struct stat st;
+ if(fd<0){*error=@"Cannot open local media.";return nil;}
+ BOOL admitted=fstat(fd,&st)==0&&S_ISREG(st.st_mode)&&st.st_size>0&&st.st_size<=1024ll*1024ll*1024ll;close(fd);
+ if(!admitted){*error=@"Media must be a regular file of at most 1 GiB.";return nil;}
+ if(atomic_load(&job->canceled))return nil;
+ AVURLAsset *asset=[AVURLAsset URLAssetWithURL:[NSURL fileURLWithPath:job.config[@"path"]] options:@{AVURLAssetPreferPreciseDurationAndTimingKey:@NO}];
+ dispatch_semaphore_t ready=dispatch_semaphore_create(0);
+ [asset loadValuesAsynchronouslyForKeys:@[@"playable"] completionHandler:^{dispatch_semaphore_signal(ready);}];
+ // Bound our own metadata wait; AVFoundation owns decoder/resource internals.
+ long wait=dispatch_semaphore_wait(ready,dispatch_time(DISPATCH_TIME_NOW,5ll*NSEC_PER_SEC));
+ if(wait||atomic_load(&job->canceled)){[asset cancelLoading];*error=@"Local media loading was canceled or timed out.";return nil;}
+ NSError *reason=nil;if([asset statusOfValueForKey:@"playable" error:&reason]!=AVKeyValueStatusLoaded||!asset.playable){[asset cancelLoading];*error=@"This local media file cannot be played.";return nil;}
+ return asset;
+}
+
 @interface VellumContentClip : NSView
 @property BOOL coordinateFlipped;
 @end
@@ -153,7 +231,7 @@ static BOOL vellumContentStopping;
 static NSString *vellumContentKey(uint64_t token,NSString *identifier){return [NSString stringWithFormat:@"%llu:%@",(unsigned long long)token,identifier];}
 static BOOL vellumContentContains(NSView *root,NSResponder *responder){return [responder isKindOfClass:NSView.class]&&[(NSView *)responder isDescendantOf:root];}
 static BOOL vellumContentRecipe(NSDictionary *config){
- if(![config isKindOfClass:NSDictionary.class]||![config[@"type"] isEqual:@"pdf"])return NO;
+ if(![config isKindOfClass:NSDictionary.class]||(![config[@"type"] isEqual:@"pdf"]&&![config[@"type"] isEqual:@"media"]))return NO;
  NSString *path=config[@"path"];return [path isKindOfClass:NSString.class]&&path.length>0&&[path lengthOfBytesUsingEncoding:NSUTF8StringEncoding]<=4096&&path.isAbsolutePath&&[path rangeOfString:[NSString stringWithCharacters:(unichar[]){0} length:1]].location==NSNotFound;
 }
 static PDFDocument *vellumContentReadPDF(VellumContentJob *job,NSString **error){
@@ -176,7 +254,7 @@ static void vellumContentPump(void){
  for(NSString *key in vellumContentHosts){VellumContentHost *h=vellumContentHosts[key];if(!h.pending||h.job)continue;
   h.pending=NO;VellumContentJob *job=[VellumContentJob new];job.key=key;job.config=h.config;h.job=job;vellumContentWorkers++;
   dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED,0),^{@autoreleasepool{
-   NSString *error=nil;id document=vellumContentReadPDF(job,&error);
+   NSString *error=nil;id document=[job.config[@"type"] isEqual:@"media"]?vellumContentReadMedia(job,&error):vellumContentReadPDF(job,&error);
    dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{
     vellumContentWorkers--;VellumContentHost *live=vellumContentHosts[job.key];
     if(live.job==job&&!atomic_load(&job->canceled)){live.job=nil;[live.controller install:document error:error];}
@@ -196,7 +274,12 @@ static void vellumContentMonitor(void){
  if(vellumContentKeyMonitor)return;
  vellumContentKeyMonitor=[NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskKeyDown handler:^NSEvent *(NSEvent *event){
   for(VellumContentHost *h in vellumContentHosts.allValues){NSWindow *w=h.clip.window;if(event.window!=w||!vellumContentContains(h.clip,w.firstResponder))continue;
-   if(event.modifierFlags&NSEventModifierFlagCommand){if([h.controller command:event.charactersIgnoringModifiers.lowercaseString])return nil;}
+   if(event.modifierFlags&NSEventModifierFlagCommand){NSString *key=event.charactersIgnoringModifiers.lowercaseString;if([h.controller command:key])return nil;
+    NSDictionary *edits=@{@"c":@"copy:",@"x":@"cut:",@"v":@"paste:",@"a":@"selectAll:",@"z":@"undo:",@"y":@"redo:"};NSString *selector=edits[key];
+    if(selector){NSResponder *r=w.firstResponder;if([r isKindOfClass:NSTextView.class]){
+      if([key isEqual:@"z"]){if(event.modifierFlags&NSEventModifierFlagShift)[r.undoManager redo];else [r.undoManager undo];}
+      else if([key isEqual:@"y"])[r.undoManager redo];else [r tryToPerform:NSSelectorFromString(selector) with:h.controller];
+    }return nil;}}
    if(event.keyCode==48){NSView *current=[w.firstResponder isKindOfClass:NSView.class]?(NSView *)w.firstResponder:nil;
     if([current isKindOfClass:NSTextView.class]&&[(NSTextView *)current isFieldEditor]&&[[(NSTextView *)current delegate] isKindOfClass:NSView.class])current=(NSView *)[(NSTextView *)current delegate];
     BOOL reverse=(event.modifierFlags&NSEventModifierFlagShift)!=0;NSView *next=reverse?current.previousValidKeyView:current.nextValidKeyView;
@@ -205,16 +288,22 @@ static void vellumContentMonitor(void){
   }return event;
  }];
 }
-static NSRect vellumContentRect(NSArray *r,NSView *parent){
- CGFloat scale=parent.window.backingScaleFactor?:1;
+static NSRect vellumContentRectValues(NSArray *r,CGFloat scale,CGFloat height,BOOL flipped){
+ if(scale<=0)scale=1;
  NSRect result=NSMakeRect([r[0] doubleValue]/scale,[r[1] doubleValue]/scale,[r[2] doubleValue]/scale,[r[3] doubleValue]/scale);
- if(!parent.isFlipped)result.origin.y=NSHeight(parent.bounds)-NSMaxY(result);return result;
+ if(!flipped)result.origin.y=height-NSMaxY(result);return result;
+}
+static NSRect vellumContentRect(NSArray *r,NSView *parent){return vellumContentRectValues(r,parent.window.backingScaleFactor,NSHeight(parent.bounds),parent.isFlipped);}
+static NSRect vellumContentLocalFrame(NSRect raw,NSRect clip){raw.origin.x-=clip.origin.x;raw.origin.y-=clip.origin.y;return raw;
 }
 void vellumNativeContentSync(uint64_t token){
  if(![NSThread isMainThread]||vellumContentStopping)return;
  NSView *parent=vellumAXNativeParent(token);if(!parent)return;
  if(!vellumContentHosts)vellumContentHosts=[NSMutableDictionary new];NSMutableSet *wanted=[NSMutableSet new];
- for(NSDictionary *item in vellumAXNativeItems(token)){
+ NSArray *items=vellumAXNativeItems(token);NSMutableSet *eligible=[NSMutableSet new];
+ for(NSDictionary *item in items){if(!vellumContentRecipe(item[@"config"]))continue;NSRect raw=vellumContentRect(item[@"raw"],parent),clip=NSIntersectionRect(vellumContentRect(item[@"clip"],parent),parent.visibleRect);if(!NSIsEmptyRect(raw)&&!NSIsEmptyRect(clip))[eligible addObject:vellumContentKey(token,item[@"id"])];}
+ for(NSString *key in vellumContentHosts.allKeys.copy)if(vellumContentHosts[key].token==token&&![eligible containsObject:key])vellumContentRemove(key);
+ for(NSDictionary *item in items){
   NSDictionary *config=item[@"config"];if(!vellumContentRecipe(config))continue;
   NSRect raw=vellumContentRect(item[@"raw"],parent),clip=NSIntersectionRect(vellumContentRect(item[@"clip"],parent),parent.visibleRect);
   if(NSIsEmptyRect(clip)||NSIsEmptyRect(raw))continue;
@@ -223,9 +312,9 @@ void vellumNativeContentSync(uint64_t token){
   if(!h){if(vellumContentHosts.count>=8)continue;
    h=[VellumContentHost new];h.token=token;h.identifier=identifier;h.config=config;h.pending=YES;
    h.clip=[[VellumContentClip alloc]initWithFrame:clip];h.clip.coordinateFlipped=parent.isFlipped;h.clip.wantsLayer=YES;h.clip.layer.masksToBounds=YES;
-   h.controller=[[VellumPDFController alloc]initWithConfig:config];[h.clip addSubview:h.controller.view];[parent addSubview:h.clip positioned:NSWindowAbove relativeTo:nil];vellumContentHosts[key]=h;vellumContentMonitor();
+   h.controller=[config[@"type"] isEqual:@"media"]?[[VellumMediaController alloc]initWithConfig:config]:[[VellumPDFController alloc]initWithConfig:config];[h.clip addSubview:h.controller.view];[parent addSubview:h.clip positioned:NSWindowAbove relativeTo:nil];vellumContentHosts[key]=h;vellumContentMonitor();
   }
-  h.config=config;h.clip.frame=clip;NSRect local=raw;local.origin.x-=clip.origin.x;local.origin.y-=clip.origin.y;h.controller.view.frame=local;
+  [h.controller update:config];h.config=config;h.clip.frame=clip;h.controller.view.frame=vellumContentLocalFrame(raw,clip);
   h.controller.view.appearance=[NSAppearance appearanceNamed:[config[@"dark"] boolValue]?NSAppearanceNameDarkAqua:NSAppearanceNameAqua];
   BOOL focus=[item[@"focused"] boolValue];if(focus&&!h.focused)[parent.window makeFirstResponder:h.controller.focusView];h.focused=focus;
  }
@@ -242,9 +331,12 @@ void vellumNativeContentProbe(uint64_t parent,uint64_t request){dispatch_async(d
  NSData *data=[NSJSONSerialization dataWithJSONObject:@{@"hosts":hosts,@"workers":@(vellumContentWorkers),@"geometry":vellumAXNativeDiagnostics(parent)} options:0 error:nil];vellumServiceResult(request,[[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding] UTF8String],0);
  }});}
 int vellumPDFDecodeFixture(const char *path,int want){@autoreleasepool{VellumContentJob *j=[VellumContentJob new];j.config=@{@"path":[NSString stringWithUTF8String:path]};NSString *error=nil;PDFDocument *d=vellumContentReadPDF(j,&error);return want>0?d.pageCount==want:(!d&&error!=nil);}}
-int vellumNativeFrameFixture(void){
- // Same raw-minus-clip math used for scroll clipping; cropping must never
- // resize the document's native layout viewport.
- NSRect raw=NSMakeRect(10,-40,300,400),clip=NSMakeRect(10,0,300,200);NSRect local=raw;local.origin.x-=clip.origin.x;local.origin.y-=clip.origin.y;
- return local.origin.y==-40&&local.size.height==400&&clip.size.height==200;
-}
+int vellumNativeFrameFixture(void){@autoreleasepool{
+ NSArray *raw=@[@20,@(-80),@600,@800],*clip=@[@20,@0,@600,@400];
+ NSRect flipped=vellumContentLocalFrame(vellumContentRectValues(raw,2,500,YES),vellumContentRectValues(clip,2,500,YES));
+ NSRect unflipped=vellumContentLocalFrame(vellumContentRectValues(raw,2,500,NO),vellumContentRectValues(clip,2,500,NO));
+ NSRect one=vellumContentLocalFrame(vellumContentRectValues(raw,1,1000,YES),vellumContentRectValues(clip,1,1000,YES));
+ return NSEqualRects(flipped,NSMakeRect(0,-40,300,400))&&NSEqualRects(unflipped,NSMakeRect(0,-160,300,400))&&NSEqualRects(one,NSMakeRect(0,-80,600,800));
+}}
+
+int vellumMediaDecodeFixture(const char *path,int want){@autoreleasepool{VellumContentJob *j=[VellumContentJob new];j.config=@{@"path":[NSString stringWithUTF8String:path]};NSString *error=nil;id asset=vellumContentReadMedia(j,&error);return want?(asset!=nil):(!asset&&error!=nil);}}

@@ -39,6 +39,9 @@ experimental. See the [support matrix](docs/macos-v1.md#supported-api-contract).
 - **Toolbars:** full-color icons, multiple sizes and display styles, overflow,
   spacers, customization and persistence; native titlebar toolbars can have
   independent commands and availability for each window.
+- **Content widgets:** controlled checklists, file/folder fields, date ranges,
+  embedded PDFKit documents and AVKit media with original-color posters on macOS.
+  [Contracts and native limits](docs/controls.md).
 - **Application services:** multiple windows, command menus and shortcuts,
   clipboard, file dialogs, native panels and accessibility integration.
 - **Application state:** commands, bounded Undo/Redo, document persistence,

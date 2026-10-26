@@ -1499,7 +1499,7 @@ func (h *accessibilityDialogHost) RenderWidget() {
 	if prefix, _ := h.Property("vellum.accessibility-namespace").(string); prefix != "" {
 		qualified := make(map[string][4]float32, len(bounds))
 		for id, rect := range bounds {
-			qualified[prefix+id] = rect
+			qualified[accessibilityGeometryID(prefix, id)] = rect
 		}
 		bounds = qualified
 	}

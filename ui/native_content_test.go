@@ -1,12 +1,13 @@
 package ui
 
 import (
+	"path/filepath"
 	"strings"
 	"testing"
 )
 
 func TestPDFViewerAdmission(t *testing.T) {
-	p := PDFViewer{ID: "pdf", Label: "Reference", Path: "/tmp/document.pdf", ShowThumbnails: true}
+	p := PDFViewer{ID: "pdf", Label: "Reference", Path: filepath.Join(t.TempDir(), "document.pdf"), ShowThumbnails: true}
 	n, e := p.View()
 	if e != nil {
 		t.Fatal(e)
@@ -16,7 +17,7 @@ func TestPDFViewerAdmission(t *testing.T) {
 		t.Fatal(c)
 	}
 	// Every View detaches its driver metadata from caller mutation.
-	p.Path = "/tmp/other.pdf"
+	p.Path = filepath.Join(t.TempDir(), "other.pdf")
 	if c.NativeContent.Path == p.Path {
 		t.Fatal("aliased")
 	}

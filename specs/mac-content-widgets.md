@@ -26,3 +26,12 @@ baseline, backend and performance policy. No public assets/tags or OS settings.
 
 Portable/offscreen/recipe checks are distinct from live native presentation,
 physical input and human accessibility/IME qualification. No new broad campaign.
+
+Implementation checkpoints live on `codex/mac-content-widgets`, separately
+reviewed/committed. Native content uses canonical descriptor publication, exact
+visible semantic membership and independent raw/clip geometry (including dock
+namespaces). Eight active hosts share at most two file/metadata jobs; admission
+and OS decoder limits are separate. PDF: 64 MiB/1024 pages. Media: 1 GiB regular
+file admission, five-second metadata wait, initial paused transport and bounded
+original-color PNG poster. See docs/controls.md for cancellation and overlay limits.
+The private v1 archives and release/API baselines are unchanged.

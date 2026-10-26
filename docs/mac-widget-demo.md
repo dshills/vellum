@@ -22,6 +22,18 @@ retaining values and immutable full-color icons. The rest of each bundle keeps
 its startup appearance. Scroll inside a page to reach its controls. The ordinary macOS title bar remains draggable.
 
 
+- **Checklist, File / folder field and Date range** (Components): edit sample
+  checklist names/completion, browse/drop/reveal an accepted local path, or choose
+  two civil dates from the shared calendar/presets. Samples retain accepted values
+  across local appearance changes; applications own persistence/history.
+- **PDF viewer** (Components): Open PDF chooses one local file. Use native
+  thumbnails, page arrows, zoom/Fit, Find and selection/copy.
+- **Media player** (Components): Open audio or video chooses a local file.
+  Playback starts paused; AVKit provides transport, seek and volume. The poster
+  keeps original colors. Native viewers require a macOS window; offscreen views
+  are placeholders. [Source/resource/lifecycle limits](controls.md). Physical
+  pointer and human accessibility checks are distinct from the synthetic native
+  load/removal smoke.
 - **Components:** choose Themes, Cascading menus, Split buttons, Inspector panel,
   Column browser, Filter / rule editor, Image well, Searchable icon picker,
   Settings pane, Native alert, Calendar picker, Document list, Mac outline,

@@ -3,12 +3,13 @@
 package cogent
 
 /*
-#cgo darwin LDFLAGS: -framework PDFKit
+#cgo darwin LDFLAGS: -framework PDFKit -framework AVKit -framework AVFoundation -framework CoreMedia
 #include <stdint.h>
 #include <stdlib.h>
 void vellumNativeContentProbe(uint64_t,uint64_t);
 int vellumPDFDecodeFixture(const char *,int);
 int vellumNativeFrameFixture(void);
+int vellumMediaDecodeFixture(const char *,int);
 */
 import "C"
 import (
@@ -32,3 +33,13 @@ func nativePDFDecodeFixture(path string, want int) bool {
 	return C.vellumPDFDecodeFixture(s, C.int(want)) == 1
 }
 func nativeFrameFixture() bool { return C.vellumNativeFrameFixture() == 1 }
+
+func nativeMediaDecodeFixture(path string, want bool) bool {
+	s := C.CString(path)
+	defer C.free(unsafe.Pointer(s))
+	w := 0
+	if want {
+		w = 1
+	}
+	return C.vellumMediaDecodeFixture(s, C.int(w)) == 1
+}

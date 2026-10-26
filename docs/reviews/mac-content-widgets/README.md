@@ -30,3 +30,11 @@ Prism: `mac-content-pdf-final.json` (Anthropic Claude Sonnet 5.5, complete cover
 Fixed Prism thumbnail constraint finding. Addressed the serialized-worker observation with two bounded jobs; two blocked OS reads/decoders can still delay loading, explicitly documented. The native run reproduced omitted optimized-wire metadata, repaired by canonical JSON fallback with copy/equality/schema regressions. Final actual-window check passed load/removal/recreation/removal with zero hosts/workers. This is automated native evidence, not physical pointer or human accessibility qualification.
 
 Focused checks: `mac-content-pdf-ready-checks.json`, `mac-content-pdf-final-checks.json`.
+
+## Add Mac media player with native transport and full-color posters
+
+Prism: `mac-content-media-final.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Fixed the prior Prism smoke fixture branch finding; it constructs only the chosen widget. TiledImage is immutable and the model owner-only; a WithPatch replacement regression proves poster refresh without mutating prior artwork. Final Prism notes AVFoundation reopens a mutable path after initial admission: documented explicitly in the API and control contract, with application-owned snapshots required for stable bytes. This is not an untrusted-file sandbox or hard runtime size guarantee. Native source/observer retirement, raw clipping at 1x/2x and both axis directions, namespaced dock geometry, original-color posters, root API compatibility and focused native load/removal checks passed. Actual-window evidence is separate from unperformed physical playback/seek/volume and human accessibility checks.
+
+Focused checks: `mac-content-media-ready-checks.json`, `mac-content-media-final-checks.json`, `mac-content-media-title-checks.json`.

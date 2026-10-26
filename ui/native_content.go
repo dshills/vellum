@@ -16,12 +16,14 @@ const NativeContent Kind = "native-content"
 // NativeContentInput is detached presentation metadata, not a service handle.
 // Construct it using a content widget's View method. Revision reloads the same path.
 type NativeContentInput struct {
-	Type       string `json:"type"`
-	Path       string `json:"path"`
-	Revision   uint64 `json:"revision"`
-	Thumbnails bool   `json:"thumbnails"`
-	Dark       bool   `json:"dark"`
-	generated  bool
+	Type         string `json:"type"`
+	Path         string `json:"path"`
+	Revision     uint64 `json:"revision"`
+	InitialMuted bool   `json:"initial_muted"`
+	PosterPNG    string `json:"poster_png,omitempty"`
+	Thumbnails   bool   `json:"thumbnails"`
+	Dark         bool   `json:"dark"`
+	generated    bool
 }
 
 func validateNativeContent(n Node) error {
@@ -32,7 +34,10 @@ func validateNativeContent(n Node) error {
 		}
 		return nil
 	}
-	if n.Kind != NativeContent || !c.generated || c.Type != "pdf" || len(c.Path) > 4096 || !utf8.ValidString(c.Path) || strings.ContainsRune(c.Path, 0) || !filepath.IsAbs(c.Path) {
+	if !validateNativePoster(c.PosterPNG) {
+		return fmt.Errorf("ui: invalid native poster")
+	}
+	if n.Kind != NativeContent || !c.generated || (c.Type != "pdf" && c.Type != "media") || len(c.Path) > 4096 || !utf8.ValidString(c.Path) || strings.ContainsRune(c.Path, 0) || !filepath.IsAbs(c.Path) {
 		return fmt.Errorf("ui: invalid native content source")
 	}
 	return nil
@@ -55,11 +60,21 @@ func (p *PDFViewer) View() (Node, error) {
 	if p == nil || p.ID == "" || !paletteText(p.Label, 256, false) {
 		return Node{}, fmt.Errorf("ui: invalid PDF viewer")
 	}
-	header := Node{ID: p.ID + "/label", Kind: Button, Text: p.Label, IconImage: p.IconImage, Disabled: true, Appearance: ButtonTool}
+	header := nativeContentHeader(p.ID, p.Label, p.IconImage)
 	body := Node{ID: p.ID + "/content", Kind: Label, Text: "Choose a local PDF document.", MinHeight: 320, Grow: true}
 	if p.Path != "" {
 		body = Node{ID: p.ID + "/content", Kind: NativeContent, Text: "PDFKit viewer — available in a native macOS window", MinWidth: 280, MinHeight: 320, Grow: true, Disabled: p.Disabled, Accessibility: Accessibility{Name: p.Label}, NativeContent: &NativeContentInput{Type: "pdf", Path: p.Path, Revision: p.Revision, Thumbnails: p.ShowThumbnails, Dark: p.Dark, generated: true}}
 	}
 	n := Node{ID: p.ID, Kind: Column, Children: []Node{header, body}, Grow: true, Style: p.Style}
 	return n, Validate(n)
+}
+
+// A content title is a label with decorative artwork, not a disabled action.
+func nativeContentHeader(id, label string, icon *canvas.TiledImage) Node {
+	row := Node{ID: id + "/label", Kind: Row, Style: Style{Gap: Some(float32(8)), Align: Some(AlignCenter)}}
+	if icon != nil {
+		row.Children = append(row.Children, Node{ID: id + "/label/icon", Kind: Image, Image: icon, Fit: ImageContain, Style: Style{MinSize: Some(Size{Width: 24, Height: 24}), MaxSize: Some(Size{Width: 24, Height: 24})}})
+	}
+	row.Children = append(row.Children, Node{ID: id + "/label/text", Kind: Label, Text: label, Style: Style{Typography: Some(MacTypography(13, 600))}})
+	return row
 }

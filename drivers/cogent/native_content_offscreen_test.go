@@ -3,8 +3,10 @@
 package cogent
 
 import (
+	"cogentcore.org/core/core"
 	"encoding/json"
 	"github.com/dshills/vellum/ui"
+	"github.com/dshills/vellum/workbench"
 	"strings"
 	"testing"
 )
@@ -59,5 +61,41 @@ func TestNativeContentSemanticDescriptorIsPublishedAndDetached(t *testing.T) {
 	n.NativeContent.Path = "/tmp/changed.pdf"
 	if out[0].NativeContent.Path == n.NativeContent.Path || accessibilitySameWireNode(out[0], n) {
 		t.Fatal("native source aliased or equality ignored it")
+	}
+}
+
+func TestNativeContentWorkbenchRawGeometryUsesSemanticNamespace(t *testing.T) {
+	a, b := newAXTest(t, 8)
+	workspace, e := workbench.New(workbench.Layout{Version: workbench.Version, Root: &workbench.Group{ID: "group", Tabs: []string{"pdf"}, Active: "pdf"}}, []string{"pdf"})
+	if e != nil {
+		t.Fatal(e)
+	}
+	p := ui.PDFViewer{ID: "document", Label: "Reference", Path: "/tmp/synthetic.pdf"}
+	w := &Workbench{Owner: a, Window: "ax", Workspace: workspace, Panels: []Panel{{ID: "pdf", Title: "PDF", View: func() ui.Node {
+		n, e := p.View()
+		if e != nil {
+			panic(e)
+		}
+		return n
+	}}}}
+	host := core.NewFrame(core.NewBody("Native content dock"))
+	root, e := reconcile(host, nil, ui.Node{ID: "dock", Kind: ui.Extension, Custom: w}, a, "ax")
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer root.widget.AsTree().Delete()
+	nodes, _ := accessibilitySnapshot(root, b)
+	bounds := nativeAccessibilityBounds(root)
+	found := false
+	for _, n := range nodes {
+		if n.NativeContent != nil {
+			found = true
+			if _, ok := bounds["native-frame:"+n.ID]; !ok {
+				t.Fatal("raw geometry does not match namespaced source", n.ID, bounds)
+			}
+		}
+	}
+	if !found {
+		t.Fatal("native source missing")
 	}
 }

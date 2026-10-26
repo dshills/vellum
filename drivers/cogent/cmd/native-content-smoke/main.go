@@ -4,12 +4,16 @@ package main
 
 import (
 	"context"
+	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/ui"
+	"image"
+	"image/color"
 	"os"
 	"path/filepath"
 	"strings"
@@ -51,10 +55,39 @@ func run() error {
 	defer a.Close()
 	p := &ui.PDFViewer{ID: "pdf", Label: "Synthetic PDF", Path: path, ShowThumbnails: true}
 	visible := true
+	media := false
+	wavPath := filepath.Join(dir, "silent.wav")
+	data := make([]byte, 44+16000)
+	copy(data, "RIFF")
+	binary.LittleEndian.PutUint32(data[4:], uint32(len(data)-8))
+	copy(data[8:], "WAVEfmt ")
+	binary.LittleEndian.PutUint32(data[16:], 16)
+	binary.LittleEndian.PutUint16(data[20:], 1)
+	binary.LittleEndian.PutUint16(data[22:], 1)
+	binary.LittleEndian.PutUint32(data[24:], 8000)
+	binary.LittleEndian.PutUint32(data[28:], 16000)
+	binary.LittleEndian.PutUint16(data[32:], 2)
+	binary.LittleEndian.PutUint16(data[34:], 16)
+	copy(data[36:], "data")
+	binary.LittleEndian.PutUint32(data[40:], 16000)
+	if e = os.WriteFile(wavPath, data, 0600); e != nil {
+		return e
+	}
+	pixels := image.NewNRGBA(image.Rect(0, 0, 2, 1))
+	pixels.SetNRGBA(0, 0, color.NRGBA{R: 220, G: 50, B: 140, A: 255})
+	pixels.SetNRGBA(1, 0, color.NRGBA{G: 160, B: 230, A: 255})
+	poster, _ := canvas.NewTiledImage(pixels)
+	player := ui.MediaPlayer{PosterImage: poster, ID: "media", Label: "Synthetic silent audio", Path: wavPath, InitialMuted: true}
 	ref, e := a.OpenWindow(app.Window{ID: "native-content-smoke", Title: "Vellum synthetic content check", Width: 760, Height: 600, View: func() ui.Node {
 		n := ui.Node{ID: "root", Kind: ui.Column, Grow: true}
 		if visible {
-			v, e := p.View()
+			var v ui.Node
+			var e error
+			if media {
+				v, e = player.View()
+			} else {
+				v, e = p.View()
+			}
 			if e != nil {
 				panic(e)
 			}
@@ -65,23 +98,26 @@ func run() error {
 	if e != nil {
 		return e
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 25*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 35*time.Second)
 	defer cancel()
 	done := make(chan error, 1)
 	go func() {
-		await := func(count int) error {
+		await := func(count int, kind string) error {
 			var last string
 			for ctx.Err() == nil {
 				wire, e := cogent.InspectNativeContent(ctx, a, ref)
 				last = wire
 				var v struct {
 					Hosts []struct {
+						Rate             float64
+						Muted            bool
+						Poster           bool
 						Class            string `json:"class"`
 						Loaded, Attached bool
 						Pages            int
 					}
 				}
-				if e == nil && json.Unmarshal([]byte(wire), &v) == nil && len(v.Hosts) == count && (count == 0 || v.Hosts[0].Loaded && v.Hosts[0].Attached && v.Hosts[0].Pages == 1) {
+				if e == nil && json.Unmarshal([]byte(wire), &v) == nil && len(v.Hosts) == count && (count == 0 || v.Hosts[0].Loaded && v.Hosts[0].Attached && v.Hosts[0].Class == kind && (kind != "PDFView" || v.Hosts[0].Pages == 1) && (kind != "AVPlayerView" || v.Hosts[0].Rate == 0 && v.Hosts[0].Muted && v.Hosts[0].Poster)) {
 					fmt.Println(wire)
 					return nil
 				}
@@ -92,24 +128,36 @@ func run() error {
 			}
 			return fmt.Errorf("native hosts=%d: %w; last=%s", count, ctx.Err(), last)
 		}
-		e := await(1)
+		e := await(1, "PDFView")
 		if e == nil {
 			e = a.PostWindow(ref, func() { visible = false; a.Invalidate(ref.ID()) })
 		}
 		if e == nil {
-			e = await(0)
+			e = await(0, "")
 		}
 		if e == nil {
 			e = a.PostWindow(ref, func() { visible = true; a.Invalidate(ref.ID()) })
 		}
 		if e == nil {
-			e = await(1)
+			e = await(1, "PDFView")
 		}
 		if e == nil {
 			e = a.PostWindow(ref, func() { visible = false; a.Invalidate(ref.ID()) })
 		}
 		if e == nil {
-			e = await(0)
+			e = await(0, "")
+		}
+		if e == nil {
+			e = a.PostWindow(ref, func() { media = true; visible = true; a.Invalidate(ref.ID()) })
+		}
+		if e == nil {
+			e = await(1, "AVPlayerView")
+		}
+		if e == nil {
+			e = a.PostWindow(ref, func() { visible = false; a.Invalidate(ref.ID()) })
+		}
+		if e == nil {
+			e = await(0, "")
 		}
 		done <- e
 		cancel()

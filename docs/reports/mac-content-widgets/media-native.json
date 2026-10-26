@@ -1,0 +1,146 @@
+{
+  "fixture": "generated local PDF and silent WAV with two-color PNG poster; no user files or physical input",
+  "observations": [
+    {
+      "hosts": [
+        {
+          "status": "",
+          "pages": 1,
+          "loaded": true,
+          "id": "node:cGRmL2NvbnRlbnQ",
+          "frame": "{{8, 8}, {754, 564}}",
+          "class": "PDFView",
+          "attached": true
+        }
+      ],
+      "workers": 0,
+      "geometry": {
+        "semantic_count": 5,
+        "view": "{{0, 0}, {770, 608}}",
+        "nodes": [
+          {
+            "id": "node:cGRmL2NvbnRlbnQ",
+            "raw": [
+              8,
+              36,
+              754,
+              564
+            ],
+            "clip": [
+              8,
+              36,
+              754,
+              564
+            ]
+          }
+        ],
+        "visible": "{{0, 0}, {770, 640}}"
+      }
+    },
+    {
+      "hosts": [],
+      "workers": 0,
+      "geometry": {
+        "semantic_count": 1,
+        "view": "{{0, 0}, {770, 608}}",
+        "nodes": [],
+        "visible": "{{0, 0}, {770, 640}}"
+      }
+    },
+    {
+      "hosts": [
+        {
+          "status": "",
+          "pages": 1,
+          "loaded": true,
+          "id": "node:cGRmL2NvbnRlbnQ",
+          "frame": "{{8, 8}, {754, 564}}",
+          "class": "PDFView",
+          "attached": true
+        }
+      ],
+      "workers": 0,
+      "geometry": {
+        "semantic_count": 5,
+        "view": "{{0, 0}, {770, 608}}",
+        "nodes": [
+          {
+            "id": "node:cGRmL2NvbnRlbnQ",
+            "raw": [
+              8,
+              36,
+              754,
+              564
+            ],
+            "clip": [
+              8,
+              36,
+              754,
+              564
+            ]
+          }
+        ],
+        "visible": "{{0, 0}, {770, 640}}"
+      }
+    },
+    {
+      "hosts": [],
+      "workers": 0,
+      "geometry": {
+        "semantic_count": 1,
+        "view": "{{0, 0}, {770, 608}}",
+        "nodes": [],
+        "visible": "{{0, 0}, {770, 640}}"
+      }
+    },
+    {
+      "hosts": [
+        {
+          "status": "",
+          "poster": true,
+          "loaded": true,
+          "id": "node:bWVkaWEvY29udGVudA",
+          "rate": 0,
+          "muted": true,
+          "class": "AVPlayerView",
+          "frame": "{{8, 8}, {754, 564}}",
+          "attached": true
+        }
+      ],
+      "workers": 0,
+      "geometry": {
+        "semantic_count": 5,
+        "view": "{{0, 0}, {770, 608}}",
+        "nodes": [
+          {
+            "id": "node:bWVkaWEvY29udGVudA",
+            "raw": [
+              8,
+              36,
+              754,
+              564
+            ],
+            "clip": [
+              8,
+              36,
+              754,
+              564
+            ]
+          }
+        ],
+        "visible": "{{0, 0}, {770, 640}}"
+      }
+    },
+    {
+      "hosts": [],
+      "workers": 0,
+      "geometry": {
+        "semantic_count": 1,
+        "view": "{{0, 0}, {770, 608}}",
+        "nodes": [],
+        "visible": "{{0, 0}, {770, 640}}"
+      }
+    }
+  ],
+  "result": "final title views: PDF load/removal/recreation/removal, AVPlayerView ready/attached/paused/muted/poster, removal with zero hosts/workers; process exited 0"
+}

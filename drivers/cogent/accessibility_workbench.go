@@ -4,6 +4,7 @@ import (
 	"cogentcore.org/core/core"
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/workbench"
+	"strings"
 )
 
 func accessibilityWorkbenchNamespace(extension, panel string) string {
@@ -184,7 +185,7 @@ func workbenchAccessibilityBounds(r *record, bounds func(string, core.Widget), o
 		if active := w.records[group.Active]; active != nil {
 			prefix := accessibilityWorkbenchNamespace(r.node.ID, group.Active)
 			for id, rect := range accessibilityBoundsIncludingScoped(active, includeScoped) {
-				out[prefix+id] = rect
+				out[accessibilityGeometryID(prefix, id)] = rect
 			}
 		}
 	})
@@ -405,4 +406,13 @@ func accessibilityDialogVisible(r *record) bool {
 		}
 	}
 	return true
+}
+
+// Prefix the managed identity inside the raw-frame envelope, including nested
+// dock namespaces; Cocoa pairs raw geometry with that exact semantic identity.
+func accessibilityGeometryID(prefix, id string) string {
+	if strings.HasPrefix(id, "native-frame:") {
+		return "native-frame:" + prefix + strings.TrimPrefix(id, "native-frame:")
+	}
+	return prefix + id
 }

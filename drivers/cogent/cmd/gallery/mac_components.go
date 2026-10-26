@@ -42,6 +42,9 @@ type macComponentsGallery struct {
 	filePickerTicket *app.Completion
 	dateRange        *ui.DateRangePicker
 	pdfPath          string
+	mediaPath        string
+	mediaPlayer      *ui.MediaPlayer
+	mediaTicket      *app.Completion
 	pdfTicket        *app.Completion
 	artwork          map[ui.Symbol]*canvas.TiledImage
 }
@@ -104,6 +107,9 @@ func (m *macComponentsGallery) view() ui.Node {
 		m.essentials = newMacEssentialsGallery(m)
 	}
 	content := m.themePreview()
+	if m.page == "media-player" {
+		content = m.mediaPlayerView()
+	}
 	if m.page == "pdf" {
 		content = m.pdfViewerView()
 	}
@@ -191,7 +197,7 @@ func (m *macComponentsGallery) view() ui.Node {
 	if m.page == "menus" {
 		content = m.menuPreview()
 	}
-	navigation := ui.Node{ID: "components/pages", Kind: ui.Selector, SelectedID: m.page, Options: []ui.Option{{ID: "pdf", Label: "PDF viewer"}, {ID: "date-range", Label: "Date range"}, {ID: "path-picker", Label: "File / folder field"}, {ID: "checklist", Label: "Checklist"}, {ID: "commands", Label: "Command palette"}, {ID: "file-drop", Label: "File drop zone"}, {ID: "sharing", Label: "Native Share"}, {ID: "links", Label: "Links"}, {ID: "help-tags", Label: "Help tags"}, {ID: "range-slider", Label: "Range slider"}, {ID: "gradient", Label: "Gradient well"}, {ID: "search-scopes", Label: "Search scope bar"}, {ID: "find-replace", Label: "Find / Replace"}, {ID: "quick-look", Label: "Quick Look"}, {ID: "theme", Label: "Themes"}, {ID: "menus", Label: "Cascading menus"}, {ID: "split", Label: "Split buttons"}, {ID: "inspector", Label: "Inspector panel"}, {ID: "browser", Label: "Column browser"}, {ID: "rules", Label: "Filter / rule editor"}, {ID: "image-well", Label: "Image well"}, {ID: "icon-picker", Label: "Searchable icon picker"}, {ID: "settings", Label: "Settings pane"}, {ID: "alerts", Label: "Native alert"}, {ID: "calendar", Label: "Calendar picker"}, {ID: "documents", Label: "Document list"}, {ID: "outline", Label: "Mac outline"}, {ID: "native-colors", Label: "Native Colors panel"}, {ID: "native-fonts", Label: "Native Fonts panel"}, {ID: "angle-dial", Label: "Circular angle dial"}}, Accessibility: ui.Accessibility{Name: "Component demonstration"}, Change: func(e ui.ChangeEvent) { m.page = e.SelectedID }}
+	navigation := ui.Node{ID: "components/pages", Kind: ui.Selector, SelectedID: m.page, Options: []ui.Option{{ID: "media-player", Label: "Media player"}, {ID: "pdf", Label: "PDF viewer"}, {ID: "date-range", Label: "Date range"}, {ID: "path-picker", Label: "File / folder field"}, {ID: "checklist", Label: "Checklist"}, {ID: "commands", Label: "Command palette"}, {ID: "file-drop", Label: "File drop zone"}, {ID: "sharing", Label: "Native Share"}, {ID: "links", Label: "Links"}, {ID: "help-tags", Label: "Help tags"}, {ID: "range-slider", Label: "Range slider"}, {ID: "gradient", Label: "Gradient well"}, {ID: "search-scopes", Label: "Search scope bar"}, {ID: "find-replace", Label: "Find / Replace"}, {ID: "quick-look", Label: "Quick Look"}, {ID: "theme", Label: "Themes"}, {ID: "menus", Label: "Cascading menus"}, {ID: "split", Label: "Split buttons"}, {ID: "inspector", Label: "Inspector panel"}, {ID: "browser", Label: "Column browser"}, {ID: "rules", Label: "Filter / rule editor"}, {ID: "image-well", Label: "Image well"}, {ID: "icon-picker", Label: "Searchable icon picker"}, {ID: "settings", Label: "Settings pane"}, {ID: "alerts", Label: "Native alert"}, {ID: "calendar", Label: "Calendar picker"}, {ID: "documents", Label: "Document list"}, {ID: "outline", Label: "Mac outline"}, {ID: "native-colors", Label: "Native Colors panel"}, {ID: "native-fonts", Label: "Native Fonts panel"}, {ID: "angle-dial", Label: "Circular angle dial"}}, Accessibility: ui.Accessibility{Name: "Component demonstration"}, Change: func(e ui.ChangeEvent) { m.page = e.SelectedID }}
 
 	return ui.Node{ID: "mac-components", Kind: ui.Scroll, Theme: &theme, Grow: true, Style: ui.Style{Background: ui.Some(palette.Window), Padding: ui.Some(ui.UniformInsets(16)), Gap: ui.Some(float32(12))}, Children: []ui.Node{{ID: "components/title", Kind: ui.Label, Text: "Mac components", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 20, Weight: 600})}}, {ID: "components/appearance", Kind: ui.Row, Children: appearance}, navigation, content, {ID: "components/status", Kind: ui.Label, Text: fmt.Sprintf("%s · actions: %d", m.status, m.count)}}}
 }

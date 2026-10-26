@@ -634,7 +634,9 @@ lifetime, with separate unclipped layout and clipped presentation frames scaled
 from device pixels. Hiding, disabling, source replacement, a modal projection,
 removal or closing releases the document and transient state. Theme changes
 preserve the loaded document. Up to eight hosts share two bounded loading jobs;
-new requests coalesce by live host, and stale completions cannot install. Reads
+new requests coalesce by live host, and stale completions cannot install. At
+capacity, additional leaves retain their placeholder until a later publication
+can admit them. Same-window removed hosts retire before replacements are admitted. Reads
 are regular-file-only and capped at 64 MiB; documents at 1024 pages. These are
 admission limits, not a hard bound on PDFKit decoder memory/time. An already
 blocked local-filesystem read or decoder can finish after cancellation without
@@ -652,3 +654,37 @@ modified by that check. PDF links/remote navigation/print delegate requests are
 ignored. Native context menus are platform-owned; use trusted local documents.
 
 Platform reference: [Apple PDFView](https://developer.apple.com/documentation/pdfkit/pdfview).
+
+## Embedded media (macOS)
+
+`ui.MediaPlayer.View` hosts AVKit's native transport, scrub/seek and volume
+controls for an explicit local audio/video path. Every new Path/Revision starts
+paused; `InitialMuted` applies at creation. `PosterImage` retains original colors
+(up to 256x256 pixels/256 KiB PNG), updates without restarting playback and hides
+when playback advances. Empty paths show a prompt; unsupported files show an
+error. The Mac Components gallery opens common local audio/video formats.
+
+The PDF adapter's exact-window membership, raw/clipped geometry, eight-host/two-job
+bounds and stale-result retirement also apply. Media metadata gets a five-second
+worker wait and a regular-file/1 GiB size admission check. AVFoundation streams
+the local source and owns codec buffers, internal asynchronous work and decoding
+costs; these admission limits are not a hard runtime resource cap. OS-supported
+codecs apply. AVFoundation reopens the path after the admission check: replacing
+or changing the file can change playback bytes and bypass the initial kind/size
+check. This is a mutable-path streaming contract, not an immutable snapshot or
+security boundary. Applications requiring stable bytes must own a private
+snapshot. Use trusted local media; admission does not sandbox decoders or
+container references. Hiding/disabling/removing the node or closing the window
+pauses the player, cancels pending seeks/loading, removes observers and releases
+its item. Sharing, full-screen controls, Picture in Picture and video analysis
+are disabled. No network URL source, autoplay, capture or recording API is added.
+Native media editing shortcuts do not reach an unrelated managed text editor.
+
+Offscreen checks cover public contracts, original-color poster encoding and local
+file admission. `cmd/native-content-smoke` additionally opens a generated silent
+WAV, checks an attached ready AVPlayerView at rate zero/muted, removes it and
+checks zero hosts/workers. This is separate from physical playback/seek/volume
+and human accessibility checks, which remain unqualified. Native overlays are
+not part of Vellum offscreen captures or arbitrary managed popover stacking.
+
+Platform reference: [Apple AVPlayerView](https://developer.apple.com/documentation/avkit/avplayerview).
