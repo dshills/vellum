@@ -20,11 +20,12 @@ jobs:
         with:
           go-version-file: go.mod
           cache: false
-      - name: Guard tests and static checks
+      - name: Guard tests
         working-directory: tools/apicompat
-        run: |
-          go test ./...
-          go vet ./...
+        run: go test ./...
+      - name: Static checks
+        working-directory: tools/apicompat
+        run: go vet ./...
       - name: Race checks
         if: runner.os != 'Windows'
         working-directory: tools/apicompat

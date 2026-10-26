@@ -39,8 +39,10 @@ the developer tool, not those platforms' native framework runtime.
 
 ## Next bounded work
 
-1. The guard is locally tested and Prism-reviewed. Inspect its first CI outcomes;
-   fix only reproduced guard defects, preserving its assertions and scope.
+1. The guard passed [its first three-host CI matrix](https://github.com/dshills/vellum/actions/runs/40258277100)
+   at e2530b1. The subsequent test/vet step split is separately reviewed to prevent
+   Windows shell error masking; inspect its follow-up CI before merging this branch.
+   Fix only reproduced guard defects, preserving its assertions and scope.
 2. Improve repeatable private packaging/developer handoff where a concrete gap
    exists; keep the accepted build9 archives unchanged.
 3. Consider an independently scoped native-facade compatibility check after the
