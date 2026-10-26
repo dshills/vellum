@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "8e72b2aaa4457512fd31558f156d67ab",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "ab577e67d5eddfed3905d5621ea1029bae452686",
+    "branch": "codex/mac-widget-v11"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "3c2aad54c1742599",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Chooser cancel not handled; empty path proposed",
+      "message": "If the user cancels the chooser, ChooseFile may return an empty path with nil error (or a cancel error). An empty path is then passed to ProposeFiles, producing a spurious rejection message, or a cancel error is shown as a failure.",
+      "suggestion": "After ChooseFile, treat an empty path with nil error as a cancel and skip ProposeFiles; also special-case the cancellation error.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/mac_file_drop.go",
+          "lines": {
+            "start": 32,
+            "end": 34
+          }
+        }
+      ],
+      "tags": [
+        "cancel",
+        "chooser",
+        "location-corrected"
+      ],
+      "evidence": "if err == nil {\n\t\t\t\t\tpath, err = s.ChooseFile(w.Context(), app.FileOptions{Title: \"Choose a reference file\", Extensions: ext})\n\t\t\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "2969280e1b8c7079",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Bounded message can exceed bound after UTF-8 fixup",
+      "message": "Truncating at a byte boundary can split a multibyte rune. ToValidUTF8 then replaces the fragment with '?', which can grow the string; the result can slightly exceed 512 bytes (up to 2 extra). The test asserts len\u003c=512 only for ASCII.",
+      "suggestion": "Sanitize with ToValidUTF8 first, then truncate at a rune boundary (e.g. back up while !utf8.RuneStart(s[n])).",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/file_drop_zone.go",
+          "lines": {
+            "start": 42,
+            "end": 86
+          }
+        }
+      ],
+      "tags": [
+        "utf8"
+      ],
+      "evidence": "if len(s) \u003e 512 {\n\t\ts = s[:512]\n\t}\n\ts = strings.ToValidUTF8(s, \"?\")",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5634,
+    "totalMs": 5659
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 20098,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 12136,
+        "output": 661,
+        "costUSD": 0.030882
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

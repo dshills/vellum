@@ -1,0 +1,30 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui",
+      "-run",
+      "TestDropZone"
+    ],
+    "exit_code": 0,
+    "seconds": 2.964391834102571
+  },
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./cmd/gallery",
+      "-run",
+      "TestMacFileChoice"
+    ],
+    "exit_code": 0,
+    "seconds": 17.939071208937094
+  }
+]

@@ -22,3 +22,11 @@ Prism: `mac-v11-share-final.json` (Anthropic Claude Sonnet 5.5, complete coverag
 Initial Prism findings addressed: regular-file validation is explicitly a worker-side ShareServices obligation and implemented in the supported driver; metadata validation performs no I/O. Gallery busy state derives from Completion lifetime, with revoked-window regression. Final findings: added nil gallery-binding guard; documented synchronous filesystem syscall cancellation limit rather than create detached unbounded workers; shutdown already marks finished synchronously, and expanded real-cleanup fixtures prove late finish is idempotent for selected/unselected sessions. Cleanup never closes committed service UI. All focused checks pass; initial icon catalogue failures remain diagnostic artifacts and the exact expected catalogue increases by one. Native recipes/cleanup tests use synthetic content/fake picker, with no OS presentation or transfer. Physical Share anchoring/service delivery remains unverified. Stable API comparison passes and accepted v1 archives remain unchanged.
 
 Focused checks: `mac-v11-share-verified-checks.json`, `mac-v11-share-lifetime-checks.json`, `mac-v11-share-review-fixes-checks.json`.
+
+## Add reusable Mac file drop zone with shared chooser validation
+
+Prism: `mac-v11-drop-zone.json` (Anthropic Claude Sonnet 5.5, complete coverage).
+
+Prism coverage is complete. Chooser cancellation now skips admission and preserves existing feedback, with regression tests. Its UTF-8 growth concern is not reproduced: replacement is the one-byte ASCII question mark and cannot grow a truncated byte buffer; split/invalid UTF-8 and NUL vectors now verify the 512-byte valid-text bound. Root race/vet, existing transformed native file-drop routing, rejected-drop consumption/ancestor protection, gallery checks and stable API comparison pass. The component reads no files and retains no paths. Finder pre-drop acceptance remains a documented existing backend limit; actual physical Finder behavior is not newly verified.
+
+Focused checks: `mac-v11-drop-zone-checks.json`, `mac-v11-drop-review-fixes-checks.json`.

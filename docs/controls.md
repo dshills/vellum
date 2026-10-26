@@ -563,3 +563,13 @@ syscall, including a slow mounted/network filesystem.
 
 Native design reference: [Apple sharing picker](https://developer.apple.com/documentation/appkit/nssharingservicepicker),
 [anchoring](https://developer.apple.com/documentation/appkit/nssharingservicepicker/show%28relativeto%3Aof%3Apreferrededge%3A%29).
+
+`ui.FileDropZone` presents a Mac-style rounded drop target with original-color
+artwork, extension hints, bounded accepted/rejected feedback and a keyboard
+accessible Choose File action. `ProposeFiles` feeds chooser results through the
+same all-or-nothing validation/callback as external drops. It performs no file
+I/O and retains no paths. MaxFiles defaults to16 (maximum256); existing 1 MiB
+payload limits apply. Extensions are simple filename suffixes, not MIME/security
+validation. A routed rejection is consumed to prevent ancestor admission and to
+render feedback. Finder pre-drop cursor/acceptance cannot predict validation
+with the current backend; feedback follows the drop, not hover.
