@@ -1,0 +1,88 @@
+[
+  {
+    "cwd": ".",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/package-app.py",
+      "--binary",
+      "/private/tmp/vellum-app-icon-starter",
+      "--output",
+      "/private/tmp/vellum-app-icons-l30w8ur0/Vellum Personal.app",
+      "--name",
+      "Vellum Personal",
+      "--identifier",
+      "com.dshills.vellum.personal.iconcheck",
+      "--version",
+      "1.0.0",
+      "--build-version",
+      "1",
+      "--icon",
+      "examples/personal-mac/assets/app-icon.png",
+      "--sign-identity",
+      "-"
+    ],
+    "exit_code": 0,
+    "seconds": 0.5978554158937186
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "ditto",
+      "-c",
+      "-k",
+      "--keepParent",
+      "/private/tmp/vellum-app-icons-l30w8ur0/Vellum Personal.app",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/deliveries/mac-app-icons/Vellum Personal.zip"
+    ],
+    "exit_code": 0,
+    "seconds": 1.2847097080666572
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "ditto",
+      "-x",
+      "-k",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/deliveries/mac-app-icons/Vellum Personal.zip",
+      "/private/tmp/vellum-app-icons-l30w8ur0/verified"
+    ],
+    "exit_code": 0,
+    "seconds": 0.08067470812238753
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "codesign",
+      "--verify",
+      "--deep",
+      "--strict",
+      "/private/tmp/vellum-app-icons-l30w8ur0/verified/Vellum Personal.app"
+    ],
+    "exit_code": 0,
+    "seconds": 0.037075042026117444
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "/usr/bin/iconutil",
+      "--convert",
+      "iconset",
+      "--output",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/deliveries/mac-app-icons/verified.iconset",
+      "/private/tmp/vellum-app-icons-l30w8ur0/verified/Vellum Personal.app/Contents/Resources/AppIcon.icns"
+    ],
+    "exit_code": 0,
+    "seconds": 0.030212708050385118
+  },
+  {
+    "cwd": ".",
+    "argv": [
+      "/private/tmp/vellum-inspect-app-icon",
+      "/private/tmp/vellum-app-icons-l30w8ur0/Vellum Personal.app",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/deliveries/mac-app-icons/verified.iconset/icon_512x512@2x.png"
+    ],
+    "exit_code": 0,
+    "seconds": 0.07996608293615282
+  }
+]

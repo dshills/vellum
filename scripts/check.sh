@@ -19,6 +19,7 @@ python3 scripts/release-sdk_test.py
 python3 scripts/distribution-inventory_test.py
 python3 scripts/check-sdk_test.py
 python3 scripts/package-app_test.py
+python3 scripts/app_icons_test.py
 go test -race ./...
 go vet ./...
 cd drivers/cogent

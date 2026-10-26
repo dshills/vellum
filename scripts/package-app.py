@@ -23,6 +23,7 @@ if __name__ == "__main__":
     sys.dont_write_bytecode = True
 
 import app_notices
+import app_icons
 
 from native_archive import regular_stream, unchanged
 
@@ -147,17 +148,22 @@ def binary_digest(path):
     return digest.hexdigest()
 
 
-def verify_app(stage, name, binary_sha256, manifest_bytes, notice_record):
+def verify_app(stage, name, binary_sha256, manifest_bytes, notice_record, icon_record=None):
     if binary_digest(stage/"Contents/MacOS"/name) != binary_sha256:
         raise ValueError("packaged app executable changed")
     resources = stage/"Contents/Resources"
     if app_notices.read_regular(resources/"APP_MANIFEST.json", len(manifest_bytes)) != manifest_bytes:
         raise ValueError("packaged app manifest changed")
+    app_icons.verify(resources, icon_record)
+    if icon_record is not None and plistlib.loads((stage/"Contents/Info.plist").read_bytes()).get("CFBundleIconFile") != app_icons.ICON_NAME:
+        raise ValueError("packaged app icon metadata changed")
     if notice_record is not None:
         app_notices.verify(resources/app_notices.DIRECTORY, notice_record["artifact_sha256"], notice_record)
 
 
-def package(binary, output, name, identifier, version, target, identity=None, build_version="1", notice_bundle=None, *, public=False):
+def package(binary, output, name, identifier, version, target, identity=None, build_version="1", notice_bundle=None, *, public=False, icon=None):
+    if icon is not None and target != "darwin":
+        raise ValueError("app icons are implemented only for macOS")
     if type(public) is not bool:
         raise ValueError("public mode must be boolean")
     if public and target != "darwin":
@@ -219,17 +225,20 @@ def package(binary, output, name, identifier, version, target, identity=None, bu
             if notice_bundle is not None:
                 manifest["component_notices"] = app_notices.copy(notice_bundle, resources/app_notices.DIRECTORY, manifest["source_binary_sha256"])
             info={"CFBundlePackageType":"APPL","CFBundleName":name,"CFBundleDisplayName":name,"CFBundleExecutable":name,"CFBundleIdentifier":identifier,"CFBundleVersion":build_version,"CFBundleShortVersionString":version,"NSHighResolutionCapable":True}
+            if icon is not None:
+                manifest["app_icon"] = app_icons.install(icon, resources)
+                info["CFBundleIconFile"] = app_icons.ICON_NAME
             (stage/"Contents/Info.plist").write_bytes(plistlib.dumps(info,sort_keys=True))
             manifest_bytes = (json.dumps(manifest,indent=2)+"\n").encode()
             (resources/"APP_MANIFEST.json").write_bytes(manifest_bytes)
             normalize_layout(stage)
             notice_record = manifest.get("component_notices")
-            verify_app(stage, name, manifest["source_binary_sha256"], manifest_bytes, notice_record)
+            verify_app(stage, name, manifest["source_binary_sha256"], manifest_bytes, notice_record, manifest.get("app_icon"))
             if identity is not None:
                 run_child(["codesign","--force","--sign",identity,str(stage)],check=True, env=child_environment(), timeout=NATIVE_TOOL_TIMEOUT_SECONDS)
                 run_child(["codesign","--verify","--strict",str(stage)],check=True, env=child_environment(), timeout=NATIVE_TOOL_TIMEOUT_SECONDS)
             packaged_sha256 = binary_digest(executable) if identity is not None else manifest["source_binary_sha256"]
-            verify_app(stage, name, packaged_sha256, manifest_bytes, notice_record)
+            verify_app(stage, name, packaged_sha256, manifest_bytes, notice_record, manifest.get("app_icon"))
             # Recheck public authorization before output reservation. This remains
             # sampled local provenance, not protection against transient reversal.
             recheck_authorization()
@@ -254,7 +263,7 @@ def package(binary, output, name, identifier, version, target, identity=None, bu
                 require_owned()
                 if identity is not None:
                     run_child(["codesign","--verify","--strict",str(output)],check=True, env=child_environment(), timeout=NATIVE_TOOL_TIMEOUT_SECONDS)
-                verify_app(output, name, packaged_sha256, manifest_bytes, notice_record)
+                verify_app(output, name, packaged_sha256, manifest_bytes, notice_record, manifest.get("app_icon"))
                 recheck_authorization()
                 require_owned()
             except BaseException:
@@ -284,10 +293,11 @@ def main():
     parser.add_argument("--build-version",default="1",help="numeric bundle build version (one to three components); increment for distribution")
     parser.add_argument("--platform",dest="target",choices=["darwin","windows","linux"],default=platform.system().lower())
     parser.add_argument("--notice-bundle",type=Path,help="explicit binary-bound original notice bundle for a macOS app; rights review remains pending")
+    parser.add_argument("--icon",type=Path,help="macOS app icon: .icns or 1024x1024 PNG; embedded before signing")
     parser.add_argument("--public",action="store_true",help="require existing source release-audit gates and binary-bound notices; does not publish or notarize")
     parser.add_argument("--sign-identity",help="explicit macOS code-signing identity; '-' requests ad-hoc signing")
     args=parser.parse_args()
-    print(json.dumps(package(args.binary.absolute(),args.output.absolute(),args.name,args.identifier,args.version,args.target,args.sign_identity,args.build_version,args.notice_bundle,public=args.public),indent=2))
+    print(json.dumps(package(args.binary.absolute(),args.output.absolute(),args.name,args.identifier,args.version,args.target,args.sign_identity,args.build_version,args.notice_bundle,public=args.public,icon=args.icon),indent=2))
 
 
 if __name__=="__main__":main()

@@ -1,0 +1,71 @@
+{
+  "source_base": "0c973001e30ec749c986d8a259a8c0026353d61a",
+  "packager_source_state": "precommit reviewed candidate; source hashes below",
+  "packager_sources": {
+    "scripts/package-app.py": "cedfbbaddca3a07089ca6cd0929cebe2eafdba1a96ad2f8cc9a00159c82bebde",
+    "scripts/app_icons.py": "49bf72fc254e11ac197a7a4da67acacf31b584494cc872dd5e3169b6f4c65c32"
+  },
+  "app": "/private/tmp/vellum-app-icons-l30w8ur0/Vellum Personal.app",
+  "archive": "Vellum Personal.zip",
+  "archive_sha256": "eb7595db355f68fbc84658fb4a0691443baf151dd8cbd48dfc35bceffe2bdeb7",
+  "icon": {
+    "file": "AppIcon.icns",
+    "sha256": "63b9cbdbc7ae79a50008b20205bdb355642afcb727bb1e8487581931e16e0c98",
+    "source_format": "png",
+    "source_sha256": "88e0f194c1bbe368908c5b72f594da0c0325f78b837e925eed8febaa3ce1aed3"
+  },
+  "retina_representations": {
+    "icon_32x32@2x.png": [
+      64,
+      64
+    ],
+    "icon_128x128.png": [
+      128,
+      128
+    ],
+    "icon_256x256@2x.png": [
+      512,
+      512
+    ],
+    "icon_32x32.png": [
+      32,
+      32
+    ],
+    "icon_512x512.png": [
+      512,
+      512
+    ],
+    "icon_16x16.png": [
+      16,
+      16
+    ],
+    "icon_16x16@2x.png": [
+      32,
+      32
+    ],
+    "icon_128x128@2x.png": [
+      256,
+      256
+    ],
+    "icon_512x512@2x.png": [
+      1024,
+      1024
+    ],
+    "icon_256x256.png": [
+      256,
+      256
+    ]
+  },
+  "signature_verified_after_extraction": true,
+  "private": true,
+  "adhoc_signed": true,
+  "notarized": false,
+  "desktop_interactions": "none; OS image decoding and bundle/signature checks only; Finder/Dock cache appearance not physically verified",
+  "appkit_image_check": {
+    "bundle_icon_decodes": true,
+    "full_color_and_transparency_preserved": true,
+    "inspection": "AppKit decoding only; no app launch or Finder/Dock pixel assertion",
+    "representations": 10
+  },
+  "observed_staging_failure": "Signing or extracting under Documents storage introduced Finder/resource-fork metadata rejected by codesign; Documents signing still refused after moving conversion outside the bundle. Local temporary staging/extraction passed. No metadata was stripped from user files."
+}

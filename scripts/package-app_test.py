@@ -34,7 +34,7 @@ class AppChecks(unittest.TestCase):
    root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");out=root/"Test.app"
    app.package(binary,out,"Test","org.example.test","0.1.0","darwin")
    self.assertTrue((out/"Contents/Info.plist").is_file());self.assertTrue((out/"Contents/MacOS/Test").is_file());execute.assert_not_called()
-   info=plistlib.loads((out/"Contents/Info.plist").read_bytes());self.assertEqual(info["CFBundleShortVersionString"],"0.1.0");self.assertEqual(info["CFBundleVersion"],"1")
+   info=plistlib.loads((out/"Contents/Info.plist").read_bytes());self.assertEqual(info["CFBundleShortVersionString"],"0.1.0");self.assertEqual(info["CFBundleVersion"],"1");self.assertNotIn("CFBundleIconFile",info)
    manifest=json.loads((out/"Contents/Resources/APP_MANIFEST.json").read_text());self.assertEqual(manifest["sdk_release"],json.loads((app.ROOT/"release/version.json").read_text())["version"]);self.assertEqual(manifest["build_version"],"1")
  def test_bundle_versions_are_distinct_and_numeric(self):
   with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"),mock.patch.object(app,"run_child"):

@@ -1,0 +1,8 @@
+import AppKit
+import Foundation
+let app=URL(fileURLWithPath:CommandLine.arguments[1])
+guard let bundle=Bundle(url:app),bundle.object(forInfoDictionaryKey:"CFBundleIconFile") as? String == "AppIcon.icns",let icon=NSImage(contentsOf:app.appendingPathComponent("Contents/Resources/AppIcon.icns")),icon.isValid else{fatalError("bundle icon did not decode")}
+let representation=URL(fileURLWithPath:CommandLine.arguments[2])
+guard let bitmap=NSBitmapImageRep(data:try! Data(contentsOf:representation)),let transparent=bitmap.colorAt(x:0,y:0)?.usingColorSpace(.deviceRGB),let blue=bitmap.colorAt(x:200,y:512)?.usingColorSpace(.deviceRGB),let paper=bitmap.colorAt(x:310,y:400)?.usingColorSpace(.deviceRGB),transparent.alphaComponent==0,blue.blueComponent>blue.redComponent,paper.redComponent>0.9,paper.greenComponent>0.9 else{fatalError("full-color/alpha artwork did not survive conversion")}
+let result:[String:Any] = ["bundle_icon_decodes":true,"representations":icon.representations.count,"full_color_and_transparency_preserved":true,"inspection":"AppKit decoding only; no app launch or Finder/Dock pixel assertion"]
+print(String(data:try! JSONSerialization.data(withJSONObject:result,options:[.sortedKeys]),encoding:.utf8)!)

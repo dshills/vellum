@@ -1,0 +1,22 @@
+from pathlib import Path
+import hashlib,json,os,plistlib,subprocess,sys,time,tempfile
+r=Path('/Users/dshills/Development/projects/Vellum');x=Path('/Users/dshills/Documents/ChatGPT/Go Native UI');d=x/'deliveries/mac-app-icons';d.mkdir(exist_ok=True)
+env=os.environ.copy();env['PYTHONDONTWRITEBYTECODE']='1';checks=[]
+def run(argv):
+ start=time.monotonic();p=subprocess.run(argv,cwd=r,env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,timeout=120);(x/'artifacts/mac-app-icons'/('command-'+str(len(checks))+'.log')).write_text(p.stdout);checks.append({'cwd':'.','argv':argv,'exit_code':p.returncode,'seconds':time.monotonic()-start});assert p.returncode==0,p.stdout;return p.stdout
+local=Path(tempfile.mkdtemp(prefix='vellum-app-icons-',dir='/private/tmp'));bundle=local/'Vellum Personal.app'
+run(['python3','-B','scripts/package-app.py','--binary','/private/tmp/vellum-app-icon-starter','--output',str(bundle),'--name','Vellum Personal','--identifier','com.dshills.vellum.personal.iconcheck','--version','1.0.0','--build-version','1','--icon','examples/personal-mac/assets/app-icon.png','--sign-identity','-'])
+archive=d/'Vellum Personal.zip';run(['ditto','-c','-k','--keepParent',str(bundle),str(archive)])
+extracted=local/'verified';run(['ditto','-x','-k',str(archive),str(extracted)])
+app=extracted/bundle.name;run(['codesign','--verify','--deep','--strict',str(app)])
+info=plistlib.loads((app/'Contents/Info.plist').read_bytes());assert info['CFBundleIconFile']=='AppIcon.icns'
+manifest=json.loads((app/'Contents/Resources/APP_MANIFEST.json').read_text());icon=app/'Contents/Resources/AppIcon.icns';assert hashlib.sha256(icon.read_bytes()).hexdigest()==manifest['app_icon']['sha256']
+run(['/usr/bin/iconutil','--convert','iconset','--output',str(d/'verified.iconset'),str(icon)])
+representations={}
+for f in (d/'verified.iconset').glob('*.png'):
+ body=f.read_bytes();representations[f.name]=[int.from_bytes(body[16:20],'big'),int.from_bytes(body[20:24],'big')]
+assert len(representations)==10
+report={'source_base':subprocess.check_output(['git','rev-parse','HEAD'],cwd=r,text=True).strip(),'packager_source_state':'precommit reviewed candidate; source hashes below','packager_sources':{name:hashlib.sha256((r/name).read_bytes()).hexdigest() for name in ('scripts/package-app.py','scripts/app_icons.py')},'app':str(bundle),'archive':archive.name,'archive_sha256':hashlib.sha256(archive.read_bytes()).hexdigest(),'icon':manifest['app_icon'],'retina_representations':representations,'signature_verified_after_extraction':True,'private':True,'adhoc_signed':True,'notarized':False,'desktop_interactions':'none; OS image decoding and bundle/signature checks only; Finder/Dock cache appearance not physically verified'}
+(d/'verification.json').write_text(json.dumps(report,indent=2)+'\n');(d/'SHA256SUMS').write_text(report['archive_sha256']+'  '+archive.name+'\n');(x/'artifacts/mac-widget-expansion/mac-app-icons-package.json').write_text(json.dumps(checks,indent=2)+'\n')
+(d/'README.md').write_text('# macOS app-icon example\n\nVellum Personal.app and Vellum Personal.zip demonstrate the optional --icon packaging path using the original full-color starter artwork. Verify SHA256SUMS, extract the ZIP and open the app. The bundle is private, ad-hoc signed and unnotarized; public distribution is not approved. No user documents are accessed. verification.json pins the precommit packaging source bytes and reports the ten Retina representations and extracted signature check. This delivery does not modify prior Widgets/Reminders packages. No desktop interactions were run for this check.\n')
+print(json.dumps(report,indent=2))

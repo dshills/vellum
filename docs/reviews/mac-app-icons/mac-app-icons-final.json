@@ -1,0 +1,143 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "fc0a22f2dcb5700bdb8385664805d055",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "0c973001e30ec749c986d8a259a8c0026353d61a",
+    "branch": "codex/macos-app-icons"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "e769fa3dabbd3a64",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Combined error conditions obscure failures",
+      "message": "read_icon reads the file, then checks that its length equals the earlier stat size. If the file is a legitimate file smaller than the limit this works, but when called on a file from iconutil output the check relies on st_size from regular_stream; a file growing between stat and read raises a generic ValueError. More importantly, the ICNS sizing validation only checks framing, so a PNG-in-ICNS is never decoded before being copied unchanged on non-validated paths.",
+      "suggestion": "Keep the size check but give a distinct error for each condition; consider decoding the ICNS with iconutil, which is already done.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "scripts/app_icons.py",
+          "lines": {
+            "start": 22,
+            "end": 22
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "location-corrected"
+      ],
+      "evidence": "if len(data) != before.st_size or not data or len(data) \u003e MAX_ICON_BYTES:",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "a76f93ec6ceddcc4",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Weak ICNS decode validation",
+      "message": "An ICNS can decode to an iconset containing only a few representations, or none that macOS actually uses. The check only confirms at least one PNG exists, so an icon lacking the 512/1024 representations passes. Also the test case 'structurally valid icns without images' catches either exception type, so it does not verify that this branch is exercised.",
+      "suggestion": "Also verify that the decoded PNGs are non-empty and valid PNG headers, and tighten the test to expect a specific error.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "scripts/app_icons.py",
+          "lines": {
+            "start": 88,
+            "end": 88
+          }
+        }
+      ],
+      "tags": [
+        "validation"
+      ],
+      "evidence": "if not any(decoded.glob(\"*.png\")):",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7120,
+    "totalMs": 7156
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 14,
+    "bytes": 46348,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 21106,
+        "output": 877,
+        "costUSD": 0.050982
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "3e5c24cc747b548b",
+        "severity": "medium",
+        "category": "security",
+        "title": "Hardcoded personal absolute paths in committed artifact",
+        "message": "The committed report producer hardcodes a personal home directory and private workspace paths, leaking local environment details and making the script non-reproducible for others.",
+        "suggestion": "Parameterize paths through arguments or environment variables, or omit personal paths from the committed artifact.",
+        "confidence": 0.45,
+        "locations": [
+          {
+            "path": "docs/reports/mac-app-icons/package-producer.py.txt",
+            "lines": {
+              "start": 3,
+              "end": 3
+            }
+          }
+        ],
+        "tags": [
+          "privacy",
+          "reproducibility"
+        ],
+        "evidence": "r=Path('/Users/dshills/Development/projects/Vellum');x=Path('/Users/dshills/Documents/ChatGPT/Go Native UI')",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/mac-app-icons/package-producer.py.txt"
+    }
+  ],
+  "suppressed": []
+}

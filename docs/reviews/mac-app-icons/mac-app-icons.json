@@ -1,0 +1,144 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "20572f586046e9da11b70209525480e9",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "0c973001e30ec749c986d8a259a8c0026353d61a",
+    "branch": "codex/macos-app-icons"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "83467662e5ef7880",
+      "severity": "medium",
+      "category": "bug",
+      "title": "ICNS validation is structural only",
+      "message": "The validator accepts any ICNS whose element lengths chain correctly, including a file with zero elements: data of 8 bytes is rejected by len\u003c16, fine, but element type tags are never checked and the container may hold no image elements. The later iconutil decode catches this. Minor, but the length check at the 'len(data) \u003c 16' stage depends on iconutil only on macOS.",
+      "suggestion": "Also verify at least one known image element type.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "scripts/app_icons.py",
+          "lines": {
+            "start": 35,
+            "end": 35
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "location-corrected"
+      ],
+      "evidence": "if size \u003c= 8 or offset + size \u003e len(data):",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "7a960864fc6b13aa",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Temp work directory created inside the app bundle",
+      "message": "The temp directory is created in resources.parent, which is the bundle's Contents directory (stage/Contents). If the cleanup or an exception path leaves it, or if a failure occurs, the work directory sits inside the bundle that gets signed and moved. It is removed at the end of the with block, but the hidden dir exists in Contents during install and normalize_layout/signing is later. More importantly, the test passes a resources dir whose parent is the temp root, so behavior is not representative.",
+      "suggestion": "Use a temp dir outside the bundle (e.g. tempfile.TemporaryDirectory() default or the stage's parent) to avoid polluting the bundle.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "scripts/app_icons.py",
+          "lines": {
+            "start": 63,
+            "end": 63
+          }
+        }
+      ],
+      "tags": [
+        "bundle",
+        "tempdir",
+        "location-corrected"
+      ],
+      "evidence": "with tempfile.TemporaryDirectory(prefix=\".vellum-icon-\", dir=resources.parent) as temporary:",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 8994,
+    "totalMs": 9029
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 14,
+    "bytes": 45422,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 20716,
+        "output": 891,
+        "costUSD": 0.050342
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "1ae37cb855094640",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "PNG checks superficial",
+        "message": "PNG validation only inspects the signature and IHDR dimensions; it does not check bit depth, color type or that the file decodes. The docs claim RGBA transparency is preserved and PNG must be valid, but a palette or grayscale 1024x1024 PNG is accepted; sips failures are the only guard.",
+        "suggestion": "Document or check color type, or rely on sips errors and test for them.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "scripts/app_icons.py",
+            "lines": {
+              "start": 55,
+              "end": 25
+            }
+          }
+        ],
+        "tags": [
+          "validation"
+        ],
+        "evidence": "data[8:16] != b\"\\x00\\x00\\x00\\rIHDR\"",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in scripts/app_icons.py"
+    }
+  ],
+  "suppressed": []
+}

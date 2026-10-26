@@ -140,3 +140,46 @@ it is not a rich-text document or a fixed-column tab editor. Font fallback and
 unsupported bidi-isolate interaction remain explicit limits. The body title is
 a separate controlled field. Offscreen layout and geometry do not prove native
 pointer acceptance or human IME/VoiceOver quality.
+
+## Application icons
+
+The macOS packager accepts an optional `--icon /absolute/path/AppIcon.icns` or
+`--icon /absolute/path/AppIcon.png`. A PNG must be exactly 1024×1024; full-color
+RGBA transparency is preserved. It is resampled into the standard 16, 32, 128,
+256 and 512 point sizes at 1× and 2× using macOS `sips`, then compiled with
+`iconutil`. An existing `.icns` is decoded for validation and copied unchanged,
+so it can contain individually designed small-size artwork. Sources must be
+regular, nonsymlink files no larger than 16 MiB. Invalid artwork refuses the
+package without publishing a partial app.
+
+```sh
+python3 scripts/package-app.py --binary /absolute/build/my-app \
+  --output '/absolute/build/My App.app' --name 'My App' \
+  --identifier com.example.myapp --version 1.0.0 --build-version 1 \
+  --icon /absolute/assets/AppIcon.png --sign-identity -
+```
+
+The packager embeds `Contents/Resources/AppIcon.icns`, sets `CFBundleIconFile`
+and records source/output artwork hashes in `APP_MANIFEST.json`. Icon bytes and
+metadata are verified before signing, after signing and after publication.
+The existing binary-bound notices, audit and exclusive-output rules still apply;
+include the appropriate `--notice-bundle` for a distributed application.
+No icon argument preserves the existing bundle behavior. Non-macOS targets reject
+this option explicitly. A [complete starter example](../examples/personal-mac/README.md#application-icon)
+includes original full-color artwork.
+
+The icon is application identity shared by all windows, rather than a titlebar
+or toolbar image. Launch the packaged `.app`; `go run` and standalone binaries
+have no bundle icon. Finder/Dock may cache artwork: rebuild to a new bundle path
+and relaunch instead of modifying a signed app in place. This supports classic
+ICNS artwork, without Icon Composer `.icon`, asset-catalog appearance variants,
+or runtime Dock badges/icon replacement. Packaging checks do not establish
+that Finder/Dock have refreshed their cached pixels. If codesign reports Finder
+information/resource-fork detritus, use a local build/extraction directory outside
+synchronized Documents storage. This host injected that metadata there during
+the example check; local temporary packaging/extraction passed. The packager
+does not strip metadata from user-owned files.
+
+The bundle key and Retina conventions follow Apple's
+[CFBundleIconFile reference](https://developer.apple.com/documentation/BundleResources/Information-Property-List/CFBundleIconFile)
+and [high-resolution icon guidance](https://developer.apple.com/library/archive/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html).
