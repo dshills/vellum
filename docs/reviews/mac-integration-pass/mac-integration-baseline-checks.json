@@ -1,0 +1,50 @@
+[
+  {
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "build",
+      "-o",
+      "/private/tmp/vellum-integration-gallery",
+      "./cmd/gallery"
+    ],
+    "exit_code": 0,
+    "seconds": 6.619553999975324
+  },
+  {
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 1.928143332945183
+  },
+  {
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.15629466599784791
+  },
+  {
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.32127933390438557
+  }
+]

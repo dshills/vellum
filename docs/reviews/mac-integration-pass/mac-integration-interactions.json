@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "35dc4017af07c4312e814dcc283ec037",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "e261cc616a92587ed0b96c3149a81a84d5c8c096",
+    "branch": "codex/mac-integration-polish"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "642e29006a149730",
+      "severity": "medium",
+      "category": "bug",
+      "title": "PDF byte offsets computed from str character lengths",
+      "message": "The PDF is built as a str and xref offsets are computed with len() of characters, and the final encode is ASCII, so it works only while all content is ASCII. Also the page objects reference contents 6 and 7 while objects are numbered by index: catalog=1, pages=2, pages 3,4, font=5, contents 6,7. That is correct. The /Length value excludes the newline before endstream, which is mostly fine. The ASCII assumption is fragile for offsets but currently valid.",
+      "suggestion": "Build the PDF as bytes, or assert the content is ASCII, so that character offsets equal byte offsets.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "scripts/content-fixtures.py",
+          "lines": {
+            "start": 20,
+            "end": 21
+          }
+        }
+      ],
+      "tags": [
+        "pdf",
+        "location-corrected"
+      ],
+      "evidence": "        body = \"BT /F1 20 Tf 30 400 Td (\" + text + \") Tj ET\\n\"\n        objects.append(\"\u003c\u003c /Length \" + str(len(body)) + \" \u003e\u003e\\nstream\\n\" + body + \"endstream\")",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4953,
+    "totalMs": 4968
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 9568,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5942,
+        "output": 409,
+        "costUSD": 0.015974
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
