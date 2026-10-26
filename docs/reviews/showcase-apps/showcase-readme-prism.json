@@ -1,0 +1,85 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "bed4e474b8991b5b202188743698eaf0",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "b646a9c72ace856225e88abb373a297100c2303e",
+    "branch": "codex/showcase-apps"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3124,
+    "totalMs": 3145
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 8,
+    "bytes": 16187,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 9061,
+        "output": 284,
+        "costUSD": 0.020962
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "080966a58a3ab444",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Verification timestamps look implausible",
+        "message": "The recorded checked_utc date of 2026-10-26 may be in the future relative to the commit, and the package was reportedly built from a source commit that precedes this commit. The provenance claims cannot be independently verified from the data, and a wrong timestamp undermines the audit trail.",
+        "suggestion": "Verify the timestamps come from the actual system clock at verification time and regenerate them if they do not.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "docs/reviews/showcase-apps/final-package-verification.json",
+            "lines": {
+              "start": 4,
+              "end": 7
+            }
+          }
+        ],
+        "tags": [
+          "provenance"
+        ],
+        "evidence": "\"checked_utc\": \"2026-10-26T20:11:59.257279+00:00\"",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reviews/showcase-apps/final-package-verification.json"
+    }
+  ],
+  "suppressed": []
+}

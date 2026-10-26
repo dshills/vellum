@@ -1,0 +1,38 @@
+{
+  "private": true,
+  "notarized": false,
+  "apps": [
+    {
+      "name": "Forma",
+      "archive": "Forma.zip",
+      "sha256": "a675c4477ffd1320383fdd656d4f3dc1958ce46b4cadfb29bfb8622c3d5bd8c2"
+    },
+    {
+      "name": "Luma",
+      "archive": "Luma.zip",
+      "sha256": "58903b47922183ecd2800f145531b8105c51154ecd0c9a5737e337a5718766fc"
+    },
+    {
+      "name": "Pulse",
+      "archive": "Pulse.zip",
+      "sha256": "c976ab456cd3b077dbbd0ae71b218493401d5c6a7f6ba8438d5ff74e49114b33"
+    }
+  ],
+  "source_sha256": {
+    "demo/app_icons.go": "ea941b4dc039241272598d7aa12a30f6a5039f9825fe24de49c0725824013062",
+    "demo/art.go": "feee77a79fd369687bfc9e2ab4da3458c55b749aee194c07a8b58f756003f2ef",
+    "demo/common.go": "7813cf63120d926bb9e7c9ab0560332161dab3e860fd8e6a00db2ab386bbfbdd",
+    "demo/forma.go": "991170b457fb589f53bddec9c6ce05bbd00651d4a8296070f8a565d7cd71cd52",
+    "demo/luma.go": "f542bd365ae7acd939b91f9c9ca8510e9d5a940cdb94b4e2d8250cf8351d3253",
+    "demo/models_test.go": "306fa9af1e92bf366263a2a9f3c18f6ec7b0c3536e246e698b315ec439862f97",
+    "demo/pulse.go": "6f632241489afab01496dcaa9fdcda5f847be6355ec4438107f45f25e6038a74",
+    "demo/routing_offscreen_test.go": "2ae9d4cf58f27c6d7573ae88453b16f8f79c3189008f785577a91c3ac1f53428",
+    "cmd/artwork/main.go": "32b8c6f30e35a83e2988a3e1b4dde166f99a53133943b28c3a10ccdd2a446b03",
+    "cmd/forma/main.go": "6fb6f020dca7a7d1f85692ca03f0d6a85e742ac83c2c568b2f80979ec6ed8d12",
+    "cmd/luma/main.go": "1c8488e47fc7a59ffb3134289e864475743ca9fd8d93fbd61a4dbc09ceb6c74f",
+    "cmd/pulse/main.go": "729f6dd883ccb3f3c4ec3025c91c3861a87c87de2028047d9a47e5dd06f8017e",
+    "go.mod": "cd858c8c379bad3167f8892a0ab48a5fdc73f9da31ed2383b5bbc0f3b9896c66",
+    "go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "package.py": "a5dde9a5d77f7733f7fa2c78693cf1c1ded1539a6bc4a995124dd6b0427676d1"
+  }
+}

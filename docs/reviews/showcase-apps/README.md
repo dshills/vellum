@@ -49,3 +49,30 @@ race/vet receipt includes that correction. A final checkpoint review covers it.
 
 Final checkpoint Prism coverage: 32 files, complete, no findings. Source is
 committed before the final private app build and README window captures.
+
+## Final native packages and captures
+
+The private final packages were built from clean source commit
+`b646a9c72ace856225e88abb373a297100c2303e`. All three ZIPs were extracted into
+separate local directories and passed `codesign --verify --deep --strict` with
+their full-color ICNS assets present. Source file hashes match the package
+manifest. Final Forma/Luma/Pulse bundles were launched and their complete windows
+visually inspected; raw unmodified app-window JPEGs are in `docs/screenshots`.
+The corrected Luma profile caption was verified by switching Mono then Original
+in the final bundle. Forma and Pulse production sources are unchanged from the
+interaction checks above. Closing all three preceding disposable demo windows
+was followed by successful final launches. No personal documents were opened.
+
+The README describes real functionality and limitations. No full release or
+performance campaign was repeated. Physical coordinate targeting did not produce
+a reliable control result in this session; native AX actions and offscreen
+routing are recorded separately. This is not new human accessibility acceptance.
+The apps are private, ad-hoc signed and unnotarized; no public assets/tags were
+created. Final app copies remain under `/private/tmp/vellum-showcase-final`.
+
+Final documentation checkpoint: Prism / Anthropic Claude Sonnet 5.5 reviewed
+all eight textual files with complete coverage and no findings. The three binary
+JPEGs were visually inspected separately, including their native chrome and
+selection appearance. All 73 local documentation links resolved and each stored
+image SHA256 matched its capture record (1418×931). No pixel edits or conversions
+were applied to the captured bytes.

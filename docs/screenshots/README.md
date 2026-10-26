@@ -20,7 +20,14 @@ Use macOS Capture Selected Window (Shift-Cmd-4, then Space) to capture that app
 only. Screen-sharing indicators or window controls belong to macOS, not Vellum.
 Do not add hypothetical controls or replace the displayed UI after capture.
 
-The final image files and source/hash metadata are recorded beside this guide
-when capture is complete. Application source and limitations are in
+The final images [Forma](forma.jpg), [Luma](luma.jpg) and [Pulse](pulse.jpg) were
+captured on macOS from private packages built at source commit
+`b646a9c72ace856225e88abb373a297100c2303e`. The automated capture used the
+computer-use service's per-app `getScreenshot` API and saved its JPEG bytes
+unchanged. The manual procedure above is an equivalent reproduction route.
+[Capture metadata](captures.json) records dimensions, state and SHA256 digests;
+[package verification](../reviews/showcase-apps/final-package-verification.json)
+records clean-source provenance, ZIP hashes and extracted signature checks.
+macOS screen-sharing and pointer indicators are retained in the raw captures. Application source and limitations are in
 [the showcase guide](../../examples/showcase/README.md). The private app ZIPs
 are separate from these Git-tracked images; no public release assets are created.

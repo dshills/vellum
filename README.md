@@ -9,6 +9,48 @@ Managed widgets use shared Mac typography, spacing and themes; AppKit provides
 native titlebar toolbars, file dialogs, alerts, Quick Look, and Colors/Fonts panels.
 Full-color toolbar and picker artwork remains untinted.
 
+## See it in action
+
+Three original, runnable Mac apps built with Vellum's public Go APIs. These
+windows use managed Mac-themed UI, native AppKit toolbars and full-color icons.
+The screenshots are actual app captures; artwork and data are original fixtures.
+
+### Forma — a space for ideas
+
+A poster studio combining retained GPU geometry, an image layer, layer selection,
+a color/size inspector and command-based Undo/Redo. Pan, zoom and fit the artboard.
+
+![Forma design studio with an editable poster, layers and color inspector](docs/screenshots/forma.jpg)
+
+Run: `(cd examples/showcase && go run ./cmd/forma)`
+
+### Luma — a library of light
+
+An image browser with a selectable filmstrip, collections, favorites, search,
+nondestructive color variants and a histogram sampled from the displayed image.
+Every landscape is generated locally in Go.
+
+![Luma image library showing original landscape artwork, filmstrip and histogram](docs/screenshots/luma.jpg)
+
+Run: `(cd examples/showcase && go run ./cmd/luma)`
+
+### Pulse — a clearer signal
+
+A dark telemetry explorer pairing retained GPU charts with a virtualized,
+indexed table of 1,024 fictional service records. Filter, sort, inspect a service
+or advance the repeatable sample data. No monitoring service is contacted.
+
+![Pulse dark telemetry explorer with a chart, selected service and details](docs/screenshots/pulse.jpg)
+
+Run: `(cd examples/showcase && go run ./cmd/pulse)`
+
+Prepare and source the driver environment using the Quick start below first.
+See the [showcase guide](examples/showcase/README.md) for controls, private app
+packaging and limits, and [screenshot reproduction](docs/screenshots/README.md)
+for source identities and capture details. These examples reset on launch and
+use the existing experimental GPU surface APIs; they do not expand the stable
+API or release qualification.
+
 ## Current status
 
 **Current source identifies `v1.0.0` for private personal macOS use.** The
@@ -86,6 +128,9 @@ After preparation, run these commands from the repository root with
 
 | Example | Run | Demonstrates |
 | --- | --- | --- |
+| [Forma](examples/showcase/README.md#forma--design-studio) | `(cd examples/showcase && go run ./cmd/forma)` | Original poster, retained GPU canvas, layer inspector and Undo/Redo |
+| [Luma](examples/showcase/README.md#luma--image-library) | `(cd examples/showcase && go run ./cmd/luma)` | Original image assets, filmstrip selection, collections, color variants and sampled histogram |
+| [Pulse](examples/showcase/README.md#pulse--telemetry-explorer) | `(cd examples/showcase && go run ./cmd/pulse)` | Dark theme, retained charts and virtualized service fixtures |
 | [Mac Widgets](docs/mac-widget-demo.md) | `(cd drivers/cogent && go run ./cmd/gallery -mac-widgets -native-titlebar -mac-system-appearance)` | Frozen widget catalogue, scoped themes, full-color icons, toolbar customization and native panels |
 | [Notes](examples/macapps/notes/README.md) | `(cd examples/macapps && go run ./cmd/notes)` | Proportional prose with emoji, folders/search, native toolbar and menus, local Save/Open, recovery and Undo/Redo |
 | [Native shell](examples/macapps/cmd/macshell/main.go) | `(cd examples/macapps && go run ./cmd/macshell)` | Two windows with independent native toolbar commands and disabled states |
