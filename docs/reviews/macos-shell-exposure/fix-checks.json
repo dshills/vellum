@@ -1,0 +1,45 @@
+{
+  "baseline_failures_expected": true,
+  "fixed_regressions_pass": true,
+  "checks": [
+    {
+      "name": "baseline-final-regressions",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "seconds": 8.564
+    },
+    {
+      "name": "fixed-exposure-regressions",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 9.531
+    },
+    {
+      "name": "related-composition-lifecycle",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 6.647
+    },
+    {
+      "name": "core-vet",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 7.199
+    },
+    {
+      "name": "patch-recipe-pins",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.129
+    }
+  ],
+  "recipe_replay_matches_tested_sources": true,
+  "drifted_input_refused_before_new_file": true,
+  "runtime_changed_files": [
+    "core/renderwindow.go"
+  ],
+  "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "features_and_api_unchanged": true,
+  "experimental_options_unchanged": true,
+  "retirement_focus_race_regressions_pass": true
+}

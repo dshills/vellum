@@ -1,0 +1,85 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "944e61be0d709874a39d5b8b274f56fe",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "70f6c7b872b01d7f5032c80258a3aea592d994e2",
+    "branch": "codex/macos-public-packaging"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4042,
+    "totalMs": 4062
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 18163,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 9973,
+        "output": 392,
+        "costUSD": 0.023866
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "547f5574163276c8",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Forced-frame flag consumed late; risk of stale or stuck request",
+        "message": "The flag was formerly cleared in the nothing-to-do branch. Now it is cleared only after the visibility check and after the point where the composer starts. Any early return between (for example the closed-window or native-ownership guards, if present) leaves the flag set. This can produce repeated forced compositions. The hidden-path code also sets the flag on every pass, so a permanently hidden window keeps the request pending.",
+        "suggestion": "Verify that every early return between the check and the clear either retains the request intentionally or is covered by a test. Add a test for the minimized-then-restored path and for ownership-guard returns.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/exposure/0108-window-exposure-repaint.patch",
+            "lines": {
+              "start": 866,
+              "end": 866
+            }
+          }
+        ],
+        "tags": [
+          "rendering",
+          "state-flag"
+        ],
+        "evidence": "if !spriteMods \u0026\u0026 !rebuild \u0026\u0026 !stageMods \u0026\u0026 !sceneMods \u0026\u0026 !w.flags.HasFlag(winRenderSkipped) {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/exposure/0108-window-exposure-repaint.patch"
+    }
+  ],
+  "suppressed": []
+}

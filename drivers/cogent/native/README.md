@@ -266,3 +266,9 @@ precede explicit arming; earlier compositions remain unarmed. It does not alter
 ordinary single-event tracing or supply native callback/performance qualification.
 See [the stage](patches/desktopmeasurement/README.md) and
 [measurement contract](../../../specs/native-presentation.md).
+
+Stage108 repairs native exposure of unchanged windows using one coalesced
+presentation request. Retained-scene pixel regressions cover surviving-window
+focus restoration, raise/show/focus, hidden state and busy composition. Features,
+backend and experimental pacing options are unchanged. See
+[the exposure contract](patches/exposure/README.md).

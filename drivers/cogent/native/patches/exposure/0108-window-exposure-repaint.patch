@@ -1,0 +1,180 @@
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -399,6 +399,10 @@
+ 		return
+ 	}
+ 	w.SystemWindow.Raise()
++	// Native exposure needs one presentation even when the model is unchanged.
++	// Closing another window restores focus through this same Raise path.
++	w.flags.SetFlag(true, winRenderSkipped)
++	w.requestPaintAfter(0)
+ }
+ 
+ // minimize requests that the window be minimized, making it no longer
+@@ -589,6 +593,7 @@
+ 			// }
+ 		case events.WinShow:
+ 			e.SetHandled()
++			w.flags.SetFlag(true, winRenderSkipped)
+ 			// note that this is sent delayed by driver
+ 			if DebugSettings.WindowEventTrace {
+ 				fmt.Printf("Win: %v got show event\n", w.name)
+@@ -607,6 +612,7 @@
+ 			if !w.publishFocus() {
+ 				return
+ 			}
++			w.flags.SetFlag(true, winRenderSkipped)
+ 			if !w.flags.HasFlag(winGotFocus) {
+ 				w.flags.SetFlag(true, winGotFocus)
+ 				w.sendWinFocusEvent(events.WinFocus)
+@@ -857,15 +863,14 @@
+ 		spriteMods = true
+ 	}
+ 
+-	if !spriteMods && !rebuild && !stageMods && !sceneMods { // nothing to do!
+-		if w.flags.HasFlag(winRenderSkipped) {
+-			w.flags.SetFlag(false, winRenderSkipped)
+-		} else {
+-			traceUnchanged = true
+-			return
+-		}
++	if !spriteMods && !rebuild && !stageMods && !sceneMods && !w.flags.HasFlag(winRenderSkipped) {
++		traceUnchanged = true
++		return
+ 	}
+ 	if !w.isVisible() || w.SystemWindow.Is(system.Minimized) {
++		// updateAll may consume scene dirty state while no native frame can show.
++		// Retain a single presentation request until visibility returns.
++		w.flags.SetFlag(true, winRenderSkipped)
+ 		if DebugSettings.WindowRenderTrace {
+ 			log.Printf("RenderWindow: skipping update on inactive / minimized window: %v\n", w.name)
+ 		}
+@@ -899,6 +904,7 @@
+ 	}()
+ 	// now we go in the proper bottom-up order to generate the [render.Scene]
+ 	cp := w.SystemWindow.Composer()
++	w.flags.SetFlag(false, winRenderSkipped)
+ 	cp.Start()
+ 	sm := &w.mains
+ 	n := sm.stack.Len()
+--- /dev/null
++++ b/core/exposure_vellum_test.go
+@@ -0,0 +1,118 @@
++//go:build offscreen
++
++// Copyright (c) 2026 Davin Hills. SPDX-License-Identifier: MIT.
++package core
++
++import (
++	"image"
++	"image/color"
++	"image/draw"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/system"
++)
++
++// The retained scene and software compositor are real. Only the native backing
++// surface is overwritten to model exposure after an unavailable/lost frame.
++// No model property or scene dirty bit changes to repair that surface.
++func TestVellumExposurePresentsOwnUnchangedScene(t *testing.T) {
++	for _, action := range []string{"raise", "close-other", "focus", "show"} {
++		t.Run(action, func(t *testing.T) {
++			m, _, _, drawer := busyRetryFixture(t)
++			close(drawer.release)
++			target := drawer.GetImage()
++			draw.Draw(target, target.Bounds(), image.NewUniform(color.RGBA{R: 211, A: 255}), image.Point{}, draw.Src)
++			switch action {
++			case "raise":
++				for range 32 {
++					m.window.Raise()
++				}
++			case "close-other":
++				closing := &renderWindow{name: "closing-other"}
++				AllRenderWindows.add(closing)
++				closing.closed() // Actual registry removal and surviving-window Raise path.
++			case "focus":
++				m.window.SystemWindow.Events().Window(events.WinFocus)
++			case "show":
++				m.window.SystemWindow.Events().Window(events.WinShow)
++			}
++			drainManual(t, m)
++			if drawer.ends.Load() != 1 {
++				t.Fatalf("exposure composed %d times, want one without a model edit", drawer.ends.Load())
++			}
++			p := drawer.GetImage().RGBAAt(target.Bounds().Dx()/2, target.Bounds().Dy()/2)
++			if p.R != 31 || p.G != 47 || p.B != 79 {
++				t.Fatalf("exposure retained another surface's pixels: %v", p)
++			}
++			drainManual(t, m)
++			if drawer.ends.Load() != 1 {
++				t.Fatal("exposure kept composing unchanged idle work")
++			}
++		})
++	}
++}
++
++type exposureVisibilityWindow struct {
++	system.Window
++	hidden bool
++}
++
++func (w *exposureVisibilityWindow) Is(f system.WindowFlags) bool {
++	return f == system.Minimized && w.hidden || w.Window.Is(f)
++}
++func (w *exposureVisibilityWindow) RequestPaintAfter(dur time.Duration) {
++	w.Window.(requestedPainter).RequestPaintAfter(dur)
++}
++
++func (w *exposureVisibilityWindow) ManualExecution() bool {
++	return w.Window.(manualSystemWindow).ManualExecution()
++}
++func (w *exposureVisibilityWindow) ManualState() system.ManualWindowState {
++	return w.Window.(manualSystemWindow).ManualState()
++}
++func (w *exposureVisibilityWindow) FlushReadyPaint() bool {
++	return w.Window.(manualSystemWindow).FlushReadyPaint()
++}
++func (w *exposureVisibilityWindow) RequestPaint()    { w.Window.(requestedPainter).RequestPaint() }
++func (w *exposureVisibilityWindow) IsOnDemand() bool { return w.Window.(requestedPainter).IsOnDemand() }
++
++func TestVellumExposureSurvivesHiddenPresentation(t *testing.T) {
++	m, _, _, drawer := busyRetryFixture(t)
++	close(drawer.release)
++	w := &exposureVisibilityWindow{Window: m.window.SystemWindow, hidden: true}
++	m.window.SystemWindow = w
++	m.window.Raise()
++	// Use the normal render path while hidden; a redraw request must survive it.
++	m.window.renderWindow()
++	if drawer.ends.Load() != 0 {
++		t.Fatal("hidden window composed")
++	}
++	w.hidden = false
++	m.window.renderWindow()
++	if drawer.ends.Load() != 1 {
++		t.Fatal("hidden pass consumed pending exposure presentation")
++	}
++	m.window.renderWindow()
++	if drawer.ends.Load() != 1 {
++		t.Fatal("visible pass failed to retire exposure request")
++	}
++}
++
++func TestVellumExposureDuringCompositionCoalesces(t *testing.T) {
++	m, _, _, drawer := busyRetryFixture(t)
++	finish := holdBusyRetryComposition(t, m, drawer)
++	for range 32 {
++		m.window.Raise()
++	}
++	finish()
++	drainManual(t, m)
++	if drawer.ends.Load() != 2 {
++		t.Fatalf("exposure during composition lost/duplicated: %d", drawer.ends.Load())
++	}
++	drainManual(t, m)
++	if drawer.ends.Load() != 2 {
++		t.Fatal("idle exposure rescheduled")
++	}
++}

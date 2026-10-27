@@ -21,3 +21,14 @@ private build9 packages as builds of that tag. Compatibility, experimental
 exclusions and runtime qualification limits remain unchanged. Native-module
 release coordination remains separate; native consumers use the checkout and
 its explicit replacements.
+
+## Frozen-feature correctness maintenance: window exposure
+
+A visible window restored after a sibling closes must present its own retained
+scene without requiring a document command or value edit. Coalesce exposure
+requests, retain one while hidden/in flight, and return to unchanged idle after
+presentation. Retire closed windows through the existing ownership guards. This
+is a correctness repair within the freeze, not a new feature or pacing option.
+Separate deterministic scene/composition regressions from actual packaged Mac
+window observations; preserve historical binaries/audits and record any new
+source, prepared-Go patch, executable and notice bindings explicitly.

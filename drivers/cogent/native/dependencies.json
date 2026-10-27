@@ -1403,6 +1403,17 @@
               "sha256": "21480216011ef80aaeab31a68508e3a24ec0274bc0832ae2be6bf70798c75061"
             }
           ]
+        },
+        {
+          "origin": "Vellum bounded native window exposure repaint repair",
+          "inputs": "native/patches/exposure/original-hashes.json",
+          "outputs": "native/patches/exposure/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/exposure/0108-window-exposure-repaint.patch",
+              "sha256": "fd6e54c276ce8d4d071e4a779f8ddff7267d5e52e153e509c5de74d9dd1b33de"
+            }
+          ]
         }
       ]
     },
