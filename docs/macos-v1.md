@@ -23,7 +23,7 @@ The named stable APIs preserve exported signatures and documented defaults throu
 
 Portable race/vet, affected native offscreen tests, command/lifetime regressions and independently extracted SDK consumers provide automated evidence. Physical pointer/native-window observations are recorded separately in the [RC native report](reports/macos-v1/README.md). That report lists exact source identity, observed host and outcomes. Historical soak and catalogue evidence is reused for unchanged paths; it does not certify all future workloads.
 
-Human IME candidate behavior and VoiceOver usability remain explicitly **unqualified**, as chosen by the owner. Follow the [human checklist](personal-macos-input-checklist.md) before claiming those results. Other macOS versions, Intel, multi-display changes, Windows and Linux remain unqualified; Wayland remains unsupported. No signing identity, notarization or public distribution approval is implied. Current payload distribution audit remains pending.
+Human IME candidate behavior and VoiceOver usability remain explicitly **unqualified**, as chosen by the owner. Follow the [human checklist](personal-macos-input-checklist.md) before claiming those results. Other macOS versions, Intel, multi-display changes, Windows and Linux remain unqualified; Wayland remains unsupported. No signing identity, notarization or public distribution approval is implied. The owner-approved [current payload audit](../release/macos-v1-distribution-audit.json) authorizes final local public packaging and launch checks; downloadable assets remain unpublished until a separate final-asset decision.
 
 ## Consume the private SDK
 

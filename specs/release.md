@@ -13,8 +13,11 @@ below remain unchanged; `source_release` records this narrower authorization.
 
 The root module is `github.com/dshills/vellum`, the native module is
 `github.com/dshills/vellum/drivers/cogent`, and Vellum's own code uses MIT.
-Third-party components retain original notices. Current changed-payload audit
-status remains pending; historical alpha.3 exact-payload approval is not reused.
+Third-party components retain original notices. The owner approved the current delta-audited payload on 27 October 2026;
+[the new exact-payload record](../release/macos-v1-distribution-audit.json) binds
+its source, binaries, notices and icons. The historical alpha.3 approval remains
+unchanged. Local public production and launch checks are authorized; publishing
+final downloads, Developer ID signing and notarization remain separate decisions.
 
 The published alpha.3 preview, personal-v0.1 and v1 RC records are historical.
 Numeric optimization goals, full platform/endurance qualification and broader
@@ -699,3 +702,16 @@ subsequent decisions. Reuse unchanged implementation/runtime/CI evidence within
 its recorded source and binary scope; perform focused final public-consumer and
 launch checks before publication. Candidate hashes identify private audit bytes,
 not future public archives whose metadata/signing may differ.
+
+## Approved current-payload public packaging
+
+The 27 October direct owner reply approves the current distribution-audit payload
+and authorizes final public-mode packaging, bounded launch checks, review and
+commits. The new release audit record binds the db5d80b packet, frozen 4b42fb8
+product source, exact native archive and each pre-sign binary/notice inventory.
+Existing public guards, declaration labels and historical approvals remain intact.
+Only approval/source documentation, public manifests and existing ad-hoc signature
+bytes may change during production. Public output must preserve audited product,
+dependency, native and asset identities. Record final asset hashes and any native
+limitations before requesting the separate publication decision. Do not move the
+existing source tag, upload assets, use a signing identity or notarize here.

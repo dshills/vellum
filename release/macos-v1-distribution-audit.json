@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "status": "approved",
+  "release": "v1.0.0",
+  "approved_on": "2026-10-27",
+  "authority": "Repository owner, explicit direct conversation approval of the current distribution audit payload",
+  "owner_decision": "I approve the current distribution audit payload. Proceed with final public packaging and launch checks. Keep features frozen, review with Prism using Anthropic Claude Sonnet 5.5, and commit.",
+  "audit_packet_commit": "db5d80b4b0aae8bb5dd79eba429230e52c54289a",
+  "product_source_commit": "4b42fb89948b8abf0f2f65970fb5980987c1af0c",
+  "product_source_tag": "v1.0.0",
+  "decision_inputs": {
+    "packet": {
+      "path": "docs/reports/macos-v1-distribution/candidate-packet.json",
+      "sha256": "21f11a34d5133a8fa055036faacb4b9ea534f8feb3bf841b77aa3f3b8b3cef09"
+    },
+    "rights_dispositions": {
+      "path": "docs/reports/macos-v1-distribution/rights-disposition.json",
+      "sha256": "8e7cbe6b0d7dafd57ff2043a30ad4121bc1812b39ed229a32db5b1036fb70394"
+    },
+    "retained_pre_sign_inputs": {
+      "file": "PRE_SIGN_INPUTS.tar.gz",
+      "sha256": "44ea387d626e9548e0cee9d8215d8179e3e16ffcfc3e950b1553cad9078ba678",
+      "scope": "Private audit/build inputs only; never a proposed public asset. Reconstruct each notice directory with exactly the files named by its INVENTORY, not the entire shared superset."
+    }
+  },
+  "private_sdk_candidate_sha256": "e6556ceaefb9b6d4e1fb911598f80fb33d56ebb5a4b32c89dd01b40267fa9e9a",
+  "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "baseline_approval": {
+    "path": "release/macos-preview-audit.json",
+    "sha256": "c86448a24e5ece322e648cb1bb9011c5b2c24e74152fa553b232a3ab53a114e1"
+  },
+  "apps": [
+    {
+      "id": "notes",
+      "name": "Vellum Notes",
+      "identifier": "com.dshills.vellum.notes.personal",
+      "source_binary_sha256": "dd199fe0efbd41dbdc0e604bec6949e80d4d900782d690450901e19a4ceaef26",
+      "notice_inventory_sha256": "1f97565f1ad9bbb6e7099819c3237f00c90281e07efb802e69e12d112f5ce7ac",
+      "notice_files": 418
+    },
+    {
+      "id": "widgets",
+      "name": "Vellum Mac Widgets",
+      "identifier": "com.dshills.vellum.widgets.v1",
+      "source_binary_sha256": "693b850cfc5f5fe671fcedc7972e5e22c5b063ddfce3b1d11c49ba8dea4cda03",
+      "notice_inventory_sha256": "b6b28f63d2edb7d75aa2883cd5d2d025a3d33d08f72b5450d7d4aa0775e53fd5",
+      "notice_files": 418
+    },
+    {
+      "id": "shell",
+      "name": "Vellum Mac Shell",
+      "identifier": "com.dshills.vellum.macshell.v1",
+      "source_binary_sha256": "f934be497302406e8c59471058821b9da4692154c5cff1ec4c0d948ca3c398b4",
+      "notice_inventory_sha256": "6a174b2beda911c25527d04d2db115785bb651f70f229adff1e5bbf419e19d72",
+      "notice_files": 418
+    },
+    {
+      "id": "forma",
+      "name": "Forma",
+      "identifier": "com.dshills.vellum.showcase.forma",
+      "source_binary_sha256": "418d74e0f759543b706047cae43d5e0a8d51513e5e3a978bcb58e17f8a13e3cf",
+      "notice_inventory_sha256": "f367b31a9cb2f7143075f2cc31c9a9714fe3c205ba9062a75c3995d3dd95f043",
+      "notice_files": 419,
+      "icon_input": {
+        "file": "icons/forma.png",
+        "sha256": "add7df7ca1cf1609403a3605f031de437560aef3e3f8e063ff580b277441382a",
+        "source": "examples/showcase/demo/app_icons.go at frozen source tag"
+      }
+    },
+    {
+      "id": "luma",
+      "name": "Luma",
+      "identifier": "com.dshills.vellum.showcase.luma",
+      "source_binary_sha256": "7ccb7ea20d87111754e08ffedbaaf3adf58d56235da77c9d12c970cf29c2f765",
+      "notice_inventory_sha256": "8562ca4fbb96bf3fdb63ecf0aff5a47960425ab2eb5dbbf6f9a5fae9670ee917",
+      "notice_files": 419,
+      "icon_input": {
+        "file": "icons/luma.png",
+        "sha256": "684a91a929660ce5c30d7e9bc90be67f08d1165566ffef3f8be23bd8197958ae",
+        "source": "examples/showcase/demo/app_icons.go at frozen source tag"
+      }
+    },
+    {
+      "id": "pulse",
+      "name": "Pulse",
+      "identifier": "com.dshills.vellum.showcase.pulse",
+      "source_binary_sha256": "5975395fa4803ac84d844c9ec3453471d1bc8d659a9da7340029f187c5adf7ac",
+      "notice_inventory_sha256": "3d904f8cafd7c8e8812d81eca3018dd01d63e3174384247add8ebf88de399f3b",
+      "notice_files": 419,
+      "icon_input": {
+        "file": "icons/pulse.png",
+        "sha256": "2771816f0a37336bf32d191497e8ce4663acb4766726e26fc7bde864080f332c",
+        "source": "examples/showcase/demo/app_icons.go at frozen source tag"
+      }
+    }
+  ],
+  "font_notice": {
+    "module": "golang.org/x/image",
+    "version": "v0.44.0",
+    "file": "font/gofont/ttfs/README",
+    "sha256": "dc588a7ba9130043b67c2380cc03cc6644ed3557f6d5e8589b96acba1c64e343",
+    "compiled_fonts": {
+      "Go-Bold.ttf": "c18494baa7ea35b8dbfac3861787d360b9c0ab91232562371a09e6fbf09aaa40",
+      "Go-Regular.ttf": "197d9f3703b4c00af609178876a8d73e396f64fe438b2c871778566632374be3"
+    },
+    "scope": "Original font-specific notice absent from alpha.3 bundle; now included in the three showcase apps. Module root Go Authors notice alone did not carry this font-specific copyright."
+  },
+  "scope": "The exact product/dependency/native/asset payload and original notices identified by the audited packet. Includes the added Go-font notice in the three showcase app bundles and the carried-forward unchanged native-component disposition. This records the owner decision, not a new upstream license grant. Future payload changes require review.",
+  "authorized_next_steps": [
+    "Final local public-mode SDK/app production through existing guards",
+    "Bounded app launch/close and independent SDK-consumer checks",
+    "Prism/Anthropic Claude Sonnet 5.5 review and checkpoint commits"
+  ],
+  "allowed_packaging_changes": "Public producer authorization/manifests, approval/source documentation and ad-hoc app signatures may change artifact bytes; product code, dependencies, native archive, icons and original notice contents stay fixed. Final archive hashes must be recorded separately.",
+  "publication_authorized": false,
+  "signing_route": "Existing ad-hoc signed, unnotarized developer route only. No Developer ID/private key use, notarization, new agreement acceptance or global security-setting changes."
+}

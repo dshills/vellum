@@ -68,8 +68,9 @@ This release creates the root `v1.0.0` tag; it does not add native-module tags.
 The latest prebuilt native download remains the older
 [v0.1.0-alpha.3 developer preview](https://github.com/dshills/vellum/releases/tag/v0.1.0-alpha.3).
 Its SDK and Placement app do not contain the current Notes, widget or showcase
-work. Current v1 SDK/app bundles remain private; the changed-payload distribution
-audit is pending. No native binaries or prepared SDK assets accompany the source
+work. Current v1 SDK/app downloads remain unpublished. The owner approved the
+[current payload audit](release/macos-v1-distribution-audit.json) on 27 October;
+final local public packaging and launch checks are the next checkpoint. No native binaries or prepared SDK assets accompany the source
 release. Private apps are ad-hoc signed and unnotarized. The
 [Mac guide](docs/macos-v1.md) and [private release report](docs/reports/macos-v1-release/README.md)
 retain their exact build identities, supported behavior and verification limits.
