@@ -1,5 +1,7 @@
 # Foundation reports
 
+- [Published macOS v1 build13](macos-v1-build13-publication/README.md): approved release, matching-source tag, actual public byte verification and checksum filename adaptation.
+
 - [Coherent macOS v1 build13](macos-v1-build13/README.md): same-green-commit SDK and six apps, native checks and final packet.
 
 These reports preserve investigation outcomes and their original validation scope.

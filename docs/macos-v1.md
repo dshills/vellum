@@ -2,8 +2,10 @@
 
 `v1.0.0` adopts the [stable API contract](../specs/stable-api.md) for private personal use on the recorded Apple Silicon macOS 26.6.2 configuration. The [release closeout](../specs/macos-v1-release.md) governs final CI and matching SDK/apps. The completed RC, public alpha.3 and older personal-v0.1 deliveries retain their original identities. The later owner-authorized [v1.0.0 source release](../release/notes/v1.0.0.md)
 adds a public root tag and checkout source. Historical private packages retain
-their original identities. [Coherent build13 public-mode candidates](reports/macos-v1-build13/README.md)
-are now prepared locally; no v1 native downloads have been uploaded.
+their original identities. The matching-source
+[macos-v1.0.0-build13 SDK and six apps](https://github.com/dshills/vellum/releases/tag/macos-v1.0.0-build13)
+are now published as ad-hoc signed, unnotarized developer downloads. The separate
+packaging tag identifies source64bf9cf; the root v1.0.0 source tag remains4b42fb8.
 
 ## Supported API contract
 
@@ -24,23 +26,41 @@ The named stable APIs preserve exported signatures and documented defaults throu
 
 Portable race/vet, affected native offscreen tests, command/lifetime regressions and independently extracted SDK consumers provide automated evidence. Physical pointer/native-window observations are recorded separately in the [RC native report](reports/macos-v1/README.md). That report lists exact source identity, observed host and outcomes. Historical soak and catalogue evidence is reused for unchanged paths; it does not certify all future workloads.
 
-Human IME candidate behavior and VoiceOver usability remain explicitly **unqualified**, as chosen by the owner. Follow the [human checklist](personal-macos-input-checklist.md) before claiming those results. Other macOS versions, Intel, multi-display changes, Windows and Linux remain unqualified; Wayland remains unsupported. No signing identity, notarization or public distribution approval is implied. The owner-approved [current payload audit](../release/macos-v1-distribution-audit.json) authorizes final local public packaging and launch checks; downloadable assets remain unpublished until a separate final-asset decision.
-The [build13 report](reports/macos-v1-build13/README.md) records a fresh SDK and
-all six apps from green source 64bf9cf. Each uses that same SDK, including the
-exposure repair; bounded render/close checks, notice bindings and post-launch
-signatures pass. The [final packet](reports/macos-v1-build13/PUBLICATION_PACKET.md)
-records exact hashes, retained intermediate observations and the separate upload
-decision. Apps remain ad-hoc signed and unnotarized; downloaded-quarantine is
-unqualified. Older private/mixed-source packages retain their own identities.
+Human IME candidate behavior and VoiceOver usability remain explicitly
+**unqualified**, as chosen by the owner. Use the [human checklist](personal-macos-input-checklist.md)
+before claiming those results. Other macOS versions, Intel, additional displays,
+Windows and Linux remain unqualified; Wayland is unsupported.
 
-## Consume the private SDK
+The owner approved the exact [build13 publication](../release/macos-v1-build13-publication.json).
+The [download receipt](reports/macos-v1-build13-publication/README.md) records
+all eight actual public downloads, unchanged SDK/app hashes, the reviewed release
+body, matching source tag, original notices and checksum filename adaptation.
+The [build13 tests](reports/macos-v1-build13/README.md) retain their bounded native
+render/close/exposure results and intermediate observations. Producer-time
+unverified/private flags and older reports retain their historical meaning;
+they are not blanket authorization to publish a future payload. Apps remain
+ad-hoc signed and unnotarized; downloaded-quarantine launch is unqualified.
 
-The matching delivery includes a private SDK archive, original-color Mac Widgets catalogue, Notes, a two-window shell fixture and a separate example-source archive. Verify SHA256SUMS before extraction. Extract the SDK and example source beside each other so the example's module replacements point into `vellum-v1.0.0`, never the repository checkout. Use Go 1.25.6 and Xcode command-line development tools on Apple Silicon. The SDK contains the pinned native capsule; do not run prepare.sh over it.
+## Consume the published SDK
 
-From the example source: `go test -race ./...`, `go vet ./...`, then `go run ./cmd/notes` or `go run ./cmd/macshell`. From the extracted SDK, `python3 scripts/new-app.py /absolute/new/app --module example.com/my-app` generates an independent starter. See [app-shell APIs](macos-app-shell.md), [shared presentation](mac-presentation.md) and [Notes storage/commands](../examples/macapps/notes/README.md).
+Download the prepared SDK and SHA256SUMS from the
+[build13 release](https://github.com/dshills/vellum/releases/tag/macos-v1.0.0-build13).
+Compare the SDK's digest against its named checksum row before extraction. If
+you downloaded all seven payloads, `shasum -a 256 -c SHA256SUMS` verifies the set.
+For a subset, compare only the downloaded files' named rows.
 
-Apps are ad-hoc signed and unnotarized. The delivery manifest pins source commit, SDK/native hashes and exact ZIP bytes. Notes uses its existing local notebook location and preserves saved data; its toolbar does not change file format or history. The delivery README contains launch instructions, known limitations and current acceptance status. Public native release assets and native-module tags require a separate owner decision.
+Extract the internal `vellum-v1.0.0` folder intact. Use Go1.25.6, Python3 and
+Xcode Command Line Tools on Apple Silicon. The SDK already includes prepared
+sources and the pinned native capsule; do not run prepare.sh over it. From the
+SDK, `python3 scripts/new-app.py /absolute/new/app --module example.com/my-app`
+generates an independent starter; build/run from that new app. Its replacements
+must resolve into the extracted SDK. The included examples are separate modules.
+See [app-shell APIs](macos-app-shell.md), [shared presentation](mac-presentation.md)
+and [Notes storage/commands](../examples/macapps/notes/README.md).
 
-## Remaining qualification and distribution work
-
-Human IME/VoiceOver usability and additional host/display qualification remain explicitly outside the current support claim. Obtain results before expanding those claims. Native SDK/app distribution, coordinated native-module tags, signing/notarization and changed-payload audit require a separate owner-authorized release. Cosmetic or broader-framework work remains in the backlog.
+Native apps use Archive Utility to extract their ZIPs. Notes keeps its existing
+local plain-text notebook and recovery/history behavior; validation used only a
+disposable notebook. Preserve backups of important personal data. The showcases
+use original offline fixture data and reset on launch. Human/host qualification
+limits above remain unchanged. Future payloads, native-module version tags,
+Developer ID signing and notarization require separate owner decisions.

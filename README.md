@@ -65,19 +65,20 @@ run the pinned dependency preparation step before native builds. The separately
 versioned native driver is consumed through the checkout's local replacements.
 This release creates the root `v1.0.0` tag; it does not add native-module tags.
 
-The latest prebuilt native download remains the older
-[v0.1.0-alpha.3 developer preview](https://github.com/dshills/vellum/releases/tag/v0.1.0-alpha.3).
-Its SDK and Placement app do not contain the current Notes, widget or showcase
-work. Current v1 SDK/app downloads remain unpublished. The owner approved the
-[current payload audit](release/macos-v1-distribution-audit.json) on 27 October;
-[coherent build13 packaging](docs/reports/macos-v1-build13/README.md)
-now provides a fresh SDK and all six apps from green commit `64bf9cf`. Each app
-is compiled from that SDK and includes the window-exposure repair. The
-[final publication packet](docs/reports/macos-v1-build13/PUBLICATION_PACKET.md)
-records exact hashes and the proposed destination; no v1 native download has been uploaded.
-The candidates are ad-hoc signed and unnotarized. The
-[Mac guide](docs/macos-v1.md) and [private release report](docs/reports/macos-v1-release/README.md)
-retain their exact build identities, supported behavior and verification limits.
+**Prepared macOS downloads: [macos-v1.0.0-build13](https://github.com/dshills/vellum/releases/tag/macos-v1.0.0-build13).**
+The release contains the SDK, Vellum Notes, Mac Widgets, Mac Shell, Forma, Luma
+and Pulse, all built from green source `64bf9cf`. Every app uses that same SDK
+and includes the window-exposure repair. The separate packaging tag matches
+that source; the original `v1.0.0` Go source tag stays at `4b42fb8`.
+
+Download the [prepared SDK](https://github.com/dshills/vellum/releases/download/macos-v1.0.0-build13/vellum-v1.0.0-build13-darwin-arm64-sdk.tar.gz)
+and [SHA256SUMS](https://github.com/dshills/vellum/releases/download/macos-v1.0.0-build13/SHA256SUMS),
+or choose any of the six apps on the release page. Verify the matching named
+checksum before extraction. GitHub download filenames use dots in place of spaces.
+Apps are **ad-hoc signed and unnotarized**; downloaded-quarantine launch is
+unqualified. See the [publication record](docs/reports/macos-v1-build13-publication/README.md)
+for verified download hashes and the [Mac guide](docs/macos-v1.md) for use/support.
+The older alpha.3 preview and private deliveries retain their original identities.
 
 Native acceptance covers the recorded Apple Silicon macOS host. Human
 IME candidate behavior and VoiceOver usability remain unqualified, as do other
@@ -243,9 +244,10 @@ workflow is `scripts/check.sh`; see [CONTRIBUTING](CONTRIBUTING.md) and the
 
 Vellum's own code is [MIT licensed](LICENSE). Third-party components retain their
 original licenses and notices. The approved alpha.3 distribution decision covers
-that exact payload and notice bundle. The owner has also approved the exact
-[current v1 payload](release/macos-v1-distribution-audit.json). The v1.0.0 source
-tag is public; final public-mode SDK/app candidates remain local and unpublished.
-Their [publication packet](docs/reports/macos-v1-build13/PUBLICATION_PACKET.md)
-records the SDK and six build13 apps, matched notices, final checksums and the separate upload decision. See the [release contract](specs/release.md) and
-[release metadata](release/version.json).
+that exact payload and notice bundle. The owner also approved the v1 baseline
+[audit](release/macos-v1-distribution-audit.json) and the exact
+[build13 publication](release/macos-v1-build13-publication.json). The prepared
+SDK and six apps are now public developer downloads with original notices and
+verified checksums. This approval covers only the named payload; future native
+assets, signing identities and notarization require separate decisions. See the
+[release contract](specs/release.md) and [release metadata](release/version.json).

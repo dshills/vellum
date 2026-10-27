@@ -14,7 +14,8 @@ retains broader qualification work.
 - [Foundation and SDK reports](reports/README.md): investigation outcomes, fixes and remaining validation gaps.
 - [Mac Shell exposure correction](reports/macos-shell-exposure/README.md): verified build12 and updated proposed asset set.
 - [Mac Shell contrast correction](reports/macos-shell-contrast/README.md): historical build11, unchanged notices and its recorded exposure/capture discrepancy.
-- [Current coherent macOS build13](reports/macos-v1-build13/README.md): one green source for the SDK and six apps, local checks and final packet.
+- [Published macOS build13](reports/macos-v1-build13-publication/README.md): SDK/six apps, exact public download hashes and the final owner decision.
+- [Coherent macOS build13 preparation](reports/macos-v1-build13/README.md): matching-source packaging, native checks and the historical prepublication packet.
 - [Historical macOS public packaging](reports/macos-v1-public-packaging/README.md): prior mixed-source candidates and original checks.
 - [Historical delta-audit packet](reports/macos-v1-distribution/README.md): exact private inputs bound by the current approval.
 - [Distribution checks](distribution.md): packaging the native foundation fixture.

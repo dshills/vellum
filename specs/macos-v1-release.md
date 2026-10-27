@@ -50,3 +50,15 @@ local preparation/review/commit, not publication, new tags, audit rewrites,
 signing identities or notarization. Features, stable API, backend, performance
 gate and qualification limits remain frozen. Report-only commits never relabel
 the build-source CI or artifacts.
+
+## Approved publication — 27 October 2026
+
+The owner approved the exact final packet and requested merge/push/publication.
+The SDK and six apps are published under macos-v1.0.0-build13 at64bf9cf, using
+the reviewed text and ad-hoc/unnotarized route. [Publication record](../release/macos-v1-build13-publication.json)
+binds the eight public assets and actual download checks. GitHub normalized
+three filenames' spaces to dots; checksum filename entries alone were adapted.
+The seven SDK/app hashes and reviewed release text are identical to the packet.
+Existing source tags/releases, audit records and historical preauthorization
+reports remain unchanged. Only this payload is authorized; future releases,
+identity signing/notarization and broader qualification remain separate work.

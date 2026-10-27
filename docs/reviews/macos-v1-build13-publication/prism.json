@@ -1,0 +1,85 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "4ef764586433453fbf6b9c971e6b0031",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "5bc55e4f1ddfa3412270c921fba42cc5a3ed538a",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6734,
+    "totalMs": 6773
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 13,
+    "bytes": 33667,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 16165,
+        "output": 280,
+        "costUSD": 0.03513
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "c9d464054c45f6fe",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Publication timestamp possibly inaccurate",
+        "message": "The record carries a publication date of 27 October 2026, and the docs use the same date. If this is wrong or in the future relative to the actual publish time, the audit trail is misleading. The record also names a merged checkpoint, 5bc55e4, that does not include this commit, so the record cannot be validated from the repo alone.",
+        "suggestion": "Verify the timestamp against the GitHub release API and record the actual publication time.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "release/macos-v1-build13-publication.json",
+            "lines": {
+              "start": 14,
+              "end": 1
+            }
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "evidence": "\"published_at\": \"2026-10-27T14:32:12Z\"",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in release/macos-v1-build13-publication.json"
+    }
+  ],
+  "suppressed": []
+}

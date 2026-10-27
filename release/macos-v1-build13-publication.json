@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "repository": "dshills/vellum",
+  "tag": "macos-v1.0.0-build13",
+  "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+  "tag_object": "b643a1115ac070bae7ed815a91274fa04d72bc9c",
+  "merged_checkpoint": "5bc55e4f1ddfa3412270c921fba42cc5a3ed538a",
+  "release_id": 425563994,
+  "url": "https://github.com/dshills/vellum/releases/tag/macos-v1.0.0-build13",
+  "published_at": "2026-10-27T14:32:12Z",
+  "owner_authorization": "Direct owner instruction: approve final publication packet, merge/push main and publish macos-v1.0.0-build13 with SDK, six apps and checksums using reviewed text and ad-hoc/unnotarized route. Applies only to this named payload.",
+  "publication_authorized": true,
+  "published": true,
+  "signing": "ad-hoc (-)",
+  "notarized": false,
+  "downloaded_quarantine_qualified": false,
+  "approved_packet_sha256": "1e700ac4278c3fb5bb118e4d8adcdbfdca49134816578412a8e0fb0b03153220",
+  "reviewed_release_body_sha256": "d68b53f1a187d78d8ae893c34e84924c11ab5030145edd63f39412296b6ad4e2",
+  "assets": [
+    {
+      "file": "Forma-build13.zip",
+      "sha256": "2dfdeacd20685169b46f88bf9fa0da9ea84e6e17f533f6824c61b4c6f6e42ed0",
+      "bytes": 28820231,
+      "asset_id": 681826957,
+      "url": "https://github.com/dshills/vellum/releases/download/macos-v1.0.0-build13/Forma-build13.zip",
+      "original_packet_file": "Forma-build13.zip"
+    },
+    {
+      "file": "Luma-build13.zip",
+      "sha256": "4cece800a3a53369ae3c2667947aa5186ff22b544153dd59f3f9f61df3803b82",
+      "bytes": 29202602,
+      "asset_id": 681827208,
+      "url": "https://github.com/dshills/vellum/releases/download/macos-v1.0.0-build13/Luma-build13.zip",
+      "original_packet_file": "Luma-build13.zip"
+    },
+    {
+      "file": "Pulse-build13.zip",
+      "sha256": "04a60a5fa715e365a9de0fd6cdad834b9a73cd8376d890d1f9d315b534453560",
+      "bytes": 28812883,
+      "asset_id": 681827228,
+      "url": "https://github.com/dshills/vellum/releases/download/macos-v1.0.0-build13/Pulse-build13.zip",
+      "original_packet_file": "Pulse-build13.zip"
+    },
+    {
+      "file": "SHA256SUMS",
+      "sha256": "be4bfaa1c05baac1414ae3a295df312fe5effadc0591ec717ddbb02864f76a06",
+      "bytes": 646,
+      "asset_id": 681836060,
+      "url": "https://github.com/dshills/vellum/releases/download/macos-v1.0.0-build13/SHA256SUMS",
+      "original_packet_file": "SHA256SUMS"
+    },
+    {
+      "file": "vellum-v1.0.0-build13-darwin-arm64-sdk.tar.gz",
+      "sha256": "48bcffef1c8d11ee4801186cc33501f5807af2a4b0770321b4cb310e18fa3614",
+      "bytes": 32109058,
+      "asset_id": 681826958,
+      "url": "https://github.com/dshills/vellum/releases/download/macos-v1.0.0-build13/vellum-v1.0.0-build13-darwin-arm64-sdk.tar.gz",
+      "original_packet_file": "vellum-v1.0.0-build13-darwin-arm64-sdk.tar.gz"
+    },
+    {
+      "file": "Vellum.Mac.Shell-build13.zip",
+      "sha256": "18ebcf5557b3129ac98e041f1fb77f57cd64aae191901f08312bf7c6be1bc119",
+      "bytes": 28272730,
+      "asset_id": 681826963,
+      "url": "https://github.com/dshills/vellum/releases/download/macos-v1.0.0-build13/Vellum.Mac.Shell-build13.zip",
+      "original_packet_file": "Vellum Mac Shell-build13.zip"
+    },
+    {
+      "file": "Vellum.Mac.Widgets-build13.zip",
+      "sha256": "e966294fc953bf779d9cb78431bd3e120282246babe307ef6e5c902c12a52844",
+      "bytes": 29098413,
+      "asset_id": 681826960,
+      "url": "https://github.com/dshills/vellum/releases/download/macos-v1.0.0-build13/Vellum.Mac.Widgets-build13.zip",
+      "original_packet_file": "Vellum Mac Widgets-build13.zip"
+    },
+    {
+      "file": "Vellum.Notes-build13.zip",
+      "sha256": "8682623e6b4bf9eadd2c33d52132060c12ceda93a845e45ce0cfba66d88cfa82",
+      "bytes": 28440021,
+      "asset_id": 681826956,
+      "url": "https://github.com/dshills/vellum/releases/download/macos-v1.0.0-build13/Vellum.Notes-build13.zip",
+      "original_packet_file": "Vellum Notes-build13.zip"
+    }
+  ],
+  "checksum_filename_adjustment": {
+    "reason": "GitHub normalizes spaces to dots on upload and asset-name updates. Only filename entries changed; all seven payload hashes and reviewed release text are identical.",
+    "original_checksum_sha256": "c9ba736ef450b80a33fcb68f00d0c54aac1143b24ece00da4f5f4c013539c84a",
+    "published_checksum_sha256": "be4bfaa1c05baac1414ae3a295df312fe5effadc0591ec717ddbb02864f76a06",
+    "changed_names": [
+      {
+        "original": "Vellum Mac Shell-build13.zip",
+        "published": "Vellum.Mac.Shell-build13.zip"
+      },
+      {
+        "original": "Vellum Mac Widgets-build13.zip",
+        "published": "Vellum.Mac.Widgets-build13.zip"
+      },
+      {
+        "original": "Vellum Notes-build13.zip",
+        "published": "Vellum.Notes-build13.zip"
+      }
+    ]
+  },
+  "verification": {
+    "actual_public_downloads": 8,
+    "all_seven_payload_hashes_match_approved_packet": true,
+    "public_checksum_cli": "shasum -a 256 -c SHA256SUMS: all7 OK",
+    "release_body_matches_reviewed_hash": true,
+    "existing_releases_unchanged": true,
+    "existing_source_tag_unchanged": {
+      "name": "v1.0.0",
+      "object": "a9eb00099d2be1f7fdd83b159f0515c82ec0a678",
+      "commit": "4b42fb89948b8abf0f2f65970fb5980987c1af0c"
+    },
+    "audit_records_unchanged": {
+      "release/macos-v1-distribution-audit.json": "adf2f08a4dbb6622ee67ef60889a68dbb6dd719d6a15f8b9cc41b6890c15b5ae",
+      "release/macos-preview-audit.json": "c86448a24e5ece322e648cb1bb9011c5b2c24e74152fa553b232a3ab53a114e1"
+    },
+    "new_native_or_performance_qualification": false
+  },
+  "scope": "Exact seven approved SDK/app archives plus filename-adjusted checksum metadata. No private inputs/evidence uploaded as release assets. No general future-payload approval, Developer ID, notarization, feature, backend or release-gate change."
+}
