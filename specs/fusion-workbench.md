@@ -119,3 +119,9 @@ leaving an empty band under compact ribbon tools. Only tab descriptors whose
 pages are all grouped toolbars clear that internal minimum; ordinary tabs keep
 their native floor, restored on descriptor reuse. A three-DPI geometry/reuse
 regression pins this correction. No public API or input behavior changes.
+
+The first packaged minimum-only correction collapsed the scrollable page despite
+the offscreen upper-height check. It is superseded: grouped-tool pages also
+contribute intrinsic vertical content (visible Y overflow and zero vertical grow);
+ordinary pages retain their native scroll/grow defaults. The regression now
+requires a lower height bound and visible, contained ribbon action geometry.

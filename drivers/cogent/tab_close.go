@@ -153,6 +153,21 @@ func syncTabsPresentation(r *record) {
 		}
 	}
 
+	for id, page := range r.control.tabs.pages {
+		if page.Property("vellum.ribbon.fit") == nil {
+			page.SetProperty("vellum.ribbon.fit", true)
+			page.FinalStyler(func(s *styles.Style) {
+				for _, child := range r.node.Children {
+					if child.ID == id && child.Kind == ui.Toolbar && child.ToolbarGroups {
+						// Scrollable content pages may shrink to zero. A ribbon must
+						// contribute its tool height before the tab host can fit it.
+						s.Overflow.Y = styles.OverflowVisible
+						s.Grow.Y = 0
+					}
+				}
+			})
+		}
+	}
 	for _, o := range r.node.Options {
 		button := r.control.tabs.buttons[o.ID]
 		binding := r.control.tabs.bindings[o.ID]

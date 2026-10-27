@@ -99,8 +99,12 @@ func TestRibbonPageMinimumDoesNotLeaveEmptyBandOrChangeOrdinaryTabs(t *testing.T
 			r := findRecord(w.state.root, "r")
 			tabs := r.widget.(*core.Tabs)
 			frame := tabs.ChildByName("frame").(*core.Frame)
-			if frame.Styles.Min.Y.Value != 0 || float32(tabs.Geom.TotalBBox.Dy()) > 125*dpi/160 {
+			if frame.Styles.Min.Y.Value != 0 || float32(tabs.Geom.TotalBBox.Dy()) > 125*dpi/160 || float32(tabs.Geom.TotalBBox.Dy()) < 80*dpi/160 {
 				t.Fatal("ribbon retained content-tab minimum", frame.Styles.Min, tabs.Geom.TotalBBox)
+			}
+			action := findRecord(w.state.root, ui.RibbonActionID("r", "solid", "add"))
+			if action == nil || action.widget.AsWidget().Geom.TotalBBox.Empty() || !action.widget.AsWidget().Geom.TotalBBox.In(tabs.Geom.TotalBBox) {
+				t.Fatal("ribbon action clipped")
 			}
 			ordinary = true
 			if e := a.Invalidate("one"); e != nil {

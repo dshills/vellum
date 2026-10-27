@@ -1,0 +1,32 @@
+[
+  {
+    "name": "fidelity-ribbon-fit",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestRibbon|TestWorkbenchFidelity|TestNativeTabs|TestTabs|TestSettingsPane",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 19.696
+  },
+  {
+    "name": "fidelity-vet-fit",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 11.784
+  }
+]

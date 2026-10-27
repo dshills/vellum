@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "9797d78a106a56b1c3feeb0631e0626a",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f22e6d4b4f019c2fe81125c42814bfb7731a0311",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "24930372bdf3f1f1",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Styler closure captures loop variable and record",
+      "message": "The page styler is installed once per page and closes over the loop variable `id` and the record `r`. If the page widget is reused for a different record or a page ID is remapped, the styler would still use the stale `r`. The `id` capture is safe only when the module targets Go 1.22 or later. On earlier versions all stylers share the final `id`, so ribbon pages get the wrong styling.",
+      "suggestion": "Copy the loop variable (`id := id`) before the closure. Also resolve the node from the page's current descriptor rather than capturing `r`, or verify that `r` is stable for the page's lifetime.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/tab_close.go",
+          "lines": {
+            "start": 143,
+            "end": 186
+          }
+        }
+      ],
+      "tags": [
+        "closure",
+        "loop-variable"
+      ],
+      "evidence": "for id, page := range r.control.tabs.pages {\n\t\tif page.Property(\"vellum.ribbon.fit\") == nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3805,
+    "totalMs": 3811
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 6797,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5543,
+        "output": 364,
+        "costUSD": 0.014726
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
