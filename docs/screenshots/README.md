@@ -31,3 +31,15 @@ records clean-source provenance, ZIP hashes and extracted signature checks.
 macOS screen-sharing and pointer indicators are retained in the raw captures. Application source and limitations are in
 [the showcase guide](../../examples/showcase/README.md). The private app ZIPs
 are separate from these Git-tracked images; no public release assets are created.
+
+## Forge workbench
+
+[Forge](forge.jpg) is an unmodified JPEG from the running private build3 app, source
+`b41f08fc5bcc97eb5df8a43005fbc23f1675da3f`. The final exact extracted bundle was rebound by its full
+path in the computer-use service before capture, avoiding a superseded process
+binding. See [capture metadata](forge-capture.json) and the
+[private delivery record](../reviews/fusion-workbench/delivery/README.md).
+Reproduce from a clean checkout with `examples/forge/package.py`, launch the app,
+keep the default camera/seven-body study and capture its window after Add/Undo.
+macOS recording/pointer indicators remain. No geometry, icons or controls were
+added to the screenshot after capture. The private ZIP is not a public download.

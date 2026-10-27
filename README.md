@@ -22,6 +22,8 @@ browser, live depth-rendered 3D assembly and orientation cube, unit expressions,
 feature strip, and undoable body edits. Full-color icons and native titlebar
 controls complement the managed Mac-themed interface.
 
+![Forge Mac design workbench with a live 3D assembly, flat full-color tools, browser and inspector](docs/screenshots/forge.jpg)
+
 Run: `(cd examples/forge && go run .)`
 
 See the [Forge guide](examples/forge/README.md) for controls and private packaging,
@@ -61,9 +63,9 @@ Run: `(cd examples/showcase && go run ./cmd/pulse)`
 Prepare and source the driver environment using the Quick start below first.
 See the [showcase guide](examples/showcase/README.md) for controls, private app
 packaging and limits, and [screenshot reproduction](docs/screenshots/README.md)
-for source identities and capture details. These examples reset on launch and
-use the existing experimental GPU surface APIs; they do not expand the stable
-API or release qualification.
+for source identities and capture details. These examples reset on launch and use experimental GPU surfaces. The Forge
+track adds reusable preview controls while preserving the released v1 API
+signatures and existing release qualification.
 
 ## Current status
 

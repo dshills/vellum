@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "README.md,docs/reviews/fusion-workbench/delivery/README.md,docs/reviews/fusion-workbench/delivery/SHA256SUMS,docs/reviews/fusion-workbench/delivery/native-checks.json,docs/reviews/fusion-workbench/delivery/package-manifest.json,docs/reviews/fusion-workbench/delivery/phase6-reviewed-smoke.json,docs/reviews/fusion-workbench/delivery/phase6-reviewed-smoke.stdout,docs/reviews/fusion-workbench/delivery/phase7-package.json,docs/reviews/fusion-workbench/delivery/phase8-package.json,docs/screenshots/README.md,docs/screenshots/forge-capture.json,docs/screenshots/forge.png",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "6",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/forge-delivery/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/forge-delivery/prism.json"
+  ],
+  "cwd": "/Users/dshills/Development/projects/Vellum",
+  "started_utc": "2026-10-27T19:20:57.229529+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 1,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 46089,
+  "group": 46089,
+  "owned": {
+    "created": true,
+    "pid": 46089,
+    "group": 46089,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 1,
+    "errors": [],
+    "observation": {
+      "group": 46089,
+      "members": [],
+      "observation_sha256": "b60378827efa88affe86f59d77c0916e6dd02f3c1dfb059a38dc8b2f33538a84"
+    }
+  },
+  "seconds": 4.2756244170013815,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}
