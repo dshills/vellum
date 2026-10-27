@@ -1,0 +1,39 @@
+[
+  {
+    "name": "phase6-tests",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 3.59
+  },
+  {
+    "name": "phase6-vet",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.568
+  },
+  {
+    "name": "phase6-reviewed-smoke",
+    "cwd": "examples/forge",
+    "argv": [
+      "/private/tmp/vellum-forge-reviewed",
+      "--smoke"
+    ],
+    "exit_code": 0,
+    "seconds": 1.242
+  }
+]

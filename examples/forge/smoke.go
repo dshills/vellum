@@ -30,6 +30,7 @@ func smokeCheck(a *app.Application, ref app.WindowRef, m *workbench) error {
 		return fmt.Errorf("Forge scene did not become ready")
 	}
 	var result error
+	var baseline cogent.GPUViewStats
 	if e := a.Do(func() {
 		st, e := m.surface.Stats()
 		if e != nil {
@@ -95,6 +96,11 @@ func smokeCheck(a *app.Application, ref app.WindowRef, m *workbench) error {
 		}
 		m.orient(viewport.Front)
 		m.fit()
+		baseline, e = m.surface.Stats()
+		if e != nil {
+			result = e
+			return
+		}
 		count := len(m.state.Objects)
 		if e := m.add(); e != nil {
 			result = e
@@ -134,5 +140,24 @@ func smokeCheck(a *app.Application, ref app.WindowRef, m *workbench) error {
 	}); e != nil {
 		return e
 	}
-	return result
+
+	if result != nil {
+		return result
+	}
+	// Allow reconciliation and rendering after the added body changed buffer sizes.
+	// This validates actual GPUResources descriptor replacement, not just CPU mesh math.
+	deadline = time.Now().Add(10 * time.Second)
+	for time.Now().Before(deadline) {
+		time.Sleep(100 * time.Millisecond)
+		var st cogent.GPUViewStats
+		var err error
+		if e := a.Do(func() { st, err = m.surface.Stats() }); e != nil {
+			return e
+		}
+		if err == nil && st.Ready && st.Frames > baseline.Frames && st.BufferBytes > baseline.BufferBytes {
+			fmt.Printf("Forge mesh growth: frames %d -> %d; buffer bytes %d -> %d; ready=true\n", baseline.Frames, st.Frames, baseline.BufferBytes, st.BufferBytes)
+			return nil
+		}
+	}
+	return fmt.Errorf("added-body mesh did not render with replaced GPU buffers")
 }

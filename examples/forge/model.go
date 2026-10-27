@@ -141,6 +141,9 @@ func (m *workbench) refresh() {
 			m.scene.Objects[j].Visible = m.scene.Objects[j].Visible && enabled
 		}
 	}
+	if m.state.Selected == "" && m.tab == "body" {
+		m.tab = "solid"
+	}
 	m.scene.SelectedID = m.state.Selected
 	m.scene.HoveredID = ""
 	_ = m.scene.Touch()

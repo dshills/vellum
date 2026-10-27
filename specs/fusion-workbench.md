@@ -1,6 +1,6 @@
 # Fusion-style Mac workbench development track
 
-The owner authorized this post-release feature work on27 October2026 after the
+The owner authorized this post-release feature work on 27 October 2026 after the
 build13 publication. This narrow track permits the reusable controls and input
 additions below; it supersedes the earlier feature freeze only for this work.
 Published tags/archives, existing stable APIs, backend, rendering/pacing defaults,
@@ -21,7 +21,7 @@ release/performance policy and historical audit records remain unchanged.
 
 Every implementation phase updates this contract/docs, runs focused meaningful
 regressions and appropriate compatibility checks, receives Prism review using
-Anthropic Claude Sonnet5.5 and is committed. Reuse unchanged checks. Automated
+Anthropic Claude Sonnet 5.5 and is committed. Reuse unchanged checks. Automated
 routing/picking evidence is separate from physical pointer/native presentation.
 Human IME/VoiceOver, Fusion-scale assemblies, cross-window pointer dragging and
 parametric geometry remain outside this demonstration's qualification.
@@ -39,17 +39,17 @@ ui.Ribbon retains contextual tab/group/action identities and full-color artwork.
 Its nested measured group frames use the existing overflow adapter; complete
 hidden groups become submenus, preserving split-button choices and disabled
 ancestry. The ordinary toolbar/customizer contract remains unchanged. Menu
-limits remain64 entries/four levels. Source menus and instance caches preserve
+limits remain 64 entries/four levels. Source menus and instance caches preserve
 submenu identity across ordinary redraws; removed cached branches are pruned.
 
 ui.ModelBrowser provides separate disclosure, visibility, select and active-item
-targets on a bounded256-item hierarchy (depth16). The application accepts events;
+targets on a bounded 256-item hierarchy (16 ancestors). The application accepts events;
 removed, disabled or newly collapsed targets refuse stale callbacks. This control
 does not replace the large indexed DataTree or claim CAD-scale rich-row virtualization.
 
 ## Small-scene 3D view and orientation
 
-viewport.Scene admits256 opaque named box proxies. SceneView3D is an experimental
+viewport.Scene admits 256 opaque named box proxies. SceneView3D is an experimental
 shared-device extension using GPUView, depth, retained geometry, camera-only
 uniform updates, explicit revision changes and the same typed capture lifecycle.
 Click proposes one nearest visible object; drag or Option-drag orbits; Shift-drag
@@ -65,8 +65,22 @@ quantity.Length parses bounded arithmetic, explicit mm/cm/m/in/ft and named
 length parameters; it never evaluates code. Canonical values are millimeters.
 QuantityField admits only finite, in-range candidates through Apply; applications
 own drafts/errors and commit through their commands. FeatureTimeline presents
-up to128 stable features and a rollback marker, with accessible earlier/later
+up to 128 stable features and a rollback marker, with accessible earlier/later
 reorder proposals. It does not solve or replay CAD features. MarkingMenu supplies
 an eight-direction, focus-scoped action panel and external direction admission;
 this version has visible buttons/keyboard access, not invisible flick gestures,
 nested radial tracking or pointer-positioned native popup windows.
+
+## Private Forge delivery
+
+The independent examples/forge module uses the public additions in a small box
+assembly. Geometry edits, visibility, creation/deletion and feature-marker/reorder
+changes use snapshot history. Selection, active component, camera and split widths
+are transient. Body creation is capped at48 and feature entries at96. No files
+or cloud services are used; closing discards the in-memory study.
+
+A clean-commit private producer builds a new original-icon app, ad-hoc signs it,
+creates a ZIP/checksum/source manifest and verifies the exact extracted signature.
+Native readiness/readback and GPU-buffer growth are tested separately from
+physical pointer input. Published build13 artifacts remain immutable and contain
+none of these additions. No public distribution or new audit decision is implied.

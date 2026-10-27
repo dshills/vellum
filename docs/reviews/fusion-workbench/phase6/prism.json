@@ -1,0 +1,116 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "7ee8fb8c9a64b370d91670e257c186b4",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "71707015eebe30265d5a0f218ddca9de9abbe28c",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "51a0a7d7e90fceae",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Output dir created before dirty-tree validation leaves partial output",
+      "message": "The output directory is created with out.mkdir() before the clean-tree check, so a dirty tree raises ValueError after the directory already exists. Re-running with the same path then fails, which undermines the 'exclusive fresh output' flow. On any later failure the partial output is also left behind.",
+      "suggestion": "Run the git revision and dirty checks before out.mkdir(), and remove the partial output directory on failure.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/forge/package.py",
+          "lines": {
+            "start": 22,
+            "end": 38
+          }
+        }
+      ],
+      "tags": [
+        "packaging",
+        "error-handling"
+      ],
+      "evidence": "extract=out/'extracted';extract.mkdir();run(['ditto','-x','-k',str(archive),str(extract)])",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "9f62ce9766f22082",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Mesh-growth check shares exhausted deadline and baseline is stale",
+      "message": "The baseline is captured before the orbit, pan, zoom and add. If the buffer allocation counter is incremented by non-growth events, or if the add does not trigger a reallocation (capacity slack), the check fails or passes for the wrong reason. The smoke could time out spuriously because the shared 40s deadline is partly consumed by the readiness loop.",
+      "suggestion": "Use a fresh deadline for the second wait and capture the baseline immediately before m.add(), so the check is tied to the growth event.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/forge/smoke.go",
+          "lines": {
+            "start": 152,
+            "end": 152
+          }
+        }
+      ],
+      "tags": [
+        "smoke",
+        "timing",
+        "location-corrected"
+      ],
+      "evidence": "if err == nil \u0026\u0026 st.Ready \u0026\u0026 st.Frames \u003e baseline.Frames \u0026\u0026 st.BufferAllocations \u003e baseline.BufferAllocations {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6137,
+    "totalMs": 6158
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 28926,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 15951,
+        "output": 629,
+        "costUSD": 0.038192
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

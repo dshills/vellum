@@ -11,9 +11,23 @@ Full-color toolbar and picker artwork remains untinted.
 
 ## See it in action
 
-Three original, runnable Mac apps built with Vellum's public Go APIs. These
+Original, runnable Mac apps built with Vellum's public Go APIs. These
 windows use managed Mac-themed UI, native AppKit toolbars and full-color icons.
 The screenshots are actual app captures; artwork and data are original fixtures.
+
+### Forge — a design workbench
+
+An original Fusion-inspired Mac workbench: contextual grouped ribbon, rich model
+browser, live depth-rendered 3D assembly and orientation cube, unit expressions,
+feature strip, and undoable body edits. Full-color icons and native titlebar
+controls complement the managed Mac-themed interface.
+
+Run: `(cd examples/forge && go run .)`
+
+See the [Forge guide](examples/forge/README.md) for controls and private packaging,
+and the [reusable workbench APIs](docs/fusion-workbench.md) for integration. The
+new viewport is experimental, uses box proxies and has no CAD kernel. This demo
+is source/private-build work and is absent from the six published build13 apps.
 
 ### Forma — a space for ideas
 

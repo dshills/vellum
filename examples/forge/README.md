@@ -37,3 +37,13 @@ Checks: `go test -race -tags offscreen ./...` and `go vet -tags offscreen ./...`
 synthetic owner-routed orbit/pan/zoom/history checks. Those synthetic events are
 separate from physical pointer/native-delivery verification in the delivery report.
 Private packages are ad-hoc signed, unnotarized, and not public release artifacts.
+
+Build a private package from a clean, committed checkout (native environment
+prepared as above): `python3 -B package.py --output /private/tmp/forge-new-build`.
+The output is exclusive and contains the app, ZIP, checksum, source manifest and
+this README. It verifies the signature again after extracting the exact ZIP.
+No publication, Developer ID identity or notarization is requested.
+
+A rejected dirty checkout does not reserve the output directory. Later failures
+retain partial output for diagnosis; only a finished producer writes manifest.json
+and SHA256SUMS. Choose a fresh output directory for another attempt.

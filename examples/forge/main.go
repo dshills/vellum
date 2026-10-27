@@ -17,7 +17,14 @@ import (
 func main() {
 	smoke := flag.Bool("smoke", false, "bounded app-local native rendering and input smoke")
 	exitAfter := flag.Duration("exit-after", 0, "optional bounded lifetime, max 1m")
+	writeIcon := flag.String("write-icon", "", "write original app icon to a new PNG, without launching")
 	flag.Parse()
+	if *writeIcon != "" {
+		if e := writeAppIcon(*writeIcon); e != nil {
+			fail(e)
+		}
+		return
+	}
 	if *exitAfter < 0 || *exitAfter > time.Minute {
 		fail(fmt.Errorf("exit-after must be 0..1m"))
 	}

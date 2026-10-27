@@ -108,3 +108,17 @@ func TestUnfeaturedBodyKeepsExplicitVisibility(t *testing.T) {
 		t.Fatal("known feature ignored marker")
 	}
 }
+
+func TestContextTabFallsBackAfterDeletion(t *testing.T) {
+	m := newWorkbench()
+	m.tab = "body"
+	if e := m.deleteSelected(); e != nil {
+		t.Fatal(e)
+	}
+	if m.tab != "solid" {
+		t.Fatal("inactive context remained selected")
+	}
+	if e := ui.Validate(m.View()); e != nil {
+		t.Fatal(e)
+	}
+}
