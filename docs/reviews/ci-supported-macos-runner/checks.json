@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "shell-syntax",
+      "exit_code": 0,
+      "seconds": 0.006
+    },
+    {
+      "name": "workflow-yaml",
+      "exit_code": 0,
+      "seconds": 0.09
+    },
+    {
+      "name": "selected-exposure-regressions",
+      "exit_code": 0,
+      "seconds": 13.292
+    }
+  ],
+  "new_tests_selected_by_ci": [
+    "TestVellumExposurePresentsOwnUnchangedScene",
+    "TestVellumExposureSurvivesHiddenPresentation",
+    "TestVellumExposureDuringCompositionCoalesces"
+  ],
+  "runner": "macos-15",
+  "scope": "CI host/selection only; no product API/features/backend/performance/packaging change",
+  "source_commit_checked": "c8ef1f79022a00966f9e5577a7d5e22b6f93462a",
+  "upstream_deprecation": "https://github.com/actions/runner-images/issues/13518",
+  "upstream_architecture_labels": "https://github.com/actions/runner-images/blob/main/README.md",
+  "ci_host_is_not_runtime_qualification": true
+}

@@ -2,7 +2,7 @@ name: Framework
 on: [push, pull_request]
 jobs:
   framework:
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4

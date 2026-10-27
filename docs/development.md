@@ -442,3 +442,11 @@ The output must be new. Inspect `Contents/Resources/APP_MANIFEST.json` and
 and exact original payloads. Notice admission/copying is a headless packaging
 check; source selection, completeness and distribution approval remain pending.
 Opening the app is a separate native acceptance action.
+
+## Hosted macOS CI
+
+Framework and stable-API CI pin `macos-15` (standard ARM64 hosted runner), replacing
+the retiring `macos-14` image. This host pin does not expand runtime qualification
+or change test deadlines. Explicit prepared-dependency selection in scripts/check.sh
+includes the stage0108 exposure regressions; dependency tests are not transitive.
+See [the maintenance checkpoint](reviews/ci-supported-macos-runner/README.md).
