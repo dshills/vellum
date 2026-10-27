@@ -30,3 +30,13 @@ Apple reference screenshots are not part of the executable or distributed
 assets. Bundled weather symbols retain their pinned Apache-2.0 notices in the
 driver assets directory. Native pointer, visual and accessibility evidence is
 separate from automated model/routing results.
+
+## Multiwindow shell fixture
+
+`go run ./cmd/macshell` opens two independent titlebar-toolbar windows. The fixture
+uses a fixed light content theme, paints its root with that theme’s window color,
+and explicitly selects Light native appearance
+for each window, so text remains legible when the desktop uses Dark appearance.
+It does not change system appearance. Each toolbar edits only its own document;
+closing one window leaves the other alive. This fixture is not a new feature or
+an adaptive appearance demonstration.

@@ -1,0 +1,47 @@
+{
+  "baseline_sdk_source": {
+    "clean": true,
+    "commit": "1fc594b6952d3b072a4c72b619a6f259da389474"
+  },
+  "sdk_files_verified": 8856,
+  "changed_product_files": [
+    "examples/macapps/cmd/macshell/main.go"
+  ],
+  "main_sha256": "7a619ee8569f2a8fb115d5b52d38f393367357b23eb4347b373c8180065876f4",
+  "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "checks": [
+    {
+      "name": "shell-offscreen-compile",
+      "exit_code": 0,
+      "seconds": 24.961
+    },
+    {
+      "name": "shell-vet",
+      "exit_code": 0,
+      "seconds": 20.608
+    },
+    {
+      "name": "window-policy-regressions",
+      "exit_code": 0,
+      "seconds": 1.848
+    },
+    {
+      "name": "offscreen-native-policy-refusal",
+      "exit_code": 0,
+      "seconds": 19.076
+    },
+    {
+      "name": "shell-final-compile",
+      "exit_code": 0,
+      "seconds": 0.887
+    },
+    {
+      "name": "shell-final-vet",
+      "exit_code": 0,
+      "seconds": 0.611
+    }
+  ],
+  "features_unchanged": true,
+  "global_settings_unchanged": true,
+  "earlier_compile_vet": "First two checks cover the chrome-only candidate; final compile/vet cover the explicit palette surface as well. Window-policy tests reuse unchanged supporting APIs."
+}

@@ -32,12 +32,13 @@ func run() error {
 		edits    int
 		locked   bool
 	}
+	theme := ui.MacTheme(false)
 	documents := map[app.WindowRef]*document{}
 	for _, name := range []string{"A", "B"} {
 		name := name
 		d := &document{commands: command.New()}
-		ref, err := a.OpenWindow(app.Window{ID: "shell-" + name, Title: "Vellum Mac Widgets — " + name, Width: 480, Height: 280, View: func() ui.Node {
-			return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Style: ui.Style{Padding: ui.Some(ui.UniformInsets(24))}, Children: []ui.Node{
+		ref, err := a.OpenWindow(app.Window{ID: "shell-" + name, Title: "Vellum Mac Widgets — " + name, Width: 480, Height: 280, Chrome: app.WindowChrome{Appearance: app.AppearanceLight}, View: func() ui.Node {
+			return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Style: ui.Style{Padding: ui.Some(ui.UniformInsets(24)), Background: ui.Some(theme.Palette.Value.Window)}, Children: []ui.Node{
 				{ID: "title", Kind: ui.Label, Text: "Independent native toolbar " + name, Style: ui.Style{Typography: ui.Some(ui.MacTypography(20, 600))}},
 				{ID: "status", Kind: ui.Label, Text: fmt.Sprintf("Document %s edits: %d", name, d.edits)},
 				{ID: "lock", Kind: ui.Checkbox, Text: "Disable editing", Checked: d.locked, Change: func(e ui.ChangeEvent) { d.locked = e.Checked; _ = a.Invalidate(d.ref.ID()) }},
@@ -66,7 +67,7 @@ func run() error {
 	if err = png.Encode(&pngData, image); err != nil {
 		return err
 	}
-	return a.Run(context.Background(), cogent.Driver{Theme: ui.MacTheme(false), TitlebarToolbars: func(ref app.WindowRef) (*cogent.TitlebarToolbar, error) {
+	return a.Run(context.Background(), cogent.Driver{Theme: theme, TitlebarToolbars: func(ref app.WindowRef) (*cogent.TitlebarToolbar, error) {
 		d := documents[ref]
 		if d == nil {
 			return nil, nil
