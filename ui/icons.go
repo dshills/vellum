@@ -45,6 +45,7 @@ const (
 	SymbolWind         Symbol = "wind"
 	SymbolSunrise      Symbol = "sunrise"
 	SymbolPartlyCloudy Symbol = "partly-cloudy"
+	SymbolVisibility   Symbol = "visibility"
 	SymbolCircle       Symbol = "circle"
 	SymbolCircleCheck  Symbol = "circle-check"
 )
@@ -54,7 +55,7 @@ var symbols = [...]Symbol{SymbolAdd, SymbolRemove, SymbolCheck, SymbolClose,
 	SymbolCopy, SymbolCut, SymbolPaste, SymbolInfo, SymbolWarning, SymbolDelete,
 	SymbolLeft, SymbolRight, SymbolUp, SymbolDown, SymbolMenu, SymbolGrip, SymbolExpand, SymbolCollapse,
 	SymbolBackspace, SymbolSidebar, SymbolCalculator, SymbolSun, SymbolCloud,
-	SymbolRain, SymbolWind, SymbolSunrise, SymbolPartlyCloudy, SymbolCircle, SymbolCircleCheck}
+	SymbolRain, SymbolWind, SymbolSunrise, SymbolPartlyCloudy, SymbolCircle, SymbolCircleCheck, SymbolVisibility}
 
 // Symbols returns a detached list of all built-in symbol names.
 func Symbols() []Symbol { return append([]Symbol(nil), symbols[:]...) }

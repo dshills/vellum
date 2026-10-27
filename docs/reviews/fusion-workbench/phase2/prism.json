@@ -1,0 +1,143 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "3f16c2725d6491090488d0e2f3aa608d",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "ae09fe30572d6cf755b2ec1a191a8f3f1d862e1f",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "38315f1678fe1d6a",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Hidden check walks unbounded ancestors",
+      "message": "The loop walks up through all ancestors, including the toolbar and beyond. If any ancestor carries the hidden property, then the record is reported as hidden. Also, node.AsTree().Parent may be a typed nil, but tree.IsNil handles that. The behavior change makes non-group toolbar items inherit hidden state from any ancestor, which could affect unrelated widgets.",
+      "suggestion": "Limit the walk to ancestors that are within the same overflow toolbar, stopping at the toolbar owner.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/toolbar_overflow.go",
+          "lines": {
+            "start": 21,
+            "end": 21
+          }
+        }
+      ],
+      "tags": [
+        "scope",
+        "location-corrected"
+      ],
+      "evidence": "for node := tree.Node(r.widget); !tree.IsNil(node); node = node.AsTree().Parent {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "c75c92f2d283c80e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Depth limit off-by-one",
+      "message": "The depth check fires once len(visited) reaches 16, so a chain with exactly 16 ancestors (depth 16) is rejected, contradicting the documented depth of 16. The ancestry walk is also repeated for every item on every propose/View call, which is O(n*depth) and fine at 256 items but does redundant work.",
+      "suggestion": "Use len(visited) \u003e 16 or document the limit as 15 ancestors.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "ui/model_browser.go",
+          "lines": {
+            "start": 58,
+            "end": 58
+          }
+        }
+      ],
+      "tags": [
+        "off-by-one",
+        "location-corrected"
+      ],
+      "evidence": "if by[parent].ID == \"\" || visited[parent] || parent == i.ID || len(visited) \u003e= 16 {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7490,
+    "totalMs": 7516
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 11,
+    "bytes": 36226,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 20540,
+        "output": 877,
+        "costUSD": 0.04985
+      }
+    ],
+    "widenedFiles": 5,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "b6326c19e9dfceb3",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Expand accepted for items without children",
+        "message": "The expand event is proposed for a disabled item with disabled children, and Disabled is checked for ancestors but a disabled item cannot be collapsed. More importantly, ModelBrowserExpand on a leaf or item without children is accepted if called directly; stale callbacks for items that no longer have children are not refused.",
+        "suggestion": "For ModelBrowserExpand, verify the item still has children before calling Change.",
+        "confidence": 0.55,
+        "locations": [
+          {
+            "path": "ui/model_browser.go",
+            "lines": {
+              "start": 93,
+              "end": 93
+            }
+          }
+        ],
+        "tags": [
+          "stale-callback"
+        ],
+        "evidence": "if by[id].ID == \"\" || by[id].Disabled || !p.visible(id, by, expanded) {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in ui/model_browser.go"
+    }
+  ],
+  "suppressed": []
+}

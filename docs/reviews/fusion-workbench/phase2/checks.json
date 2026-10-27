@@ -1,0 +1,100 @@
+[
+  {
+    "name": "phase2-reviewed-ui",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 2.93
+  },
+  {
+    "name": "phase2-reviewed-native",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestRibbon|TestToolbarOverflow",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 20.513
+  },
+  {
+    "name": "phase2-native-dpi",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestRibbon|TestToolbarOverflow|Test.*Icon",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 20.997
+  },
+  {
+    "name": "phase2-api-tests",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 2.0
+  },
+  {
+    "name": "phase2-api-vet",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.263
+  },
+  {
+    "name": "phase2-api",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.851
+  },
+  {
+    "name": "phase2-vet",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 12.42
+  }
+]

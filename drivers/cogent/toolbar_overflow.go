@@ -18,8 +18,15 @@ func toolbarOverflowHidden(r *record) bool {
 	if r == nil || tree.IsNil(r.widget) {
 		return false
 	}
-	hidden, _ := r.widget.AsWidget().Property(toolbarOverflowHiddenProperty).(bool)
-	return hidden
+	for node := tree.Node(r.widget); !tree.IsNil(node); node = node.AsTree().Parent {
+		if _, owner := node.(*overflowToolbarFrame); owner {
+			break
+		}
+		if hidden, _ := node.AsTree().Property(toolbarOverflowHiddenProperty).(bool); hidden {
+			return true
+		}
+	}
+	return false
 }
 
 // The retained controls remain children of the same native frame. Invisible

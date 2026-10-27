@@ -93,6 +93,8 @@ func nativeSymbol(symbol ui.Symbol) icons.Icon {
 		return icons.Icon(sunriseSymbol)
 	case ui.SymbolPartlyCloudy:
 		return icons.Icon(partlyCloudySymbol)
+	case ui.SymbolVisibility:
+		return icons.Visibility
 	case ui.SymbolCircle:
 		return icons.RadioButtonUnchecked
 	case ui.SymbolCircleCheck:

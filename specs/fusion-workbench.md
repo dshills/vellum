@@ -32,3 +32,17 @@ or removed owners cancel using existing capture; closed windows suppress late
 callbacks. Secondary/middle input does not claim out-of-widget capture. Camera
 helpers are renderer-independent, Y-up, float64 model math with float32 WebGPU
 matrices at the upload boundary. Picking boxes are application-supplied proxies.
+
+## Ribbon and model browser
+
+ui.Ribbon retains contextual tab/group/action identities and full-color artwork.
+Its nested measured group frames use the existing overflow adapter; complete
+hidden groups become submenus, preserving split-button choices and disabled
+ancestry. The ordinary toolbar/customizer contract remains unchanged. Menu
+limits remain64 entries/four levels. Source menus and instance caches preserve
+submenu identity across ordinary redraws; removed cached branches are pruned.
+
+ui.ModelBrowser provides separate disclosure, visibility, select and active-item
+targets on a bounded256-item hierarchy (depth16). The application accepts events;
+removed, disabled or newly collapsed targets refuse stale callbacks. This control
+does not replace the large indexed DataTree or claim CAD-scale rich-row virtualization.

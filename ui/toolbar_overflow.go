@@ -50,6 +50,9 @@ func WithToolbarOverflow(toolbar Node) Node {
 }
 
 func validateToolbarOverflow(n Node) error {
+	if n.ToolbarGroups && !n.ToolbarOverflow {
+		return fmt.Errorf("ui: grouped toolbar requires overflow")
+	}
 	if !n.ToolbarOverflow {
 		return nil
 	}
@@ -61,6 +64,12 @@ func validateToolbarOverflow(n Node) error {
 		return fmt.Errorf("ui: use WithToolbarOverflow to create the managed overflow menu")
 	}
 	for i, child := range n.Children[:len(n.Children)-1] {
+		if n.ToolbarGroups {
+			if child.Kind != Column || len(child.Children) == 0 || more.Options[i].ID != child.ID || more.Options[i].Branch == nil {
+				return fmt.Errorf("ui: invalid ribbon group overflow")
+			}
+			continue
+		}
 		if (child.Kind != Button && child.Kind != Separator && !IsToolbarSpace(child.Kind)) || child.ContextMenu != nil || child.PlacementSource != nil || len(child.Children) != 0 {
 			return fmt.Errorf("ui: overflow toolbar items must be ordinary Buttons, Separators or toolbar spaces")
 		}
