@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "26733b92a3edb336a172912bb8cb9b13",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "99a1a817d940b29c2d1bd72006e2d1cc3d4dc4b8",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "c6b505d1bf67af50",
+      "severity": "medium",
+      "category": "bug",
+      "title": "x",
+      "message": "The pan icon is drawn on a 96x96 rasterizer with no x2 scaling, while the other shapes use 48-unit coordinates doubled in polygon/circle. The undo/redo path also uses 96-space values such as 96-v. That is consistent, but the pan path doubles back on itself (43,45 then 43,13), producing degenerate edges and probably a distorted hand silhouette instead of distinct fingers.",
+      "suggestion": "Rework the pan path so each finger has distinct left and right edges with a valley between fingers, and verify it by rendering the icon.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "examples/forge/tool_icons.go",
+          "lines": {
+            "start": 142,
+            "end": 143
+          }
+        }
+      ],
+      "tags": [
+        "rendering",
+        "location-corrected"
+      ],
+      "evidence": "r.LineTo(43, 45)\n\t\t\tr.LineTo(43, 13)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "7198e2bdc83b19b5",
+      "severity": "medium",
+      "category": "bug",
+      "title": "x",
+      "message": "The control point x(99) lies outside the 96px canvas, and for redo it mirrors to -3. The curve may be clipped or distorted at the edge. The loop also leaves a self-overlapping shape around 69,80.",
+      "suggestion": "Keep control points within 0..96 and check the arrow shape visually.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/forge/tool_icons.go",
+          "lines": {
+            "start": 182,
+            "end": 182
+          }
+        }
+      ],
+      "tags": [
+        "rendering",
+        "location-corrected"
+      ],
+      "evidence": "r.CubeTo(x(99), 56, x(75), 21, x(31), 35)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5875,
+    "totalMs": 5896
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 24365,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 15657,
+        "output": 552,
+        "costUSD": 0.036834
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

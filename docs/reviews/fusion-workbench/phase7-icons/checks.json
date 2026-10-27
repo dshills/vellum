@@ -1,0 +1,58 @@
+[
+  {
+    "name": "phase7-ui",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 3.53
+  },
+  {
+    "name": "phase7-reviewed-app",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 6.821
+  },
+  {
+    "name": "phase7-native",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestRibbon|TestButtonIconAboveTextGeometryRoutingAndRestoration",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 22.828
+  },
+  {
+    "name": "phase7-vet",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 11.822
+  }
+]

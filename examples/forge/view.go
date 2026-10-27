@@ -3,68 +3,12 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/ui"
-	"image"
 	"image/color"
 	"image/png"
-	"sync"
 )
 
-var iconCache sync.Map
-
-func artwork(name string, c color.NRGBA) *canvas.TiledImage {
-	key := fmt.Sprint(name, c)
-	if v, ok := iconCache.Load(key); ok {
-		return v.(*canvas.TiledImage)
-	}
-	im := image.NewNRGBA(image.Rect(0, 0, 48, 48))
-	for y := 5; y < 43; y++ {
-		for x := 5; x < 43; x++ {
-			if (x < 10 || x > 37) && (y < 10 || y > 37) {
-				continue
-			}
-			cc := c
-			if y < 22 {
-				cc.R = uint8((int(cc.R) + 255) / 2)
-				cc.G = uint8((int(cc.G) + 255) / 2)
-				cc.B = uint8((int(cc.B) + 255) / 2)
-			}
-			im.SetNRGBA(x, y, cc)
-		}
-	}
-	for y := 13; y < 35; y++ {
-		for x := 13; x < 35; x++ {
-			draw := false
-			switch name {
-			case "add":
-				draw = x >= 22 && x < 26 || y >= 22 && y < 26
-			case "grid":
-				draw = x%8 < 2 || y%8 < 2
-			case "move":
-				draw = y >= 22 && y <= 25 || x >= 30 && y >= 18 && y <= 29
-			case "undo":
-				draw = x < 17 || y < 17
-			case "redo":
-				draw = x > 30 || y < 17
-			case "cube":
-				draw = y < 16 || y > 30 || x < 16 || x > 30 || x > 22 && x < 25
-			default:
-				draw = (x-24)*(x-24)+(y-24)*(y-24) < 70
-			}
-			if draw {
-				im.SetNRGBA(x, y, rgb(255, 255, 255))
-			}
-		}
-	}
-	out, e := canvas.NewTiledImage(im)
-	if e != nil {
-		panic(e)
-	}
-	iconCache.Store(key, out)
-	return out
-}
 func pngIcon(name string, c color.NRGBA) []byte {
 	var b bytes.Buffer
 	if e := png.Encode(&b, artwork(name, c)); e != nil {
@@ -94,7 +38,7 @@ func must(n ui.Node, e error) ui.Node {
 	return n
 }
 func (m *workbench) toolbar() []cogent.TitlebarToolbarItem {
-	return []cogent.TitlebarToolbarItem{{ID: "add", Label: "New body", Kind: ui.Button, PNG: pngIcon("add", rgb(63, 128, 229)), Command: "forge.add"}, {ID: "flex", Kind: ui.ToolbarFlexibleSpace}, {ID: "undo", Label: "Undo", Kind: ui.Button, PNG: pngIcon("undo", rgb(143, 101, 207)), Command: "forge.undo"}, {ID: "redo", Label: "Redo", Kind: ui.Button, PNG: pngIcon("redo", rgb(45, 158, 155)), Command: "forge.redo"}, {ID: "fit", Label: "Fit assembly", Kind: ui.Button, PNG: pngIcon("cube", rgb(236, 158, 51)), Activate: m.fit}}
+	return []cogent.TitlebarToolbarItem{{ID: "add", Label: "New body", Kind: ui.Button, PNG: pngIcon("add", rgb(63, 128, 229)), Command: "forge.add"}, {ID: "flex", Kind: ui.ToolbarFlexibleSpace}, {ID: "undo", Label: "Undo", Kind: ui.Button, PNG: pngIcon("undo", rgb(143, 101, 207)), Command: "forge.undo"}, {ID: "redo", Label: "Redo", Kind: ui.Button, PNG: pngIcon("redo", rgb(45, 158, 155)), Command: "forge.redo"}, {ID: "fit", Label: "Fit assembly", Kind: ui.Button, PNG: pngIcon("fit", rgb(236, 158, 51)), Activate: m.fit}}
 }
 func (m *workbench) ribbonView() ui.Node {
 	a := func(id, label, art string, c color.NRGBA) ui.RibbonAction {
@@ -107,7 +51,7 @@ func (m *workbench) ribbonView() ui.Node {
 	m.ribbon.ID = "ribbon"
 	m.ribbon.Label = "Design tools"
 	m.ribbon.SelectedTab = m.tab
-	m.ribbon.Tabs = []ui.RibbonTab{{ID: "solid", Label: "Solid", Groups: []ui.RibbonGroup{{ID: "create", Label: "CREATE", Actions: []ui.RibbonAction{a("add", "New body", "add", blue)}}, {ID: "modify", Label: "MODIFY", Actions: []ui.RibbonAction{a("move", "Move +4 mm", "move", teal), a("delete", "Delete", "cube", rgb(224, 101, 97))}}, {ID: "view", Label: "DISPLAY", Actions: []ui.RibbonAction{a("grid", "Grid", "grid", gold), a("projection", "Projection", "cube", purple)}}, {ID: "navigate", Label: "NAVIGATE", Actions: []ui.RibbonAction{a("orbit", "Orbit", "cube", blue), a("pan", "Pan", "move", teal), a("select", "Select", "cube", gold)}}}}, {ID: "inspect", Label: "Inspect", Groups: []ui.RibbonGroup{{ID: "orientation", Label: "ORIENTATION", Actions: []ui.RibbonAction{a("front", "Front", "cube", blue), a("top", "Top", "cube", teal), a("right", "Right", "cube", purple), a("fit", "Fit assembly", "cube", gold)}}, {ID: "context", Label: "ACTIONS", Actions: []ui.RibbonAction{a("marking", "Action wheel", "grid", purple)}}}}, {ID: "body", Label: "Body tools", Contextual: true, Disabled: m.selectedIndex() < 0, Groups: []ui.RibbonGroup{{ID: "transform", Label: "SELECTED BODY", Actions: []ui.RibbonAction{a("move", "Move +4 mm", "move", teal), a("delete", "Delete body", "cube", rgb(224, 101, 97))}}}}}
+	m.ribbon.Tabs = []ui.RibbonTab{{ID: "solid", Label: "Solid", Groups: []ui.RibbonGroup{{ID: "create", Label: "CREATE", Actions: []ui.RibbonAction{a("add", "New body", "add", blue)}}, {ID: "modify", Label: "MODIFY", Actions: []ui.RibbonAction{a("move", "Move +4 mm", "move", teal), a("delete", "Delete", "delete", rgb(224, 101, 97))}}, {ID: "view", Label: "DISPLAY", Actions: []ui.RibbonAction{a("grid", "Grid", "grid", gold), a("projection", "Projection", "projection", purple)}}, {ID: "navigate", Label: "NAVIGATE", Actions: []ui.RibbonAction{a("orbit", "Orbit", "orbit", blue), a("pan", "Pan", "pan", teal), a("select", "Select", "select", gold)}}}}, {ID: "inspect", Label: "Inspect", Groups: []ui.RibbonGroup{{ID: "orientation", Label: "ORIENTATION", Actions: []ui.RibbonAction{a("front", "Front", "front", blue), a("top", "Top", "top", teal), a("right", "Right", "right", purple), a("fit", "Fit assembly", "fit", gold)}}, {ID: "context", Label: "ACTIONS", Actions: []ui.RibbonAction{a("marking", "Action wheel", "wheel", purple)}}}}, {ID: "body", Label: "Body tools", Contextual: true, Disabled: m.selectedIndex() < 0, Groups: []ui.RibbonGroup{{ID: "transform", Label: "SELECTED BODY", Actions: []ui.RibbonAction{a("move", "Move +4 mm", "move", teal), a("delete", "Delete body", "delete", rgb(224, 101, 97))}}}}}
 	m.ribbon.SelectTab = func(id string) { m.tab = id; m.changed() }
 	m.ribbon.Action = func(e ui.RibbonEvent) { m.action(e.ActionID) }
 	m.ribbon.Style = ui.Style{GrowY: ui.Some(float32(0)), Background: ui.Some(rgb(249, 250, 252))}
@@ -208,7 +152,7 @@ func (m *workbench) View() ui.Node {
 
 	m.marking.Choose = m.action
 	m.marking.Dismiss = func() { m.marking.Open = false; m.changed() }
-	m.marking.Actions = []ui.MarkingAction{{ID: "fit", Label: "Fit", IconImage: artwork("cube", rgb(236, 168, 52))}, {ID: "orbit", Label: "Orbit", IconImage: artwork("cube", rgb(58, 122, 225))}, {ID: "pan", Label: "Pan", IconImage: artwork("move", rgb(48, 166, 158))}, {ID: "select", Label: "Select", IconImage: artwork("cube", rgb(148, 105, 210))}, {ID: "grid", Label: "Grid", IconImage: artwork("grid", rgb(236, 168, 52))}, {ID: "undo", Label: "Undo", IconImage: artwork("undo", rgb(148, 105, 210)), Disabled: m.journal.Snapshot().UndoCount == 0}, {ID: "move", Label: "Move +4 mm", IconImage: artwork("move", rgb(48, 166, 158)), Disabled: m.selectedIndex() < 0}, {ID: "add", Label: "New body", IconImage: artwork("add", rgb(58, 122, 225))}}
+	m.marking.Actions = []ui.MarkingAction{{ID: "fit", Label: "Fit", IconImage: artwork("fit", rgb(236, 168, 52))}, {ID: "orbit", Label: "Orbit", IconImage: artwork("orbit", rgb(58, 122, 225))}, {ID: "pan", Label: "Pan", IconImage: artwork("pan", rgb(48, 166, 158))}, {ID: "select", Label: "Select", IconImage: artwork("select", rgb(148, 105, 210))}, {ID: "grid", Label: "Grid", IconImage: artwork("grid", rgb(236, 168, 52))}, {ID: "undo", Label: "Undo", IconImage: artwork("undo", rgb(148, 105, 210)), Disabled: m.journal.Snapshot().UndoCount == 0}, {ID: "move", Label: "Move +4 mm", IconImage: artwork("move", rgb(48, 166, 158)), Disabled: m.selectedIndex() < 0}, {ID: "add", Label: "New body", IconImage: artwork("add", rgb(58, 122, 225))}}
 	footer := text("status", fmt.Sprintf("%s    ·    %d bodies    ·    Undo %d / Redo %d", m.status, len(m.state.Objects), m.journal.Snapshot().UndoCount, m.journal.Snapshot().RedoCount)+fmt.Sprintf("  ·  Camera %.2f / %.2f / %.2f  ·  Target %.2f, %.2f, %.2f", m.scene.Camera.Yaw, m.scene.Camera.Pitch, m.scene.Camera.Distance, m.scene.Camera.Target.X, m.scene.Camera.Target.Y, m.scene.Camera.Target.Z), 11, 400, muted)
 	footer.Style.Padding = ui.Some(ui.Insets{Left: 18, Bottom: 8, Top: 3})
 	return ui.Node{ID: "forge-root", Kind: ui.Column, Grow: true, Style: ui.Style{Gap: ui.Some(float32(0)), Padding: ui.Some(ui.Insets{}), Background: ui.Some(rgb(248, 249, 252))}, Children: []ui.Node{m.ribbonView(), panes, must(m.timeline.View()), footer, must(m.marking.View())}}

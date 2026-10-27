@@ -84,3 +84,8 @@ creates a ZIP/checksum/source manifest and verifies the exact extracted signatur
 Native readiness/readback and GPU-buffer growth are tested separately from
 physical pointer input. Published build13 artifacts remain immutable and contain
 none of these additions. No public distribution or new audit decision is implied.
+
+Forge tool icons use distinct original antialiased silhouettes on transparent
+backgrounds (body-plus, trash, transform arrows, grid, projection, orbit, hand,
+cursor, orientation faces and curved Undo/Redo), not generic colored tiles. Ribbon
+buttons use a flat quiet appearance while retaining native hover/focus feedback.
