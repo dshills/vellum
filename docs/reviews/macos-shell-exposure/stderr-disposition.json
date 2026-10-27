@@ -1,0 +1,18 @@
+{
+  "prism_finding": "39195b9c09cdfd43",
+  "disposition": "Inspected and documented successful stderr. No failing command or verifier; no rerun or artifact change needed. Separate extracted/postlaunch strict signatures pass.",
+  "records": [
+    {
+      "file": "patch-recipe-pins.stderr",
+      "sha256": "e8e9851dac2a2818b5f207a493e32ae7e8ba12fcb5256f8b5c368a8d60ef11ed",
+      "text": ".\n----------------------------------------------------------------------\nRan 1 test in 0.042s\n\nOK\n",
+      "classification": "expected success output; command exit0, not a warning/failure"
+    },
+    {
+      "file": "replacement-public-package.stderr",
+      "sha256": "56b09546d18f338e29a9d9f6a1121f9d9d5286d01a1d2b6e0159104a3e82ca89",
+      "text": "/private/tmp/vellum-shell-exposure-20261027/.vellum-app-_y8e6mx0/application.app: replacing existing signature\n",
+      "classification": "expected success output; command exit0, not a warning/failure"
+    }
+  ]
+}

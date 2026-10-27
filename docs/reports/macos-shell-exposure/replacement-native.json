@@ -1,0 +1,160 @@
+{
+  "schema": 1,
+  "source_commit": "9961ecf1b6b2c3f6582694480ff163756da706ed",
+  "completed_at": "2026-10-27T11:51:30.085707+00:00",
+  "old_build11_controls": {
+    "runs": 2,
+    "result": "A0 correctly observed without model action; earlier mismatch intermittent, not erased or proven capture-only"
+  },
+  "replacement_build12_cases": [
+    {
+      "case": "native B0 close to A0, plus native Raise",
+      "result": "AX and pixels match A0 without model edit"
+    },
+    {
+      "case": "native B2 close to A0",
+      "result": "AX and pixels match A0 without model edit; B2 pixels distinct"
+    },
+    {
+      "case": "content Close B to A0",
+      "result": "AX and pixels match A0 before any A action"
+    }
+  ],
+  "toolbar_and_lock": "B increments to2, lock disables/reenables its toolbar; A later increments once to1",
+  "contrast": "readable Light window/background in all replacement captures",
+  "normal_final_window_close": "observed in all three runs; final exact process path absent",
+  "postlaunch_strict_signature": true,
+  "signed_binary_and_manifest_unchanged": true,
+  "binary_bound_notice_files_verified": 418,
+  "historical_archives_unchanged": {
+    "public_candidates": 7,
+    "contrast_build11": true
+  },
+  "exposure_acceptance": "pass within the three bounded Shell cases; deterministic missing-presentation regression fixed",
+  "scope": "Native AX actions and captured pixels; not physical-pointer, cross-platform, other-host, performance, human IME/VoiceOver or downloaded-quarantine qualification",
+  "recommended_for_final_asset_decision": true,
+  "publication_authorized": false,
+  "uploaded": false,
+  "evidence": [
+    {
+      "path": "native/baseline-a-after-edited-b.jpg",
+      "bytes": 14119,
+      "sha256": "732fc50556ebf93429bfc8e1ac4c817444c1fee7dda24a048cc3f053b040231b"
+    },
+    {
+      "path": "native/baseline-a-after-edited-b.txt",
+      "bytes": 689,
+      "sha256": "4f7979c458f7da298a1d6c176c612802f100311b83d244c43f236a95e5c76ad1"
+    },
+    {
+      "path": "native/baseline-after-close.jpg",
+      "bytes": 14119,
+      "sha256": "732fc50556ebf93429bfc8e1ac4c817444c1fee7dda24a048cc3f053b040231b"
+    },
+    {
+      "path": "native/baseline-after-close.txt",
+      "bytes": 689,
+      "sha256": "4f7979c458f7da298a1d6c176c612802f100311b83d244c43f236a95e5c76ad1"
+    },
+    {
+      "path": "native/baseline-edited-b.jpg",
+      "bytes": 15049,
+      "sha256": "a806f22fc55ea8608aa818c97648cb30bc54e7e756a4b403c81ad96cbd18ac7c"
+    },
+    {
+      "path": "native/baseline-edited-b.txt",
+      "bytes": 689,
+      "sha256": "07739ff0e73d7af40d915304c18f2b12dc2997468fbd689fd61350564a17db60"
+    },
+    {
+      "path": "native/fixed1-a-native-close.jpg",
+      "bytes": 14119,
+      "sha256": "732fc50556ebf93429bfc8e1ac4c817444c1fee7dda24a048cc3f053b040231b"
+    },
+    {
+      "path": "native/fixed1-a-native-close.txt",
+      "bytes": 689,
+      "sha256": "4f7979c458f7da298a1d6c176c612802f100311b83d244c43f236a95e5c76ad1"
+    },
+    {
+      "path": "native/fixed1-a-raised.jpg",
+      "bytes": 15197,
+      "sha256": "69b430d2e8a633050e67a138da5cfa1d131a3cdd99d0583116d97abcc3c0a97c"
+    },
+    {
+      "path": "native/fixed1-a-raised.txt",
+      "bytes": 689,
+      "sha256": "4f7979c458f7da298a1d6c176c612802f100311b83d244c43f236a95e5c76ad1"
+    },
+    {
+      "path": "native/fixed1-closed.txt",
+      "bytes": 500,
+      "sha256": "ee8e0da8856f673d255c5a6f167dcf4496777bf14aff39135026345cd8708291"
+    },
+    {
+      "path": "native/fixed2-a0-native-close.jpg",
+      "bytes": 14119,
+      "sha256": "732fc50556ebf93429bfc8e1ac4c817444c1fee7dda24a048cc3f053b040231b"
+    },
+    {
+      "path": "native/fixed2-a0-native-close.txt",
+      "bytes": 689,
+      "sha256": "4f7979c458f7da298a1d6c176c612802f100311b83d244c43f236a95e5c76ad1"
+    },
+    {
+      "path": "native/fixed2-b1.txt",
+      "bytes": 689,
+      "sha256": "07739ff0e73d7af40d915304c18f2b12dc2997468fbd689fd61350564a17db60"
+    },
+    {
+      "path": "native/fixed2-b2.jpg",
+      "bytes": 15065,
+      "sha256": "4ba98198088097e45ba59ebe9fd5ea7175541d154abcd4c0b00c52543f429cd1"
+    },
+    {
+      "path": "native/fixed2-b2.txt",
+      "bytes": 689,
+      "sha256": "0fd690ab185c40d71b13d78da817d33b0c559d4fd8de7fa2bf3ffc0bd9bd7ff1"
+    },
+    {
+      "path": "native/fixed2-closed.txt",
+      "bytes": 50,
+      "sha256": "65be61b3f8fd40de3621e6184c75dfe202fc8096a5967e1578007e98b2b32ae6"
+    },
+    {
+      "path": "native/fixed3-a0-content-close.jpg",
+      "bytes": 14119,
+      "sha256": "732fc50556ebf93429bfc8e1ac4c817444c1fee7dda24a048cc3f053b040231b"
+    },
+    {
+      "path": "native/fixed3-a0-content-close.txt",
+      "bytes": 689,
+      "sha256": "4f7979c458f7da298a1d6c176c612802f100311b83d244c43f236a95e5c76ad1"
+    },
+    {
+      "path": "native/fixed3-a1.jpg",
+      "bytes": 14972,
+      "sha256": "1e9653f3d6f3a2f5e712d25888264712eb2e9574bdcce12bf4fd4375a4a79867"
+    },
+    {
+      "path": "native/fixed3-a1.txt",
+      "bytes": 689,
+      "sha256": "210855be4243751a7f9e42e3a427a03a4a345a99c77c94565548de1f6011ae60"
+    },
+    {
+      "path": "native/fixed3-b-locked.txt",
+      "bytes": 699,
+      "sha256": "865fd87559651bfebc8abc429dfdeef1d921837a548373314c2fb636e89c6d77"
+    },
+    {
+      "path": "native/fixed3-b-unlocked.txt",
+      "bytes": 689,
+      "sha256": "fdd9b3ea381f3ca7faf1de4dc0bd2d3d4f447ebee07ce2ce23c6013d19366321"
+    },
+    {
+      "path": "native/fixed3-closed.txt",
+      "bytes": 50,
+      "sha256": "65be61b3f8fd40de3621e6184c75dfe202fc8096a5967e1578007e98b2b32ae6"
+    }
+  ]
+}

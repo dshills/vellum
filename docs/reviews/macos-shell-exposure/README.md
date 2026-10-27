@@ -43,3 +43,21 @@ signing identity, notarization or global setting/notebook change is authorized.
 The code checkpoint Prism review (Anthropic claude-sonnet-5-5) covers all ten
 staged files completely and reports no findings. The replacement package/native
 observations follow in a separate checkpoint after this source commit.
+
+The committed fix is rebuilt as version1.0.0 build12 through unchanged public
+producer guards. Three packaged native launch/exposure checks pass without an A
+model edit after B closes (B0 native close, B2 native close, application Close),
+including a native Raise control. A later toolbar edit and B lock availability
+remain correct. All three runs close normally; post-launch signatures, notices
+and archive integrity verify. Historical SDK/app/build11 archives are unchanged.
+The current report closes bounded Shell exposure acceptance while retaining the
+old intermittent captures and limits. No upload/audit/tag change is performed.
+
+The replacement-packet Prism review (Anthropic claude-sonnet-5-5) has complete
+text coverage and one medium evidence-clarity finding39195b9c09cdfd43 about
+non-empty stderr. Inspected actual contents: unittest’s one-test OK summary and
+codesign’s expected replacing-existing-signature message during requested ad-hoc
+signing. Commands exit0; separate extracted/post-launch strict signatures pass.
+The report now documents those messages, and stderr-disposition.json retains
+exact content/hashes. No failing check was suppressed, no unchanged command was
+rerun to obtain empty logs, and no artifact bytes or source fix changed.

@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f5c3c24835583527951a34e912bef647",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "9961ecf1b6b2c3f6582694480ff163756da706ed",
+    "branch": "codex/macos-public-packaging"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "39195b9c09cdfd43",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Patch pin check has non-empty stderr despite claimed pass",
+      "message": "The evidence index lists non-empty stderr for patch-recipe-pins (98 bytes) and an empty stdout, while the report claims patch-pin checks pass. Likewise replacement-public-package.stderr is 111 bytes. Non-empty stderr may indicate a failure or warning that is undocumented, which undermines the pass claim in the publication set.",
+      "suggestion": "Inspect the stderr contents for patch-recipe-pins and replacement-public-package and document them, or rerun the checks until they are clean before recommending publication.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reports/macos-shell-exposure/evidence-index.json",
+          "lines": {
+            "start": 100,
+            "end": 101
+          }
+        }
+      ],
+      "tags": [
+        "evidence",
+        "verification",
+        "location-corrected"
+      ],
+      "evidence": "      \"path\": \"patch-recipe-pins.stderr\",\n      \"bytes\": 98,",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3961,
+    "totalMs": 4008
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 42271,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 21829,
+        "output": 350,
+        "costUSD": 0.047158
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "source_commit": "9961ecf1b6b2c3f6582694480ff163756da706ed",
+  "baseline_product_source": "4b42fb89948b8abf0f2f65970fb5980987c1af0c",
+  "baseline_sdk_sha256": "0519cc8645616ac14489ee69d94efb07ab8dcccc1e56ed1f4be14976daa33ab3",
+  "changed_product_files": [
+    "drivers/cogent/build/upstream/core/renderwindow.go",
+    "examples/macapps/cmd/macshell/main.go"
+  ],
+  "module_records_unchanged": 92,
+  "module_origins": {
+    "cogentcore.org/core": "drivers/cogent/build/upstream",
+    "github.com/dshills/vellum": ".",
+    "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+    "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+    "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+    "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+    "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+    "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+    "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+  },
+  "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "linkmap_sha256": "d61404361fd7f59bbd0d70fa91b592b5e4b0d82b15ae1c42228846ec118dec14",
+  "main_sha256": "7a619ee8569f2a8fb115d5b52d38f393367357b23eb4347b373c8180065876f4",
+  "previous_source_binary_sha256": "3d68a0588f8d3aeb6f3f66a40641fb66bc950ce3b86d2e23eca8aa65b47bc1a2",
+  "source_binary_sha256": "fb3c04dd7b1bc728c48f6b0a99feb6bb77108a0ec31fa47a8334cbb9f6e5125c",
+  "previous_notice_inventory_sha256": "a142dd25f165bc50d5900b5060c5ead16ed44dc7ef8eb1d77d3e0667ba485eba",
+  "notice_inventory_sha256": "a14acf8b5e5eb80e3782198c5af56f8a032588d95d87d42bab8ca521c8f46c44",
+  "notice_original_files_unchanged": 418,
+  "notice_inventory_only_changed_field": "artifact_sha256",
+  "old_notice_binding_rejects_replacement": true,
+  "previous_zip_sha256": "9c5f9fa7f7afc7df5345ebfa170d8ff8257709577ce387671de313f4542425f4",
+  "archive": "Vellum Mac Shell.zip",
+  "archive_sha256": "da83c7d548c9f669bb6e24ced7a1790f287a3df4f000e570d5cd2d2c78cb8cd1",
+  "packaged_binary_sha256": "d55e9cf11ade94f2d496e171a5aa7da349891852d5ce104ddb307cd86702b125",
+  "manifest_sha256": "74e1a2685f8e693127baef051e855629562bcdf94e73c68dcffdfa322f1b3998",
+  "build_version": "12",
+  "private_build": false,
+  "notarized": false,
+  "native_distribution_audit": "approved",
+  "prepared_go_patch": {
+    "file": "drivers/cogent/native/patches/exposure/0108-window-exposure-repaint.patch",
+    "sha256": "fd6e54c276ce8d4d071e4a779f8ddff7267d5e52e153e509c5de74d9dd1b33de",
+    "output_hashes": {
+      "core/renderwindow.go": "3960374de3a8b104f116865632f645f31ac999320151b1da22a4ba41a7b1412b",
+      "core/exposure_vellum_test.go": "64bad82535cda56cadc08a7c8f1edcfc15cdcccd9b7cb3f87f64cf282d97030e"
+    }
+  },
+  "runtime_delta_from_build11": [
+    "core/renderwindow.go"
+  ],
+  "runtime_result": "pass: three bounded exposure cases without model edit",
+  "audit_scope": "Reviewed prepared-Core Go exposure repair; build11 fixture source, dependency module identities/versions, assets, original notices and native archive unchanged. Prepared Core Go source is explicitly changed by pinned stage0108. Historical owner approval is unchanged, not relabeled as approval of the new binary/archive. Final asset publication remains unapproved.",
+  "publication_authorized": false,
+  "uploaded": false,
+  "checks": [
+    {
+      "name": "baseline-modules",
+      "exit_code": 0,
+      "seconds": 0.016
+    },
+    {
+      "name": "replacement-modules",
+      "exit_code": 0,
+      "seconds": 0.011
+    },
+    {
+      "name": "replacement-build",
+      "exit_code": 0,
+      "seconds": 24.756
+    },
+    {
+      "name": "replacement-public-package",
+      "exit_code": 0,
+      "seconds": 0.946
+    },
+    {
+      "name": "replacement-zip",
+      "exit_code": 0,
+      "seconds": 1.235
+    },
+    {
+      "name": "replacement-extract",
+      "exit_code": 0,
+      "seconds": 0.154
+    },
+    {
+      "name": "replacement-signature",
+      "exit_code": 0,
+      "seconds": 0.072
+    },
+    {
+      "name": "replacement-launch-copy",
+      "exit_code": 0,
+      "seconds": 0.104
+    },
+    {
+      "name": "replacement-launch-signature",
+      "exit_code": 0,
+      "seconds": 0.073
+    }
+  ],
+  "runtime_evidence": "replacement-native.json",
+  "recommended_for_final_asset_decision": true
+}

@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "assets": [
+    {
+      "file": "vellum-v1.0.0-darwin-arm64-sdk.tar.gz",
+      "sha256": "0519cc8645616ac14489ee69d94efb07ab8dcccc1e56ed1f4be14976daa33ab3",
+      "local_delivery": "macos-v1-public-candidates-20261027",
+      "source": {
+        "clean": true,
+        "commit": "1fc594b6952d3b072a4c72b619a6f259da389474"
+      }
+    },
+    {
+      "file": "Vellum Notes.zip",
+      "sha256": "3d60955b9336bcdfe931ca68222057cb4d36022f44b37ec74c4515cd8693fc25",
+      "local_delivery": "macos-v1-public-candidates-20261027",
+      "product_source": "4b42fb89948b8abf0f2f65970fb5980987c1af0c",
+      "packaging_source": "1fc594b6952d3b072a4c72b619a6f259da389474"
+    },
+    {
+      "file": "Vellum Mac Widgets.zip",
+      "sha256": "c9a3b636faa8cb24498a6f7f09f180d4811e407dbe3b89489eb11611f6999ca7",
+      "local_delivery": "macos-v1-public-candidates-20261027",
+      "product_source": "4b42fb89948b8abf0f2f65970fb5980987c1af0c",
+      "packaging_source": "1fc594b6952d3b072a4c72b619a6f259da389474"
+    },
+    {
+      "file": "Vellum Mac Shell.zip",
+      "sha256": "da83c7d548c9f669bb6e24ced7a1790f287a3df4f000e570d5cd2d2c78cb8cd1",
+      "local_delivery": "macos-shell-exposure-20261027",
+      "source_commit": "9961ecf1b6b2c3f6582694480ff163756da706ed",
+      "build": "12",
+      "prepared_go_overlay": "stage0108"
+    },
+    {
+      "file": "Forma.zip",
+      "sha256": "cc9d994a3322a04412b891b5762c6e2ef6230500faeec5b7f812764a7a5285ec",
+      "local_delivery": "macos-v1-public-candidates-20261027",
+      "product_source": "4b42fb89948b8abf0f2f65970fb5980987c1af0c",
+      "packaging_source": "1fc594b6952d3b072a4c72b619a6f259da389474"
+    },
+    {
+      "file": "Luma.zip",
+      "sha256": "291753ff5c401cc079a9d96cf837f76611e6b9914c99a7c0e24bf206b19391f1",
+      "local_delivery": "macos-v1-public-candidates-20261027",
+      "product_source": "4b42fb89948b8abf0f2f65970fb5980987c1af0c",
+      "packaging_source": "1fc594b6952d3b072a4c72b619a6f259da389474"
+    },
+    {
+      "file": "Pulse.zip",
+      "sha256": "1a03c26bcea3ff8d81a15377d548aa627462ea4d7b1d0ad7b65866bac005a1e6",
+      "local_delivery": "macos-v1-public-candidates-20261027",
+      "product_source": "4b42fb89948b8abf0f2f65970fb5980987c1af0c",
+      "packaging_source": "1fc594b6952d3b072a4c72b619a6f259da389474"
+    }
+  ],
+  "source_tag_unchanged": "4b42fb89948b8abf0f2f65970fb5980987c1af0c",
+  "historical_audits_unchanged": true,
+  "publication_authorized": false,
+  "uploaded": false,
+  "signing_route": "ad-hoc signed, unnotarized developer download; no downloaded-quarantine qualification",
+  "scope": "SDK and five previous app archives unchanged. Only Shell is replaced by build12. Source/metadata origins differ explicitly; no tag movement or claim old SDK contains stage0108."
+}
