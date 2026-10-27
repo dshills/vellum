@@ -1,0 +1,19 @@
+[
+  {
+    "name": "phase8-ribbon-native",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestRibbonWholeGroupOverflowNestedVisibilityAndRetention",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 23.851
+  }
+]

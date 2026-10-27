@@ -168,7 +168,7 @@ func (p *Ribbon) View() (Node, error) {
 				aid := RibbonActionID(p.ID, tab.ID, action.ID)
 				disabled := action.Disabled || group.Disabled || p.Action == nil
 				tabID, actionID := tab.ID, action.ID
-				main := Node{ID: aid, Kind: Button, Text: action.Label, Icon: action.Icon, IconImage: action.IconImage, Appearance: ButtonQuiet, Disabled: disabled, IconPlacement: IconAboveText, Accessibility: Accessibility{Name: action.Label}, Style: Style{MinSize: Some(Size{Width: 64, Height: 54}), MaxSize: Some(Size{Width: 92, Height: 54}), Padding: Some(Insets{Top: 4, Right: 6, Bottom: 4, Left: 6}), Gap: Some(float32(3)), Border: Some(Border{}), Background: Some(color.NRGBA{}), CornerRadius: Some(float32(6)), Typography: Some(MacTypography(12, 400)), GrowX: Some(float32(0)), GrowY: Some(float32(0))}, Activate: func() { dispatch(tabID, actionID, "") }}
+				main := Node{ID: aid, Kind: Button, Text: action.Label, Icon: action.Icon, IconImage: action.IconImage, Appearance: ButtonTool, Disabled: disabled, IconPlacement: IconAboveText, Accessibility: Accessibility{Name: action.Label}, Style: Style{MinSize: Some(Size{Width: 64, Height: 54}), MaxSize: Some(Size{Width: 92, Height: 54}), Padding: Some(Insets{Top: 4, Right: 6, Bottom: 4, Left: 6}), Gap: Some(float32(3)), Border: Some(Border{}), Background: Some(color.NRGBA{}), CornerRadius: Some(float32(6)), Typography: Some(MacTypography(12, 400)), GrowX: Some(float32(0)), GrowY: Some(float32(0))}, Activate: func() { dispatch(tabID, actionID, "") }}
 				if action.Icon == "" && action.IconImage == nil {
 					main.IconPlacement = IconLeading
 				}
@@ -208,7 +208,7 @@ func (p *Ribbon) View() (Node, error) {
 					return Node{}, e
 				}
 				items = append(items, Option{ID: aid + "/options", Label: action.Label + " options", Icon: action.Icon, IconImage: action.IconImage, Disabled: disabled, Branch: branch})
-				button := Node{ID: aid + "/menu-button", Kind: MenuButton, Icon: SymbolDown, Accessibility: Accessibility{Name: action.Label + " options"}, Options: menu, Disabled: disabled, Appearance: ButtonQuiet, Style: Style{MinSize: Some(Size{Width: 22, Height: 54}), MaxSize: Some(Size{Width: 22, Height: 54}), Padding: Some(Insets{}), Border: Some(Border{}), GrowX: Some(float32(0))}, Change: func(e ChangeEvent) {
+				button := Node{ID: aid + "/menu-button", Kind: MenuButton, Icon: SymbolDown, Accessibility: Accessibility{Name: action.Label + " options"}, Options: menu, Disabled: disabled, Appearance: ButtonTool, Style: Style{MinSize: Some(Size{Width: 22, Height: 54}), MaxSize: Some(Size{Width: 22, Height: 54}), Padding: Some(Insets{}), Border: Some(Border{}), GrowX: Some(float32(0))}, Change: func(e ChangeEvent) {
 					if route, ok := routes[e.SelectedID]; ok {
 						dispatch(tabID, route.action, route.option)
 					}

@@ -88,4 +88,5 @@ none of these additions. No public distribution or new audit decision is implied
 Forge tool icons use distinct original antialiased silhouettes on transparent
 backgrounds (body-plus, trash, transform arrows, grid, projection, orbit, hand,
 cursor, orientation faces and curved Undo/Redo), not generic colored tiles. Ribbon
-buttons use a flat quiet appearance while retaining native hover/focus feedback.
+buttons use a flat transparent tool appearance while retaining native hover/focus
+feedback. The tool style avoids the text-button hover shadow creating overflow.
