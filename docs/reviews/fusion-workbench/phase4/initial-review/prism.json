@@ -1,0 +1,114 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "ecbcebac0f79ecd82104784b4ba57170",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "8e3b68c48436b80c94f6fa3c9d2547a4e94d1267",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 1
+    },
+    "highestSeverity": "high"
+  },
+  "findings": [
+    {
+      "id": "9369c6ab5cde2636",
+      "severity": "high",
+      "category": "bug",
+      "title": "x",
+      "message": "The next() method body is corrupted: it contains the literal text `p.[REDACTED]` instead of a call that advances the scanner (e.g. p.token = p.s.Scan()). The package will not compile, and the token would never advance.",
+      "suggestion": "Replace the placeholder with `p.token = p.s.Scan()`.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "quantity/length.go",
+          "lines": {
+            "start": 28,
+            "end": 29
+          }
+        }
+      ],
+      "tags": [
+        "compile-error",
+        "unverified"
+      ],
+      "evidence": "func (p *parser) next() error {\n\tp.[REDACTED]",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "724b129abc76e37e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unary operator handling ignores error before negation",
+      "message": "Unary minus parses its operand with min precedence 3, so no binary operator is consumed. For '-2 mm * 3' it works by luck, but after the unary branch the loop continues and applies binary ops to the negated value, which is fine. However, a.n is negated even when e != nil; harmless since returned value is discarded. More importantly, the Int/Float case: ParseFloat on text like '1e-2' works, but a following identifier 'e' unit handling is fine. Main issue is limited: the unit lookup after a number ignores unknown identifiers (e.g. '2 foo'), leaving the token as Ident so the caller yields a generic error.",
+      "suggestion": "Check the error before negating, and report unknown unit identifiers explicitly.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "quantity/length.go",
+          "lines": {
+            "start": 49,
+            "end": 52
+          }
+        }
+      ],
+      "tags": [
+        "parser",
+        "location-corrected"
+      ],
+      "evidence": "a, e = p.expr(3, depth+1)\n\t\tif op == '-' {\n\t\t\ta.n = -a.n\n\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5558,
+    "totalMs": 5753
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 7,
+    "bytes": 20125,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 12303,
+        "output": 624,
+        "costUSD": 0.030846
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -58,3 +58,15 @@ application-owned. The in-canvas ViewCube renders and picks the same six labeled
 faces; dragging it orbits, and ui.ViewCube supplies keyboard/accessible face
 alternatives. Small views omit the cube. This is a preview toolkit, not CAD
 geometry, arbitrary-mesh picking or an assembly performance qualification.
+
+## Controlled editing and feature controls
+
+quantity.Length parses bounded arithmetic, explicit mm/cm/m/in/ft and named
+length parameters; it never evaluates code. Canonical values are millimeters.
+QuantityField admits only finite, in-range candidates through Apply; applications
+own drafts/errors and commit through their commands. FeatureTimeline presents
+up to128 stable features and a rollback marker, with accessible earlier/later
+reorder proposals. It does not solve or replay CAD features. MarkingMenu supplies
+an eight-direction, focus-scoped action panel and external direction admission;
+this version has visible buttons/keyboard access, not invisible flick gestures,
+nested radial tracking or pointer-positioned native popup windows.

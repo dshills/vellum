@@ -1,0 +1,43 @@
+[
+  {
+    "name": "phase4-review-regressions",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./quantity",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 2.978
+  },
+  {
+    "name": "phase4-reviewed-vet",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "vet",
+      "./quantity",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 0.207
+  },
+  {
+    "name": "phase4-api",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.264
+  }
+]
