@@ -1,0 +1,23 @@
+{
+  "checks": [
+    {
+      "producer": "sdk",
+      "exit_code": 1,
+      "expected_refusal": true,
+      "reason": "third-party/native binary distribution audit is incomplete",
+      "source_clean": true,
+      "output_created": false
+    },
+    {
+      "producer": "app",
+      "exit_code": 1,
+      "expected_refusal": true,
+      "reason": "third-party/native binary distribution audit is incomplete",
+      "source_clean": true,
+      "output_created": false
+    }
+  ],
+  "metadata_sha256": "f2f0882a19c0d6ccae08de16fb033c8497a7ffe43164e8f4194179487824c33d",
+  "audit_unchanged": true,
+  "publication_unchanged": true
+}

@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "cf0e3b35ae07752e711e7064ad1dcfaf",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "4b42fb89948b8abf0f2f65970fb5980987c1af0c",
+    "branch": "codex/macos-distribution-delta"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "85232780ba11e485",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Duplicate, ambiguous check names in audit evidence",
+      "message": "The candidate-packet.json `checks` array lists forma/luma/pulse package/zip/extract/signature steps twice (the original run and the font-notice repackage), and `controller_attempt_records` duplicates the entire list. Names are not unique, so consumers keyed by name cannot tell which entry corresponds to the final candidate. README claims 67 steps, and packet-check.json also says 67, but the array contains more entries than that.",
+      "suggestion": "Give each check a unique id or attempt/phase field (e.g. \"phase\":\"initial\"/\"repackage\") and verify the stated count against the array length with a script.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "docs/reports/macos-v1-distribution/candidate-packet.json",
+          "lines": {
+            "start": 1,
+            "end": 1000
+          }
+        }
+      ],
+      "tags": [
+        "data-integrity",
+        "audit-evidence"
+      ],
+      "evidence": "\"checks\": [\n    {\n      \"name\": \"sdk-export\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5940,
+    "totalMs": 6075
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 15,
+    "bytes": 181852,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 100399,
+        "output": 376,
+        "costUSD": 0.204558
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

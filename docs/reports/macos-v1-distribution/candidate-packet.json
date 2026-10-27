@@ -1,0 +1,918 @@
+{
+  "source_commit": "4b42fb89948b8abf0f2f65970fb5980987c1af0c",
+  "sdk_archive": "vellum-v1.0.0-audit-sdk.tar.gz",
+  "sdk_sha256": "e6556ceaefb9b6d4e1fb911598f80fb33d56ebb5a4b32c89dd01b40267fa9e9a",
+  "baseline_sdk_sha256": "28a95b5c2354673d97161df30e828008a5aa18465ce18545a42e8caf0a82f269",
+  "baseline_audit_record_sha256": "c86448a24e5ece322e648cb1bb9011c5b2c24e74152fa553b232a3ab53a114e1",
+  "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "private": true,
+  "distribution_audit": "pending",
+  "publication_authorized": false,
+  "runtime_executed": false,
+  "apps": [
+    {
+      "id": "notes",
+      "name": "Vellum Notes",
+      "identifier": "com.dshills.vellum.notes.personal",
+      "archive": "Vellum Notes.zip",
+      "archive_sha256": "b0a450c85fc21b562755362c41e05a8f69772a2656060803bdf3750ebc1b1f68",
+      "source_binary_sha256": "dd199fe0efbd41dbdc0e604bec6949e80d4d900782d690450901e19a4ceaef26",
+      "packaged_binary_sha256": "91529ccbf02fdcee1b1296284685470de7ab4db15a831729df20db4f263dc415",
+      "notice_inventory_sha256": "1f97565f1ad9bbb6e7099819c3237f00c90281e07efb802e69e12d112f5ce7ac",
+      "notice_files": 418,
+      "notice_components": 275,
+      "added_notice_files": [],
+      "selected_assets_delta": {
+        "comparison": "same example target",
+        "selected_embeds": 4441,
+        "reference_embeds": 4441,
+        "added": [],
+        "changed": [],
+        "not_selected_from_reference": 0
+      },
+      "module_origins": {
+        "cogentcore.org/core": "drivers/cogent/build/upstream",
+        "github.com/dshills/vellum": ".",
+        "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+        "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+        "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+        "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+        "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+        "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+        "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+      },
+      "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+      "link_observation_sha256": "613b7606d94e76446785831a241361b311101db9448b049b23714ae5f6dc89e3",
+      "build_inputs_sha256": "1ed961cb80906c1bdf56c4da90b0a68610e34d9b37b8bf293f3b1784913df685",
+      "extracted_signature": "pass",
+      "runtime_executed": false,
+      "generated_font_source": []
+    },
+    {
+      "id": "widgets",
+      "name": "Vellum Mac Widgets",
+      "identifier": "com.dshills.vellum.widgets.v1",
+      "archive": "Vellum Mac Widgets.zip",
+      "archive_sha256": "5c6ec0f69c62490e86bd080b03a9e11fb910928c5718a6aebfbc58f5e8067672",
+      "source_binary_sha256": "693b850cfc5f5fe671fcedc7972e5e22c5b063ddfce3b1d11c49ba8dea4cda03",
+      "packaged_binary_sha256": "815cb5081e285482e8c5f3d89f3aac9ee52cce5a77a23ca8ed1eaf1bb43e0571",
+      "notice_inventory_sha256": "b6b28f63d2edb7d75aa2883cd5d2d025a3d33d08f72b5450d7d4aa0775e53fd5",
+      "notice_files": 418,
+      "notice_components": 274,
+      "added_notice_files": [],
+      "selected_assets_delta": {
+        "comparison": "same example target",
+        "selected_embeds": 4441,
+        "reference_embeds": 4441,
+        "added": [],
+        "changed": [],
+        "not_selected_from_reference": 0
+      },
+      "module_origins": {
+        "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+        "github.com/dshills/vellum": ".",
+        "cogentcore.org/core": "drivers/cogent/build/upstream",
+        "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+        "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+        "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+        "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+        "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+        "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+      },
+      "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+      "link_observation_sha256": "754631aa0ff4c4379aea232c8530af28c68f6c8ac61ccc3a5687ca89abd456c9",
+      "build_inputs_sha256": "12b7b691e72f8b3fd92903ebf53721959d86ff5ba0a784c5b1bf3f71e6249af8",
+      "extracted_signature": "pass",
+      "runtime_executed": false,
+      "generated_font_source": []
+    },
+    {
+      "generated_font_source": [],
+      "id": "shell",
+      "name": "Vellum Mac Shell",
+      "identifier": "com.dshills.vellum.macshell.v1",
+      "archive": "Vellum Mac Shell.zip",
+      "archive_sha256": "963dd446d90a88478b1d93060c37a2a5cd418b03a830238835d768508d83347f",
+      "source_binary_sha256": "f934be497302406e8c59471058821b9da4692154c5cff1ec4c0d948ca3c398b4",
+      "packaged_binary_sha256": "c327ce3f532fcf70361c221e4117afe6f601337b89df73314ebb76854c24376d",
+      "notice_inventory_sha256": "6a174b2beda911c25527d04d2db115785bb651f70f229adff1e5bbf419e19d72",
+      "notice_files": 418,
+      "notice_components": 275,
+      "added_notice_files": [],
+      "selected_assets_delta": {
+        "comparison": "new app; approved Placement reference only",
+        "selected_embeds": 4441,
+        "reference_embeds": 4441,
+        "added": [],
+        "changed": [],
+        "not_selected_from_reference": 0
+      },
+      "module_origins": {
+        "cogentcore.org/core": "drivers/cogent/build/upstream",
+        "github.com/dshills/vellum": ".",
+        "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+        "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+        "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+        "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+        "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+        "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+        "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+      },
+      "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+      "link_observation_sha256": "33c345ced97a6bf2eb3ff123315096cea8d14dea9ecb056c8a961c87e40f115b",
+      "build_inputs_sha256": "779e36e3fbb55a442daa0850ad57e0b857f02def9c76d4387b231bb4456655ff",
+      "extracted_signature": "pass",
+      "runtime_executed": false
+    },
+    {
+      "generated_font_source": [
+        {
+          "package": "golang.org/x/image/font/gofont/gobold",
+          "module": "golang.org/x/image",
+          "files": [
+            {
+              "file": "data.go",
+              "sha256": "fc7962ee60b083d84f22a643e1cb835735c32b48d48916a8b183b5b4571882e2"
+            }
+          ]
+        },
+        {
+          "package": "golang.org/x/image/font/gofont/goregular",
+          "module": "golang.org/x/image",
+          "files": [
+            {
+              "file": "data.go",
+              "sha256": "3c5bc52e0342e5d9f50f90cb331b64bc2227b88def55d23ed1112a71f84b821c"
+            }
+          ]
+        }
+      ],
+      "id": "forma",
+      "name": "Forma",
+      "identifier": "com.dshills.vellum.showcase.forma",
+      "archive": "Forma.zip",
+      "archive_sha256": "0af6d638ab300c728945d726d1c5825f5bfcb9cd5d582e4afe9dd0c2e55faef8",
+      "source_binary_sha256": "418d74e0f759543b706047cae43d5e0a8d51513e5e3a978bcb58e17f8a13e3cf",
+      "packaged_binary_sha256": "c793ec62e5a1d82ffa4e626e87ae6c671916c6a4910f92a1349062d5fd79232d",
+      "notice_inventory_sha256": "f367b31a9cb2f7143075f2cc31c9a9714fe3c205ba9062a75c3995d3dd95f043",
+      "notice_files": 419,
+      "notice_components": 276,
+      "added_notice_files": [
+        {
+          "file": "NOTICES/dc588a7ba9130043b67c2380cc03cc6644ed3557f6d5e8589b96acba1c64e343-Go-fonts-README",
+          "sha256": "dc588a7ba9130043b67c2380cc03cc6644ed3557f6d5e8589b96acba1c64e343",
+          "component": "Go font family"
+        }
+      ],
+      "selected_assets_delta": {
+        "comparison": "new app; approved Placement reference only",
+        "selected_embeds": 4441,
+        "reference_embeds": 4441,
+        "added": [],
+        "changed": [],
+        "not_selected_from_reference": 0
+      },
+      "module_origins": {
+        "cogentcore.org/core": "drivers/cogent/build/upstream",
+        "github.com/dshills/vellum": ".",
+        "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+        "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+        "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+        "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+        "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+        "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+        "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+      },
+      "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+      "link_observation_sha256": "9e3b96e3a5436fc8286ca51d2a08306d7606f1e6c5370cc5628cdb5d6a1b24e6",
+      "build_inputs_sha256": "6cceefa8ab40455be3f192fa7e0692200d696fe51fa5d4d003fde5d9f13016eb",
+      "extracted_signature": "pass",
+      "runtime_executed": false,
+      "compiled_font_hashes": {
+        "Go-Bold.ttf": "c18494baa7ea35b8dbfac3861787d360b9c0ab91232562371a09e6fbf09aaa40",
+        "Go-Regular.ttf": "197d9f3703b4c00af609178876a8d73e396f64fe438b2c871778566632374be3"
+      },
+      "icon_input": {
+        "file": "icons/forma.png",
+        "sha256": "add7df7ca1cf1609403a3605f031de437560aef3e3f8e063ff580b277441382a",
+        "source": "examples/showcase/demo/app_icons.go at frozen source tag"
+      }
+    },
+    {
+      "generated_font_source": [
+        {
+          "package": "golang.org/x/image/font/gofont/gobold",
+          "module": "golang.org/x/image",
+          "files": [
+            {
+              "file": "data.go",
+              "sha256": "fc7962ee60b083d84f22a643e1cb835735c32b48d48916a8b183b5b4571882e2"
+            }
+          ]
+        },
+        {
+          "package": "golang.org/x/image/font/gofont/goregular",
+          "module": "golang.org/x/image",
+          "files": [
+            {
+              "file": "data.go",
+              "sha256": "3c5bc52e0342e5d9f50f90cb331b64bc2227b88def55d23ed1112a71f84b821c"
+            }
+          ]
+        }
+      ],
+      "id": "luma",
+      "name": "Luma",
+      "identifier": "com.dshills.vellum.showcase.luma",
+      "archive": "Luma.zip",
+      "archive_sha256": "479d070b96ad36108be6da6e98e731c80b75d5a2a728f3aa5f586f4666f7354b",
+      "source_binary_sha256": "7ccb7ea20d87111754e08ffedbaaf3adf58d56235da77c9d12c970cf29c2f765",
+      "packaged_binary_sha256": "4d14dd5dadb39d71ff66e215dfaeb757701827fb01be737978dfdfc9cbaba7d4",
+      "notice_inventory_sha256": "8562ca4fbb96bf3fdb63ecf0aff5a47960425ab2eb5dbbf6f9a5fae9670ee917",
+      "notice_files": 419,
+      "notice_components": 276,
+      "added_notice_files": [
+        {
+          "file": "NOTICES/dc588a7ba9130043b67c2380cc03cc6644ed3557f6d5e8589b96acba1c64e343-Go-fonts-README",
+          "sha256": "dc588a7ba9130043b67c2380cc03cc6644ed3557f6d5e8589b96acba1c64e343",
+          "component": "Go font family"
+        }
+      ],
+      "selected_assets_delta": {
+        "comparison": "new app; approved Placement reference only",
+        "selected_embeds": 4441,
+        "reference_embeds": 4441,
+        "added": [],
+        "changed": [],
+        "not_selected_from_reference": 0
+      },
+      "module_origins": {
+        "cogentcore.org/core": "drivers/cogent/build/upstream",
+        "github.com/dshills/vellum": ".",
+        "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+        "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+        "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+        "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+        "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+        "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+        "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+      },
+      "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+      "link_observation_sha256": "a8808c12ed2a1e9e4a2008971a03111e77d9ef708888579766bf8a6829cc30aa",
+      "build_inputs_sha256": "7384678392487dcca44c0f69afccb426e0b989c8e5369a7a40a32eda92c58b43",
+      "extracted_signature": "pass",
+      "runtime_executed": false,
+      "compiled_font_hashes": {
+        "Go-Bold.ttf": "c18494baa7ea35b8dbfac3861787d360b9c0ab91232562371a09e6fbf09aaa40",
+        "Go-Regular.ttf": "197d9f3703b4c00af609178876a8d73e396f64fe438b2c871778566632374be3"
+      },
+      "icon_input": {
+        "file": "icons/luma.png",
+        "sha256": "684a91a929660ce5c30d7e9bc90be67f08d1165566ffef3f8be23bd8197958ae",
+        "source": "examples/showcase/demo/app_icons.go at frozen source tag"
+      }
+    },
+    {
+      "generated_font_source": [
+        {
+          "package": "golang.org/x/image/font/gofont/gobold",
+          "module": "golang.org/x/image",
+          "files": [
+            {
+              "file": "data.go",
+              "sha256": "fc7962ee60b083d84f22a643e1cb835735c32b48d48916a8b183b5b4571882e2"
+            }
+          ]
+        },
+        {
+          "package": "golang.org/x/image/font/gofont/goregular",
+          "module": "golang.org/x/image",
+          "files": [
+            {
+              "file": "data.go",
+              "sha256": "3c5bc52e0342e5d9f50f90cb331b64bc2227b88def55d23ed1112a71f84b821c"
+            }
+          ]
+        }
+      ],
+      "id": "pulse",
+      "name": "Pulse",
+      "identifier": "com.dshills.vellum.showcase.pulse",
+      "archive": "Pulse.zip",
+      "archive_sha256": "5311bc88c8cc22583ada0681641c83f565955cc1d71955222bd985dbd8e3f0fb",
+      "source_binary_sha256": "5975395fa4803ac84d844c9ec3453471d1bc8d659a9da7340029f187c5adf7ac",
+      "packaged_binary_sha256": "10d25f4f63389e1d4b84df5729c7e3d26829ba3bc5a0262d07619331de14da43",
+      "notice_inventory_sha256": "3d904f8cafd7c8e8812d81eca3018dd01d63e3174384247add8ebf88de399f3b",
+      "notice_files": 419,
+      "notice_components": 276,
+      "added_notice_files": [
+        {
+          "file": "NOTICES/dc588a7ba9130043b67c2380cc03cc6644ed3557f6d5e8589b96acba1c64e343-Go-fonts-README",
+          "sha256": "dc588a7ba9130043b67c2380cc03cc6644ed3557f6d5e8589b96acba1c64e343",
+          "component": "Go font family"
+        }
+      ],
+      "selected_assets_delta": {
+        "comparison": "new app; approved Placement reference only",
+        "selected_embeds": 4441,
+        "reference_embeds": 4441,
+        "added": [],
+        "changed": [],
+        "not_selected_from_reference": 0
+      },
+      "module_origins": {
+        "cogentcore.org/core": "drivers/cogent/build/upstream",
+        "github.com/dshills/vellum": ".",
+        "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+        "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+        "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+        "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+        "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+        "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+        "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+      },
+      "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+      "link_observation_sha256": "0e83ef4a775ef24f155f249e53d6608e3b544c3feee13a3f1cf2ef290d0ae6e3",
+      "build_inputs_sha256": "61fd08e395994cd108aacb15b6fd95264b8e0946fb6e85b2dc8b2afd97b8ee19",
+      "extracted_signature": "pass",
+      "runtime_executed": false,
+      "compiled_font_hashes": {
+        "Go-Bold.ttf": "c18494baa7ea35b8dbfac3861787d360b9c0ab91232562371a09e6fbf09aaa40",
+        "Go-Regular.ttf": "197d9f3703b4c00af609178876a8d73e396f64fe438b2c871778566632374be3"
+      },
+      "icon_input": {
+        "file": "icons/pulse.png",
+        "sha256": "2771816f0a37336bf32d191497e8ce4663acb4766726e26fc7bde864080f332c",
+        "source": "examples/showcase/demo/app_icons.go at frozen source tag"
+      }
+    }
+  ],
+  "checks": [
+    {
+      "name": "sdk-export",
+      "exit_code": 0,
+      "seconds": 7.529,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/sdk-export",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "icons",
+      "exit_code": 0,
+      "seconds": 32.54,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/icons",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "go-root",
+      "exit_code": 0,
+      "seconds": 0.009,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/go-root",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "notes-graph",
+      "exit_code": 0,
+      "seconds": 0.506,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/notes-graph",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "notes-origins",
+      "exit_code": 0,
+      "seconds": 0.018,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/notes-origins",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "notes-baseline-graph",
+      "exit_code": 0,
+      "seconds": 0.565,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/notes-baseline-graph",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "notes-build",
+      "exit_code": 0,
+      "seconds": 4.439,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/notes-build",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "notes-package",
+      "exit_code": 0,
+      "seconds": 0.638,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/notes-package",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "notes-zip",
+      "exit_code": 0,
+      "seconds": 1.32,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/notes-zip",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "notes-extract",
+      "exit_code": 0,
+      "seconds": 0.165,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/notes-extract",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "notes-signature",
+      "exit_code": 0,
+      "seconds": 0.078,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/notes-signature",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "widgets-graph",
+      "exit_code": 0,
+      "seconds": 0.398,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/widgets-graph",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "widgets-origins",
+      "exit_code": 0,
+      "seconds": 0.016,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/widgets-origins",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "widgets-baseline-graph",
+      "exit_code": 0,
+      "seconds": 0.332,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/widgets-baseline-graph",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "widgets-build",
+      "exit_code": 0,
+      "seconds": 4.231,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/widgets-build",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "widgets-package",
+      "exit_code": 0,
+      "seconds": 0.631,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/widgets-package",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "widgets-zip",
+      "exit_code": 0,
+      "seconds": 1.286,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/widgets-zip",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "widgets-extract",
+      "exit_code": 0,
+      "seconds": 0.152,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/widgets-extract",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "widgets-signature",
+      "exit_code": 0,
+      "seconds": 0.072,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/widgets-signature",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "shell-graph",
+      "exit_code": 0,
+      "seconds": 0.38,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/shell-graph",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "shell-origins",
+      "exit_code": 0,
+      "seconds": 0.017,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/shell-origins",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "shell-baseline-graph",
+      "exit_code": 0,
+      "seconds": 0.347,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/shell-baseline-graph",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "shell-build",
+      "exit_code": 0,
+      "seconds": 3.203,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/shell-build",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "shell-package",
+      "exit_code": 0,
+      "seconds": 0.593,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/shell-package",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "shell-zip",
+      "exit_code": 0,
+      "seconds": 1.227,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/shell-zip",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "shell-extract",
+      "exit_code": 0,
+      "seconds": 0.153,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/shell-extract",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "shell-signature",
+      "exit_code": 0,
+      "seconds": 0.075,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/shell-signature",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "forma-graph",
+      "exit_code": 0,
+      "seconds": 0.442,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/forma-graph",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "forma-origins",
+      "exit_code": 0,
+      "seconds": 0.018,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/forma-origins",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "forma-baseline-graph",
+      "exit_code": 0,
+      "seconds": 0.361,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/forma-baseline-graph",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "forma-build",
+      "exit_code": 0,
+      "seconds": 3.249,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/forma-build",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "forma-package",
+      "exit_code": 0,
+      "seconds": 0.755,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/forma-package",
+      "final_candidate_evidence": false
+    },
+    {
+      "name": "forma-zip",
+      "exit_code": 0,
+      "seconds": 1.237,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/forma-zip",
+      "final_candidate_evidence": false
+    },
+    {
+      "name": "forma-extract",
+      "exit_code": 0,
+      "seconds": 0.152,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/forma-extract",
+      "final_candidate_evidence": false
+    },
+    {
+      "name": "forma-signature",
+      "exit_code": 0,
+      "seconds": 0.073,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/forma-signature",
+      "final_candidate_evidence": false
+    },
+    {
+      "name": "luma-graph",
+      "exit_code": 0,
+      "seconds": 0.411,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/luma-graph",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "luma-origins",
+      "exit_code": 0,
+      "seconds": 0.017,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/luma-origins",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "luma-baseline-graph",
+      "exit_code": 0,
+      "seconds": 0.336,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/luma-baseline-graph",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "luma-build",
+      "exit_code": 0,
+      "seconds": 3.219,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/luma-build",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "luma-package",
+      "exit_code": 0,
+      "seconds": 0.82,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/luma-package",
+      "final_candidate_evidence": false
+    },
+    {
+      "name": "luma-zip",
+      "exit_code": 0,
+      "seconds": 1.249,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/luma-zip",
+      "final_candidate_evidence": false
+    },
+    {
+      "name": "luma-extract",
+      "exit_code": 0,
+      "seconds": 0.165,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/luma-extract",
+      "final_candidate_evidence": false
+    },
+    {
+      "name": "luma-signature",
+      "exit_code": 0,
+      "seconds": 0.073,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/luma-signature",
+      "final_candidate_evidence": false
+    },
+    {
+      "name": "pulse-graph",
+      "exit_code": 0,
+      "seconds": 0.4,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/pulse-graph",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "pulse-origins",
+      "exit_code": 0,
+      "seconds": 0.018,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/pulse-origins",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "pulse-baseline-graph",
+      "exit_code": 0,
+      "seconds": 0.379,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/pulse-baseline-graph",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "pulse-build",
+      "exit_code": 0,
+      "seconds": 3.117,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/pulse-build",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "pulse-package",
+      "exit_code": 0,
+      "seconds": 0.793,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/pulse-package",
+      "final_candidate_evidence": false
+    },
+    {
+      "name": "pulse-zip",
+      "exit_code": 0,
+      "seconds": 1.335,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/pulse-zip",
+      "final_candidate_evidence": false
+    },
+    {
+      "name": "pulse-extract",
+      "exit_code": 0,
+      "seconds": 0.145,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/pulse-extract",
+      "final_candidate_evidence": false
+    },
+    {
+      "name": "pulse-signature",
+      "exit_code": 0,
+      "seconds": 0.071,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/pulse-signature",
+      "final_candidate_evidence": false
+    },
+    {
+      "name": "starter-generate",
+      "exit_code": 0,
+      "seconds": 0.117,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/starter-generate",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "starter-test",
+      "exit_code": 0,
+      "seconds": 37.684,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/starter-test",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "starter-build",
+      "exit_code": 0,
+      "seconds": 3.425,
+      "phase": "initial-candidate",
+      "check_id": "initial-candidate/starter-build",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "font-byte-proof",
+      "exit_code": 0,
+      "seconds": 0.343,
+      "phase": "font-notice-correction",
+      "check_id": "font-notice-correction/font-byte-proof",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "forma-package",
+      "exit_code": 0,
+      "seconds": 0.764,
+      "phase": "font-notice-correction",
+      "check_id": "font-notice-correction/forma-package",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "forma-zip",
+      "exit_code": 0,
+      "seconds": 1.218,
+      "phase": "font-notice-correction",
+      "check_id": "font-notice-correction/forma-zip",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "forma-extract",
+      "exit_code": 0,
+      "seconds": 0.147,
+      "phase": "font-notice-correction",
+      "check_id": "font-notice-correction/forma-extract",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "forma-signature",
+      "exit_code": 0,
+      "seconds": 0.072,
+      "phase": "font-notice-correction",
+      "check_id": "font-notice-correction/forma-signature",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "luma-package",
+      "exit_code": 0,
+      "seconds": 0.807,
+      "phase": "font-notice-correction",
+      "check_id": "font-notice-correction/luma-package",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "luma-zip",
+      "exit_code": 0,
+      "seconds": 1.286,
+      "phase": "font-notice-correction",
+      "check_id": "font-notice-correction/luma-zip",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "luma-extract",
+      "exit_code": 0,
+      "seconds": 0.143,
+      "phase": "font-notice-correction",
+      "check_id": "font-notice-correction/luma-extract",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "luma-signature",
+      "exit_code": 0,
+      "seconds": 0.07,
+      "phase": "font-notice-correction",
+      "check_id": "font-notice-correction/luma-signature",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "pulse-package",
+      "exit_code": 0,
+      "seconds": 1.176,
+      "phase": "font-notice-correction",
+      "check_id": "font-notice-correction/pulse-package",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "pulse-zip",
+      "exit_code": 0,
+      "seconds": 1.226,
+      "phase": "font-notice-correction",
+      "check_id": "font-notice-correction/pulse-zip",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "pulse-extract",
+      "exit_code": 0,
+      "seconds": 0.148,
+      "phase": "font-notice-correction",
+      "check_id": "font-notice-correction/pulse-extract",
+      "final_candidate_evidence": true
+    },
+    {
+      "name": "pulse-signature",
+      "exit_code": 0,
+      "seconds": 0.074,
+      "phase": "font-notice-correction",
+      "check_id": "font-notice-correction/pulse-signature",
+      "final_candidate_evidence": true
+    }
+  ],
+  "asset_directory": "final",
+  "font_notice": {
+    "module": "golang.org/x/image",
+    "version": "v0.44.0",
+    "file": "font/gofont/ttfs/README",
+    "sha256": "dc588a7ba9130043b67c2380cc03cc6644ed3557f6d5e8589b96acba1c64e343",
+    "compiled_fonts": {
+      "Go-Bold.ttf": "c18494baa7ea35b8dbfac3861787d360b9c0ab91232562371a09e6fbf09aaa40",
+      "Go-Regular.ttf": "197d9f3703b4c00af609178876a8d73e396f64fe438b2c871778566632374be3"
+    },
+    "scope": "Original font-specific notice absent from alpha.3 bundle; now included in the three showcase apps. Module root Go Authors notice alone did not carry this font-specific copyright."
+  },
+  "retained_pre_sign_inputs": {
+    "file": "PRE_SIGN_INPUTS.tar.gz",
+    "sha256": "44ea387d626e9548e0cee9d8215d8179e3e16ffcfc3e950b1553cad9078ba678",
+    "scope": "Private audit/build inputs only; never a proposed public asset. Reconstruct each notice directory with exactly the files named by its INVENTORY, not the entire shared superset."
+  },
+  "source_tag": "v1.0.0",
+  "prepared_on": "2026-10-27",
+  "runtime_execution_scope": "No target app launched; only the non-UI icon/font utilities and generated starter test binary ran.",
+  "native_components_unchanged": 82,
+  "go_module_count": 89,
+  "notice_component_count_semantics": "App inventory entries include baseline components plus explicit current-graph/owned-module aliases. Their higher counts are references, not additional third-party modules or native crates.",
+  "historical_controller_records": {
+    "archive": "evidence.tar.gz",
+    "prefix": "controller/",
+    "scope": "Original failed cache/controller attempts and superseded successful stages are retained separately; final check IDs have explicit phases and final-evidence flags."
+  },
+  "schema": 1,
+  "packet_kind": "private-macos-distribution-audit"
+}

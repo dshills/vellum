@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "docs/README.md,docs/reports/macos-v1-distribution/CANDIDATE_SHA256SUMS,docs/reports/macos-v1-distribution/Go-fonts-NOTICE.txt,docs/reports/macos-v1-distribution/PUBLICATION_DRAFT.md,docs/reports/macos-v1-distribution/README.md,docs/reports/macos-v1-distribution/REPRODUCE.md,docs/reports/macos-v1-distribution/candidate-packet.json,docs/reports/macos-v1-distribution/evidence-index.json,docs/reports/macos-v1-distribution/evidence.tar.gz,docs/reports/macos-v1-distribution/font-binary-proof.json,docs/reports/macos-v1-distribution/guard-proof.json,docs/reports/macos-v1-distribution/packet-check.json,docs/reports/macos-v1-distribution/preparation-comparison.json,docs/reports/macos-v1-distribution/reused-ci.json,docs/reports/macos-v1-distribution/rights-disposition.json,docs/reports/macos-v1-distribution/sdk-delta.json,docs/reviews/macos-v1-distribution/README.md,docs/reviews/macos-v1-distribution/initial-prism.json,docs/reviews/macos-v1-distribution/initial-receipt.json,specs/release.md",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "6",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/macos-v1-distribution-final/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/macos-v1-distribution-final/prism.json"
+  ],
+  "cwd": "/Users/dshills/Development/projects/Vellum",
+  "started_utc": "2026-10-27T07:33:08.635070+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 1,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 58091,
+  "group": 58091,
+  "owned": {
+    "created": true,
+    "pid": 58091,
+    "group": 58091,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 1,
+    "errors": [],
+    "observation": {
+      "group": 58091,
+      "members": [],
+      "observation_sha256": "45f8796456c332b243180f7b0a497574b427596a5fad6d3366263ccd97a81635"
+    }
+  },
+  "seconds": 6.118636541068554,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

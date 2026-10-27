@@ -679,3 +679,23 @@ producer's successful return and validate the returned/manifest hashes; director
 watchers are not a release handoff. A later source change or transient reversal
 cannot be atomically excluded by these filesystem/Git samples. Distribution of
 the resulting artifacts is a separate owner-authorized action.
+
+## Current macOS v1 delta-audit packet
+
+The owner requested a delta audit and publication packet on 27 October 2026.
+[The packet](../docs/reports/macos-v1-distribution/README.md) freezes product
+source at the v1.0.0 tag (4b42fb8), compares the actual published alpha.3 SDK
+and original owner-approved notices, and records six new private app candidates
+plus a private SDK using the same approved native-archive bytes. Dependency
+versions/declarations and the 82-component native notice tree match. The three
+showcases additionally link Go-font byte arrays; their original font-family
+notice is now attached, and exact font/notice/binary bindings are recorded.
+
+This is preparation for owner review, not a distribution approval. Existing
+release audit/publication fields, producer guards and source tag remain unchanged.
+No target app launch, public asset, signing identity or notarization is part of
+this checkpoint. Public production and final asset publication remain distinct
+subsequent decisions. Reuse unchanged implementation/runtime/CI evidence within
+its recorded source and binary scope; perform focused final public-consumer and
+launch checks before publication. Candidate hashes identify private audit bytes,
+not future public archives whose metadata/signing may differ.

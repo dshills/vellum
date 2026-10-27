@@ -1,0 +1,55 @@
+{
+  "audit_status": "pending-owner-review",
+  "publication_authorized": false,
+  "prepared_on": "2026-10-27",
+  "baseline_approval": "release/macos-preview-audit.json",
+  "baseline_approval_sha256": "c86448a24e5ece322e648cb1bb9011c5b2c24e74152fa553b232a3ab53a114e1",
+  "items": [
+    {
+      "item": "Native WGPU/Rust/header/toolchain component bundle",
+      "status": "byte-identical-to-approved-reference",
+      "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+      "components": 82,
+      "disposition": "Carry forward exact input/notice evidence; new payload approval still required."
+    },
+    {
+      "item": "Effective SDK Go module graph",
+      "status": "unchanged-versions-and-declarations",
+      "modules_before": 89,
+      "modules_after": 89,
+      "disposition": "All 89 module/version/sum/notice identities match alpha.3; new first-party application modules have their original MIT declarations."
+    },
+    {
+      "item": "Prepared Core/typesetting source",
+      "status": "modified-by-reviewed-first-party-patches",
+      "core_added": 3,
+      "core_changed": 6,
+      "typesetting_changed": 0,
+      "disposition": "Public checksum-verified preparation reproduces all 6033 Core and 299 typesetting candidate files exactly. Upstream versions and declaration texts unchanged."
+    },
+    {
+      "item": "Go Regular and Go Bold in showcase binaries",
+      "status": "new-linked-font-material-notice-gap-corrected",
+      "notice_sha256": "dc588a7ba9130043b67c2380cc03cc6644ed3557f6d5e8589b96acba1c64e343",
+      "disposition": "Original Bigelow & Holmes font-family notice added only to Forma/Luma/Pulse; compiled TTF arrays match pinned module TTF files. Candidate notice counts become 419, with no product-code change. Owner review must cover this added material."
+    },
+    {
+      "item": "Original full-color icons and procedural artwork",
+      "status": "first-party-source-generated",
+      "disposition": "Source is frozen at v1.0.0, covered by existing example MIT files. No personal photos, externally generated artwork or Apple application assets are included."
+    },
+    {
+      "item": "objc2 Apple-SDK-derived binding caveat",
+      "status": "same-native-input-existing-owner-decision-not-new-rights-grant",
+      "source": "https://raw.githubusercontent.com/madsmtm/objc2/objc2-0.6.4/LICENSE.md",
+      "disposition": "Pinned upstream note rechecked 27 October; caveat remains. Existing alpha.3 owner decision covers the same native archive. Explicit owner decision for current payload must retain its treatment; seek additional rights advice if that disposition is insufficient."
+    },
+    {
+      "item": "Signing and notarization",
+      "status": "ad-hoc-private-candidates-only",
+      "disposition": "No Developer ID credentials, hardened-runtime changes, Apple submission, notarization or publication authorized by this packet."
+    }
+  ],
+  "owner_decision_needed": "Review current contents, the new font notice and carried-forward dispositions, then approve or decline the updated distribution audit. This packet does not supply that approval.",
+  "final_publication_needed": "After audit approval is recorded and committed, run guarded public producers, verify final bytes and request explicit publication approval for final asset hashes. Do not upload these private candidates or move the existing v1.0.0 source tag."
+}
