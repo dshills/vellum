@@ -1,0 +1,32 @@
+{
+  "checked_at_utc": "2026-10-27T21:23:22.603250+00:00",
+  "checks": [
+    {
+      "argv": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        "--verbose=2",
+        "/private/tmp/vellum-forge-delivery-20261027-build6/Vellum Forge.app"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "/private/tmp/vellum-forge-delivery-20261027-build6/Vellum Forge.app: valid on disk\n/private/tmp/vellum-forge-delivery-20261027-build6/Vellum Forge.app: satisfies its Designated Requirement\n"
+    },
+    {
+      "argv": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        "--verbose=2",
+        "/private/tmp/vellum-forge-delivery-20261027-build6/extracted/Vellum Forge.app"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "/private/tmp/vellum-forge-delivery-20261027-build6/extracted/Vellum Forge.app: valid on disk\n/private/tmp/vellum-forge-delivery-20261027-build6/extracted/Vellum Forge.app: satisfies its Designated Requirement\n"
+    }
+  ],
+  "source_binding": "Existing package.py checks clean source HEAD before and after building, writes the pinned source manifest only after signing and verifying the exact ZIP extraction. Signature validity alone does not attest source provenance."
+}

@@ -22,7 +22,7 @@ browser, live depth-rendered 3D assembly and orientation cube, unit expressions,
 feature strip, and undoable body edits. Full-color icons and native titlebar
 controls complement the managed Mac-themed interface.
 
-![Forge Mac design workbench with a live 3D assembly, flat full-color tools, browser and inspector](docs/screenshots/forge.jpg)
+![Forge Mac design workbench with a compact grouped ribbon, browser outline and feature icon strip](docs/screenshots/forge-fidelity.jpg)
 
 Run: `(cd examples/forge && go run .)`
 

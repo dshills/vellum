@@ -1,0 +1,762 @@
+{
+  "source_commit": "ad207e218e4e16106067920b4d82f135baa459de",
+  "native_method": "existing owner-approved Forge-only macOS helper; physical CGEvent input, native AX state",
+  "automated_routing_is_separate": true,
+  "quiet_window": {
+    "start_utc": "2026-10-27T21:17:27Z",
+    "final_state_utc": "2026-10-27T21:18:43Z",
+    "authorized_minutes": 3
+  },
+  "final_pid": 6534,
+  "final_window": {
+    "height": 972,
+    "width": 1458,
+    "x": 2975,
+    "y": 199
+  },
+  "final_status": "Ready \u00b7 Local, in-memory document    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+  "geometry": {
+    "Design tools": [
+      0,
+      40,
+      1458,
+      113
+    ],
+    "Feature history": [
+      0,
+      907,
+      1458,
+      37
+    ],
+    "Select Sliding carriage": [
+      71,
+      329,
+      162,
+      29
+    ]
+  },
+  "screenshot": {
+    "file": "docs/screenshots/forge-fidelity.jpg",
+    "format": "JPEG",
+    "width": 1458,
+    "height": 972,
+    "sha256": "f376a4541713c53ed7d095533aab9d2ef0cd149e064c0e2afdb7bedb9bacf1a3"
+  },
+  "raw_records": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/fusion-fidelity",
+  "records": [
+    {
+      "record": "05-ribbon-add.json",
+      "sha256": "54fc05327b58ae167dab164caa94f5ed7f245f18ccfa4b26882f50925f4d1cd9",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Ready \u00b7 Local, in-memory document    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Create body    \u00b7    8 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Body 8"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft",
+        "Create New body"
+      ]
+    },
+    {
+      "record": "06-add-undo.json",
+      "sha256": "2210b1fbe394ceabdb27f3f7c62b88fa41731c8a86bb994d979cf9166ba084f3",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Create body    \u00b7    8 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Create body    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "07-add-redo.json",
+      "sha256": "932fac8bc006a6d92b8b35c30ad5c9e2be84700d07a7e6fc44ea1bb28f9a8d91",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Undid Create body    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Create body    \u00b7    8 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Body 8"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft",
+        "Create New body"
+      ]
+    },
+    {
+      "record": "08-add-restored.json",
+      "sha256": "f0a465390a63e5bcf01b1d15bc8a1e967bc91913a4edd7bb9515e7bcb22f5db6",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Create body    \u00b7    8 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Create body    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "09-select-housing.json",
+      "sha256": "08d2228f9723bfdf0e6bb2cc0cf3d5ebf71e68961d1d30f9cf3c57b5673801bc",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Undid Create body    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Create body    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Motor housing"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "10-eye-carriage.json",
+      "sha256": "f8e8fb0c341917ddd7aa1da9181fb70626737e6f5b54b4fa2807e9afd5a4dedb",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Undid Create body    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Change body visibility    \u00b7    7 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Motor housing"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "11-eye-undo.json",
+      "sha256": "bb5a40126a1eb1eaf7bf4b268f685708ec003b5057deab0c3418e89613df07b0",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Change body visibility    \u00b7    7 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Change body visibility    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Motor housing"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "12-active-carriage.json",
+      "sha256": "ec4888c541ab6fc8eeaa5640750aa27a529252776ec5c6fe23ddf82dbafe5626",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Undid Change body visibility    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Change body visibility    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Motor housing"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "13-select-carriage.json",
+      "sha256": "54682e4a4cea7c4933bba508e006238158eefd257027fd34dc75cd58bdaa1bb2",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Undid Change body visibility    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Change body visibility    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "14-collapse.json",
+      "sha256": "f1ea16f4ca89d74bd37d233f8ac76461d80e4de11e0dc22b0a97281842931e77",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Undid Change body visibility    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Change body visibility    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "15-expand.json",
+      "sha256": "854cd6adc92d3873d2cf86d5243ddc624e4069d4b47c2697d5c7b437bd8edd94",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Undid Change body visibility    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Change body visibility    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "16-timeline-select.json",
+      "sha256": "fa061c173778f4a53fb428a4c3d6ecd9d11431afa046c6f1ee9eac35eedd36f2",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Undid Change body visibility    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Change body visibility    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "17-timeline-earlier.json",
+      "sha256": "24e2a1e8083e8fd257db0a4d990240509fb052d38afe725cac7368c6063ed0c1",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Undid Change body visibility    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Reorder feature    \u00b7    7 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Sliding carriage",
+        "Create Motor housing",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "18-earlier-undo.json",
+      "sha256": "cdd7f83fbd31987e7dcb24cc17769ec82e4aa94c5571610d56234beb04fab8f4",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Reorder feature    \u00b7    7 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Reorder feature    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "19-earlier-redo.json",
+      "sha256": "8da67d52e738d0d205c5f287b6b1e0d95d83e4f7b47cc6e6edaf6b11e3e278a5",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Undid Reorder feature    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Reorder feature    \u00b7    7 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Sliding carriage",
+        "Create Motor housing",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "20-earlier-restored.json",
+      "sha256": "0f5863a883cbd957d6c7d6af466dcad33e0ee370593a6f6c5cb303b0717723ae",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Reorder feature    \u00b7    7 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Reorder feature    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "21-marker-back.json",
+      "sha256": "11abd8df329d8832ac25431486e8baf06a0a15933e837932b468d40223c4f849",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Undid Reorder feature    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Move feature marker    \u00b7    7 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft \u00b7 paused"
+      ]
+    },
+    {
+      "record": "22-marker-undo.json",
+      "sha256": "02da168743739b8507042c65466a568fcd08324319bee2293fc3ba9ba2b1377f",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Move feature marker    \u00b7    7 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Move feature marker    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "23-marker-redo.json",
+      "sha256": "b60f03cf04bc5a366417b0a24c3c59ef11dc5287fad92a846c34a44ce9e59523",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Undid Move feature marker    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Move feature marker    \u00b7    7 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft \u00b7 paused"
+      ]
+    },
+    {
+      "record": "24-marker-restored.json",
+      "sha256": "00704b5d8cacf0cd934bf49ec81343adab490d1c3e3b0553737a7a690adbe6da",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Move feature marker    \u00b7    7 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Move feature marker    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "25-timeline-later.json",
+      "sha256": "23cf961089cd000642d6a116af08d28766f544a7e618a2ea4e36853372584e85",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Undid Move feature marker    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Reorder feature    \u00b7    7 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create End support",
+        "Create Sliding carriage",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "26-later-restored.json",
+      "sha256": "7edc968e59428abb5968ea855e563ed095ab456126b0f9dd1a6b7179ae3388a8",
+      "accepted": true,
+      "pid": 1676,
+      "before": "Reorder feature    \u00b7    7 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Reorder feature    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "27-marker-back-again.json",
+      "sha256": "27ce96642d5993b98bf60552f0935db87f5b3c0aab1be29dde22f2f9650050b0",
+      "accepted": false,
+      "pid": 1676,
+      "before": "Undid Reorder feature    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Move feature marker    \u00b7    7 bodies    \u00b7    Undo 2 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support \u00b7 paused",
+        "Create Drive shaft \u00b7 paused"
+      ]
+    },
+    {
+      "record": "28-marker-forward.json",
+      "sha256": "d8ed37515777bb800a2bd095a8cd109191201a4adcd0ba298636a103d79003fc",
+      "accepted": false,
+      "pid": 1676,
+      "before": "Move feature marker    \u00b7    7 bodies    \u00b7    Undo 2 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Move feature marker    \u00b7    7 bodies    \u00b7    Undo 3 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft \u00b7 paused"
+      ]
+    },
+    {
+      "record": "29-keyboard-tab.json",
+      "sha256": "1fe27a7968a9a6f21b1b51dc67f3ae6833ff36d3675f3367cdbd89264b113646",
+      "accepted": false,
+      "pid": 1676,
+      "before": "Move feature marker    \u00b7    7 bodies    \u00b7    Undo 3 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Move feature marker    \u00b7    7 bodies    \u00b7    Undo 3 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft \u00b7 paused"
+      ]
+    },
+    {
+      "record": "31-fresh-back.json",
+      "sha256": "6ac727f6b1afb085ddf0999be0f0987e07d8a18975e03357b151b527c186fedb",
+      "accepted": false,
+      "pid": 4622,
+      "before": "Ready \u00b7 Local, in-memory document    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Move feature marker    \u00b7    7 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Sliding carriage",
+        "Create Motor housing",
+        "Create End support",
+        "Create Drive shaft \u00b7 paused"
+      ]
+    },
+    {
+      "record": "32-fresh-forward.json",
+      "sha256": "0b7071d6af17a0b69a9bccfaad739f3c95e8637eba6d82ba22866b385ec98897",
+      "accepted": false,
+      "pid": 4622,
+      "before": "Reorder feature    \u00b7    7 bodies    \u00b7    Undo 2 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Move feature marker    \u00b7    7 bodies    \u00b7    Undo 3 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Sliding carriage",
+        "Create Motor housing",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "33-quiet-back.json",
+      "sha256": "fe477c0b604cd9023dab00cf514753024d3266296e91d51b2e8f98d45532cf04",
+      "accepted": true,
+      "pid": 5760,
+      "before": "Ready \u00b7 Local, in-memory document    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Move feature marker    \u00b7    7 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft \u00b7 paused"
+      ]
+    },
+    {
+      "record": "34-quiet-forward.json",
+      "sha256": "192f07ebfea1e943accaa287d4acbb627df689a8a8034447ade655736a933714",
+      "accepted": true,
+      "pid": 5760,
+      "before": "Move feature marker    \u00b7    7 bodies    \u00b7    Undo 1 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Move feature marker    \u00b7    7 bodies    \u00b7    Undo 2 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "35-quiet-earlier.json",
+      "sha256": "3e091862d6ff735fbaa999b11215e27ded058683d92c098088829b457706c551",
+      "accepted": true,
+      "pid": 5760,
+      "before": "Move feature marker    \u00b7    7 bodies    \u00b7    Undo 2 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Reorder feature    \u00b7    7 bodies    \u00b7    Undo 3 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Sliding carriage",
+        "Create Motor housing",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "36-quiet-earlier-undo.json",
+      "sha256": "b3ae1b60fd1cf27edb16a78aa829f4ae30bb9d5dacaf3ed7e8883a95d4865d8b",
+      "accepted": true,
+      "pid": 5760,
+      "before": "Reorder feature    \u00b7    7 bodies    \u00b7    Undo 3 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Reorder feature    \u00b7    7 bodies    \u00b7    Undo 2 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "37-quiet-later.json",
+      "sha256": "28cab10f847a2426aac17e3fcd6b35c8cc899bd6c26594387f9080c69ce52cb3",
+      "accepted": true,
+      "pid": 5760,
+      "before": "Undid Reorder feature    \u00b7    7 bodies    \u00b7    Undo 2 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Reorder feature    \u00b7    7 bodies    \u00b7    Undo 3 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create End support",
+        "Create Sliding carriage",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "38-quiet-later-undo.json",
+      "sha256": "17a0ad778fcee5266b39cbd9c75891a49bdcdaa5e52ef4d6fa324b322f69795f",
+      "accepted": true,
+      "pid": 5760,
+      "before": "Reorder feature    \u00b7    7 bodies    \u00b7    Undo 3 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Reorder feature    \u00b7    7 bodies    \u00b7    Undo 2 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "39-quiet-redo.json",
+      "sha256": "07d8a48cc4052181e171ae73c7c45d1a74b536d66844f380638b5e751a143979",
+      "accepted": true,
+      "pid": 5760,
+      "before": "Undid Reorder feature    \u00b7    7 bodies    \u00b7    Undo 2 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Reorder feature    \u00b7    7 bodies    \u00b7    Undo 3 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create End support",
+        "Create Sliding carriage",
+        "Create Drive shaft"
+      ]
+    },
+    {
+      "record": "40-quiet-undo.json",
+      "sha256": "d5d7358837d60abe0f1f9cc5a723245bbb74cd62eb5d5cc13c3155b2d293e795",
+      "accepted": true,
+      "pid": 5760,
+      "before": "Reorder feature    \u00b7    7 bodies    \u00b7    Undo 3 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "after": "Undid Reorder feature    \u00b7    7 bodies    \u00b7    Undo 2 / Redo 1  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+      "selection": [
+        "Sliding carriage"
+      ],
+      "features": [
+        "Create Machined base",
+        "Create Front guide rail",
+        "Create Rear guide rail",
+        "Create Motor housing",
+        "Create Sliding carriage",
+        "Create End support",
+        "Create Drive shaft"
+      ]
+    }
+  ],
+  "invalidated_attempts": "27-32 contain unrequested state changes between helper actions and a closed process. No cause is attributed; these are not counted as controlled verification. Fresh quiet-window33-40 showed exactly one journal change per requested action with no intervening state changes.",
+  "final_relaunch": {
+    "previous_process": 5760,
+    "final_process": 6534,
+    "new_process": true,
+    "observed_at_utc": "2026-10-27T21:18:43Z",
+    "record": "42-final-ready.json",
+    "sha256": "03c9d96cd7582e9abb51c678a2e76ef9f2047d3c6c911da4afa4e085a96d0538",
+    "status": "Ready \u00b7 Local, in-memory document    \u00b7    7 bodies    \u00b7    Undo 0 / Redo 0  \u00b7  Camera 0.65 / 0.42 / 8.00  \u00b7  Target 0.00, 0.45, 0.00",
+    "bundle_path": "/private/tmp/vellum-forge-delivery-20261027-build6/extracted/Vellum Forge.app",
+    "sequence": "Close process5760 after quiet checks; launch exact extracted build6; native final-ready record confirms a fresh seven-body study and Undo0/Redo0. Screenshot41 captures this same fresh state."
+  }
+}

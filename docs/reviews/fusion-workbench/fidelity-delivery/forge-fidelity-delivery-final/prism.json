@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "0f437b5da87fffaa4986a4cb002161f4",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "ad207e218e4e16106067920b4d82f135baa459de",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "7b477eaddbcf3ea6",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Manifest asserts verification without evidence",
+      "message": "The manifest claims the source commit is bound to the archive, but it records only a boolean for signature verification and no verifiable evidence. It carries no build number, no verifier output and no timestamp, and the README cites a separate producer check for the binding. The manifest alone cannot be used to validate the delivery.",
+      "suggestion": "Add build_version, signature verification command output or hash, and a timestamp to the manifest, or have package-check.json record the verification result.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reviews/fusion-workbench/fidelity-delivery/manifest.json",
+          "lines": {
+            "start": 9,
+            "end": 9
+          }
+        }
+      ],
+      "tags": [
+        "provenance",
+        "location-corrected"
+      ],
+      "evidence": "\"extracted_signature_verified\": true",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 2969,
+    "totalMs": 3005
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 38959,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 20566,
+        "output": 291,
+        "costUSD": 0.044042
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
