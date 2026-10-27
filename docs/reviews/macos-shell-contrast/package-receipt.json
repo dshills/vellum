@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "README.md,docs/README.md,docs/macos-v1.md,docs/reports/macos-shell-contrast/README.md,docs/reports/macos-shell-contrast/SHA256SUMS,docs/reports/macos-shell-contrast/evidence-index.json,docs/reports/macos-shell-contrast/evidence.tar.gz,docs/reports/macos-shell-contrast/replacement-native.json,docs/reports/macos-shell-contrast/replacement-package.json,docs/reports/macos-shell-contrast/shell-a.jpg,docs/reports/macos-shell-contrast/shell-b.jpg,docs/reviews/macos-shell-contrast/README.md,docs/reviews/macos-shell-contrast/replacement-validation.json",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "6",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/macos-shell-contrast-package/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/macos-shell-contrast-package/prism.json"
+  ],
+  "cwd": "/Users/dshills/Development/projects/Vellum",
+  "started_utc": "2026-10-27T11:27:09.380906+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 1,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 76310,
+  "group": 76310,
+  "owned": {
+    "created": true,
+    "pid": 76310,
+    "group": 76310,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 1,
+    "errors": [],
+    "observation": {
+      "group": 76310,
+      "members": [],
+      "observation_sha256": "146705c88de18221e23d44b983f13d5118597cd071b97f9a72ed7219adc7c46a"
+    }
+  },
+  "seconds": 3.833529792027548,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

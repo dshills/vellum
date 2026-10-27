@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "source_commit": "917d4c0fe185a9bc0294503623da48ec7352df42",
+  "baseline_product_source": "4b42fb89948b8abf0f2f65970fb5980987c1af0c",
+  "baseline_sdk_sha256": "0519cc8645616ac14489ee69d94efb07ab8dcccc1e56ed1f4be14976daa33ab3",
+  "changed_product_files": [
+    "examples/macapps/cmd/macshell/main.go"
+  ],
+  "module_records_unchanged": 92,
+  "module_origins": {
+    "cogentcore.org/core": "drivers/cogent/build/upstream",
+    "github.com/dshills/vellum": ".",
+    "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+    "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+    "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+    "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+    "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+    "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+    "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+  },
+  "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "linkmap_sha256": "56ebebd169f193229b9f3acf33ad5a9c8ff1d42138d1ace35fd91f7c6b33c0d4",
+  "main_sha256": "7a619ee8569f2a8fb115d5b52d38f393367357b23eb4347b373c8180065876f4",
+  "previous_source_binary_sha256": "f934be497302406e8c59471058821b9da4692154c5cff1ec4c0d948ca3c398b4",
+  "source_binary_sha256": "3d68a0588f8d3aeb6f3f66a40641fb66bc950ce3b86d2e23eca8aa65b47bc1a2",
+  "previous_notice_inventory_sha256": "6a174b2beda911c25527d04d2db115785bb651f70f229adff1e5bbf419e19d72",
+  "notice_inventory_sha256": "a142dd25f165bc50d5900b5060c5ead16ed44dc7ef8eb1d77d3e0667ba485eba",
+  "notice_original_files_unchanged": 418,
+  "notice_inventory_only_changed_field": "artifact_sha256",
+  "old_notice_binding_rejects_replacement": true,
+  "previous_zip_sha256": "7d3ad7aaefe1d19cab5e1b2dcf9b20c7c1e690b08d1fcfd99c418ee26af1db7f",
+  "archive": "Vellum Mac Shell.zip",
+  "archive_sha256": "9c5f9fa7f7afc7df5345ebfa170d8ff8257709577ce387671de313f4542425f4",
+  "packaged_binary_sha256": "dad56574b273416505f2e154664c499dd48e0c28a975cfdfe5af1a7927ab4691",
+  "manifest_sha256": "c8bf09aa8b4b704ede33492da0063fedbeb3ecd14dbd0dd7152fd79c655f6622",
+  "build_version": "11",
+  "private_build": false,
+  "notarized": false,
+  "native_distribution_audit": "approved",
+  "runtime_result": "contrast-and-command-path-pass; exposure-capture-mismatch-unresolved",
+  "audit_scope": "Reviewed first-party fixture correction; original notices, dependencies and native bytes unchanged. Historical exact-payload owner approval remains unchanged, not relabeled as approval of this new binary/archive hash. Separate final-asset publication decision still required.",
+  "publication_authorized": false,
+  "uploaded": false,
+  "checks": [
+    {
+      "name": "baseline-modules",
+      "exit_code": 0,
+      "seconds": 0.015
+    },
+    {
+      "name": "replacement-modules",
+      "exit_code": 0,
+      "seconds": 0.01
+    },
+    {
+      "name": "replacement-build",
+      "exit_code": 0,
+      "seconds": 16.704
+    },
+    {
+      "name": "replacement-public-package",
+      "exit_code": 0,
+      "seconds": 0.971
+    },
+    {
+      "name": "replacement-zip",
+      "exit_code": 0,
+      "seconds": 1.282
+    },
+    {
+      "name": "replacement-extract",
+      "exit_code": 0,
+      "seconds": 0.156
+    },
+    {
+      "name": "replacement-signature",
+      "exit_code": 0,
+      "seconds": 0.073
+    },
+    {
+      "name": "replacement-launch-copy",
+      "exit_code": 0,
+      "seconds": 0.098
+    },
+    {
+      "name": "replacement-launch-signature",
+      "exit_code": 0,
+      "seconds": 0.074
+    }
+  ],
+  "runtime_evidence": "replacement-native.json"
+}

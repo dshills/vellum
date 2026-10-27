@@ -29,3 +29,21 @@ Developer ID signing, notarization or expansion of qualification is authorized.
 The fix checkpoint Prism review (Anthropic claude-sonnet-5-5) has complete
 coverage of all four staged files and no findings. Replacement packaging/native
 results will follow in a separate evidence checkpoint.
+
+The committed fix is repackaged as build11. Final extracted native checks verify
+readable contrast in B and in A after its command repaint, independent document
+counters, toolbar availability and normal final-window shutdown. Post-launch
+signatures, notice bindings and archive hashes pass. A separate exposure/capture
+mismatch is reproduced and explicitly retained as unresolved, so public upload
+recommendation for this optional fixture remains held. No original archive,
+audit approval, SDK or other app is changed. See the final report for identities.
+
+Replacement evidence Prism review (Anthropic claude-sonnet-5-5) has complete
+text coverage and one medium finding f34226a04f7498c4: the pre-launch production
+snapshot's not-yet-run field could be mistaken for final status. Addressed using
+the review's suggested correction: the report's package record now states the
+observed contrast/command pass with unresolved exposure/capture mismatch and
+references replacement-native.json. The original pre-launch receipt is retained
+unchanged in raw evidence and documented as a capture-time snapshot. The durable
+local delivery manifest already has the completed native results. No sealed
+app/archive byte or audit record was changed by this documentation correction.

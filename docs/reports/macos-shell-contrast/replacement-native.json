@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "source_commit": "917d4c0fe185a9bc0294503623da48ec7352df42",
+  "completed_at": "2026-10-27T11:24:33.390095+00:00",
+  "contrast": "pass: B initial and A after command repaint visibly dark readable labels on light palette surface",
+  "toolbar_B_edits_only_B": "pass; B0 to B1 then A remains0",
+  "toolbar_A": "pass; A0 to A1",
+  "lock_availability": "pass; B editing checkbox disables and reenables native toolbar button",
+  "close_one_window": "pass; A remains live after B close",
+  "last_window_close": "pass; App quit observed twice and exact executable process path absent",
+  "postlaunch_strict_signature": true,
+  "signed_binary_and_manifest_unchanged": true,
+  "original_notice_files_verified": 418,
+  "old_seven_archives_unchanged": true,
+  "exposure_capture_control": {
+    "status": "unresolved captured-frame mismatch",
+    "observation": "After closing B, AX identifies A0 while screenshots retain B content. Native Raise alone does not resolve; an A toolbar command repaints correct A1. Reproduced once without edits; distinguishes neither underlying presentation nor computer-use capture caching.",
+    "scope": "Separate from corrected contrast; no new framework repair attempted. Full native exposure acceptance remains unqualified."
+  },
+  "recommended_for_publication": false,
+  "publication_hold": "Resolve or independently classify captured-window exposure mismatch before recommending this optional fixture. Original contrast defect itself is corrected.",
+  "publication_authorized": false,
+  "uploaded": false,
+  "evidence": [
+    {
+      "path": "native/a-after-b-close.txt",
+      "bytes": 689,
+      "sha256": "4f7979c458f7da298a1d6c176c612802f100311b83d244c43f236a95e5c76ad1"
+    },
+    {
+      "path": "native/a-current.jpg",
+      "bytes": 14793,
+      "sha256": "5191e61f40aa699cba774dcd7bc9c2ae80b470809f3bb1c658e09958eb9fdfe1"
+    },
+    {
+      "path": "native/a-current.txt",
+      "bytes": 689,
+      "sha256": "4f7979c458f7da298a1d6c176c612802f100311b83d244c43f236a95e5c76ad1"
+    },
+    {
+      "path": "native/a-edited.jpg",
+      "bytes": 14973,
+      "sha256": "5f2af677f769c6a24a74e8de24a513c733dffc3903f362622b45bdbd899cdcce"
+    },
+    {
+      "path": "native/a-edited.txt",
+      "bytes": 689,
+      "sha256": "210855be4243751a7f9e42e3a427a03a4a345a99c77c94565548de1f6011ae60"
+    },
+    {
+      "path": "native/a-initial.jpg",
+      "bytes": 14156,
+      "sha256": "007f82b51fa73c615db2657e47e550e226ea5d26d69d13707930f80da53c33c2"
+    },
+    {
+      "path": "native/after-close.txt",
+      "bytes": 50,
+      "sha256": "65be61b3f8fd40de3621e6184c75dfe202fc8096a5967e1578007e98b2b32ae6"
+    },
+    {
+      "path": "native/b-edited.txt",
+      "bytes": 689,
+      "sha256": "07739ff0e73d7af40d915304c18f2b12dc2997468fbd689fd61350564a17db60"
+    },
+    {
+      "path": "native/b-initial.jpg",
+      "bytes": 14875,
+      "sha256": "bb5b6ac3d9b244f9524e9da977f4f956c5d9d4e44a188861ea6202966d6dfcd7"
+    },
+    {
+      "path": "native/b-initial.txt",
+      "bytes": 689,
+      "sha256": "fdd9b3ea381f3ca7faf1de4dc0bd2d3d4f447ebee07ce2ce23c6013d19366321"
+    },
+    {
+      "path": "native/b-locked.txt",
+      "bytes": 699,
+      "sha256": "477da8260cd4ea6da4ca4344e73e049cd1a11b72217ad5b9a242dabbfcfa2cee"
+    },
+    {
+      "path": "native/b-unlocked.txt",
+      "bytes": 689,
+      "sha256": "07739ff0e73d7af40d915304c18f2b12dc2997468fbd689fd61350564a17db60"
+    },
+    {
+      "path": "native/exposure-a-after-close.txt",
+      "bytes": 689,
+      "sha256": "4f7979c458f7da298a1d6c176c612802f100311b83d244c43f236a95e5c76ad1"
+    },
+    {
+      "path": "native/exposure-a-raised.jpg",
+      "bytes": 15197,
+      "sha256": "fafa8b81bb43698972b03c1f663d0ea9c60ce8c9a6b2d3d2e299b4afce908d87"
+    },
+    {
+      "path": "native/exposure-a-raised.txt",
+      "bytes": 689,
+      "sha256": "4f7979c458f7da298a1d6c176c612802f100311b83d244c43f236a95e5c76ad1"
+    },
+    {
+      "path": "native/exposure-after-close.txt",
+      "bytes": 50,
+      "sha256": "65be61b3f8fd40de3621e6184c75dfe202fc8096a5967e1578007e98b2b32ae6"
+    }
+  ]
+}

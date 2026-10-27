@@ -71,8 +71,9 @@ Its SDK and Placement app do not contain the current Notes, widget or showcase
 work. Current v1 SDK/app downloads remain unpublished. The owner approved the
 [current payload audit](release/macos-v1-distribution-audit.json) on 27 October;
 [final local packaging checks](docs/reports/macos-v1-public-packaging/README.md)
-produced an SDK and five recommended app candidates. The optional Mac Shell fixture
-is held for dark-appearance contrast. No v1 native download has been uploaded.
+produced an SDK and five recommended app candidates. A [contrast-corrected Mac Shell replacement](docs/reports/macos-shell-contrast/README.md)
+is verified locally; a separate exposure/capture discrepancy keeps that optional
+fixture outside the proposed public set. No v1 native download has been uploaded.
 The candidates are ad-hoc signed and unnotarized. The
 [Mac guide](docs/macos-v1.md) and [private release report](docs/reports/macos-v1-release/README.md)
 retain their exact build identities, supported behavior and verification limits.

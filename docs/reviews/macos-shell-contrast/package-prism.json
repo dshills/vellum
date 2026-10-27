@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "d12fb54225431bfd492daff998e3cff0",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "917d4c0fe185a9bc0294503623da48ec7352df42",
+    "branch": "codex/macos-public-packaging"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "f34226a04f7498c4",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Package record contradicts runtime results",
+      "message": "The package record states runtime_result is \"not-yet-run\", while the README and replacement-native.json report that native launch checks were performed. This contradiction in a machine-readable provenance record can mislead any tooling or reviewer that reads it for release gating.",
+      "suggestion": "Update runtime_result to reflect the actual outcome (e.g. \"pass-with-exposure-discrepancy\") and reference replacement-native.json, or document that the field is a pre-launch snapshot.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "docs/reports/macos-shell-contrast/replacement-package.json",
+          "lines": {
+            "start": 40,
+            "end": 40
+          }
+        }
+      ],
+      "tags": [
+        "provenance",
+        "consistency",
+        "location-corrected"
+      ],
+      "evidence": "\"runtime_result\": \"not-yet-run\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3732,
+    "totalMs": 3772
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 31979,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 16634,
+        "output": 304,
+        "costUSD": 0.036308
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
