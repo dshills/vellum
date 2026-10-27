@@ -197,3 +197,19 @@ Every post-launch smoke return closes the application and joins the smoke worker
 before restoring the process-local geometry setting. Worker completion follows
 its context cleanup and application-close callback; receiving its result alone
 is not a completion barrier. The outer watchdog remains active during the join.
+
+## Typed input extension
+
+GPUView.InputEvent optionally captures a typed callback at mount and replaces
+legacy Input routing for that mount. GPUEvent includes kind, button/modifiers,
+full content-local pixel position/size, dp scale, visible-clip membership and both
+scroll axes. Primary pointer gestures use same-window capture and swallow release;
+Escape/focus/retirement cancel. Callbacks run only on a live application/window.
+Secondary/middle events remain targeted and do not promise capture outside the
+view. Legacy Input and all rendering/presentation behavior remain unchanged.
+See the [workbench track](fusion-workbench.md) for scope and camera helpers.
+
+Typed cancellation is posted to the originating owner to avoid nested ownership
+when focus/popup transitions happen inside a command. GPUEvent.Sequence identifies
+the primary gesture; viewport.Gesture ignores cancellation from an older sequence.
+Widget/window retirement suppresses outstanding callbacks and revokes capture.

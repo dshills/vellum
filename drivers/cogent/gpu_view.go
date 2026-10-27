@@ -91,8 +91,10 @@ type GPUView struct {
 	MaxSnapshotBytes uint64
 	OnError          func(error)
 	Input            func(GPUInput) bool
-	widget           *gpuViewWidget
-	snapshotActive   atomic.Bool
+	// InputEvent opts into typed input in place of legacy Input; captured at mount.
+	InputEvent     func(GPUEvent) bool
+	widget         *gpuViewWidget
+	snapshotActive atomic.Bool
 }
 
 type GPUViewStats struct {
@@ -167,6 +169,12 @@ func (g *GPUView) Mount(parent tree.Node) core.Widget {
 		s.Grow.Set(1, 1)
 		s.SetAbilities(true, abilities.Focusable, abilities.Clickable, abilities.Slideable)
 	})
+	if g.InputEvent != nil {
+		w.onInput = g.InputEvent
+		w.installGPUInput()
+		mounted = true
+		return w
+	}
 	dispatch := func(e events.Event, input func() GPUInput) {
 		handled := false
 		w.ownerEvent(func() {
@@ -323,20 +331,25 @@ func (g *GPUView) Snapshot() (*image.NRGBA, error) {
 
 type gpuViewWidget struct {
 	core.WidgetBase
-	owner       *GPUView
-	application *app.Application
-	windowID    string
-	windowRef   app.WindowRef
-	program     *GPUProgram
-	depth       bool
-	retired     atomic.Bool
-	native      atomic.Pointer[drawingWindow]
-	resources   gpuViewResources
+	owner         *GPUView
+	application   *app.Application
+	windowID      string
+	windowRef     app.WindowRef
+	program       *GPUProgram
+	depth         bool
+	retired       atomic.Bool
+	native        atomic.Pointer[drawingWindow]
+	resources     gpuViewResources
+	onInput       func(GPUEvent) bool
+	inputCapture  uint64
+	inputSequence uint64
+	lastInput     GPUEvent
 }
 
 func (w *gpuViewWidget) Init()  { w.WidgetBase.Init() }
 func (w *gpuViewWidget) OnAdd() { w.WidgetBase.OnAdd(); w.Scene.AddDirectRender(w) }
 func (w *gpuViewWidget) Destroy() {
+	w.endGPUCapture(false)
 	if w.retired.Swap(true) {
 		return
 	}

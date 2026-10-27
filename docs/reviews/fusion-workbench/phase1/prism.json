@@ -1,0 +1,118 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "248392b0db2fe387e40d7babff523a6c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "06c3a2cce9dbcc88e9286f5076e789a696bf4808",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "dfc0c9dd1c84d1aa",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Duplicate event delivery during capture",
+      "message": "This registers MouseUp, MouseMove, MouseDrag, Scroll and KeyChord handlers that duplicate the capture handler. During capture the router may deliver the same event to both, so the app sees each pointer-move, scroll or key twice. It also emits events when no capture is active and the user did not press in the view, so a MouseUp for a press that began outside is reported. Map iteration order is also random.",
+      "suggestion": "Skip the generic handler while w.inputCapture != 0, and return early from MouseUp when there is no active capture.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/gpu_input.go",
+          "lines": {
+            "start": 161,
+            "end": 167
+          }
+        }
+      ],
+      "tags": [
+        "events",
+        "duplicate"
+      ],
+      "evidence": "w.OnFirst(typ, func(e events.Event) {\n\t\t\tif w.emitInput(w.eventData(kind, e)) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5981,
+    "totalMs": 6004
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 30328,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 17939,
+        "output": 670,
+        "costUSD": 0.042578
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "12f7e6310daa9aaf",
+        "severity": "medium",
+        "category": "bug",
+        "title": "No cancel on widget destruction",
+        "message": "Cancel is posted asynchronously, but Destroy calls endGPUCapture(false) before retired is set. Also, Destroy on a widget whose Scene is nil is fine, but the cancel closure reads w.retired and w.owner from another goroutine without ownership guarantees. Additionally, in Destroy a cancel isn't sent, so the app's gesture state is left active after widget removal.",
+        "suggestion": "Send a cancel to the application (or document that none is sent) before retiring.",
+        "confidence": 0.55,
+        "locations": [
+          {
+            "path": "drivers/cogent/gpu_input.go",
+            "lines": {
+              "start": 84,
+              "end": 84
+            }
+          }
+        ],
+        "tags": [
+          "lifecycle"
+        ],
+        "evidence": "v := GPUEvent{Kind: kind, Sequence: w.inputSequence, Position: p.Sub(w.Geom.Pos.Content.ToPoint())",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/gpu_input.go"
+    }
+  ],
+  "suppressed": []
+}
