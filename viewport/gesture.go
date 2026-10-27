@@ -53,3 +53,6 @@ func (g *Gesture) Reset() {
 	}
 }
 func (g *Gesture) Active() bool { return g != nil && g.down }
+
+// Dragging reports whether the active gesture crossed the logical threshold.
+func (g *Gesture) Dragging() bool { return g != nil && g.down && g.moved }

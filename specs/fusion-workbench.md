@@ -46,3 +46,15 @@ ui.ModelBrowser provides separate disclosure, visibility, select and active-item
 targets on a bounded256-item hierarchy (depth16). The application accepts events;
 removed, disabled or newly collapsed targets refuse stale callbacks. This control
 does not replace the large indexed DataTree or claim CAD-scale rich-row virtualization.
+
+## Small-scene 3D view and orientation
+
+viewport.Scene admits256 opaque named box proxies. SceneView3D is an experimental
+shared-device extension using GPUView, depth, retained geometry, camera-only
+uniform updates, explicit revision changes and the same typed capture lifecycle.
+Click proposes one nearest visible object; drag or Option-drag orbits; Shift-drag
+pans; scrolling zooms. Hover is transient. Selection/geometry commands remain
+application-owned. The in-canvas ViewCube renders and picks the same six labeled
+faces; dragging it orbits, and ui.ViewCube supplies keyboard/accessible face
+alternatives. Small views omit the cube. This is a preview toolkit, not CAD
+geometry, arbitrary-mesh picking or an assembly performance qualification.

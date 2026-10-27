@@ -1,0 +1,61 @@
+[
+  {
+    "name": "phase3-portable",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./viewport",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 2.92
+  },
+  {
+    "name": "phase3-reviewed-native",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestScene3D|TestGPUInput",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 18.433
+  },
+  {
+    "name": "phase3-vet-final",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 12.068
+  },
+  {
+    "name": "phase3-api",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.495
+  }
+]

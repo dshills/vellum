@@ -1,0 +1,144 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "5c0af456f636c5ea0774506d24984864",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "1a8c8f0421398bd2fe333cf7df56c3adca0e57f2",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "592a8ba76f4859f2",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Nil Model dereference in view()",
+      "message": "Model may be nil; Scene.Validate has a nil receiver check, so Mount returns nil. However Sync and changed call v.Model.Validate/Touch which are nil-safe, but view() calls v.Model.Camera.SetView directly and dereferences nil Model.",
+      "suggestion": "Guard v.Model == nil in view() and other direct dereferences.",
+      "confidence": 0.9,
+      "locations": [
+        {
+          "path": "drivers/cogent/scene3d.go",
+          "lines": {
+            "start": 51,
+            "end": 51
+          }
+        }
+      ],
+      "tags": [
+        "nil",
+        "location-corrected"
+      ],
+      "evidence": "if v == nil || v.Owner == nil || v.Model.Validate() != nil {",
+      "fix": {
+        "before": "if v == nil || v.Owner == nil || v.Model.Validate() != nil {",
+        "after": "if v == nil || v.Owner == nil || v.Model == nil || v.Model.Validate() != nil {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "4bced99071e01a6a",
+      "severity": "medium",
+      "category": "bug",
+      "title": "cubeGesture state not reset",
+      "message": "A cube-gesture click (pointer down on the cube) sets cubeGesture, but on a non-drag release a miss of cube faces still returns true and never selects. On cancel after a drag, state is restored, but cubeGesture is not reset on PointerUp when no gesture was active (stale flag across gestures if Begin fails).",
+      "suggestion": "Reset cubeGesture when Begin returns false and on End/Cancel.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/scene3d.go",
+          "lines": {
+            "start": 135,
+            "end": 135
+          }
+        }
+      ],
+      "tags": [
+        "state",
+        "location-corrected"
+      ],
+      "evidence": "v.cubeGesture = s.ShowCube \u0026\u0026 image.Pt(e.Position.X, e.Position.Y).In(viewport.CubeRect(e.Size.X, e.Size.Y, scale))",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "da7ef4047b1f261c",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Buffer resize may reuse stale smaller buffer",
+      "message": "The vertex and index buffers are requested by label with a new size on each rebuild. If Resources.Buffer returns the cached buffer when the label exists, a larger mesh will not fit and WriteBuffer will fail. Also release() just nils the buffers without releasing them.",
+      "suggestion": "Verify that Resources.Buffer reallocates on size change; otherwise release and recreate buffers explicitly.",
+      "confidence": 0.8,
+      "locations": [
+        {
+          "path": "drivers/cogent/scene3d.go",
+          "lines": {
+            "start": 325,
+            "end": 325
+          }
+        }
+      ],
+      "tags": [
+        "gpu",
+        "resources",
+        "location-corrected"
+      ],
+      "evidence": "r.vertexBytes = uint64(len(vertices) * 4)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 13579,
+    "totalMs": 13621
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 8,
+    "bytes": 27870,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 17327,
+        "output": 905,
+        "costUSD": 0.043704
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
