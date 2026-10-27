@@ -1,0 +1,119 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "866c96ed9d18fda957a7c1499f347638",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+    "branch": "codex/macos-v1-build13"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "69138669f193bffa",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Release body CI statement contradicts build13 provenance",
+      "message": "The proposed release body includes a CI section for the old source commit 4b42fb8 next to a downloads section claiming binaries built from 64bf9cf. Readers could take the 4b42fb8 CI results as covering the attached binaries. The body also says the showcase checkpoint evidence and 'not relabeled as fresh verification of these apps', which conflicts with the build13 claims.",
+      "suggestion": "Reword the CI section to state clearly that it covers the source tag only, and that build13 binaries are covered by the 64bf9cf runs listed in the downloads section.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "docs/reports/macos-v1-build13/RELEASE_BODY.md",
+          "lines": {
+            "start": 100,
+            "end": 107
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "release"
+      ],
+      "evidence": "All required workflows passed on `4b42fb89948b8abf0f2f65970fb5980987c1af0c`:",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 7951,
+    "totalMs": 8051
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 21,
+    "bytes": 123962,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 60577,
+        "output": 673,
+        "costUSD": 0.127884
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "33856722d072bb0a",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Unclosed file handles and Python 3.11-only API in sha helper",
+        "message": "The sha lambda opens files without closing them, and the tar loop and validate() call it many times, so file handles leak until garbage collection. It also relies on hashlib.file_digest, which requires Python 3.11+ and fails on older interpreters even though the docs only say 'Python 3'.",
+        "suggestion": "Use a helper with `with p.open('rb') as f: return hashlib.file_digest(f,'sha256').hexdigest()` and document the Python 3.11+ requirement.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "docs/reports/macos-v1-build13/validate.py",
+            "lines": {
+              "start": 22,
+              "end": 125
+            }
+          }
+        ],
+        "tags": [
+          "resource-leak",
+          "compat"
+        ],
+        "evidence": "hashlib.file_digest(p.open('rb'), 'sha256').hexdigest()",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/macos-v1-build13/validate.py"
+    }
+  ],
+  "suppressed": []
+}

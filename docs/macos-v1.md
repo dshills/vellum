@@ -1,8 +1,8 @@
 # macOS v1 for personal use
 
-`v1.0.0` adopts the [stable API contract](../specs/stable-api.md) for private personal use on the recorded Apple Silicon macOS26.6.2 configuration. The [release closeout](../specs/macos-v1-release.md) governs final CI and matching SDK/apps. The completed RC, public alpha.3 and older personal-v0.1 deliveries retain their original identities. The later owner-authorized [v1.0.0 source release](../release/notes/v1.0.0.md)
+`v1.0.0` adopts the [stable API contract](../specs/stable-api.md) for private personal use on the recorded Apple Silicon macOS 26.6.2 configuration. The [release closeout](../specs/macos-v1-release.md) governs final CI and matching SDK/apps. The completed RC, public alpha.3 and older personal-v0.1 deliveries retain their original identities. The later owner-authorized [v1.0.0 source release](../release/notes/v1.0.0.md)
 adds a public root tag and checkout source. Historical private packages retain
-their original identities. [Final public-mode candidates](reports/macos-v1-public-packaging/README.md)
+their original identities. [Coherent build13 public-mode candidates](reports/macos-v1-build13/README.md)
 are now prepared locally; no v1 native downloads have been uploaded.
 
 ## Supported API contract
@@ -25,17 +25,17 @@ The named stable APIs preserve exported signatures and documented defaults throu
 Portable race/vet, affected native offscreen tests, command/lifetime regressions and independently extracted SDK consumers provide automated evidence. Physical pointer/native-window observations are recorded separately in the [RC native report](reports/macos-v1/README.md). That report lists exact source identity, observed host and outcomes. Historical soak and catalogue evidence is reused for unchanged paths; it does not certify all future workloads.
 
 Human IME candidate behavior and VoiceOver usability remain explicitly **unqualified**, as chosen by the owner. Follow the [human checklist](personal-macos-input-checklist.md) before claiming those results. Other macOS versions, Intel, multi-display changes, Windows and Linux remain unqualified; Wayland remains unsupported. No signing identity, notarization or public distribution approval is implied. The owner-approved [current payload audit](../release/macos-v1-distribution-audit.json) authorizes final local public packaging and launch checks; downloadable assets remain unpublished until a separate final-asset decision.
-The [final packaging report](reports/macos-v1-public-packaging/README.md) records
-a verified SDK plus five rendered/closed apps; the optional Mac Shell fixture
-now has a [verified build12 replacement](reports/macos-shell-exposure/README.md)
-covering contrast and bounded window exposure without model edits. It can join
-the proposed asset set after a separate final-asset decision. Other SDK/app
-archives remain unchanged and do not gain its prepared-Go exposure repair. Apps remain ad-hoc
-signed and unnotarized; downloaded-quarantine behavior is unqualified.
+The [build13 report](reports/macos-v1-build13/README.md) records a fresh SDK and
+all six apps from green source 64bf9cf. Each uses that same SDK, including the
+exposure repair; bounded render/close checks, notice bindings and post-launch
+signatures pass. The [final packet](reports/macos-v1-build13/PUBLICATION_PACKET.md)
+records exact hashes, retained intermediate observations and the separate upload
+decision. Apps remain ad-hoc signed and unnotarized; downloaded-quarantine is
+unqualified. Older private/mixed-source packages retain their own identities.
 
 ## Consume the private SDK
 
-The matching delivery includes a private SDK archive, original-color Mac Widgets catalogue, Notes, a two-window shell fixture and a separate example-source archive. Verify SHA256SUMS before extraction. Extract the SDK and example source beside each other so the example's module replacements point into `vellum-v1.0.0`, never the repository checkout. Use Go1.25.6 and Xcode command-line development tools on Apple Silicon. The SDK contains the pinned native capsule; do not run prepare.sh over it.
+The matching delivery includes a private SDK archive, original-color Mac Widgets catalogue, Notes, a two-window shell fixture and a separate example-source archive. Verify SHA256SUMS before extraction. Extract the SDK and example source beside each other so the example's module replacements point into `vellum-v1.0.0`, never the repository checkout. Use Go 1.25.6 and Xcode command-line development tools on Apple Silicon. The SDK contains the pinned native capsule; do not run prepare.sh over it.
 
 From the example source: `go test -race ./...`, `go vet ./...`, then `go run ./cmd/notes` or `go run ./cmd/macshell`. From the extracted SDK, `python3 scripts/new-app.py /absolute/new/app --module example.com/my-app` generates an independent starter. See [app-shell APIs](macos-app-shell.md), [shared presentation](mac-presentation.md) and [Notes storage/commands](../examples/macapps/notes/README.md).
 

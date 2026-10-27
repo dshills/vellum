@@ -1,0 +1,116 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "aae4e2e3df1b803bb34d8873329c06e2",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+    "branch": "codex/macos-v1-build13"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "685f0ef7ce16f28b",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Asserts used for release validation are stripped under -O",
+      "message": "Validation is written entirely with bare assert statements. Running Python with -O strips every assert, so the script would print pass: True without checking anything. A validator used as a release gate must not be silently disabled.",
+      "suggestion": "Raise explicit exceptions through a helper (e.g. def check(cond, msg): if not cond: raise SystemExit(msg)), or guard with `if not __debug__: sys.exit(...)` at the top.",
+      "confidence": 0.7,
+      "locations": [
+        {
+          "path": "docs/reports/macos-v1-build13/validate.py",
+          "lines": {
+            "start": 19,
+            "end": 19
+          }
+        }
+      ],
+      "tags": [
+        "assert",
+        "validation",
+        "location-corrected"
+      ],
+      "evidence": "spec.loader.exec_module(checker)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "d5d7f0aec33f94cf",
+      "severity": "medium",
+      "category": "security",
+      "title": "Archive entry names and sizes not validated",
+      "message": "The validator reads entries from archives it is meant to check, using names taken from the manifest (a['name'], ni['files'] keys) without checking the names. A crafted inventory with '../' or absolute-style names is not rejected. The zip is read-only and not extracted, so exposure is small. The tar member names are also matched only against an allow-list.",
+      "suggestion": "Validate that inventory file names are relative and contain no '..' components before building the prefix path, and check the zip uncompressed sizes, not just the entry count, to guard against zip bombs.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "docs/reports/macos-v1-build13/validate.py",
+          "lines": {
+            "start": 77,
+            "end": 79
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "zip",
+        "location-corrected"
+      ],
+      "evidence": "            assert len(names) == len(set(names)) and len(names) \u003c 1000\n            root = a['name'] + '.app/Contents/'\n            raw = z.read(root + 'Resources/APP_MANIFEST.json')",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6021,
+    "totalMs": 6030
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 1,
+    "bytes": 8807,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5854,
+        "output": 644,
+        "costUSD": 0.018148
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

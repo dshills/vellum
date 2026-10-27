@@ -70,10 +70,11 @@ The latest prebuilt native download remains the older
 Its SDK and Placement app do not contain the current Notes, widget or showcase
 work. Current v1 SDK/app downloads remain unpublished. The owner approved the
 [current payload audit](release/macos-v1-distribution-audit.json) on 27 October;
-[final local packaging checks](docs/reports/macos-v1-public-packaging/README.md)
-produced an SDK and five recommended app candidates. The [Mac Shell build12 replacement](docs/reports/macos-shell-exposure/README.md)
-also passes bounded window-exposure checks and can join the proposed asset set.
-It includes a reviewed prepared-Go repair; the older SDK/app archives stay unchanged. No v1 native download has been uploaded.
+[coherent build13 packaging](docs/reports/macos-v1-build13/README.md)
+now provides a fresh SDK and all six apps from green commit `64bf9cf`. Each app
+is compiled from that SDK and includes the window-exposure repair. The
+[final publication packet](docs/reports/macos-v1-build13/PUBLICATION_PACKET.md)
+records exact hashes and the proposed destination; no v1 native download has been uploaded.
 The candidates are ad-hoc signed and unnotarized. The
 [Mac guide](docs/macos-v1.md) and [private release report](docs/reports/macos-v1-release/README.md)
 retain their exact build identities, supported behavior and verification limits.
@@ -245,6 +246,6 @@ original licenses and notices. The approved alpha.3 distribution decision covers
 that exact payload and notice bundle. The owner has also approved the exact
 [current v1 payload](release/macos-v1-distribution-audit.json). The v1.0.0 source
 tag is public; final public-mode SDK/app candidates remain local and unpublished.
-Their [publication packet](docs/reports/macos-v1-public-packaging/PUBLICATION_PACKET.md)
-records matched notices, final checksums, a held fixture and the separate upload decision. See the [release contract](specs/release.md) and
+Their [publication packet](docs/reports/macos-v1-build13/PUBLICATION_PACKET.md)
+records the SDK and six build13 apps, matched notices, final checksums and the separate upload decision. See the [release contract](specs/release.md) and
 [release metadata](release/version.json).

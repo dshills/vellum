@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "d0380ca6947de8952dddd980fc8229a1",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+    "branch": "codex/macos-v1-build13"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "d3aae3c8943d18a7",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Binaries built from a commit different from the release tag",
+      "message": "The manifest states that the SDK and apps are built from commit 64bf9cf, while the release it targets is tagged at 4b42fb8. Release consumers get binaries that do not match the tag's source. The release body discloses this, but the mismatch is easy to miss, and nothing in the manifest ties the published binaries to the tagged source. Provenance is weakened.",
+      "suggestion": "Publish build13 under a new tag (e.g. v1.0.1 or v1.0.0-build13) pointing at 64bf9cf, rather than attaching it to the older v1.0.0 tag.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reports/macos-v1-build13/PUBLICATION_SET.json",
+          "lines": {
+            "start": 82,
+            "end": 82
+          }
+        }
+      ],
+      "tags": [
+        "provenance",
+        "release"
+      ],
+      "evidence": "\"scope\": \"Seven new payload archives plus SHA256SUMS, proposed for existing source release as explicitly disclosed build13 packaging revision from 64bf9cf. No tag movement. Prepared Core Go bytes include stage0108 in SDK and every app.\"",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3921,
+    "totalMs": 3937
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 2,
+    "bytes": 10130,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 6312,
+        "output": 420,
+        "costUSD": 0.016824
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

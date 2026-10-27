@@ -1,0 +1,69 @@
+{
+  "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+  "build": "13",
+  "method": "Exact ZIP extraction copied without resource forks/xattrs; CUA native accessibility actions, Raise, unedited captures and normal close. Not physical-pointer qualification.",
+  "host": {
+    "macos": "26.6.2",
+    "arch": "arm64"
+  },
+  "checks": {
+    "shell_edited_b_close_reveals_unedited_a": "pass, captured before any action in A",
+    "widgets_managed_light_dark": "pass; original-color artwork retained; native chrome remains independently scoped"
+  },
+  "owned_exact_process_paths_absent": true,
+  "exit_codes_observed": false,
+  "user_notebook_accessed": false,
+  "global_preferences_changed": false,
+  "notes_background_capture": "Initial capture before Raise was blank; explicit native Raise presented the correct retained content. Both captures retained. No model action was needed.",
+  "luma_close_observation": "First close action left Luma running; a fresh observed native close retired it. One fresh independent launch followed by a single native close also retired normally. Original intermediate AX/capture and process-check failure retained; no sole-cause claim.",
+  "apps": {
+    "notes": {
+      "result": "pass",
+      "capture": "notes-raised.jpg",
+      "ax": "notes-raised.ax.txt",
+      "normal_close": true,
+      "post_launch_signature": "pass",
+      "notice_binding": "pass"
+    },
+    "widgets": {
+      "result": "pass",
+      "capture": "widgets-dark.jpg",
+      "ax": "widgets-dark.ax.txt",
+      "normal_close": true,
+      "post_launch_signature": "pass",
+      "notice_binding": "pass"
+    },
+    "shell": {
+      "result": "pass",
+      "capture": "shell-a0-after-native-close.jpg",
+      "ax": "shell-a0-after-native-close.ax.txt",
+      "normal_close": true,
+      "post_launch_signature": "pass",
+      "notice_binding": "pass"
+    },
+    "forma": {
+      "result": "pass",
+      "capture": "forma-open.jpg",
+      "ax": "forma-open.ax.txt",
+      "normal_close": true,
+      "post_launch_signature": "pass",
+      "notice_binding": "pass"
+    },
+    "luma": {
+      "result": "pass",
+      "capture": "luma-open.jpg",
+      "ax": "luma-open.ax.txt",
+      "normal_close": true,
+      "post_launch_signature": "pass",
+      "notice_binding": "pass"
+    },
+    "pulse": {
+      "result": "pass",
+      "capture": "pulse-open.jpg",
+      "ax": "pulse-open.ax.txt",
+      "normal_close": true,
+      "post_launch_signature": "pass",
+      "notice_binding": "pass"
+    }
+  }
+}

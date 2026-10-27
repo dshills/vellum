@@ -1,0 +1,714 @@
+{
+  "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+  "sdk_archive": "vellum-v1.0.0-build13-darwin-arm64-sdk.tar.gz",
+  "sdk_sha256": "48bcffef1c8d11ee4801186cc33501f5807af2a4b0770321b4cb310e18fa3614",
+  "verified_files": 8861,
+  "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "audit_record_sha256": "adf2f08a4dbb6622ee67ef60889a68dbb6dd719d6a15f8b9cc41b6890c15b5ae",
+  "checks": [
+    {
+      "name": "sdk-public",
+      "exit_code": 0,
+      "seconds": 9.939
+    },
+    {
+      "name": "sdk-independent-consumer",
+      "exit_code": 0,
+      "seconds": 64.15
+    },
+    {
+      "name": "sdk-exposure-regression",
+      "exit_code": 0,
+      "seconds": 16.132
+    },
+    {
+      "name": "go-root",
+      "exit_code": 0,
+      "seconds": 0.009
+    },
+    {
+      "name": "go-root-apps",
+      "exit_code": 0,
+      "seconds": 0.008
+    },
+    {
+      "name": "icons",
+      "exit_code": 0,
+      "seconds": 25.458
+    },
+    {
+      "name": "notes-graph",
+      "exit_code": 0,
+      "seconds": 0.381
+    },
+    {
+      "name": "notes-origins",
+      "exit_code": 0,
+      "seconds": 0.015
+    },
+    {
+      "name": "notes-baseline-origins",
+      "exit_code": 0,
+      "seconds": 0.011
+    },
+    {
+      "name": "notes-baseline-assets",
+      "exit_code": 0,
+      "seconds": 0.436
+    },
+    {
+      "name": "notes-build",
+      "exit_code": 0,
+      "seconds": 3.446
+    },
+    {
+      "name": "notes-public",
+      "exit_code": 0,
+      "seconds": 1.232
+    },
+    {
+      "name": "notes-zip",
+      "exit_code": 0,
+      "seconds": 1.337
+    },
+    {
+      "name": "notes-extract",
+      "exit_code": 0,
+      "seconds": 0.171
+    },
+    {
+      "name": "notes-signature",
+      "exit_code": 0,
+      "seconds": 0.074
+    },
+    {
+      "name": "notes-launch-copy",
+      "exit_code": 0,
+      "seconds": 0.149
+    },
+    {
+      "name": "notes-launch-signature",
+      "exit_code": 0,
+      "seconds": 0.074
+    },
+    {
+      "name": "widgets-graph",
+      "exit_code": 0,
+      "seconds": 0.4
+    },
+    {
+      "name": "widgets-origins",
+      "exit_code": 0,
+      "seconds": 0.017
+    },
+    {
+      "name": "widgets-baseline-origins",
+      "exit_code": 0,
+      "seconds": 0.011
+    },
+    {
+      "name": "widgets-baseline-assets",
+      "exit_code": 0,
+      "seconds": 0.401
+    },
+    {
+      "name": "widgets-build",
+      "exit_code": 0,
+      "seconds": 4.497
+    },
+    {
+      "name": "widgets-public",
+      "exit_code": 0,
+      "seconds": 1.191
+    },
+    {
+      "name": "widgets-zip",
+      "exit_code": 0,
+      "seconds": 1.351
+    },
+    {
+      "name": "widgets-extract",
+      "exit_code": 0,
+      "seconds": 0.183
+    },
+    {
+      "name": "widgets-signature",
+      "exit_code": 0,
+      "seconds": 0.077
+    },
+    {
+      "name": "widgets-launch-copy",
+      "exit_code": 0,
+      "seconds": 0.147
+    },
+    {
+      "name": "widgets-launch-signature",
+      "exit_code": 0,
+      "seconds": 0.076
+    },
+    {
+      "name": "shell-graph",
+      "exit_code": 0,
+      "seconds": 0.386
+    },
+    {
+      "name": "shell-origins",
+      "exit_code": 0,
+      "seconds": 0.016
+    },
+    {
+      "name": "shell-baseline-origins",
+      "exit_code": 0,
+      "seconds": 0.015
+    },
+    {
+      "name": "shell-baseline-assets",
+      "exit_code": 0,
+      "seconds": 0.349
+    },
+    {
+      "name": "shell-build",
+      "exit_code": 0,
+      "seconds": 3.565
+    },
+    {
+      "name": "shell-public",
+      "exit_code": 0,
+      "seconds": 1.015
+    },
+    {
+      "name": "shell-zip",
+      "exit_code": 0,
+      "seconds": 1.353
+    },
+    {
+      "name": "shell-extract",
+      "exit_code": 0,
+      "seconds": 0.164
+    },
+    {
+      "name": "shell-signature",
+      "exit_code": 0,
+      "seconds": 0.077
+    },
+    {
+      "name": "shell-launch-copy",
+      "exit_code": 0,
+      "seconds": 0.117
+    },
+    {
+      "name": "shell-launch-signature",
+      "exit_code": 0,
+      "seconds": 0.077
+    },
+    {
+      "name": "forma-graph",
+      "exit_code": 0,
+      "seconds": 0.369
+    },
+    {
+      "name": "forma-origins",
+      "exit_code": 0,
+      "seconds": 0.015
+    },
+    {
+      "name": "forma-baseline-origins",
+      "exit_code": 0,
+      "seconds": 0.012
+    },
+    {
+      "name": "forma-baseline-assets",
+      "exit_code": 0,
+      "seconds": 0.338
+    },
+    {
+      "name": "forma-build",
+      "exit_code": 0,
+      "seconds": 3.45
+    },
+    {
+      "name": "forma-public",
+      "exit_code": 0,
+      "seconds": 1.274
+    },
+    {
+      "name": "forma-zip",
+      "exit_code": 0,
+      "seconds": 1.33
+    },
+    {
+      "name": "forma-extract",
+      "exit_code": 0,
+      "seconds": 0.167
+    },
+    {
+      "name": "forma-signature",
+      "exit_code": 0,
+      "seconds": 0.077
+    },
+    {
+      "name": "forma-launch-copy",
+      "exit_code": 0,
+      "seconds": 0.119
+    },
+    {
+      "name": "forma-launch-signature",
+      "exit_code": 0,
+      "seconds": 0.08
+    },
+    {
+      "name": "luma-graph",
+      "exit_code": 0,
+      "seconds": 0.378
+    },
+    {
+      "name": "luma-origins",
+      "exit_code": 0,
+      "seconds": 0.015
+    },
+    {
+      "name": "luma-baseline-origins",
+      "exit_code": 0,
+      "seconds": 0.011
+    },
+    {
+      "name": "luma-baseline-assets",
+      "exit_code": 0,
+      "seconds": 0.384
+    },
+    {
+      "name": "luma-build",
+      "exit_code": 0,
+      "seconds": 3.614
+    },
+    {
+      "name": "luma-public",
+      "exit_code": 0,
+      "seconds": 1.357
+    },
+    {
+      "name": "luma-zip",
+      "exit_code": 0,
+      "seconds": 1.374
+    },
+    {
+      "name": "luma-extract",
+      "exit_code": 0,
+      "seconds": 0.2
+    },
+    {
+      "name": "luma-signature",
+      "exit_code": 0,
+      "seconds": 0.078
+    },
+    {
+      "name": "luma-launch-copy",
+      "exit_code": 0,
+      "seconds": 0.115
+    },
+    {
+      "name": "luma-launch-signature",
+      "exit_code": 0,
+      "seconds": 0.078
+    },
+    {
+      "name": "pulse-graph",
+      "exit_code": 0,
+      "seconds": 0.429
+    },
+    {
+      "name": "pulse-origins",
+      "exit_code": 0,
+      "seconds": 0.017
+    },
+    {
+      "name": "pulse-baseline-origins",
+      "exit_code": 0,
+      "seconds": 0.011
+    },
+    {
+      "name": "pulse-baseline-assets",
+      "exit_code": 0,
+      "seconds": 0.402
+    },
+    {
+      "name": "pulse-build",
+      "exit_code": 0,
+      "seconds": 3.513
+    },
+    {
+      "name": "pulse-public",
+      "exit_code": 0,
+      "seconds": 1.395
+    },
+    {
+      "name": "pulse-zip",
+      "exit_code": 0,
+      "seconds": 1.378
+    },
+    {
+      "name": "pulse-extract",
+      "exit_code": 0,
+      "seconds": 0.185
+    },
+    {
+      "name": "pulse-signature",
+      "exit_code": 0,
+      "seconds": 0.078
+    },
+    {
+      "name": "pulse-launch-copy",
+      "exit_code": 0,
+      "seconds": 0.13
+    },
+    {
+      "name": "pulse-launch-signature",
+      "exit_code": 0,
+      "seconds": 0.08
+    }
+  ],
+  "controller_note": "After all four successful commands, an unused lookup of a nonexistent PACKET.json stopped the controller. Removed the unused lookup; validated all extracted SDK files and retained successful command evidence without rerunning.",
+  "schema": 1,
+  "build": "13",
+  "apps": [
+    {
+      "id": "notes",
+      "name": "Vellum Notes",
+      "identifier": "com.dshills.vellum.notes.personal",
+      "archive": "Vellum Notes-build13.zip",
+      "archive_sha256": "8682623e6b4bf9eadd2c33d52132060c12ceda93a845e45ce0cfba66d88cfa82",
+      "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+      "source_binary_sha256": "789c8cc78ae8440b19731b1dc152487686ad37966e3d1ac89a7c05a3bad862cf",
+      "packaged_binary_sha256": "dade4d43aba1f3d9b4b1132624598ba7931366b1868a1e515b82a3e8a5cf2300",
+      "notice_inventory_sha256": "df2734c599db6e23cc3f187481e54b3e9f487e911f152b107cc753d82dd8ada8",
+      "notice_files": 418,
+      "notice_components": 275,
+      "manifest_sha256": "5b4e2accf59ff2831b5cab200cc8a7421618759396d5fd95d441aaf0578b13e7",
+      "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+      "module_origins": {
+        "cogentcore.org/core": "drivers/cogent/build/upstream",
+        "github.com/dshills/vellum": ".",
+        "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+        "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+        "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+        "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+        "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+        "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+        "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+      },
+      "module_records": 92,
+      "embedded_assets": 4441,
+      "assets_unchanged": true,
+      "dependency_identities_unchanged": true,
+      "original_notice_bytes_unchanged": true,
+      "generated_font_source": [],
+      "compiled_font_hashes": {},
+      "private_build": false,
+      "native_distribution_audit": "approved",
+      "notarized": false,
+      "build": "13",
+      "runtime_result": "pass: rendered and normally closed; exact executable process absent",
+      "native_evidence": "native-result.json#notes"
+    },
+    {
+      "id": "widgets",
+      "name": "Vellum Mac Widgets",
+      "identifier": "com.dshills.vellum.widgets.v1",
+      "archive": "Vellum Mac Widgets-build13.zip",
+      "archive_sha256": "e966294fc953bf779d9cb78431bd3e120282246babe307ef6e5c902c12a52844",
+      "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+      "source_binary_sha256": "9ae5ce53dce027569f4daff81b12964f3c61ab4900a34cacf7dc228a6864de83",
+      "packaged_binary_sha256": "200db5a8739ee71a0329bf2fc4588c6318bc3bb04ee719ebb322571ce4d737fa",
+      "notice_inventory_sha256": "9b16d308baefd989a6ff695a8a38d2badb13c3c6702e012f4e59f01f7731ff90",
+      "notice_files": 418,
+      "notice_components": 274,
+      "manifest_sha256": "5603645e6ffc907b2868a08ddb0985c3eb4898a79dcfc2f3f0037ef659787df3",
+      "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+      "module_origins": {
+        "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+        "github.com/dshills/vellum": ".",
+        "cogentcore.org/core": "drivers/cogent/build/upstream",
+        "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+        "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+        "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+        "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+        "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+        "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+      },
+      "module_records": 91,
+      "embedded_assets": 4441,
+      "assets_unchanged": true,
+      "dependency_identities_unchanged": true,
+      "original_notice_bytes_unchanged": true,
+      "generated_font_source": [],
+      "compiled_font_hashes": {},
+      "private_build": false,
+      "native_distribution_audit": "approved",
+      "notarized": false,
+      "build": "13",
+      "runtime_result": "pass: rendered and normally closed; exact executable process absent",
+      "native_evidence": "native-result.json#widgets"
+    },
+    {
+      "id": "shell",
+      "name": "Vellum Mac Shell",
+      "identifier": "com.dshills.vellum.macshell.v1",
+      "archive": "Vellum Mac Shell-build13.zip",
+      "archive_sha256": "18ebcf5557b3129ac98e041f1fb77f57cd64aae191901f08312bf7c6be1bc119",
+      "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+      "source_binary_sha256": "32f57f99f64722bc51e722d33abda146ff3af232b8801affa47ee0cf40fa4f53",
+      "packaged_binary_sha256": "8c170c53fc38ad9c3432273ad23aec248857347dec33439124c8a3ed9dedb0ab",
+      "notice_inventory_sha256": "baba38ebded988b3325da85880d5002a03fd97a4c6ebe737b0ca165fff5641a7",
+      "notice_files": 418,
+      "notice_components": 275,
+      "manifest_sha256": "184ba7328dac9ae413301d42d49dba0d82fdfabecf5b4915a2964c1cce0c589f",
+      "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+      "module_origins": {
+        "cogentcore.org/core": "drivers/cogent/build/upstream",
+        "github.com/dshills/vellum": ".",
+        "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+        "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+        "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+        "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+        "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+        "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+        "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+      },
+      "module_records": 92,
+      "embedded_assets": 4441,
+      "assets_unchanged": true,
+      "dependency_identities_unchanged": true,
+      "original_notice_bytes_unchanged": true,
+      "generated_font_source": [],
+      "compiled_font_hashes": {},
+      "private_build": false,
+      "native_distribution_audit": "approved",
+      "notarized": false,
+      "build": "13",
+      "runtime_result": "pass: rendered and normally closed; exact executable process absent",
+      "native_evidence": "native-result.json#shell"
+    },
+    {
+      "id": "forma",
+      "name": "Forma",
+      "identifier": "com.dshills.vellum.showcase.forma",
+      "archive": "Forma-build13.zip",
+      "archive_sha256": "2dfdeacd20685169b46f88bf9fa0da9ea84e6e17f533f6824c61b4c6f6e42ed0",
+      "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+      "source_binary_sha256": "73dc8a6f3ebf7efdfbbeded68636ca4bd5759476b7c1a9470bf7678def43f5d9",
+      "packaged_binary_sha256": "42b00d0ba518b59a9163a7649df2ae194b4f48b1607702df4443c8c879a99e01",
+      "notice_inventory_sha256": "35829baf18ee36561aa312c036397888374abd2ad4065205b9bbb9ea982b3d50",
+      "notice_files": 419,
+      "notice_components": 276,
+      "manifest_sha256": "d52a617f3379659e66c6a32e445baacb732ad226c0c3c9682bb7f5b093bd68df",
+      "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+      "module_origins": {
+        "cogentcore.org/core": "drivers/cogent/build/upstream",
+        "github.com/dshills/vellum": ".",
+        "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+        "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+        "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+        "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+        "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+        "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+        "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+      },
+      "module_records": 92,
+      "embedded_assets": 4441,
+      "assets_unchanged": true,
+      "dependency_identities_unchanged": true,
+      "original_notice_bytes_unchanged": true,
+      "generated_font_source": [
+        {
+          "package": "golang.org/x/image/font/gofont/gobold",
+          "files": {
+            "data.go": "fc7962ee60b083d84f22a643e1cb835735c32b48d48916a8b183b5b4571882e2"
+          }
+        },
+        {
+          "package": "golang.org/x/image/font/gofont/goregular",
+          "files": {
+            "data.go": "3c5bc52e0342e5d9f50f90cb331b64bc2227b88def55d23ed1112a71f84b821c"
+          }
+        }
+      ],
+      "compiled_font_hashes": {
+        "Go-Regular.ttf": "197d9f3703b4c00af609178876a8d73e396f64fe438b2c871778566632374be3",
+        "Go-Bold.ttf": "c18494baa7ea35b8dbfac3861787d360b9c0ab91232562371a09e6fbf09aaa40"
+      },
+      "private_build": false,
+      "native_distribution_audit": "approved",
+      "notarized": false,
+      "build": "13",
+      "runtime_result": "pass: rendered and normally closed; exact executable process absent",
+      "native_evidence": "native-result.json#forma"
+    },
+    {
+      "id": "luma",
+      "name": "Luma",
+      "identifier": "com.dshills.vellum.showcase.luma",
+      "archive": "Luma-build13.zip",
+      "archive_sha256": "4cece800a3a53369ae3c2667947aa5186ff22b544153dd59f3f9f61df3803b82",
+      "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+      "source_binary_sha256": "76afc01eb8df717083cbe5a1a990c42ebc7a99e44fbaed7f6c19254389ddb184",
+      "packaged_binary_sha256": "777b557e0fab98d4da1bca1615e0fc2423a4a5c02cbbc4793d13ac825fb262f1",
+      "notice_inventory_sha256": "75ac10e955174f6941515b7b7efd9464112394563fbe55b45c8ef30d22661240",
+      "notice_files": 419,
+      "notice_components": 276,
+      "manifest_sha256": "814784324c5637fb567b0a0e568c54d71f06acb7849f2dfa309d4ec3278f8031",
+      "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+      "module_origins": {
+        "cogentcore.org/core": "drivers/cogent/build/upstream",
+        "github.com/dshills/vellum": ".",
+        "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+        "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+        "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+        "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+        "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+        "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+        "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+      },
+      "module_records": 92,
+      "embedded_assets": 4441,
+      "assets_unchanged": true,
+      "dependency_identities_unchanged": true,
+      "original_notice_bytes_unchanged": true,
+      "generated_font_source": [
+        {
+          "package": "golang.org/x/image/font/gofont/gobold",
+          "files": {
+            "data.go": "fc7962ee60b083d84f22a643e1cb835735c32b48d48916a8b183b5b4571882e2"
+          }
+        },
+        {
+          "package": "golang.org/x/image/font/gofont/goregular",
+          "files": {
+            "data.go": "3c5bc52e0342e5d9f50f90cb331b64bc2227b88def55d23ed1112a71f84b821c"
+          }
+        }
+      ],
+      "compiled_font_hashes": {
+        "Go-Regular.ttf": "197d9f3703b4c00af609178876a8d73e396f64fe438b2c871778566632374be3",
+        "Go-Bold.ttf": "c18494baa7ea35b8dbfac3861787d360b9c0ab91232562371a09e6fbf09aaa40"
+      },
+      "private_build": false,
+      "native_distribution_audit": "approved",
+      "notarized": false,
+      "build": "13",
+      "runtime_result": "pass: rendered and normally closed; exact executable process absent",
+      "native_evidence": "native-result.json#luma"
+    },
+    {
+      "id": "pulse",
+      "name": "Pulse",
+      "identifier": "com.dshills.vellum.showcase.pulse",
+      "archive": "Pulse-build13.zip",
+      "archive_sha256": "04a60a5fa715e365a9de0fd6cdad834b9a73cd8376d890d1f9d315b534453560",
+      "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+      "source_binary_sha256": "258f45bf63785a300aa606b3267507e77a86aab64334b332be1e11cdbbef8e70",
+      "packaged_binary_sha256": "aa72c2a665e5a6c006c51b74fd321b3742fe6cec5d679632d95bce28f588f769",
+      "notice_inventory_sha256": "68f114253a7e4700cd517b1805b6bf31e0fffe3b2817401f795605b972f93f9d",
+      "notice_files": 419,
+      "notice_components": 276,
+      "manifest_sha256": "32dc694c31b4d66e4f5cc3b6f5ed2b1ea0ddf6811f0e0d18f64d65f6a61a8647",
+      "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+      "module_origins": {
+        "cogentcore.org/core": "drivers/cogent/build/upstream",
+        "github.com/dshills/vellum": ".",
+        "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+        "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+        "github.com/oliverbestmann/webgpu/libs-android": "drivers/cogent/build/libs-android",
+        "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin",
+        "github.com/oliverbestmann/webgpu/libs-ios": "drivers/cogent/build/libs-ios",
+        "github.com/oliverbestmann/webgpu/libs-linux": "drivers/cogent/build/libs-linux",
+        "github.com/oliverbestmann/webgpu/libs-windows": "drivers/cogent/build/libs-windows"
+      },
+      "module_records": 92,
+      "embedded_assets": 4441,
+      "assets_unchanged": true,
+      "dependency_identities_unchanged": true,
+      "original_notice_bytes_unchanged": true,
+      "generated_font_source": [
+        {
+          "package": "golang.org/x/image/font/gofont/gobold",
+          "files": {
+            "data.go": "fc7962ee60b083d84f22a643e1cb835735c32b48d48916a8b183b5b4571882e2"
+          }
+        },
+        {
+          "package": "golang.org/x/image/font/gofont/goregular",
+          "files": {
+            "data.go": "3c5bc52e0342e5d9f50f90cb331b64bc2227b88def55d23ed1112a71f84b821c"
+          }
+        }
+      ],
+      "compiled_font_hashes": {
+        "Go-Regular.ttf": "197d9f3703b4c00af609178876a8d73e396f64fe438b2c871778566632374be3",
+        "Go-Bold.ttf": "c18494baa7ea35b8dbfac3861787d360b9c0ab91232562371a09e6fbf09aaa40"
+      },
+      "private_build": false,
+      "native_distribution_audit": "approved",
+      "notarized": false,
+      "build": "13",
+      "runtime_result": "pass: rendered and normally closed; exact executable process absent",
+      "native_evidence": "native-result.json#pulse"
+    }
+  ],
+  "publication_authorized": false,
+  "uploaded": false,
+  "notarized": false,
+  "post_launch_checks": [
+    {
+      "name": "notes-post-exact-signature",
+      "exit_code": 0
+    },
+    {
+      "name": "notes-post-launch-signature",
+      "exit_code": 0
+    },
+    {
+      "name": "widgets-post-exact-signature",
+      "exit_code": 0
+    },
+    {
+      "name": "widgets-post-launch-signature",
+      "exit_code": 0
+    },
+    {
+      "name": "shell-post-exact-signature",
+      "exit_code": 0
+    },
+    {
+      "name": "shell-post-launch-signature",
+      "exit_code": 0
+    },
+    {
+      "name": "forma-post-exact-signature",
+      "exit_code": 0
+    },
+    {
+      "name": "forma-post-launch-signature",
+      "exit_code": 0
+    },
+    {
+      "name": "luma-post-exact-signature",
+      "exit_code": 0
+    },
+    {
+      "name": "luma-post-launch-signature",
+      "exit_code": 0
+    },
+    {
+      "name": "pulse-post-exact-signature",
+      "exit_code": 0
+    },
+    {
+      "name": "pulse-post-launch-signature",
+      "exit_code": 0
+    }
+  ],
+  "native_result": "pass: bounded launch/render/close for all six apps",
+  "native_evidence": "native-result.json",
+  "existing_source_tag_unchanged": "4b42fb89948b8abf0f2f65970fb5980987c1af0c",
+  "notes_profile": "disposable fixture only"
+}

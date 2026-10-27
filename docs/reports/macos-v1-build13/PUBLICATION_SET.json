@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+  "source_clean_at_production": true,
+  "build": "13",
+  "local_delivery": "macos-v1-build13-20261027",
+  "assets": [
+    {
+      "file": "vellum-v1.0.0-build13-darwin-arm64-sdk.tar.gz",
+      "sha256": "48bcffef1c8d11ee4801186cc33501f5807af2a4b0770321b4cb310e18fa3614",
+      "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+      "kind": "sdk"
+    },
+    {
+      "file": "Vellum Notes-build13.zip",
+      "sha256": "8682623e6b4bf9eadd2c33d52132060c12ceda93a845e45ce0cfba66d88cfa82",
+      "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+      "kind": "app",
+      "id": "notes",
+      "build": "13"
+    },
+    {
+      "file": "Vellum Mac Widgets-build13.zip",
+      "sha256": "e966294fc953bf779d9cb78431bd3e120282246babe307ef6e5c902c12a52844",
+      "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+      "kind": "app",
+      "id": "widgets",
+      "build": "13"
+    },
+    {
+      "file": "Vellum Mac Shell-build13.zip",
+      "sha256": "18ebcf5557b3129ac98e041f1fb77f57cd64aae191901f08312bf7c6be1bc119",
+      "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+      "kind": "app",
+      "id": "shell",
+      "build": "13"
+    },
+    {
+      "file": "Forma-build13.zip",
+      "sha256": "2dfdeacd20685169b46f88bf9fa0da9ea84e6e17f533f6824c61b4c6f6e42ed0",
+      "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+      "kind": "app",
+      "id": "forma",
+      "build": "13"
+    },
+    {
+      "file": "Luma-build13.zip",
+      "sha256": "4cece800a3a53369ae3c2667947aa5186ff22b544153dd59f3f9f61df3803b82",
+      "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+      "kind": "app",
+      "id": "luma",
+      "build": "13"
+    },
+    {
+      "file": "Pulse-build13.zip",
+      "sha256": "04a60a5fa715e365a9de0fd6cdad834b9a73cd8376d890d1f9d315b534453560",
+      "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+      "kind": "app",
+      "id": "pulse",
+      "build": "13"
+    }
+  ],
+  "checksum_file": {
+    "file": "SHA256SUMS",
+    "sha256": "c9ba736ef450b80a33fcb68f00d0c54aac1143b24ece00da4f5f4c013539c84a"
+  },
+  "destination": {
+    "repository": "dshills/vellum",
+    "tag": "macos-v1.0.0-build13",
+    "tag_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+    "new_tag_proposed": true,
+    "url": "https://github.com/dshills/vellum/releases/tag/macos-v1.0.0-build13",
+    "release_title": "Vellum macOS v1.0.0 \u2014 build13 developer downloads",
+    "preserve_existing_source_tag": {
+      "name": "v1.0.0",
+      "commit": "4b42fb89948b8abf0f2f65970fb5980987c1af0c"
+    },
+    "modify_existing_release": false,
+    "release_body": "RELEASE_BODY.md",
+    "release_body_sha256": "d68b53f1a187d78d8ae893c34e84924c11ab5030145edd63f39412296b6ad4e2"
+  },
+  "historical_audit_sha256": "adf2f08a4dbb6622ee67ef60889a68dbb6dd719d6a15f8b9cc41b6890c15b5ae",
+  "signing": "ad-hoc (-)",
+  "notarized": false,
+  "publication_authorized": false,
+  "uploaded": false,
+  "scope": "Seven new payload archives plus SHA256SUMS, proposed for a separate macos-v1.0.0-build13 release/tag at the exact green source64bf9cf. Existing v1.0.0 source tag/release untouched. Prepared Core Go bytes include stage0108 in SDK and every app."
+}

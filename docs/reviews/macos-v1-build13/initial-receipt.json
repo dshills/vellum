@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "README.md,docs/README.md,docs/macos-v1.md,docs/reports/README.md,docs/reports/macos-v1-build13/DELIVERY_README.md,docs/reports/macos-v1-build13/PUBLICATION_PACKET.md,docs/reports/macos-v1-build13/PUBLICATION_SET.json,docs/reports/macos-v1-build13/README.md,docs/reports/macos-v1-build13/RELEASE_BODY.md,docs/reports/macos-v1-build13/REPRODUCE.md,docs/reports/macos-v1-build13/SHA256SUMS,docs/reports/macos-v1-build13/evidence-index.json,docs/reports/macos-v1-build13/evidence.tar.gz,docs/reports/macos-v1-build13/final-package.json,docs/reports/macos-v1-build13/native-result.json,docs/reports/macos-v1-build13/packet-validation.json,docs/reports/macos-v1-build13/private-inputs.json,docs/reports/macos-v1-build13/reused-ci.json,docs/reports/macos-v1-build13/sdk-delta.json,docs/reports/macos-v1-build13/shell-a0-after-native-close.jpg,docs/reports/macos-v1-build13/shell-b2.jpg,docs/reports/macos-v1-build13/validate.py,docs/reviews/macos-v1-build13/README.md,specs/macos-v1-release.md",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "6",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/macos-v1-build13-final/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/macos-v1-build13-final/prism.json"
+  ],
+  "cwd": "/Users/dshills/Development/projects/Vellum",
+  "started_utc": "2026-10-27T14:00:26.914194+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 1,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 72811,
+  "group": 72811,
+  "owned": {
+    "created": true,
+    "pid": 72811,
+    "group": 72811,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 1,
+    "errors": [],
+    "observation": {
+      "group": 72811,
+      "members": [],
+      "observation_sha256": "f3efe72b64847d59eb62e9eb7a398df16deb800c5151ef45a7388497017a5e92"
+    }
+  },
+  "seconds": 8.128931500017643,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}
