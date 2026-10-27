@@ -9,6 +9,7 @@ import (
 	"cogentcore.org/core/events/key"
 	"cogentcore.org/core/icons"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/ui"
 )
@@ -126,6 +127,20 @@ func syncTabsPresentation(r *record) {
 	}
 	w := r.widget.(*core.Tabs)
 	w.SetType(typ)
+	// Grouped ribbon pages size to their tools. Ordinary content tabs retain
+	// the native 96dp page floor, including when this descriptor is reused.
+	if frame, ok := w.ChildByName("frame").(*core.Frame); ok && frame.Property("vellum.ribbon.minimum") == nil {
+		frame.SetProperty("vellum.ribbon.minimum", true)
+		frame.FinalStyler(func(s *styles.Style) {
+			grouped := len(r.node.Children) > 0
+			for _, page := range r.node.Children {
+				grouped = grouped && page.Kind == ui.Toolbar && page.ToolbarGroups
+			}
+			if grouped {
+				s.Min.Y = units.Dp(0)
+			}
+		})
+	}
 	if len(r.node.Options) > 0 {
 		button := r.control.tabs.buttons[r.node.Options[0].ID]
 		if bar, ok := button.AsTree().Parent.(core.Widget); ok && bar.AsTree().Property("vellum.settings.tabbar") == nil {

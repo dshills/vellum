@@ -113,3 +113,9 @@ retains a text fallback. The mock body-creation history does not become a solver
 The inspector, orientation controls, model, renderer and modal action panel are
 outside this pass. Native appearance and targeting are checked separately from
 automated layout/routing, using the existing approved Forge-only mouse helper.
+
+The packaged visual check exposed the native tab host's 96dp content-page floor
+leaving an empty band under compact ribbon tools. Only tab descriptors whose
+pages are all grouped toolbars clear that internal minimum; ordinary tabs keep
+their native floor, restored on descriptor reuse. A three-DPI geometry/reuse
+regression pins this correction. No public API or input behavior changes.

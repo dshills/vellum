@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f43c06114035201b3746230bed847b66",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "deafbf6f6984fed3320d1ce557f942ff12f7c192",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "51b5e28ce7cb2315",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Styler closure captures record that may be stale",
+      "message": "The styler closure captures the record r, and reads r.node at style time. That is intended for reuse, but the property guard is set on the frame only once and the closure keeps the first record pointer. If the descriptor/record is replaced (new record reusing the same native widget), the closure reads a stale record and may apply or skip the minimum incorrectly.",
+      "suggestion": "Store the current grouped state on the frame/binding each sync (e.g. a property updated every call) and have the styler read that, or confirm the record is never replaced for a given widget.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/tab_close.go",
+          "lines": {
+            "start": 135,
+            "end": 139
+          }
+        }
+      ],
+      "tags": [
+        "reuse",
+        "closure"
+      ],
+      "evidence": "grouped := len(r.node.Children) \u003e 0\n\t\t\tfor _, page := range r.node.Children {\n\t\t\t\tgrouped = grouped \u0026\u0026 page.Kind == ui.Toolbar \u0026\u0026 page.ToolbarGroups\n\t\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4344,
+    "totalMs": 4353
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 7186,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5820,
+        "output": 381,
+        "costUSD": 0.01545
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

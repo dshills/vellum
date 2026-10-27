@@ -1,0 +1,44 @@
+[
+  {
+    "name": "fidelity-ui-floor",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 2.977
+  },
+  {
+    "name": "fidelity-ribbon-floor",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestRibbon|TestWorkbenchFidelity|TestNativeTabs|TestTabs|TestSettingsPane",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 21.125
+  },
+  {
+    "name": "fidelity-vet-floor",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 12.185
+  }
+]

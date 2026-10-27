@@ -114,7 +114,7 @@ func (p *Ribbon) View() (Node, error) {
 	used := map[string]bool{}
 	seen := map[string]bool{}
 	found := false
-	root := Node{ID: p.ID, Kind: Tabs, SelectedID: p.SelectedTab, Disabled: p.Disabled, Accessibility: Accessibility{Name: p.Label}, Style: Style{Padding: Some(Insets{}), GrowX: Some(float32(1)), GrowY: Some(float32(0))}.Overlay(p.Style)}
+	root := Node{ID: p.ID, Kind: Tabs, SelectedID: p.SelectedTab, Disabled: p.Disabled, Accessibility: Accessibility{Name: p.Label}, Style: Style{Padding: Some(Insets{}), Gap: Some(float32(0)), GrowX: Some(float32(1)), GrowY: Some(float32(0))}.Overlay(p.Style)}
 	root.Change = func(e ChangeEvent) {
 		if p.Disabled || p.SelectTab == nil {
 			return
