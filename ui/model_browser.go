@@ -153,7 +153,10 @@ func (p *ModelBrowser) View() (Node, error) {
 				row.Children = append(row.Children, Node{ID: rid + "/indent", Kind: Column, Style: quiet})
 			}
 			row.Children = append(row.Children, Node{ID: rid + "/visibility", Kind: ToggleButton, Icon: SymbolVisibility, Checked: item.Visible, Style: quiet, Accessibility: Accessibility{Name: "Visibility of " + item.Label}, Change: func(e ChangeEvent) { propose(id, ModelBrowserVisibility, e.Checked) }})
-			selectStyle := Style{Padding: Some(Insets{Left: 4, Right: 4}), Gap: Some(float32(10)), Border: Some(Border{}), GrowX: Some(float32(1)), TextAlign: Some(AlignStart), MinSize: Some(Size{Height: 24})}
+			selectStyle := Style{Padding: Some(Insets{Left: 4, Right: 4}), Gap: Some(float32(10)), Border: Some(Border{}), Background: Some(color.NRGBA{}), Typography: Some(MacTypography(12, 400)), GrowX: Some(float32(1)), TextAlign: Some(AlignStart), MinSize: Some(Size{Width: 48, Height: 24})}
+			if p.SelectedID == id {
+				selectStyle.Foreground = Some(MacPalette(false, color.NRGBA{}).AccentInk)
+			}
 			row.Children = append(row.Children, Node{ID: rid + "/select", Kind: Button, Text: item.Label, Icon: item.Icon, IconImage: item.IconImage, Appearance: ButtonQuiet, Style: selectStyle, Accessibility: Accessibility{Name: "Select " + item.Label}, Activate: func() { propose(id, ModelBrowserSelect, true) }})
 			if item.Badge != "" {
 				row.Children = append(row.Children, Node{ID: rid + "/badge", Kind: Label, Text: item.Badge, Style: Style{Typography: Some(MacTypography(10, 400)), Padding: Some(Insets{}), GrowX: Some(float32(0))}})

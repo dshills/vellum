@@ -1,0 +1,143 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "85ce412bcf79179ffd99d861136e02ba",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "aa56c3168c83d34d92cf46b1a5fe627abf3061e8",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "87161ba62ac01cb5",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Smoke result dropped when Run errors",
+      "message": "If a.Run returns an error before the smoke goroutine finishes, run returns without waiting; also if smokeCheck never completes the watchdog kills the process. More importantly, smokeCheck mutates workbench from a.Do while the main thread also uses it, relying on Do for sync; but the polling loop calls a.Do after Close may fail, acceptable. The result channel is only read if Run succeeded, leaking otherwise.",
+      "suggestion": "Read the result on error paths too, or ignore since buffered; ensure smoke failure is not masked when Run returns an error.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "examples/forge/main.go",
+          "lines": {
+            "start": 58,
+            "end": 58
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "location-corrected"
+      ],
+      "evidence": "go func() { result \u003c- smokeCheck(a, ref, m); a.Close() }()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "79814099e3ec7e68",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Objects lacking a feature are always hidden",
+      "message": "Hidden bug check: when the 'move' reorder is applied, features are shifted with append/copy on a cloned slice. That is fine, but the visibility toggle only affects Objects while refresh hides bodies by feature marker, so a body with no feature entry is always invisible (active[id] defaults to false).",
+      "suggestion": "Treat objects without a feature as active: only hide when a feature exists and its index \u003e= Marker.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "examples/forge/model.go",
+          "lines": {
+            "start": 206,
+            "end": 206
+          }
+        }
+      ],
+      "tags": [
+        "logic",
+        "location-corrected"
+      ],
+      "evidence": "s.Objects = append(s.Objects[:j], s.Objects[j+1:]...)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 8892,
+    "totalMs": 8948
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 61145,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 35838,
+        "output": 864,
+        "costUSD": 0.080316
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "6f8ab7928572f1f1",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Stale featureID after delete",
+        "message": "The smoke test and timeline timing aside, deleteSelected filters Features in place via s.Features[:0] on a clone; this is safe, but Undo's 'before' snapshot is shared only through clone, fine. However the 'move' handler leaves m.featureID stale after delete, and featureChange 'select' on a feature whose Object was removed is harmless.",
+        "suggestion": "Reset m.featureID when its feature is deleted.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "examples/forge/model.go",
+            "lines": {
+              "start": 213,
+              "end": 213
+            }
+          }
+        ],
+        "tags": [
+          "state"
+        ],
+        "evidence": "m.state.Objects = append(s.Objects[:j], s.Objects[j+1:]...)",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in examples/forge/model.go"
+    }
+  ],
+  "suppressed": []
+}

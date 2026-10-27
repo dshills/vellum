@@ -35,7 +35,7 @@ func (p *QuantityField) View() (Node, error) {
 		return Node{}, fmt.Errorf("ui: invalid quantity unit")
 	}
 	id := p.ID
-	input := Node{ID: id + "/quantity/input", Kind: TextField, Text: p.Text, Disabled: p.Change == nil, Accessibility: Accessibility{Name: p.Label}, Style: Style{GrowX: Some(float32(1))}, Change: func(e ChangeEvent) {
+	input := Node{ID: id + "/quantity/input", Kind: TextField, Text: p.Text, Disabled: p.Change == nil, Accessibility: Accessibility{Name: p.Label}, Style: Style{GrowX: Some(float32(1)), MinSize: Some(Size{Width: 64, Height: 28})}, Change: func(e ChangeEvent) {
 		if p.ID == id && !p.Disabled && p.Change != nil {
 			p.Change(e.Text)
 		}

@@ -76,7 +76,7 @@ func (p *FeatureTimeline) View() (Node, error) {
 		}
 	}
 	root := Node{ID: id, Kind: Column, Disabled: p.Disabled, Style: Style{Gap: Some(float32(6)), GrowX: Some(float32(1)), GrowY: Some(float32(0))}.Overlay(p.Style)}
-	controls := Node{ID: id + "/controls", Kind: Row, Style: Style{Gap: Some(float32(8)), GrowY: Some(float32(0))}, Children: []Node{{ID: id + "/label", Kind: Label, Text: p.Label, Style: Style{Typography: Some(MacTypography(11, 600))}}}}
+	controls := Node{ID: id + "/controls", Kind: Row, Style: Style{Gap: Some(float32(8)), GrowY: Some(float32(0))}, Children: []Node{{ID: id + "/label", Kind: Label, Text: p.Label, Style: Style{Typography: Some(MacTypography(11, 600)), MinSize: Some(Size{Width: 120}), GrowX: Some(float32(0))}}}}
 	for _, a := range []struct {
 		key, label string
 		delta      int
@@ -86,7 +86,7 @@ func (p *FeatureTimeline) View() (Node, error) {
 		if delta > 0 {
 			icon = SymbolRight
 		}
-		controls.Children = append(controls.Children, Node{ID: id + "/" + a.key, Kind: Button, Icon: icon, Accessibility: Accessibility{Name: a.label}, Disabled: p.Change == nil || p.Marker+delta < 0 || p.Marker+delta > len(p.Items), Activate: func() { event("", "marker", p.Marker+delta) }})
+		controls.Children = append(controls.Children, Node{ID: id + "/" + a.key, Kind: Button, Style: Style{GrowX: Some(float32(0))}, Icon: icon, Accessibility: Accessibility{Name: a.label}, Disabled: p.Change == nil || p.Marker+delta < 0 || p.Marker+delta > len(p.Items), Activate: func() { event("", "marker", p.Marker+delta) }})
 	}
 	selected := -1
 	for j, i := range p.Items {
@@ -99,7 +99,7 @@ func (p *FeatureTimeline) View() (Node, error) {
 		delta      int
 	}{{"earlier", "Move feature earlier", -1}, {"later", "Move feature later", 1}} {
 		delta := a.delta
-		controls.Children = append(controls.Children, Node{ID: id + "/" + a.key, Kind: Button, Text: a.label, Disabled: p.Change == nil || selected < 0 || selected+delta < 0 || selected+delta >= len(p.Items), Activate: func() {
+		controls.Children = append(controls.Children, Node{ID: id + "/" + a.key, Kind: Button, Style: Style{GrowX: Some(float32(0))}, Text: a.label, Disabled: p.Change == nil || selected < 0 || selected+delta < 0 || selected+delta >= len(p.Items), Activate: func() {
 			index := -1
 			for j, i := range p.Items {
 				if i.ID == p.SelectedID {

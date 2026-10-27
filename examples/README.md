@@ -35,3 +35,7 @@ Root `go test ./...` does not include these nested modules. Follow each README
 for its commands and applicable offscreen/live checks. Build outputs go under
 ignored `build/` directories. See [CONTRIBUTING](../CONTRIBUTING.md) for the module
 and verification workflow.
+
+- [Forge](forge/README.md): original Fusion-inspired Mac design workbench with
+  grouped ribbon, rich model browser, real GPU assembly viewport/orientation cube,
+  unit expressions, feature strip and undoable body edits.

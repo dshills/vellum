@@ -1,0 +1,59 @@
+[
+  {
+    "name": "phase5-ui",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui",
+      "./quantity",
+      "./viewport"
+    ],
+    "exit_code": 0,
+    "seconds": 3.523
+  },
+  {
+    "name": "phase5-reviewed-app",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 3.458
+  },
+  {
+    "name": "phase5-app-vet-v3",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 17.252
+  },
+  {
+    "name": "phase5-api",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.556
+  }
+]
