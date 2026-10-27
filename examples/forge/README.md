@@ -47,3 +47,11 @@ No publication, Developer ID identity or notarization is requested.
 A rejected dirty checkout does not reserve the output directory. Later failures
 retain partial output for diagnosis; only a finished producer writes manifest.json
 and SHA256SUMS. Choose a fresh output directory for another attempt.
+
+The Fusion fidelity pass keeps commands frozen while using a shorter grouped
+ribbon with separators, a single compact browser heading/outline, and one feature
+icon strip. Hover/focus feature icons for names and paused state. The two straight
+arrows move the marker; the two curved arrows move the selected feature earlier
+or later. These remain separate history actions with Undo/Redo; no new timeline
+drag behavior or CAD feature calculation is introduced. Visibility and activation
+retain independent keyboard/pointer targets and accessible checked states.

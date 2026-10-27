@@ -1,7 +1,10 @@
 package ui
 
 import (
+	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/viewport"
+	"image"
+	"image/color"
 	"testing"
 )
 
@@ -39,12 +42,12 @@ func TestTimelineAndMarkingControlled(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	n.Children[0].Children[4].Activate()
+	nodeByID(n, "t/later").Activate()
 	if calls != 1 {
 		t.Fatal(calls)
 	}
 	p.Items[0].Disabled = true
-	n.Children[0].Children[4].Activate()
+	nodeByID(n, "t/later").Activate()
 	if calls != 1 {
 		t.Fatal("stale disabled action")
 	}
@@ -73,5 +76,50 @@ func TestTimelineAndMarkingControlled(t *testing.T) {
 	cube.Children[1].Activate()
 	if calls != 3 {
 		t.Fatal(calls)
+	}
+}
+
+func TestCompactTimelineKeepsNamesFallbackMarkerAndAdmission(t *testing.T) {
+	pixels := image.NewNRGBA(image.Rect(0, 0, 2, 2))
+	pixels.SetNRGBA(0, 0, color.NRGBA{R: 230, A: 255})
+	art, _ := canvas.NewTiledImage(pixels)
+	var got []FeatureTimelineEvent
+	p := &FeatureTimeline{ID: "compact", Label: "Feature history", Items: []FeatureItem{{ID: "a", Label: "Create A", IconImage: art}, {ID: "b", Label: "Create B"}}, SelectedID: "a", Marker: 1, Change: func(e FeatureTimelineEvent) { got = append(got, e) }}
+	n, e := p.View()
+	if e != nil {
+		t.Fatal(e)
+	}
+	a := nodeByID(n, "compact/feature/"+ribbonPart("a"))
+	b := nodeByID(n, "compact/feature/"+ribbonPart("b"))
+	if a.Text != "" || a.IconImage != art || a.Accessibility.Name != "Create A" || b.Text != "Create B" || b.Accessibility.Name != "Create B · paused" {
+		t.Fatal("lost names/art/fallback")
+	}
+	a.Activate()
+	nodeByID(n, "compact/later").Activate()
+	nodeByID(n, "compact/back").Activate()
+	if len(got) != 3 || got[0].Action != "select" || got[1].Action != "move" || got[1].Index != 1 || got[2].Action != "marker" || got[2].Index != 0 {
+		t.Fatal(got)
+	}
+	p.SelectedID = "b"
+	paused, e := p.View()
+	if e != nil {
+		t.Fatal(e)
+	}
+	selectedPaused := nodeByID(paused, "compact/feature/"+ribbonPart("b"))
+	if selectedPaused.Style.Background.Value != (color.NRGBA{R: 237, G: 240, B: 244, A: 255}) || selectedPaused.Style.Border.Value.Width != 1 {
+		t.Fatal("paused selection lost fill/outline")
+	}
+	p.Items[0].Disabled = true
+	a.Activate()
+	if len(got) != 3 {
+		t.Fatal("disabled feature accepted")
+	}
+	if nodeByID(n, "compact/marker") == nil {
+		t.Fatal("marker missing")
+	}
+	p.ID = "retired"
+	nodeByID(n, "compact/back").Activate()
+	if len(got) != 3 {
+		t.Fatal("retired callback")
 	}
 }

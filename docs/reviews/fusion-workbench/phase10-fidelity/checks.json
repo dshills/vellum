@@ -1,0 +1,98 @@
+[
+  {
+    "name": "fidelity-ui-v3",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 2.873
+  },
+  {
+    "name": "fidelity-native-ready",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestWorkbenchFidelity|TestRibbon|TestButtonIconAboveText",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 20.15
+  },
+  {
+    "name": "fidelity-app-final",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 16.048
+  },
+  {
+    "name": "fidelity-vet-ui",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "vet",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 0.251
+  },
+  {
+    "name": "fidelity-vet-native",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 12.413
+  },
+  {
+    "name": "fidelity-vet-app",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 11.011
+  },
+  {
+    "name": "fidelity-api",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.35
+  }
+]

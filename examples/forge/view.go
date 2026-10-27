@@ -51,7 +51,7 @@ func (m *workbench) ribbonView() ui.Node {
 	m.ribbon.ID = "ribbon"
 	m.ribbon.Label = "Design tools"
 	m.ribbon.SelectedTab = m.tab
-	m.ribbon.Tabs = []ui.RibbonTab{{ID: "solid", Label: "Solid", Groups: []ui.RibbonGroup{{ID: "create", Label: "CREATE", Actions: []ui.RibbonAction{a("add", "New body", "add", blue)}}, {ID: "modify", Label: "MODIFY", Actions: []ui.RibbonAction{a("move", "Move +4 mm", "move", teal), a("delete", "Delete", "delete", rgb(224, 101, 97))}}, {ID: "view", Label: "DISPLAY", Actions: []ui.RibbonAction{a("grid", "Grid", "grid", gold), a("projection", "Projection", "projection", purple)}}, {ID: "navigate", Label: "NAVIGATE", Actions: []ui.RibbonAction{a("orbit", "Orbit", "orbit", blue), a("pan", "Pan", "pan", teal), a("select", "Select", "select", gold)}}}}, {ID: "inspect", Label: "Inspect", Groups: []ui.RibbonGroup{{ID: "orientation", Label: "ORIENTATION", Actions: []ui.RibbonAction{a("front", "Front", "front", blue), a("top", "Top", "top", teal), a("right", "Right", "right", purple), a("fit", "Fit assembly", "fit", gold)}}, {ID: "context", Label: "ACTIONS", Actions: []ui.RibbonAction{a("marking", "Action wheel", "wheel", purple)}}}}, {ID: "body", Label: "Body tools", Contextual: true, Disabled: m.selectedIndex() < 0, Groups: []ui.RibbonGroup{{ID: "transform", Label: "SELECTED BODY", Actions: []ui.RibbonAction{a("move", "Move +4 mm", "move", teal), a("delete", "Delete body", "delete", rgb(224, 101, 97))}}}}}
+	m.ribbon.Tabs = []ui.RibbonTab{{ID: "solid", Label: "SOLID", Groups: []ui.RibbonGroup{{ID: "create", Label: "CREATE", Actions: []ui.RibbonAction{a("add", "New body", "add", blue)}}, {ID: "modify", Label: "MODIFY", Actions: []ui.RibbonAction{a("move", "Move +4 mm", "move", teal), a("delete", "Delete", "delete", rgb(224, 101, 97))}}, {ID: "view", Label: "DISPLAY", Actions: []ui.RibbonAction{a("grid", "Grid", "grid", gold), a("projection", "Projection", "projection", purple)}}, {ID: "navigate", Label: "NAVIGATE", Actions: []ui.RibbonAction{a("orbit", "Orbit", "orbit", blue), a("pan", "Pan", "pan", teal), a("select", "Select", "select", gold)}}}}, {ID: "inspect", Label: "INSPECT", Groups: []ui.RibbonGroup{{ID: "orientation", Label: "ORIENTATION", Actions: []ui.RibbonAction{a("front", "Front", "front", blue), a("top", "Top", "top", teal), a("right", "Right", "right", purple), a("fit", "Fit assembly", "fit", gold)}}, {ID: "context", Label: "ACTIONS", Actions: []ui.RibbonAction{a("marking", "Action wheel", "wheel", purple)}}}}, {ID: "body", Label: "BODY TOOLS", Contextual: true, Disabled: m.selectedIndex() < 0, Groups: []ui.RibbonGroup{{ID: "transform", Label: "SELECTED BODY", Actions: []ui.RibbonAction{a("move", "Move +4 mm", "move", teal), a("delete", "Delete body", "delete", rgb(224, 101, 97))}}}}}
 	m.ribbon.SelectTab = func(id string) { m.tab = id; m.changed() }
 	m.ribbon.Action = func(e ui.RibbonEvent) { m.action(e.ActionID) }
 	m.ribbon.Style = ui.Style{GrowY: ui.Some(float32(0)), Background: ui.Some(rgb(249, 250, 252))}
@@ -62,7 +62,7 @@ func (m *workbench) browserView() ui.Node {
 	for _, o := range m.state.Objects {
 		items = append(items, ui.ModelBrowserItem{ID: o.ID, Parent: "assembly", Label: o.Name, Visible: o.Visible, Activatable: true, IconImage: artwork("cube", o.Color)})
 	}
-	m.browser = ui.ModelBrowser{ID: "browser", Label: "Assembly browser", Items: items, ExpandedIDs: m.expanded, SelectedID: m.state.Selected, ActiveID: m.active, Change: func(e ui.ModelBrowserEvent) {
+	m.browser = ui.ModelBrowser{ID: "browser", Label: "BROWSER", Items: items, ExpandedIDs: m.expanded, SelectedID: m.state.Selected, ActiveID: m.active, Change: func(e ui.ModelBrowserEvent) {
 		switch e.Kind {
 		case ui.ModelBrowserSelect:
 			if e.ItemID != "assembly" {
@@ -124,12 +124,13 @@ func (m *workbench) inspectorView() ui.Node {
 func (m *workbench) View() ui.Node {
 	ink := rgb(42, 49, 61)
 	muted := rgb(116, 125, 140)
-	left := column("project", text("project-label", "PROJECT BROWSER", 10, 600, muted), text("project-title", "Actuator study", 20, 600, ink), text("project-subtitle", "Design workspace  /  v1", 11, 400, muted), must((ui.Node{ID: "browser-scroll", Kind: ui.Scroll, Grow: true, Children: []ui.Node{m.browserView()}}), nil), text("browser-tip", "Select a body, toggle its eye,\nor activate a component.", 11, 400, muted))
-	left.Style.Padding = ui.Some(ui.Insets{Top: 20, Left: 14, Right: 10, Bottom: 14})
-	left.Style.Background = ui.Some(rgb(244, 246, 250))
+	left := column("project", m.browserView())
+	left.Style.Padding = ui.Some(ui.Insets{Left: 4, Right: 4, Top: 3, Bottom: 3})
+	left.Style.Gap = ui.Some(float32(0))
+	left.Style.Background = ui.Some(rgb(247, 248, 250))
 	left.Style.GrowY = ui.Some(float32(1))
 	viewControl := &ui.ViewCube{ID: "orientation", Label: "Camera orientation", Change: m.orient}
-	title := row("canvas-title", text("canvas-name", "Linear actuator", 14, 600, ink), text("canvas-mode", "Solid • Perspective / Orthographic", 11, 400, muted))
+	title := row("canvas-title", text("canvas-name", "Actuator study — Linear actuator", 14, 600, ink), text("canvas-mode", "Solid • Perspective / Orthographic", 11, 400, muted))
 	title.Style.Padding = ui.Some(ui.Insets{Left: 16, Right: 12, Top: 10, Bottom: 8})
 	center := column("canvas-column", title, ui.Node{ID: "scene", Kind: ui.Extension, Custom: m.surface, Grow: true, Accessibility: ui.Accessibility{Name: "3D assembly viewport", Help: "Drag orbit. Shift drag pan. Scroll zoom. Home resets orientation."}}, must(viewControl.View()), text("canvas-hints", "Drag to orbit  ·  ⇧ drag to pan  ·  Scroll to zoom  ·  Click to select  ·  Right-click for actions", 11, 400, muted))
 	center.Style.GrowY = ui.Some(float32(1))
@@ -141,12 +142,12 @@ func (m *workbench) View() ui.Node {
 	features := []ui.FeatureItem{}
 	validSelection := ""
 	for _, f := range m.state.Features {
-		features = append(features, ui.FeatureItem{ID: f.ID, Label: f.Label, IconImage: artwork("cube", rgb(104, 142, 191))})
+		features = append(features, ui.FeatureItem{ID: f.ID, Label: "Create " + f.Label, IconImage: artwork("add", rgb(104, 142, 191))})
 		if f.ID == m.featureID {
 			validSelection = f.ID
 		}
 	}
-	m.timeline = ui.FeatureTimeline{ID: "timeline", Label: "FEATURE HISTORY", Items: features, Marker: m.state.Marker, SelectedID: validSelection, Change: m.featureChange, Style: ui.Style{Padding: ui.Some(ui.Insets{Top: 10, Left: 18, Right: 18, Bottom: 8}), Background: ui.Some(rgb(250, 251, 253))}}
+	m.timeline = ui.FeatureTimeline{ID: "timeline", Label: "Feature history", Items: features, Marker: m.state.Marker, SelectedID: validSelection, Change: m.featureChange, Style: ui.Style{Padding: ui.Some(ui.Insets{Top: 4, Left: 8, Right: 8, Bottom: 4}), Background: ui.Some(rgb(250, 251, 253))}}
 	m.marking.ID = "action-wheel"
 	m.marking.Label = "Workbench actions"
 

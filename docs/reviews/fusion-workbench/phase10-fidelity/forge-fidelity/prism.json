@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "87194357282500d73b026e84262c763c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "614c22e29e1097dd46b0374d4bd7aa0387e85f9f",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a64347324afe697b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Fragile test assumptions about history",
+      "message": "The test asserts that Features[3] is create-carriage after moving 'earlier', but the initial order places carriage at index 4. The assertion depends on a selected featureID that may not be set via View, which is fragile. Undo-after-marker also assumes marker changes are journaled, which is unverified against the model.",
+      "suggestion": "Verify that marker moves are journaled, or drop the Undo assertions that depend on that.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/forge/model_test.go",
+          "lines": {
+            "start": 154,
+            "end": 154
+          }
+        }
+      ],
+      "tags": [
+        "test",
+        "location-corrected"
+      ],
+      "evidence": "if e := m.journal.Undo(); e != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "85f182199f5518fd",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Selected paused feature loses paused visual state",
+      "message": "The marker is rendered before item j==p.Marker, so item j is after the marker and therefore paused. This part is consistent. However, when Marker==len(Items) and an item is selected, the selected style overrides the paused style, so a paused selected feature loses its visual paused state; only the tooltip/AX reveal it. This is minor but a hidden state change.",
+      "suggestion": "Keep a paused cue (for example a dimmed foreground) on selected paused items.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "ui/feature_timeline.go",
+          "lines": {
+            "start": 125,
+            "end": 126
+          }
+        }
+      ],
+      "tags": [
+        "ux",
+        "location-corrected"
+      ],
+      "evidence": "if j \u003e= p.Marker {\n\t\t\tname += \" · paused\"",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5957,
+    "totalMs": 6004
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 55878,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 30318,
+        "output": 541,
+        "costUSD": 0.066046
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

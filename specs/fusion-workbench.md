@@ -90,3 +90,26 @@ backgrounds (body-plus, trash, transform arrows, grid, projection, orbit, hand,
 cursor, orientation faces and curved Undo/Redo), not generic colored tiles. Ribbon
 buttons use a flat transparent tool appearance while retaining native hover/focus
 feedback. The tool style avoids the text-button hover shadow creating overflow.
+
+## Frozen-feature Fusion fidelity pass
+
+The owner approved a presentation pass limited to the ribbon, model browser and
+feature timeline. Existing command IDs, item identities, event validation,
+primary capture, marker/reorder semantics, Undo/Redo and lifecycle stay intact.
+No new widgets, drag interactions, CAD operations, context-popup behavior,
+backend options, release/performance gates or public release assets are added.
+
+The fixed visual reference is Autodesk's desktop interface overview at
+https://help.autodesk.com/cloudhelp/ENU/Fusion-GetStarted/images/diagram/ui-overview-sept-26.png,
+with Mac window/toolbar references from the prior visual comparison. These are
+qualitative references across different versions/scales, not a pixel specification.
+Ribbon buttons are shorter with complete-group dividers; overflow still owns
+whole groups. Browser rows use compact spacing, quiet independent targets and
+one heading; the app removes duplicate project headings and its outer scroller.
+The timeline becomes one icon strip with an explicit blue marker. Existing
+previous/next and earlier/later actions remain as named, tooltip-bearing buttons;
+feature names/paused state remain in tooltips and accessibility. Missing artwork
+retains a text fallback. The mock body-creation history does not become a solver.
+The inspector, orientation controls, model, renderer and modal action panel are
+outside this pass. Native appearance and targeting are checked separately from
+automated layout/routing, using the existing approved Forge-only mouse helper.

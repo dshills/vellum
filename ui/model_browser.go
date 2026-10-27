@@ -122,7 +122,7 @@ func (p *ModelBrowser) View() (Node, error) {
 	for _, i := range p.Items {
 		children[i.Parent] = append(children[i.Parent], i)
 	}
-	rows := Node{ID: p.ID + "/browser/rows", Kind: Column, Style: Style{Gap: Some(float32(2)), GrowX: Some(float32(1))}}
+	rows := Node{ID: p.ID + "/browser/rows", Kind: Column, Style: Style{Gap: Some(float32(0)), GrowX: Some(float32(1))}}
 	var appendItems func(string, int)
 	appendItems = func(parent string, depth int) {
 		for _, item := range children[parent] {
@@ -132,18 +132,18 @@ func (p *ModelBrowser) View() (Node, error) {
 			for parent := item.Parent; parent != ""; parent = by[parent].Parent {
 				disabled = disabled || by[parent].Disabled
 			}
-			row := Node{ID: rid, Kind: Row, Disabled: disabled, Style: Style{Padding: Some(Insets{Left: float32(6 + depth*12), Right: 6, Top: 2, Bottom: 2}), Gap: Some(float32(5)), CornerRadius: Some(float32(6)), GrowX: Some(float32(1)), GrowY: Some(float32(0))}}
+			row := Node{ID: rid, Kind: Row, Disabled: disabled, Style: Style{Padding: Some(Insets{Left: float32(3 + depth*10), Right: 3, Top: 0, Bottom: 0}), Gap: Some(float32(4)), CornerRadius: Some(float32(2)), GrowX: Some(float32(1)), GrowY: Some(float32(0))}}
 			if p.SelectedID == id {
-				row.Style.Background = Some(MacPalette(false, color.NRGBA{}).Accent)
-				row.Style.Foreground = Some(MacPalette(false, color.NRGBA{}).AccentInk)
+				row.Style.Background = Some(color.NRGBA{R: 222, G: 234, B: 249, A: 255})
+				row.Style.Foreground = Some(color.NRGBA{R: 26, G: 48, B: 76, A: 255})
 			}
-			quiet := Style{Padding: Some(Insets{}), Border: Some(Border{}), MinSize: Some(Size{Width: 20, Height: 24}), MaxSize: Some(Size{Width: 20, Height: 24}), GrowX: Some(float32(0))}
+			quiet := Style{Padding: Some(Insets{}), Border: Some(Border{}), Background: Some(color.NRGBA{}), Typography: Some(MacTypography(10, 400)), MinSize: Some(Size{Width: 20, Height: 24}), MaxSize: Some(Size{Width: 20, Height: 24}), GrowX: Some(float32(0))}
 			if len(children[id]) > 0 {
 				icon := SymbolRight
 				if expanded[id] {
 					icon = SymbolDown
 				}
-				row.Children = append(row.Children, Node{ID: rid + "/expand", Kind: Button, Icon: icon, Appearance: ButtonQuiet, Style: quiet, Accessibility: Accessibility{Name: "Expand " + item.Label}, Activate: func() {
+				row.Children = append(row.Children, Node{ID: rid + "/expand", Kind: Button, Icon: icon, Appearance: ButtonTool, Style: quiet, Accessibility: Accessibility{Name: "Expand " + item.Label}, Activate: func() {
 					_, current, err := p.items()
 					if err == nil {
 						propose(id, ModelBrowserExpand, !current[id])
@@ -153,16 +153,21 @@ func (p *ModelBrowser) View() (Node, error) {
 				row.Children = append(row.Children, Node{ID: rid + "/indent", Kind: Column, Style: quiet})
 			}
 			row.Children = append(row.Children, Node{ID: rid + "/visibility", Kind: ToggleButton, Icon: SymbolVisibility, Checked: item.Visible, Style: quiet, Accessibility: Accessibility{Name: "Visibility of " + item.Label}, Change: func(e ChangeEvent) { propose(id, ModelBrowserVisibility, e.Checked) }})
-			selectStyle := Style{Padding: Some(Insets{Left: 4, Right: 4}), Gap: Some(float32(10)), Border: Some(Border{}), Background: Some(color.NRGBA{}), Typography: Some(MacTypography(12, 400)), GrowX: Some(float32(1)), TextAlign: Some(AlignStart), MinSize: Some(Size{Width: 48, Height: 24})}
+			selectStyle := Style{Padding: Some(Insets{Left: 1, Right: 1}), Gap: Some(float32(5)), Border: Some(Border{}), Background: Some(color.NRGBA{}), Typography: Some(MacTypography(12, 400)), GrowX: Some(float32(1)), TextAlign: Some(AlignStart), MinSize: Some(Size{Width: 48, Height: 24})}
 			if p.SelectedID == id {
-				selectStyle.Foreground = Some(MacPalette(false, color.NRGBA{}).AccentInk)
+				selectStyle.Foreground = Some(color.NRGBA{R: 26, G: 48, B: 76, A: 255})
 			}
-			row.Children = append(row.Children, Node{ID: rid + "/select", Kind: Button, Text: item.Label, Icon: item.Icon, IconImage: item.IconImage, Appearance: ButtonQuiet, Style: selectStyle, Accessibility: Accessibility{Name: "Select " + item.Label}, Activate: func() { propose(id, ModelBrowserSelect, true) }})
+			row.Children = append(row.Children, Node{ID: rid + "/select", Kind: Button, Text: item.Label, Icon: item.Icon, IconImage: item.IconImage, Appearance: ButtonTool, Style: selectStyle, Accessibility: Accessibility{Name: "Select " + item.Label}, Activate: func() { propose(id, ModelBrowserSelect, true) }})
 			if item.Badge != "" {
 				row.Children = append(row.Children, Node{ID: rid + "/badge", Kind: Label, Text: item.Badge, Style: Style{Typography: Some(MacTypography(10, 400)), Padding: Some(Insets{}), GrowX: Some(float32(0))}})
 			}
 			if item.Activatable {
-				row.Children = append(row.Children, Node{ID: rid + "/active", Kind: ToggleButton, Icon: SymbolCircle, Checked: p.ActiveID == id, Style: quiet, Accessibility: Accessibility{Name: "Activate " + item.Label}, Change: func(ChangeEvent) { propose(id, ModelBrowserActivate, true) }})
+				row.Children = append(row.Children, Node{ID: rid + "/active", Kind: ToggleButton, Icon: func() Symbol {
+					if p.ActiveID == id {
+						return SymbolCircleCheck
+					}
+					return SymbolCircle
+				}(), Checked: p.ActiveID == id, Style: quiet, Accessibility: Accessibility{Name: "Activate " + item.Label}, Change: func(ChangeEvent) { propose(id, ModelBrowserActivate, true) }})
 			}
 			rows.Children = append(rows.Children, row)
 			if expanded[id] {
@@ -171,7 +176,7 @@ func (p *ModelBrowser) View() (Node, error) {
 		}
 	}
 	appendItems("", 0)
-	root := Node{ID: p.ID, Kind: Column, Disabled: p.Disabled, Accessibility: Accessibility{Name: p.Label}, Style: Style{Padding: Some(UniformInsets(8)), Gap: Some(float32(8)), GrowX: Some(float32(1)), GrowY: Some(float32(1))}.Overlay(p.Style), Children: []Node{{ID: p.ID + "/browser/title", Kind: Label, Text: p.Label, Style: Style{Typography: Some(MacTypography(11, 600))}}, {ID: p.ID + "/browser/scroll", Kind: Scroll, Grow: true, Children: []Node{rows}}}}
+	root := Node{ID: p.ID, Kind: Column, Disabled: p.Disabled, Accessibility: Accessibility{Name: p.Label}, Style: Style{Padding: Some(UniformInsets(4)), Gap: Some(float32(3)), GrowX: Some(float32(1)), GrowY: Some(float32(1))}.Overlay(p.Style), Children: []Node{{ID: p.ID + "/browser/title", Kind: Label, Text: p.Label, Style: Style{Typography: Some(MacTypography(10, 600)), Padding: Some(Insets{Left: 4, Top: 3, Bottom: 3}), GrowY: Some(float32(0)), GrowX: Some(float32(1))}}, {ID: p.ID + "/browser/scroll", Kind: Scroll, Grow: true, Children: []Node{rows}}}}
 	if e := Validate(root); e != nil {
 		return Node{}, e
 	}

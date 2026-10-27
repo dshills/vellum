@@ -122,3 +122,58 @@ func TestContextTabFallsBackAfterDeletion(t *testing.T) {
 		t.Fatal(e)
 	}
 }
+
+func fidelityNode(n ui.Node, id string) *ui.Node {
+	if n.ID == id {
+		return &n
+	}
+	for _, c := range n.Children {
+		if found := fidelityNode(c, id); found != nil {
+			return found
+		}
+	}
+	return nil
+}
+func TestFidelityDescriptionsKeepHistoryCommands(t *testing.T) {
+	m := newWorkbench()
+	view := m.View()
+	if m.featureID != "create-carriage" || m.state.Features[4].ID != m.featureID || m.state.Marker != len(m.state.Features) {
+		t.Fatal("fixture selection/marker changed")
+	}
+	count := len(m.state.Objects)
+	fidelityNode(view, ui.RibbonActionID("ribbon", "solid", "add")).Activate()
+	if len(m.state.Objects) != count+1 || m.journal.Snapshot().UndoCount != 1 {
+		t.Fatal("ribbon command changed")
+	}
+	if e := m.journal.Undo(); e != nil {
+		t.Fatal(e)
+	}
+	view = m.View()
+	v := fidelityNode(view, ui.ModelBrowserRowID("browser", "carriage")+"/visibility")
+	v.Change(ui.ChangeEvent{Checked: false})
+	if m.selected().Visible || m.journal.Snapshot().UndoCount != 1 {
+		t.Fatal("visibility command changed")
+	}
+	if e := m.journal.Undo(); e != nil {
+		t.Fatal(e)
+	}
+	view = m.View()
+	fidelityNode(view, "timeline/earlier").Activate()
+	if m.state.Features[3].ID != "create-carriage" {
+		t.Fatal("reorder changed")
+	}
+	if e := m.journal.Undo(); e != nil {
+		t.Fatal(e)
+	}
+	view = m.View()
+	fidelityNode(view, "timeline/back").Activate()
+	if m.state.Marker != len(m.state.Features)-1 {
+		t.Fatal("marker changed")
+	}
+	if e := m.journal.Undo(); e != nil {
+		t.Fatal(e)
+	}
+	if len(m.state.Objects) != count || !m.selected().Visible || m.state.Marker != len(m.state.Features) {
+		t.Fatal("history restore")
+	}
+}

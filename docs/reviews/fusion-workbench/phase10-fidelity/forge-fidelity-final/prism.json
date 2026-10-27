@@ -1,0 +1,145 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "fd1d19c9e3b40dcc730e0ced28a42fd2",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "614c22e29e1097dd46b0374d4bd7aa0387e85f9f",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "9511a06b4d0345be",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible nil dereference in test",
+      "message": "The test calls findRecord for each target and dereferences c without a nil check, so a missing record panics instead of failing cleanly. The same applies to `history`, which is dereferenced right after findRecord.",
+      "suggestion": "Check `if c == nil { t.Fatal(...) }` after each findRecord call, and likewise for history.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_fidelity_offscreen_test.go",
+          "lines": {
+            "start": 65,
+            "end": 65
+          }
+        }
+      ],
+      "tags": [
+        "test",
+        "nil",
+        "location-corrected"
+      ],
+      "evidence": "if bounds.Empty() || !bounds.In(box) || !previous.Empty() \u0026\u0026 bounds.Min.X \u003c previous.Max.X {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "cce4ff11313e58a6",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Marker node ID unguarded",
+      "message": "The marker node has the fixed ID id+\"/marker\", and it is emitted from only one place (either inside the loop or after it), so duplicates are unlikely. However, features with an ID that sanitizes to \"marker\" could collide via ribbonPart. The sanitized-ID collision is not guarded.",
+      "suggestion": "Validate that feature IDs do not collide with reserved node IDs, or use a distinct namespace such as /feature/ for items.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/feature_timeline.go",
+          "lines": {
+            "start": 120,
+            "end": 120
+          }
+        }
+      ],
+      "tags": [
+        "ui",
+        "location-corrected"
+      ],
+      "evidence": "track.Children = append(track.Children, marker())",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6290,
+    "totalMs": 6329
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 56804,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 30783,
+        "output": 796,
+        "costUSD": 0.069526
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "802ca730c904ac6e",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Text fallback feature button clipped to 24px width",
+        "message": "A feature without an icon has MaxSize width 24 (from quiet) while its text label is set; only the height and padding are overridden, and MinSize is replaced with Height only. MaxSize.Width stays 24, so the text label is clipped to 24px wide.",
+        "suggestion": "For the text fallback, set MaxSize to Size{Height: 24} (width unbounded) so the label is not clipped.",
+        "confidence": 0.55,
+        "locations": [
+          {
+            "path": "ui/feature_timeline.go",
+            "lines": {
+              "start": 55,
+              "end": 55
+            }
+          }
+        ],
+        "tags": [
+          "ui",
+          "layout"
+        ],
+        "evidence": "style := quiet\n\t\tn := Node{",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in ui/feature_timeline.go"
+    }
+  ],
+  "suppressed": []
+}

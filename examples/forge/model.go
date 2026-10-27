@@ -48,7 +48,7 @@ func clone(s document) document {
 }
 func newWorkbench() *workbench {
 	j, _ := history.New(96)
-	m := &workbench{journal: j, commands: command.New(), next: 8, expanded: []string{"assembly"}, active: "housing", tab: "solid", left: .23, right: .72, status: "Ready · Local, in-memory document"}
+	m := &workbench{journal: j, commands: command.New(), next: 8, expanded: []string{"assembly"}, active: "housing", tab: "solid", left: .19, right: .72, status: "Ready · Local, in-memory document"}
 	c := viewport.DefaultCamera()
 	c.Target = vec(0, .45, 0)
 	m.scene = viewport.Scene{Camera: c, Grid: true, ShowCube: true}

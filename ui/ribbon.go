@@ -142,12 +142,12 @@ func (p *Ribbon) View() (Node, error) {
 		if tab.ID == p.SelectedTab {
 			root.SelectedID = pageID
 		}
-		bar := Node{ID: pageID, Kind: Toolbar, ToolbarOverflow: true, ToolbarGroups: true, Disabled: tab.Disabled, Style: Style{Padding: Some(Insets{Top: 6, Right: 8, Bottom: 5, Left: 8}), Gap: Some(float32(2)), GrowX: Some(float32(1)), GrowY: Some(float32(0))}}
+		bar := Node{ID: pageID, Kind: Toolbar, ToolbarOverflow: true, ToolbarGroups: true, Disabled: tab.Disabled, Style: Style{Padding: Some(Insets{Top: 3, Right: 6, Bottom: 2, Left: 6}), Gap: Some(float32(2)), GrowX: Some(float32(1)), GrowY: Some(float32(0))}}
 		var groupOptions []Option
 		groupSeen := map[string]bool{}
 		actionSeen := map[string]bool{}
 		routes := map[string]struct{ action, option string }{}
-		for _, group := range tab.Groups {
+		for groupIndex, group := range tab.Groups {
 			if !validTokenText(group.ID) || !validTokenText(group.Label) || groupSeen[group.ID] || len(group.Actions) < 1 || len(group.Actions) > 12 {
 				return Node{}, fmt.Errorf("ui: invalid ribbon group")
 			}
@@ -168,7 +168,7 @@ func (p *Ribbon) View() (Node, error) {
 				aid := RibbonActionID(p.ID, tab.ID, action.ID)
 				disabled := action.Disabled || group.Disabled || p.Action == nil
 				tabID, actionID := tab.ID, action.ID
-				main := Node{ID: aid, Kind: Button, Text: action.Label, Icon: action.Icon, IconImage: action.IconImage, Appearance: ButtonTool, Disabled: disabled, IconPlacement: IconAboveText, Accessibility: Accessibility{Name: action.Label}, Style: Style{MinSize: Some(Size{Width: 64, Height: 54}), MaxSize: Some(Size{Width: 92, Height: 54}), Padding: Some(Insets{Top: 4, Right: 6, Bottom: 4, Left: 6}), Gap: Some(float32(3)), Border: Some(Border{}), Background: Some(color.NRGBA{}), CornerRadius: Some(float32(6)), Typography: Some(MacTypography(12, 400)), GrowX: Some(float32(0)), GrowY: Some(float32(0))}, Activate: func() { dispatch(tabID, actionID, "") }}
+				main := Node{ID: aid, Kind: Button, Text: action.Label, Icon: action.Icon, IconImage: action.IconImage, Appearance: ButtonTool, Disabled: disabled, IconPlacement: IconAboveText, Accessibility: Accessibility{Name: action.Label}, Style: Style{MinSize: Some(Size{Width: 52, Height: 42}), MaxSize: Some(Size{Width: 82, Height: 42}), Padding: Some(Insets{Top: 2, Right: 5, Bottom: 2, Left: 5}), Gap: Some(float32(2)), Border: Some(Border{}), Background: Some(color.NRGBA{}), CornerRadius: Some(float32(6)), Typography: Some(MacTypography(11, 400)), GrowX: Some(float32(0)), GrowY: Some(float32(0))}, Activate: func() { dispatch(tabID, actionID, "") }}
 				if action.Icon == "" && action.IconImage == nil {
 					main.IconPlacement = IconLeading
 				}
@@ -208,14 +208,20 @@ func (p *Ribbon) View() (Node, error) {
 					return Node{}, e
 				}
 				items = append(items, Option{ID: aid + "/options", Label: action.Label + " options", Icon: action.Icon, IconImage: action.IconImage, Disabled: disabled, Branch: branch})
-				button := Node{ID: aid + "/menu-button", Kind: MenuButton, Icon: SymbolDown, Accessibility: Accessibility{Name: action.Label + " options"}, Options: menu, Disabled: disabled, Appearance: ButtonTool, Style: Style{MinSize: Some(Size{Width: 22, Height: 54}), MaxSize: Some(Size{Width: 22, Height: 54}), Padding: Some(Insets{}), Border: Some(Border{}), GrowX: Some(float32(0))}, Change: func(e ChangeEvent) {
+				button := Node{ID: aid + "/menu-button", Kind: MenuButton, Icon: SymbolDown, Accessibility: Accessibility{Name: action.Label + " options"}, Options: menu, Disabled: disabled, Appearance: ButtonTool, Style: Style{MinSize: Some(Size{Width: 20, Height: 42}), MaxSize: Some(Size{Width: 20, Height: 42}), Padding: Some(Insets{}), Border: Some(Border{}), GrowX: Some(float32(0))}, Change: func(e ChangeEvent) {
 					if route, ok := routes[e.SelectedID]; ok {
 						dispatch(tabID, route.action, route.option)
 					}
 				}}
 				row.Children = append(row.Children, Node{ID: aid + "/split", Kind: Row, Children: []Node{main, button}, Style: Style{Gap: Some(float32(0)), GrowX: Some(float32(0))}})
 			}
-			groupNode := Node{ID: gid, Kind: Column, Disabled: group.Disabled, Accessibility: Accessibility{Name: group.Label}, Children: []Node{row, {ID: gid + "/caption", Kind: Label, Text: strings.ToUpper(group.Label), Style: Style{Typography: Some(MacTypography(10, 400)), TextAlign: Some(AlignCenter), GrowX: Some(float32(1)), Padding: Some(Insets{})}}}, Style: Style{Padding: Some(Insets{Left: 7, Right: 7}), Gap: Some(float32(4)), GrowX: Some(float32(0)), GrowY: Some(float32(0))}}
+			// The divider belongs to its measured group, so collapse/overflow keeps
+			// one complete unit and never strands an independently routed action.
+			content := Node{ID: gid + "/content", Kind: Row, Children: []Node{row}, Style: Style{Padding: Some(Insets{}), Gap: Some(float32(5)), GrowX: Some(float32(0)), GrowY: Some(float32(0))}}
+			if groupIndex < len(tab.Groups)-1 {
+				content.Children = append(content.Children, Node{ID: gid + "/divider", Kind: Column, Style: Style{Padding: Some(Insets{}), MinSize: Some(Size{Width: 1, Height: 40}), MaxSize: Some(Size{Width: 1, Height: 40}), Grow: Some(float32(0)), Background: Some(color.NRGBA{R: 208, G: 213, B: 221, A: 255})}})
+			}
+			groupNode := Node{ID: gid, Kind: Column, Disabled: group.Disabled, Accessibility: Accessibility{Name: group.Label}, Children: []Node{content, {ID: gid + "/caption", Kind: Label, Text: strings.ToUpper(group.Label), Style: Style{Typography: Some(MacTypography(10, 400)), TextAlign: Some(AlignCenter), GrowX: Some(float32(1)), Padding: Some(Insets{})}}}, Style: Style{Padding: Some(Insets{Left: 3, Right: 3}), Gap: Some(float32(0)), GrowX: Some(float32(0)), GrowY: Some(float32(0))}}
 			bar.Children = append(bar.Children, groupNode)
 			branch, e := p.branch(gid, items, used)
 			if e != nil {
@@ -224,7 +230,7 @@ func (p *Ribbon) View() (Node, error) {
 			groupOptions = append(groupOptions, Option{ID: gid, Label: group.Label, Branch: branch, Disabled: group.Disabled})
 		}
 		tabID := tab.ID
-		bar.Children = append(bar.Children, Node{ID: ToolbarOverflowID(pageID), Kind: MenuButton, Text: "»", Options: groupOptions, Accessibility: Accessibility{Name: "More " + tab.Label + " tools"}, Disabled: p.Action == nil, Style: Style{GrowX: Some(float32(0)), MinSize: Some(Size{Width: 30, Height: 54})}, Change: func(e ChangeEvent) {
+		bar.Children = append(bar.Children, Node{ID: ToolbarOverflowID(pageID), Kind: MenuButton, Text: "»", Options: groupOptions, Accessibility: Accessibility{Name: "More " + tab.Label + " tools"}, Disabled: p.Action == nil, Style: Style{GrowX: Some(float32(0)), MinSize: Some(Size{Width: 28, Height: 42})}, Change: func(e ChangeEvent) {
 			if route, ok := routes[e.SelectedID]; ok {
 				dispatch(tabID, route.action, route.option)
 			}

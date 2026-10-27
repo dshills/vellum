@@ -1,0 +1,86 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a9726ceb034c27865ed3276edf109069",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "614c22e29e1097dd46b0374d4bd7aa0387e85f9f",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4048,
+    "totalMs": 4104
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 56591,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 30653,
+        "output": 316,
+        "costUSD": 0.064466
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "d802f7e93f7742a6",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Paused styling overrides selected styling",
+        "message": "The paused-state style is applied after the selection style, so the selected feature's blue-tinted background and foreground are overwritten whenever the item is at or after the marker. The selection is then marked only by the border. This also makes the 'selected' fill unobservable for paused items.",
+        "suggestion": "Apply the paused background/foreground first, then overlay the selection border (and foreground) so selection stays visible. Or skip the paused fill when the item is selected.",
+        "confidence": 0.55,
+        "locations": [
+          {
+            "path": "ui/feature_timeline.go",
+            "lines": {
+              "start": 66,
+              "end": 67
+            }
+          }
+        ],
+        "tags": [
+          "ui",
+          "style-order"
+        ],
+        "evidence": "if j \u003e= p.Marker {\n\t\t\tn.Style.Background = Some(color.NRGBA{R: 237, G: 240, B: 244, A: 255})",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in ui/feature_timeline.go"
+    }
+  ],
+  "suppressed": []
+}
