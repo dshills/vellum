@@ -1,0 +1,211 @@
+{
+  "schema": 1,
+  "completed_at": "2026-10-27T09:53:33.590737+00:00",
+  "scope": "bounded local launch/render/native-close; not full pointer, performance, download/quarantine or human accessibility acceptance",
+  "product_source": "4b42fb89948b8abf0f2f65970fb5980987c1af0c",
+  "packaging_source": "1fc594b6952d3b072a4c72b619a6f259da389474",
+  "all_candidate_processes_absent": true,
+  "archives": [
+    {
+      "file": "vellum-v1.0.0-darwin-arm64-sdk.tar.gz",
+      "sha256": "0519cc8645616ac14489ee69d94efb07ab8dcccc1e56ed1f4be14976daa33ab3",
+      "verified": true
+    },
+    {
+      "file": "Vellum Notes.zip",
+      "sha256": "3d60955b9336bcdfe931ca68222057cb4d36022f44b37ec74c4515cd8693fc25",
+      "verified": true
+    },
+    {
+      "file": "Vellum Mac Widgets.zip",
+      "sha256": "c9a3b636faa8cb24498a6f7f09f180d4811e407dbe3b89489eb11611f6999ca7",
+      "verified": true
+    },
+    {
+      "file": "Vellum Mac Shell.zip",
+      "sha256": "7d3ad7aaefe1d19cab5e1b2dcf9b20c7c1e690b08d1fcfd99c418ee26af1db7f",
+      "verified": true
+    },
+    {
+      "file": "Forma.zip",
+      "sha256": "cc9d994a3322a04412b891b5762c6e2ef6230500faeec5b7f812764a7a5285ec",
+      "verified": true
+    },
+    {
+      "file": "Luma.zip",
+      "sha256": "291753ff5c401cc079a9d96cf837f76611e6b9914c99a7c0e24bf206b19391f1",
+      "verified": true
+    },
+    {
+      "file": "Pulse.zip",
+      "sha256": "1a03c26bcea3ff8d81a15377d548aa627462ea4d7b1d0ad7b65866bac005a1e6",
+      "verified": true
+    }
+  ],
+  "apps": [
+    {
+      "id": "notes",
+      "name": "Vellum Notes",
+      "launch": "observed",
+      "native_close": "observed",
+      "process_absent_after_closure": true,
+      "strict_signature_after_closure": true,
+      "signed_binary_unchanged": true,
+      "manifest_unchanged": true,
+      "binary_bound_original_notices_verified": true,
+      "visual_result": "pass",
+      "recommended_for_publication": true,
+      "evidence": [
+        {
+          "file": "native/notes.jpg",
+          "sha256": "93c60faeb6fb0878639361d529c30bc003b14ccc2a4e67e41d6f9214e9951851",
+          "bytes": 71614
+        },
+        {
+          "file": "native/notes.txt",
+          "sha256": "9084b3da237db2f7fd545a1ecc2af6ec1fe0e0e2b97d9f0286b6cd050fe12e65",
+          "bytes": 3885
+        }
+      ]
+    },
+    {
+      "id": "widgets",
+      "name": "Vellum Mac Widgets",
+      "launch": "observed",
+      "native_close": "observed",
+      "process_absent_after_closure": true,
+      "strict_signature_after_closure": true,
+      "signed_binary_unchanged": true,
+      "manifest_unchanged": true,
+      "binary_bound_original_notices_verified": true,
+      "visual_result": "pass",
+      "recommended_for_publication": true,
+      "evidence": [
+        {
+          "file": "native/widgets.jpg",
+          "sha256": "fe4dcdd11af53bb20fc752b8d7aeb0f3b793d4d810c38716d5cc257761f77e4a",
+          "bytes": 46399
+        },
+        {
+          "file": "native/widgets.txt",
+          "sha256": "0d3de7320d9eda65c2e557bb6d2758e9eaf4ace4d399580ce8d3171a8294ab89",
+          "bytes": 6767
+        }
+      ]
+    },
+    {
+      "id": "shell",
+      "name": "Vellum Mac Shell",
+      "launch": "observed",
+      "native_close": "observed",
+      "process_absent_after_closure": true,
+      "strict_signature_after_closure": true,
+      "signed_binary_unchanged": true,
+      "manifest_unchanged": true,
+      "binary_bound_original_notices_verified": true,
+      "visual_result": "held-dark-contrast",
+      "recommended_for_publication": false,
+      "evidence": [
+        {
+          "file": "native/shell-a.jpg",
+          "sha256": "8cf4672a7c7253dcf81d72843977371592127a0e69bf54af26be24383840db62",
+          "bytes": 11228
+        },
+        {
+          "file": "native/shell-a.txt",
+          "sha256": "4f7979c458f7da298a1d6c176c612802f100311b83d244c43f236a95e5c76ad1",
+          "bytes": 689
+        },
+        {
+          "file": "native/shell-b.jpg",
+          "sha256": "d546d774758bf8297657df1722b44affd9202b8719de76e2ecccdbc85bb5b936",
+          "bytes": 11114
+        },
+        {
+          "file": "native/shell-b.txt",
+          "sha256": "fdd9b3ea381f3ca7faf1de4dc0bd2d3d4f447ebee07ce2ce23c6013d19366321",
+          "bytes": 689
+        }
+      ]
+    },
+    {
+      "id": "forma",
+      "name": "Forma",
+      "launch": "observed",
+      "native_close": "observed",
+      "process_absent_after_closure": true,
+      "strict_signature_after_closure": true,
+      "signed_binary_unchanged": true,
+      "manifest_unchanged": true,
+      "binary_bound_original_notices_verified": true,
+      "visual_result": "pass",
+      "recommended_for_publication": true,
+      "evidence": [
+        {
+          "file": "native/forma.jpg",
+          "sha256": "d64a533f1e4d9f58caf8e5b4bb05e3e96ff6c1710dcc06b26f2638fb1e35272a",
+          "bytes": 119867
+        },
+        {
+          "file": "native/forma.txt",
+          "sha256": "8395299653686259389f7ce327dc65f95e423141d980bd990fea30f2077ef37a",
+          "bytes": 3880
+        }
+      ]
+    },
+    {
+      "id": "luma",
+      "name": "Luma",
+      "launch": "observed",
+      "native_close": "observed",
+      "process_absent_after_closure": true,
+      "strict_signature_after_closure": true,
+      "signed_binary_unchanged": true,
+      "manifest_unchanged": true,
+      "binary_bound_original_notices_verified": true,
+      "visual_result": "pass",
+      "recommended_for_publication": true,
+      "evidence": [
+        {
+          "file": "native/luma.jpg",
+          "sha256": "a04e142fb58affc1fd57090c1ca1e969cef6d6fb7933319041a56e12843bbeac",
+          "bytes": 117015
+        },
+        {
+          "file": "native/luma.txt",
+          "sha256": "fcb2dc6f8881863f4ba6bd9f620f34cb3a450575c0b895a717252d1b95ab689d",
+          "bytes": 4681
+        }
+      ]
+    },
+    {
+      "id": "pulse",
+      "name": "Pulse",
+      "launch": "observed",
+      "native_close": "observed",
+      "process_absent_after_closure": true,
+      "strict_signature_after_closure": true,
+      "signed_binary_unchanged": true,
+      "manifest_unchanged": true,
+      "binary_bound_original_notices_verified": true,
+      "visual_result": "pass",
+      "recommended_for_publication": true,
+      "evidence": [
+        {
+          "file": "native/pulse.jpg",
+          "sha256": "96b0934e0516e4cef577326768e78e13f467147452dd66bc1980ca0de08f80d4",
+          "bytes": 144802
+        },
+        {
+          "file": "native/pulse.txt",
+          "sha256": "b054091c64057a78309d53aeb83e2536d56b6bee30961215b0c3a6bc48fd671a",
+          "bytes": 9806
+        }
+      ]
+    }
+  ],
+  "notes_profile": "disposable fixture only; personal notebook not opened",
+  "runtime_manifests": "Producer target_runtime=unverified is preserved in sealed packages; this separate report records observed checks. Component notice discovery labels remain pending/review-required; exact-payload owner approval is recorded separately.",
+  "publication_authorized": false,
+  "uploaded": false
+}

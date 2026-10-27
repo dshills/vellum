@@ -715,3 +715,17 @@ bytes may change during production. Public output must preserve audited product,
 dependency, native and asset identities. Record final asset hashes and any native
 limitations before requesting the separate publication decision. Do not move the
 existing source tag, upload assets, use a signing identity or notarize here.
+
+
+### Final local public-candidate outcome
+
+[Final public packaging](../docs/reports/macos-v1-public-packaging/README.md)
+passes guarded SDK/app production, SDK independent consumption and exact-byte
+extraction/signature/notice checks. Five app render/close observations pass; the
+optional Mac Shell fixture is held for dark-system contrast. Preserve its audited
+binary and failed visual evidence; do not include it in the recommended checksum
+set or silently replace it with an unaudited fix. Sealed collection/runtime labels
+retain their producer meanings; separate reports record owner approval and actual
+observations. No full interaction/performance/human-accessibility campaign is
+implied. Public upload still requires approval of the exact recommended assets,
+destination and disclosed ad-hoc/unnotarized route. No source tag is moved.

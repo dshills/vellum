@@ -1,0 +1,58 @@
+{
+  "passed": true,
+  "prism_findings": {
+    "529cda190c414303": "All Forma hashes identical; added cross-record/table/byte validation.",
+    "0d78228b50dbdc2f": "Validate each named README row, including notice count/disposition/hash; swapped rows now reject.",
+    "cb699f1df18c6c74": "Missing assets already failed closed; added explicit presence check and concise error instead of traceback. No security bypass existed."
+  },
+  "checks": [
+    {
+      "case": "actual-seven-archives-and-all-packet-references",
+      "exit_code": 0,
+      "result": {
+        "passed": true,
+        "consistent_archive_hashes": 7,
+        "recommended_assets": 6,
+        "held_apps": [
+          "shell"
+        ],
+        "evidence_members": 119,
+        "actual_asset_bytes_checked": true
+      }
+    },
+    {
+      "case": "altered-README-Forma-checksum",
+      "rejected": true,
+      "reason": "README app row/digest mismatch"
+    },
+    {
+      "case": "swapped-README-Forma-Luma-rows",
+      "rejected": true,
+      "reason": "README app row/digest mismatch"
+    },
+    {
+      "case": "held-Shell-added-to-recommended-set",
+      "rejected": true,
+      "reason": "recommended set includes held/missing asset"
+    },
+    {
+      "case": "malformed-checksum-line",
+      "rejected": true,
+      "reason": "malformed checksum line"
+    },
+    {
+      "case": "altered-evidence-archive-checksum",
+      "rejected": true,
+      "reason": "evidence archive mismatch"
+    },
+    {
+      "case": "missing-asset-file",
+      "rejected": true,
+      "reason": "missing asset archive:"
+    }
+  ],
+  "final_review_dispositions": {
+    "d885645a5a563d90": "Applied the reviewed explicit malformed-checksum diagnostic; negative control rejects malformed line.",
+    "cd59796068f12b1d": "Applied the reviewed defensive non-None stream check and bounded member read. Only regular members already passed validation; no invalid bytes were accepted."
+  }
+}

@@ -1,0 +1,316 @@
+{
+  "schema": 1,
+  "product_source": "4b42fb89948b8abf0f2f65970fb5980987c1af0c",
+  "packaging_source": "1fc594b6952d3b072a4c72b619a6f259da389474",
+  "audit_record_sha256": "adf2f08a4dbb6622ee67ef60889a68dbb6dd719d6a15f8b9cc41b6890c15b5ae",
+  "sdk": {
+    "archive": "vellum-v1.0.0-darwin-arm64-sdk.tar.gz",
+    "sha256": "0519cc8645616ac14489ee69d94efb07ab8dcccc1e56ed1f4be14976daa33ab3",
+    "private_build": false,
+    "source": {
+      "clean": true,
+      "commit": "1fc594b6952d3b072a4c72b619a6f259da389474"
+    },
+    "verified_files": 8856
+  },
+  "apps": [
+    {
+      "id": "notes",
+      "name": "Vellum Notes",
+      "identifier": "com.dshills.vellum.notes.personal",
+      "archive": "Vellum Notes.zip",
+      "archive_sha256": "3d60955b9336bcdfe931ca68222057cb4d36022f44b37ec74c4515cd8693fc25",
+      "source_binary_sha256": "dd199fe0efbd41dbdc0e604bec6949e80d4d900782d690450901e19a4ceaef26",
+      "packaged_binary_sha256": "2fa52e46c6bdd69eb3ba95e19aec760efb280accbfc258d9f9c5123e0fd4774b",
+      "notice_inventory_sha256": "1f97565f1ad9bbb6e7099819c3237f00c90281e07efb802e69e12d112f5ce7ac",
+      "notice_files": 418,
+      "manifest_sha256": "f909da4bae726b5bf66ef18b85d4c2465952416ea5a8ab6d0ba8af004427e5fb",
+      "private_build": false,
+      "native_distribution_audit": "approved",
+      "notarized": false,
+      "launch_path": "/private/tmp/vellum-v1-public-checks-20261027/launch/Vellum Notes.app",
+      "runtime_result": "not-yet-run"
+    },
+    {
+      "id": "widgets",
+      "name": "Vellum Mac Widgets",
+      "identifier": "com.dshills.vellum.widgets.v1",
+      "archive": "Vellum Mac Widgets.zip",
+      "archive_sha256": "c9a3b636faa8cb24498a6f7f09f180d4811e407dbe3b89489eb11611f6999ca7",
+      "source_binary_sha256": "693b850cfc5f5fe671fcedc7972e5e22c5b063ddfce3b1d11c49ba8dea4cda03",
+      "packaged_binary_sha256": "c8d2b9461ad07c219a6e5a3505be09d21b6b0db88181abc666d7c950b9835411",
+      "notice_inventory_sha256": "b6b28f63d2edb7d75aa2883cd5d2d025a3d33d08f72b5450d7d4aa0775e53fd5",
+      "notice_files": 418,
+      "manifest_sha256": "9fde294032f58297286b1dcdaded940c15a6754326aa876a1825b809901eeb99",
+      "private_build": false,
+      "native_distribution_audit": "approved",
+      "notarized": false,
+      "launch_path": "/private/tmp/vellum-v1-public-checks-20261027/launch/Vellum Mac Widgets.app",
+      "runtime_result": "not-yet-run"
+    },
+    {
+      "id": "shell",
+      "name": "Vellum Mac Shell",
+      "identifier": "com.dshills.vellum.macshell.v1",
+      "archive": "Vellum Mac Shell.zip",
+      "archive_sha256": "7d3ad7aaefe1d19cab5e1b2dcf9b20c7c1e690b08d1fcfd99c418ee26af1db7f",
+      "source_binary_sha256": "f934be497302406e8c59471058821b9da4692154c5cff1ec4c0d948ca3c398b4",
+      "packaged_binary_sha256": "ffefb7e9a0d63a15157a3a24fdb663640148d1a6f1ac79e9b75281aa4100ccdf",
+      "notice_inventory_sha256": "6a174b2beda911c25527d04d2db115785bb651f70f229adff1e5bbf419e19d72",
+      "notice_files": 418,
+      "manifest_sha256": "b5d80a5d6596fb12db809df84e4df7a4134ccaf40cce916b5b041c79f9dd9640",
+      "private_build": false,
+      "native_distribution_audit": "approved",
+      "notarized": false,
+      "launch_path": "/private/tmp/vellum-v1-public-checks-20261027/launch/Vellum Mac Shell.app",
+      "runtime_result": "not-yet-run"
+    },
+    {
+      "id": "forma",
+      "name": "Forma",
+      "identifier": "com.dshills.vellum.showcase.forma",
+      "archive": "Forma.zip",
+      "archive_sha256": "cc9d994a3322a04412b891b5762c6e2ef6230500faeec5b7f812764a7a5285ec",
+      "source_binary_sha256": "418d74e0f759543b706047cae43d5e0a8d51513e5e3a978bcb58e17f8a13e3cf",
+      "packaged_binary_sha256": "7a75fe72500808b6279c6562ad995609bb5dd5b50f5ab246652c9dd6c1189844",
+      "notice_inventory_sha256": "f367b31a9cb2f7143075f2cc31c9a9714fe3c205ba9062a75c3995d3dd95f043",
+      "notice_files": 419,
+      "manifest_sha256": "5fa33df50135782f04778c17a023946f34c3b926f68d290ce712783a9a893c8d",
+      "private_build": false,
+      "native_distribution_audit": "approved",
+      "notarized": false,
+      "launch_path": "/private/tmp/vellum-v1-public-checks-20261027/launch/Forma.app",
+      "runtime_result": "not-yet-run"
+    },
+    {
+      "id": "luma",
+      "name": "Luma",
+      "identifier": "com.dshills.vellum.showcase.luma",
+      "archive": "Luma.zip",
+      "archive_sha256": "291753ff5c401cc079a9d96cf837f76611e6b9914c99a7c0e24bf206b19391f1",
+      "source_binary_sha256": "7ccb7ea20d87111754e08ffedbaaf3adf58d56235da77c9d12c970cf29c2f765",
+      "packaged_binary_sha256": "18b3b4db5528a9cea8765514fc31dc5412353010618a6082f4da378214732a24",
+      "notice_inventory_sha256": "8562ca4fbb96bf3fdb63ecf0aff5a47960425ab2eb5dbbf6f9a5fae9670ee917",
+      "notice_files": 419,
+      "manifest_sha256": "046bf97a0e4dc38c3468a72c49c0a053b16ee13ade7fdd9fbab7832c95810aea",
+      "private_build": false,
+      "native_distribution_audit": "approved",
+      "notarized": false,
+      "launch_path": "/private/tmp/vellum-v1-public-checks-20261027/launch/Luma.app",
+      "runtime_result": "not-yet-run"
+    },
+    {
+      "id": "pulse",
+      "name": "Pulse",
+      "identifier": "com.dshills.vellum.showcase.pulse",
+      "archive": "Pulse.zip",
+      "archive_sha256": "1a03c26bcea3ff8d81a15377d548aa627462ea4d7b1d0ad7b65866bac005a1e6",
+      "source_binary_sha256": "5975395fa4803ac84d844c9ec3453471d1bc8d659a9da7340029f187c5adf7ac",
+      "packaged_binary_sha256": "bb90173420306f3134a52571a79d2b7f168b8f1696a6864ef38ad105e0c1c41c",
+      "notice_inventory_sha256": "3d904f8cafd7c8e8812d81eca3018dd01d63e3174384247add8ebf88de399f3b",
+      "notice_files": 419,
+      "manifest_sha256": "61747a556dc990613ad5b7353afe4189e3b7ffd12b19b53a9cccece66aab1230",
+      "private_build": false,
+      "native_distribution_audit": "approved",
+      "notarized": false,
+      "launch_path": "/private/tmp/vellum-v1-public-checks-20261027/launch/Pulse.app",
+      "runtime_result": "not-yet-run"
+    }
+  ],
+  "checks": [
+    {
+      "name": "sdk-public",
+      "exit_code": 0,
+      "seconds": 9.163
+    },
+    {
+      "name": "sdk-independent-consumer",
+      "exit_code": 0,
+      "seconds": 63.247
+    },
+    {
+      "name": "notes-public",
+      "exit_code": 0,
+      "seconds": 1.04
+    },
+    {
+      "name": "notes-zip",
+      "exit_code": 0,
+      "seconds": 1.282
+    },
+    {
+      "name": "notes-extract",
+      "exit_code": 0,
+      "seconds": 0.157
+    },
+    {
+      "name": "notes-signature",
+      "exit_code": 0,
+      "seconds": 0.075
+    },
+    {
+      "name": "notes-launch-copy",
+      "exit_code": 0,
+      "seconds": 0.095
+    },
+    {
+      "name": "notes-launch-signature",
+      "exit_code": 0,
+      "seconds": 0.076
+    },
+    {
+      "name": "widgets-public",
+      "exit_code": 0,
+      "seconds": 0.95
+    },
+    {
+      "name": "widgets-zip",
+      "exit_code": 0,
+      "seconds": 1.302
+    },
+    {
+      "name": "widgets-extract",
+      "exit_code": 0,
+      "seconds": 0.154
+    },
+    {
+      "name": "widgets-signature",
+      "exit_code": 0,
+      "seconds": 0.074
+    },
+    {
+      "name": "widgets-launch-copy",
+      "exit_code": 0,
+      "seconds": 0.104
+    },
+    {
+      "name": "widgets-launch-signature",
+      "exit_code": 0,
+      "seconds": 0.075
+    },
+    {
+      "name": "shell-public",
+      "exit_code": 0,
+      "seconds": 0.977
+    },
+    {
+      "name": "shell-zip",
+      "exit_code": 0,
+      "seconds": 1.268
+    },
+    {
+      "name": "shell-extract",
+      "exit_code": 0,
+      "seconds": 0.163
+    },
+    {
+      "name": "shell-signature",
+      "exit_code": 0,
+      "seconds": 0.076
+    },
+    {
+      "name": "shell-launch-copy",
+      "exit_code": 0,
+      "seconds": 0.121
+    },
+    {
+      "name": "shell-launch-signature",
+      "exit_code": 0,
+      "seconds": 0.078
+    },
+    {
+      "name": "forma-public",
+      "exit_code": 0,
+      "seconds": 1.178
+    },
+    {
+      "name": "forma-zip",
+      "exit_code": 0,
+      "seconds": 1.26
+    },
+    {
+      "name": "forma-extract",
+      "exit_code": 0,
+      "seconds": 0.155
+    },
+    {
+      "name": "forma-signature",
+      "exit_code": 0,
+      "seconds": 0.07
+    },
+    {
+      "name": "forma-launch-copy",
+      "exit_code": 0,
+      "seconds": 0.119
+    },
+    {
+      "name": "forma-launch-signature",
+      "exit_code": 0,
+      "seconds": 0.074
+    },
+    {
+      "name": "luma-public",
+      "exit_code": 0,
+      "seconds": 1.227
+    },
+    {
+      "name": "luma-zip",
+      "exit_code": 0,
+      "seconds": 1.27
+    },
+    {
+      "name": "luma-extract",
+      "exit_code": 0,
+      "seconds": 0.163
+    },
+    {
+      "name": "luma-signature",
+      "exit_code": 0,
+      "seconds": 0.076
+    },
+    {
+      "name": "luma-launch-copy",
+      "exit_code": 0,
+      "seconds": 0.118
+    },
+    {
+      "name": "luma-launch-signature",
+      "exit_code": 0,
+      "seconds": 0.073
+    },
+    {
+      "name": "pulse-public",
+      "exit_code": 0,
+      "seconds": 1.255
+    },
+    {
+      "name": "pulse-zip",
+      "exit_code": 0,
+      "seconds": 1.378
+    },
+    {
+      "name": "pulse-extract",
+      "exit_code": 0,
+      "seconds": 0.171
+    },
+    {
+      "name": "pulse-signature",
+      "exit_code": 0,
+      "seconds": 0.078
+    },
+    {
+      "name": "pulse-launch-copy",
+      "exit_code": 0,
+      "seconds": 0.124
+    },
+    {
+      "name": "pulse-launch-signature",
+      "exit_code": 0,
+      "seconds": 0.079
+    }
+  ],
+  "publication_authorized": false,
+  "uploaded": false,
+  "notarized": false,
+  "native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883"
+}

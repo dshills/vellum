@@ -1,8 +1,9 @@
 # macOS v1 for personal use
 
 `v1.0.0` adopts the [stable API contract](../specs/stable-api.md) for private personal use on the recorded Apple Silicon macOS26.6.2 configuration. The [release closeout](../specs/macos-v1-release.md) governs final CI and matching SDK/apps. The completed RC, public alpha.3 and older personal-v0.1 deliveries retain their original identities. The later owner-authorized [v1.0.0 source release](../release/notes/v1.0.0.md)
-adds a public root tag and checkout source; current native SDK/app packages remain
-private with their original identities. No native binaries accompany that tag.
+adds a public root tag and checkout source. Historical private packages retain
+their original identities. [Final public-mode candidates](reports/macos-v1-public-packaging/README.md)
+are now prepared locally; no v1 native downloads have been uploaded.
 
 ## Supported API contract
 
@@ -24,6 +25,10 @@ The named stable APIs preserve exported signatures and documented defaults throu
 Portable race/vet, affected native offscreen tests, command/lifetime regressions and independently extracted SDK consumers provide automated evidence. Physical pointer/native-window observations are recorded separately in the [RC native report](reports/macos-v1/README.md). That report lists exact source identity, observed host and outcomes. Historical soak and catalogue evidence is reused for unchanged paths; it does not certify all future workloads.
 
 Human IME candidate behavior and VoiceOver usability remain explicitly **unqualified**, as chosen by the owner. Follow the [human checklist](personal-macos-input-checklist.md) before claiming those results. Other macOS versions, Intel, multi-display changes, Windows and Linux remain unqualified; Wayland remains unsupported. No signing identity, notarization or public distribution approval is implied. The owner-approved [current payload audit](../release/macos-v1-distribution-audit.json) authorizes final local public packaging and launch checks; downloadable assets remain unpublished until a separate final-asset decision.
+The [final packaging report](reports/macos-v1-public-packaging/README.md) records
+a verified SDK plus five rendered/closed apps; the optional Mac Shell fixture
+is held for poor contrast in the observed dark appearance. Apps remain ad-hoc
+signed and unnotarized; downloaded-quarantine behavior is unqualified.
 
 ## Consume the private SDK
 

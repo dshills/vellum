@@ -1,0 +1,122 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "989ee3cc91b5a0d54b1c7778435683e2",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "1fc594b6952d3b072a4c72b619a6f259da389474",
+    "branch": "codex/macos-public-packaging"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "d885645a5a563d90",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Malformed checksum line gives opaque error",
+      "message": "A blank or malformed line in a checksum file makes the unpack raise ValueError with the unhelpful message 'not enough values to unpack'. A blank trailing line in the middle of the file, for example, also fails this way. The result is a confusing error rather than a clear validation message.",
+      "suggestion": "Skip empty lines and validate that the separator is present before splitting.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "docs/reports/macos-v1-public-packaging/verify-packet.py",
+          "lines": {
+            "start": 28,
+            "end": 28
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "location-corrected"
+      ],
+      "evidence": "        value, name = line.split('  ', 1)",
+      "fix": {
+        "before": "        value, name = line.split('  ', 1)",
+        "after": "        require('  ' in line, 'malformed checksum line')\n        value, name = line.split('  ', 1)"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "cd59796068f12b1d",
+      "severity": "medium",
+      "category": "security",
+      "title": "extractfile may return None; unhandled AttributeError",
+      "message": "The size check relies on the tar header, which is trusted as given. The member is then read whole into memory. Reading a member that is much larger than its header claims is not a realistic case for a well-formed tar, but extractfile can return None, which would raise AttributeError. That exception is not in the caught list, so the script ends with a traceback instead of the clean failure message.",
+      "suggestion": "Check that extractfile did not return None and fail through require(). Also add AttributeError to the caught exceptions, or read in bounded chunks.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "docs/reports/macos-v1-public-packaging/verify-packet.py",
+          "lines": {
+            "start": 83,
+            "end": 84
+          }
+        }
+      ],
+      "tags": [
+        "robustness",
+        "location-corrected"
+      ],
+      "evidence": "            stream = archive.extractfile(member)\n            require(hashlib.sha256(stream.read()).hexdigest() == record['sha256'], 'evidence member checksum mismatch')",
+      "fix": {
+        "before": "            stream = archive.extractfile(member)\n            require(hashlib.sha256(stream.read()).hexdigest() == record['sha256'], 'evidence member checksum mismatch')",
+        "after": "            stream = archive.extractfile(member)\n            require(stream is not None, 'unreadable evidence member')\n            require(hashlib.sha256(stream.read(16 * 1024 * 1024 + 1)).hexdigest() == record['sha256'], 'evidence member checksum mismatch')"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 13452,
+    "totalMs": 13496
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 1,
+    "bytes": 6136,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 4511,
+        "output": 822,
+        "costUSD": 0.017242
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
