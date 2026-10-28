@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"github.com/dshills/vellum/canvas"
+	"image/color"
 )
 
 type MarkingAction struct {
@@ -49,17 +50,20 @@ func (p *MarkingMenu) View() (Node, error) {
 		if p.ID == id && p.Dismiss != nil {
 			p.Dismiss()
 		}
-	}, Style: Style{Padding: Some(UniformInsets(16)), Gap: Some(float32(8))}}
+	}, Style: Style{Padding: Some(UniformInsets(10)), Gap: Some(float32(4))}}
 	positions := [][]int{{7, 0, 1}, {6, -1, 2}, {5, 4, 3}}
 	for y, indices := range positions {
-		row := Node{ID: fmt.Sprintf("%s/row/%d", id, y), Kind: Row, Style: Style{Gap: Some(float32(8))}}
+		row := Node{ID: fmt.Sprintf("%s/row/%d", id, y), Kind: Row, Style: Style{Gap: Some(float32(4)), Padding: Some(Insets{}), GrowY: Some(float32(0))}}
 		for x, index := range indices {
-			cell := Node{ID: fmt.Sprintf("%s/cell/%d/%d", id, y, x), Kind: Column, Style: Style{MinSize: Some(Size{Width: 100, Height: 64}), MaxSize: Some(Size{Width: 100, Height: 64})}}
+			cell := Node{ID: fmt.Sprintf("%s/cell/%d/%d", id, y, x), Kind: Column, Style: Style{MinSize: Some(Size{Width: 88, Height: 52}), MaxSize: Some(Size{Width: 88, Height: 52}), Padding: Some(UniformInsets(4)), Gap: Some(float32(3)), Border: Some(Border{}), Background: Some(color.NRGBA{}), CornerRadius: Some(float32(5)), Typography: Some(MacTypography(11, 400)), Grow: Some(float32(0))}}
 			if index >= 0 && index < len(p.Actions) {
 				a := p.Actions[index]
 				actionID := a.ID
 				cell.Kind = Button
 				cell.Text = a.Label
+				cell.Appearance = ButtonTool
+				cell.Tooltip = a.Label
+				cell.Accessibility = Accessibility{Name: a.Label}
 				cell.IconImage = a.IconImage
 				if a.IconImage != nil {
 					cell.IconPlacement = IconAboveText
@@ -76,6 +80,11 @@ func (p *MarkingMenu) View() (Node, error) {
 						}
 					}
 				}
+			}
+			if index == -1 {
+				cell.Children = []Node{{ID: id + "/center-label", Kind: Label, Text: "ACTIONS", Style: Style{Typography: Some(MacTypography(9, 500)), TextAlign: Some(AlignCenter), GrowX: Some(float32(1)), Padding: Some(Insets{})}}}
+				cell.Style.Align = Some(AlignCenter)
+				cell.Style.Justify = Some(AlignCenter)
 			}
 			row.Children = append(row.Children, cell)
 		}

@@ -1,0 +1,31 @@
+[
+  {
+    "name": "finish-panel-ui",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 2.758
+  },
+  {
+    "name": "finish-panel-native-final",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestMarkingPanelFidelity",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 25.676
+  }
+]

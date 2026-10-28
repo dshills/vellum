@@ -143,3 +143,9 @@ original continuous stroke face names and clearer neutral faces/dark lettering.
 The existing mesh pipeline, resource ownership, cube rectangle, six face IDs and
 picking math stay unchanged. Accessible orientation alternatives use quieter
 Mac tool styling and explicit names/tooltips, with the same callbacks/IDs.
+
+The existing eight-direction action panel keeps its modal lifecycle, direction
+order, stable cell/action IDs, validation, focus scope and callbacks. Smaller
+flat tool cells align full-color icons/labels and use tighter balanced spacing;
+the noninteractive center labels the panel. No flick gestures, pointer-anchored
+popup, nested menu or additional command is introduced.

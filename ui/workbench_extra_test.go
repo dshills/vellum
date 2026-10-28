@@ -151,3 +151,38 @@ func TestOrientationAlternativesKeepFacesAndAdmission(t *testing.T) {
 		t.Fatal("disabled or retired callback")
 	}
 }
+
+func TestActionPanelFidelityKeepsDirectionIdentityAndAdmission(t *testing.T) {
+	pixels := image.NewNRGBA(image.Rect(0, 0, 2, 2))
+	pixels.SetNRGBA(0, 0, color.NRGBA{R: 230, A: 255})
+	art, _ := canvas.NewTiledImage(pixels)
+	var chosen []string
+	dismissed := 0
+	p := &MarkingMenu{ID: "panel", Label: "Actions", Open: true, Actions: []MarkingAction{{ID: "north", Label: "North", IconImage: art}, {ID: "ne", Label: "North east"}}, Choose: func(id string) { chosen = append(chosen, id) }, Dismiss: func() { dismissed++ }}
+	n, e := p.View()
+	if e != nil {
+		t.Fatal(e)
+	}
+	north := nodeByID(n, "panel/cell/0/1")
+	if north == nil || north.IconImage != art || north.Accessibility.Name != "North" || north.Tooltip != "North" {
+		t.Fatal("lost art/name")
+	}
+	north.Activate()
+	p.ChooseDirection(1)
+	if len(chosen) != 2 || chosen[0] != "north" || chosen[1] != "ne" {
+		t.Fatal(chosen)
+	}
+	p.Actions[0].Disabled = true
+	north.Activate()
+	p.Open = false
+	p.ChooseDirection(1)
+	if len(chosen) != 2 {
+		t.Fatal("disabled/closed admitted")
+	}
+	p.ID = "retired"
+	north.Activate()
+	n.Dismiss()
+	if len(chosen) != 2 || dismissed != 0 {
+		t.Fatal("retired callback")
+	}
+}
