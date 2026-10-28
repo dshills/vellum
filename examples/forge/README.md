@@ -26,7 +26,7 @@ go run .
   dividers resize the browser and inspector. Artwork is original, full-color.
 
 Documents exist only in memory; no Save/Open, user files, network or cloud service
-is used. Closing discards the study. Geometry/picking uses opaque box proxies,
+is used. Closing discards the study. Display geometry uses opaque boxes and a round shaft; picking uses box proxies,
 with a 48-body demo limit. There are no sketch constraints, B-rep modeling,
 assemblies at Fusion scale, cross-window capture, or secondary-button capture.
 The reusable SceneView3D and viewport helpers are experimental additions; the
@@ -63,3 +63,27 @@ identities and camera/picking math remain. The existing action panel has compact
 flat full-color cells, tooltips and accessible names; its actions, Escape dismissal
 and modal lifecycle remain unchanged. The viewport is still a small box-proxy
 demonstration, and the presentation pass adds no CAD operations.
+
+## Try the completed preview
+
+1. Start on Solid. The blue tool treatment and viewport caption identify Orbit.
+2. Drag to orbit, choose Pan and drag to pan, or scroll to zoom. Select admits
+   clicks while leaving plain drags inert; Shift-drag pans and Option-drag orbits.
+3. Click a cube face to orient. Fit assembly restores the initial camera/target;
+   Home/orientation buttons change orientation while preserving pan/zoom.
+4. Select a body in the viewport or browser. Its material stays visible inside
+   a blue outline of its picking bounds. Hover gives a lighter preview.
+5. Select Drive shaft to see cylindrical display geometry. Its inspector explicitly
+   identifies the box picking proxy; selection near its silhouette can hit that box.
+6. Apply a width, Move or Delete, then Undo/Redo. Right-click opens existing actions;
+   Escape dismisses them. Navigation/selection does not add history entries.
+
+The app intentionally retains a light design on light/dark macOS hosts. Ribbon,
+action panel title/content/footer and Close use matching readable colors. Full-color
+icons and native focus feedback remain. It does not offer automatic dark theming.
+
+The completion checks physically verified navigation tools, pan, inert Select
+drag, cube Front, right-click, Escape and Fit dismissal on the private candidate.
+Earlier attempts affected by desktop activity are excluded. Automated routing,
+geometry, winding, host-palette and history tests are separate evidence; these
+checks do not qualify other hardware/displays, human accessibility or CAD scale.

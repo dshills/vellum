@@ -43,3 +43,13 @@ Reproduce from a clean checkout with `examples/forge/package.py`, launch the app
 keep the default camera/seven-body study and capture its window after Add/Undo.
 macOS recording/pointer indicators remain. No geometry, icons or controls were
 added to the screenshot after capture. The private ZIP is not a public download.
+
+### Forge completion capture
+
+The root README now uses [forge-completion.jpg](forge-completion.jpg), an unmodified
+native JPEG from the exact ZIP-extracted private build11. Its [metadata](forge-completion-capture.json)
+records the source commit and hash. The round shaft, active Orbit treatment and
+material-preserving selection outline are running app output. Reproduce with the
+seven-body default study, Fit assembly, Orbit and selected Sliding carriage; keep
+history empty. Native focus/pointer/recording indicators remain. Earlier Forge
+captures and their historical metadata are retained unchanged.

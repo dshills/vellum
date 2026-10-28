@@ -12,7 +12,7 @@ These additions do not retroactively qualify new workloads or published builds.
 | `ui.Ribbon` | Stable tabs/groups/action identities, contextual tabs, full-color icon-above-label buttons and whole-group overflow; retained per owner/window. |
 | `ui.ModelBrowser` | Separate disclosure, visibility, selection and activation proposals; up to 256 items, at most 16 ancestors. |
 | `viewport.Camera`, `Ray`, `Box`, `Gesture` | Portable camera matrices, scale-consistent rays, box-proxy picking and sequence-aware click/drag admission. |
-| `viewport.Scene`, `cogent.SceneView3D` | Experimental depth-rendered preview of up to 256 opaque boxes; the same retained GPU device/resource contracts as `GPUView`. |
+| `viewport.Scene`, `cogent.SceneView3D` | Experimental depth-rendered preview of up to 256 opaque box/cylinder display primitives with box picking; the same retained GPU device/resource contracts as `GPUView`. |
 | `ui.ViewCube` | Keyboard/accessible view choices using the same face identifiers as the rendered in-canvas cube. |
 | `quantity.Length`, `ui.QuantityField` | Bounded arithmetic and named length parameters, canonical millimeters, explicit Apply and application validation/command admission. |
 | `ui.FeatureTimeline` | Controlled feature selection, earlier/later reorder and rollback-marker proposals. No solver or dependency replay. |
@@ -102,3 +102,25 @@ producer. Public release tags/assets, audit changes, signing identities and
 notarization remain outside this source-integration/private-delivery request.
 Final CI outcomes, package hashes and native observations belong to the final
 source-bound delivery handoff; they are not preclaimed by this integration guide.
+
+## Completed Forge feedback and delivery
+
+`viewport.Object.Shape` defaults to `viewport.BoxShape`; the experimental
+`viewport.CylinderXShape` renders a capped 48-segment cylinder along X, inscribed
+in Bounds. Y/Z extents define its cross-section; Forge uses equal radii for the
+shaft. All shapes deliberately retain Bounds for picking. This is display geometry,
+not CAD topology or exact cylinder intersection. Use keyed literals as above.
+
+Selected geometry keeps its original material with a thin blue outline of picking
+bounds; hovered geometry is lighter. Forge's existing tool buttons/panel expose
+one active Orbit/Pan/Select mode, with matching hints and caption. The demo keeps
+an intentional light application theme under either host palette. Dialog-specific
+colors theme native dialog chrome; generic content defaults preserve historical
+native chrome. Existing frozen replay images/inputs remain unchanged.
+
+See [the current native screenshot](screenshots/forge-completion.jpg) and its
+[capture identity](screenshots/forge-completion-capture.json). This capture comes
+from the tested implementation candidate; the following documentation checkpoint
+adds no runtime code. Final exact-commit CI, ZIP checksums/signature results and
+launch observations belong to the private delivery handoff. Source/review
+checkpoints are phase22–phase27 under docs/reviews/fusion-workbench.

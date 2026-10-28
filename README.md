@@ -19,16 +19,18 @@ The screenshots are actual app captures; artwork and data are original fixtures.
 
 An original Fusion-inspired Mac workbench: contextual grouped ribbon, rich model
 browser, live depth-rendered 3D assembly and orientation cube, unit expressions,
-feature strip, and undoable body edits. Full-color icons and native titlebar
+feature strip, and undoable body edits. Active navigation tools, a round drive
+shaft and material-preserving selection outlines clarify the preview. Full-color icons and native titlebar
 controls complement the managed Mac-themed interface.
 
-![Forge Mac design workbench with a compact grouped ribbon, browser outline and feature icon strip](docs/screenshots/forge-fidelity.jpg)
+![Forge Mac design workbench with a compact grouped ribbon, browser outline and feature icon strip](docs/screenshots/forge-completion.jpg)
 
 Run: `(cd examples/forge && go run .)`
 
 See the [Forge guide](examples/forge/README.md) for controls and private packaging,
 and the [reusable workbench APIs](docs/fusion-workbench.md) for integration. The
-new viewport is experimental, uses box proxies and has no CAD kernel. This demo
+new viewport is experimental, uses box picking proxies (including the cylindrical
+shaft) and has no CAD kernel. This demo
 is source/private-build work and is absent from the six published build13 apps.
 
 ### Forma — a space for ideas

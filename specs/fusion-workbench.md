@@ -220,3 +220,12 @@ replay. Dialog chrome coloring now requires an explicit dialog node/kind color;
 a generic content default alone preserves historical native chrome. MacTheme
 already supplies the explicit dialog pair, so Forge retains its contrast fix.
 The immutable replay records/goldens and all behavior/API checks remain unchanged.
+
+The controlled build-11 native closeout verified Pan drag, Select's inert plain
+drag, active tool/caption changes, cube Front, viewport right-click/Escape, Fit
+and browser shaft selection without history additions. The round shaft and fully
+paired dialog chrome were visually inspected in actual package captures.
+Uncontrolled earlier desktop attempts are excluded. Documentation/screenshots
+are source-bound; final exact-commit CI and final private package/signature/hash
+and launch outcomes are recorded in the delivery handoff, without preclaiming
+remote success or publishing release assets.

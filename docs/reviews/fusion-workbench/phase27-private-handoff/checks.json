@@ -1,0 +1,57 @@
+[
+  {
+    "name": "complete-docs",
+    "cwd": ".",
+    "argv": [
+      "python3",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/forge-completion-20261028/check-docs.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.028
+  },
+  {
+    "name": "complete-package-candidate",
+    "cwd": "examples/forge",
+    "argv": [
+      "python3",
+      "-B",
+      "package.py",
+      "--output",
+      "/private/tmp/vellum-forge-completion-20261028-build11",
+      "--build-version",
+      "11"
+    ],
+    "exit_code": 0,
+    "seconds": 20.466
+  },
+  {
+    "name": "complete-feedback-app",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 26.612
+  },
+  {
+    "name": "complete-api",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.51
+  }
+]
