@@ -23,6 +23,9 @@ type Object struct {
 	Color    color.NRGBA
 	Visible  bool
 	Shape    Shape
+	// Overlay boxes render and pick above scene geometry. ScreenSize is a logical-pixel side length; zero uses Bounds.
+	Overlay    bool
+	ScreenSize float64
 }
 type Scene struct {
 	Camera                Camera
@@ -39,7 +42,7 @@ func (s *Scene) Validate() error {
 	}
 	seen := map[string]bool{}
 	for _, o := range s.Objects {
-		if o.ID == "" || o.Name == "" || len(o.ID) > 256 || len(o.Name) > 1024 || seen[o.ID] || o.Bounds.Validate() != nil || o.Color.A != 255 || o.Shape > CylinderXShape {
+		if o.ID == "" || o.Name == "" || len(o.ID) > 256 || len(o.Name) > 1024 || seen[o.ID] || o.Bounds.Validate() != nil || o.Color.A != 255 || o.Shape > CylinderXShape || !finite(o.ScreenSize) || (o.Overlay && o.Shape != BoxShape) || o.ScreenSize < 0 || o.ScreenSize > 128 || (o.ScreenSize > 0 && (!o.Overlay || o.Shape != BoxShape)) {
 			return fmt.Errorf("viewport: invalid preview object")
 		}
 		seen[o.ID] = true
@@ -67,7 +70,16 @@ func (s *Scene) Touch() error {
 	return nil
 }
 func (s *Scene) Pick(x, y, width, height float64) (string, error) {
+	return s.PickScaled(x, y, width, height, 1)
+}
+
+// PickScaled uses the same logical-pixel overlay bounds as the renderer.
+func (s *Scene) PickScaled(x, y, width, height, scale float64) (string, error) {
 	if e := s.Validate(); e != nil {
+		return "", e
+	}
+	objects, e := s.DisplayObjects(width, height, scale)
+	if e != nil {
 		return "", e
 	}
 	ray, e := s.Camera.RayAt(x, y, width, height)
@@ -76,15 +88,44 @@ func (s *Scene) Pick(x, y, width, height float64) (string, error) {
 	}
 	distance := math.Inf(1)
 	id := ""
-	for _, o := range s.Objects {
+	overlay := false
+	for _, o := range objects {
 		if !o.Visible {
 			continue
 		}
-		if d, ok := hitObject(ray, o); ok && d < distance {
-			distance, id = d, o.ID
+		if d, ok := hitObject(ray, o); ok && ((!overlay && o.Overlay) || (overlay == o.Overlay && d < distance)) {
+			distance, id, overlay = d, o.ID, o.Overlay
 		}
 	}
 	return id, nil
+}
+
+// DisplayObjects resolves optional screen-sized overlay boxes without changing
+// application geometry. Camera depth determines world size in perspective.
+func (s *Scene) DisplayObjects(width, height, scale float64) ([]Object, error) {
+	if s.Validate() != nil || !dimensions(width, height) || !finite(scale) || scale <= 0 || scale > 16 {
+		return nil, fmt.Errorf("viewport: invalid overlay projection")
+	}
+	out := append([]Object(nil), s.Objects...)
+	eye, _, _, forward := s.Camera.Basis()
+	for i, o := range out {
+		if o.ScreenSize == 0 {
+			continue
+		}
+		center := o.Bounds.Min.Add(o.Bounds.Max).Mul(.5)
+		depth := s.Camera.Distance
+		if !s.Camera.Orthographic {
+			depth = center.Sub(eye).Dot(forward)
+		}
+		if depth <= .001 {
+			out[i].Visible = false
+			continue
+		}
+		half := depth * math.Tan(math.Pi/8) * o.ScreenSize * scale / height
+		v := Vec3{half, half, half}
+		out[i].Bounds = Box{center.Sub(v), center.Add(v)}
+	}
+	return out, nil
 }
 
 // CubeRect reserves an in-canvas orientation control in full-content physical

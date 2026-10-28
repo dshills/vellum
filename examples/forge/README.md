@@ -113,6 +113,6 @@ Invalid preferences are preserved until Reset Workspace. An invalid recovery
 file refuses startup with its error; preserve or move the named recovery file
 from ~/Library/Caches/VellumForge before retrying.
 
-Axis cubes are depth-tested and may be occluded by neighboring bodies. Orbit or
-hide obstructing bodies, or use the numeric controls. This preview still has a
+Axis cubes stay visible above assembly geometry, retain a consistent screen size
+under zoom/display scaling, and highlight gold on hover. This preview still has a
 48-body limit and no CAD topology/constraint solver.

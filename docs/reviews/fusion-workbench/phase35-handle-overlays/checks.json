@@ -1,0 +1,44 @@
+[
+  {
+    "name": "forge-overlay-verified",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./viewport"
+    ],
+    "exit_code": 0,
+    "seconds": 1.295
+  },
+  {
+    "name": "forge-overlay-app",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 24.589
+  },
+  {
+    "name": "forge-overlay-final",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestScene|TestGPUInput",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 36.751
+  }
+]

@@ -62,7 +62,7 @@ func validateStudy(s studyFile) error {
 	}
 	ids := map[string]bool{}
 	for _, o := range s.Document.Objects {
-		if strings.HasPrefix(o.ID, "forge-handle-") {
+		if o.Overlay || o.ScreenSize != 0 || strings.HasPrefix(o.ID, "forge-handle-") {
 			return fmt.Errorf("reserved body identity")
 		}
 		if strings.HasPrefix(o.ID, "body-") {

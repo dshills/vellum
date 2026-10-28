@@ -67,7 +67,7 @@ func (m *workbench) addHandles() {
 			pos.Z = o.Bounds.Max.Z + .18
 		}
 		half := viewport.Vec3{X: .065, Y: .065, Z: .065}
-		m.scene.Objects = append(m.scene.Objects, viewport.Object{ID: fmt.Sprintf("forge-handle-%d", i), Name: []string{"X handle", "Y handle", "Z handle"}[i], Bounds: viewport.Box{Min: pos.Sub(half), Max: pos.Add(half)}, Color: rgb(c.r, c.g, c.b), Visible: true})
+		m.scene.Objects = append(m.scene.Objects, viewport.Object{ID: fmt.Sprintf("forge-handle-%d", i), Name: []string{"X handle", "Y handle", "Z handle"}[i], Bounds: viewport.Box{Min: pos.Sub(half), Max: pos.Add(half)}, Color: rgb(c.r, c.g, c.b), Visible: true, Overlay: true, ScreenSize: 14})
 	}
 }
 
@@ -121,7 +121,7 @@ func (m *workbench) handleInput(e cogent.GPUEvent) bool {
 		if e.Kind != cogent.GPUPointerDown || e.Button != cogent.GPUButtonPrimary || !e.Inside || m.prompt != "" {
 			return false
 		}
-		id, err := m.scene.Pick(float64(e.Position.X), float64(e.Position.Y), float64(e.Size.X), float64(e.Size.Y))
+		id, err := m.scene.PickScaled(float64(e.Position.X), float64(e.Position.Y), float64(e.Size.X), float64(e.Size.Y), max(1, e.Scale))
 		if err != nil || !strings.HasPrefix(id, "forge-handle-") {
 			return false
 		}

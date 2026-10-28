@@ -171,7 +171,7 @@ func (v *SceneView3D) HandleInput(e GPUEvent) bool {
 		if !e.Inside {
 			return false
 		}
-		id, err := s.Pick(float64(e.Position.X), float64(e.Position.Y), float64(e.Size.X), float64(e.Size.Y))
+		id, err := s.PickScaled(float64(e.Position.X), float64(e.Position.Y), float64(e.Size.X), float64(e.Size.Y), scale)
 		if err == nil && id != s.HoveredID {
 			s.HoveredID = id
 			v.changed()
@@ -196,7 +196,7 @@ func (v *SceneView3D) HandleInput(e GPUEvent) bool {
 			}
 			return true
 		}
-		if id, err := s.Pick(float64(e.Position.X), float64(e.Position.Y), float64(e.Size.X), float64(e.Size.Y)); err == nil && (v.Select != nil || v.SelectModified != nil) {
+		if id, err := s.PickScaled(float64(e.Position.X), float64(e.Position.Y), float64(e.Size.X), float64(e.Size.Y), scale); err == nil && (v.Select != nil || v.SelectModified != nil) {
 			if v.SelectModified != nil {
 				v.SelectModified(id, e.Modifiers&GPUShift != 0)
 			} else {
@@ -261,17 +261,17 @@ func (v *SceneView3D) HandleInput(e GPUEvent) bool {
 }
 
 type scene3DRenderer struct {
-	scene                   *viewport.Scene
-	previous                []viewport.Object
-	selected, hover         string
-	selections              []string
-	grid                    bool
-	generation              uint64
-	main, cube              *wgpu.RenderPipeline
-	mainGroup, cubeGroup    *wgpu.BindGroup
-	vertices, indices       *wgpu.Buffer
-	vertexBytes, indexBytes uint64
-	mainCount, cubeCount    uint32
+	scene                              *viewport.Scene
+	previous                           []viewport.Object
+	selected, hover                    string
+	selections                         []string
+	grid                               bool
+	generation                         uint64
+	main, cube                         *wgpu.RenderPipeline
+	mainGroup, cubeGroup               *wgpu.BindGroup
+	vertices, indices                  *wgpu.Buffer
+	vertexBytes, indexBytes            uint64
+	mainCount, cubeCount, overlayCount uint32
 }
 
 func (r *scene3DRenderer) release() {
@@ -344,8 +344,18 @@ func (r *scene3DRenderer) prepare(f GPUFrame) error {
 		}
 		r.generation = f.ResourceGeneration
 	}
-	if fresh || !slices.Equal(r.previous, r.scene.Objects) || !slices.Equal(r.selections, r.scene.SelectedIDs) || r.selected != r.scene.SelectedID || r.hover != r.scene.HoveredID || r.grid != r.scene.Grid {
-		vertices, indices, main, cube := buildScene3DMesh(r.scene)
+	display := *r.scene
+	scale := float64(f.DpScale)
+	if scale <= 0 {
+		scale = 1
+	}
+	objects, resolveErr := r.scene.DisplayObjects(float64(f.Size.X), float64(f.Size.Y), scale)
+	if resolveErr != nil {
+		return resolveErr
+	}
+	display.Objects = objects
+	if fresh || !slices.Equal(r.previous, objects) || !slices.Equal(r.selections, r.scene.SelectedIDs) || r.selected != r.scene.SelectedID || r.hover != r.scene.HoveredID || r.grid != r.scene.Grid {
+		vertices, indices, main, cube, overlays := buildScene3DMeshRanges(&display)
 		var err error
 		r.vertexBytes = uint64(len(vertices) * 4)
 		r.indexBytes = uint64(len(indices) * 4)
@@ -364,7 +374,8 @@ func (r *scene3DRenderer) prepare(f GPUFrame) error {
 			return err
 		}
 		r.mainCount, r.cubeCount = main, cube
-		r.previous = slices.Clone(r.scene.Objects)
+		r.previous = slices.Clone(objects)
+		r.overlayCount = overlays
 		r.selections = slices.Clone(r.scene.SelectedIDs)
 		r.selected, r.hover, r.grid = r.scene.SelectedID, r.scene.HoveredID, r.scene.Grid
 	}
@@ -386,7 +397,12 @@ func (r *scene3DRenderer) draw(f GPUFrame, p *wgpu.RenderPassEncoder) error {
 	p.SetBindGroup(0, r.mainGroup, nil)
 	p.SetVertexBuffer(0, r.vertices, 0, r.vertexBytes)
 	p.SetIndexBuffer(r.indices, wgpu.IndexFormatUint32, 0, r.indexBytes)
-	p.DrawIndexed(r.mainCount, 1, 0, 0, 0)
+	p.DrawIndexed(r.mainCount-r.overlayCount, 1, 0, 0, 0)
+	if r.overlayCount > 0 {
+		p.SetPipeline(r.cube)
+		p.SetBindGroup(0, r.mainGroup, nil)
+		p.DrawIndexed(r.overlayCount, 1, r.mainCount-r.overlayCount, 0, 0)
+	}
 	if r.scene.ShowCube {
 		rect := viewport.CubeRect(f.Size.X, f.Size.Y, float64(f.DpScale))
 		if !rect.Empty() {
@@ -535,6 +551,10 @@ func (m *sceneMesh) outlineBox(b viewport.Box, c color.NRGBA) {
 }
 
 func buildScene3DMesh(s *viewport.Scene) ([]float32, []uint32, uint32, uint32) {
+	v, i, m, c, _ := buildScene3DMeshRanges(s)
+	return v, i, m, c
+}
+func buildScene3DMeshRanges(s *viewport.Scene) ([]float32, []uint32, uint32, uint32, uint32) {
 	m := &sceneMesh{}
 	if s.Grid {
 		for i := -10; i <= 10; i++ {
@@ -548,7 +568,7 @@ func buildScene3DMesh(s *viewport.Scene) ([]float32, []uint32, uint32, uint32) {
 		}
 	}
 	for _, o := range s.Objects {
-		if !o.Visible {
+		if !o.Visible || o.Overlay {
 			continue
 		}
 		c := o.Color
@@ -566,6 +586,16 @@ func buildScene3DMesh(s *viewport.Scene) ([]float32, []uint32, uint32, uint32) {
 			m.outlineBox(o.Bounds, color.NRGBA{R: 20, G: 92, B: 190, A: 255})
 		}
 	}
+	overlayStart := uint32(len(m.indices))
+	for _, o := range s.Objects {
+		if o.Visible && o.Overlay {
+			c := o.Color
+			if o.ID == s.HoveredID {
+				c = color.NRGBA{255, 213, 80, 255}
+			}
+			m.box(o.Bounds, c)
+		}
+	}
 	mainCount := uint32(len(m.indices))
 	// Original geometry only; existing pipeline, scale and pick rectangles stay.
 	m.box(viewport.Box{Min: viewport.Vec3{X: -1, Y: -1, Z: -1}, Max: viewport.Vec3{X: 1, Y: 1, Z: 1}}, color.NRGBA{R: 241, G: 243, B: 247, A: 255})
@@ -573,5 +603,5 @@ func buildScene3DMesh(s *viewport.Scene) ([]float32, []uint32, uint32, uint32) {
 		m.cubeLabel(face.label, face.normal, face.u, face.v)
 	}
 
-	return m.vertices, m.indices, mainCount, uint32(len(m.indices)) - mainCount
+	return m.vertices, m.indices, mainCount, uint32(len(m.indices)) - mainCount, mainCount - overlayStart
 }
