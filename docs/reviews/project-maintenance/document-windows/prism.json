@@ -1,0 +1,114 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "8b58296778dc2c86f3753d77385a4d56",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "725c6953b08beb67765dd488bbc57fa0056fe07f",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "cf4b5a318630bd54",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unsynchronized access to active window state",
+      "message": "The workspace struct (documents map and active field) is read and written without synchronization. activate is called from the native focus callback, while Available/Execute run from menu handlers. If these run on different goroutines this is a data race. The map is also not mutated after setup, but the active field is.",
+      "suggestion": "Guard active with a sync.Mutex (or atomic.Value) and lock in activate/current.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "examples/macapps/cmd/documents/main.go",
+          "lines": {
+            "start": 31,
+            "end": 36
+          }
+        }
+      ],
+      "tags": [
+        "race"
+      ],
+      "evidence": "func (w *workspace) activate(ref app.WindowRef) {\n\tif w.documents[ref] != nil \u0026\u0026 ref.Context().Err() == nil {\n\t\tw.active = ref",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "3cfc035d9714ddc0",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Double Close and incomplete cleanup on error",
+      "message": "If openDocument fails for B after A was opened successfully, A is not yet in w.documents when the error is returned? Actually A is added, but if B fails, its own cleanup closes B. However, a failure inside the openDocument defer for a partially-opened document only closes the repository; files attached earlier (AttachFiles succeeded but later steps) are not stopped. Also a.Close() is called twice, relying on idempotence.",
+      "suggestion": "Remove the duplicate a.Close() and ensure d.files.Stop() is called on openDocument error paths after AttachFiles.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/macapps/cmd/documents/main.go",
+          "lines": {
+            "start": 141,
+            "end": 144
+          }
+        }
+      ],
+      "tags": [
+        "cleanup",
+        "location-corrected"
+      ],
+      "evidence": "defer a.Close()\n\tw := \u0026workspace{owner: a, documents: map[app.WindowRef]*documentWindow{}}\n\tdefer func() {\n\t\ta.Close()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6244,
+    "totalMs": 6259
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 8,
+    "bytes": 18612,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 11387,
+        "output": 669,
+        "costUSD": 0.029464
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

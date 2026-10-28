@@ -28,7 +28,7 @@ cd "$VELLUM_REPO_ROOT/examples/macapps"
 go test -race ./...
 go vet ./...
 mkdir -p build
-for VELLUM_APP_NAME in calculator notes weather reminders; do
+for VELLUM_APP_NAME in calculator notes weather reminders documents; do
  go build -o "build/vellum-$VELLUM_APP_NAME" "./cmd/$VELLUM_APP_NAME"
 done
 

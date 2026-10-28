@@ -54,3 +54,20 @@ parent remains the application main window. It does not activate background apps
 retired windows. The physical Notes cancellation check covers the ordinary path. Scalar identity
 and state fixtures cover refusal policy; they do not simulate closing an actual
 NSWindow or native responder delivery.
+
+## Active document menus
+
+`Driver.OnWindowActivated` reports native macOS focus gained on the application
+owner with the exact live WindowRef. Its callback must not enter Application.Do.
+Use a single process-menu registry that forwards availability and execution to
+the active document registry; recheck the reference on every call. Keep separate
+per-window TitlebarToolbar.Commands registries. A retired active reference refuses
+commands until another live document activates. The callback follows the existing
+coalesced native focus observer and adds no polling or global preference changes.
+
+The independent consumer is `(cd examples/macapps && go run ./cmd/documents
+-data-dir /absolute/private/workspace)`. A and B use separate repositories,
+models, histories, recovery files and native toolbar namespaces. Close one while
+retaining the other; OS focus changes route File/Edit menus to the surviving
+document. Source tests cover routing and retirement; native observations remain
+separate from human accessibility and other-platform qualification.

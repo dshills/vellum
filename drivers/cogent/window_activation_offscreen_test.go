@@ -37,6 +37,12 @@ func TestMacSourceListNativeWindowActivation(t *testing.T) {
 			unitSettle(t, m)
 			managed := m.implementation.find("one")
 			w := managed.state
+			activated := 0
+			w.activated = func() {
+				if err := a.Do(func() { activated++ }); err != nil {
+					t.Fatal(err)
+				}
+			}
 			bindWindowOriginCustom(w, nil, func(*nativeWindow, events.Event) {})
 			cd := w.body.Scene.RenderWindow().SystemWindow.Composer().(*composer.ComposerDrawer)
 			oldDrawer := cd.Drawer
@@ -90,6 +96,9 @@ func TestMacSourceListNativeWindowActivation(t *testing.T) {
 			beforePaints := drawer.calls
 			pump()
 			assertRows(false)
+			if activated != 0 {
+				t.Fatal("inactive callback fired")
+			}
 			if drawer.calls != beforePaints+1 {
 				t.Fatal("activation did not compose exactly one changed frame", beforePaints, drawer.calls)
 			}
@@ -121,6 +130,9 @@ func TestMacSourceListNativeWindowActivation(t *testing.T) {
 			v.observe(true)
 			pump()
 			assertRows(true)
+			if activated != 1 {
+				t.Fatal("focus gained callback lost", activated)
+			}
 			foreign := &windowActivation{}
 			t.Cleanup(foreign.close)
 			if err := foreign.bind(w.body.SystemEvents()); err != nil {
@@ -129,6 +141,9 @@ func TestMacSourceListNativeWindowActivation(t *testing.T) {
 			before = passes
 			foreign.observe(false)
 			pump()
+			if activated != 1 {
+				t.Fatal("foreign callback admitted")
+			}
 			assertRows(true)
 			if passes != before {
 				t.Fatal("foreign state restyled this window")

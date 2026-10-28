@@ -1,0 +1,46 @@
+[
+  {
+    "name": "documents-workspace",
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./cmd/documents"
+    ],
+    "exit_code": 0,
+    "seconds": 15.745
+  },
+  {
+    "name": "documents-workspace-vet",
+    "cwd": "examples/macapps",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./cmd/documents"
+    ],
+    "exit_code": 0,
+    "seconds": 11.952
+  },
+  {
+    "name": "documents-activation-final",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "Test.*(SourceListNativeWindowActivation|WindowActivation|PerWindow)",
+      "-timeout=120s",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 21.867
+  }
+]

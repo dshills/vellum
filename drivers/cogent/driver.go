@@ -37,6 +37,11 @@ type Extension interface {
 type ThemeExtension interface{ SetTheme(ui.Theme) }
 
 type Driver struct {
+	// OnWindowActivated observes macOS native focus gained on the application
+	// owner for the exact live window. Use it to route process-wide menus.
+	// It must not enter Application.Do. Other platforms retain existing behavior.
+	OnWindowActivated func(app.WindowRef)
+
 	// FollowSystemAppearance opts into notification-driven Mac presets. Explicit node
 	// themes/styles still override them. No polling or system setting changes.
 	FollowSystemAppearance bool
@@ -97,6 +102,8 @@ type record struct {
 var processRun atomic.Bool
 
 type nativeWindow struct {
+	activated func()
+
 	window             app.Window
 	body               *core.Body
 	host               *core.Frame
@@ -417,6 +424,11 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				return
 			}
 			w := &nativeWindow{window: spec}
+			if d.OnWindowActivated != nil {
+				w.activated = func() {
+					_ = withWindowOwner(a, spec.Ref(), func() { d.OnWindowActivated(spec.Ref()); _ = a.Invalidate("") })
+				}
+			}
 			windowTitlebar := titlebar
 			if d.TitlebarToolbars != nil {
 				if p, ok := preparedToolbars[spec.Ref()]; ok {

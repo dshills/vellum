@@ -142,6 +142,8 @@ func handleWindowActivation(w *nativeWindow, e events.Event) bool {
 	if w != nil && w.host != nil && w.body != nil && !w.closing.Load() && w.window.Ref().Context().Err() == nil && w.activation.Load() == wake.state && wake.state.consume(w.body.SystemEvents(), wake) {
 		if !wake.state.active() {
 			cancelWindowShortcutRecorders(w.root)
+		} else if w.activated != nil {
+			w.activated()
 		}
 		w.desktop.invalidate(w)
 		w.host.Restyle()
