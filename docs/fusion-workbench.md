@@ -80,3 +80,25 @@ Private packaging uses `examples/forge/package.py`, an exclusive fresh output,
 clean source commit, original procedural icon, ad-hoc signature, ZIP/checksum and
 signature verification after exact ZIP extraction. No public download, release
 tag, audit change, signing identity or notarization is performed.
+
+## Forge fidelity integration
+
+The remaining presentation pass keeps the original commands and public shapes:
+compact inspector fields/actions, centered original cube face names, quiet
+orientation alternatives, a balanced eight-action panel, and app-local scroll
+containers for short/narrow panes. Source checkpoints are recorded in the
+phase14–phase17 review folders under docs/reviews/fusion-workbench.
+
+The complete app-description layout regression runs in the Forge module with
+`go test -race -tags offscreen ./...`; CI's scripts/check.sh includes it. It uses
+the app's theme factory and a measured placeholder only for the GPU viewport,
+so geometry evidence does not claim GPU appearance, physical input, or human
+accessibility qualification. Native private-package checks remain separate.
+
+Integration fast-forwards main from the owner-approved branch when possible,
+pushes source to the existing repository, and checks the exact commit's push CI.
+A private package is then built from clean committed source using the unchanged
+producer. Public release tags/assets, audit changes, signing identities and
+notarization remain outside this source-integration/private-delivery request.
+Final CI outcomes, package hashes and native observations belong to the final
+source-bound delivery handoff; they are not preclaimed by this integration guide.

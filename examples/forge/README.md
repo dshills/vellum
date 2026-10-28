@@ -55,3 +55,11 @@ arrows move the marker; the two curved arrows move the selected feature earlier
 or later. These remain separate history actions with Undo/Redo; no new timeline
 drag behavior or CAD feature calculation is introduced. Visibility and activation
 retain independent keyboard/pointer targets and accessible checked states.
+
+The inspector now uses compact aligned property controls and scrolls independently
+when the window is short. The orientation row scrolls horizontally if a split
+pane is too narrow. Cube faces carry original stroke names; the same six face
+identities and camera/picking math remain. The existing action panel has compact
+flat full-color cells, tooltips and accessible names; its actions, Escape dismissal
+and modal lifecycle remain unchanged. The viewport is still a small box-proxy
+demonstration, and the presentation pass adds no CAD operations.

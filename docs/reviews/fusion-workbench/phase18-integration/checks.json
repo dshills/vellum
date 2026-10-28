@@ -1,0 +1,74 @@
+[
+  {
+    "name": "finish-window-fonts",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestForgeWindowFidelityGeometry",
+      "-count=1",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 9.796
+  },
+  {
+    "name": "finish-app-final",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 9.923
+  },
+  {
+    "name": "finish-app-vet",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 11.535
+  },
+  {
+    "name": "finish-api",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.818
+  },
+  {
+    "name": "finish-ui-vet",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "vet",
+      "./ui",
+      "./viewport"
+    ],
+    "exit_code": 0,
+    "seconds": 0.483
+  }
+]
