@@ -1,0 +1,43 @@
+[
+  {
+    "name": "finish-sdk-export",
+    "cwd": ".",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/release-sdk_test.py"
+    ],
+    "exit_code": 0,
+    "seconds": 1.805
+  },
+  {
+    "name": "finish-dark-ribbon",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestForgeWindowFidelityGeometry",
+      "-count=1",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 11.723
+  },
+  {
+    "name": "finish-contrast-vet",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.338
+  }
+]

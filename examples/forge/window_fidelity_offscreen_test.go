@@ -3,6 +3,8 @@
 package main
 
 import (
+	"cogentcore.org/core/colors"
+	"cogentcore.org/core/colors/matcolor"
 	"cogentcore.org/core/text/fonts"
 	"context"
 	"crypto/sha256"
@@ -22,6 +24,12 @@ import (
 // Geometry/routing of the exact app descriptions. The GPU viewport alone is
 // a fixed placeholder; this fixture does not claim GPU/native pointer evidence.
 func TestForgeWindowFidelityGeometry(t *testing.T) {
+	// Serial fixture: no t.Parallel. All Manual windows close before restoration.
+	// Process-local native palette only; never changes macOS appearance.
+	previousDark := matcolor.SchemeIsDark
+	colors.SetScheme(true)
+	defer colors.SetScheme(previousDark)
+
 	var fixtureFonts []cogent.ManualFont
 	if e := fs.WalkDir(fonts.Default, ".", func(p string, d fs.DirEntry, e error) error {
 		if e != nil {
@@ -133,6 +141,33 @@ func TestForgeWindowFidelityGeometry(t *testing.T) {
 					el, ok := elements[id]
 					if !ok || el.Bounds.Empty() || !el.Bounds.In(bounds) {
 						t.Fatal("control clipped/missing", id, el.Bounds, bounds)
+					}
+				}
+				if dpi == 160 && size[0] == 1440 {
+					frame, e := m.Capture(ctx, "forge")
+					if e != nil {
+						t.Fatal(e)
+					}
+					bar := elements["ribbon/ribbon/c29saWQ"].Bounds
+					if bar.Empty() {
+						t.Fatal("missing ribbon page")
+					}
+					sample := frame.RGBAAt(bar.Max.X-20, bar.Min.Y+bar.Dy()/2)
+					if sample.R < 230 || sample.G < 230 || sample.B < 230 {
+						t.Fatal("ribbon inherited dark native surface", sample)
+					}
+					action := elements[ui.RibbonActionID("ribbon", "solid", "add")].Bounds
+					ink := 0
+					for y := action.Min.Y + action.Dy()/2; y < action.Max.Y; y++ {
+						for x := action.Min.X; x < action.Max.X; x++ {
+							p := frame.RGBAAt(x, y)
+							if p.R < 90 && p.G < 100 && p.B < 110 {
+								ink++
+							}
+						}
+					}
+					if ink < 3 {
+						t.Fatal("ribbon caption lost dark readable ink", ink)
 					}
 				}
 				input, apply := elements["width/quantity/input"].Bounds, elements["width/quantity/apply"].Bounds

@@ -161,3 +161,10 @@ The packaged native check found a dark native-toolbar surface under light
 caption colors when the host uses dark appearance. Forge now explicitly pairs
 its existing light ribbon page surfaces and ink, including native tab-label ink,
 without changing global appearance or framework theme policy.
+
+Framework CI exposed an SDK source inventory omission: ui now imports quantity
+and viewport, so those owned portable packages must also be exported and copied
+into the relocated-consumer fixture. The consumer exercises their public APIs
+after deleting source. Existing distribution/audit/notices gates remain intact;
+no public SDK asset is built or published by this repair. A process-local dark
+native-palette pixel regression pins the light ribbon surface and dark captions.

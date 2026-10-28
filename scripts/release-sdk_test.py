@@ -297,7 +297,7 @@ class ReleaseChecks(unittest.TestCase):
             root.mkdir()
             (root / "go.mod").write_bytes((release.ROOT / "go.mod").read_bytes())
             public_files = []
-            for package in ("history", "document", "editor", "execution", "replay", "tasks", "app", "ui", "virtual", "canvas", "placement"):
+            for package in ("history", "document", "editor", "execution", "replay", "tasks", "app", "ui", "virtual", "canvas", "placement", "quantity", "viewport"):
                 (root / package).mkdir()
                 for source in (release.ROOT / package).glob("*.go"):
                     if not source.name.endswith("_test.go"):
@@ -338,7 +338,16 @@ import (
     "github.com/dshills/vellum/tasks"
     "github.com/dshills/vellum/replay"
     "github.com/dshills/vellum/ui"
+    "github.com/dshills/vellum/quantity"
+    "github.com/dshills/vellum/viewport"
 )
+func TestExportedWorkbenchDependencies(t *testing.T) {
+    mm,err:=quantity.Length("2 in","mm",nil);if err!=nil||mm!=50.8 {t.Fatal(mm,err)}
+    camera:=viewport.DefaultCamera();if err:=camera.Validate();err!=nil {t.Fatal(err)}
+    field:=&ui.QuantityField{ID:"width",Label:"Width",Text:"2 in",Unit:"mm",Min:0,Max:100}
+    if _,err:=field.View();err!=nil {t.Fatal(err)}
+    cube:=&ui.ViewCube{ID:"orientation",Label:"Orientation"};if _,err:=cube.View();err!=nil {t.Fatal(err)}
+}
 func TestExportedControls(t *testing.T) {
     path := &ui.Breadcrumb{ID:"path",Items:[]ui.BreadcrumbItem{{ID:"home",Label:"Home"},{ID:"current",Label:"Current"}},Navigate:func(e ui.BreadcrumbEvent){if e.ItemID==""{t.Fatal("missing location identity")}}}
     pathNode, err := path.View()

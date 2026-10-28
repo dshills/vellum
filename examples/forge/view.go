@@ -145,7 +145,7 @@ func (m *workbench) inspectorView() ui.Node {
 	actions := column("inspect-actions", action("nudge", "Move +4 mm", "move", rgb(48, 166, 158), func() { m.result(m.nudge()) }), action("remove", "Delete body", "delete", rgb(224, 101, 97), func() { m.result(m.deleteSelected()) }))
 	actions.Style.Gap = ui.Some(float32(5))
 	divider := func(id string) ui.Node {
-		return ui.Node{ID: id, Kind: ui.Separator, Style: ui.Style{GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(0)), Foreground: ui.Some(rgb(219, 224, 232))}}
+		return ui.Node{ID: id, Kind: ui.Separator, Style: ui.Style{GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(0)), Foreground: ui.Some(rgb(219, 224, 232)), Background: ui.Some(rgb(219, 224, 232))}}
 	}
 	about := column("inspect-about", text("demo-heading", "ABOUT THIS WORKBENCH", 10, 600, muted), text("demo-copy", "Original Fusion-inspired UI", 10, 400, muted), text("demo-copy2", "Live GPU viewport · local history", 10, 400, muted), text("demo-copy3", "No CAD kernel or cloud service", 10, 400, muted))
 	about.Style.Gap = ui.Some(float32(4))
