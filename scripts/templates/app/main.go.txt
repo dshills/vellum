@@ -1,0 +1,32 @@
+// A minimal public-API Vellum application. Run after sourcing the SDK environment.
+package main
+
+import (
+	"context"
+	"fmt"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/ui"
+	"os"
+)
+
+func run() error {
+	a, err := app.New(app.Config{})
+	if err != nil {
+		return err
+	}
+	defer a.Close()
+	model := &counter{}
+	if err = a.Open(app.Window{ID: "main", Title: "My Vellum App", Width: 640, Height: 480, View: func() ui.Node {
+		return model.view(ui.Node{ID: "hint", Kind: ui.Label, Text: "Build your application using public Go APIs."})
+	}}); err != nil {
+		return err
+	}
+	return a.Run(context.Background(), cogent.Driver{FollowSystemAppearance: true})
+}
+func main() {
+	if err := run(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}

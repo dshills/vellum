@@ -1,0 +1,30 @@
+[
+  {
+    "name": "review-fix-starter-generate-final",
+    "cwd": ".",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/new-app.py",
+      "/private/tmp/vellum-maintenance-starter-final-20261028",
+      "--module",
+      "example.com/starter-check"
+    ],
+    "exit_code": 0,
+    "seconds": 0.05
+  },
+  {
+    "name": "review-fix-starter-build-final",
+    "cwd": "/private/tmp/vellum-maintenance-starter-final-20261028",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 2.949
+  }
+]

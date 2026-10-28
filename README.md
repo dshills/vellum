@@ -217,6 +217,10 @@ SDK supports the same generator with replacements contained inside its extracted
 archive; no repository checkout is needed. Do not run `prepare.sh` over the SDK's
 pinned native capsule.
 
+The generated starter contains ordinary public-API UI and no GPU benchmark
+flags or direct Cogent Core imports. Use the [Personal Mac starter](examples/personal-mac/README.md)
+for a native toolbar example; `examples/hello` retains diagnostic benchmarks.
+
 Start with [building a macOS app](docs/building-macos-apps.md), the
 [application tutorial](docs/tutorials/building-an-app.md),
 [shared Mac presentation](docs/mac-presentation.md), and

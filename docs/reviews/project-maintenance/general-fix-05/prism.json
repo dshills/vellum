@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "2e66a4b2a49b59b0c5676421bb43cd33",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "7f23c18606408d8e3c59d2c1a62a91c0078f4c52",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "f5da4d98d0e64304",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Template depends on examples/hello model API",
+      "message": "The new template main.go calls `model.view(...)` with a hint node, but model.go is still copied from examples/hello and may define a different signature for `counter` and `view`. This couples the template to an unrelated example, so a change to hello's model can break generated apps without any test noticing. The template can fail to compile if hello's model.go does not accept a node argument.",
+      "suggestion": "Ship the template's own model.go (and its test) in scripts/templates/app, or add a test that generates an app and runs `go build ./...` to catch drift.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "scripts/templates/app/main.go",
+          "lines": {
+            "start": 21,
+            "end": 21
+          }
+        }
+      ],
+      "tags": [
+        "template",
+        "coupling",
+        "location-corrected"
+      ],
+      "evidence": "return model.view(ui.Node{ID: \"hint\", Kind: ui.Label, Text: \"Build your application using public Go APIs.\"})",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3154,
+    "totalMs": 3157
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 4050,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 4270,
+        "output": 336,
+        "costUSD": 0.0119
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

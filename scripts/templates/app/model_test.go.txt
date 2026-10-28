@@ -1,0 +1,3 @@
+package main
+import("testing";"github.com/dshills/vellum/ui")
+func TestCounterAction(t *testing.T){m:=&counter{};n:=m.view(ui.Node{ID:"hint",Kind:ui.Label,Text:"Ready"});if e:=ui.Validate(n);e!=nil{t.Fatal(e)};n.Children[2].Activate();if m.value!=1{t.Fatal("increment")}}
