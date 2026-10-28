@@ -1,0 +1,37 @@
+[
+  {
+    "name": "complete-ci-dialog",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestGenericContentTheme|TestOrdinaryDialog|TestMarkingPanel",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 27.937
+  },
+  {
+    "name": "complete-ci-replay",
+    "cwd": "examples/replay",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "^TestFrozenWorkspaceRecordsAcrossBatches$/^(10000|1000000)$/^7$",
+      "-count=1",
+      "-timeout=5m",
+      "./workspace"
+    ],
+    "exit_code": 0,
+    "seconds": 66.363
+  }
+]

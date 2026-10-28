@@ -903,6 +903,13 @@ func syncDialog(r *record) {
 	}
 }
 
+// A generic content default did not historically theme native dialog chrome.
+// Opt in only with a dialog-specific node or kind color; MacTheme supplies both.
+func hasDialogColors(r *record) bool {
+	kind := r.theme.Kinds[ui.Dialog]
+	return r.node.Style.Background.Set || r.node.Style.Foreground.Set || kind.Background.Set || kind.Foreground.Set
+}
+
 // prepareDialogBody keeps one stable child host across native modal scenes.
 func prepareDialogBody(r *record) *core.Body {
 	d := r.control.dialog
@@ -913,7 +920,7 @@ func prepareDialogBody(r *record) *core.Body {
 	// Ordinary dialogs have a separate native Body; the managed hidden host's
 	// colors do not reach it. Honor the existing resolved pair on that surface.
 	dialogColors := func(s *styles.Style) {
-		if r.node.PopoverAnchor != "" || r.node.Sheet {
+		if r.node.PopoverAnchor != "" || r.node.Sheet || !hasDialogColors(r) {
 			return
 		}
 		value, err := ui.ResolveStyle(r.node, r.theme)
@@ -983,7 +990,11 @@ func prepareDialogBody(r *record) *core.Body {
 		body.AddBottomBar(func(bar *core.Frame) {
 			closeButton := body.AddCancel(bar).SetText("Close")
 			// Use the theme button preset; dialog layout styles must not reach Close.
-			closeButton.FinalStyler(func(s *styles.Style) { applyStyle(s, ui.Node{Kind: ui.Button}, r.theme) })
+			closeButton.FinalStyler(func(s *styles.Style) {
+				if hasDialogColors(r) {
+					applyStyle(s, ui.Node{Kind: ui.Button}, r.theme)
+				}
+			})
 		})
 	}
 	return body

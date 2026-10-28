@@ -214,3 +214,9 @@ Selection preserves original material colors and marks its existing box picking
 bounds with twelve thin blue rods. Hover retains a lighter material preview,
 selection takes precedence, and pointer leave clears hover. No new input modes,
 commands, exact-shape picking, cursor policy or renderer pipeline is introduced.
+
+CI caught an unintended ordinary-dialog image change in the frozen workspace
+replay. Dialog chrome coloring now requires an explicit dialog node/kind color;
+a generic content default alone preserves historical native chrome. MacTheme
+already supplies the explicit dialog pair, so Forge retains its contrast fix.
+The immutable replay records/goldens and all behavior/API checks remain unchanged.

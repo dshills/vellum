@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "75279b77b7a4a987c00c6d1c9c187d2e",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "6612e5052de687810517277a5e2792efb1c76fc1",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "194b7959046f3064",
+      "severity": "medium",
+      "category": "maintainability",
+      "title": "Doc comment attached to the wrong function",
+      "message": "The doc comment for prepareDialogBody now sits above hasDialogColors, and the new comment lines are mixed into it. As a result prepareDialogBody has no doc comment, and hasDialogColors has a misleading one.",
+      "suggestion": "Move the prepareDialogBody comment back directly above that function and give hasDialogColors its own comment.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/controls.go",
+          "lines": {
+            "start": 906,
+            "end": 908
+          }
+        }
+      ],
+      "tags": [
+        "docs"
+      ],
+      "evidence": "// prepareDialogBody keeps one stable child host across native modal scenes.\n// A generic content default did not historically theme native dialog chrome.",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "06d705600d01cd95",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Opt-in check may miss classes or states that ResolveStyle applies",
+      "message": "The new hasDialogColors gate checks only the node's own style and the Dialog kind style. A dialog whose colors come from a class, state, or variant in the theme, which ui.ResolveStyle would otherwise apply, no longer themes the native chrome. The gate and the resolution can therefore disagree, and the Close button goes unthemed in those cases.",
+      "suggestion": "Make the gate use the same sources as ResolveStyle. For example, resolve the style first and compare it against the generic default, or also check the classes and states that ResolveStyle consults.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/controls.go",
+          "lines": {
+            "start": 909,
+            "end": 912
+          }
+        }
+      ],
+      "tags": [
+        "theming",
+        "regression",
+        "location-corrected"
+      ],
+      "evidence": "func hasDialogColors(r *record) bool {\n\tkind := r.theme.Kinds[ui.Dialog]\n\treturn r.node.Style.Background.Set || r.node.Style.Foreground.Set || kind.Background.Set || kind.Foreground.Set\n}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5760,
+    "totalMs": 5765
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 5870,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5075,
+        "output": 672,
+        "costUSD": 0.01687
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

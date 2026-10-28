@@ -160,3 +160,23 @@ func TestOrdinaryDialogResolvesItsOwnSurfaceAfterNativePaletteChange(t *testing.
 		})
 	}
 }
+
+func TestGenericContentThemeDoesNotOptIntoDialogChrome(t *testing.T) {
+	cfg := manualConfig(t, 7)
+	defaultColor := color.NRGBA{R: 13, G: 27, B: 41, A: 255}
+	cfg.Theme = ui.Theme{Default: ui.Style{Background: ui.Some(defaultColor), Foreground: ui.Some(color.NRGBA{R: 2, G: 4, B: 6, A: 255}), Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 13})}}
+	m, _ := simpleManual(t, cfg, func() ui.Node {
+		return ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{{ID: "ordinary", Kind: ui.Dialog, Text: "Native defaults", Open: true}}}
+	})
+	unitSettle(t, m)
+	r := findRecord(m.implementation.find("one").state.root, "ordinary")
+	if hasDialogColors(r) {
+		t.Fatal("generic default opted into native chrome")
+	}
+	for _, w := range []core.Widget{r.control.dialog.body, r.control.dialog.body.Scene} {
+		bg := w.AsWidget().Styles.Background
+		if bg != nil && color.NRGBAModel.Convert(bg.At(0, 0)).(color.NRGBA) == defaultColor {
+			t.Fatal("generic content fill leaked into native dialog")
+		}
+	}
+}
