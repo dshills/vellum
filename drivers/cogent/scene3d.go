@@ -268,13 +268,17 @@ type scene3DRenderer struct {
 	grid                               bool
 	generation                         uint64
 	main, cube                         *wgpu.RenderPipeline
-	mainGroup, cubeGroup               *wgpu.BindGroup
+	mainGroup, cubeGroup, overlayGroup *wgpu.BindGroup
 	vertices, indices                  *wgpu.Buffer
 	vertexBytes, indexBytes            uint64
 	mainCount, cubeCount, overlayCount uint32
 }
 
 func (r *scene3DRenderer) release() {
+	if r.overlayGroup != nil {
+		r.overlayGroup.Release()
+		r.overlayGroup = nil
+	}
 	if r.mainGroup != nil {
 		r.mainGroup.Release()
 		r.mainGroup = nil
@@ -296,7 +300,7 @@ func (r *scene3DRenderer) release() {
 	r.vertices = nil
 	r.indices = nil
 }
-func (r *scene3DRenderer) prepare(f GPUFrame) error {
+func (r *scene3DRenderer) prepare(f GPUFrame) (result error) {
 	if e := r.scene.Validate(); e != nil {
 		return e
 	}
@@ -305,6 +309,12 @@ func (r *scene3DRenderer) prepare(f GPUFrame) error {
 	}
 	fresh := r.main == nil || r.generation != f.ResourceGeneration
 	if fresh {
+		r.release()
+		defer func() {
+			if result != nil {
+				r.release()
+			}
+		}()
 		var err error
 		mainBuffer, err := f.Resources.Buffer("scene3d.camera", wgpu.BufferDescriptor{Size: 64, Usage: wgpu.BufferUsageUniform | wgpu.BufferUsageCopyDst})
 		if err != nil {
@@ -338,6 +348,9 @@ func (r *scene3DRenderer) prepare(f GPUFrame) error {
 		}
 		layout = r.cube.GetBindGroupLayout(0)
 		r.cubeGroup, err = f.Device.TryCreateBindGroup(&wgpu.BindGroupDescriptor{Layout: layout, Entries: []wgpu.BindGroupEntry{{Binding: 0, Buffer: cubeBuffer, Size: 64}}})
+		if err == nil {
+			r.overlayGroup, err = f.Device.TryCreateBindGroup(&wgpu.BindGroupDescriptor{Layout: layout, Entries: []wgpu.BindGroupEntry{{Binding: 0, Buffer: mainBuffer, Size: 64}}})
+		}
 		layout.Release()
 		if err != nil {
 			return err
@@ -400,7 +413,7 @@ func (r *scene3DRenderer) draw(f GPUFrame, p *wgpu.RenderPassEncoder) error {
 	p.DrawIndexed(r.mainCount-r.overlayCount, 1, 0, 0, 0)
 	if r.overlayCount > 0 {
 		p.SetPipeline(r.cube)
-		p.SetBindGroup(0, r.mainGroup, nil)
+		p.SetBindGroup(0, r.overlayGroup, nil)
 		p.DrawIndexed(r.overlayCount, 1, r.mainCount-r.overlayCount, 0, 0)
 	}
 	if r.scene.ShowCube {

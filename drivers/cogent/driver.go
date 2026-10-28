@@ -15,8 +15,10 @@ import (
 	"time"
 
 	"cogentcore.org/core/core"
+	"cogentcore.org/core/cursors"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/system"
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/app"
@@ -497,6 +499,14 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				if w.closing.Load() {
 					go rw.SystemWindow.CloseReq()
 					return
+				}
+				if system.TheApp.Platform() == system.MacOS {
+					cursor := system.TheApp.Cursor(rw.SystemWindow)
+					cursor.SetSize(units.Dp(20))
+					if err := cursor.Set(cursors.Arrow); err != nil {
+						failWindow(w, err)
+						return
+					}
 				}
 				if err := attachPresentation(w, rw.SystemWindow); err != nil {
 					failWindow(w, err)

@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "d3505fd4e6deaeff5fa263897f88f5c6",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "8a198ea97e51ae8f6ab92eec25e1dc1a9e7a0365",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "08403cd75e2b60c6",
+      "severity": "medium",
+      "category": "bug",
+      "title": "overlayGroup lifecycle may leak or go stale",
+      "message": "If cubeGroup creation fails, or overlayGroup creation fails, previously created groups are assigned in r and only released via release() if the caller invokes it on error. Also the overlay group is created only in this branch (apparently when the cube/pipelines are created); if mainBuffer or the group is recreated elsewhere (e.g. on resize or buffer replacement), overlayGroup becomes stale since it is only built here, while mainGroup may be rebuilt separately. Stale bind groups reference destroyed buffers.",
+      "suggestion": "Create/release overlayGroup in the same place and under the same conditions as mainGroup, and ensure any old overlayGroup is released before reassigning.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/scene3d.go",
+          "lines": {
+            "start": 345,
+            "end": 346
+          }
+        }
+      ],
+      "tags": [
+        "resource-leak",
+        "wgpu"
+      ],
+      "evidence": "r.overlayGroup, err = f.Device.TryCreateBindGroup(\u0026wgpu.BindGroupDescriptor{Layout: layout, Entries: []wgpu.BindGroupEntry{{Binding: 0, Buffer: mainBuffer, Size: 64}}})",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4419,
+    "totalMs": 4427
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 7971,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 6349,
+        "output": 451,
+        "costUSD": 0.017208
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

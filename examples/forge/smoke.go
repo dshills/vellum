@@ -6,6 +6,7 @@ import (
 	"github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/viewport"
 	"image"
+	"image/color"
 	"time"
 )
 
@@ -135,6 +136,8 @@ func smokeCheck(a *app.Application, ref app.WindowRef, m *workbench) error {
 			result = e
 			return
 		}
+		m.handleMode = "move"
+		m.refresh()
 		m.changed()
 		fmt.Printf("Forge smoke: real GPU %dx%d, %d sampled colors; synthetic orbit/pan/zoom and command Undo/Redo passed\n", size.X, size.Y, len(colors))
 	}); e != nil {
@@ -155,6 +158,28 @@ func smokeCheck(a *app.Application, ref app.WindowRef, m *workbench) error {
 			return e
 		}
 		if err == nil && st.Ready && st.Frames > baseline.Frames && st.BufferBytes > baseline.BufferBytes {
+			var readErr error
+			if e := a.Do(func() {
+				im, e := m.surface.Snapshot()
+				if e != nil {
+					readErr = e
+					return
+				}
+				colors := map[color.NRGBA]bool{}
+				for y := 0; y < im.Bounds().Dy(); y += 11 {
+					for x := 0; x < im.Bounds().Dx(); x += 11 {
+						colors[im.NRGBAAt(x, y)] = true
+					}
+				}
+				if len(colors) < 10 {
+					readErr = fmt.Errorf("handle-enabled viewport is blank")
+				}
+			}); e != nil {
+				return e
+			}
+			if readErr != nil {
+				return readErr
+			}
 			fmt.Printf("Forge mesh growth: frames %d -> %d; buffer bytes %d -> %d; ready=true\n", baseline.Frames, st.Frames, baseline.BufferBytes, st.BufferBytes)
 			return nil
 		}
