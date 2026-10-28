@@ -135,7 +135,7 @@ func newWorkbench() *workbench {
 }
 func (m *workbench) register(id, label, key string, available func() error, run func() error) {
 	scope := command.WindowShortcuts
-	if id == "copy" || id == "paste" || id == "duplicate" {
+	if id == "copy" || id == "paste" || id == "duplicate" || id == "delete" || id == "undo" || id == "redo" {
 		scope = command.AfterFocusShortcuts
 	}
 	if e := m.commands.Register(command.Command{ShortcutScope: scope, ID: "forge." + id, Label: label, Shortcut: key, Available: available, Execute: func(context.Context) error { e := run(); m.result(e); return e }}); e != nil {

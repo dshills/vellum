@@ -143,3 +143,6 @@ changing the current document. File → Revert to Saved always asks before reloa
 the current path, discards unsaved edits only after confirmation, and starts a
 fresh history on success. Cancel preserves current edits; failure preserves the
 current study. The original v1 file format remains readable.
+
+Document Delete and Undo/Redo shortcuts run after focused text controls, so
+Backspace edits a dimension instead of deleting the selected body.

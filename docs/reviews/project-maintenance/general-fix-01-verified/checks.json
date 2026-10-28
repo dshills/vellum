@@ -1,0 +1,19 @@
+[
+  {
+    "name": "review-fix-focus-accepted",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestFocusedBackspace",
+      "-timeout=120s",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 5.532
+  }
+]
