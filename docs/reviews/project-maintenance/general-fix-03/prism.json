@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b3e98e1450d83de2790d0170d411219b",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "db4a6c80527aef95865deb71658118a4e1e10bd0",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "31b14288074176e6",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Background goroutine invalidates UI on every recovery write",
+      "message": "The recovery worker calls Invalidate on every processed snapshot, including successes, from a background goroutine. If Invalidate is not goroutine-safe or triggers a re-render on each recovery write, it can cause races or needless redraws. Its error is also discarded.",
+      "suggestion": "Confirm Invalidate is safe to call from other goroutines. Invalidate only when the failure state changes (compare old and new error) to avoid redundant repaints.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/forge/files.go",
+          "lines": {
+            "start": 344,
+            "end": 346
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "performance",
+        "location-corrected"
+      ],
+      "evidence": "\tif r.owner != nil {\n\t\t_ = r.owner.Invalidate(\"\")\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3850,
+    "totalMs": 3859
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 12450,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 8747,
+        "output": 307,
+        "costUSD": 0.020564
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

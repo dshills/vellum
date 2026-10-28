@@ -146,3 +146,6 @@ current study. The original v1 file format remains readable.
 
 Document Delete and Undo/Redo shortcuts run after focused text controls, so
 Backspace edits a dimension instead of deleting the selected body.
+
+Recovery failures remain visible in the status bar until a subsequent recovery
+operation succeeds. Keep saving important studies explicitly.

@@ -1,0 +1,36 @@
+[
+  {
+    "name": "review-fix-recovery",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestRecovery|Test.*Study|Test.*Revert",
+      "-timeout=120s",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 17.56
+  },
+  {
+    "name": "review-fix-recovery-final",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestRecoveryFailures",
+      "-timeout=120s",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 3.647
+  }
+]

@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 )
 
@@ -129,7 +130,7 @@ func (m *workbench) bindFiles() (err error) {
 			return nil
 		}, func() error { return m.fileAction(c.id, false) })
 	}
-	m.recovery, e = openRecovery()
+	m.recovery, e = openRecovery(m.application)
 	if e != nil {
 		return e
 	}
@@ -283,13 +284,16 @@ func (m *workbench) fileToolbar() []cogent.TitlebarToolbarItem {
 // A single bounded worker owns atomic recovery writes. flock excludes another
 // Forge instance; snapshots never share mutable slices with the UI owner.
 type recoveryStore struct {
-	path  string
-	lock  *os.File
-	queue chan studyFile
-	done  chan struct{}
+	path      string
+	lock      *os.File
+	queue     chan studyFile
+	done      chan struct{}
+	owner     *app.Application
+	failureMu sync.Mutex
+	failure   error
 }
 
-func openRecovery() (*recoveryStore, error) {
+func openRecovery(owners ...*app.Application) (*recoveryStore, error) {
 	base, e := os.UserCacheDir()
 	if e != nil {
 		return nil, e
@@ -306,21 +310,52 @@ func openRecovery() (*recoveryStore, error) {
 		f.Close()
 		return nil, fmt.Errorf("another Forge owns recovery: %w", e)
 	}
-	r := &recoveryStore{filepath.Join(dir, "recovery.vforge"), f, make(chan studyFile, 1), make(chan struct{})}
+	r := &recoveryStore{path: filepath.Join(dir, "recovery.vforge"), lock: f, queue: make(chan studyFile, 1), done: make(chan struct{})}
+	if len(owners) > 0 {
+		r.owner = owners[0]
+	}
 	go func() {
 		defer close(r.done)
 		for s := range r.queue {
-			if s.Version == 0 {
-				_ = os.Remove(r.path)
-				continue
-			}
-			b, e := encodeStudy(s)
-			if e == nil {
-				_, _ = (vdoc.FileStore{}).Write(context.Background(), r.path, b, studyLimit)
-			}
+			r.process(s)
 		}
 	}()
 	return r, nil
+}
+
+// process records recovery failures independently of ordinary status messages.
+func (r *recoveryStore) process(s studyFile) {
+	var err error
+	if s.Version == 0 {
+		err = os.Remove(r.path)
+		if errors.Is(err, os.ErrNotExist) {
+			err = nil
+		}
+	} else {
+		var b []byte
+		b, err = encodeStudy(s)
+		if err == nil {
+			_, err = (vdoc.FileStore{}).Write(context.Background(), r.path, b, studyLimit)
+		}
+	}
+	r.failureMu.Lock()
+	changed := fmt.Sprint(r.failure) != fmt.Sprint(err)
+	r.failure = err
+	r.failureMu.Unlock()
+	if changed && r.owner != nil {
+		_ = r.owner.Invalidate("")
+	}
+}
+func (r *recoveryStore) warning() string {
+	if r == nil {
+		return ""
+	}
+	r.failureMu.Lock()
+	defer r.failureMu.Unlock()
+	if r.failure != nil {
+		return "Recovery unavailable: " + r.failure.Error()
+	}
+	return ""
 }
 func (r *recoveryStore) offer(s studyFile) {
 	select {
