@@ -409,14 +409,56 @@ func (m *sceneMesh) quad(center, u, v viewport.Vec3, c color.NRGBA) {
 
 var cubeFaces = []struct {
 	normal, u, v viewport.Vec3
-	letter       []string
+	label        string
 }{
-	{viewport.Vec3{X: 0, Y: 0, Z: 1}, viewport.Vec3{X: 1, Y: 0, Z: 0}, viewport.Vec3{X: 0, Y: 1, Z: 0}, []string{"111", "100", "110", "100", "100"}},
-	{viewport.Vec3{X: 0, Y: 0, Z: -1}, viewport.Vec3{X: -1, Y: 0, Z: 0}, viewport.Vec3{X: 0, Y: 1, Z: 0}, []string{"110", "101", "110", "101", "110"}},
-	{viewport.Vec3{X: 1, Y: 0, Z: 0}, viewport.Vec3{X: 0, Y: 0, Z: -1}, viewport.Vec3{X: 0, Y: 1, Z: 0}, []string{"110", "101", "110", "101", "101"}},
-	{viewport.Vec3{X: -1, Y: 0, Z: 0}, viewport.Vec3{X: 0, Y: 0, Z: 1}, viewport.Vec3{X: 0, Y: 1, Z: 0}, []string{"100", "100", "100", "100", "111"}},
-	{viewport.Vec3{X: 0, Y: 1, Z: 0}, viewport.Vec3{X: 1, Y: 0, Z: 0}, viewport.Vec3{X: 0, Y: 0, Z: -1}, []string{"111", "010", "010", "010", "010"}},
-	{viewport.Vec3{X: 0, Y: -1, Z: 0}, viewport.Vec3{X: 1, Y: 0, Z: 0}, viewport.Vec3{X: 0, Y: 0, Z: 1}, []string{"110", "101", "101", "101", "110"}},
+	{viewport.Vec3{Z: 1}, viewport.Vec3{X: 1}, viewport.Vec3{Y: 1}, "FRONT"},
+	{viewport.Vec3{Z: -1}, viewport.Vec3{X: -1}, viewport.Vec3{Y: 1}, "BACK"},
+	{viewport.Vec3{X: 1}, viewport.Vec3{Z: -1}, viewport.Vec3{Y: 1}, "RIGHT"},
+	{viewport.Vec3{X: -1}, viewport.Vec3{Z: 1}, viewport.Vec3{Y: 1}, "LEFT"},
+	{viewport.Vec3{Y: 1}, viewport.Vec3{X: 1}, viewport.Vec3{Z: -1}, "TOP"},
+	{viewport.Vec3{Y: -1}, viewport.Vec3{X: 1}, viewport.Vec3{Z: 1}, "BOTTOM"},
+}
+
+// Original stroke geometry keeps face names continuous and centered, without
+// embedding a font or changing the existing rendering/picking pipeline.
+var cubeStrokes = map[rune][][4]float64{
+	'A': {{0, 0, .5, 1}, {.5, 1, 1, 0}, {.2, .4, .8, .4}},
+	'B': {{0, 0, 0, 1}, {0, 1, .8, 1}, {.8, 1, 1, .75}, {1, .75, .8, .5}, {.8, .5, 0, .5}, {.8, .5, 1, .25}, {1, .25, .8, 0}, {.8, 0, 0, 0}},
+	'C': {{1, 1, 0, 1}, {0, 1, 0, 0}, {0, 0, 1, 0}},
+	'E': {{0, 0, 0, 1}, {0, 1, 1, 1}, {0, .5, .8, .5}, {0, 0, 1, 0}},
+	'F': {{0, 0, 0, 1}, {0, 1, 1, 1}, {0, .5, .8, .5}},
+	'G': {{1, 1, 0, 1}, {0, 1, 0, 0}, {0, 0, 1, 0}, {1, 0, 1, .5}, {1, .5, .5, .5}},
+	'H': {{0, 0, 0, 1}, {1, 0, 1, 1}, {0, .5, 1, .5}},
+	'I': {{0, 1, 1, 1}, {.5, 1, .5, 0}, {0, 0, 1, 0}},
+	'K': {{0, 0, 0, 1}, {0, .5, 1, 1}, {0, .5, 1, 0}},
+	'L': {{0, 1, 0, 0}, {0, 0, 1, 0}},
+	'M': {{0, 0, 0, 1}, {0, 1, .5, .4}, {.5, .4, 1, 1}, {1, 1, 1, 0}},
+	'N': {{0, 0, 0, 1}, {0, 1, 1, 0}, {1, 0, 1, 1}},
+	'O': {{.15, 0, .85, 0}, {.85, 0, 1, .15}, {1, .15, 1, .85}, {1, .85, .85, 1}, {.85, 1, .15, 1}, {.15, 1, 0, .85}, {0, .85, 0, .15}, {0, .15, .15, 0}},
+	'P': {{0, 0, 0, 1}, {0, 1, 1, 1}, {1, 1, 1, .5}, {1, .5, 0, .5}},
+	'R': {{0, 0, 0, 1}, {0, 1, 1, 1}, {1, 1, 1, .5}, {1, .5, 0, .5}, {.4, .5, 1, 0}},
+	'T': {{0, 1, 1, 1}, {.5, 1, .5, 0}},
+}
+
+// cubeLabel lays out only the six fixed ASCII names in cubeFaces.
+func (m *sceneMesh) cubeLabel(label string, normal, u, v viewport.Vec3) {
+	const width, height, gap, stroke = .18, .34, .055, .014
+	left := -(float64(len(label))*width + float64(len(label)-1)*gap) / 2
+	for i, ch := range label {
+		for _, line := range cubeStrokes[ch] {
+			ax, ay := left+float64(i)*(width+gap)+line[0]*width, (line[1]-.5)*height
+			bx, by := left+float64(i)*(width+gap)+line[2]*width, (line[3]-.5)*height
+			dx, dy := bx-ax, by-ay
+			length := math.Hypot(dx, dy)
+			if length == 0 {
+				continue
+			}
+			center := normal.Mul(1.012).Add(u.Mul((ax + bx) / 2)).Add(v.Mul((ay + by) / 2))
+			along := u.Mul(dx / 2).Add(v.Mul(dy / 2))
+			across := u.Mul(-dy / length * stroke).Add(v.Mul(dx / length * stroke))
+			m.quad(center, along, across, color.NRGBA{R: 45, G: 55, B: 70, A: 255})
+		}
+	}
 }
 
 func (m *sceneMesh) box(b viewport.Box, c color.NRGBA) {
@@ -459,19 +501,11 @@ func buildScene3DMesh(s *viewport.Scene) ([]float32, []uint32, uint32, uint32) {
 		m.box(o.Bounds, c)
 	}
 	mainCount := uint32(len(m.indices))
-	// All orientation artwork is original geometry; labels use tiny stroke blocks,
-	// so no third-party font/image bytes are embedded in this renderer.
-	m.box(viewport.Box{Min: viewport.Vec3{X: -1, Y: -1, Z: -1}, Max: viewport.Vec3{X: 1, Y: 1, Z: 1}}, color.NRGBA{230, 235, 242, 255})
-	for _, f := range cubeFaces {
-		for y, row := range f.letter {
-			for x, ch := range row {
-				if ch != '1' {
-					continue
-				}
-				p := f.normal.Mul(1.008).Add(f.u.Mul((float64(x) - 1) * .19)).Add(f.v.Mul((2 - float64(y)) * .19))
-				m.quad(p, f.u.Mul(.078), f.v.Mul(.078), color.NRGBA{70, 80, 97, 255})
-			}
-		}
+	// Original geometry only; existing pipeline, scale and pick rectangles stay.
+	m.box(viewport.Box{Min: viewport.Vec3{X: -1, Y: -1, Z: -1}, Max: viewport.Vec3{X: 1, Y: 1, Z: 1}}, color.NRGBA{R: 241, G: 243, B: 247, A: 255})
+	for _, face := range cubeFaces {
+		m.cubeLabel(face.label, face.normal, face.u, face.v)
 	}
+
 	return m.vertices, m.indices, mainCount, uint32(len(m.indices)) - mainCount
 }

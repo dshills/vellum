@@ -123,3 +123,31 @@ func TestCompactTimelineKeepsNamesFallbackMarkerAndAdmission(t *testing.T) {
 		t.Fatal("retired callback")
 	}
 }
+
+func TestOrientationAlternativesKeepFacesAndAdmission(t *testing.T) {
+	var chosen []viewport.View
+	p := &ViewCube{ID: "cube", Label: "Orientation", Change: func(v viewport.View) { chosen = append(chosen, v) }}
+	n, e := p.View()
+	if e != nil {
+		t.Fatal(e)
+	}
+	views := []viewport.View{viewport.Isometric, viewport.Front, viewport.Top, viewport.Right, viewport.Back, viewport.Left, viewport.Bottom}
+	for i, v := range views {
+		c := n.Children[i]
+		if c.ID != "cube/view/"+string(v) || c.Accessibility.Name == "" || c.Tooltip == "" {
+			t.Fatal("lost orientation identity/name")
+		}
+		c.Activate()
+		if chosen[i] != v {
+			t.Fatal("wrong face", chosen)
+		}
+	}
+	p.Disabled = true
+	n.Children[0].Activate()
+	p.Disabled = false
+	p.ID = "retired"
+	n.Children[0].Activate()
+	if len(chosen) != 7 {
+		t.Fatal("disabled or retired callback")
+	}
+}

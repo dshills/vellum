@@ -137,3 +137,9 @@ tests, Prism Anthropic Claude Sonnet 5.5 review and a commit.
 The inspector uses a compact property row with the existing QuantityField IDs,
 Apply/validation path and command/history. Original full-color action artwork,
 smaller headings, aligned fields and restrained dividers replace oversized gaps.
+
+The orientation polish replaces disconnected letter pixels with centered,
+original continuous stroke face names and clearer neutral faces/dark lettering.
+The existing mesh pipeline, resource ownership, cube rectangle, six face IDs and
+picking math stay unchanged. Accessible orientation alternatives use quieter
+Mac tool styling and explicit names/tooltips, with the same callbacks/IDs.

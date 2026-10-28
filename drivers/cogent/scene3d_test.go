@@ -4,6 +4,7 @@ import (
 	"github.com/dshills/vellum/viewport"
 	"image"
 	"image/color"
+	"math"
 	"testing"
 )
 
@@ -110,3 +111,39 @@ func TestScene3DCancelRestoresCameraAndRejectsStaleDown(t *testing.T) {
 	nilView.view(viewport.Front)
 	(&SceneView3D{}).view(viewport.Front)
 }
+
+func TestCubeFaceStrokeLabelsStayCenteredAndOnFace(t *testing.T) {
+	for _, face := range cubeFaces {
+		for _, ch := range face.label {
+			lines := cubeStrokes[ch]
+			if ch > 127 || len(lines) == 0 {
+				t.Fatal("missing fixed ASCII glyph", face.label, ch)
+			}
+			for _, line := range lines {
+				if line[0] == line[2] && line[1] == line[3] {
+					t.Fatal("degenerate fixed stroke", ch)
+				}
+			}
+		}
+		m := &sceneMesh{}
+		m.cubeLabel(face.label, face.normal, face.u, face.v)
+		if len(m.indices) == 0 {
+			t.Fatal("missing face name", face.label)
+		}
+		min, max := float64(2), float64(-2)
+		for i := 0; i < len(m.vertices); i += 7 {
+			p := viewport.Vec3{X: float64(m.vertices[i]), Y: float64(m.vertices[i+1]), Z: float64(m.vertices[i+2])}
+			u, v := dotScene(p, face.u), dotScene(p, face.v)
+			if math.Abs(dotScene(p, face.normal)-1.012) > 1e-5 || math.Abs(u) > .85 || math.Abs(v) > .2 {
+				t.Fatal("label clipped or off face", face.label, p)
+			}
+			min = math.Min(min, u)
+			max = math.Max(max, u)
+		}
+		if math.Abs(min+max) > .04 {
+			t.Fatal("label not centered", face.label, min, max)
+		}
+	}
+}
+
+func dotScene(a, b viewport.Vec3) float64 { return a.X*b.X + a.Y*b.Y + a.Z*b.Z }

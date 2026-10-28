@@ -1,0 +1,45 @@
+[
+  {
+    "name": "finish-orientation-ui-final",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui",
+      "./viewport"
+    ],
+    "exit_code": 0,
+    "seconds": 2.782
+  },
+  {
+    "name": "finish-orientation-guard",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestScene3D|TestCubeFace",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 19.248
+  },
+  {
+    "name": "finish-orientation-vet",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 12.979
+  }
+]
