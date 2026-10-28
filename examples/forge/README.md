@@ -90,3 +90,8 @@ drag, cube Front, right-click, Escape and Fit dismissal on the private candidate
 Earlier attempts affected by desktop activity are excluded. Automated routing,
 geometry, winding, host-palette and history tests are separate evidence; these
 checks do not qualify other hardware/displays, human accessibility or CAD scale.
+
+Shift-click bodies in the viewport or browser to toggle membership in a selection.
+Plain click replaces it. Selected bodies retain their materials and blue outlines.
+Move +4 mm and Delete operate on the full selection as one Undo/Redo action.
+The inspector width field edits the primary body only.

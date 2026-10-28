@@ -1,0 +1,61 @@
+[
+  {
+    "name": "forge-multi-final",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 23.225
+  },
+  {
+    "name": "forge-multi-ui-final",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui",
+      "./viewport"
+    ],
+    "exit_code": 0,
+    "seconds": 2.927
+  },
+  {
+    "name": "forge-multi-driver-final",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestScene|TestGPUInput",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 38.798
+  },
+  {
+    "name": "forge-multi-api",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.276
+  }
+]

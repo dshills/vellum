@@ -27,6 +27,7 @@ type Object struct {
 type Scene struct {
 	Camera                Camera
 	Objects               []Object
+	SelectedIDs           []string
 	SelectedID, HoveredID string
 	Grid, ShowCube        bool
 	Revision              uint64
@@ -42,6 +43,16 @@ func (s *Scene) Validate() error {
 			return fmt.Errorf("viewport: invalid preview object")
 		}
 		seen[o.ID] = true
+	}
+	if len(s.SelectedIDs) > 256 {
+		return fmt.Errorf("viewport: selection limit")
+	}
+	chosen := map[string]bool{}
+	for _, id := range s.SelectedIDs {
+		if !seen[id] || chosen[id] {
+			return fmt.Errorf("viewport: invalid selection")
+		}
+		chosen[id] = true
 	}
 	if s.SelectedID != "" && !seen[s.SelectedID] || s.HoveredID != "" && !seen[s.HoveredID] {
 		return fmt.Errorf("viewport: missing selected/hovered object")

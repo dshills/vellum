@@ -155,10 +155,15 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 				e.SetHandled()
 				return
 			}
+			mods := gpuModifiers(e.Modifiers())
 			guard := placementActivationGuard(r)
 			postControl(r, func() {
-				if guard() && !c.disabled && r.node.Activate != nil {
-					r.node.Activate()
+				if guard() && !c.disabled && (r.node.Activate != nil || r.node.ActivateModified != nil) {
+					if r.node.ActivateModified != nil {
+						r.node.ActivateModified(ui.ActivationEvent{Shift: mods&GPUShift != 0, Command: mods&GPUCommand != 0, Option: mods&GPUOption != 0, Control: mods&GPUControl != 0})
+					} else {
+						r.node.Activate()
+					}
 					c.a.Invalidate(c.window)
 				}
 			})

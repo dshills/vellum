@@ -16,10 +16,11 @@ import (
 
 type feature struct{ ID, Label, Object string }
 type document struct {
-	Objects  []viewport.Object
-	Features []feature
-	Marker   int
-	Selected string
+	Objects   []viewport.Object
+	Features  []feature
+	Marker    int
+	Selected  string
+	Selection []string
 }
 type workbench struct {
 	application                                       *app.Application
@@ -48,6 +49,7 @@ type workbench struct {
 func vec(x, y, z float64) viewport.Vec3 { return viewport.Vec3{X: x, Y: y, Z: z} }
 func rgb(r, g, b uint8) color.NRGBA     { return color.NRGBA{R: r, G: g, B: b, A: 255} }
 func clone(s document) document {
+	s.Selection = slices.Clone(s.Selection)
 	s.Objects = slices.Clone(s.Objects)
 	s.Features = slices.Clone(s.Features)
 	return s
@@ -77,7 +79,7 @@ func newWorkbench() *workbench {
 	m.state.Marker = len(m.state.Features)
 	m.state.Selected = "carriage"
 	m.featureID = "create-carriage"
-	m.surface = &cogent.SceneView3D{Model: &m.scene, Tool: cogent.SceneOrbit, Select: m.selectObject, CameraChanged: func(viewport.Camera) { m.changed() }, Context: func(cogent.GPUEvent) { m.marking.Open = true; m.changed() }, OnError: func(e error) { m.status = e.Error(); fmt.Println("Forge GPU:", e) }}
+	m.surface = &cogent.SceneView3D{Model: &m.scene, Tool: cogent.SceneOrbit, Select: m.selectObject, SelectModified: m.selectModified, CameraChanged: func(viewport.Camera) { m.changed() }, Context: func(cogent.GPUEvent) { m.marking.Open = true; m.changed() }, OnError: func(e error) { m.status = e.Error(); fmt.Println("Forge GPU:", e) }}
 	m.register("add", "New body", "Meta+N", func() error {
 		if len(m.state.Objects) >= 48 {
 			return fmt.Errorf("demo body limit reached")
@@ -152,6 +154,7 @@ func (m *workbench) refresh() {
 	if m.state.Selected == "" && m.tab == "body" {
 		m.tab = "solid"
 	}
+	m.scene.SelectedIDs = slices.Clone(m.state.Selection)
 	m.scene.SelectedID = m.state.Selected
 	m.scene.HoveredID = ""
 	_ = m.scene.Touch()
@@ -174,6 +177,7 @@ func (m *workbench) selectObject(id string) {
 			return
 		}
 	}
+	m.state.Selection = nil
 	m.state.Selected = id
 	m.refresh()
 }
@@ -185,6 +189,7 @@ func (m *workbench) apply(label string, after document) error {
 	}
 	probe := m.scene
 	probe.Objects = after.Objects
+	probe.SelectedIDs = slices.Clone(after.Selection)
 	probe.SelectedID = after.Selected
 	probe.HoveredID = ""
 	if e := probe.Validate(); e != nil {
@@ -205,6 +210,7 @@ func (m *workbench) add() error {
 	s.Features = append(s.Features, feature{ID: "create-" + id, Label: "New body", Object: id})
 	s.Marker = len(s.Features)
 	s.Selected = id
+	s.Selection = nil
 	m.next++
 	if e := m.apply("Create body", s); e != nil {
 		m.next--
@@ -218,12 +224,12 @@ func (m *workbench) deleteSelected() error {
 		return fmt.Errorf("select a body")
 	}
 	s := clone(m.state)
-	id := s.Selected
-	s.Objects = append(s.Objects[:j], s.Objects[j+1:]...)
+	selected := m.selectionSet()
+	s.Objects = slices.DeleteFunc(s.Objects, func(o viewport.Object) bool { return selected[o.ID] })
 	features := s.Features[:0]
 	marker := 0
 	for index, f := range s.Features {
-		if f.Object != id {
+		if !selected[f.Object] {
 			features = append(features, f)
 			if index < s.Marker {
 				marker++
@@ -233,6 +239,7 @@ func (m *workbench) deleteSelected() error {
 	s.Features = features
 	s.Marker = marker
 	s.Selected = ""
+	s.Selection = nil
 	return m.apply("Delete body", s)
 }
 func (m *workbench) resize(value float64) error {
@@ -256,8 +263,12 @@ func (m *workbench) nudge() error {
 		return fmt.Errorf("select a body")
 	}
 	s := clone(m.state)
-	s.Objects[j].Bounds.Min.X += .2
-	s.Objects[j].Bounds.Max.X += .2
+	for i := range s.Objects {
+		if m.selectionSet()[s.Objects[i].ID] {
+			s.Objects[i].Bounds.Min.X += .2
+			s.Objects[i].Bounds.Max.X += .2
+		}
+	}
 	return m.apply("Move body +4 mm", s)
 }
 func (m *workbench) visibility(id string, value bool) error {
@@ -357,4 +368,39 @@ func (m *workbench) action(id string) {
 		m.marking.Open = true
 	}
 	m.changed()
+}
+
+func (m *workbench) selectionSet() map[string]bool {
+	ids := map[string]bool{}
+	if m.state.Selected != "" {
+		ids[m.state.Selected] = true
+	}
+	for _, id := range m.state.Selection {
+		ids[id] = true
+	}
+	return ids
+}
+func (m *workbench) selectModified(id string, extend bool) {
+	if !extend {
+		m.selectObject(id)
+		return
+	}
+	if id == "" {
+		return
+	}
+	ids := m.selectionSet()
+	if ids[id] {
+		delete(ids, id)
+	} else {
+		ids[id] = true
+	}
+	m.state.Selection = nil
+	m.state.Selected = ""
+	for _, o := range m.state.Objects {
+		if ids[o.ID] {
+			m.state.Selection = append(m.state.Selection, o.ID)
+			m.state.Selected = o.ID
+		}
+	}
+	m.refresh()
 }

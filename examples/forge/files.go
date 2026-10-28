@@ -54,7 +54,7 @@ func validateStudy(s studyFile) error {
 	if s.Version != 1 || s.Next < 8 || s.Next > 1<<53 || len(s.Document.Objects) > 48 || len(s.Document.Features) > 96 || s.Document.Marker < 0 || s.Document.Marker > len(s.Document.Features) {
 		return fmt.Errorf("invalid study version or limits")
 	}
-	scene := viewport.Scene{Camera: s.Camera, Objects: s.Document.Objects, SelectedID: s.Document.Selected}
+	scene := viewport.Scene{Camera: s.Camera, Objects: s.Document.Objects, SelectedIDs: s.Document.Selection, SelectedID: s.Document.Selected}
 	if e := scene.Validate(); e != nil {
 		return e
 	}

@@ -100,7 +100,7 @@ func (m *workbench) browserView() ui.Node {
 	for _, o := range m.state.Objects {
 		items = append(items, ui.ModelBrowserItem{ID: o.ID, Parent: "assembly", Label: o.Name, Visible: o.Visible, Activatable: true, IconImage: artwork("cube", o.Color)})
 	}
-	m.browser = ui.ModelBrowser{ID: "browser", Label: "BROWSER", Items: items, ExpandedIDs: m.expanded, SelectedID: m.state.Selected, ActiveID: m.active, Change: func(e ui.ModelBrowserEvent) {
+	m.browser = ui.ModelBrowser{ID: "browser", Label: "BROWSER", Items: items, SelectedIDs: m.state.Selection, SelectModified: m.selectModified, ExpandedIDs: m.expanded, SelectedID: m.state.Selected, ActiveID: m.active, Change: func(e ui.ModelBrowserEvent) {
 		switch e.Kind {
 		case ui.ModelBrowserSelect:
 			if e.ItemID != "assembly" {
@@ -146,6 +146,9 @@ func (m *workbench) inspectorView() ui.Node {
 	name := "No body selected"
 	if o.ID != "" {
 		name = o.Name
+		if len(m.selectionSet()) > 1 {
+			name = fmt.Sprintf("%d bodies selected", len(m.selectionSet()))
+		}
 	}
 	m.dimension = ui.QuantityField{ID: "width", Label: "Width", Text: m.draft, Unit: "mm", Min: 2, Max: 240, Disabled: o.ID == "", ValidationMessage: m.validation, Variables: map[string]float64{}, Change: func(s string) { m.draft = s; m.validation = ""; m.changed() }, Invalid: func(e error) { m.validation = e.Error(); m.changed() }, Commit: func(v float64) { m.result(m.resize(v)) }}
 	if o.ID != "" {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/dshills/vellum/canvas"
 	"image/color"
+	"slices"
 )
 
 type ModelBrowserItem struct {
@@ -32,6 +33,8 @@ type ModelBrowserEvent struct {
 // the separate DataTree remains the indexed path for larger datasets.
 type ModelBrowser struct {
 	ID, Label, SelectedID, ActiveID string
+	SelectedIDs                     []string
+	SelectModified                  func(string, bool)
 	Items                           []ModelBrowserItem
 	ExpandedIDs                     []string
 	Disabled                        bool
@@ -66,6 +69,16 @@ func (p *ModelBrowser) items() (map[string]ModelBrowserItem, map[string]bool, er
 			return nil, nil, fmt.Errorf("ui: invalid browser expansion")
 		}
 		expanded[id] = true
+	}
+	if len(p.SelectedIDs) > 256 {
+		return nil, nil, fmt.Errorf("ui: selection limit")
+	}
+	selected := map[string]bool{}
+	for _, id := range p.SelectedIDs {
+		if by[id].ID == "" || selected[id] {
+			return nil, nil, fmt.Errorf("ui: invalid multi-selection")
+		}
+		selected[id] = true
 	}
 	if p.SelectedID != "" && by[p.SelectedID].ID == "" || p.ActiveID != "" && (by[p.ActiveID].ID == "" || !by[p.ActiveID].Activatable) {
 		return nil, nil, fmt.Errorf("ui: invalid browser selection/active item")
@@ -133,7 +146,7 @@ func (p *ModelBrowser) View() (Node, error) {
 				disabled = disabled || by[parent].Disabled
 			}
 			row := Node{ID: rid, Kind: Row, Disabled: disabled, Style: Style{Padding: Some(Insets{Left: float32(3 + depth*10), Right: 3, Top: 0, Bottom: 0}), Gap: Some(float32(4)), CornerRadius: Some(float32(2)), GrowX: Some(float32(1)), GrowY: Some(float32(0))}}
-			if p.SelectedID == id {
+			if p.SelectedID == id || slices.Contains(p.SelectedIDs, id) {
 				row.Style.Background = Some(color.NRGBA{R: 222, G: 234, B: 249, A: 255})
 				row.Style.Foreground = Some(color.NRGBA{R: 26, G: 48, B: 76, A: 255})
 			}
@@ -154,10 +167,16 @@ func (p *ModelBrowser) View() (Node, error) {
 			}
 			row.Children = append(row.Children, Node{ID: rid + "/visibility", Kind: ToggleButton, Icon: SymbolVisibility, Checked: item.Visible, Style: quiet, Accessibility: Accessibility{Name: "Visibility of " + item.Label}, Change: func(e ChangeEvent) { propose(id, ModelBrowserVisibility, e.Checked) }})
 			selectStyle := Style{Padding: Some(Insets{Left: 1, Right: 1}), Gap: Some(float32(5)), Border: Some(Border{}), Background: Some(color.NRGBA{}), Typography: Some(MacTypography(12, 400)), GrowX: Some(float32(1)), TextAlign: Some(AlignStart), MinSize: Some(Size{Width: 48, Height: 24})}
-			if p.SelectedID == id {
+			if p.SelectedID == id || slices.Contains(p.SelectedIDs, id) {
 				selectStyle.Foreground = Some(color.NRGBA{R: 26, G: 48, B: 76, A: 255})
 			}
-			row.Children = append(row.Children, Node{ID: rid + "/select", Kind: Button, Text: item.Label, Icon: item.Icon, IconImage: item.IconImage, Appearance: ButtonTool, Style: selectStyle, Accessibility: Accessibility{Name: "Select " + item.Label}, Activate: func() { propose(id, ModelBrowserSelect, true) }})
+			row.Children = append(row.Children, Node{ID: rid + "/select", Kind: Button, Text: item.Label, Icon: item.Icon, IconImage: item.IconImage, Appearance: ButtonTool, Style: selectStyle, Accessibility: Accessibility{Name: "Select " + item.Label}, ActivateModified: func(e ActivationEvent) {
+				if p.SelectModified != nil {
+					p.SelectModified(id, e.Shift)
+				} else {
+					propose(id, ModelBrowserSelect, true)
+				}
+			}, Activate: func() { propose(id, ModelBrowserSelect, true) }})
 			if item.Badge != "" {
 				row.Children = append(row.Children, Node{ID: rid + "/badge", Kind: Label, Text: item.Badge, Style: Style{Typography: Some(MacTypography(10, 400)), Padding: Some(Insets{}), GrowX: Some(float32(0))}})
 			}

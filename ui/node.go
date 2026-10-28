@@ -92,10 +92,12 @@ type Node struct {
 	Grow                bool
 	MinWidth, MinHeight float32
 	Activate            func()
-	FileDrop            func(FileDropEvent) bool
-	Children            []Node
-	ContextMenu         *ContextMenu
-	Custom              any
+	// ActivateModified receives native modifier state; Activate remains the keyboard/accessibility fallback.
+	ActivateModified func(ActivationEvent)
+	FileDrop         func(FileDropEvent) bool
+	Children         []Node
+	ContextMenu      *ContextMenu
+	Custom           any
 	// Canvas2D uses logical canvas units and the existing canvas navigation model.
 	Canvas *canvas.Scene
 	// CanvasObjects optionally exposes named scene objects to assistive technology.
@@ -264,3 +266,6 @@ func Validate(root Node) error {
 	}
 	return nil
 }
+
+// ActivationEvent is detached modifier state captured at button activation.
+type ActivationEvent struct{ Shift, Command, Option, Control bool }

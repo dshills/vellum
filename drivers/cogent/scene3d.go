@@ -31,21 +31,22 @@ const (
 // belong to the application owner; model/owner/window are fixed while mounted.
 // Selection is proposed to Select; camera/hover are transient model state.
 type SceneView3D struct {
-	Owner         *app.Application
-	Window        string
-	Model         *viewport.Scene
-	Tool          SceneTool
-	Select        func(string)
-	CameraChanged func(viewport.Camera)
-	Context       func(GPUEvent)
-	OnError       func(error)
-	gpu           *GPUView
-	renderer      *scene3DRenderer
-	gesture       viewport.Gesture
-	mode          SceneTool
-	cubeGesture   bool
-	sequence      uint64
-	beforeCamera  viewport.Camera
+	Owner          *app.Application
+	Window         string
+	Model          *viewport.Scene
+	Tool           SceneTool
+	Select         func(string)
+	SelectModified func(string, bool)
+	CameraChanged  func(viewport.Camera)
+	Context        func(GPUEvent)
+	OnError        func(error)
+	gpu            *GPUView
+	renderer       *scene3DRenderer
+	gesture        viewport.Gesture
+	mode           SceneTool
+	cubeGesture    bool
+	sequence       uint64
+	beforeCamera   viewport.Camera
 }
 
 func (v *SceneView3D) Mount(parent tree.Node) core.Widget {
@@ -190,8 +191,12 @@ func (v *SceneView3D) HandleInput(e GPUEvent) bool {
 			}
 			return true
 		}
-		if id, err := s.Pick(float64(e.Position.X), float64(e.Position.Y), float64(e.Size.X), float64(e.Size.Y)); err == nil && v.Select != nil {
-			v.Select(id)
+		if id, err := s.Pick(float64(e.Position.X), float64(e.Position.Y), float64(e.Size.X), float64(e.Size.Y)); err == nil && (v.Select != nil || v.SelectModified != nil) {
+			if v.SelectModified != nil {
+				v.SelectModified(id, e.Modifiers&GPUShift != 0)
+			} else {
+				v.Select(id)
+			}
 		}
 		return true
 	case GPUCancel:
@@ -254,6 +259,7 @@ type scene3DRenderer struct {
 	scene                   *viewport.Scene
 	previous                []viewport.Object
 	selected, hover         string
+	selections              []string
 	grid                    bool
 	generation              uint64
 	main, cube              *wgpu.RenderPipeline
@@ -333,7 +339,7 @@ func (r *scene3DRenderer) prepare(f GPUFrame) error {
 		}
 		r.generation = f.ResourceGeneration
 	}
-	if fresh || !slices.Equal(r.previous, r.scene.Objects) || r.selected != r.scene.SelectedID || r.hover != r.scene.HoveredID || r.grid != r.scene.Grid {
+	if fresh || !slices.Equal(r.previous, r.scene.Objects) || !slices.Equal(r.selections, r.scene.SelectedIDs) || r.selected != r.scene.SelectedID || r.hover != r.scene.HoveredID || r.grid != r.scene.Grid {
 		vertices, indices, main, cube := buildScene3DMesh(r.scene)
 		var err error
 		r.vertexBytes = uint64(len(vertices) * 4)
@@ -354,6 +360,7 @@ func (r *scene3DRenderer) prepare(f GPUFrame) error {
 		}
 		r.mainCount, r.cubeCount = main, cube
 		r.previous = slices.Clone(r.scene.Objects)
+		r.selections = slices.Clone(r.scene.SelectedIDs)
 		r.selected, r.hover, r.grid = r.scene.SelectedID, r.scene.HoveredID, r.scene.Grid
 	}
 	matrix, err := r.scene.Camera.Matrix(float64(f.Size.X), float64(f.Size.Y))
@@ -540,7 +547,7 @@ func buildScene3DMesh(s *viewport.Scene) ([]float32, []uint32, uint32, uint32) {
 			continue
 		}
 		c := o.Color
-		if o.ID == s.HoveredID && o.ID != s.SelectedID {
+		if o.ID == s.HoveredID && o.ID != s.SelectedID && !slices.Contains(s.SelectedIDs, o.ID) {
 			c.R = uint8((int(c.R)*3 + 255) / 4)
 			c.G = uint8((int(c.G)*3 + 255) / 4)
 			c.B = uint8((int(c.B)*3 + 255) / 4)
@@ -550,7 +557,7 @@ func buildScene3DMesh(s *viewport.Scene) ([]float32, []uint32, uint32, uint32) {
 		} else {
 			m.box(o.Bounds, c)
 		}
-		if o.ID == s.SelectedID {
+		if o.ID == s.SelectedID || slices.Contains(s.SelectedIDs, o.ID) {
 			m.outlineBox(o.Bounds, color.NRGBA{R: 20, G: 92, B: 190, A: 255})
 		}
 	}
