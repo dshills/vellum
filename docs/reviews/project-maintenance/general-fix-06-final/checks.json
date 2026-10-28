@@ -1,0 +1,70 @@
+[
+  {
+    "name": "review-fix-theme-accepted",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui"
+    ],
+    "exit_code": 0,
+    "seconds": 2.868
+  },
+  {
+    "name": "review-fix-theme-api-final",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.247
+  },
+  {
+    "name": "review-fix-api-tests",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 1.865
+  },
+  {
+    "name": "review-fix-api-vet",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.329
+  },
+  {
+    "name": "review-fix-theme-driver",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "Test.*(Style|Palette|Theme|Ribbon|Timeline|ModelBrowser)",
+      "-timeout=120s",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 29.362
+  }
+]

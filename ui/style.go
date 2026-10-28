@@ -57,6 +57,13 @@ type Border struct {
 // the cross axis; Justify distributes children on the main axis. Grow sets both
 // axes. Foreground and Background use straight-alpha sRGB bytes.
 type Style struct {
+	// ForegroundRole and BackgroundRole resolve from the inherited Theme.Palette.
+	// Accepted roles: ink, secondary, line, accent, accent-ink, panel, field.
+	// Explicit colors on a later overlay override a role; omitted roles inherit.
+	BorderRole     string `json:",omitempty"`
+	ForegroundRole string `json:",omitempty"`
+	BackgroundRole string `json:",omitempty"`
+
 	Padding          Optional[Insets]
 	Gap              Optional[float32]
 	Align, Justify   Optional[Alignment]
@@ -75,6 +82,14 @@ func finiteNonnegative(value float32) bool {
 	return value >= 0 && !math.IsNaN(float64(value)) && !math.IsInf(float64(value), 0)
 }
 func (s Style) Validate() error {
+	for _, role := range []string{s.ForegroundRole, s.BackgroundRole, s.BorderRole} {
+		if role != "" {
+			if _, ok := paletteRole(Palette{}, role); !ok {
+				return fmt.Errorf("ui: invalid palette role %q", role)
+			}
+		}
+	}
+
 	for name, property := range map[string]Optional[float32]{"gap": s.Gap, "grow": s.Grow, "horizontal grow": s.GrowX, "vertical grow": s.GrowY, "corner radius": s.CornerRadius} {
 		if property.Set && !finiteNonnegative(property.Value) {
 			return fmt.Errorf("ui: %s must be finite and nonnegative", name)
@@ -160,12 +175,26 @@ func (s Style) Overlay(o Style) Style {
 		s.CornerRadius = o.CornerRadius
 	}
 	if o.Border.Set {
+		s.BorderRole = ""
 		s.Border = o.Border
 	}
+	if o.BorderRole != "" {
+		s.BorderRole = o.BorderRole
+	}
+	if o.ForegroundRole != "" {
+		s.ForegroundRole = o.ForegroundRole
+		s.Foreground = Optional[color.NRGBA]{}
+	}
+	if o.BackgroundRole != "" {
+		s.BackgroundRole = o.BackgroundRole
+		s.Background = Optional[color.NRGBA]{}
+	}
 	if o.Foreground.Set {
+		s.ForegroundRole = ""
 		s.Foreground = o.Foreground
 	}
 	if o.Background.Set {
+		s.BackgroundRole = ""
 		s.Background = o.Background
 	}
 	if o.Typography.Set {
@@ -242,8 +271,48 @@ func ResolveStyle(n Node, theme Theme) (Style, error) {
 		s.Grow = Some(float32(1))
 	}
 	s = s.Overlay(n.Style)
+	palette := MacPalette(false, color.NRGBA{})
+	if theme.Palette.Set {
+		palette = theme.Palette.Value
+	}
+	if s.BorderRole != "" {
+		if c, ok := paletteRole(palette, s.BorderRole); ok {
+			s.Border.Value.Color = c
+			s.Border.Set = true
+		}
+	}
+	if s.ForegroundRole != "" {
+		if c, ok := paletteRole(palette, s.ForegroundRole); ok {
+			s.Foreground = Some(c)
+		}
+	}
+	if s.BackgroundRole != "" {
+		if c, ok := paletteRole(palette, s.BackgroundRole); ok {
+			s.Background = Some(c)
+		}
+	}
 	if err := s.Validate(); err != nil {
 		return Style{}, fmt.Errorf("ui: node %q: %w", n.ID, err)
 	}
 	return s, nil
+}
+
+func paletteRole(p Palette, role string) (color.NRGBA, bool) {
+	switch role {
+	case "ink":
+		return p.Ink, true
+	case "secondary":
+		return p.Secondary, true
+	case "line":
+		return p.Line, true
+	case "accent":
+		return p.Accent, true
+	case "accent-ink":
+		return p.AccentInk, true
+	case "panel":
+		return p.Panel, true
+	case "field":
+		return p.Field, true
+	}
+	return color.NRGBA{}, false
 }

@@ -16,3 +16,15 @@ document bytes, editor history, input settlement or global OS preferences.
 Code editors retain their native frame/gutter by default. App-specific column
 widths and selection accents still belong to the app. Notes consumes this shared
 style; it does not implement a second text renderer or font fallback policy.
+
+Reusable workbench controls resolve selection, paused states and separators through
+semantic palette roles. `Style.ForegroundRole` and `BackgroundRole` accept `ink`,
+`secondary`, `line`, `accent`, `accent-ink`, `panel` or `field`. Roles use the
+inherited scoped theme palette (light Mac defaults when absent). A later explicit
+foreground/background color overrides its role. Original-color artwork is unchanged.
+`Style.BorderRole` resolves an outline color while retaining its configured width.
+When a single style supplies both a foreground/background role and a concrete
+color, the concrete color wins; use Overlay to replace it with a role.
+A BorderRole in the same style as Border replaces only its color. A later
+Overlay containing a complete Border clears the previous BorderRole; supply
+BorderRole again when changing width while retaining semantic color.

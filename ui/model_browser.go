@@ -156,8 +156,8 @@ func (p *ModelBrowser) View() (Node, error) {
 			}
 			row := Node{ID: rid, Kind: Row, Disabled: disabled, Style: Style{Padding: Some(Insets{Left: float32(3 + depth*10), Right: 3, Top: 0, Bottom: 0}), Gap: Some(float32(4)), CornerRadius: Some(float32(2)), GrowX: Some(float32(1)), GrowY: Some(float32(0))}}
 			if p.SelectedID == id || slices.Contains(p.SelectedIDs, id) {
-				row.Style.Background = Some(color.NRGBA{R: 222, G: 234, B: 249, A: 255})
-				row.Style.Foreground = Some(color.NRGBA{R: 26, G: 48, B: 76, A: 255})
+				row.Style = row.Style.Overlay(Style{BackgroundRole: "accent"})
+				row.Style = row.Style.Overlay(Style{ForegroundRole: "accent-ink"})
 			}
 			quiet := Style{Padding: Some(Insets{}), Border: Some(Border{}), Background: Some(color.NRGBA{}), Typography: Some(MacTypography(10, 400)), MinSize: Some(Size{Width: 20, Height: 24}), MaxSize: Some(Size{Width: 20, Height: 24}), GrowX: Some(float32(0))}
 			if len(children[id]) > 0 {
@@ -177,7 +177,7 @@ func (p *ModelBrowser) View() (Node, error) {
 			row.Children = append(row.Children, Node{ID: rid + "/visibility", Kind: ToggleButton, Icon: SymbolVisibility, Checked: item.Visible, Style: quiet, Accessibility: Accessibility{Name: "Visibility of " + item.Label}, Change: func(e ChangeEvent) { propose(id, ModelBrowserVisibility, e.Checked) }})
 			selectStyle := Style{Padding: Some(Insets{Left: 1, Right: 1}), Gap: Some(float32(5)), Border: Some(Border{}), Background: Some(color.NRGBA{}), Typography: Some(MacTypography(12, 400)), GrowX: Some(float32(1)), TextAlign: Some(AlignStart), MinSize: Some(Size{Width: 48, Height: 24})}
 			if p.SelectedID == id || slices.Contains(p.SelectedIDs, id) {
-				selectStyle.Foreground = Some(color.NRGBA{R: 26, G: 48, B: 76, A: 255})
+				selectStyle = selectStyle.Overlay(Style{ForegroundRole: "accent-ink"})
 			}
 			row.Children = append(row.Children, Node{ID: rid + "/select", Kind: Button, Text: item.Label, Icon: item.Icon, IconImage: item.IconImage, Appearance: ButtonTool, Style: selectStyle, Accessibility: Accessibility{Name: "Select " + item.Label}, ActivateModified: func(e ActivationEvent) {
 				if p.SelectModified != nil {

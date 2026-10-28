@@ -113,7 +113,7 @@ func (p *FeatureTimeline) View() (Node, error) {
 	}
 	track := Node{ID: id + "/track", Kind: Row, Style: Style{Padding: Some(Insets{}), Gap: Some(float32(2)), GrowY: Some(float32(0))}}
 	marker := func() Node {
-		return Node{ID: id + "/marker", Kind: Column, Accessibility: Accessibility{Name: "History marker", Help: fmt.Sprintf("%d of %d features active", p.Marker, len(p.Items))}, Style: Style{Padding: Some(Insets{}), MinSize: Some(Size{Width: 2, Height: 24}), MaxSize: Some(Size{Width: 2, Height: 24}), Grow: Some(float32(0)), Background: Some(color.NRGBA{R: 58, G: 122, B: 225, A: 255})}}
+		return Node{ID: id + "/marker", Kind: Column, Accessibility: Accessibility{Name: "History marker", Help: fmt.Sprintf("%d of %d features active", p.Marker, len(p.Items))}, Style: Style{Padding: Some(Insets{}), MinSize: Some(Size{Width: 2, Height: 24}), MaxSize: Some(Size{Width: 2, Height: 24}), Grow: Some(float32(0)), BackgroundRole: "accent"}}
 	}
 	for j, item := range p.Items {
 		if j == p.Marker {
@@ -135,14 +135,14 @@ func (p *FeatureTimeline) View() (Node, error) {
 			n.Style.Padding = Some(Insets{Left: 6, Right: 6})
 		}
 		if item.ID == p.SelectedID {
-			n.Style.Background = Some(color.NRGBA{R: 216, G: 231, B: 251, A: 255})
-			n.Style.Foreground = Some(color.NRGBA{R: 26, G: 48, B: 76, A: 255})
-			n.Style.Border = Some(Border{Width: 1, Color: color.NRGBA{R: 58, G: 122, B: 225, A: 255}})
+			n.Style = n.Style.Overlay(Style{BackgroundRole: "accent"})
+			n.Style = n.Style.Overlay(Style{ForegroundRole: "accent-ink"})
+			n.Style = n.Style.Overlay(Style{Border: Some(Border{Width: 1}), BorderRole: "accent"})
 		}
 		// A paused item keeps its gray fill even when the blue selection outline is present.
 		if j >= p.Marker {
-			n.Style.Background = Some(color.NRGBA{R: 237, G: 240, B: 244, A: 255})
-			n.Style.Foreground = Some(color.NRGBA{R: 75, G: 86, B: 102, A: 255})
+			n.Style = n.Style.Overlay(Style{BackgroundRole: "panel"})
+			n.Style = n.Style.Overlay(Style{ForegroundRole: "secondary"})
 		}
 		track.Children = append(track.Children, n)
 	}

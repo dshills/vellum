@@ -106,7 +106,7 @@ func TestCompactTimelineKeepsNamesFallbackMarkerAndAdmission(t *testing.T) {
 		t.Fatal(e)
 	}
 	selectedPaused := nodeByID(paused, "compact/feature/"+ribbonPart("b"))
-	if selectedPaused.Style.Background.Value != (color.NRGBA{R: 237, G: 240, B: 244, A: 255}) || selectedPaused.Style.Border.Value.Width != 1 {
+	if selectedPaused.Style.BackgroundRole != "panel" || selectedPaused.Style.Border.Value.Width != 1 {
 		t.Fatal("paused selection lost fill/outline")
 	}
 	p.Items[0].Disabled = true

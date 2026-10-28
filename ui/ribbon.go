@@ -219,7 +219,7 @@ func (p *Ribbon) View() (Node, error) {
 			// one complete unit and never strands an independently routed action.
 			content := Node{ID: gid + "/content", Kind: Row, Children: []Node{row}, Style: Style{Padding: Some(Insets{}), Gap: Some(float32(5)), GrowX: Some(float32(0)), GrowY: Some(float32(0))}}
 			if groupIndex < len(tab.Groups)-1 {
-				content.Children = append(content.Children, Node{ID: gid + "/divider", Kind: Column, Style: Style{Padding: Some(Insets{}), MinSize: Some(Size{Width: 1, Height: 40}), MaxSize: Some(Size{Width: 1, Height: 40}), Grow: Some(float32(0)), Background: Some(color.NRGBA{R: 208, G: 213, B: 221, A: 255})}})
+				content.Children = append(content.Children, Node{ID: gid + "/divider", Kind: Column, Style: Style{Padding: Some(Insets{}), MinSize: Some(Size{Width: 1, Height: 40}), MaxSize: Some(Size{Width: 1, Height: 40}), Grow: Some(float32(0)), BackgroundRole: "line"}})
 			}
 			groupNode := Node{ID: gid, Kind: Column, Disabled: group.Disabled, Accessibility: Accessibility{Name: group.Label}, Children: []Node{content, {ID: gid + "/caption", Kind: Label, Text: strings.ToUpper(group.Label), Style: Style{Typography: Some(MacTypography(10, 400)), TextAlign: Some(AlignCenter), GrowX: Some(float32(1)), Padding: Some(Insets{})}}}, Style: Style{Padding: Some(Insets{Left: 3, Right: 3}), Gap: Some(float32(0)), GrowX: Some(float32(0)), GrowY: Some(float32(0))}}
 			bar.Children = append(bar.Children, groupNode)

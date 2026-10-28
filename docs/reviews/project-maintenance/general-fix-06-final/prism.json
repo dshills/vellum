@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "107a411ff4fc029f4fb4e85fce3e460a",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "ac66f645a67cddd718821d5f21ac4c923844f9ed",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "7b1301ee3a7db91a",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Role validation constructs palette each call",
+      "message": "Validate builds a full MacPalette just to check role names on every call; Validate runs per node during Validate/ResolveStyle, adding avoidable allocation/computation. Also ResolveStyle silently ignores unknown roles before Validate only because Validate catches them later; coupling is fragile.",
+      "suggestion": "Add a validRole(role string) bool with a static switch and use it in Validate.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "ui/style.go",
+          "lines": {
+            "start": 87,
+            "end": 99
+          }
+        }
+      ],
+      "tags": [
+        "performance"
+      ],
+      "evidence": "if _, ok := paletteRole(MacPalette(false, color.NRGBA{}), role); !ok {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "c22e72915dc5d3f0",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Border override semantics inconsistent with docs",
+      "message": "Overlay clears a base BorderRole when a later overlay sets any Border, so an explicit Border with only width (e.g. the one in the selection overlay) is replaced. This contradicts the docs saying BorderRole 'retains configured width'. In the other direction, ResolveStyle overwrites an explicit Border color whenever a BorderRole is inherited from a theme default, so concrete colors set after a role in the same Style are silently ignored.",
+      "suggestion": "Make the precedence consistent: clear BorderRole only if the new Border has a non-zero Color, or track order explicitly, and document it.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "ui/style.go",
+          "lines": {
+            "start": 177,
+            "end": 181
+          }
+        }
+      ],
+      "tags": [
+        "style",
+        "overlay",
+        "location-corrected"
+      ],
+      "evidence": "if o.Border.Set {\n\t\ts.BorderRole = \"\"\n\t\ts.Border = o.Border\n\t}\n\tif o.BorderRole != \"\" {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5696,
+    "totalMs": 5714
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 7,
+    "bytes": 25353,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 14934,
+        "output": 634,
+        "costUSD": 0.036208
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
