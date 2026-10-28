@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "examples/forge/README.md,examples/forge/clipboard.go,examples/forge/clipboard_test.go,examples/forge/files.go,examples/forge/main.go,examples/forge/model.go",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "6",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/forge-clipboard-next-20261028/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/forge-clipboard-next-20261028/prism.json"
+  ],
+  "cwd": "/Users/dshills/Development/projects/Vellum",
+  "started_utc": "2026-10-28T11:37:46.569264+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 1,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 84852,
+  "group": 84852,
+  "owned": {
+    "created": true,
+    "pid": 84852,
+    "group": 84852,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 1,
+    "errors": [],
+    "observation": {
+      "group": 84852,
+      "members": [],
+      "observation_sha256": "5d9032c537990100a6da547378fe30847e3bbfded92af462bc4b77e1eb1d2d65"
+    }
+  },
+  "seconds": 7.015975250000338,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

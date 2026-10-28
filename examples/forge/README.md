@@ -116,3 +116,10 @@ from ~/Library/Caches/VellumForge before retrying.
 Axis cubes stay visible above assembly geometry, retain a consistent screen size
 under zoom/display scaling, and highlight gold on hover. This preview still has a
 48-body limit and no CAD topology/constraint solver.
+
+Copy selected bodies with Cmd-C, paste with Cmd-V, or duplicate directly with
+Cmd-D. Paste/duplicate preserves relative positions, assigns fresh body/feature
+identities and offsets the new selection by 5 mm in X/Z (successive pastes fan out).
+Each insertion is one Undo/Redo action. The clipboard uses a versioned Forge JSON
+selection; unrelated text is rejected. Clipboard IO is window-scoped and bounded
+to one pending operation; stale paste results never modify a replacement study.

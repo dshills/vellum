@@ -23,6 +23,10 @@ type document struct {
 	Selection []string
 }
 type workbench struct {
+	clipboardBusy                                     bool
+	clipboardCancel                                   context.CancelFunc
+	pasteKey                                          [32]byte
+	pasteCount                                        int
 	hideBrowser, hideInspector                        bool
 	workspaceLoaded                                   bool
 	preferencesBlocked                                bool
@@ -111,6 +115,7 @@ func newWorkbench() *workbench {
 		}
 		return nil
 	}, j.Redo)
+	m.bindClipboardCommands()
 	m.refresh()
 	return m
 }
@@ -191,8 +196,8 @@ func (m *workbench) selectObject(id string) {
 	m.refresh()
 }
 func (m *workbench) apply(label string, after document) error {
-	if m.drag != nil {
-		return fmt.Errorf("finish or cancel handle drag first")
+	if m.clipboardBusy || m.drag != nil {
+		return fmt.Errorf("finish or cancel active operation first")
 	}
 	before := clone(m.state)
 	after = clone(after)

@@ -1,0 +1,140 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "594cf83fd628ec67995ac56eb6601fbb",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "5aff56cdabe8a2a857151fa682db41ec1a53d578",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "6f6d32de6f9ece01",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Paste offset state not reset across studies",
+      "message": "The doc says duplicate offset is 5 mm, but code uses 0.25 units; the unit relationship is unverified. Additionally, paste offset on a different document than the copy source has no guard. Also a successful paste updates pasteKey keyed only on text, so pasting in a different study continues fanning out.",
+      "suggestion": "Confirm 0.25 equals 5 mm in scene units, or define a named constant; reset pasteKey on study replacement.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/forge/clipboard.go",
+          "lines": {
+            "start": 132,
+            "end": 132
+          }
+        }
+      ],
+      "tags": [
+        "correctness",
+        "location-corrected"
+      ],
+      "evidence": "if m.journal.Snapshot().Revision != revision || !reflect.DeepEqual(before, m.state) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "71189a7e964a6937",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Busy flag may stick if Publish fails",
+      "message": "Paste is completed inside ticket.Publish, where clipboardBusy is still true until it is reset; but completePaste calls insertBodies, which calls m.apply, which rejects while clipboardBusy is true. Because the flag is cleared before completePaste in the callback this works, but if Publish never runs (window closed/ticket dropped) clipboardBusy stays true forever. Also, m.clipboardBusy and the cancel field are read/written without a clear synchronization guarantee on the UI thread.",
+      "suggestion": "Ensure the busy flag is reset if Publish fails: check the error returned by ticket.Publish and reset state, or cancel the ticket on failure.",
+      "confidence": 0.85,
+      "locations": [
+        {
+          "path": "examples/forge/clipboard.go",
+          "lines": {
+            "start": 183,
+            "end": 185
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "state",
+        "location-corrected"
+      ],
+      "evidence": "m.clipboardBusy = true\n\tm.clipboardCancel = cancel\n\tgo func() {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "8c15b4b59985667e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Ignored Publish error leaves state locked",
+      "message": "The Publish error is ignored. If it fails, the callback never runs and clipboardBusy/clipboardCancel are never cleared, permanently blocking file actions, edits (apply), and window close.",
+      "suggestion": "Handle the error from Publish; on failure clear clipboardBusy and clipboardCancel via a safe path or log it.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "examples/forge/clipboard.go",
+          "lines": {
+            "start": 176,
+            "end": 193
+          }
+        }
+      ],
+      "tags": [
+        "error-handling"
+      ],
+      "evidence": "_ = ticket.Publish(func() {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6941,
+    "totalMs": 6959
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 15537,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 10039,
+        "output": 897,
+        "costUSD": 0.029048
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

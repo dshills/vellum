@@ -94,3 +94,20 @@ func TestRecoveryRoundTripAndCleanRemoval(t *testing.T) {
 		t.Fatal("clean close kept recovery")
 	}
 }
+
+func TestRecoveredCameraAndNextInstalledBeforeCapture(t *testing.T) {
+	src := newWorkbench()
+	_ = src.add()
+	src.scene.Camera.Distance = 12
+	s := src.captureStudy()
+	m := newWorkbench()
+	if e := m.restoreRecoveredStudy(s); e != nil {
+		t.Fatal(e)
+	}
+	if !reflect.DeepEqual(m.captureStudy(), s) {
+		t.Fatal("recovered metadata differs")
+	}
+	if e := m.add(); e != nil {
+		t.Fatal(e)
+	}
+}

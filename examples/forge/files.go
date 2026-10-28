@@ -88,6 +88,8 @@ func (m *workbench) installStudy(s studyFile) error {
 	if e := validateStudy(s); e != nil {
 		return e
 	}
+	m.pasteKey = [32]byte{}
+	m.pasteCount = 0
 	m.state = clone(s.Document)
 	m.scene.Camera = s.Camera
 	m.next = s.Next
@@ -142,7 +144,7 @@ func (m *workbench) bindFiles() (err error) {
 	return nil
 }
 func (m *workbench) fileAction(id string, discard bool) error {
-	if m.drag != nil {
+	if m.clipboardBusy || m.drag != nil {
 		return vdoc.ErrBusy
 	}
 	if m.files == nil {
@@ -160,6 +162,14 @@ func (m *workbench) fileAction(id string, discard bool) error {
 	return m.files.Save(m.ref.Context(), vdoc.SaveOptions{Choose: id == "save-as"})
 }
 func (m *workbench) requestClose() bool {
+	if m.clipboardBusy {
+		if m.clipboardCancel != nil {
+			m.clipboardCancel()
+		}
+		m.status = "Canceling clipboard operation; close again when complete"
+		m.changed()
+		return false
+	}
 	if m.drag != nil {
 		m.drag = nil
 		m.refresh()
@@ -323,4 +333,20 @@ func (m *workbench) syncRecovery() {
 	} else {
 		m.recovery.offer(studyFile{})
 	}
+}
+
+func (m *workbench) restoreRecoveredStudy(s studyFile) error {
+	if e := validateStudy(s); e != nil {
+		return e
+	}
+	oldCamera, oldNext := m.scene.Camera, m.next
+	m.scene.Camera = s.Camera
+	m.next = s.Next
+	if e := m.apply("Recover study", s.Document); e != nil {
+		m.scene.Camera = oldCamera
+		m.next = oldNext
+		m.refresh()
+		return e
+	}
+	return nil
 }
