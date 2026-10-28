@@ -1,0 +1,29 @@
+[
+  {
+    "name": "finish-ribbon-contrast",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 11.621
+  },
+  {
+    "name": "finish-contrast-vet",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.338
+  }
+]

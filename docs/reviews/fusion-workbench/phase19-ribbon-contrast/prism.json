@@ -1,0 +1,94 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "46c7a84379331d06356a2b12c804069b",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "603e5098afef3bb82ed115dec1f5a3c7e0dd9c5e",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "bcce13212f330b86",
+      "severity": "medium",
+      "category": "bug",
+      "title": "t.Fatal used with formatting argument",
+      "message": "t.Fatal does not take a format string; it just concatenates its arguments, so the page ID is appended with no separator. The test message is unclear, and go vet may flag it.",
+      "suggestion": "Use t.Fatalf with a %s verb for the page ID.",
+      "confidence": 0.97,
+      "locations": [
+        {
+          "path": "examples/forge/fidelity_test.go",
+          "lines": {
+            "start": 73,
+            "end": 73
+          }
+        }
+      ],
+      "tags": [
+        "testing",
+        "location-corrected"
+      ],
+      "evidence": "t.Fatal(\"native toolbar page inherited system appearance\", page.ID)",
+      "fix": {
+        "before": "t.Fatal(\"native toolbar page inherited system appearance\", page.ID)",
+        "after": "t.Fatalf(\"native toolbar page %s inherited system appearance\", page.ID)"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3301,
+    "totalMs": 3331
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 10623,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 7639,
+        "output": 290,
+        "costUSD": 0.018178
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -54,8 +54,15 @@ func (m *workbench) ribbonView() ui.Node {
 	m.ribbon.Tabs = []ui.RibbonTab{{ID: "solid", Label: "SOLID", Groups: []ui.RibbonGroup{{ID: "create", Label: "CREATE", Actions: []ui.RibbonAction{a("add", "New body", "add", blue)}}, {ID: "modify", Label: "MODIFY", Actions: []ui.RibbonAction{a("move", "Move +4 mm", "move", teal), a("delete", "Delete", "delete", rgb(224, 101, 97))}}, {ID: "view", Label: "DISPLAY", Actions: []ui.RibbonAction{a("grid", "Grid", "grid", gold), a("projection", "Projection", "projection", purple)}}, {ID: "navigate", Label: "NAVIGATE", Actions: []ui.RibbonAction{a("orbit", "Orbit", "orbit", blue), a("pan", "Pan", "pan", teal), a("select", "Select", "select", gold)}}}}, {ID: "inspect", Label: "INSPECT", Groups: []ui.RibbonGroup{{ID: "orientation", Label: "ORIENTATION", Actions: []ui.RibbonAction{a("front", "Front", "front", blue), a("top", "Top", "top", teal), a("right", "Right", "right", purple), a("fit", "Fit assembly", "fit", gold)}}, {ID: "context", Label: "ACTIONS", Actions: []ui.RibbonAction{a("marking", "Action wheel", "wheel", purple)}}}}, {ID: "body", Label: "BODY TOOLS", Contextual: true, Disabled: m.selectedIndex() < 0, Groups: []ui.RibbonGroup{{ID: "transform", Label: "SELECTED BODY", Actions: []ui.RibbonAction{a("move", "Move +4 mm", "move", teal), a("delete", "Delete body", "delete", rgb(224, 101, 97))}}}}}
 	m.ribbon.SelectTab = func(id string) { m.tab = id; m.changed() }
 	m.ribbon.Action = func(e ui.RibbonEvent) { m.action(e.ActionID) }
-	m.ribbon.Style = ui.Style{GrowY: ui.Some(float32(0)), Background: ui.Some(rgb(249, 250, 252))}
-	return must(m.ribbon.View())
+	m.ribbon.Style = ui.Style{GrowY: ui.Some(float32(0)), Background: ui.Some(rgb(249, 250, 252)), Foreground: ui.Some(rgb(42, 49, 61))}
+	n := must(m.ribbon.View())
+	// The native toolbar has a system-appearance surface of its own. Keep every
+	// managed ribbon page on this app's explicit light surface as well.
+	for i := range n.Children {
+		n.Children[i].Style.Background = m.ribbon.Style.Background
+		n.Children[i].Style.Foreground = m.ribbon.Style.Foreground
+	}
+	return n
 }
 func (m *workbench) browserView() ui.Node {
 	items := []ui.ModelBrowserItem{{ID: "assembly", Label: "Linear actuator", Visible: true, Activatable: true, IconImage: artwork("cube", rgb(117, 131, 153)), Badge: fmt.Sprint(len(m.state.Objects))}}
@@ -138,7 +145,7 @@ func (m *workbench) inspectorView() ui.Node {
 	actions := column("inspect-actions", action("nudge", "Move +4 mm", "move", rgb(48, 166, 158), func() { m.result(m.nudge()) }), action("remove", "Delete body", "delete", rgb(224, 101, 97), func() { m.result(m.deleteSelected()) }))
 	actions.Style.Gap = ui.Some(float32(5))
 	divider := func(id string) ui.Node {
-		return ui.Node{ID: id, Kind: ui.Separator, Style: ui.Style{GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(0))}}
+		return ui.Node{ID: id, Kind: ui.Separator, Style: ui.Style{GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(0)), Foreground: ui.Some(rgb(219, 224, 232))}}
 	}
 	about := column("inspect-about", text("demo-heading", "ABOUT THIS WORKBENCH", 10, 600, muted), text("demo-copy", "Original Fusion-inspired UI", 10, 400, muted), text("demo-copy2", "Live GPU viewport · local history", 10, 400, muted), text("demo-copy3", "No CAD kernel or cloud service", 10, 400, muted))
 	about.Style.Gap = ui.Some(float32(4))

@@ -61,3 +61,16 @@ func TestProjectionCaptionMatchesExistingCameraState(t *testing.T) {
 		t.Fatal("projection caption ignored state")
 	}
 }
+
+func TestRibbonExplicitLightSurfaceAndInk(t *testing.T) {
+	m := newWorkbench()
+	n := m.ribbonView()
+	if !n.Style.Foreground.Set || !n.Style.Background.Set {
+		t.Fatal("ribbon must own light surface and ink")
+	}
+	for _, page := range n.Children {
+		if page.Style.Background != n.Style.Background || page.Style.Foreground != n.Style.Foreground {
+			t.Fatalf("native toolbar page %s inherited system appearance", page.ID)
+		}
+	}
+}

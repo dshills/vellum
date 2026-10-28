@@ -156,3 +156,8 @@ panes narrow. The existing projection state is accurately labeled. The shared
 app-local theme factory is unchanged in value; offscreen layout tests use those
 same descriptors with only the GPU viewport replaced by a measured placeholder.
 Actual GPU appearance/picking remain separate native checks.
+
+The packaged native check found a dark native-toolbar surface under light
+caption colors when the host uses dark appearance. Forge now explicitly pairs
+its existing light ribbon page surfaces and ink, including native tab-label ink,
+without changing global appearance or framework theme policy.
