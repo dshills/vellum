@@ -53,3 +53,14 @@ material-preserving selection outline are running app output. Reproduce with the
 seven-body default study, Fit assembly, Orbit and selected Sliding carriage; keep
 history empty. Native focus/pointer/recording indicators remain. Earlier Forge
 captures and their historical metadata are retained unchanged.
+
+### Forge detail gallery
+
+The root README also shows [shaft inspection](forge-shaft.jpg) and the
+[context action panel](forge-actions.jpg). Both are unmodified native captures
+from the same exact ZIP-extracted private build11 and source as the overview.
+[Gallery metadata](forge-gallery-captures.json) records each image hash and state.
+Select Drive shaft for the inspection view; right-click inside the viewport for
+the panel view. The shaft's display is cylindrical while its picking bounds
+remain a box. Native focus, pointer and recording indicators are retained.
+No new desktop capture, image editing or public app release was required.

@@ -17,21 +17,35 @@ The screenshots are actual app captures; artwork and data are original fixtures.
 
 ### Forge — a design workbench
 
-An original Fusion-inspired Mac workbench: contextual grouped ribbon, rich model
-browser, live depth-rendered 3D assembly and orientation cube, unit expressions,
-feature strip, and undoable body edits. Active navigation tools, a round drive
-shaft and material-preserving selection outlines clarify the preview. Full-color icons and native titlebar
-controls complement the managed Mac-themed interface.
+A Fusion-inspired macOS workbench built with Vellum's public Go APIs. A grouped
+ribbon, model browser and property inspector surround a live 3D assembly. Full-color
+icons, a native titlebar toolbar and a compact feature strip complete the workspace.
 
-![Forge Mac design workbench with a compact grouped ribbon, browser outline and feature icon strip](docs/screenshots/forge-completion.jpg)
+![Forge workbench showing the grouped ribbon, assembly browser, live 3D viewport, selected body, inspector and feature history](docs/screenshots/forge-completion.jpg)
 
-Run: `(cd examples/forge && go run .)`
+Orbit, pan and zoom the assembly, select bodies, click the orientation cube,
+and edit dimensions using expressions such as `2 in` or `width / 2`. Creation,
+movement, resizing, visibility and feature-history edits support Undo/Redo.
+Active tools stay visible, and selection outlines preserve each body's material.
+
+| Body inspection | Context actions |
+| --- | --- |
+| ![Forge with the cylindrical drive shaft selected and its dimensions shown in the inspector](docs/screenshots/forge-shaft.jpg) | ![Forge action panel with full-color icons, keyboard focus and an active Orbit tool](docs/screenshots/forge-actions.jpg) |
+| Cylindrical shaft display with its box picking bounds outlined. | A focus-scoped action panel with consistent macOS-style colors. |
+
+After the native preparation in [Quick start](#quick-start-on-macos), run:
+
+```sh
+cd examples/forge
+go run .
+```
 
 See the [Forge guide](examples/forge/README.md) for controls and private packaging,
-and the [reusable workbench APIs](docs/fusion-workbench.md) for integration. The
-new viewport is experimental, uses box picking proxies (including the cylindrical
-shaft) and has no CAD kernel. This demo
-is source/private-build work and is absent from the six published build13 apps.
+the [reusable workbench APIs](docs/fusion-workbench.md) for integration, and
+[screenshot details](docs/screenshots/README.md#forge-workbench) for capture identities.
+The viewport is experimental and uses box picking proxies, including for the
+cylindrical shaft. This in-memory demo has no CAD kernel or Save/Open. It is
+source/private-build work and is absent from the six published build13 apps.
 
 ### Forma — a space for ideas
 

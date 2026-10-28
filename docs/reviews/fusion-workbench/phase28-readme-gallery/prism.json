@@ -1,0 +1,56 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "7ada45a6095cbd7ddffc048cc3fe7af3",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "07fff6a10d36abc97b8701c5543edf15579be782",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 1404,
+    "totalMs": 1413
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 5705,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 4116,
+        "output": 10,
+        "costUSD": 0.008332
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
