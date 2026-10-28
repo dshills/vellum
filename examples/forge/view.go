@@ -63,6 +63,36 @@ func (m *workbench) ribbonView() ui.Node {
 		n.Children[i].Style.Background = m.ribbon.Style.Background
 		n.Children[i].Style.Foreground = m.ribbon.Style.Foreground
 	}
+	return m.navigationFeedback(n)
+}
+
+func (m *workbench) toolLabel() string {
+	switch m.surface.Tool {
+	case cogent.ScenePan:
+		return "Pan"
+	case cogent.SceneSelect:
+		return "Select"
+	default:
+		return "Orbit"
+	}
+}
+
+// Application-local feedback for existing modes; commands/IDs remain unchanged.
+func (m *workbench) navigationFeedback(n ui.Node) ui.Node {
+	if n.Kind == ui.Button && (n.Text == "Orbit" || n.Text == "Pan" || n.Text == "Select") {
+		n.Accessibility.Help = "Switch navigation to " + n.Text
+		if n.Text == m.toolLabel() {
+			n.Style.Background = ui.Some(rgb(224, 236, 251))
+			n.Style.Foreground = ui.Some(rgb(27, 79, 148))
+			n.Style.Border = ui.Some(ui.Border{Width: 1, Color: rgb(128, 164, 212)})
+			n.Accessibility.Name = n.Text + " (active)"
+			n.Accessibility.Help = "Active navigation mode"
+			n.Tooltip = n.Text + " — active navigation mode"
+		}
+	}
+	for i := range n.Children {
+		n.Children[i] = m.navigationFeedback(n.Children[i])
+	}
 	return n
 }
 func (m *workbench) browserView() ui.Node {
@@ -171,14 +201,21 @@ func (m *workbench) View() ui.Node {
 	left.Style.Background = ui.Some(rgb(247, 248, 250))
 	left.Style.GrowY = ui.Some(float32(1))
 	viewControl := &ui.ViewCube{ID: "orientation", Label: "Camera orientation", Change: m.orient}
-	mode := "Solid · Perspective"
+	mode := m.toolLabel() + " · Perspective"
 	if m.scene.Camera.Orthographic {
-		mode = "Solid · Orthographic"
+		mode = m.toolLabel() + " · Orthographic"
 	}
 	title := row("canvas-title", text("canvas-name", "Actuator study — Linear actuator", 14, 600, ink), text("canvas-mode", mode, 11, 400, muted))
 	title.Children[0].Style.GrowX = ui.Some(float32(1))
 	title.Style.Padding = ui.Some(ui.Insets{Left: 16, Right: 12, Top: 10, Bottom: 8})
-	center := column("canvas-column", title, ui.Node{ID: "scene", Kind: ui.Extension, Custom: m.surface, Grow: true, Accessibility: ui.Accessibility{Name: "3D assembly viewport", Help: "Drag orbit. Shift drag pan. Scroll zoom. Home resets orientation."}}, ui.Node{ID: "orientation-scroll", Kind: ui.Scroll, Children: []ui.Node{must(viewControl.View())}, Style: ui.Style{Padding: ui.Some(ui.Insets{}), GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(0)), MinSize: ui.Some(ui.Size{Height: 32}), MaxSize: ui.Some(ui.Size{Height: 32})}}, text("canvas-hints", "Drag to orbit  ·  ⇧ drag to pan  ·  Scroll to zoom  ·  Click to select  ·  Right-click for actions", 11, 400, muted))
+	hints := "Drag to orbit  ·  ⇧ drag to pan  ·  Scroll to zoom  ·  Click to select  ·  Right-click for actions"
+	if m.surface.Tool == cogent.ScenePan {
+		hints = "Drag to pan  ·  Option-drag to orbit  ·  Scroll to zoom  ·  Click to select"
+	}
+	if m.surface.Tool == cogent.SceneSelect {
+		hints = "Click to select  ·  ⇧ drag to pan  ·  Option-drag to orbit  ·  Scroll to zoom"
+	}
+	center := column("canvas-column", title, ui.Node{ID: "scene", Kind: ui.Extension, Custom: m.surface, Grow: true, Accessibility: ui.Accessibility{Name: "3D assembly viewport", Help: "Drag orbit. Shift drag pan. Scroll zoom. Home resets orientation."}}, ui.Node{ID: "orientation-scroll", Kind: ui.Scroll, Children: []ui.Node{must(viewControl.View())}, Style: ui.Style{Padding: ui.Some(ui.Insets{}), GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(0)), MinSize: ui.Some(ui.Size{Height: 32}), MaxSize: ui.Some(ui.Size{Height: 32})}}, text("canvas-hints", hints, 11, 400, muted))
 	center.Style.GrowY = ui.Some(float32(1))
 	center.Style.Gap = ui.Some(float32(6))
 	center.Style.Background = ui.Some(rgb(241, 243, 247))
@@ -202,5 +239,5 @@ func (m *workbench) View() ui.Node {
 	m.marking.Actions = []ui.MarkingAction{{ID: "fit", Label: "Fit", IconImage: artwork("fit", rgb(236, 168, 52))}, {ID: "orbit", Label: "Orbit", IconImage: artwork("orbit", rgb(58, 122, 225))}, {ID: "pan", Label: "Pan", IconImage: artwork("pan", rgb(48, 166, 158))}, {ID: "select", Label: "Select", IconImage: artwork("select", rgb(148, 105, 210))}, {ID: "grid", Label: "Grid", IconImage: artwork("grid", rgb(236, 168, 52))}, {ID: "undo", Label: "Undo", IconImage: artwork("undo", rgb(148, 105, 210)), Disabled: m.journal.Snapshot().UndoCount == 0}, {ID: "move", Label: "Move +4 mm", IconImage: artwork("move", rgb(48, 166, 158)), Disabled: m.selectedIndex() < 0}, {ID: "add", Label: "New body", IconImage: artwork("add", rgb(58, 122, 225))}}
 	footer := text("status", fmt.Sprintf("%s    ·    %d bodies    ·    Undo %d / Redo %d", m.status, len(m.state.Objects), m.journal.Snapshot().UndoCount, m.journal.Snapshot().RedoCount)+fmt.Sprintf("  ·  Camera %.2f / %.2f / %.2f  ·  Target %.2f, %.2f, %.2f", m.scene.Camera.Yaw, m.scene.Camera.Pitch, m.scene.Camera.Distance, m.scene.Camera.Target.X, m.scene.Camera.Target.Y, m.scene.Camera.Target.Z), 11, 400, muted)
 	footer.Style.Padding = ui.Some(ui.Insets{Left: 18, Bottom: 8, Top: 3})
-	return ui.Node{ID: "forge-root", Kind: ui.Column, Grow: true, Style: ui.Style{Gap: ui.Some(float32(0)), Padding: ui.Some(ui.Insets{}), Background: ui.Some(rgb(248, 249, 252))}, Children: []ui.Node{m.ribbonView(), panes, must(m.timeline.View()), footer, must(m.marking.View())}}
+	return ui.Node{ID: "forge-root", Kind: ui.Column, Grow: true, Style: ui.Style{Gap: ui.Some(float32(0)), Padding: ui.Some(ui.Insets{}), Background: ui.Some(rgb(248, 249, 252))}, Children: []ui.Node{m.ribbonView(), panes, must(m.timeline.View()), footer, m.navigationFeedback(must(m.marking.View()))}}
 }

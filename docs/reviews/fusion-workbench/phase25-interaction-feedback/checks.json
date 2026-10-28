@@ -1,0 +1,59 @@
+[
+  {
+    "name": "complete-feedback-app",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 26.612
+  },
+  {
+    "name": "complete-feedback-vet",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 12.995
+  },
+  {
+    "name": "complete-feedback-driver",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestScene3D|TestSceneSelection|TestCylinder|TestRoundShaft|TestCubeFace|TestGPUInputCaptured",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 21.15
+  },
+  {
+    "name": "complete-feedback-driver-vet",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 13.97
+  }
+]

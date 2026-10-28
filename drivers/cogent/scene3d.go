@@ -502,6 +502,26 @@ func (m *sceneMesh) cylinderX(b viewport.Box, c color.NRGBA) {
 	}
 }
 
+// outlineBox marks the existing picking bounds without replacing material ink.
+// Only one selected proxy is admitted by Scene; this adds twelve bounded rods.
+func (m *sceneMesh) outlineBox(b viewport.Box, c color.NRGBA) {
+	lo, hi := [3]float64{b.Min.X, b.Min.Y, b.Min.Z}, [3]float64{b.Max.X, b.Max.Y, b.Max.Z}
+	width := math.Max(.002, math.Min(.018, math.Min(hi[0]-lo[0], math.Min(hi[1]-lo[1], hi[2]-lo[2]))*.025))
+	for axis := 0; axis < 3; axis++ {
+		a, baxis := (axis+1)%3, (axis+2)%3
+		for _, u := range []float64{lo[a], hi[a]} {
+			for _, v := range []float64{lo[baxis], hi[baxis]} {
+				min, max := lo, hi
+				min[axis] -= width
+				max[axis] += width
+				min[a], max[a] = u-width, u+width
+				min[baxis], max[baxis] = v-width, v+width
+				m.box(viewport.Box{Min: viewport.Vec3{X: min[0], Y: min[1], Z: min[2]}, Max: viewport.Vec3{X: max[0], Y: max[1], Z: max[2]}}, c)
+			}
+		}
+	}
+}
+
 func buildScene3DMesh(s *viewport.Scene) ([]float32, []uint32, uint32, uint32) {
 	m := &sceneMesh{}
 	if s.Grid {
@@ -520,9 +540,7 @@ func buildScene3DMesh(s *viewport.Scene) ([]float32, []uint32, uint32, uint32) {
 			continue
 		}
 		c := o.Color
-		if o.ID == s.SelectedID {
-			c = color.NRGBA{65, 133, 225, 255}
-		} else if o.ID == s.HoveredID {
+		if o.ID == s.HoveredID && o.ID != s.SelectedID {
 			c.R = uint8((int(c.R)*3 + 255) / 4)
 			c.G = uint8((int(c.G)*3 + 255) / 4)
 			c.B = uint8((int(c.B)*3 + 255) / 4)
@@ -531,6 +549,9 @@ func buildScene3DMesh(s *viewport.Scene) ([]float32, []uint32, uint32, uint32) {
 			m.cylinderX(o.Bounds, c)
 		} else {
 			m.box(o.Bounds, c)
+		}
+		if o.ID == s.SelectedID {
+			m.outlineBox(o.Bounds, color.NRGBA{R: 20, G: 92, B: 190, A: 255})
 		}
 	}
 	mainCount := uint32(len(m.indices))

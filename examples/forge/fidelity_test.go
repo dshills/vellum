@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/dshills/vellum/ui"
 	"math"
+	"slices"
+	"strings"
 	"testing"
 )
 
@@ -53,11 +55,11 @@ func requireFidelityNode(t *testing.T, n ui.Node, id string) *ui.Node {
 
 func TestProjectionCaptionMatchesExistingCameraState(t *testing.T) {
 	m := newWorkbench()
-	if requireFidelityNode(t, m.View(), "canvas-mode").Text != "Solid · Perspective" {
+	if requireFidelityNode(t, m.View(), "canvas-mode").Text != "Orbit · Perspective" {
 		t.Fatal("perspective caption")
 	}
 	m.action("projection")
-	if !m.scene.Camera.Orthographic || requireFidelityNode(t, m.View(), "canvas-mode").Text != "Solid · Orthographic" {
+	if !m.scene.Camera.Orthographic || requireFidelityNode(t, m.View(), "canvas-mode").Text != "Orbit · Orthographic" {
 		t.Fatal("projection caption ignored state")
 	}
 }
@@ -72,5 +74,39 @@ func TestRibbonExplicitLightSurfaceAndInk(t *testing.T) {
 		if page.Style.Background != n.Style.Background || page.Style.Foreground != n.Style.Foreground {
 			t.Fatalf("native toolbar page %s inherited system appearance", page.ID)
 		}
+	}
+}
+
+func TestNavigationFeedbackTracksExistingModesWithoutHistory(t *testing.T) {
+	m := newWorkbench()
+	before := clone(m.state)
+	for _, tool := range []string{"orbit", "pan", "select"} {
+		m.action(tool)
+		view := m.View()
+		for _, candidate := range []string{"orbit", "pan", "select"} {
+			n := fidelityNode(view, ui.RibbonActionID("ribbon", "solid", candidate))
+			if n == nil {
+				t.Fatal("missing mode", candidate)
+			}
+			active := strings.Contains(n.Accessibility.Name, "(active)")
+			if active != (candidate == tool) {
+				t.Fatal("incorrect active mode", tool, candidate)
+			}
+			if active && (!n.Style.Background.Set || !n.Style.Border.Set || n.Tooltip == "") {
+				t.Fatal("missing mode feedback")
+			}
+		}
+		if !strings.HasPrefix(fidelityNode(view, "canvas-mode").Text, m.toolLabel()+" ·") {
+			t.Fatal("stale mode caption")
+		}
+		if m.journal.Snapshot().UndoCount != 0 || m.state.Selected != before.Selected || !slices.Equal(m.state.Objects, before.Objects) {
+			t.Fatal("transient mode changed document")
+		}
+	}
+	m.marking.Open = true
+	view := m.View()
+	active := fidelityNode(view, "action-wheel/cell/2/2")
+	if active.Accessibility.Name != "Select (active)" {
+		t.Fatal("panel disagrees with ribbon", active.Accessibility.Name)
 	}
 }

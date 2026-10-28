@@ -206,3 +206,11 @@ experimental preview model, with default box behavior and bounded 48-segment
 geometry. Forge's shaft has equal Y/Z radii. Box picking proxies remain explicit;
 no exact cylinder intersections, CAD topology, modeling command or stable-v1 API
 is introduced. Snapshot history preserves the primitive during move/resize/delete.
+
+Existing navigation tools now expose one active state through restrained blue
+button fill/border, tooltip/accessibility text and the viewport mode caption;
+existing hints match Orbit/Pan/Select. These remain transient and add no history.
+Selection preserves original material colors and marks its existing box picking
+bounds with twelve thin blue rods. Hover retains a lighter material preview,
+selection takes precedence, and pointer leave clears hover. No new input modes,
+commands, exact-shape picking, cursor policy or renderer pipeline is introduced.

@@ -6,6 +6,7 @@ import (
 	"image"
 	"image/color"
 	"math"
+	"slices"
 	"testing"
 )
 
@@ -246,5 +247,37 @@ func TestCylinderFacesPointOutwardForBackfaceCulling(t *testing.T) {
 		if b.Sub(a).Cross(c.Sub(a)).Dot(outward) <= 0 {
 			t.Fatal("inward or degenerate cylinder triangle", j/3)
 		}
+	}
+}
+
+func TestSceneSelectionOutlinePreservesMaterialAndDominatesHover(t *testing.T) {
+	s := sceneFixture()
+	original := s.Objects[0]
+	plain, _, plainCount, _ := buildScene3DMesh(s)
+	s.SelectedID = "box"
+	selected, _, count, _ := buildScene3DMesh(s)
+	if count != plainCount+12*36 {
+		t.Fatal("selection outline not bounded", count, plainCount)
+	}
+	if !slices.Equal(plain[:24*7], selected[:24*7]) {
+		t.Fatal("selection replaced material")
+	}
+	s.HoveredID = "box"
+	both, _, _, _ := buildScene3DMesh(s)
+	if !slices.Equal(selected, both) {
+		t.Fatal("hover overrode selection")
+	}
+	s.SelectedID = ""
+	hover, _, hoverCount, _ := buildScene3DMesh(s)
+	if hoverCount != plainCount || slices.Equal(plain[:24*7], hover[:24*7]) {
+		t.Fatal("hover missing or grew geometry")
+	}
+	if s.Objects[0] != original {
+		t.Fatal("feedback mutated document")
+	}
+	v := &SceneView3D{Model: s}
+	v.HandleInput(GPUEvent{Kind: GPUPointerLeave})
+	if s.HoveredID != "" {
+		t.Fatal("stale hover on leave")
 	}
 }

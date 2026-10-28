@@ -1,0 +1,85 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "5a259216722459de3ba56a65b7638099",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "665ec0f385a2cfe97b34a73e3634902bacddf74d",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3945,
+    "totalMs": 3959
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 17640,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 11552,
+        "output": 334,
+        "costUSD": 0.026444
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "3c45f80979830498",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Feedback matched by label text rather than ID",
+        "message": "The navigationFeedback function matches nodes by display text (\"Orbit\", \"Pan\", \"Select\") and recurses through the whole tree, including the marking wheel. Any other button with the same text, such as a ribbon action in another tab, would be wrongly marked active. The test also assumes the wheel cell index 2/2 maps to Select, which is fragile.",
+        "suggestion": "Match on node IDs (ui.RibbonActionID and the marking cell IDs) instead of Text, and have the test look up the wheel cell by its action ID.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "examples/forge/view.go",
+            "lines": {
+              "start": 186,
+              "end": 186
+            }
+          }
+        ],
+        "tags": [
+          "fragile"
+        ],
+        "evidence": "if active \u0026\u0026 (!n.Style.Background.Set || !n.Style.Border.Set || n.Tooltip == \"\") {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in examples/forge/view.go"
+    }
+  ],
+  "suppressed": []
+}
