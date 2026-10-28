@@ -123,3 +123,8 @@ identities and offsets the new selection by 5 mm in X/Z (successive pastes fan o
 Each insertion is one Undo/Redo action. The clipboard uses a versioned Forge JSON
 selection; unrelated text is rejected. Clipboard IO is window-scoped and bounded
 to one pending operation; stale paste results never modify a replacement study.
+
+Rename the primary body using the inspector's Rename… button, Edit → Rename Body,
+or a browser row's context menu. Names accept 1–128 characters and reject control
+characters. Rename updates browser, inspector and creation feature labels without
+changing identity; Undo/Redo and saved studies retain the result.

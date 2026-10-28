@@ -138,7 +138,7 @@ func (m *workbench) browserView() ui.Node {
 		m.active = ""
 		m.browser.ActiveID = ""
 	}
-	return must(m.browser.View())
+	return m.browserContext(must(m.browser.View()))
 }
 func (m *workbench) inspectorView() ui.Node {
 	ink := rgb(40, 46, 58)
@@ -188,7 +188,7 @@ func (m *workbench) inspectorView() ui.Node {
 	}
 	about := column("inspect-about", text("demo-heading", "ABOUT THIS WORKBENCH", 10, 600, muted), text("demo-copy", "Original Fusion-inspired UI", 10, 400, muted), text("demo-copy2", "Live GPU viewport · local history", 10, 400, muted), text("demo-copy3", "No CAD kernel or cloud service", 10, 400, muted))
 	about.Style.Gap = ui.Some(float32(4))
-	n := column("inspector-content", header, divider("inspect-rule"), quantity, text("unit-help", "2 in · 50 mm · width / 2", 11, 400, muted), actions, m.handleControls(), divider("about-rule"), about)
+	n := column("inspector-content", header, divider("inspect-rule"), quantity, text("unit-help", "2 in · 50 mm · width / 2", 11, 400, muted), actions, button("rename-inspector", "Rename…", func() { m.beginRename(m.state.Selected) }), m.handleControls(), divider("about-rule"), about)
 	n.Style.Padding = ui.Some(ui.UniformInsets(12))
 	n.Style.Gap = ui.Some(float32(8))
 	n.Style.Background = ui.Some(rgb(250, 251, 253))
@@ -251,5 +251,5 @@ func (m *workbench) View() ui.Node {
 	m.marking.Actions = []ui.MarkingAction{{ID: "fit", Label: "Fit", IconImage: artwork("fit", rgb(236, 168, 52))}, {ID: "orbit", Label: "Orbit", IconImage: artwork("orbit", rgb(58, 122, 225))}, {ID: "pan", Label: "Pan", IconImage: artwork("pan", rgb(48, 166, 158))}, {ID: "select", Label: "Select", IconImage: artwork("select", rgb(148, 105, 210))}, {ID: "grid", Label: "Grid", IconImage: artwork("grid", rgb(236, 168, 52))}, {ID: "undo", Label: "Undo", IconImage: artwork("undo", rgb(148, 105, 210)), Disabled: m.journal.Snapshot().UndoCount == 0}, {ID: "move", Label: "Move +4 mm", IconImage: artwork("move", rgb(48, 166, 158)), Disabled: m.selectedIndex() < 0}, {ID: "add", Label: "New body", IconImage: artwork("add", rgb(58, 122, 225))}}
 	footer := text("status", fmt.Sprintf("%s    ·    %d bodies    ·    Undo %d / Redo %d", m.status, len(m.state.Objects), m.journal.Snapshot().UndoCount, m.journal.Snapshot().RedoCount)+fmt.Sprintf("  ·  Camera %.2f / %.2f / %.2f  ·  Target %.2f, %.2f, %.2f", m.scene.Camera.Yaw, m.scene.Camera.Pitch, m.scene.Camera.Distance, m.scene.Camera.Target.X, m.scene.Camera.Target.Y, m.scene.Camera.Target.Z), 11, 400, muted)
 	footer.Style.Padding = ui.Some(ui.Insets{Left: 18, Bottom: 8, Top: 3})
-	return ui.Node{ID: "forge-root", Kind: ui.Column, Grow: true, Style: ui.Style{Gap: ui.Some(float32(0)), Padding: ui.Some(ui.Insets{}), Background: ui.Some(rgb(248, 249, 252))}, Children: []ui.Node{m.ribbonView(), panes, must(m.timeline.View()), footer, m.navigationFeedback(must(m.marking.View())), m.filePrompt()}}
+	return ui.Node{ID: "forge-root", Kind: ui.Column, Grow: true, Style: ui.Style{Gap: ui.Some(float32(0)), Padding: ui.Some(ui.Insets{}), Background: ui.Some(rgb(248, 249, 252))}, Children: []ui.Node{m.ribbonView(), panes, must(m.timeline.View()), footer, m.navigationFeedback(must(m.marking.View())), m.filePrompt(), m.renamePrompt()}}
 }

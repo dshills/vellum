@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "41aadac1f0e07564201447efa613a4d7",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "52c78eb595a686733dde39397d9120d6a12a3249",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "37bd301f10ef7d16",
+      "severity": "medium",
+      "category": "bug",
+      "title": "No-op rename skips feature label sync",
+      "message": "Renaming to the same name returns nil silently without an action. Feature labels that diverge from the object name are never synced, and the caller gets no feedback. This is minor, but the early return also happens inside the loop before the found check.",
+      "suggestion": "Accept the no-op explicitly after the found check, or compare feature labels too before skipping.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/forge/rename.go",
+          "lines": {
+            "start": 25,
+            "end": 27
+          }
+        }
+      ],
+      "tags": [
+        "logic",
+        "location-corrected"
+      ],
+      "evidence": "\t\t\tif s.Objects[i].Name == name {\n\t\t\t\treturn nil\n\t\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "dbc5f17a146281f5",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Dialog close relies on guarded cancel after apply",
+      "message": "After renameBody succeeds, m.apply likely triggers refresh and changed. cancel() then calls valid(), which relies on the unchanged renameEpoch, so it should work. However, if apply resets state such as the selection or the dialog, cancel may silently fail to close. This is a fragile dependency.",
+      "suggestion": "Clear m.renameID and increment the epoch directly after success rather than via the guarded cancel.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "examples/forge/rename.go",
+          "lines": {
+            "start": 79,
+            "end": 84
+          }
+        }
+      ],
+      "tags": [
+        "dialog",
+        "location-corrected"
+      ],
+      "evidence": "if e := m.renameBody(id, m.renameText); e != nil {\n\t\t\tm.renameError = e.Error()\n\t\t\tm.changed()\n\t\t\treturn\n\t\t}\n\t\tcancel()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5395,
+    "totalMs": 5404
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 12716,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 8637,
+        "output": 586,
+        "costUSD": 0.023134
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

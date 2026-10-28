@@ -23,6 +23,8 @@ type document struct {
 	Selection []string
 }
 type workbench struct {
+	renameID, renameText, renameError                 string
+	renameEpoch                                       uint64
 	clipboardBusy                                     bool
 	clipboardCancel                                   context.CancelFunc
 	pasteKey                                          [32]byte
@@ -116,6 +118,12 @@ func newWorkbench() *workbench {
 		return nil
 	}, j.Redo)
 	m.bindClipboardCommands()
+	m.register("rename", "Rename Body…", "", func() error {
+		if m.selectedIndex() < 0 {
+			return fmt.Errorf("select a body")
+		}
+		return m.clipboardReady()
+	}, func() error { m.beginRename(m.state.Selected); return nil })
 	m.refresh()
 	return m
 }

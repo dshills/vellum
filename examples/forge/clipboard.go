@@ -106,7 +106,7 @@ func (m *workbench) duplicateBodies() error {
 	return m.insertBodies(objects, vec(.25, 0, .25), "Duplicate bodies")
 }
 func (m *workbench) clipboardReady() error {
-	if m.clipboardBusy || m.drag != nil || m.prompt != "" || (m.files != nil && m.files.State().Busy) {
+	if m.clipboardBusy || m.drag != nil || m.prompt != "" || m.renameID != "" || (m.files != nil && m.files.State().Busy) {
 		return vdoc.ErrBusy
 	}
 	return nil
