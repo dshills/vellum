@@ -3,11 +3,14 @@
 package cogent
 
 import (
+	"cogentcore.org/core/colors"
+	"cogentcore.org/core/colors/matcolor"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
 	"fmt"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/ui"
+	"image/color"
 	"testing"
 )
 
@@ -97,5 +100,42 @@ func TestMarkingPanelFidelityGeometryFocusAndDismiss(t *testing.T) {
 				t.Fatal("modal retained on close")
 			}
 		})
+	}
+}
+
+func TestOrdinaryDialogResolvesItsOwnSurfaceAfterNativePaletteChange(t *testing.T) {
+	cfg := manualConfig(t, 7)
+	bg := cfg.Theme.Default.Background
+	cfg.Theme = ui.MacTheme(false)
+	cfg.Theme.Default.Background = bg
+	cfg.Theme.Default.Typography = ui.Some(ui.Typography{Family: "Noto Sans", Size: 13})
+	panel := &ui.MarkingMenu{ID: "panel", Label: "Actions", Actions: []ui.MarkingAction{{ID: "fit", Label: "Fit"}}, Choose: func(string) {}}
+	m, a := simpleManual(t, cfg, func() ui.Node {
+		n, e := panel.View()
+		if e != nil {
+			panic(e)
+		}
+		return ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{n}}
+	})
+	unitSettle(t, m)
+	// Native initialization may reset the process palette. Reproduce the host
+	// appearance at the actual dialog-opening boundary; never changes macOS.
+	previous := matcolor.SchemeIsDark
+	colors.SetScheme(true)
+	defer colors.SetScheme(previous)
+	panel.Open = true
+	if e := a.Invalidate("one"); e != nil {
+		t.Fatal(e)
+	}
+	unitSettle(t, m)
+	r := findRecord(m.implementation.find("one").state.root, "panel")
+	body := r.control.dialog.body
+	if body == nil {
+		t.Fatal("dialog absent")
+	}
+	surface := color.NRGBAModel.Convert(body.Styles.Background.At(0, 0)).(color.NRGBA)
+	ink := color.NRGBAModel.Convert(body.Styles.Color.At(0, 0)).(color.NRGBA)
+	if surface.R < 230 || surface.G < 230 || surface.B < 230 || ink.R > 90 || ink.G > 90 || ink.B > 90 {
+		t.Fatal("separate native body lost resolved light colors", surface, ink)
 	}
 }

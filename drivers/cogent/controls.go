@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync/atomic"
 
+	"cogentcore.org/core/colors"
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/styles"
@@ -909,6 +910,23 @@ func prepareDialogBody(r *record) *core.Body {
 	d.tabScope.Store(scope)
 	d.body = core.NewBody(r.node.Text)
 	body := d.body
+	// Ordinary dialogs have a separate native Body; the managed hidden host's
+	// colors do not reach it. Honor the existing resolved pair on that surface.
+	body.FinalStyler(func(s *styles.Style) {
+		if r.node.PopoverAnchor != "" || r.node.Sheet {
+			return
+		}
+		value, err := ui.ResolveStyle(r.node, r.theme)
+		if err != nil {
+			return
+		}
+		if value.Background.Set {
+			s.Background = colors.Uniform(value.Background.Value)
+		}
+		if value.Foreground.Set {
+			s.Color = colors.Uniform(value.Foreground.Value)
+		}
+	})
 	if r.node.PopoverAnchor != "" {
 		previous := body.Scene.EventBoundary
 		body.Scene.EventBoundary = func(e events.Event) {

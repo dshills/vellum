@@ -1,0 +1,32 @@
+[
+  {
+    "name": "finish-dialog-surface",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestOrdinaryDialog|TestMarkingPanel|TestMacSheet|TestPopover",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 27.472
+  },
+  {
+    "name": "finish-dialog-vet",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 13.765
+  }
+]

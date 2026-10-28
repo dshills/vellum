@@ -168,3 +168,11 @@ into the relocated-consumer fixture. The consumer exercises their public APIs
 after deleting source. Existing distribution/audit/notices gates remain intact;
 no public SDK asset is built or published by this repair. A process-local dark
 native-palette pixel regression pins the light ribbon surface and dark captions.
+
+The native action-panel check exposed the same host-dark mismatch on the
+ordinary dialog's separate Body. Its resolved existing background/foreground
+pair now reaches that native surface; absent theme colors retain native defaults.
+Popover/sheet policy, commands, layout, public shape and global system appearance
+are unchanged. The regression switches the process-local native palette after
+manual initialization and before opening the dialog, matching the actual failure
+sequence that an initialization-only palette diagnostic did not reproduce.
