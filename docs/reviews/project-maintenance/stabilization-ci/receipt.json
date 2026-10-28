@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "scripts/native_gpu_test.py,scripts/release-sdk_test.py",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "6",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/stabilization-ci/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/stabilization-ci/prism.json"
+  ],
+  "cwd": "/Users/dshills/Development/projects/Vellum",
+  "started_utc": "2026-10-28T12:55:30.920672+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 0,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 51307,
+  "group": 51307,
+  "owned": {
+    "created": true,
+    "pid": 51307,
+    "group": 51307,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 0,
+    "errors": [],
+    "observation": {
+      "group": 51307,
+      "members": [],
+      "observation_sha256": "6e97f655ac066fa3b8e07c0e60ce0733a0d9272840567ececf9f3d82172b3546"
+    }
+  },
+  "seconds": 1.6233083330007503,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

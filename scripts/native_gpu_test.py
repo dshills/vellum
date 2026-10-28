@@ -81,6 +81,8 @@ require (
     for name, text in [("main.go", "package main\nfunc main() {}\n"), ("model.go", "package main\n"),
                        ("model_test.go", "package main\n"), ("go.sum", ""), ("LICENSE", "starter notice\n")]:
         write("examples/hello/" + name, text)
+    for name in ["main.go", "model.go", "model_test.go"]:
+        write("scripts/templates/app/" + name + ".txt", "package main\n")
     for name in ["new-app.py", "native_gpu.py", "native_archive.py", "native_linkers.py"]:
         write("scripts/" + name, (SCRIPTS / name).read_text())
     return root, files

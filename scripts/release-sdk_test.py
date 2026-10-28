@@ -275,8 +275,10 @@ class ReleaseChecks(unittest.TestCase):
             root = Path(temporary) / "SDK"
             template = root / "examples/hello"
             template.mkdir(parents=True)
+            dedicated = root / "scripts/templates/app"
+            dedicated.mkdir(parents=True)
             for name in ("main.go", "model.go", "model_test.go"):
-                (template / name).write_text("package main\n")
+                (dedicated / (name + ".txt")).write_text("package main\n// dedicated template\n")
             (template / "go.mod").write_text("module example.com/starter\ngo 1.25.6\n")
             (template / "go.sum").write_text("")
             (template / "LICENSE").write_text("Original starter copyright and license\n")
@@ -288,6 +290,7 @@ class ReleaseChecks(unittest.TestCase):
             with mock.patch.object(generator, "ROOT", root), mock.patch.object(sys, "argv", ["new-app.py", str(destination), "--module=example.com/my-application"]):
                 generator.main()
             self.assertEqual((destination / "LICENSE").read_bytes(), (template / "LICENSE").read_bytes())
+            self.assertIn("dedicated template", (destination / "main.go").read_text())
             self.assertIn("module example.com/my-application", (destination / "go.mod").read_text())
 
     def test_exported_history_document_editor_execution_replay_and_grid_are_consumable_without_the_source_checkout(self):
