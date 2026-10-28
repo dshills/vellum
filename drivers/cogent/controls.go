@@ -912,7 +912,7 @@ func prepareDialogBody(r *record) *core.Body {
 	body := d.body
 	// Ordinary dialogs have a separate native Body; the managed hidden host's
 	// colors do not reach it. Honor the existing resolved pair on that surface.
-	body.FinalStyler(func(s *styles.Style) {
+	dialogColors := func(s *styles.Style) {
 		if r.node.PopoverAnchor != "" || r.node.Sheet {
 			return
 		}
@@ -926,7 +926,11 @@ func prepareDialogBody(r *record) *core.Body {
 		if value.Foreground.Set {
 			s.Color = colors.Uniform(value.Foreground.Value)
 		}
-	})
+	}
+	body.FinalStyler(dialogColors)
+	// The enclosing scene also owns the native title and bottom bar. Pair its
+	// surface and inherited title ink with the managed content, not the host palette.
+	body.Scene.FinalStyler(dialogColors)
 	if r.node.PopoverAnchor != "" {
 		previous := body.Scene.EventBoundary
 		body.Scene.EventBoundary = func(e events.Event) {
@@ -976,7 +980,11 @@ func prepareDialogBody(r *record) *core.Body {
 		})
 	})
 	if r.node.PopoverAnchor == "" && !r.node.Sheet {
-		body.AddBottomBar(func(bar *core.Frame) { body.AddCancel(bar).SetText("Close") })
+		body.AddBottomBar(func(bar *core.Frame) {
+			closeButton := body.AddCancel(bar).SetText("Close")
+			// Use the theme button preset; dialog layout styles must not reach Close.
+			closeButton.FinalStyler(func(s *styles.Style) { applyStyle(s, ui.Node{Kind: ui.Button}, r.theme) })
+		})
 	}
 	return body
 }

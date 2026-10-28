@@ -1,0 +1,51 @@
+[
+  {
+    "name": "complete-appearance",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestOrdinaryDialog|TestMarkingPanel|TestScopedSelectorPopup|TestToolbarOverflowResponsive|TestMenuButtonRealPopup",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 29.273
+  },
+  {
+    "name": "complete-appearance-ui",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./ui",
+      "-run",
+      "TestRibbon|TestMarking",
+      "-count=1"
+    ],
+    "exit_code": 0,
+    "seconds": 2.63
+  },
+  {
+    "name": "complete-appearance-window",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestForgeWindowFidelityGeometry",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 24.661
+  }
+]

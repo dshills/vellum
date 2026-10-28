@@ -191,3 +191,11 @@ sequence preserves body selection, camera and history except for the requested
 orientation. Detached 1/1.5/2-scale routing regressions separately pin cube versus
 object admission and secondary-button context without primary capture. No
 cross-window or secondary capture claim is introduced.
+
+Forge retains its explicit light application design under either host appearance.
+The ordinary dialog's enclosing scene/title/footer and Close button use the same
+resolved pair/theme as its managed content; sheets/popovers remain unchanged.
+Ribbon action tooltips expose existing labels. Menus retain the existing Mac
+palette; native tooltips retain their paired inverse surface/ink. Process-local
+light/dark host regressions include dialog chrome and disabled action styling;
+no global settings or runtime appearance option is added.

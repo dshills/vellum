@@ -27,7 +27,6 @@ func TestForgeWindowFidelityGeometry(t *testing.T) {
 	// Serial fixture: no t.Parallel. All Manual windows close before restoration.
 	// Process-local native palette only; never changes macOS appearance.
 	previousDark := matcolor.SchemeIsDark
-	colors.SetScheme(true)
 	defer colors.SetScheme(previousDark)
 
 	var fixtureFonts []cogent.ManualFont
@@ -95,6 +94,7 @@ func TestForgeWindowFidelityGeometry(t *testing.T) {
 					t.Fatal(e)
 				}
 				defer m.Close(ctx)
+				colors.SetScheme(true) // Reproduce host palette after native initialization.
 				settle := func() {
 					t.Helper()
 					for range 128 {

@@ -168,7 +168,7 @@ func (p *Ribbon) View() (Node, error) {
 				aid := RibbonActionID(p.ID, tab.ID, action.ID)
 				disabled := action.Disabled || group.Disabled || p.Action == nil
 				tabID, actionID := tab.ID, action.ID
-				main := Node{ID: aid, Kind: Button, Text: action.Label, Icon: action.Icon, IconImage: action.IconImage, Appearance: ButtonTool, Disabled: disabled, IconPlacement: IconAboveText, Accessibility: Accessibility{Name: action.Label}, Style: Style{MinSize: Some(Size{Width: 52, Height: 42}), MaxSize: Some(Size{Width: 82, Height: 42}), Padding: Some(Insets{Top: 2, Right: 5, Bottom: 2, Left: 5}), Gap: Some(float32(2)), Border: Some(Border{}), Background: Some(color.NRGBA{}), CornerRadius: Some(float32(6)), Typography: Some(MacTypography(11, 400)), GrowX: Some(float32(0)), GrowY: Some(float32(0))}, Activate: func() { dispatch(tabID, actionID, "") }}
+				main := Node{ID: aid, Kind: Button, Text: action.Label, Tooltip: action.Label, Icon: action.Icon, IconImage: action.IconImage, Appearance: ButtonTool, Disabled: disabled, IconPlacement: IconAboveText, Accessibility: Accessibility{Name: action.Label}, Style: Style{MinSize: Some(Size{Width: 52, Height: 42}), MaxSize: Some(Size{Width: 82, Height: 42}), Padding: Some(Insets{Top: 2, Right: 5, Bottom: 2, Left: 5}), Gap: Some(float32(2)), Border: Some(Border{}), Background: Some(color.NRGBA{}), CornerRadius: Some(float32(6)), Typography: Some(MacTypography(11, 400)), GrowX: Some(float32(0)), GrowY: Some(float32(0))}, Activate: func() { dispatch(tabID, actionID, "") }}
 				if action.Icon == "" && action.IconImage == nil {
 					main.IconPlacement = IconLeading
 				}

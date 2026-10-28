@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "726dda03de9115836a8dc3b909be1d8b",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f06c9c1a0ed467c6c74eabb731046c8d8b352c09",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "98fef269f29b8026",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Close button styled from empty node and shadows builtin",
+      "message": "The Close button is styled with a bare ui.Node{Kind: ui.Button}, which has no Style or Appearance. This may not reproduce the resolved pair used for the rest of the dialog. The local variable named `close` also shadows the builtin.",
+      "suggestion": "Resolve the colors through ui.ResolveStyle on a button node derived from r.node, or reuse the same resolved pair. Rename the variable to closeBtn.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/controls.go",
+          "lines": {
+            "start": 985,
+            "end": 985
+          }
+        }
+      ],
+      "tags": [
+        "shadowing",
+        "styling",
+        "location-corrected"
+      ],
+      "evidence": "close.FinalStyler(func(s *styles.Style) { applyStyle(s, ui.Node{Kind: ui.Button}, r.theme) })",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3737,
+    "totalMs": 3747
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 11327,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 7826,
+        "output": 315,
+        "costUSD": 0.018802
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
