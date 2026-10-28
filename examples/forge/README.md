@@ -25,8 +25,11 @@ go run .
 - Resize the window to see whole ribbon groups overflow into More. Split-pane
   dividers resize the browser and inspector. Artwork is original, full-color.
 
-Documents exist only in memory; no Save/Open, user files, network or cloud service
-is used. Closing discards the study. Display geometry uses opaque boxes and a round shaft; picking uses box proxies,
+Studies use versioned `.vforge` files through native Open/Save (Cmd-O/Cmd-S;
+Cmd-Shift-S for Save As). Closing or opening a dirty study asks before discard.
+An atomic private recovery copy is offered after interruption; only one Forge
+instance may own recovery. Saved studies are never replaced by recovery.
+No network or cloud service is used. Display geometry uses opaque boxes and a round shaft; picking uses box proxies,
 with a 48-body demo limit. There are no sketch constraints, B-rep modeling,
 assemblies at Fusion scale, cross-window capture, or secondary-button capture.
 The reusable SceneView3D and viewport helpers are experimental additions; the

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/command"
+	vdoc "github.com/dshills/vellum/document"
 	"github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/history"
 	"github.com/dshills/vellum/ui"
@@ -35,6 +36,11 @@ type workbench struct {
 	dimension                                         ui.QuantityField
 	expanded                                          []string
 	active, tab, featureID, status, draft, validation string
+	files                                             *vdoc.Session[studyFile]
+	prompt                                            string
+	recovery                                          *recoveryStore
+	recovered                                         *studyFile
+	cleanClose                                        bool
 	next                                              uint64
 	left, right                                       float32
 }
@@ -105,6 +111,7 @@ func (m *workbench) register(id, label, key string, available func() error, run 
 	}
 }
 func (m *workbench) result(e error) {
+	m.syncRecovery()
 	if e != nil {
 		m.status = e.Error()
 	}
@@ -183,7 +190,9 @@ func (m *workbench) apply(label string, after document) error {
 	if e := probe.Validate(); e != nil {
 		return e
 	}
-	return m.journal.Apply(history.Change{Label: label, Apply: func() error { m.state = clone(after); m.status = label; m.refresh(); return nil }, Revert: func() error { m.state = clone(before); m.status = "Undid " + label; m.refresh(); return nil }})
+	err := m.journal.Apply(history.Change{Label: label, Apply: func() error { m.state = clone(after); m.status = label; m.refresh(); return nil }, Revert: func() error { m.state = clone(before); m.status = "Undid " + label; m.refresh(); return nil }})
+	m.syncRecovery()
+	return err
 }
 func (m *workbench) add() error {
 	if len(m.state.Objects) >= 48 || len(m.state.Features) >= 96 {
@@ -196,10 +205,11 @@ func (m *workbench) add() error {
 	s.Features = append(s.Features, feature{ID: "create-" + id, Label: "New body", Object: id})
 	s.Marker = len(s.Features)
 	s.Selected = id
+	m.next++
 	if e := m.apply("Create body", s); e != nil {
+		m.next--
 		return e
 	}
-	m.next++
 	return nil
 }
 func (m *workbench) deleteSelected() error {

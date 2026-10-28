@@ -48,11 +48,17 @@ func run(smoke bool, exitAfter time.Duration) error {
 	m.application = a
 	m.surface.Owner = a
 	m.surface.Window = "forge"
-	ref, e := a.OpenWindow(app.Window{ID: "forge", Title: "Vellum Forge — Design Workbench", Width: 1440, Height: 920, DisableRootScrolling: true, Chrome: app.WindowChrome{Style: app.ChromeStandard, Appearance: app.AppearanceLight}, View: m.View})
+	ref, e := a.OpenWindow(app.Window{ID: "forge", Title: "Vellum Forge — Design Workbench", Width: 1440, Height: 920, DisableRootScrolling: true, Chrome: app.WindowChrome{Style: app.ChromeStandard, Appearance: app.AppearanceLight}, View: m.View, CloseRequest: m.requestClose})
 	if e != nil {
 		return e
 	}
 	m.ref = ref
+	if !smoke {
+		if e := m.bindFiles(); e != nil {
+			return e
+		}
+		defer m.recovery.stop(m)
+	}
 	t := forgeTheme()
 	toolbar := &cogent.TitlebarToolbar{Window: ref, Items: m.toolbar(), Commands: m.commands}
 	result := make(chan error, 1)

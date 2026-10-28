@@ -1,0 +1,140 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "af4a38b5b5dcccd84ccd814da370c5b8",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "de722d6ed134f288157c115b1539e2013d0682af",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "b1ef2ac9fdb02a8f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Recovery restore applies state out of order",
+      "message": "The recovered document is applied via apply, which runs syncRecovery before m.next and camera are restored. Recovered Next is not validated against the current state, so next may collide with existing body IDs, and the recovery write captures stale next/camera. apply also does not run validateStudy-level checks such as feature references.",
+      "suggestion": "Set next and camera before apply, or use installStudy and validate the study; restore them if apply fails.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "examples/forge/files.go",
+          "lines": {
+            "start": 199,
+            "end": 203
+          }
+        }
+      ],
+      "tags": [
+        "correctness",
+        "location-corrected"
+      ],
+      "evidence": "s := *m.recovered\n\t\t\t\tm.recovered = nil\n\t\t\t\tm.result(m.apply(\"Recover study\", s.Document))\n\t\t\t\tm.scene.Camera = s.Camera\n\t\t\t\tm.next = s.Next",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "28d677347ea46fa5",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Closed channel send / double close in recoveryStore",
+      "message": "offer can be called after stop closes queue, or concurrently from multiple goroutines. The drain-then-send fallback can block or panic (send on closed channel). stop sets m.recovery=nil but a deferred stop in run plus the bindFiles error-path stop could call stop twice on the same store, which closes the channel twice and panics.",
+      "suggestion": "Guard with a mutex and a closed flag or sync.Once; make stop idempotent and make offer a no-op after stop.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "examples/forge/files.go",
+          "lines": {
+            "start": 280,
+            "end": 282
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "panic",
+        "location-corrected"
+      ],
+      "evidence": "\t\tr.queue \u003c- s\n\t}\n}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "54dc42f55e038c2c",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Recovery stop potentially called twice",
+      "message": "m.recovery.stop sets m.recovery=nil, but the deferred call's receiver m.recovery is evaluated at defer time, so it is fine; however bindFiles already stops recovery on error and returns, so run returns before the defer. The real issue: stop deletes the recovery file on cleanClose only, while the dirty-then-close path via CloseWindow can leave Flock held by a nil-safe path. Low risk but double stop is possible if bindFiles failed after setting recovery.",
+      "suggestion": "Make stop idempotent.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/forge/main.go",
+          "lines": {
+            "start": 55,
+            "end": 86
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle"
+      ],
+      "evidence": "defer m.recovery.stop(m)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 8290,
+    "totalMs": 8316
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 25578,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 15028,
+        "output": 921,
+        "costUSD": 0.039266
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
