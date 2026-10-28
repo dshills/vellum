@@ -47,6 +47,15 @@ func (m *workbench) addHandles() {
 	if m.handleMode == "" || m.selectedIndex() < 0 {
 		return
 	}
+	visible := false
+	for _, object := range m.scene.Objects {
+		if object.ID == m.state.Selected {
+			visible = object.Visible
+		}
+	}
+	if !visible {
+		return
+	}
 	o := m.selected()
 	if m.drag != nil {
 		for _, v := range m.drag.after.Objects {
@@ -171,6 +180,7 @@ func (m *workbench) handleInput(e cogent.GPUEvent) bool {
 		d.after = s
 		d.moved = math.Abs(delta) > 1e-5
 		m.scene.Objects = displayObjects(s)
+		m.applyIsolation(m.scene.Objects)
 		m.addHandles()
 		_ = m.scene.Touch()
 		m.status = fmt.Sprintf("%s %s · %.2f mm", d.mode, []string{"X", "Y", "Z"}[d.axis], delta*20)

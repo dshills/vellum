@@ -88,6 +88,9 @@ func (m *workbench) installStudy(s studyFile) error {
 	if e := validateStudy(s); e != nil {
 		return e
 	}
+	m.isolatedIDs = nil
+	m.renameID = ""
+	m.renameEpoch++
 	m.pasteKey = [32]byte{}
 	m.pasteCount = 0
 	m.state = clone(s.Document)

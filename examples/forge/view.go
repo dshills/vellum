@@ -188,7 +188,7 @@ func (m *workbench) inspectorView() ui.Node {
 	}
 	about := column("inspect-about", text("demo-heading", "ABOUT THIS WORKBENCH", 10, 600, muted), text("demo-copy", "Original Fusion-inspired UI", 10, 400, muted), text("demo-copy2", "Live GPU viewport · local history", 10, 400, muted), text("demo-copy3", "No CAD kernel or cloud service", 10, 400, muted))
 	about.Style.Gap = ui.Some(float32(4))
-	n := column("inspector-content", header, divider("inspect-rule"), quantity, text("unit-help", "2 in · 50 mm · width / 2", 11, 400, muted), actions, button("rename-inspector", "Rename…", func() { m.beginRename(m.state.Selected) }), m.handleControls(), divider("about-rule"), about)
+	n := column("inspector-content", header, divider("inspect-rule"), quantity, text("unit-help", "2 in · 50 mm · width / 2", 11, 400, muted), actions, button("rename-inspector", "Rename…", func() { m.beginRename(m.state.Selected) }), m.isolationControls(), m.handleControls(), divider("about-rule"), about)
 	n.Style.Padding = ui.Some(ui.UniformInsets(12))
 	n.Style.Gap = ui.Some(float32(8))
 	n.Style.Background = ui.Some(rgb(250, 251, 253))

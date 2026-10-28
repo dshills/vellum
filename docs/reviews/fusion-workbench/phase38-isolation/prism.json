@@ -1,0 +1,85 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "c4e57bf8804d1f943af500c585c2eeb3",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "44c0148b30fca2d132283a0fe8eec0cfb6957c1a",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5254,
+    "totalMs": 5266
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 16922,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 10830,
+        "output": 384,
+        "costUSD": 0.0255
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "599f0c387bd401b7",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Isolation and selection interplay can leave stale state",
+        "message": "applyIsolation is called from refresh() on m.scene.Objects, but when isolated bodies are all deleted it clears isolation only after visibility has already been computed in this pass; the surviving objects are left with their prior visibility. After deleting the isolated bodies, the view is correct only because applyIsolation returns early without re-filtering, which is fine, but the selection check in addHandles uses m.state.Selected against scene objects that may be hidden by isolation and so suppresses handles for selected bodies not in the isolated set.",
+        "suggestion": "Verify that handle suppression for selected-but-hidden bodies is intended, and that a selection outside the isolated set is cleared or handled when isolating.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "examples/forge/isolation.go",
+            "lines": {
+              "start": 42,
+              "end": 57
+            }
+          }
+        ],
+        "tags": [
+          "isolation"
+        ],
+        "evidence": "\tm.isolatedIDs = nil\n\tm.renameID = \"\"\n\tm.renameEpoch++",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in examples/forge/isolation.go"
+    }
+  ],
+  "suppressed": []
+}

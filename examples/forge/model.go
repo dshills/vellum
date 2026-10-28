@@ -23,6 +23,7 @@ type document struct {
 	Selection []string
 }
 type workbench struct {
+	isolatedIDs                                       []string
 	renameID, renameText, renameError                 string
 	renameEpoch                                       uint64
 	clipboardBusy                                     bool
@@ -118,6 +119,7 @@ func newWorkbench() *workbench {
 		return nil
 	}, j.Redo)
 	m.bindClipboardCommands()
+	m.bindIsolationCommands()
 	m.register("rename", "Rename Body…", "", func() error {
 		if m.selectedIndex() < 0 {
 			return fmt.Errorf("select a body")
@@ -171,6 +173,7 @@ func (m *workbench) refresh() {
 			m.scene.Objects[j].Visible = m.scene.Objects[j].Visible && enabled
 		}
 	}
+	m.applyIsolation(m.scene.Objects)
 	if m.state.Selected == "" && m.tab == "body" {
 		m.tab = "solid"
 	}

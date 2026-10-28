@@ -75,6 +75,7 @@ func (m *workbench) resetWorkspace() {
 	m.hideInspector = false
 	m.preferencesBlocked = false
 	m.drag = nil
+	m.isolatedIDs = nil
 	m.handleMode = ""
 	m.refresh()
 }

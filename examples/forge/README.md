@@ -128,3 +128,9 @@ Rename the primary body using the inspector's Rename… button, Edit → Rename 
 or a browser row's context menu. Names accept 1–128 characters and reject control
 characters. Rename updates browser, inspector and creation feature labels without
 changing identity; Undo/Redo and saved studies retain the result.
+
+Use View → Isolate Selection or the inspector's Isolate Selection action to
+temporarily filter the viewport. Restore Visibility returns to the document's
+visibility settings, including bodies already hidden before isolation. Isolation
+is transient, never saved, never enters Undo history, and ends on Open or Reset
+Workspace. Deleting all isolated bodies also clears it. Hidden bodies stay hidden.
