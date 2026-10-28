@@ -142,12 +142,12 @@ func (m *workbench) inspectorView() ui.Node {
 	}
 	about := column("inspect-about", text("demo-heading", "ABOUT THIS WORKBENCH", 10, 600, muted), text("demo-copy", "Original Fusion-inspired UI", 10, 400, muted), text("demo-copy2", "Live GPU viewport · local history", 10, 400, muted), text("demo-copy3", "No CAD kernel or cloud service", 10, 400, muted))
 	about.Style.Gap = ui.Some(float32(4))
-	n := column("inspector", header, divider("inspect-rule"), quantity, text("unit-help", "2 in · 50 mm · width / 2", 11, 400, muted), actions, divider("about-rule"), about)
+	n := column("inspector-content", header, divider("inspect-rule"), quantity, text("unit-help", "2 in · 50 mm · width / 2", 11, 400, muted), actions, divider("about-rule"), about)
 	n.Style.Padding = ui.Some(ui.UniformInsets(12))
 	n.Style.Gap = ui.Some(float32(8))
 	n.Style.Background = ui.Some(rgb(250, 251, 253))
-	n.Style.GrowY = ui.Some(float32(1))
-	return n
+	n.Style.GrowY = ui.Some(float32(0))
+	return ui.Node{ID: "inspector", Kind: ui.Scroll, Grow: true, Children: []ui.Node{n}, Style: ui.Style{Padding: ui.Some(ui.Insets{}), Background: ui.Some(rgb(250, 251, 253))}}
 }
 
 func (m *workbench) View() ui.Node {
@@ -159,9 +159,14 @@ func (m *workbench) View() ui.Node {
 	left.Style.Background = ui.Some(rgb(247, 248, 250))
 	left.Style.GrowY = ui.Some(float32(1))
 	viewControl := &ui.ViewCube{ID: "orientation", Label: "Camera orientation", Change: m.orient}
-	title := row("canvas-title", text("canvas-name", "Actuator study — Linear actuator", 14, 600, ink), text("canvas-mode", "Solid • Perspective / Orthographic", 11, 400, muted))
+	mode := "Solid · Perspective"
+	if m.scene.Camera.Orthographic {
+		mode = "Solid · Orthographic"
+	}
+	title := row("canvas-title", text("canvas-name", "Actuator study — Linear actuator", 14, 600, ink), text("canvas-mode", mode, 11, 400, muted))
+	title.Children[0].Style.GrowX = ui.Some(float32(1))
 	title.Style.Padding = ui.Some(ui.Insets{Left: 16, Right: 12, Top: 10, Bottom: 8})
-	center := column("canvas-column", title, ui.Node{ID: "scene", Kind: ui.Extension, Custom: m.surface, Grow: true, Accessibility: ui.Accessibility{Name: "3D assembly viewport", Help: "Drag orbit. Shift drag pan. Scroll zoom. Home resets orientation."}}, must(viewControl.View()), text("canvas-hints", "Drag to orbit  ·  ⇧ drag to pan  ·  Scroll to zoom  ·  Click to select  ·  Right-click for actions", 11, 400, muted))
+	center := column("canvas-column", title, ui.Node{ID: "scene", Kind: ui.Extension, Custom: m.surface, Grow: true, Accessibility: ui.Accessibility{Name: "3D assembly viewport", Help: "Drag orbit. Shift drag pan. Scroll zoom. Home resets orientation."}}, ui.Node{ID: "orientation-scroll", Kind: ui.Scroll, Children: []ui.Node{must(viewControl.View())}, Style: ui.Style{Padding: ui.Some(ui.Insets{}), GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(0)), MinSize: ui.Some(ui.Size{Height: 32}), MaxSize: ui.Some(ui.Size{Height: 32})}}, text("canvas-hints", "Drag to orbit  ·  ⇧ drag to pan  ·  Scroll to zoom  ·  Click to select  ·  Right-click for actions", 11, 400, muted))
 	center.Style.GrowY = ui.Some(float32(1))
 	center.Style.Gap = ui.Some(float32(6))
 	center.Style.Background = ui.Some(rgb(241, 243, 247))

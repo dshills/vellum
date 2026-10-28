@@ -149,3 +149,10 @@ order, stable cell/action IDs, validation, focus scope and callbacks. Smaller
 flat tool cells align full-color icons/labels and use tighter balanced spacing;
 the noninteractive center labels the panel. No flick gestures, pointer-anchored
 popup, nested menu or additional command is introduced.
+
+Whole-window polish keeps the inspector independently scrollable in short
+windows and orientation alternatives in a bounded horizontal scroller when
+panes narrow. The existing projection state is accurately labeled. The shared
+app-local theme factory is unchanged in value; offscreen layout tests use those
+same descriptors with only the GPU viewport replaced by a measured placeholder.
+Actual GPU appearance/picking remain separate native checks.

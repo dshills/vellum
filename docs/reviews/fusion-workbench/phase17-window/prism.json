@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "bcd18cc5b3bb86042be0413ca6f890f9",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "9944712d22cd16593b6a346c6367d774ea0167d9",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "3cf8e850df83f8e4",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Fonts reloaded for every subtest",
+      "message": "The test iterates 3 DPIs by 3 sizes and walks and hashes every embedded font for each subtest. This is slow and wasteful. It also compiles only under the offscreen tag, so it will not run in normal CI.",
+      "suggestion": "Load the fonts once outside the loops and reuse the slice across subtests.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/forge/window_fidelity_offscreen_test.go",
+          "lines": {
+            "start": 47,
+            "end": 47
+          }
+        }
+      ],
+      "tags": [
+        "performance",
+        "testing",
+        "location-corrected"
+      ],
+      "evidence": "if d.IsDir() || !strings.HasSuffix(p, \".ttf\") \u0026\u0026 !strings.HasSuffix(p, \".otf\") {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5410,
+    "totalMs": 5419
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 12260,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 8353,
+        "output": 281,
+        "costUSD": 0.019516
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -50,3 +50,14 @@ func requireFidelityNode(t *testing.T, n ui.Node, id string) *ui.Node {
 	}
 	return found
 }
+
+func TestProjectionCaptionMatchesExistingCameraState(t *testing.T) {
+	m := newWorkbench()
+	if requireFidelityNode(t, m.View(), "canvas-mode").Text != "Solid · Perspective" {
+		t.Fatal("perspective caption")
+	}
+	m.action("projection")
+	if !m.scene.Camera.Orthographic || requireFidelityNode(t, m.View(), "canvas-mode").Text != "Solid · Orthographic" {
+		t.Fatal("projection caption ignored state")
+	}
+}

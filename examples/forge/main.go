@@ -53,13 +53,7 @@ func run(smoke bool, exitAfter time.Duration) error {
 		return e
 	}
 	m.ref = ref
-	t := ui.MacTheme(false)
-	for _, k := range []ui.Kind{ui.Column, ui.Row} {
-		s := t.Kinds[k]
-		s.Padding = ui.Some(ui.Insets{})
-		s.Gap = ui.Some(float32(0))
-		t.Kinds[k] = s
-	}
+	t := forgeTheme()
 	toolbar := &cogent.TitlebarToolbar{Window: ref, Items: m.toolbar(), Commands: m.commands}
 	result := make(chan error, 1)
 	if smoke {
@@ -90,4 +84,15 @@ func run(smoke bool, exitAfter time.Duration) error {
 		return <-result
 	}
 	return nil
+}
+
+func forgeTheme() ui.Theme {
+	t := ui.MacTheme(false)
+	for _, k := range []ui.Kind{ui.Column, ui.Row} {
+		s := t.Kinds[k]
+		s.Padding = ui.Some(ui.Insets{})
+		s.Gap = ui.Some(float32(0))
+		t.Kinds[k] = s
+	}
+	return t
 }
