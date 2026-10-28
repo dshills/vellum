@@ -1,0 +1,36 @@
+[
+  {
+    "name": "complete-targeting",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestScene3D|TestCubeFace|TestGPUInputCaptured",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 22.906
+  },
+  {
+    "name": "complete-targeting-final",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestScene3DCubeAndContext",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 20.36
+  }
+]

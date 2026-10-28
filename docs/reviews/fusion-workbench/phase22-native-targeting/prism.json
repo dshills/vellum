@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "8d0b1ab67fb9a5b1de547591aa7c052b",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "9a19e801114fefd0a2e2b5a6d21cc87f00b9c00f",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "e49dc8a6f1a7d02f",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Weak assertions vs. stated intent",
+      "message": "The context-menu phase of the test asserts the camera is unchanged, but the secondary-button click is at the viewport center, which may be handled differently. It also never confirms the cube-click phase made no model command, even though the comment says so; only selections is checked. The test also hard-fails with t.Fatal and no distinct message for each condition, which makes failures hard to diagnose.",
+      "suggestion": "Split the assertions into separate checks with distinct messages. Add a check for model commands/history if the comment's claim is to be verified.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/scene3d_test.go",
+          "lines": {
+            "start": 193,
+            "end": 193
+          }
+        }
+      ],
+      "tags": [
+        "testing",
+        "location-corrected"
+      ],
+      "evidence": "if contexts != 1 || selections != 0 || s.Camera != front || v.gesture.Active() {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3518,
+    "totalMs": 3526
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 2,
+    "bytes": 3701,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 3904,
+        "output": 320,
+        "costUSD": 0.011008
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

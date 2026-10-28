@@ -1,6 +1,7 @@
 package cogent
 
 import (
+	"fmt"
 	"github.com/dshills/vellum/viewport"
 	"image"
 	"image/color"
@@ -147,3 +148,60 @@ func TestCubeFaceStrokeLabelsStayCenteredAndOnFace(t *testing.T) {
 }
 
 func dotScene(a, b viewport.Vec3) float64 { return a.X*b.X + a.Y*b.Y + a.Z*b.Z }
+
+// Detached routing at matching physical size/scale, separate from native mouse
+// evidence. Cube clicks must not invoke body selection; this view has no command journal.
+func TestScene3DCubeAndContextKeepObjectSelection(t *testing.T) {
+	for _, scale := range []float64{1, 1.5, 2} {
+		t.Run(fmt.Sprint(scale), func(t *testing.T) {
+			s := sceneFixture()
+			s.Camera = viewport.DefaultCamera()
+			before := s.Camera
+			selections, contexts := 0, 0
+			v := &SceneView3D{Model: s, Select: func(string) { selections++ }, Context: func(GPUEvent) { contexts++ }}
+			size := image.Pt(int(800*scale), int(600*scale))
+			rect := viewport.CubeRect(size.X, size.Y, scale)
+			var target image.Point
+			found := false
+			for y := rect.Min.Y; y < rect.Max.Y && !found; y++ {
+				for x := rect.Min.X; x < rect.Max.X; x++ {
+					if face, ok := viewport.CubeViewAt(s.Camera, x, y, size.X, size.Y, scale); ok && face == viewport.Front {
+						target = image.Pt(x, y)
+						found = true
+						break
+					}
+				}
+			}
+			if !found {
+				t.Fatal("no front face")
+			}
+			e := GPUEvent{Kind: GPUPointerDown, Sequence: 1, Button: GPUButtonPrimary, Position: target, Size: size, Scale: scale, Inside: true}
+			if !v.HandleInput(e) {
+				t.Fatal("cube down")
+			}
+			e.Kind = GPUPointerUp
+			if !v.HandleInput(e) || selections != 0 || s.Camera == before {
+				t.Fatal("cube click selected object or did not orient")
+			}
+			front := s.Camera
+			e.Button = GPUButtonSecondary
+			e.Position = image.Pt(size.X/2, size.Y/2)
+			for _, kind := range []GPUEventKind{GPUPointerDown, GPUPointerUp, GPUContextMenu} {
+				e.Kind = kind
+				v.HandleInput(e)
+			}
+			if contexts != 1 {
+				t.Fatal("context callback count", contexts)
+			}
+			if selections != 0 {
+				t.Fatal("secondary click selected an object", selections)
+			}
+			if s.Camera != front {
+				t.Fatal("context changed camera")
+			}
+			if v.gesture.Active() {
+				t.Fatal("secondary context retained capture")
+			}
+		})
+	}
+}

@@ -176,3 +176,18 @@ Popover/sheet policy, commands, layout, public shape and global system appearanc
 are unchanged. The regression switches the process-local native palette after
 manual initialization and before opening the dialog, matching the actual failure
 sequence that an initialization-only palette diagnostic did not reproduce.
+
+## Frozen-feature completion pass
+
+The owner approved five bounded closeout items: existing CI completion; physical
+cube/context targeting; consistent appearance across native host palettes;
+existing hover/selection/navigation feedback; and a green-source private package
+with updated screenshots and controls. Features, APIs, backend/pacing, release
+policy and distribution decisions remain frozen.
+
+Physical build-10 checks now establish a visible Front cube-face click, viewport
+right-click opening the existing action panel and Escape dismissal. The repeated
+sequence preserves body selection, camera and history except for the requested
+orientation. Detached 1/1.5/2-scale routing regressions separately pin cube versus
+object admission and secondary-button context without primary capture. No
+cross-window or secondary capture claim is introduced.
