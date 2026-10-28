@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "268c9d4fd173430cb6024fae176acfc2",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "1026a404c89663b297ee511f80250fcb3df68618",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "03c67f2121336b54",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Triangle winding consistency unverified",
+      "message": "The side and end-cap triangles use flat per-face shading with unshared vertices and no normals. Winding is chosen by hand and may not be consistent (side vs caps), so if the pipeline culls back faces, parts of the cylinder (or caps) could be invisible. The test checks only bounds and counts, not winding or orientation.",
+      "suggestion": "Verify the winding against the pipeline's cull mode and add a test that checks triangle normals point outward (e.g. cross product dot with the vector from the axis).",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/scene3d.go",
+          "lines": {
+            "start": 498,
+            "end": 499
+          }
+        }
+      ],
+      "tags": [
+        "rendering",
+        "winding",
+        "location-corrected"
+      ],
+      "evidence": "triangle(leftA, rightB, rightA, tint)\n\t\ttriangle(leftA, leftB, rightB, tint)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3781,
+    "totalMs": 3795
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 8,
+    "bytes": 13743,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 9530,
+        "output": 329,
+        "costUSD": 0.02235
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -199,3 +199,10 @@ Ribbon action tooltips expose existing labels. Menus retain the existing Mac
 palette; native tooltips retain their paired inverse surface/ink. Process-local
 light/dark host regressions include dialog chrome and disabled action styling;
 no global settings or runtime appearance option is added.
+
+The owner identified the rectangular drive shaft as a visual defect. This narrow
+correction permits one optional X-axis cylinder display primitive in the
+experimental preview model, with default box behavior and bounded 48-segment
+geometry. Forge's shaft has equal Y/Z radii. Box picking proxies remain explicit;
+no exact cylinder intersections, CAD topology, modeling command or stable-v1 API
+is introduced. Snapshot history preserves the primitive during move/resize/delete.

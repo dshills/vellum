@@ -1,0 +1,81 @@
+[
+  {
+    "name": "complete-shaft-root",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./viewport"
+    ],
+    "exit_code": 0,
+    "seconds": 1.643
+  },
+  {
+    "name": "complete-shaft-driver",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestScene3D|TestCubeFace|TestRoundShaft",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 23.15
+  },
+  {
+    "name": "complete-shaft-app",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestShaft|TestDocument|TestTimeline|TestFidelity|TestInspector|TestContext",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 19.05
+  },
+  {
+    "name": "complete-api",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.51
+  },
+  {
+    "name": "complete-shaft-winding",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestCylinderFaces|TestRoundShaft",
+      "-count=1",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 23.155
+  }
+]

@@ -473,6 +473,35 @@ func (m *sceneMesh) box(b viewport.Box, c color.NRGBA) {
 		m.quad(center.Add(f.normal.Mul(extent(f.normal))), f.u.Mul(extent(f.u)), f.v.Mul(extent(f.v)), color)
 	}
 }
+
+// cylinderX is display geometry only. Scene.Pick deliberately retains Bounds.
+func (m *sceneMesh) cylinderX(b viewport.Box, c color.NRGBA) {
+	const segments = 48
+	center, half := b.Min.Add(b.Max).Mul(.5), b.Max.Sub(b.Min).Mul(.5)
+	triangle := func(a, b, cpoint viewport.Vec3, tint color.NRGBA) {
+		base := uint32(len(m.vertices) / 7)
+		for _, p := range []viewport.Vec3{a, b, cpoint} {
+			m.vertices = append(m.vertices, float32(p.X), float32(p.Y), float32(p.Z), linearSceneColor(tint.R), linearSceneColor(tint.G), linearSceneColor(tint.B), 1)
+		}
+		m.indices = append(m.indices, base, base+1, base+2)
+	}
+	shade := func(f float64) color.NRGBA {
+		return color.NRGBA{uint8(float64(c.R) * f), uint8(float64(c.G) * f), uint8(float64(c.B) * f), 255}
+	}
+	point := func(x, angle float64) viewport.Vec3 {
+		return viewport.Vec3{X: x, Y: center.Y + half.Y*math.Cos(angle), Z: center.Z + half.Z*math.Sin(angle)}
+	}
+	for i := 0; i < segments; i++ {
+		a, next := float64(i)*2*math.Pi/segments, float64(i+1)*2*math.Pi/segments
+		leftA, leftB, rightA, rightB := point(center.X-half.X, a), point(center.X-half.X, next), point(center.X+half.X, a), point(center.X+half.X, next)
+		tint := shade(.65 + .35*math.Max(0, .8*math.Cos((a+next)/2)+.6*math.Sin((a+next)/2)))
+		triangle(leftA, rightB, rightA, tint)
+		triangle(leftA, leftB, rightB, tint)
+		triangle(viewport.Vec3{X: center.X - half.X, Y: center.Y, Z: center.Z}, leftB, leftA, shade(.78))
+		triangle(viewport.Vec3{X: center.X + half.X, Y: center.Y, Z: center.Z}, rightA, rightB, shade(.94))
+	}
+}
+
 func buildScene3DMesh(s *viewport.Scene) ([]float32, []uint32, uint32, uint32) {
 	m := &sceneMesh{}
 	if s.Grid {
@@ -498,7 +527,11 @@ func buildScene3DMesh(s *viewport.Scene) ([]float32, []uint32, uint32, uint32) {
 			c.G = uint8((int(c.G)*3 + 255) / 4)
 			c.B = uint8((int(c.B)*3 + 255) / 4)
 		}
-		m.box(o.Bounds, c)
+		if o.Shape == viewport.CylinderXShape {
+			m.cylinderX(o.Bounds, c)
+		} else {
+			m.box(o.Bounds, c)
+		}
 	}
 	mainCount := uint32(len(m.indices))
 	// Original geometry only; existing pipeline, scale and pick rectangles stay.

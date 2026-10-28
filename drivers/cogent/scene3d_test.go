@@ -205,3 +205,46 @@ func TestScene3DCubeAndContextKeepObjectSelection(t *testing.T) {
 		})
 	}
 }
+
+func TestRoundShaftDisplayGeometryStaysInsideProxy(t *testing.T) {
+	b := viewport.Box{Min: viewport.Vec3{X: -2, Y: -.1, Z: -.1}, Max: viewport.Vec3{X: 2, Y: .1, Z: .1}}
+	m := &sceneMesh{}
+	m.cylinderX(b, color.NRGBA{R: 190, G: 200, B: 210, A: 255})
+	if len(m.indices) != 48*12 || len(m.vertices)/7 != 48*12 {
+		t.Fatal("unbounded cylinder tessellation")
+	}
+	for j := 0; j < len(m.vertices); j += 7 {
+		x, y, z := float64(m.vertices[j]), float64(m.vertices[j+1]), float64(m.vertices[j+2])
+		if math.Abs(x) > 2.00001 || y*y+z*z > .010001 {
+			t.Fatal("vertex outside round shaft", x, y, z)
+		}
+	}
+	for _, i := range m.indices {
+		if int(i) >= len(m.vertices)/7 {
+			t.Fatal("invalid cylinder index")
+		}
+	}
+}
+
+func TestCylinderFacesPointOutwardForBackfaceCulling(t *testing.T) {
+	m := &sceneMesh{}
+	m.cylinderX(viewport.Box{Min: viewport.Vec3{X: -2, Y: -.1, Z: -.1}, Max: viewport.Vec3{X: 2, Y: .1, Z: .1}}, color.NRGBA{A: 255})
+	at := func(index uint32) viewport.Vec3 {
+		j := int(index) * 7
+		return viewport.Vec3{X: float64(m.vertices[j]), Y: float64(m.vertices[j+1]), Z: float64(m.vertices[j+2])}
+	}
+	for j := 0; j < len(m.indices); j += 3 {
+		a, b, c := at(m.indices[j]), at(m.indices[j+1]), at(m.indices[j+2])
+		center := a.Add(b).Add(c).Mul(1.0 / 3)
+		outward := viewport.Vec3{Y: center.Y, Z: center.Z}
+		switch (j / 3) % 4 {
+		case 2:
+			outward = viewport.Vec3{X: -1}
+		case 3:
+			outward = viewport.Vec3{X: 1}
+		}
+		if b.Sub(a).Cross(c.Sub(a)).Dot(outward) <= 0 {
+			t.Fatal("inward or degenerate cylinder triangle", j/3)
+		}
+	}
+}

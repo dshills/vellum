@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/dshills/vellum/quantity"
 	"github.com/dshills/vellum/ui"
+	"github.com/dshills/vellum/viewport"
 	"math"
 	"testing"
 )
@@ -175,5 +176,29 @@ func TestFidelityDescriptionsKeepHistoryCommands(t *testing.T) {
 	}
 	if len(m.state.Objects) != count || !m.selected().Visible || m.state.Marker != len(m.state.Features) {
 		t.Fatal("history restore")
+	}
+}
+
+func TestShaftRoundShapeSurvivesCommands(t *testing.T) {
+	m := newWorkbench()
+	m.selectObject("shaft")
+	original := m.selected()
+	if original.Shape != viewport.CylinderXShape || math.Abs((original.Bounds.Max.Y-original.Bounds.Min.Y)-(original.Bounds.Max.Z-original.Bounds.Min.Z)) > 1e-9 {
+		t.Fatal("shaft is not round")
+	}
+	if e := m.resize(60); e != nil {
+		t.Fatal(e)
+	}
+	if m.selected().Shape != original.Shape {
+		t.Fatal("resize lost shape")
+	}
+	if e := m.journal.Undo(); e != nil || m.selected() != original {
+		t.Fatal("undo shaft", e)
+	}
+	if e := m.deleteSelected(); e != nil {
+		t.Fatal(e)
+	}
+	if e := m.journal.Undo(); e != nil || m.selected() != original {
+		t.Fatal("delete/undo shaft", e)
 	}
 }

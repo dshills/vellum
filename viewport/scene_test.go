@@ -31,3 +31,19 @@ func TestSceneNearestVisibleAndCubeScaling(t *testing.T) {
 		t.Fatal("missing selection")
 	}
 }
+
+func TestPreviewShapeAdmissionKeepsBoxPicking(t *testing.T) {
+	s := &Scene{Camera: DefaultCamera(), Objects: []Object{{ID: "shaft", Name: "Shaft", Bounds: Box{Vec3{-1, -.2, -.2}, Vec3{1, .2, .2}}, Color: color.NRGBA{A: 255}, Visible: true, Shape: CylinderXShape}}}
+	if e := s.Validate(); e != nil {
+		t.Fatal(e)
+	}
+	_ = s.Camera.SetView(Front)
+	id, e := s.Pick(400, 300, 800, 600)
+	if e != nil || id != "shaft" {
+		t.Fatal("proxy picking", id, e)
+	}
+	s.Objects[0].Shape = Shape(255)
+	if s.Validate() == nil {
+		t.Fatal("unbounded primitive admitted")
+	}
+}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/ui"
+	"github.com/dshills/vellum/viewport"
 	"image/color"
 	"image/png"
 )
@@ -133,7 +134,11 @@ func (m *workbench) inspectorView() ui.Node {
 		controls.Children = append([]ui.Node{label}, controls.Children...)
 		quantity.Children = append([]ui.Node{controls}, quantity.Children[2:]...)
 	}
-	header := column("inspect-header", text("inspect-heading", "INSPECTOR", 10, 600, muted), text("selected-name", name, 14, 600, ink), text("inspect-type", "Solid body · Box proxy", 11, 400, muted))
+	kind := "Solid body · Box proxy"
+	if o.Shape == viewport.CylinderXShape {
+		kind = "Cylinder · Box picking proxy"
+	}
+	header := column("inspect-header", text("inspect-heading", "INSPECTOR", 10, 600, muted), text("selected-name", name, 14, 600, ink), text("inspect-type", kind, 11, 400, muted))
 	header.Style.Gap = ui.Some(float32(4))
 	action := func(id, label, art string, c color.NRGBA, run func()) ui.Node {
 		n := button(id, label, run)

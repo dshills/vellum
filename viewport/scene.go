@@ -7,13 +7,22 @@ import (
 	"math"
 )
 
-// Object is an opaque box fixture/picking proxy. A Scene is a small interactive
+// Shape is a bounded preview primitive; all shapes retain box picking proxies.
+type Shape uint8
+
+const (
+	BoxShape       Shape = iota
+	CylinderXShape       // Cylinder along X, inscribed in Bounds; Y/Z extents set radii.
+)
+
+// Object is an opaque preview fixture with a box picking proxy. A Scene is a small interactive
 // preview, not a boundary-representation model or an assembly acceleration index.
 type Object struct {
 	ID, Name string
 	Bounds   Box
 	Color    color.NRGBA
 	Visible  bool
+	Shape    Shape
 }
 type Scene struct {
 	Camera                Camera
@@ -29,7 +38,7 @@ func (s *Scene) Validate() error {
 	}
 	seen := map[string]bool{}
 	for _, o := range s.Objects {
-		if o.ID == "" || o.Name == "" || len(o.ID) > 256 || len(o.Name) > 1024 || seen[o.ID] || o.Bounds.Validate() != nil || o.Color.A != 255 {
+		if o.ID == "" || o.Name == "" || len(o.ID) > 256 || len(o.Name) > 1024 || seen[o.ID] || o.Bounds.Validate() != nil || o.Color.A != 255 || o.Shape > CylinderXShape {
 			return fmt.Errorf("viewport: invalid preview object")
 		}
 		seen[o.ID] = true

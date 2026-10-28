@@ -62,8 +62,9 @@ func newWorkbench() *workbench {
 		makeObject("housing", "Motor housing", vec(-1.75, .18, -.65), vec(-.55, 1.3, .65), rgb(53, 111, 220)),
 		makeObject("carriage", "Sliding carriage", vec(-.2, .35, -.62), vec(1.05, .9, .62), rgb(243, 142, 68)),
 		makeObject("cap", "End support", vec(1.45, .18, -.65), vec(1.8, .8, .65), rgb(76, 172, 164)),
-		makeObject("shaft", "Drive shaft", vec(-.55, .48, -.1), vec(1.5, .62, .1), rgb(194, 202, 217)),
+		makeObject("shaft", "Drive shaft", vec(-.55, .45, -.1), vec(1.5, .65, .1), rgb(194, 202, 217)),
 	}
+	m.state.Objects[6].Shape = viewport.CylinderXShape
 	for _, o := range m.state.Objects {
 		m.state.Features = append(m.state.Features, feature{ID: "create-" + o.ID, Label: o.Name, Object: o.ID})
 	}
