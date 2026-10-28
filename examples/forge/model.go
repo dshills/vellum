@@ -23,6 +23,10 @@ type document struct {
 	Selection []string
 }
 type workbench struct {
+	drag                                              *handleDrag
+	handleMode                                        string
+	snap                                              bool
+	handleValues                                      [3]string
 	application                                       *app.Application
 	ref                                               app.WindowRef
 	commands                                          *command.Registry
@@ -79,7 +83,7 @@ func newWorkbench() *workbench {
 	m.state.Marker = len(m.state.Features)
 	m.state.Selected = "carriage"
 	m.featureID = "create-carriage"
-	m.surface = &cogent.SceneView3D{Model: &m.scene, Tool: cogent.SceneOrbit, Select: m.selectObject, SelectModified: m.selectModified, CameraChanged: func(viewport.Camera) { m.changed() }, Context: func(cogent.GPUEvent) { m.marking.Open = true; m.changed() }, OnError: func(e error) { m.status = e.Error(); fmt.Println("Forge GPU:", e) }}
+	m.surface = &cogent.SceneView3D{Interaction: m.handleInput, Model: &m.scene, Tool: cogent.SceneOrbit, Select: m.selectObject, SelectModified: m.selectModified, CameraChanged: func(viewport.Camera) { m.changed() }, Context: func(cogent.GPUEvent) { m.marking.Open = true; m.changed() }, OnError: func(e error) { m.status = e.Error(); fmt.Println("Forge GPU:", e) }}
 	m.register("add", "New body", "Meta+N", func() error {
 		if len(m.state.Objects) >= 48 {
 			return fmt.Errorf("demo body limit reached")
@@ -157,6 +161,7 @@ func (m *workbench) refresh() {
 	m.scene.SelectedIDs = slices.Clone(m.state.Selection)
 	m.scene.SelectedID = m.state.Selected
 	m.scene.HoveredID = ""
+	m.addHandles()
 	_ = m.scene.Touch()
 	o := m.selected()
 	if o.ID != "" {
@@ -168,6 +173,7 @@ func (m *workbench) refresh() {
 	m.changed()
 }
 func (m *workbench) selectObject(id string) {
+	m.drag = nil
 	if id != "" {
 		found := false
 		for _, o := range m.state.Objects {
@@ -182,6 +188,9 @@ func (m *workbench) selectObject(id string) {
 	m.refresh()
 }
 func (m *workbench) apply(label string, after document) error {
+	if m.drag != nil {
+		return fmt.Errorf("finish or cancel handle drag first")
+	}
 	before := clone(m.state)
 	after = clone(after)
 	if len(after.Objects) > 48 || len(after.Features) > 96 || after.Marker < 0 || after.Marker > len(after.Features) {

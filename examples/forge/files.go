@@ -130,6 +130,9 @@ func (m *workbench) bindFiles() (err error) {
 	return nil
 }
 func (m *workbench) fileAction(id string, discard bool) error {
+	if m.drag != nil {
+		return vdoc.ErrBusy
+	}
 	if m.files == nil {
 		return app.ErrUnavailable
 	}
@@ -145,6 +148,10 @@ func (m *workbench) fileAction(id string, discard bool) error {
 	return m.files.Save(m.ref.Context(), vdoc.SaveOptions{Choose: id == "save-as"})
 }
 func (m *workbench) requestClose() bool {
+	if m.drag != nil {
+		m.drag = nil
+		m.refresh()
+	}
 	if m.files == nil {
 		return true
 	}

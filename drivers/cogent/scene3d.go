@@ -37,16 +37,18 @@ type SceneView3D struct {
 	Tool           SceneTool
 	Select         func(string)
 	SelectModified func(string, bool)
-	CameraChanged  func(viewport.Camera)
-	Context        func(GPUEvent)
-	OnError        func(error)
-	gpu            *GPUView
-	renderer       *scene3DRenderer
-	gesture        viewport.Gesture
-	mode           SceneTool
-	cubeGesture    bool
-	sequence       uint64
-	beforeCamera   viewport.Camera
+	// Interaction optionally consumes application-owned handle input before navigation.
+	Interaction   func(GPUEvent) bool
+	CameraChanged func(viewport.Camera)
+	Context       func(GPUEvent)
+	OnError       func(error)
+	gpu           *GPUView
+	renderer      *scene3DRenderer
+	gesture       viewport.Gesture
+	mode          SceneTool
+	cubeGesture   bool
+	sequence      uint64
+	beforeCamera  viewport.Camera
 }
 
 func (v *SceneView3D) Mount(parent tree.Node) core.Widget {
@@ -115,6 +117,9 @@ func (v *SceneView3D) view(face viewport.View) {
 func (v *SceneView3D) HandleInput(e GPUEvent) bool {
 	if v == nil || v.Model == nil || v.Model.Validate() != nil {
 		return false
+	}
+	if v.Interaction != nil && v.Interaction(e) {
+		return true
 	}
 	s := v.Model
 	scale := e.Scale

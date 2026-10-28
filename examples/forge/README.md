@@ -95,3 +95,11 @@ Shift-click bodies in the viewport or browser to toggle membership in a selectio
 Plain click replaces it. Selected bodies retain their materials and blue outlines.
 Move +4 mm and Delete operate on the full selection as one Undo/Redo action.
 The inspector width field edits the primary body only.
+
+Choose Move or Resize in the inspector's Handles controls. Drag a red X, green Y
+or blue Z cube to preview an axis edit; release inside to commit one Undo action.
+Escape, capture cancellation or outside release discards the preview. Resize
+changes each selected body's positive extent; Move translates the selection.
+Optional 1 mm snapping applies to dragging. Numeric X/Y/Z delta fields use mm.
+Axes nearly facing the camera refuse unstable dragging; use numeric entry or
+orbit first. Handles are transient, are absent from saved studies and stay off by default.
