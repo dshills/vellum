@@ -12,7 +12,7 @@ These additions do not retroactively qualify new workloads or published builds.
 | `ui.Ribbon` | Stable tabs/groups/action identities, contextual tabs, full-color icon-above-label buttons and whole-group overflow; retained per owner/window. |
 | `ui.ModelBrowser` | Separate disclosure, visibility, selection and activation proposals; up to 256 items, at most 16 ancestors. |
 | `viewport.Camera`, `Ray`, `Box`, `Gesture` | Portable camera matrices, scale-consistent rays, box-proxy picking and sequence-aware click/drag admission. |
-| `viewport.Scene`, `cogent.SceneView3D` | Experimental depth-rendered preview of up to 256 opaque box/cylinder display primitives with box picking; the same retained GPU device/resource contracts as `GPUView`. |
+| `viewport.Scene`, `cogent.SceneView3D` | Experimental depth-rendered preview of up to 256 opaque box/cylinder display primitives with primitive-accurate box/capped-cylinder picking; the same retained GPU device/resource contracts as `GPUView`. |
 | `ui.ViewCube` | Keyboard/accessible view choices using the same face identifiers as the rendered in-canvas cube. |
 | `quantity.Length`, `ui.QuantityField` | Bounded arithmetic and named length parameters, canonical millimeters, explicit Apply and application validation/command admission. |
 | `ui.FeatureTimeline` | Controlled feature selection, earlier/later reorder and rollback-marker proposals. No solver or dependency replay. |
@@ -124,3 +124,25 @@ from the tested implementation candidate; the following documentation checkpoint
 adds no runtime code. Final exact-commit CI, ZIP checksums/signature results and
 launch observations belong to the private delivery handoff. Source/review
 checkpoints are phase22–phase27 under docs/reviews/fusion-workbench.
+
+## Forge document and interaction workflow
+
+Forge now consumes document.Session for versioned .vforge Save/Open, bounded
+history and a single-worker atomic recovery copy. File installation validates
+objects, feature references, selections, camera and monotonic identities first.
+Native titlebar file actions and File menus share the same command registry.
+
+ModelBrowser supports controlled SelectedIDs and SelectModified; button
+ActivationEvent captures Shift/Command/Option/Control before native-to-owner
+posting. Ordinary Activate remains the accessible/keyboard fallback. SceneView3D
+supports SelectModified and an optional owner-only Interaction interceptor for
+application handles. Scene.SelectedIDs adds material-preserving outlines.
+
+Forge axis handles use existing GPUView same-window capture, physical content
+coordinates and camera rays. Move/resize previews remain outside the document;
+release commits one history change; cancellation discards them. Near-parallel
+axes require a changed view or numeric entry. No CAD topology is implied.
+
+Workspace panel preferences use bounded private storage on orderly shutdown.
+AppKit owns native toolbar autosave/customization. ResetTitlebarToolbar requests
+an asynchronous reset with the same owner/lifetime/modal rules as customization.

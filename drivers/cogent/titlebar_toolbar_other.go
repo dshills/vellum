@@ -16,3 +16,5 @@ func nativeTitlebarCustomize(uint64) {}
 
 func nativeTitlebarRequestAttach(uint64, string, string) {}
 func nativeTitlebarStateChanged(uint64)                  {}
+
+func nativeTitlebarReset(uint64) {}

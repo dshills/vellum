@@ -103,3 +103,12 @@ changes each selected body's positive extent; Move translates the selection.
 Optional 1 mm snapping applies to dragging. Numeric X/Y/Z delta fields use mm.
 Axes nearly facing the camera refuse unstable dragging; use numeric entry or
 orbit first. Handles are transient, are absent from saved studies and stay off by default.
+
+Workspace panel widths and visibility are remembered on orderly shutdown. Use
+View → Show/Hide Browser or Inspector, Customize Toolbar, or Reset Workspace.
+AppKit remembers toolbar order, hidden items and display mode under Forge's own
+settings namespace. Reset Workspace restores panel defaults and toolbar order,
+visibility and icon-only display. These preferences do not enter drawing history.
+Invalid preferences are preserved until Reset Workspace. An invalid recovery
+file refuses startup with its error; preserve or move the named recovery file
+from ~/Library/Caches/VellumForge before retrying.

@@ -346,6 +346,30 @@ func CustomizeTitlebarToolbar(ref app.WindowRef) error {
 	nativeTitlebarCustomize(bridge.token)
 	return nil
 }
+
+// ResetTitlebarToolbar restores configured order, visibility and icon display.
+// It has the same asynchronous owner/lifetime/modal rules as CustomizeTitlebarToolbar.
+func ResetTitlebarToolbar(ref app.WindowRef) error {
+	if ref.Context().Err() != nil {
+		return app.ErrWindowClosed
+	}
+	bridge, err := lookupAccessibility(ref.ID())
+	if err != nil {
+		return err
+	}
+	bridge.mu.Lock()
+	same := bridge.windowRef == ref
+	bridge.mu.Unlock()
+	if !same {
+		return app.ErrInvalidWindowRef
+	}
+	binding := bridge.titlebar.Load()
+	if binding == nil || binding.closed.Load() || binding.config.customizationID == "" {
+		return errors.New("cogent: native titlebar customization unavailable")
+	}
+	nativeTitlebarReset(bridge.token)
+	return nil
+}
 func titlebarBindingForToken(token uint64) *titlebarToolbarBinding {
 	accessibilityRegistry.Lock()
 	b := accessibilityRegistry.bridges[token]

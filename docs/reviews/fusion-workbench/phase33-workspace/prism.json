@@ -1,0 +1,139 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "31c2459cf934ac2c70b5aa2a91bb5997",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "ecfa35e5c9950117471a9d24edc233eebb317ded",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "5226783957d7ea24",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Toolbar reset may drop items",
+      "message": "Reset removes and reinserts all items but sets visible/displayMode directly, which AppKit persists under the autosave identifier; items not in owner.order (e.g. flexible spaces, or allowed-but-not-default items) are lost. Also fine-grained default set may differ from configured order.",
+      "suggestion": "Reinsert the configured default identifiers exactly as at attach time (including separators/spaces) and verify the origin of owner.order.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/titlebar_toolbar_darwin.m",
+          "lines": {
+            "start": 250,
+            "end": 250
+          }
+        }
+      ],
+      "tags": [
+        "appkit",
+        "location-corrected"
+      ],
+      "evidence": "while(bar.items.count\u003e0)[bar removeItemAtIndex:bar.items.count-1];",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "b80bb493473e69ed",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Workspace overwritten with defaults when startup fails early",
+      "message": "If workspace commands are registered only in bindFiles, they are absent in smoke mode, yet the menus are also conditioned on !smoke, which is OK. However, bindFiles returns early on recovery errors, and the deferred stop() then calls saveWorkspace with m.left/right possibly unloaded, overwriting valid saved preferences with defaults when startup fails (preferencesBlocked is false because load never ran).",
+      "suggestion": "Track a loaded flag and only save when loadWorkspace has run, or load workspace before the recovery decode step.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "examples/forge/files.go",
+          "lines": {
+            "start": 140,
+            "end": 141
+          }
+        }
+      ],
+      "tags": [
+        "data-loss",
+        "location-corrected"
+      ],
+      "evidence": "m.loadWorkspace()\n\tm.bindWorkspaceCommands()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "189aecb01dd67c17",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Fragile post-hoc mutation of split pane children",
+      "message": "The ui.Node `panes` is built with Children containing the original rightSplit value (copied by value into the slice), and then replaced afterwards. This works but when the inspector is hidden, center is used directly inside a SplitPane with one remaining child, so the browser split has no inspector; more importantly the split-pane Number for center is lost. Risk is moderate: the split IDs remain stable but layout state may be inconsistent.",
+      "suggestion": "Construct panes after deciding visibility, instead of mutating Children after construction.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "examples/forge/view.go",
+          "lines": {
+            "start": 230,
+            "end": 238
+          }
+        }
+      ],
+      "tags": [
+        "ui"
+      ],
+      "evidence": "if m.hideInspector {\n\t\trightSplit = center\n\t}\n\tif m.hideBrowser {\n\t\tpanes = rightSplit\n\t} else {\n\t\tpanes.Children[1] = rightSplit\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 8614,
+    "totalMs": 8636
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 21506,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 12649,
+        "output": 978,
+        "costUSD": 0.035078
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

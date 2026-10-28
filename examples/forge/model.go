@@ -23,6 +23,9 @@ type document struct {
 	Selection []string
 }
 type workbench struct {
+	hideBrowser, hideInspector                        bool
+	workspaceLoaded                                   bool
+	preferencesBlocked                                bool
 	drag                                              *handleDrag
 	handleMode                                        string
 	snap                                              bool

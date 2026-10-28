@@ -60,7 +60,10 @@ func run(smoke bool, exitAfter time.Duration) error {
 		defer m.recovery.stop(m)
 	}
 	t := forgeTheme()
-	toolbar := &cogent.TitlebarToolbar{Window: ref, Items: m.toolbar(), Commands: m.commands}
+	toolbar := &cogent.TitlebarToolbar{Window: ref, Items: m.toolbar(), Commands: m.commands, CustomizationID: "com.dshills.vellum.forge.workspace.v1"}
+	if smoke {
+		toolbar.CustomizationID = ""
+	}
 	result := make(chan error, 1)
 	if smoke {
 		go func() { result <- smokeCheck(a, ref, m); a.Close() }()
@@ -73,7 +76,11 @@ func run(smoke bool, exitAfter time.Duration) error {
 		timer := time.AfterFunc(60*time.Second, func() { fmt.Fprintln(os.Stderr, "Forge smoke watchdog"); os.Exit(1) })
 		defer timer.Stop()
 	}
-	e = a.Run(context.Background(), cogent.Driver{Theme: t, Commands: m.commands, TitlebarToolbar: toolbar, OnError: func(e error) { fmt.Fprintln(os.Stderr, e) }})
+	menus := []app.MenuGroup{}
+	if !smoke {
+		menus = []app.MenuGroup{{Label: "File", Commands: []string{"forge.open", "forge.save", "forge.save-as"}}, {Label: "Edit", Commands: []string{"forge.undo", "forge.redo", "forge.delete"}}, {Label: "View", Commands: []string{"forge.browser", "forge.inspector", "forge.customize", "forge.reset-workspace"}}}
+	}
+	e = a.Run(context.Background(), cogent.Driver{Theme: t, Commands: m.commands, CommandMenus: menus, TitlebarToolbar: toolbar, OnError: func(e error) { fmt.Fprintln(os.Stderr, e) }})
 	if e != nil {
 		a.Close()
 		if smoke {

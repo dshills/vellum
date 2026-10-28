@@ -8,6 +8,7 @@ import (
 	"github.com/dshills/vellum/viewport"
 	"image/color"
 	"image/png"
+	"math"
 )
 
 func pngIcon(name string, c color.NRGBA) []byte {
@@ -223,8 +224,16 @@ func (m *workbench) View() ui.Node {
 	center.Style.Gap = ui.Some(float32(6))
 	center.Style.Background = ui.Some(rgb(241, 243, 247))
 	center.Style.Padding = ui.Some(ui.Insets{Bottom: 10})
-	rightSplit := ui.Node{ID: "inspector-split", Kind: ui.SplitPane, Orientation: ui.Horizontal, Number: m.right, Grow: true, Change: func(e ui.ChangeEvent) { m.right = e.Number; m.changed() }, Children: []ui.Node{center, m.inspectorView()}}
-	panes := ui.Node{ID: "browser-split", Kind: ui.SplitPane, Orientation: ui.Horizontal, Number: m.left, Grow: true, Change: func(e ui.ChangeEvent) { m.left = e.Number; m.changed() }, Children: []ui.Node{left, rightSplit}}
+	rightSplit := ui.Node{ID: "inspector-split", Kind: ui.SplitPane, Orientation: ui.Horizontal, Number: m.right, Grow: true, Change: func(e ui.ChangeEvent) { m.right = float32(math.Max(.35, math.Min(.9, float64(e.Number)))); m.changed() }, Children: []ui.Node{center, m.inspectorView()}}
+	panes := ui.Node{ID: "browser-split", Kind: ui.SplitPane, Orientation: ui.Horizontal, Number: m.left, Grow: true, Change: func(e ui.ChangeEvent) { m.left = float32(math.Max(.1, math.Min(.5, float64(e.Number)))); m.changed() }, Children: []ui.Node{left, rightSplit}}
+	if m.hideInspector {
+		rightSplit = center
+	}
+	if m.hideBrowser {
+		panes = rightSplit
+	} else {
+		panes.Children[1] = rightSplit
+	}
 	features := []ui.FeatureItem{}
 	validSelection := ""
 	for _, f := range m.state.Features {

@@ -1,0 +1,61 @@
+[
+  {
+    "name": "forge-workspace-pass",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 10.521
+  },
+  {
+    "name": "forge-workspace-vet",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 12.506
+  },
+  {
+    "name": "forge-workspace-driver",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestTitlebar|TestNativeTitlebar",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 25.719
+  },
+  {
+    "name": "forge-final-api",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.278
+  }
+]

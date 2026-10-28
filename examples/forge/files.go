@@ -14,6 +14,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"syscall"
 )
 
@@ -60,6 +62,14 @@ func validateStudy(s studyFile) error {
 	}
 	ids := map[string]bool{}
 	for _, o := range s.Document.Objects {
+		if strings.HasPrefix(o.ID, "forge-handle-") {
+			return fmt.Errorf("reserved body identity")
+		}
+		if strings.HasPrefix(o.ID, "body-") {
+			if n, e := strconv.ParseUint(strings.TrimPrefix(o.ID, "body-"), 10, 64); e == nil && n >= s.Next {
+				return fmt.Errorf("next body identity not monotonic")
+			}
+		}
 		ids[o.ID] = true
 		if o.ID == fmt.Sprintf("body-%d", s.Next) {
 			return fmt.Errorf("next body identity collides")
@@ -127,6 +137,8 @@ func (m *workbench) bindFiles() (err error) {
 	} else if !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
+	m.loadWorkspace()
+	m.bindWorkspaceCommands()
 	return nil
 }
 func (m *workbench) fileAction(id string, discard bool) error {
@@ -291,6 +303,7 @@ func (r *recoveryStore) stop(m *workbench) {
 	if r == nil {
 		return
 	}
+	m.saveWorkspace(r.path)
 	m.recovery = nil
 	close(r.queue)
 	<-r.done

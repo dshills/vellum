@@ -241,3 +241,14 @@ void vellumTitlebarStateChanged(uint64_t token) {
   owner.catalogue=catalogue;[owner refreshEnabled];
  }});
 }
+
+void vellumTitlebarReset(uint64_t token) {
+ dispatch_async(dispatch_get_main_queue(),^{
+  VellumTitlebarOwner *owner=vellumTitlebars[@(token)];
+  if(!owner || owner.closed || !owner.allowed || !owner.customizable || owner.toolbar.customizationPaletteIsRunning)return;
+  NSToolbar *bar=owner.toolbar;
+  while(bar.items.count>0)[bar removeItemAtIndex:bar.items.count-1];
+  NSUInteger i=0;for(NSString *identifier in owner.order)[bar insertItemWithItemIdentifier:identifier atIndex:i++];
+  bar.visible=YES;bar.displayMode=NSToolbarDisplayModeIconOnly;[owner refreshEnabled];
+ });
+}

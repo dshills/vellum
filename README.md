@@ -43,8 +43,9 @@ go run .
 See the [Forge guide](examples/forge/README.md) for controls and private packaging,
 the [reusable workbench APIs](docs/fusion-workbench.md) for integration, and
 [screenshot details](docs/screenshots/README.md#forge-workbench) for capture identities.
-The viewport is experimental and uses box picking proxies, including for the
-cylindrical shaft. This in-memory demo has no CAD kernel or Save/Open. It is
+The viewport is experimental and uses box and capped-cylinder primitive picking. The demo supports native Save/Open and recovery, multi-selection, axis move/resize
+handles with snapping and numeric deltas, and persistent workspace customization.
+It has no CAD kernel. It is
 source/private-build work and is absent from the six published build13 apps.
 
 ### Forma — a space for ideas

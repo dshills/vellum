@@ -9,6 +9,7 @@ int vellumTitlebarAttach(uint64_t token,void *window,const char *json,const char
 void vellumTitlebarDetach(uint64_t token);
 void vellumTitlebarAllowed(uint64_t token,int allowed);
 void vellumTitlebarCustomize(uint64_t token);
+void vellumTitlebarReset(uint64_t token);
 int vellumTitlebarCustomizationSupported(void);
 void vellumTitlebarRequestAttach(uint64_t,const char *,const char *);
 void vellumTitlebarStateChanged(uint64_t);
@@ -138,3 +139,5 @@ func vellumTitlebarStateJSON(token C.uint64_t) *C.char {
 	}
 	return C.CString(state.json)
 }
+
+func nativeTitlebarReset(token uint64) { C.vellumTitlebarReset(C.uint64_t(token)) }
