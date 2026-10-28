@@ -1,0 +1,43 @@
+[
+  {
+    "name": "measure-pad-accepted",
+    "cwd": "examples/measurepad",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 4.135
+  },
+  {
+    "name": "measure-pad-vet",
+    "cwd": "examples/measurepad",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 11.702
+  },
+  {
+    "name": "measure-pad-generate",
+    "cwd": ".",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/new-app.py",
+      "/private/tmp/vellum-measure-pad-generated-20261028",
+      "--module",
+      "github.com/dshills/vellum/examples/measurepad"
+    ],
+    "exit_code": 0,
+    "seconds": 0.08
+  }
+]

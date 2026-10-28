@@ -1,0 +1,114 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "6a9e7dbc2d71da4c6a538f3282524c68",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "083ad03a8cdb457a860c957b0139ee9bce58ec4c",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "ab569dff580f639d",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible data race on model state from document callbacks",
+      "message": "Decoding a hand-edited file is fine, but add() does not enforce the 100-entry limit separately; it relies on validate in apply, which is fine. However decode checks len(data) only after ReadAll; and the m.status field is written from OnComplete callbacks, which may run off the UI goroutine, creating a data race on m.status/m.book with the view function.",
+      "suggestion": "Confirm OnComplete and Install run on the UI thread, or guard model state with a mutex.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "examples/measurepad/model.go",
+          "lines": {
+            "start": 74,
+            "end": 74
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "location-corrected"
+      ],
+      "evidence": "if d.Decode(new(any)) != io.EOF {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "2ff8a87b8c83be8e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Delete with no selection reports error",
+      "message": "Not a bug in remove itself (clone is used), but the model's remove has an issue: after Delete via the AfterFocusShortcuts Backspace binding, selection m.selected is cleared only through install. However the more serious problem is that the Backspace shortcut is registered with the Delete command and executes even when no row is selected, producing an error status on every Backspace press outside text focus.",
+      "suggestion": "Make Delete's Available also require a non-empty selection so Backspace does nothing when nothing is selected.",
+      "confidence": 0.7,
+      "locations": [
+        {
+          "path": "examples/measurepad/model.go",
+          "lines": {
+            "start": 112,
+            "end": 112
+          }
+        }
+      ],
+      "tags": [
+        "ux",
+        "location-corrected"
+      ],
+      "evidence": "b.Entries = append(b.Entries[:i], b.Entries[i+1:]...)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6324,
+    "totalMs": 6359
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 29266,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 19606,
+        "output": 582,
+        "costUSD": 0.045032
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

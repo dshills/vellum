@@ -39,3 +39,9 @@ and verification workflow.
 - [Forge](forge/README.md): original Fusion-inspired Mac design workbench with
   grouped ribbon, rich model browser, real GPU assembly viewport/orientation cube,
   unit expressions, feature strip and undoable body edits.
+
+## Measure Pad
+
+[Measure Pad](measurepad/README.md) grows the generated minimal starter into a
+small local measurement notebook with unit expressions, Save/Open and Undo/Redo.
+It is an application example using existing public framework APIs.
