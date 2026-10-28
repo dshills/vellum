@@ -93,7 +93,7 @@ checks do not qualify other hardware/displays, human accessibility or CAD scale.
 
 Shift-click bodies in the viewport or browser to toggle membership in a selection.
 Plain click replaces it. Selected bodies retain their materials and blue outlines.
-Move +4 mm and Delete operate on the full selection as one Undo/Redo action.
+Visibility, Move +4 mm and Delete operate on the full selection as one Undo/Redo action.
 The inspector width field edits the primary body only.
 
 Choose Move or Resize in the inspector's Handles controls. Drag a red X, green Y
@@ -112,3 +112,7 @@ visibility and icon-only display. These preferences do not enter drawing history
 Invalid preferences are preserved until Reset Workspace. An invalid recovery
 file refuses startup with its error; preserve or move the named recovery file
 from ~/Library/Caches/VellumForge before retrying.
+
+Axis cubes are depth-tested and may be occluded by neighboring bodies. Orbit or
+hide obstructing bodies, or use the numeric controls. This preview still has a
+48-body limit and no CAD topology/constraint solver.

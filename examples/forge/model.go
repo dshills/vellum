@@ -63,7 +63,7 @@ func clone(s document) document {
 }
 func newWorkbench() *workbench {
 	j, _ := history.New(96)
-	m := &workbench{journal: j, commands: command.New(), next: 8, expanded: []string{"assembly"}, active: "housing", tab: "solid", left: .19, right: .72, status: "Ready · Local, in-memory document"}
+	m := &workbench{journal: j, commands: command.New(), next: 8, expanded: []string{"assembly"}, active: "housing", tab: "solid", left: .19, right: .72, status: "Ready · Local study"}
 	c := viewport.DefaultCamera()
 	c.Target = vec(0, .45, 0)
 	m.scene = viewport.Scene{Camera: c, Grid: true, ShowCube: true}
@@ -285,14 +285,23 @@ func (m *workbench) nudge() error {
 }
 func (m *workbench) visibility(id string, value bool) error {
 	s := clone(m.state)
-	for j := range s.Objects {
-		if s.Objects[j].ID == id {
-			s.Objects[j].Visible = value
-			return m.apply("Change body visibility", s)
+	ids := map[string]bool{id: true}
+	if m.selectionSet()[id] {
+		ids = m.selectionSet()
+	}
+	found := false
+	for i := range s.Objects {
+		if ids[s.Objects[i].ID] {
+			s.Objects[i].Visible = value
+			found = true
 		}
 	}
-	return fmt.Errorf("missing body")
+	if !found {
+		return fmt.Errorf("missing body")
+	}
+	return m.apply("Change body visibility", s)
 }
+
 func (m *workbench) featureChange(e ui.FeatureTimelineEvent) {
 	if e.Action == "select" {
 		m.featureID = e.ItemID

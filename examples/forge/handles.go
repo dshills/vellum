@@ -142,6 +142,7 @@ func (m *workbench) handleInput(e cogent.GPUEvent) bool {
 	}
 	if e.Kind == cogent.GPUKey && (strings.EqualFold(e.Key, "Escape") || strings.EqualFold(e.Key, "Esc")) {
 		m.drag = nil
+		m.status = "Handle edit canceled"
 		m.refresh()
 		return true
 	}
@@ -151,6 +152,7 @@ func (m *workbench) handleInput(e cogent.GPUEvent) bool {
 	switch e.Kind {
 	case cogent.GPUCancel:
 		m.drag = nil
+		m.status = "Handle edit canceled"
 		m.refresh()
 	case cogent.GPUPointerMove:
 		at, ok := axisAt(m.scene.Camera, e, d.origin, d.axis)

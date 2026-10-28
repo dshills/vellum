@@ -243,7 +243,7 @@ func (m *workbench) fileToolbar() []cogent.TitlebarToolbarItem {
 	if m.files == nil {
 		return nil
 	}
-	return []cogent.TitlebarToolbarItem{{ID: "open", Label: "Open", Kind: ui.Button, PNG: pngIcon("cube", rgb(236, 168, 52)), Command: "forge.open"}, {ID: "save", Label: "Save", Kind: ui.Button, PNG: pngIcon("save", rgb(58, 122, 225)), Command: "forge.save"}}
+	return []cogent.TitlebarToolbarItem{{ID: "open", Label: "Open", Kind: ui.Button, PNG: pngIcon("open", rgb(236, 168, 52)), Command: "forge.open"}, {ID: "save", Label: "Save", Kind: ui.Button, PNG: pngIcon("save", rgb(58, 122, 225)), Command: "forge.save"}}
 }
 
 // A single bounded worker owns atomic recovery writes. flock excludes another

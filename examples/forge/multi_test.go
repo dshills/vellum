@@ -57,3 +57,25 @@ func TestShiftToggleAndPlainSelection(t *testing.T) {
 		t.Fatal("plain replace")
 	}
 }
+
+func TestBatchVisibilityHistory(t *testing.T) {
+	m := newWorkbench()
+	m.selectObject("shaft")
+	m.selectModified("cap", true)
+	if e := m.visibility("shaft", false); e != nil {
+		t.Fatal(e)
+	}
+	for _, o := range m.state.Objects {
+		if m.selectionSet()[o.ID] && o.Visible {
+			t.Fatal("batch visibility")
+		}
+	}
+	if e := m.journal.Undo(); e != nil {
+		t.Fatal(e)
+	}
+	for _, o := range m.state.Objects {
+		if !o.Visible {
+			t.Fatal("visibility undo")
+		}
+	}
+}

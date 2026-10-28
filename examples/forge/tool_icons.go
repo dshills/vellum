@@ -92,6 +92,14 @@ func artwork(name string, c color.NRGBA) *canvas.TiledImage {
 	blue := rgb(54, 124, 225)
 	teal := rgb(40, 155, 143)
 	switch name {
+	case "open":
+		p.polygon(rgb(215, 149, 35), iconPoint{4, 12}, iconPoint{19, 12}, iconPoint{23, 17}, iconPoint{44, 17}, iconPoint{44, 40}, iconPoint{4, 40})
+		p.polygon(rgb(250, 196, 75), iconPoint{3, 21}, iconPoint{45, 21}, iconPoint{40, 42}, iconPoint{7, 42})
+	case "save":
+		p.polygon(blue, iconPoint{7, 5}, iconPoint{35, 5}, iconPoint{42, 12}, iconPoint{42, 43}, iconPoint{7, 43})
+		p.polygon(rgb(221, 237, 253), iconPoint{15, 5}, iconPoint{32, 5}, iconPoint{32, 19}, iconPoint{15, 19})
+		p.polygon(rgb(248, 250, 253), iconPoint{14, 28}, iconPoint{35, 28}, iconPoint{35, 43}, iconPoint{14, 43})
+		p.line(ink, 2, iconPoint{27, 8}, iconPoint{27, 15})
 	case "add":
 		p.cube(c, "")
 		p.circle(rgb(255, 255, 255), 36, 35, 11)

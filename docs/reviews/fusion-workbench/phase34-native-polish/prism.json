@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "37991563ad10c0a7584fc2d8cd754d7d",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "fd06b8b078788459fb85226704c2ff9677b894fc",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "e9a62128204cfe62",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Per-row visibility toggle now affects whole selection",
+      "message": "Visibility now applies to the whole selection whenever the target id is selected. Any per-row visibility toggle on a selected body hides or shows every selected body, which may surprise users and is inconsistent with the inspector semantics. It also wrongly claims atomic history for single-row toggles.",
+      "suggestion": "Confirm this is the intended UX. Otherwise limit batch behavior to the toolbar/inspector action and keep row toggles single-body.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/forge/model.go",
+          "lines": {
+            "start": 289,
+            "end": 291
+          }
+        }
+      ],
+      "tags": [
+        "behavior",
+        "location-corrected"
+      ],
+      "evidence": "\tif m.selectionSet()[id] {\n\t\tids = m.selectionSet()\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5052,
+    "totalMs": 5068
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 13046,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 8860,
+        "output": 297,
+        "costUSD": 0.02069
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
