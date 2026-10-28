@@ -28,3 +28,8 @@ color, the concrete color wins; use Overlay to replace it with a role.
 A BorderRole in the same style as Border replaces only its color. A later
 Overlay containing a complete Border clears the previous BorderRole; supply
 BorderRole again when changing width while retaining semantic color.
+
+Model-browser selected rows apply accent ink to disclosure/visibility/activation
+actions and badges as well as labels. Icon-to-label spacing is seven logical
+pixels; original-color item artwork remains untinted. Native focus and disabled
+feedback continue through the existing managed button styles.

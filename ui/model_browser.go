@@ -160,6 +160,9 @@ func (p *ModelBrowser) View() (Node, error) {
 				row.Style = row.Style.Overlay(Style{ForegroundRole: "accent-ink"})
 			}
 			quiet := Style{Padding: Some(Insets{}), Border: Some(Border{}), Background: Some(color.NRGBA{}), Typography: Some(MacTypography(10, 400)), MinSize: Some(Size{Width: 20, Height: 24}), MaxSize: Some(Size{Width: 20, Height: 24}), GrowX: Some(float32(0))}
+			if p.SelectedID == id || slices.Contains(p.SelectedIDs, id) {
+				quiet.ForegroundRole = "accent-ink"
+			}
 			if len(children[id]) > 0 {
 				icon := SymbolRight
 				if expanded[id] {
@@ -175,7 +178,7 @@ func (p *ModelBrowser) View() (Node, error) {
 				row.Children = append(row.Children, Node{ID: rid + "/indent", Kind: Column, Style: quiet})
 			}
 			row.Children = append(row.Children, Node{ID: rid + "/visibility", Kind: ToggleButton, Icon: SymbolVisibility, Checked: item.Visible, Style: quiet, Accessibility: Accessibility{Name: "Visibility of " + item.Label}, Change: func(e ChangeEvent) { propose(id, ModelBrowserVisibility, e.Checked) }})
-			selectStyle := Style{Padding: Some(Insets{Left: 1, Right: 1}), Gap: Some(float32(5)), Border: Some(Border{}), Background: Some(color.NRGBA{}), Typography: Some(MacTypography(12, 400)), GrowX: Some(float32(1)), TextAlign: Some(AlignStart), MinSize: Some(Size{Width: 48, Height: 24})}
+			selectStyle := Style{Padding: Some(Insets{Left: 1, Right: 1}), Gap: Some(float32(7)), Border: Some(Border{}), Background: Some(color.NRGBA{}), Typography: Some(MacTypography(12, 400)), GrowX: Some(float32(1)), TextAlign: Some(AlignStart), MinSize: Some(Size{Width: 48, Height: 24})}
 			if p.SelectedID == id || slices.Contains(p.SelectedIDs, id) {
 				selectStyle = selectStyle.Overlay(Style{ForegroundRole: "accent-ink"})
 			}
@@ -190,7 +193,11 @@ func (p *ModelBrowser) View() (Node, error) {
 				}
 			}, Activate: func() { propose(id, ModelBrowserSelect, true) }})
 			if item.Badge != "" {
-				row.Children = append(row.Children, Node{ID: rid + "/badge", Kind: Label, Text: item.Badge, Style: Style{Typography: Some(MacTypography(10, 400)), Padding: Some(Insets{}), GrowX: Some(float32(0))}})
+				badgeStyle := Style{Typography: Some(MacTypography(10, 400)), Padding: Some(Insets{}), GrowX: Some(float32(0))}
+				if p.SelectedID == id || slices.Contains(p.SelectedIDs, id) {
+					badgeStyle.ForegroundRole = "accent-ink"
+				}
+				row.Children = append(row.Children, Node{ID: rid + "/badge", Kind: Label, Text: item.Badge, Style: badgeStyle})
 			}
 			if item.Activatable {
 				row.Children = append(row.Children, Node{ID: rid + "/active", Kind: ToggleButton, Icon: func() Symbol {
