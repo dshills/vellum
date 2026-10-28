@@ -1,0 +1,39 @@
+[
+  {
+    "name": "finish-inspector-final",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 38.141
+  },
+  {
+    "name": "finish-inspector-vet",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 29.332
+  },
+  {
+    "name": "finish-go-version",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "version"
+    ],
+    "exit_code": 0,
+    "seconds": 0.009
+  }
+]

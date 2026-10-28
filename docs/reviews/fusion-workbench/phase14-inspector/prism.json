@@ -1,0 +1,113 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "9506ba68805247cde17ae8e8b8d31c12",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "d7445ab550e3c71e596982b6074bdc9488156b48",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "7883142aecc46683",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Undefined helper fidelityNode",
+      "message": "The test helper calls fidelityNode, which is not defined anywhere in this diff. If it does not exist elsewhere in the package, the test package will not compile. The helper is also written on one line and is not gofmt-formatted.",
+      "suggestion": "Confirm fidelityNode exists in package main. If it does not, define it as a recursive search by ID over ui.Node children. Run gofmt on the file.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/forge/fidelity_test.go",
+          "lines": {
+            "start": 45,
+            "end": 45
+          }
+        }
+      ],
+      "tags": [
+        "compile"
+      ],
+      "evidence": "func requireFidelityNode(t *testing.T,n ui.Node,id string)*ui.Node{t.Helper();found:=fidelityNode(n,id);if found==nil{t.Fatal(\"missing fidelity control\",id)};return found}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "27a80b06d9089e75",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Style overwrite and silent fallback in quantity restructure",
+      "message": "The layout rewrite mutates copies of nodes. `label` and `controls` are value copies, but `controls.Children[0]` and `[1]` share their backing slice with the original, so the style edits do land. However, the test looks up \"width/quantity/apply\" and \"width/quantity/input\" and expects the input's MinSize to be 64. The input Style is replaced wholesale, which drops any existing styling such as disabled or invalid visuals. The whole restructure is also silently skipped if the QuantityField child layout differs, so the layout would regress with no error.",
+      "suggestion": "Merge style fields into the existing Style rather than replacing it. Log or fail loudly when the structural guard does not match.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "examples/forge/view.go",
+          "lines": {
+            "start": 120,
+            "end": 135
+          }
+        }
+      ],
+      "tags": [
+        "fragile"
+      ],
+      "evidence": "controls.Children = append([]ui.Node{label}, controls.Children...)\n\tquantity.Children = append([]ui.Node{controls}, quantity.Children[2:]...)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6142,
+    "totalMs": 6156
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 9207,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 6792,
+        "output": 725,
+        "costUSD": 0.020834
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

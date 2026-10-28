@@ -125,3 +125,15 @@ the offscreen upper-height check. It is superseded: grouped-tool pages also
 contribute intrinsic vertical content (visible Y overflow and zero vertical grow);
 ordinary pages retain their native scroll/grow defaults. The regression now
 requires a lower height bound and visible, contained ribbon action geometry.
+
+## Remaining frozen-feature fidelity checkpoints
+
+The owner approved inspector, ViewCube/orientation, existing action-panel and
+whole-window polish, followed by integration/CI and private Forge packaging.
+No commands, CAD operations, public API fields, backend/performance policy,
+public release assets or audit decisions change. Each checkpoint has focused
+tests, Prism Anthropic Claude Sonnet 5.5 review and a commit.
+
+The inspector uses a compact property row with the existing QuantityField IDs,
+Apply/validation path and command/history. Original full-color action artwork,
+smaller headings, aligned fields and restrained dividers replace oversized gaps.

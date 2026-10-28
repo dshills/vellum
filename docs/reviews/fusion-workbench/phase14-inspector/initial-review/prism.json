@@ -1,0 +1,141 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "56e8b65a94d218f7cc9ef64b9b95f3a3",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "d7445ab550e3c71e596982b6074bdc9488156b48",
+    "branch": "codex/fusion-workbench"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "3c5bb709026ac86a",
+      "severity": "medium",
+      "category": "bug",
+      "title": "fidelityNode helper not defined in diff",
+      "message": "The test calls fidelityNode, which is not defined in this diff. If it is not defined elsewhere in the package, the test does not compile. A nil result would also panic when Activate is called.",
+      "suggestion": "Ensure fidelityNode exists in the package's test files, and make it fail the test on a nil result.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/forge/fidelity_test.go",
+          "lines": {
+            "start": 19,
+            "end": 19
+          }
+        }
+      ],
+      "tags": [
+        "test",
+        "location-corrected"
+      ],
+      "evidence": "fidelityNode(n, \"width/quantity/apply\").Activate()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "2964db4f69f21d83",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Brittle index-based mutation of QuantityField tree",
+      "message": "The code assumes the QuantityField View layout: Children[0] is the label, Children[1] is the controls container, and controls.Children[0] and [1] are the input and apply button. It also restructures the tree by index. Any change to QuantityField, such as an extra validation child, breaks this silently or panics. The `quantity.Children[2:]` slice also panics if there are fewer than 2 children.",
+      "suggestion": "Look nodes up by ID, or guard with length checks. Better, add layout options to QuantityField.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/forge/view.go",
+          "lines": {
+            "start": 118,
+            "end": 118
+          }
+        }
+      ],
+      "tags": [
+        "fragile",
+        "panic",
+        "location-corrected"
+      ],
+      "evidence": "label, controls := quantity.Children[0], quantity.Children[1]",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "cb2d24078bdb8f1b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "color package may not be imported",
+      "message": "The new code uses color.NRGBA, but the diff does not show an import of image/color in view.go. If it is not already imported, the package fails to compile.",
+      "suggestion": "Confirm view.go imports \"image/color\"; add it if missing.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "examples/forge/view.go",
+          "lines": {
+            "start": 129,
+            "end": 129
+          }
+        }
+      ],
+      "tags": [
+        "compile",
+        "location-corrected"
+      ],
+      "evidence": "action := func(id, label, art string, c color.NRGBA, run func()) ui.Node {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 6160,
+    "totalMs": 6166
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 8824,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 6602,
+        "output": 742,
+        "costUSD": 0.020624
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

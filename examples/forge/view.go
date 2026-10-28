@@ -113,14 +113,43 @@ func (m *workbench) inspectorView() ui.Node {
 	if o.ID != "" {
 		m.dimension.Variables["width"] = (o.Bounds.Max.X - o.Bounds.Min.X) * 20
 	}
-	n := column("inspector", text("inspect-heading", "INSPECTOR", 10, 600, muted), text("selected-name", name, 17, 600, ink), text("inspect-type", "Solid body · Box proxy", 11, 400, muted), must(m.dimension.View()), text("unit-help", "Try 2 in, 50 mm, or width / 2", 11, 400, muted), button("nudge", "Move right · 4 mm", func() { m.result(m.nudge()) }), button("remove", "Delete body", func() { m.result(m.deleteSelected()) }), text("demo-heading", "ABOUT THIS WORKBENCH", 10, 600, muted), text("demo-copy", "Original Fusion-inspired UI", 11, 400, muted), text("demo-copy2", "Live GPU viewport · local history", 11, 400, muted), text("demo-copy3", "No CAD kernel or cloud service", 11, 400, muted))
-	n.Children[5].Disabled = o.ID == ""
-	n.Children[6].Disabled = o.ID == ""
-	n.Style.Padding = ui.Some(ui.UniformInsets(18))
+	quantity := must(m.dimension.View())
+	// Retain QuantityField IDs/callbacks and validation, changing only its layout.
+	if len(quantity.Children) >= 2 && quantity.Children[0].ID == "width/quantity/label" && quantity.Children[1].ID == "width/quantity/row" && len(quantity.Children[1].Children) == 2 {
+		label, controls := quantity.Children[0], quantity.Children[1]
+		label.Style.MinSize = ui.Some(ui.Size{Width: 40})
+		label.Style.MaxSize = ui.Some(ui.Size{Width: 40})
+		label.Style.Foreground = ui.Some(muted)
+		controls.Children[0].Style = ui.Style{MinSize: ui.Some(ui.Size{Width: 64, Height: 16}), MaxSize: ui.Some(ui.Size{}), GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(0)), Padding: ui.Some(ui.Insets{Top: 4, Bottom: 4, Left: 6, Right: 6}), Typography: ui.Some(ui.MacTypography(12, 400))}
+		controls.Children[1].Style = ui.Style{Padding: ui.Some(ui.Insets{Top: 4, Bottom: 4, Left: 7, Right: 7}), Typography: ui.Some(ui.MacTypography(11, 400)), Grow: ui.Some(float32(0))}
+		controls.Style.Gap = ui.Some(float32(5))
+		controls.Children = append([]ui.Node{label}, controls.Children...)
+		quantity.Children = append([]ui.Node{controls}, quantity.Children[2:]...)
+	}
+	header := column("inspect-header", text("inspect-heading", "INSPECTOR", 10, 600, muted), text("selected-name", name, 14, 600, ink), text("inspect-type", "Solid body · Box proxy", 11, 400, muted))
+	header.Style.Gap = ui.Some(float32(4))
+	action := func(id, label, art string, c color.NRGBA, run func()) ui.Node {
+		n := button(id, label, run)
+		n.IconImage = artwork(art, c)
+		n.Disabled = o.ID == ""
+		n.Style = ui.Style{Padding: ui.Some(ui.Insets{Top: 4, Bottom: 4, Left: 8, Right: 8}), Gap: ui.Some(float32(7)), Typography: ui.Some(ui.MacTypography(12, 400)), TextAlign: ui.Some(ui.AlignStart), GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(0))}
+		return n
+	}
+	actions := column("inspect-actions", action("nudge", "Move +4 mm", "move", rgb(48, 166, 158), func() { m.result(m.nudge()) }), action("remove", "Delete body", "delete", rgb(224, 101, 97), func() { m.result(m.deleteSelected()) }))
+	actions.Style.Gap = ui.Some(float32(5))
+	divider := func(id string) ui.Node {
+		return ui.Node{ID: id, Kind: ui.Separator, Style: ui.Style{GrowX: ui.Some(float32(1)), GrowY: ui.Some(float32(0))}}
+	}
+	about := column("inspect-about", text("demo-heading", "ABOUT THIS WORKBENCH", 10, 600, muted), text("demo-copy", "Original Fusion-inspired UI", 10, 400, muted), text("demo-copy2", "Live GPU viewport · local history", 10, 400, muted), text("demo-copy3", "No CAD kernel or cloud service", 10, 400, muted))
+	about.Style.Gap = ui.Some(float32(4))
+	n := column("inspector", header, divider("inspect-rule"), quantity, text("unit-help", "2 in · 50 mm · width / 2", 11, 400, muted), actions, divider("about-rule"), about)
+	n.Style.Padding = ui.Some(ui.UniformInsets(12))
+	n.Style.Gap = ui.Some(float32(8))
 	n.Style.Background = ui.Some(rgb(250, 251, 253))
 	n.Style.GrowY = ui.Some(float32(1))
 	return n
 }
+
 func (m *workbench) View() ui.Node {
 	ink := rgb(42, 49, 61)
 	muted := rgb(116, 125, 140)
