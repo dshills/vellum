@@ -134,3 +134,12 @@ temporarily filter the viewport. Restore Visibility returns to the document's
 visibility settings, including bodies already hidden before isolation. Isolation
 is transient, never saved, never enters Undo history, and ends on Open or Reset
 Workspace. Deleting all isolated bodies also clears it. Hidden bodies stay hidden.
+
+File → Recent Studies lists the ten most recently saved/opened files; picking a
+file uses the same unsaved-change protection as Open. Hover for the full path.
+The list persists with workspace preferences on orderly shutdown; Clear List
+removes references only. Missing/unreadable studies report errors without
+changing the current document. File → Revert to Saved always asks before reloading
+the current path, discards unsaved edits only after confirmation, and starts a
+fresh history on success. Cancel preserves current edits; failure preserves the
+current study. The original v1 file format remains readable.

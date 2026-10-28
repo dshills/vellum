@@ -1,0 +1,45 @@
+[
+  {
+    "name": "forge-recent-verified",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 12.729
+  },
+  {
+    "name": "forge-next-vet",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 12.025
+  },
+  {
+    "name": "forge-next-api",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.3
+  }
+]

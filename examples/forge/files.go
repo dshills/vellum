@@ -110,6 +110,7 @@ func (m *workbench) bindFiles() (err error) {
 		if r.Err != nil {
 			m.status = r.Err.Error()
 		} else {
+			m.recordRecent(r.Path)
 			m.status = string(r.Action) + " · " + filepath.Base(r.Path)
 		}
 		if r.Err == nil && m.recovery != nil && !m.journal.Snapshot().Dirty {
@@ -138,33 +139,48 @@ func (m *workbench) bindFiles() (err error) {
 			return fmt.Errorf("recovery preserved: %w", err)
 		}
 		m.recovered = &s
-		m.prompt = "recover"
+		m.showFilePrompt("recover", "")
 	} else if !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
 	m.loadWorkspace()
 	m.bindWorkspaceCommands()
+	m.bindRecentCommands()
 	return nil
 }
 func (m *workbench) fileAction(id string, discard bool) error {
-	if m.clipboardBusy || m.drag != nil {
+	if m.clipboardBusy || m.drag != nil || m.renameID != "" || m.recentOpen {
 		return vdoc.ErrBusy
 	}
 	if m.files == nil {
 		return app.ErrUnavailable
 	}
 	if id == "open" {
-		e := m.files.Open(m.ref.Context(), vdoc.OpenOptions{DiscardChanges: discard})
-		if errors.Is(e, vdoc.ErrUnsaved) {
-			m.prompt = "open"
-			m.changed()
-			return nil
-		}
-		return e
+		return m.openStudy("", discard)
 	}
+	if id == "revert" {
+		path := m.files.State().Path
+		if path == "" {
+			return fmt.Errorf("save the study before reverting")
+		}
+		m.showFilePrompt("revert", path)
+		return nil
+	}
+
 	return m.files.Save(m.ref.Context(), vdoc.SaveOptions{Choose: id == "save-as"})
 }
 func (m *workbench) requestClose() bool {
+	if m.renameID != "" {
+		m.renameID = ""
+		m.renameEpoch++
+		m.changed()
+		return false
+	}
+	if m.recentOpen {
+		m.recentOpen = false
+		m.changed()
+		return false
+	}
 	if m.clipboardBusy {
 		if m.clipboardCancel != nil {
 			m.clipboardCancel()
@@ -190,7 +206,7 @@ func (m *workbench) requestClose() bool {
 		return true
 	}
 	if m.journal.Snapshot().Dirty {
-		m.prompt = "close"
+		m.showFilePrompt("close", "")
 		m.changed()
 		return false
 	}
@@ -198,19 +214,24 @@ func (m *workbench) requestClose() bool {
 	return true
 }
 func (m *workbench) filePrompt() ui.Node {
-	expected := m.prompt
+	expected, epoch, path := m.prompt, m.fileEpoch, m.pendingStudyPath
 	valid := func() bool {
-		return expected != "" && m.prompt == expected && (m.application == nil || m.ref.Context().Err() == nil)
+		return expected != "" && m.prompt == expected && m.fileEpoch == epoch && m.pendingStudyPath == path && (m.application == nil || m.ref.Context().Err() == nil)
 	}
 	cancel := func() {
 		if valid() {
 			m.prompt = ""
+			m.pendingStudyPath = ""
+			m.fileEpoch++
 			m.changed()
 		}
 	}
 	label := "Discard and Open…"
 	if expected == "close" {
 		label = "Discard and Close"
+	}
+	if expected == "revert" {
+		label = "Revert to Saved"
 	}
 	if expected == "recover" {
 		label = "Restore study"
@@ -230,14 +251,14 @@ func (m *workbench) filePrompt() ui.Node {
 			case "recover":
 				s := *m.recovered
 				m.recovered = nil
-				m.result(m.apply("Recover study", s.Document))
-				m.scene.Camera = s.Camera
-				m.next = s.Next
+				m.result(m.restoreRecoveredStudy(s))
 			case "close":
 				m.cleanClose = true
 				_ = m.application.CloseWindow(m.ref)
-			case "open":
-				m.result(m.fileAction("open", true))
+			case "open", "revert":
+				m.pendingStudyPath = ""
+				m.fileEpoch++
+				m.result(m.openStudy(path, true))
 			}
 			m.changed()
 		}),

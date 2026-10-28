@@ -23,6 +23,10 @@ type document struct {
 	Selection []string
 }
 type workbench struct {
+	recentStudies                                     []string
+	recentOpen                                        bool
+	pendingStudyPath                                  string
+	fileEpoch                                         uint64
 	isolatedIDs                                       []string
 	renameID, renameText, renameError                 string
 	renameEpoch                                       uint64
@@ -130,7 +134,11 @@ func newWorkbench() *workbench {
 	return m
 }
 func (m *workbench) register(id, label, key string, available func() error, run func() error) {
-	if e := m.commands.Register(command.Command{ID: "forge." + id, Label: label, Shortcut: key, Available: available, Execute: func(context.Context) error { e := run(); m.result(e); return e }}); e != nil {
+	scope := command.WindowShortcuts
+	if id == "copy" || id == "paste" || id == "duplicate" {
+		scope = command.AfterFocusShortcuts
+	}
+	if e := m.commands.Register(command.Command{ShortcutScope: scope, ID: "forge." + id, Label: label, Shortcut: key, Available: available, Execute: func(context.Context) error { e := run(); m.result(e); return e }}); e != nil {
 		panic(e)
 	}
 }

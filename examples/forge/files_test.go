@@ -111,3 +111,21 @@ func TestRecoveredCameraAndNextInstalledBeforeCapture(t *testing.T) {
 		t.Fatal(e)
 	}
 }
+
+func TestRecoveryDialogRestoresMetadata(t *testing.T) {
+	src := newWorkbench()
+	_ = src.add()
+	src.scene.Camera.Distance = 11
+	s := src.captureStudy()
+	m := newWorkbench()
+	m.recovered = &s
+	m.showFilePrompt("recover", "")
+	for _, n := range m.filePrompt().Children {
+		if n.ID == "study-confirm" {
+			n.Activate()
+		}
+	}
+	if !reflect.DeepEqual(m.captureStudy(), s) {
+		t.Fatal("dialog recovery differs")
+	}
+}

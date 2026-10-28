@@ -15,11 +15,12 @@ type workspaceSettings struct {
 	Version                    int
 	Left, Right                float32
 	HideBrowser, HideInspector bool
+	Recent                     []string `json:",omitempty"`
 }
 
 func decodeWorkspace(b []byte) (workspaceSettings, error) {
 	var s workspaceSettings
-	if len(b) > 4096 {
+	if len(b) > 16<<10 {
 		return s, fmt.Errorf("workspace size")
 	}
 	if e := json.Unmarshal(b, &s); e != nil {
@@ -28,6 +29,16 @@ func decodeWorkspace(b []byte) (workspaceSettings, error) {
 	if s.Version != 1 || math.IsNaN(float64(s.Left)) || math.IsNaN(float64(s.Right)) || s.Left < .1 || s.Left > .5 || s.Right < .35 || s.Right > .9 {
 		return s, fmt.Errorf("workspace range")
 	}
+	if len(s.Recent) > 10 {
+		return s, fmt.Errorf("recent study limit")
+	}
+	seen := map[string]bool{}
+	for _, p := range s.Recent {
+		if !filepath.IsAbs(p) || len(p) > 1024 || seen[p] {
+			return s, fmt.Errorf("invalid recent study")
+		}
+		seen[p] = true
+	}
 	return s, nil
 }
 func workspacePath(recovery string) string {
@@ -35,7 +46,7 @@ func workspacePath(recovery string) string {
 }
 func (m *workbench) loadWorkspace() {
 	m.workspaceLoaded = true
-	b, e := (vdoc.FileStore{}).Read(context.Background(), workspacePath(m.recovery.path), 4096)
+	b, e := (vdoc.FileStore{}).Read(context.Background(), workspacePath(m.recovery.path), 16<<10)
 	if os.IsNotExist(e) {
 		return
 	}
@@ -43,6 +54,7 @@ func (m *workbench) loadWorkspace() {
 		var s workspaceSettings
 		s, e = decodeWorkspace(b)
 		if e == nil {
+			m.recentStudies = append([]string(nil), s.Recent...)
 			m.left = s.Left
 			m.right = s.Right
 			m.hideBrowser = s.HideBrowser
@@ -59,10 +71,10 @@ func (m *workbench) saveWorkspace(recovery string) {
 	if !m.workspaceLoaded || m.preferencesBlocked {
 		return
 	}
-	s := workspaceSettings{1, m.left, m.right, m.hideBrowser, m.hideInspector}
+	s := workspaceSettings{Version: 1, Left: m.left, Right: m.right, HideBrowser: m.hideBrowser, HideInspector: m.hideInspector, Recent: append([]string(nil), m.recentStudies...)}
 	b, e := json.Marshal(s)
 	if e == nil {
-		_, e = (vdoc.FileStore{}).Write(context.Background(), workspacePath(recovery), b, 4096)
+		_, e = (vdoc.FileStore{}).Write(context.Background(), workspacePath(recovery), b, 16<<10)
 	}
 	if e != nil {
 		fmt.Fprintln(os.Stderr, "Forge workspace:", e)
