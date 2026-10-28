@@ -1,0 +1,117 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "1378c26c7c41b182939db80440784251",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "166148a62ace026177541bdad6b115a6b645bb75",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "82cadcfcf8a57b4b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Styler captures record pointer, may become stale",
+      "message": "The styler closes over the record pointer r and reads r.node and r.theme at style time. If the record is reused or updated on re-render, these fields may be stale or mutated concurrently with the styler. The test posts changes and relies on the record being updated in place; if records are replaced rather than mutated, the toggle would keep the old color.",
+      "suggestion": "Confirm records are updated in place on invalidate; otherwise resolve the color from the widget's current record (look it up at style time) rather than a captured pointer.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/icons.go",
+          "lines": {
+            "start": 139,
+            "end": 139
+          }
+        }
+      ],
+      "tags": [
+        "closure",
+        "stale-state",
+        "location-corrected"
+      ],
+      "evidence": "if r.node.Icon == \"\" || (!r.node.Style.Foreground.Set \u0026\u0026 r.node.Style.ForegroundRole == \"\") {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "a4c56b37852dead4",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Repeated style resolution and swallowed error",
+      "message": "ResolveStyle runs the full style resolution on every style pass for each of three icons per toggle, and errors are silently swallowed, hiding theme misconfiguration (for example an unknown role).",
+      "suggestion": "Resolve once per toggle per update and cache it, and surface or log the error rather than ignoring it.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/icons.go",
+          "lines": {
+            "start": 142,
+            "end": 142
+          }
+        }
+      ],
+      "tags": [
+        "performance",
+        "error-handling",
+        "location-corrected"
+      ],
+      "evidence": "value, err := ui.ResolveStyle(r.node, r.theme)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4960,
+    "totalMs": 4970
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 4996,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 4703,
+        "output": 568,
+        "costUSD": 0.015086
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

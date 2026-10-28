@@ -213,7 +213,9 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	case ui.Switch:
 		widget = core.NewSwitch(parent).SetType(core.SwitchSwitch)
 	case ui.ToggleButton:
-		widget = core.NewSwitch(parent).SetType(core.SwitchSegmentedButton)
+		toggle := core.NewSwitch(parent).SetType(core.SwitchSegmentedButton)
+		bindToggleSymbolColor(r, toggle)
+		widget = toggle
 	case ui.ProgressBar:
 		widget = core.NewMeter(parent)
 	case ui.ProgressRing:

@@ -3,8 +3,11 @@ package cogent
 import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/icons"
+	"cogentcore.org/core/styles"
+	"cogentcore.org/core/tree"
 	_ "embed"
 	"github.com/dshills/vellum/ui"
+	"image"
 )
 
 // These three unmodified Material Symbols carry their own Apache declaration
@@ -122,4 +125,28 @@ func syncToggleSymbol(toggle *core.Switch, symbol ui.Symbol) {
 	}
 	art := nativeSymbol(symbol)
 	toggle.SetIconOn(art).SetIconOff(art).SetIconIndeterminate(icons.None)
+}
+
+// The checked glyph has its own native primary-color styler. An explicit
+// managed foreground must reach the leaf too, without touching image artwork.
+func bindToggleSymbolColor(r *record, toggle *core.Switch) {
+	toggle.FinalMaker(func(p *tree.Plan) {
+		tree.AddInit[core.Frame](p, "stack", func(stack *core.Frame) {
+			stack.FinalMaker(func(p *tree.Plan) {
+				for _, name := range []string{"icon-on", "icon-off", "icon-indeterminate"} {
+					tree.AddInit[core.Icon](p, name, func(icon *core.Icon) {
+						icon.FinalStyler(func(s *styles.Style) {
+							if r.node.Icon == "" || (!r.node.Style.Foreground.Set && r.node.Style.ForegroundRole == "") {
+								return
+							}
+							value, err := ui.ResolveStyle(r.node, r.theme)
+							if err == nil && value.Foreground.Set {
+								s.Color = image.NewUniform(value.Foreground.Value)
+							}
+						})
+					})
+				}
+			})
+		})
+	})
 }

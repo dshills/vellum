@@ -1,0 +1,19 @@
+[
+  {
+    "name": "mac-visual-consistency-final",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "Test.*(ToggleGlyph|IconsManual|Disabled|InputFocus|MacSourceList|ToolbarFocus)",
+      "-timeout=120s",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 28.877
+  }
+]

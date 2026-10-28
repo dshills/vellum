@@ -33,3 +33,8 @@ Model-browser selected rows apply accent ink to disclosure/visibility/activation
 actions and badges as well as labels. Icon-to-label spacing is seven logical
 pixels; original-color item artwork remains untinted. Native focus and disabled
 feedback continue through the existing managed button styles.
+
+Explicit toggle-symbol foreground colors and semantic roles reach the checked
+and unchecked glyph leaves. This prevents a native primary-blue glyph from
+vanishing on an accent-blue selection. Omitted overrides retain native defaults;
+full-color image artwork and native focus/disabled behavior are unaffected.
