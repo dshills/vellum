@@ -7,6 +7,7 @@ if [ ! -f drivers/cogent/build/upstream/go.mod ] || [ ! -f drivers/cogent/build/
  echo 'Run drivers/cogent/prepare.sh before native checks.' >&2
  exit 1
 fi
+python3 -B scripts/native-patch-inventory.py --check
 python3 drivers/cogent/prepare_test.py
 python3 scripts/check-text-backend_test.py
 python3 scripts/check-text-backend.py

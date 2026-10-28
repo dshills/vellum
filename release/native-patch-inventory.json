@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "manifest_sha256": "3290c5b3a6d82848d4063538111043ebc014336efeb7251874b3326e7f352d35",
+  "dependencies": [
+    {
+      "name": "upstream",
+      "module": "cogentcore.org/core",
+      "version": "v0.3.46-0.20261009095036-5cc519b24044",
+      "stages": 98,
+      "patches": 108,
+      "affected_paths": 376,
+      "patch_set_sha256": "48835460aa3ada1769104489714187b81798d56b01bcb064a17502562397518c"
+    },
+    {
+      "name": "typesetting",
+      "module": "github.com/go-text/typesetting",
+      "version": "v0.3.5-0.20260418130854-c41d02a44bec",
+      "stages": 6,
+      "patches": 6,
+      "affected_paths": 23,
+      "patch_set_sha256": "ed7decbc9bf50875ebec80c226a58a6b1a32c66e9f7895566a27da1016fd75e4"
+    }
+  ]
+}

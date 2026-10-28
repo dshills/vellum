@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--paths",
+    "CONTRIBUTING.md,docs/decisions/0012-native-dependency-maintenance.md,release/native-patch-inventory.json,scripts/check.sh,scripts/native-patch-inventory.py",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "6",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "240000",
+    "--max-diff-bytes",
+    "240000",
+    "--rules",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/general-fix-07/rules.json",
+    "--format",
+    "json",
+    "--out",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/mac-widget-next-five/general-fix-07/prism.json"
+  ],
+  "cwd": "/Users/dshills/Development/projects/Vellum",
+  "started_utc": "2026-10-28T12:44:59.221680+00:00",
+  "watchdog_seconds": 180,
+  "error": null,
+  "exit_code": 1,
+  "created": true,
+  "observation_errors": [],
+  "logs_complete": true,
+  "pins_stable": true,
+  "stop_at_exit": false,
+  "pid": 37121,
+  "group": 37121,
+  "owned": {
+    "created": true,
+    "pid": 37121,
+    "group": 37121,
+    "terminal": true,
+    "group_absent": true,
+    "exit_code": 1,
+    "errors": [],
+    "observation": {
+      "group": 37121,
+      "members": [],
+      "observation_sha256": "cb4c260e9a71166cd88a918b63ce965236fef879c109aa88b45ca8feddf25115"
+    }
+  },
+  "seconds": 5.421145874999638,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

@@ -70,3 +70,13 @@ Before changing a stable root API, run the separate developer guard:
 The baseline is reviewed release data; checks never regenerate it. Follow the
 [guard's scope and conservative findings](tools/apicompat/README.md). Behavioral
 and native-facade changes retain their existing testing/review requirements.
+
+## Native dependency maintenance
+
+Vellum owns a substantial pinned dependency patch set. Before changing a patch or
+pin, follow [ADR 0012](docs/decisions/0012-native-dependency-maintenance.md).
+`python3 -B scripts/native-patch-inventory.py --check` refuses unrecorded drift.
+After reviewing patch ownership and upgrade impact, regenerate the inventory with
+`python3 -B scripts/native-patch-inventory.py > release/native-patch-inventory.json`
+and include it in the same reviewed checkpoint. The inventory is descriptive,
+not a performance target or an approval to publish dependencies.
