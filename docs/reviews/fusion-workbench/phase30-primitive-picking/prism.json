@@ -1,0 +1,118 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b638e1731d39012c6b7a40b3157ce971",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "4738774dc6f9964c5fc2e607f4fbf7b6cd7bf372",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "9b892f7f6de981ec",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Division by zero for degenerate cylinder bounds",
+      "message": "If Bounds has zero or negative Y/Z extent, ry or rz is 0, so the divisions produce Inf or NaN. Rays can then silently miss, or hit incorrectly, because the NaN comparisons all evaluate to false. Validation may not reject degenerate bounds for cylinders.",
+      "suggestion": "Guard with `if ry \u003c= 0 || rz \u003c= 0 { return r.Hit(o.Bounds) }` (or return a miss) before the divisions.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "viewport/scene.go",
+          "lines": {
+            "start": 139,
+            "end": 143
+          }
+        }
+      ],
+      "tags": [
+        "robustness",
+        "nan"
+      ],
+      "evidence": "y, z := (r.Origin.Y-cy)/ry, (r.Origin.Z-cz)/rz",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4841,
+    "totalMs": 4846
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 6793,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 5617,
+        "output": 596,
+        "costUSD": 0.017194
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "0c28a7a955eed85c",
+        "severity": "medium",
+        "category": "testing",
+        "title": "Misnamed test case contradicts its expectation",
+        "message": "The case named \"corner miss\" expects hit=true, and the \"box corner outside cap\" case is the one that actually misses. The misleading name makes failures confusing. The test is also a single dense line of struct literals that is hard to read.",
+        "suggestion": "Rename it to e.g. \"silhouette hit\" and reformat the table one case per line.",
+        "confidence": 0.7,
+        "locations": [
+          {
+            "path": "viewport/primitive_test.go",
+            "lines": {
+              "start": 15,
+              "end": 15
+            }
+          }
+        ],
+        "tags": [
+          "test-clarity"
+        ],
+        "evidence": "{\"corner miss\", Ray{Vec3{0, .9, 3}, Vec3{0, 0, -1}}, true, 3 - math.Sqrt(1-.81)}",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in viewport/primitive_test.go"
+    }
+  ],
+  "suppressed": []
+}

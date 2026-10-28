@@ -1,0 +1,28 @@
+[
+  {
+    "name": "forge-picking",
+    "cwd": ".",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "./viewport"
+    ],
+    "exit_code": 0,
+    "seconds": 1.312
+  },
+  {
+    "name": "forge-picking-app",
+    "cwd": "examples/forge",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 23.581
+  }
+]

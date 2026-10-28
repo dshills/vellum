@@ -29,7 +29,7 @@ Studies use versioned `.vforge` files through native Open/Save (Cmd-O/Cmd-S;
 Cmd-Shift-S for Save As). Closing or opening a dirty study asks before discard.
 An atomic private recovery copy is offered after interruption; only one Forge
 instance may own recovery. Saved studies are never replaced by recovery.
-No network or cloud service is used. Display geometry uses opaque boxes and a round shaft; picking uses box proxies,
+No network or cloud service is used. Display geometry uses opaque boxes and a round shaft; picking follows box and capped-cylinder primitives,
 with a 48-body demo limit. There are no sketch constraints, B-rep modeling,
 assemblies at Fusion scale, cross-window capture, or secondary-button capture.
 The reusable SceneView3D and viewport helpers are experimental additions; the
@@ -77,7 +77,7 @@ demonstration, and the presentation pass adds no CAD operations.
 4. Select a body in the viewport or browser. Its material stays visible inside
    a blue outline of its picking bounds. Hover gives a lighter preview.
 5. Select Drive shaft to see cylindrical display geometry. Its inspector explicitly
-   identifies the box picking proxy; selection near its silhouette can hit that box.
+   identifies precise cylinder picking. The blue outline still shows its bounding box.
 6. Apply a width, Move or Delete, then Undo/Redo. Right-click opens existing actions;
    Escape dismisses them. Navigation/selection does not add history entries.
 

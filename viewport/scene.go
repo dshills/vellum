@@ -7,7 +7,7 @@ import (
 	"math"
 )
 
-// Shape is a bounded preview primitive; all shapes retain box picking proxies.
+// Shape is a bounded preview primitive; picking follows the primitive silhouette.
 type Shape uint8
 
 const (
@@ -15,7 +15,7 @@ const (
 	CylinderXShape       // Cylinder along X, inscribed in Bounds; Y/Z extents set radii.
 )
 
-// Object is an opaque preview fixture with a box picking proxy. A Scene is a small interactive
+// Object is an opaque preview fixture with primitive picking. A Scene is a small interactive
 // preview, not a boundary-representation model or an assembly acceleration index.
 type Object struct {
 	ID, Name string
@@ -69,7 +69,7 @@ func (s *Scene) Pick(x, y, width, height float64) (string, error) {
 		if !o.Visible {
 			continue
 		}
-		if d, ok := ray.Hit(o.Bounds); ok && d < distance {
+		if d, ok := hitObject(ray, o); ok && d < distance {
 			distance, id = d, o.ID
 		}
 	}
@@ -122,4 +122,50 @@ func CubeViewAt(c Camera, x, y, width, height int, scale float64) (View, bool) {
 		return Front, true
 	}
 	return Back, true
+}
+
+// hitObject tests the actual preview primitive, including capped elliptical
+// cylinders. Distances retain the caller's ray parameter for nearest-hit order.
+func hitObject(r Ray, o Object) (float64, bool) {
+	if o.Shape != CylinderXShape {
+		return r.Hit(o.Bounds)
+	}
+	if _, ok := r.Hit(o.Bounds); !ok {
+		return 0, false
+	}
+	b := o.Bounds
+	cy := (b.Min.Y + b.Max.Y) / 2
+	cz := (b.Min.Z + b.Max.Z) / 2
+	ry := (b.Max.Y - b.Min.Y) / 2
+	rz := (b.Max.Z - b.Min.Z) / 2
+	y, z := (r.Origin.Y-cy)/ry, (r.Origin.Z-cz)/rz
+	dy, dz := r.Direction.Y/ry, r.Direction.Z/rz
+	a := dy*dy + dz*dz
+	bb := 2 * (y*dy + z*dz)
+	c := y*y + z*z - 1
+	best := math.Inf(1)
+	accept := func(t float64) {
+		x := r.Origin.X + t*r.Direction.X
+		if t >= 0 && x >= b.Min.X-1e-10 && x <= b.Max.X+1e-10 && t < best {
+			best = t
+		}
+	}
+	if a > 1e-24 {
+		disc := bb*bb - 4*a*c
+		if disc >= 0 {
+			root := math.Sqrt(disc)
+			accept((-bb - root) / (2 * a))
+			accept((-bb + root) / (2 * a))
+		}
+	}
+	if math.Abs(r.Direction.X) > 1e-12 {
+		for _, x := range []float64{b.Min.X, b.Max.X} {
+			t := (x - r.Origin.X) / r.Direction.X
+			yy, zz := y+t*dy, z+t*dz
+			if yy*yy+zz*zz <= 1+1e-12 {
+				accept(t)
+			}
+		}
+	}
+	return best, !math.IsInf(best, 1)
 }

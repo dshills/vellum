@@ -166,7 +166,7 @@ func (m *workbench) inspectorView() ui.Node {
 	}
 	kind := "Solid body · Box proxy"
 	if o.Shape == viewport.CylinderXShape {
-		kind = "Cylinder · Box picking proxy"
+		kind = "Cylinder · Precise picking"
 	}
 	header := column("inspect-header", text("inspect-heading", "INSPECTOR", 10, 600, muted), text("selected-name", name, 14, 600, ink), text("inspect-type", kind, 11, 400, muted))
 	header.Style.Gap = ui.Some(float32(4))
