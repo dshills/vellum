@@ -183,3 +183,17 @@ does not strip metadata from user-owned files.
 The bundle key and Retina conventions follow Apple's
 [CFBundleIconFile reference](https://developer.apple.com/documentation/BundleResources/Information-Property-List/CFBundleIconFile)
 and [high-resolution icon guidance](https://developer.apple.com/library/archive/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/Optimizing/Optimizing.html).
+
+## Complete document starter
+
+Generate an independent application with
+`python3 scripts/new-app.py /absolute/my-doc-app --module example.com/my-doc-app --template document`.
+It copies the tested Notes app recipe into app-owned internal packages, including
+prose editing, native toolbar/menu actions, input settlement, Save/Open/Save As,
+dirty-close decisions, recovery and Undo/Redo. Full-color artwork stays local.
+
+Run `go test -race -tags offscreen ./...`, then
+`go run . -data-dir /absolute/private/my-doc-data`. A data directory is required;
+the generated app never defaults to Vellum Notes storage. Use a separate private
+directory per application. Customize the copied internal model and views. The
+default minimal template remains available for small non-document utilities.

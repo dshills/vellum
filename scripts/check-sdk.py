@@ -284,6 +284,12 @@ def check(path, expected_sha256=None, native_runtime=False, allow_self_attested=
         run_child(["go", "mod", "verify"], cwd=consumer, env=env, check=True, stdout=sys.stderr, timeout=COMMAND_TIMEOUT_SECONDS)
         for arguments in (["go", "test", "-race", "./..."], ["go", "vet", "./..."], ["go", "build", "-o", str(base / "consumer"), "."]):
             run_child(arguments, cwd=consumer, env=env, check=True, stdout=sys.stderr, timeout=COMMAND_TIMEOUT_SECONDS)
+        document_consumer = base / "document application"
+        run_child(["python3", str(sdk / "scripts/new-app.py"), str(document_consumer), "--module=example.com/document-consumer", "--template=document"], env=env, check=True, stdout=sys.stderr, timeout=GENERATOR_TIMEOUT_SECONDS)
+        document_modules = decode_objects(check_child_output(["go", "list", "-m", "-json", "all"], cwd=document_consumer, env=env, text=True, timeout=COMMAND_TIMEOUT_SECONDS))
+        check_origin(document_modules, sdk, verified["manifest"]["release"]["module"], gpu)
+        for arguments in (["go", "test", "-race", "./..."], ["go", "vet", "./..."], ["go", "build", "-o", str(base / "document-app"), "."]):
+            run_child(arguments, cwd=document_consumer, env=env, check=True, stdout=sys.stderr, timeout=COMMAND_TIMEOUT_SECONDS)
         contract = sdk / "examples/sdk-contract"
         for arguments in (["go", "test", "-race", "./..."], ["go", "vet", "./..."]):
             run_child(arguments, cwd=contract, env=env, check=True, stdout=sys.stderr, timeout=COMMAND_TIMEOUT_SECONDS)

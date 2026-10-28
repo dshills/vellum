@@ -1,0 +1,56 @@
+[
+  {
+    "name": "document-starter-generate-final",
+    "cwd": ".",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/new-app.py",
+      "/private/tmp/vellum-document-starter-final-20261028",
+      "--module",
+      "example.com/document-final",
+      "--template",
+      "document"
+    ],
+    "exit_code": 0,
+    "seconds": 0.054
+  },
+  {
+    "name": "document-starter-test-final",
+    "cwd": "/private/tmp/vellum-document-starter-final-20261028",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 4.215
+  },
+  {
+    "name": "document-starter-vet",
+    "cwd": "/private/tmp/vellum-document-starter-20261028",
+    "argv": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 0.425
+  },
+  {
+    "name": "document-sdk-tests",
+    "cwd": ".",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/check-sdk_test.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.212
+  }
+]
