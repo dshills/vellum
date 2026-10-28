@@ -289,7 +289,14 @@ def check(path, expected_sha256=None, native_runtime=False, allow_self_attested=
             run_child(arguments, cwd=contract, env=env, check=True, stdout=sys.stderr, timeout=COMMAND_TIMEOUT_SECONDS)
         native = None
         if native_runtime:
-            completed = run_child([str(base / "consumer"), "--benchmark", "--idle=1s", "--samples=3"], env=child_environment(runtime=True), check=True, text=True, capture_output=True, timeout=RUNTIME_TIMEOUT_SECONDS)
+            diagnostic = base / "native-diagnostic"
+            diagnostic_root = sdk / "examples/hello"
+            diagnostic_modules = decode_objects(check_child_output(["go", "list", "-m", "-json", "all"], cwd=diagnostic_root, env=env, text=True, timeout=COMMAND_TIMEOUT_SECONDS))
+            check_origin(diagnostic_modules, sdk, verified["manifest"]["release"]["module"], gpu)
+            for arguments in (["go", "test", "-race", "./..."], ["go", "vet", "./..."]):
+                run_child(arguments, cwd=diagnostic_root, env=env, check=True, stdout=sys.stderr, timeout=COMMAND_TIMEOUT_SECONDS)
+            run_child(["go", "build", "-o", str(diagnostic), "."], cwd=sdk / "examples/hello", env=env, check=True, stdout=sys.stderr, timeout=COMMAND_TIMEOUT_SECONDS)
+            completed = run_child([str(diagnostic), "--benchmark", "--idle=1s", "--samples=3"], env=child_environment(runtime=True), check=True, text=True, capture_output=True, timeout=RUNTIME_TIMEOUT_SECONDS)
             native = native_benchmark_report(completed.stdout)
         return {"event": "vellum.sdk.relocated", "digest_verified_against_expected": expected_sha256 is not None, "trust_basis": "caller-supplied expected digest" if expected_sha256 is not None else "explicit self-attestation", "independent_authenticity_verified": False, "archive_sha256": verified["archive_sha256"], "version": verified["manifest"]["release"]["version"], "source": verified["manifest"].get("source"), "verified_files": len(verified["manifest"]["files"]), "replacements_within_sdk": origins, "path_contains_spaces": " " in str(sdk), "checks": ["manifest all-file integrity", "external Go module cache verification", "standalone consumer race/vet/build", "public API scenarios race/vet"], "native_runtime": native if native_runtime else "not executed", "public_distribution_audit": "not certified"}
 
@@ -299,7 +306,7 @@ def main():
     parser.add_argument("--archive", required=True, type=Path)
     parser.add_argument("--sha256", help="trusted archive digest, if available")
     parser.add_argument("--allow-self-attested", action="store_true", help="explicitly execute archive code without an independently trusted digest (for own private builds)")
-    parser.add_argument("--runtime", action="store_true", help="also open/verify/close the relocated native consumer (serialize desktop checks)")
+    parser.add_argument("--runtime", action="store_true", help="also build/test and open/verify/close the SDK native diagnostic (serialize desktop checks)")
     args = parser.parse_args()
     try:
         result = check(args.archive.absolute(), args.sha256, args.runtime, args.allow_self_attested)

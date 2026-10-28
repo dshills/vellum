@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "23b7738e795205514cbaad03964237d1",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "3e0a4a77c01abc86f7857bd4e6e5758bd21a0c1b",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "47395a083609c5b0",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Native runtime check no longer exercises the consumer binary",
+      "message": "The native runtime benchmark now runs a separately built binary from the SDK's examples/hello instead of the consumer app that was just tested. The runtime check no longer validates the relocated consumer. examples/hello is also not covered by the earlier race/vet checks, and its module resolution (replace directives, go.mod location) differs from the consumer's, so the build can fail or resolve different dependencies.",
+      "suggestion": "Confirm examples/hello is a standalone module with a valid go.mod inside the SDK and that it is vetted. Otherwise keep benchmarking the consumer binary, or add the diagnostic to the vet/test steps.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "scripts/check-sdk.py",
+          "lines": {
+            "start": 293,
+            "end": 293
+          }
+        }
+      ],
+      "tags": [
+        "verification",
+        "sdk",
+        "location-corrected"
+      ],
+      "evidence": "run_child([\"go\", \"build\", \"-o\", str(diagnostic), \".\"], cwd=sdk / \"examples/hello\", env=env, check=True, stdout=sys.stderr, timeout=COMMAND_TIMEOUT_SECONDS)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4232,
+    "totalMs": 4241
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 2,
+    "bytes": 4548,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 4020,
+        "output": 423,
+        "costUSD": 0.01227
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

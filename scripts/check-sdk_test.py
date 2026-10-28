@@ -154,6 +154,7 @@ class SDKChecks(unittest.TestCase):
      else:
       with self.assertRaisesRegex(ValueError,"did not disable window geometry"):
        sdk.check(Path("own-archive"),expected_sha256="digest",native_runtime=True)
+     self.assertEqual(Path(commands.call_args.args[0][0]).name,"native-diagnostic")
      self.assertEqual(commands.call_args.args[0][1:],["--benchmark","--idle=1s","--samples=3"])
      self.assertEqual(commands.call_args.kwargs["timeout"],sdk.RUNTIME_TIMEOUT_SECONDS)
  def test_execution_requires_digest_or_explicit_self_attestation(self):

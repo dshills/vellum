@@ -1,0 +1,41 @@
+[
+  {
+    "name": "consumer-sdk-tests-final",
+    "cwd": ".",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/check-sdk_test.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.228
+  },
+  {
+    "name": "consumer-sdk-export",
+    "cwd": ".",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/release-sdk.py",
+      "--output",
+      "/private/tmp/vellum-consumer-sdk-20261028.tar.gz"
+    ],
+    "exit_code": 0,
+    "seconds": 10.445
+  },
+  {
+    "name": "consumer-sdk-relocation",
+    "cwd": ".",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/check-sdk.py",
+      "--archive",
+      "/private/tmp/vellum-consumer-sdk-20261028.tar.gz",
+      "--sha256",
+      "a62b9247bd5b53a0123b88d5b67289b3cdb558896823cf75e8c786f85ae8554c"
+    ],
+    "exit_code": 0,
+    "seconds": 74.221
+  }
+]
