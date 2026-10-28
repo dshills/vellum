@@ -93,18 +93,27 @@ func (p *ModelBrowser) visible(id string, by map[string]ModelBrowserItem, expand
 	}
 	return true
 }
-func (p *ModelBrowser) propose(id string, kind ModelBrowserEventKind, value bool) {
-	if p.Disabled || p.Change == nil {
-		return
+
+// admitted validates current identity, hierarchy and disabled state for all row actions.
+func (p *ModelBrowser) admitted(id string) (map[string]ModelBrowserItem, bool) {
+	if p == nil || p.Disabled {
+		return nil, false
 	}
 	by, expanded, e := p.items()
 	if e != nil || by[id].ID == "" || by[id].Disabled || !p.visible(id, by, expanded) {
-		return
+		return nil, false
 	}
 	for parent := by[id].Parent; parent != ""; parent = by[parent].Parent {
 		if by[parent].Disabled {
-			return
+			return nil, false
 		}
+	}
+	return by, true
+}
+func (p *ModelBrowser) propose(id string, kind ModelBrowserEventKind, value bool) {
+	by, ok := p.admitted(id)
+	if !ok || p.Change == nil {
+		return
 	}
 	if kind == ModelBrowserExpand {
 		hasChild := false
@@ -172,6 +181,9 @@ func (p *ModelBrowser) View() (Node, error) {
 			}
 			row.Children = append(row.Children, Node{ID: rid + "/select", Kind: Button, Text: item.Label, Icon: item.Icon, IconImage: item.IconImage, Appearance: ButtonTool, Style: selectStyle, Accessibility: Accessibility{Name: "Select " + item.Label}, ActivateModified: func(e ActivationEvent) {
 				if p.SelectModified != nil {
+					if _, ok := p.admitted(id); p.ID != rootID || !ok {
+						return
+					}
 					p.SelectModified(id, e.Shift)
 				} else {
 					propose(id, ModelBrowserSelect, true)

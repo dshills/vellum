@@ -1,0 +1,94 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "02800508423e205cc9eb1d4179ec1fd0",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "5b6f02440084727fccbb3bf003a7464ac110160a",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "1b47e18137b7fdfc",
+      "severity": "medium",
+      "category": "maintainability",
+      "title": "Duplicated admission logic left in propose",
+      "message": "propose still duplicates all the checks now in admits, and calls p.items() twice (rebuilding the maps). The duplicated logic can drift, and the work is wasted. Also, p.items() error is ignored in the fix, but admits already returned true so it succeeded.",
+      "suggestion": "Remove the redundant validation from propose and reuse the result of a single items() call; keep only the kind-specific checks.",
+      "confidence": 0.8,
+      "locations": [
+        {
+          "path": "ui/model_browser.go",
+          "lines": {
+            "start": 117,
+            "end": 131
+          }
+        }
+      ],
+      "tags": [
+        "duplication",
+        "performance"
+      ],
+      "evidence": "if !p.admits(id) || p.Change == nil {\n\t\treturn\n\t}\n\tby, expanded, e := p.items()\n\tif e != nil || by[id].ID == \"\" || by[id].Disabled || !p.visible(id, by, expanded) {\n\t\treturn\n\t}\n\tfor parent := by[id].Parent; parent != \"\"; parent = by[parent].Parent {\n\t\tif by[parent].Disabled {\n\t\t\treturn\n\t\t}\n\t}",
+      "fix": {
+        "before": "if !p.admits(id) || p.Change == nil {\n\t\treturn\n\t}\n\tby, expanded, e := p.items()\n\tif e != nil || by[id].ID == \"\" || by[id].Disabled || !p.visible(id, by, expanded) {\n\t\treturn\n\t}\n\tfor parent := by[id].Parent; parent != \"\"; parent = by[parent].Parent {\n\t\tif by[parent].Disabled {\n\t\t\treturn\n\t\t}\n\t}",
+        "after": "if !p.admits(id) || p.Change == nil {\n\t\treturn\n\t}\n\tby, _, _ := p.items()"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 5772,
+    "totalMs": 5785
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 2,
+    "bytes": 2668,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 3569,
+        "output": 658,
+        "costUSD": 0.013718
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
