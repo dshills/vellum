@@ -1,0 +1,46 @@
+[
+  {
+    "name": "private-bundle-tests-final",
+    "cwd": ".",
+    "argv": [
+      "python3",
+      "-B",
+      "scripts/private-macos-bundle_test.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.096
+  },
+  {
+    "name": "consumer-final-api",
+    "cwd": "tools/apicompat",
+    "argv": [
+      "go",
+      "run",
+      ".",
+      "check",
+      "-root",
+      "../..",
+      "-baseline",
+      "../../release/api/v1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.431
+  },
+  {
+    "name": "consumer-final-facade",
+    "cwd": "drivers/cogent",
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags",
+      "offscreen",
+      "-run",
+      "TestStable|Test.*PerWindow|TestToggleGlyph",
+      "-timeout=120s",
+      "."
+    ],
+    "exit_code": 0,
+    "seconds": 5.058
+  }
+]
