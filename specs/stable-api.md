@@ -27,7 +27,9 @@ Source compatibility does not promise pixel-identical AppKit controls, arbitrary
 Root and native driver are separate Go modules. The owner-authorized
 26 October source release creates the public root `v1.0.0` tag. Native apps
 continue to build from the tagged checkout with explicit local replacements;
-no independently consumable native-driver tag or prepared public SDK is released.
+no independently consumable native-driver module tag is released. The later
+`macos-v1.0.0-build13` packaging release publishes a prepared SDK and six apps
+from source `64bf9cf`; see the [publication record](../docs/reports/macos-v1-build13-publication/README.md).
 The private SDK retains its recorded identity and replacement origins. Separate
 native-module releases require coordinated version tags and authorization. SDK
 consumers must preserve every generated native-linker replacement.

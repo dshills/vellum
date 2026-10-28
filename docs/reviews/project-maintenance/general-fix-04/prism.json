@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "dc3bd8bc3c8a34f0a931022a6be1ff63",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "4caceb907c9e628c9f046419de6004d66a64d9f1",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "9e19dbcb29ead95e",
+      "severity": "medium",
+      "category": "docs",
+      "title": "Possibly broken anchor link",
+      "message": "The README link anchor was changed to #consume-the-published-sdk, but docs/macos-v1.md is not part of this diff. If that heading was not renamed in the same change, the link is broken.",
+      "suggestion": "Confirm the heading 'Consume the published SDK' exists in docs/macos-v1.md, or rename the heading/anchor so they match.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "README.md",
+          "lines": {
+            "start": 171,
+            "end": 170
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "broken-link"
+      ],
+      "evidence": "the [Mac guide](docs/macos-v1.md#consume-the-published-sdk).",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 2715,
+    "totalMs": 2718
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 3942,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 3307,
+        "output": 252,
+        "costUSD": 0.009134
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

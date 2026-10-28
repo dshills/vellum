@@ -1,12 +1,15 @@
 # Framework implementation phases
 
-Current source identifies `v1.0.0` for private personal macOS use. See the
+Current source retains the `v1.0.0` API baseline. The root source release and
+matching build13 SDK/six macOS applications are published; see the
+[publication record](reports/macos-v1-build13-publication/README.md).
+Forge is subsequent source/private-build development, outside those assets. See the
 [stable API contract](../specs/stable-api.md), [Mac support guide](macos-v1.md)
 and [final closeout report](reports/macos-v1-release/README.md). The completed
 [v1 RC acceptance](reports/macos-v1/README.md) remains source-bound historical evidence.
 The published [alpha.3 preview](https://github.com/dshills/vellum/releases/tag/v0.1.0-alpha.3)
-does not include current widgets/Notes. Public v1 assets, broader hardware and
-human IME/VoiceOver remain outside the current delivery claim.
+does not include current widgets/Notes. Broader hardware and human
+IME/VoiceOver remain outside the current qualification claim.
 
 The phase entries below retain their historical checkpoint scope, including
 then-pending checks and publication statements. They do not redefine the current

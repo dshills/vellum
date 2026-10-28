@@ -33,11 +33,15 @@ Active tools stay visible, and selection outlines preserve each body's material.
 | ![Forge with the cylindrical drive shaft selected and its dimensions shown in the inspector](docs/screenshots/forge-shaft.jpg) | ![Forge action panel with full-color icons, keyboard focus and an active Orbit tool](docs/screenshots/forge-actions.jpg) |
 | Cylindrical shaft display with its box picking bounds outlined. | A focus-scoped action panel with consistent macOS-style colors. |
 
-After the native preparation in [Quick start](#quick-start-on-macos), run:
+Forge requires the current development checkout; the `v1.0.0` source tag and
+published build13 SDK do not contain it. From a clone of this repository, run:
 
 ```sh
-cd examples/forge
-go run .
+git switch main
+git pull --ff-only
+./drivers/cogent/prepare.sh
+. ./drivers/cogent/env.sh
+(cd examples/forge && go run .)
 ```
 
 See the [Forge guide](examples/forge/README.md) for controls and private packaging,
@@ -164,7 +168,7 @@ export VELLUM_CACHE_DIR=/tmp/vellum-go-cache
 Preparation verifies dependency sources and applies driver-owned patches. The
 native driver and example modules use explicit local replacements. Build from
 the checkout with this workflow, or use the independently extracted SDK route in
-the [Mac guide](docs/macos-v1.md#consume-the-private-sdk).
+the [Mac guide](docs/macos-v1.md#consume-the-published-sdk).
 
 ## Example applications
 
