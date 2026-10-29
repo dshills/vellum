@@ -33,8 +33,9 @@ Active tools stay visible, and selection outlines preserve each body's material.
 | ![Forge with the cylindrical drive shaft selected and its dimensions shown in the inspector](docs/screenshots/forge-shaft.jpg) | ![Forge action panel with full-color icons, keyboard focus and an active Orbit tool](docs/screenshots/forge-actions.jpg) |
 | Cylindrical shaft display with its box picking bounds outlined. | A focus-scoped action panel with consistent macOS-style colors. |
 
-Forge requires the current development checkout; the `v1.0.0` source tag and
-published build13 SDK do not contain it. From a clone of this repository, run:
+Forge is available in the current development checkout and matching newer
+private SDK bundles; the `v1.0.0` source tag and published build13 SDK do not
+contain it. From a clone of this repository, run:
 
 ```sh
 git switch main
@@ -226,6 +227,22 @@ Start with [building a macOS app](docs/building-macos-apps.md), the
 [shared Mac presentation](docs/mac-presentation.md), and
 [native shell APIs](docs/macos-app-shell.md). The [SDK contract](specs/sdk.md)
 describes packaging and relocation.
+
+## Build your own Mac application
+
+The [application guide](docs/building-macos-apps.md#complete-document-starter)
+covers two independent starter profiles. The default is a minimal utility;
+`--template document` adds an app-owned prose notebook, Save/Open/Save As,
+recovery, dirty-close decisions and Undo/Redo through public APIs. Document
+apps launch normally with their own private Application Support storage and
+retain an explicit `-data-dir` override for isolated testing.
+
+The [matching private SDK/app recipe](docs/private-consumer-bundle.md) builds
+Forge, Measure Pad, the two-window Documents diagnostic and Document Starter
+from one extracted SDK. These newer private bundles are separate from the six
+published build13 apps. The offscreen SDK consumer CI checks both starter
+profiles, while native UI observations remain separate. Current checkpoints
+use internal code reviews.
 
 ## Verification
 

@@ -450,3 +450,15 @@ the retiring `macos-14` image. This host pin does not expand runtime qualificati
 or change test deadlines. Explicit prepared-dependency selection in scripts/check.sh
 includes the stage0108 exposure regressions; dependency tests are not transitive.
 See [the maintenance checkpoint](reviews/ci-supported-macos-runner/README.md).
+
+
+## Relocated SDK consumers
+
+After native preparation, run `python3 -B scripts/check-sdk-ci.py --output
+/absolute/new/sdk-check` from a clean committed checkout. The output must be
+outside the repository. This bounded offscreen check exports a private SDK and
+runs minimal/document generated consumer race/vet/build plus public API cases
+with replacement origins constrained to the relocated SDK. See the
+[private consumer guide](private-consumer-bundle.md#reproducible-verification-and-handoff).
+The Framework workflow gives it a separate macOS job and retains only reports
+and bounded logs, without launching apps or publishing an SDK release.

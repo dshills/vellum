@@ -36,7 +36,7 @@ consumers must preserve every generated native-linker replacement.
 
 ## Verification and change review
 
-The final pass compares source changes against the accepted RC: no exported declarations are removed or reshaped; the API version constant changes deliberately. Existing root tests and the independent sdk-contract/Notes/shell consumers exercise public usage. Run focused tests for actual changes, review checkpoints with Prism using Anthropic Claude Sonnet5.5, and bind final SDK/app manifests to committed source. The final CI report records exact workflow outcomes. New compatibility obligations guide subsequent v1 maintenance; existing historical reports remain immutable.
+The final pass compares source changes against the accepted RC: no exported declarations are removed or reshaped; the API version constant changes deliberately. Existing root tests and the independent sdk-contract/Notes/shell consumers exercise public usage. Run focused tests for actual changes, internally review checkpoints and record findings and verification, and bind final SDK/app manifests to committed source. The final CI report records exact workflow outcomes. New compatibility obligations guide subsequent v1 maintenance; existing historical reports remain immutable.
 
 ## Root source compatibility guard
 

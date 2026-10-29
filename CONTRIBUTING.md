@@ -59,6 +59,10 @@ Keep changes focused. The current [macOS v1 closeout](specs/macos-v1-release.md)
 freezes features and experimental rendering/pacing. Preserve the
 [stable v1 API contract](specs/stable-api.md) when maintaining supported APIs.
 Include changes, checks and limitations in commit or pull-request descriptions.
+Use internal code review at significant checkpoints and record its scope,
+findings, fixes and verification before committing. External review services
+(including Prism) require a new explicit user request; historical receipts do not
+authorize further source transmission.
 
 Before changing a stable root API, run the separate developer guard:
 
