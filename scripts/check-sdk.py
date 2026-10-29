@@ -287,7 +287,7 @@ def check(path, expected_sha256=None, native_runtime=False, allow_self_attested=
         document_consumer = base / "document application"
         run_child(["python3", str(sdk / "scripts/new-app.py"), str(document_consumer), "--module=example.com/document-consumer", "--template=document"], env=env, check=True, stdout=sys.stderr, timeout=GENERATOR_TIMEOUT_SECONDS)
         document_modules = decode_objects(check_child_output(["go", "list", "-m", "-json", "all"], cwd=document_consumer, env=env, text=True, timeout=COMMAND_TIMEOUT_SECONDS))
-        check_origin(document_modules, sdk, verified["manifest"]["release"]["module"], gpu)
+        document_origins = check_origin(document_modules, sdk, verified["manifest"]["release"]["module"], gpu)
         for arguments in (["go", "test", "-race", "./..."], ["go", "vet", "./..."], ["go", "build", "-o", str(base / "document-app"), "."]):
             run_child(arguments, cwd=document_consumer, env=env, check=True, stdout=sys.stderr, timeout=COMMAND_TIMEOUT_SECONDS)
         contract = sdk / "examples/sdk-contract"
@@ -304,7 +304,7 @@ def check(path, expected_sha256=None, native_runtime=False, allow_self_attested=
             run_child(["go", "build", "-o", str(diagnostic), "."], cwd=sdk / "examples/hello", env=env, check=True, stdout=sys.stderr, timeout=COMMAND_TIMEOUT_SECONDS)
             completed = run_child([str(diagnostic), "--benchmark", "--idle=1s", "--samples=3"], env=child_environment(runtime=True), check=True, text=True, capture_output=True, timeout=RUNTIME_TIMEOUT_SECONDS)
             native = native_benchmark_report(completed.stdout)
-        return {"event": "vellum.sdk.relocated", "digest_verified_against_expected": expected_sha256 is not None, "trust_basis": "caller-supplied expected digest" if expected_sha256 is not None else "explicit self-attestation", "independent_authenticity_verified": False, "archive_sha256": verified["archive_sha256"], "version": verified["manifest"]["release"]["version"], "source": verified["manifest"].get("source"), "verified_files": len(verified["manifest"]["files"]), "replacements_within_sdk": origins, "path_contains_spaces": " " in str(sdk), "checks": ["manifest all-file integrity", "external Go module cache verification", "standalone consumer race/vet/build", "public API scenarios race/vet"], "native_runtime": native if native_runtime else "not executed", "public_distribution_audit": "not certified"}
+        return {"event": "vellum.sdk.relocated", "digest_verified_against_expected": expected_sha256 is not None, "trust_basis": "caller-supplied expected digest" if expected_sha256 is not None else "explicit self-attestation", "independent_authenticity_verified": False, "archive_sha256": verified["archive_sha256"], "version": verified["manifest"]["release"]["version"], "source": verified["manifest"].get("source"), "verified_files": len(verified["manifest"]["files"]), "replacements_within_sdk": origins, "document_replacements_within_sdk": document_origins, "path_contains_spaces": " " in str(sdk), "checks": ["manifest all-file integrity", "external Go module cache verification", "minimal consumer race/vet/build", "document consumer race/vet/build", "public API scenarios race/vet"], "native_runtime": native if native_runtime else "not executed", "public_distribution_audit": "not certified"}
 
 
 def main():

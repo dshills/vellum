@@ -19,6 +19,7 @@ python3 scripts/build-macos_test.py
 python3 scripts/release-sdk_test.py
 python3 scripts/distribution-inventory_test.py
 python3 scripts/check-sdk_test.py
+python3 -B scripts/check-sdk-ci_test.py
 python3 -B scripts/private-macos-bundle_test.py
 python3 scripts/package-app_test.py
 python3 scripts/app_icons_test.py

@@ -1,0 +1,35 @@
+{
+  "event": "vellum.sdk.relocated",
+  "digest_verified_against_expected": true,
+  "trust_basis": "caller-supplied expected digest",
+  "independent_authenticity_verified": false,
+  "archive_sha256": "3b9ebf8cbfdd6d138f9a6c8d184e64e8a8b85fda1300fb312ab629f3b6f85517",
+  "version": "v1.0.0",
+  "source": {
+    "clean": true,
+    "commit": "9ef6485eaa598b95bdaf3ee69ea6647eb53947c4"
+  },
+  "verified_files": 8934,
+  "replacements_within_sdk": {
+    "cogentcore.org/core": "drivers/cogent/build/upstream",
+    "github.com/dshills/vellum": ".",
+    "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+    "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+  },
+  "document_replacements_within_sdk": {
+    "cogentcore.org/core": "drivers/cogent/build/upstream",
+    "github.com/dshills/vellum": ".",
+    "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+    "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+  },
+  "path_contains_spaces": true,
+  "checks": [
+    "manifest all-file integrity",
+    "external Go module cache verification",
+    "minimal consumer race/vet/build",
+    "document consumer race/vet/build",
+    "public API scenarios race/vet"
+  ],
+  "native_runtime": "not executed",
+  "public_distribution_audit": "not certified"
+}

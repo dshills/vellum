@@ -14,3 +14,36 @@ jobs:
       - run: drivers/cogent/prepare.sh
       - run: scripts/check.sh
       - run: scripts/benchmark.sh
+
+  sdk-consumers:
+    # Separate from the long framework job; no desktop/runtime execution.
+    runs-on: macos-15
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - run: echo "VELLUM_CACHE_DIR=$RUNNER_TEMP/vellum-sdk-cache" >> "$GITHUB_ENV"
+      - run: drivers/cogent/prepare.sh
+      - name: Export and verify relocated SDK consumers
+        shell: bash
+        run: |
+          . ./drivers/cogent/env.sh
+          python3 -B scripts/check-sdk-ci.py --output "$RUNNER_TEMP/vellum-sdk-consumers"
+      - name: Retain SDK consumer verification and failure logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdk-consumer-check
+          path: |
+            ${{ runner.temp }}/vellum-sdk-consumers/relocation.json
+            ${{ runner.temp }}/vellum-sdk-consumers/*.stdout
+            ${{ runner.temp }}/vellum-sdk-consumers/*.stderr
+          if-no-files-found: ignore
+          retention-days: 7
