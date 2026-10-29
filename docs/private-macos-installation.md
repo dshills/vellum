@@ -40,9 +40,16 @@ not independent publisher authenticity, notarization or a new distribution audit
 
 ## Quit and reopening
 
-Command-Q follows each window's save/close policy. Cancel preserves a dirty
-window, but clean windows may already have closed; Quit is not atomic across
-all documents. Last-window closure ends Run. Current Notes/Document apps restore the last successful external paths for their
-startup windows, with recovery priority and native geometry reuse. They do not
-restore an arbitrary unbounded window set. Finish current
-file operations or decisions before retrying closure.
+Notes, Document Starter and A/B Documents opt into coordinated Command-Q. Every
+participating document settles input and resolves its save decision before any
+window closes. Cancel preserves every participating window; successful saves
+made before a later Cancel remain saved. Ordinary red-button close remains a
+single-window action. Forge and Measure Pad retain their existing single-window
+save/close policies. Last-window closure ends Run.
+
+Notes/Document apps restore the last successful external paths for their fixed
+startup windows, with recovery priority and existing native geometry reuse.
+They do not restore an arbitrary unbounded window set. Finish current file
+operations or decisions before retrying closure. Finder Open With accepts one
+notebook or study at a time; registration never changes system defaults. See
+[the app-building guide](building-macos-apps.md#finder-document-opening).
