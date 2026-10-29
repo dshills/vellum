@@ -4,16 +4,48 @@ jobs:
   framework:
     runs-on: macos-15
     timeout-minutes: 60
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - run: echo "VELLUM_CACHE_DIR=$RUNNER_TEMP/vellum-go-cache" >> "$GITHUB_ENV"
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: false
-      - run: drivers/cogent/prepare.sh
-      - run: scripts/check.sh
-      - run: scripts/benchmark.sh
+      - name: Restore verified downloads and Go build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ runner.temp }}/vellum-go-cache/mod/cache/download
+            ${{ runner.temp }}/vellum-go-cache/build
+          key: vellum-framework-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/go.mod', '**/go.sum', 'drivers/cogent/native/dependencies.json', 'release/native-patch-inventory.json') }}-${{ github.sha }}
+          restore-keys: |
+            vellum-framework-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/go.mod', '**/go.sum', 'drivers/cogent/native/dependencies.json', 'release/native-patch-inventory.json') }}-
+      - name: Rebuild and verify pinned native sources
+        run: drivers/cogent/prepare.sh
+      - name: Verify downloaded module contents
+        shell: bash
+        run: |
+          . ./drivers/cogent/env.sh
+          go mod verify
+          (cd drivers/cogent && go mod verify)
+      - name: Tooling and packaging regressions
+        run: scripts/check.sh --stage tooling
+      - name: Portable framework race tests and vet
+        run: scripts/check.sh --stage portable
+      - name: Native facade race tests vet and build
+        run: scripts/check.sh --stage native
+      - name: Pinned dependency regressions
+        run: scripts/check.sh --stage dependencies
+      - name: Independent example consumers
+        run: scripts/check.sh --stage examples
+      - name: Offscreen routing and integration
+        run: scripts/check.sh --stage offscreen
+      - name: Existing offscreen benchmarks
+        run: scripts/benchmark.sh
 
   sdk-consumers:
     # Separate from the long framework job; no desktop/runtime execution.
@@ -30,7 +62,23 @@ jobs:
           go-version-file: go.mod
           cache: false
       - run: echo "VELLUM_CACHE_DIR=$RUNNER_TEMP/vellum-sdk-cache" >> "$GITHUB_ENV"
-      - run: drivers/cogent/prepare.sh
+      - name: Restore verified downloads and Go build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ runner.temp }}/vellum-sdk-cache/mod/cache/download
+            ${{ runner.temp }}/vellum-sdk-cache/build
+          key: vellum-sdk-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/go.mod', '**/go.sum', 'drivers/cogent/native/dependencies.json', 'release/native-patch-inventory.json') }}-${{ github.sha }}
+          restore-keys: |
+            vellum-sdk-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/go.mod', '**/go.sum', 'drivers/cogent/native/dependencies.json', 'release/native-patch-inventory.json') }}-
+      - name: Rebuild and verify pinned native sources
+        run: drivers/cogent/prepare.sh
+      - name: Verify downloaded module contents
+        shell: bash
+        run: |
+          . ./drivers/cogent/env.sh
+          go mod verify
+          (cd drivers/cogent && go mod verify)
       - name: Export and verify relocated SDK consumers
         shell: bash
         run: |

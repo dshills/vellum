@@ -462,3 +462,21 @@ with replacement origins constrained to the relocated SDK. See the
 [private consumer guide](private-consumer-bundle.md#reproducible-verification-and-handoff).
 The Framework workflow gives it a separate macOS job and retains only reports
 and bounded logs, without launching apps or publishing an SDK release.
+
+
+### Visible framework stages and verified CI caches
+
+`scripts/check.sh` still runs the full prepared-repository suite in order. Use
+`--list-stages` to list stages, or `--stage tooling|portable|native|dependencies|
+examples|offscreen` (one name) to repeat a failing part. Hosted Framework CI shows
+those six stages separately; the existing SDK consumer job and benchmarks remain.
+No race/vet/build invocation, dependency regression or deadline was removed.
+
+Each hosted job caches only module downloads and the Go build cache. Cache keys
+separate OS/architecture, Go/module declarations, native pins/patch inventory,
+job namespace and source commit; restoration uses the matching dependency
+namespace. Prepared native source trees and release artifacts are never cached.
+Preparation still reconstructs sources from checksum-verified pinned modules and
+validates every patch input/output. `go mod verify` runs after restoration and
+preparation in both root and native modules. A cache hit is an optimization,
+not evidence of test success or an alternative to source verification.

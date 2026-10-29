@@ -68,3 +68,14 @@ refuse stale selected-note identity/composition, and record content changes in
 the existing notebook journal. Navigation does not dirty a document. Replace
 All is one notebook Undo/Redo step. Closing restores prose focus; query state is
 session-local. No regex, cross-note replacement or new editor widget.
+
+## CI contract
+
+The existing full check wrapper remains the ordered union of six individually
+runnable stages: tooling, portable, native, dependencies, examples, offscreen.
+Preserve existing commands, test selectors, race checks, vet/build coverage,
+benchmarks and timeouts. Hosted jobs restore only module downloads/Go build
+cache with OS/architecture/Go/dependency/native-pin keys, then reconstruct and
+verify pinned native source and run module integrity checks. Prepared native
+source and published artifacts are excluded. Hosted results require a pushed
+commit; local parsing and dispatch checks do not claim a green hosted run.
