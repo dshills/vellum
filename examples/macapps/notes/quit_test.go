@@ -197,3 +197,41 @@ func TestQuitRequestAfterUnexpectedRetirementUnlocksSurvivor(t *testing.T) {
 		}
 	})
 }
+
+func TestQuitHoldPreservesNativeInputsUntilSettlement(t *testing.T) {
+	a, files, group := quitFiles(t)
+	_ = a.Do(func() {
+		m := files[0].model
+		_, _ = m.Add()
+		var acknowledge func(error)
+		if err := m.SetSettlement(func(done func(error)) error { acknowledge = done; return nil }); err != nil {
+			t.Fatal(err)
+		}
+		group.Request()
+		if !m.pending || !files[0].quitHeld || acknowledge == nil {
+			t.Fatal("not awaiting native settlement")
+		}
+		for _, id := range []string{"notes-search", "note-title-" + m.selected, "note-editor-" + m.selected} {
+			node, ok := find(m.View(), id)
+			if !ok || node.Disabled {
+				t.Fatal("Quit hold invalidates native client before settlement", id)
+			}
+		}
+		if m.Commands().Enabled("notes.new") == nil {
+			t.Fatal("held structural command enabled")
+		}
+		acknowledge(nil)
+		if files[0].prompt != "quit" {
+			t.Fatal("settlement did not reach dirty decision")
+		}
+		node, _ := find(m.View(), "note-title-"+m.selected)
+		if !node.Disabled {
+			t.Fatal("modal decision did not disable input")
+		}
+		files[0].promptView().Dismiss()
+		node, _ = find(m.View(), "note-title-"+m.selected)
+		if node.Disabled || len(a.Windows()) != 2 {
+			t.Fatal("Cancel did not release held inputs")
+		}
+	})
+}

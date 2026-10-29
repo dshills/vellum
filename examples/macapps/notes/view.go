@@ -146,7 +146,7 @@ func (m *Model) listView() ui.Node {
 	for i := range header.Children {
 		header.Children[i].Style.GrowX = ui.Some(float32(1))
 	}
-	search := ui.Node{ID: "notes-search", Kind: ui.TextField, Placeholder: "Search notes", Disabled: m.files != nil && m.files.blocked(), Text: m.query, Change: func(e ui.ChangeEvent) { m.accept(m.SetSearch(e.Text)) }, Accessibility: ui.Accessibility{Name: "Search notes", Help: "Search titles and text in the selected folder"}, Style: ui.Style{GrowX: ui.Some(float32(1)), CornerRadius: ui.Some(float32(7)), MinSize: ui.Some(ui.Size{Height: 16}), MaxSize: ui.Some(ui.Size{Height: 16}), Padding: ui.Some(ui.Insets{Left: 8, Right: 8, Top: 4, Bottom: 4}), GrowY: ui.Some(float32(0)), Background: ui.Some(white)}}
+	search := ui.Node{ID: "notes-search", Kind: ui.TextField, Placeholder: "Search notes", Disabled: m.files != nil && m.files.blockedWithoutQuit(), Text: m.query, Change: func(e ui.ChangeEvent) { m.accept(m.SetSearch(e.Text)) }, Accessibility: ui.Accessibility{Name: "Search notes", Help: "Search titles and text in the selected folder"}, Style: ui.Style{GrowX: ui.Some(float32(1)), CornerRadius: ui.Some(float32(7)), MinSize: ui.Some(ui.Size{Height: 16}), MaxSize: ui.Some(ui.Size{Height: 16}), Padding: ui.Some(ui.Insets{Left: 8, Right: 8, Top: 4, Bottom: 4}), GrowY: ui.Some(float32(0)), Background: ui.Some(white)}}
 	searchBox := box(ui.Column, "notes-search-box", search)
 	searchBox.Style.Padding = ui.Some(ui.Insets{Left: 12, Right: 12, Bottom: 4})
 	searchBox.Style.GrowX = ui.Some(float32(1))
@@ -248,14 +248,14 @@ func (m *Model) documentView() ui.Node {
 		date.Style.Foreground = ui.Some(muted)
 		date.Style.TextAlign = ui.Some(ui.AlignCenter)
 		date.Style.GrowX = ui.Some(float32(1))
-		title := ui.Node{ID: "note-title-" + id, Kind: ui.TextField, Disabled: m.files != nil && m.files.blocked(), Text: selected.value.Title, Change: func(e ui.ChangeEvent) {
+		title := ui.Node{ID: "note-title-" + id, Kind: ui.TextField, Disabled: m.files != nil && m.files.blockedWithoutQuit(), Text: selected.value.Title, Change: func(e ui.ChangeEvent) {
 			m.accept(m.titleChanged(id, e.Text))
 		}, Accessibility: ui.Accessibility{Name: "Note title"}, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: notesFont, Size: 20, Weight: 600}), MinSize: ui.Some(ui.Size{Height: 30}), MaxSize: ui.Some(ui.Size{Height: 30}), CornerRadius: ui.Some(float32(0)), GrowY: ui.Some(float32(0)), Padding: ui.Some(ui.Insets{}), Border: ui.Some(ui.Border{}), Background: ui.Some(white), GrowX: ui.Some(float32(1))}}
 		bodyHelp := "Plain text editor; changes remain only in this demonstration"
 		if m.files != nil {
 			bodyHelp = "Plain text editor; Command-S saves the local notebook"
 		}
-		body := ui.Node{ID: "note-editor-" + id, Kind: ui.MultilineText, Disabled: m.files != nil && m.files.blocked(), Editor: selected.editor, Grow: true, SoftWrap: true, Prose: true, Change: func(ui.ChangeEvent) { m.accept(m.BodyChanged(id)) }, Accessibility: ui.Accessibility{Name: "Note text", Help: bodyHelp}, Style: ui.MacProseStyle(false)}
+		body := ui.Node{ID: "note-editor-" + id, Kind: ui.MultilineText, Disabled: m.files != nil && m.files.blockedWithoutQuit(), Editor: selected.editor, Grow: true, SoftWrap: true, Prose: true, Change: func(ui.ChangeEvent) { m.accept(m.BodyChanged(id)) }, Accessibility: ui.Accessibility{Name: "Note text", Help: bodyHelp}, Style: ui.MacProseStyle(false)}
 		document := box(ui.Column, "note-paper", title, body)
 		if m.files == nil {
 			document.Children = append([]ui.Node{date}, document.Children...)
