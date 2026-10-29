@@ -172,3 +172,18 @@ paths. Native Open cancellation returns keyboard input to the live parent.
 Source compatibility applies to the framework's named stable APIs; this example
 model is application code, outside the framework compatibility promise. Human
 IME/VoiceOver remain unqualified; final package results identify their exact source.
+
+## Find in the current note
+
+Command-F opens Find; Option-Command-F also opens replacement. Command-G and
+Shift-Command-G navigate matches and wrap. Escape/Done closes the bar and
+returns focus to prose. Find searches the current note body (the sidebar search
+still filters titles and bodies across the current folder). Literal Unicode
+matching supports match case and whole words. Query/replacement are bounded,
+session-local controlled fields; no regex or cross-note replacement is provided.
+
+Replace and Replace All use the existing editor and notebook history. Replace
+All is one document Undo/Redo step. Host settlement admits search, find query,
+replacement, title and body before an action; native composition must settle.
+Recovery/dirty dialogs retain priority, and rejected/stale operations preserve
+contents. The generated Document Starter and A/B Documents share this recipe.

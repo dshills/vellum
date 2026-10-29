@@ -9,6 +9,7 @@ import (
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/command"
 	"github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/editor"
 	"github.com/dshills/vellum/examples/macapps/notes"
 	"os"
 	"path/filepath"
@@ -48,9 +49,9 @@ func (w *workspace) current() (*documentWindow, error) {
 }
 func (w *workspace) bindMenus() error {
 	w.menus = command.New()
-	for _, id := range []string{"notes.new", "notes.open", "notes.save", "notes.save-as", "notes.undo", "notes.redo", "notes.delete", "notes.pin"} {
+	for _, id := range []string{"notes.new", "notes.open", "notes.save", "notes.save-as", "notes.undo", "notes.redo", "notes.delete", "notes.pin", "notes.find", "notes.find-replace", "notes.find-next", "notes.find-previous", "notes.find-close"} {
 		id := id
-		c := command.Command{ID: id, Label: map[string]string{"notes.new": "New Note", "notes.open": "Open…", "notes.save": "Save", "notes.save-as": "Save As…", "notes.undo": "Undo", "notes.redo": "Redo", "notes.delete": "Delete", "notes.pin": "Pin"}[id], Available: func() error {
+		c := command.Command{ID: id, Label: map[string]string{"notes.new": "New Note", "notes.open": "Open…", "notes.save": "Save", "notes.save-as": "Save As…", "notes.undo": "Undo", "notes.redo": "Redo", "notes.delete": "Delete", "notes.pin": "Pin", "notes.find": "Find…", "notes.find-replace": "Find and Replace…", "notes.find-next": "Find Next", "notes.find-previous": "Find Previous", "notes.find-close": "Close Find"}[id], Available: func() error {
 			d, e := w.current()
 			if e != nil {
 				return e
@@ -65,6 +66,13 @@ func (w *workspace) bindMenus() error {
 			_ = w.owner.Invalidate("")
 			return e
 		}}
+		for _, d := range w.documents {
+			if original, ok := d.model.Commands().Lookup(id); ok {
+				c.Shortcut = original.Shortcut
+				c.ShortcutScope = original.ShortcutScope
+				break
+			}
+		}
 		if e := w.menus.Register(c); e != nil {
 			return e
 		}
@@ -102,28 +110,11 @@ func openDocument(a *app.Application, id, dir string) (result *documentWindow, e
 			done(e)
 			_ = a.Invalidate(id)
 		}
-		return cogent.SettleTextField(d.ref.Context(), a, id, "notes-search", func(e error) {
-			if e != nil {
-				finish(e)
-				return
-			}
-			title, body := d.model.CurrentInput()
-			if title == "" {
-				finish(nil)
-				return
-			}
-			if e := cogent.SettleTextField(d.ref.Context(), a, id, title, func(e error) {
-				if e != nil {
-					finish(e)
-					return
-				}
-				if e := cogent.SettleEditor(d.ref.Context(), a, id, body, finish); e != nil {
-					finish(e)
-				}
-			}); e != nil {
-				finish(e)
-			}
-		})
+		return d.model.SettleInputs(func(field string, callback func(error)) error {
+			return cogent.SettleTextField(d.ref.Context(), a, id, field, callback)
+		}, func(body *editor.Model, callback func(error)) error {
+			return cogent.SettleEditor(d.ref.Context(), a, id, body, callback)
+		}, finish)
 	})
 	if e != nil {
 		return nil, e

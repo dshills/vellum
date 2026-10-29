@@ -34,7 +34,7 @@ func nativeNotesToolbar(ref app.WindowRef, m *notes.Model) (*cogent.TitlebarTool
 func nativeNotesMenus() []app.MenuGroup {
 	return []app.MenuGroup{
 		{Label: "File", Commands: []string{"notes.new", "notes.open", "notes.save", "notes.save-as"}},
-		{Label: "Edit", Commands: []string{"notes.undo", "notes.redo", "notes.delete"}},
+		{Label: "Edit", Commands: []string{"notes.undo", "notes.redo", "notes.delete", "notes.find", "notes.find-replace", "notes.find-next", "notes.find-previous"}},
 		{Label: "Note", Commands: []string{"notes.pin"}},
 	}
 }

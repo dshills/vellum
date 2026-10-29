@@ -12,6 +12,7 @@ import (
 	"__VELLUM_MODULE__/internal/notebook"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/editor"
 )
 
 func main() {
@@ -74,33 +75,11 @@ func run() error {
 			callback(err)
 			_ = a.Invalidate(window)
 		}
-		return cogent.SettleTextField(ref.Context(), a, window, "notes-search", func(err error) {
-			if err == nil {
-				err = ref.Context().Err()
-			}
-			if err != nil {
-				complete(err)
-				return
-			}
-			// Search is always mounted, even when no note is selected. Capture
-			// the current title/body only after its controlled Change is admitted.
-			titleID, body := m.CurrentInput()
-			if titleID == "" {
-				complete(nil)
-				return
-			}
-			if err := cogent.SettleTextField(ref.Context(), a, window, titleID, func(err error) {
-				if err != nil {
-					complete(err)
-					return
-				}
-				if err := cogent.SettleEditor(ref.Context(), a, window, body, complete); err != nil {
-					complete(err)
-				}
-			}); err != nil {
-				complete(err)
-			}
-		})
+		return m.SettleInputs(func(field string, callback func(error)) error {
+			return cogent.SettleTextField(ref.Context(), a, window, field, callback)
+		}, func(body *editor.Model, callback func(error)) error {
+			return cogent.SettleEditor(ref.Context(), a, window, body, callback)
+		}, complete)
 	}); err != nil {
 		return err
 	}

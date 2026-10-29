@@ -52,7 +52,7 @@ func (m *Model) View() ui.Node {
 	root.Grow = true
 	root.Style.Background = ui.Some(white)
 	// A removed note cannot leave a stale focus target in the admitted tree.
-	if m.focus.ID != "" && m.focus.ID == "note-title-"+m.selected {
+	if m.focus.ID != "" && m.lookup(m.selected) != nil && (m.focus.ID == "note-title-"+m.selected || m.focus.ID == "note-editor-"+m.selected || m.find.Open && m.focus.ID == ui.FindBarInputID(findID)) {
 		root.Focus = m.focus
 	}
 	return root
@@ -236,6 +236,9 @@ func (m *Model) documentView() ui.Node {
 		empty.Style = empty.Style.Overlay(ui.Style{Foreground: ui.Some(muted), TextAlign: ui.Some(ui.AlignCenter), GrowX: ui.Some(float32(1)), Padding: ui.Some(ui.Insets{Top: 100})})
 		content.Children = append(content.Children, empty)
 	} else {
+		if m.find.Open {
+			content.Children = append(content.Children, m.findView(selected))
+		}
 		id := selected.value.ID
 		dateText := "October 19, 2026 at 9:41 AM"
 		if m.files != nil {

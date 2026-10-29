@@ -53,6 +53,7 @@ type Model struct {
 	settlement                                       func(func(error)) error
 	pending                                          bool
 	nativeToolbar                                    bool
+	find                                             *ui.FindBar
 	pendingInputError                                error
 }
 
@@ -129,6 +130,7 @@ func New() *Model {
 			panic(err)
 		}
 	}
+	m.initFind()
 	return m
 }
 

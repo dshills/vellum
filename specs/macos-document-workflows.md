@@ -57,3 +57,14 @@ Registration uses Alternate handler rank and never overrides the user's default.
 Native Quit is intercepted at AppKit's applicationShouldTerminate: selector as
 well as the existing Go Quit request hook. The original delegate implementation
 is restored on retirement; opted-out applications keep upstream behavior.
+
+## Find/Replace contract
+
+Use the existing ui.FindBar and Unicode editor operations in Notes-family apps.
+Search the selected note body only; preserve sidebar filtering. Command-F,
+Option-Command-F, Command-G, Shift-Command-G and Escape use app commands and
+existing native FIFO settlement. Resolve query/replacement after settlement,
+refuse stale selected-note identity/composition, and record content changes in
+the existing notebook journal. Navigation does not dirty a document. Replace
+All is one notebook Undo/Redo step. Closing restores prose focus; query state is
+session-local. No regex, cross-note replacement or new editor widget.
