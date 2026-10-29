@@ -37,3 +37,11 @@ storage; all development checks must supply a disposable override.
 The installation is private, ad-hoc signed and unnotarized. This is byte/identity
 and signature verification of the explicitly selected local producer payload,
 not independent publisher authenticity, notarization or a new distribution audit.
+
+## Quit and reopening
+
+Command-Q follows each window's save/close policy. Cancel preserves a dirty
+window, but clean windows may already have closed; Quit is not atomic across
+all documents. Last-window closure ends Run. Relaunch loads the ordinary startup
+windows rather than restoring an arbitrary previous window set. Finish current
+file operations or decisions before retrying closure.
