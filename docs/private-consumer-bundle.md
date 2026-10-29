@@ -8,7 +8,7 @@ python3 -B scripts/private-macos-bundle.py --output /absolute/new/private-bundle
 ```
 
 The exclusive output contains an SDK, Forge, Measure Pad, the A/B Documents
-consumer and the generated Document Starter. Every app compiles against the
+consumer, the generated Document Starter and Notes. Every app compiles against the
 extracted SDK, with replacement origins checked to remain inside it. Both starter
 profiles receive race/vet/build checks. ZIP-extracted signatures, named checksums
 and the source-bound BUNDLE_MANIFEST.json make the result reviewable. The script
@@ -58,3 +58,7 @@ local or lifecycle checks as unfinished; keep historical source/hash records
 unchanged. The [consumer closeout](reviews/consumer-closeout/README.md) describes
 the completed lifecycle checks, exact-main CI and review policy. New checkpoints
 use internal code review; historical Prism receipts retain their original scope.
+
+Install the completed bundle with the [versioned private installer](private-macos-installation.md).
+The existing Notes app is also included for ordinary use; native tests use an
+explicit disposable -data-dir and never migrate or edit an existing notebook.

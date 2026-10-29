@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a private SDK and four apps from that extracted SDK; never publishes."""
+"""Build a private SDK and five apps from that extracted SDK; never publishes."""
 import argparse
 import hashlib
 import importlib.util
@@ -56,6 +56,7 @@ def main():
         ('Vellum Measure Pad', sdk/'examples/measurepad', '.', 'com.dshills.vellum.measurepad.demo'),
         ('Vellum Documents', sdk/'examples/macapps', './cmd/documents', 'com.dshills.vellum.documents.demo'),
         ('Vellum Document Starter', consumer, '.', 'com.dshills.vellum.documentstarter.demo'),
+        ('Vellum Notes', sdk/'examples/macapps', './cmd/notes', 'com.dshills.vellum.notes.demo'),
     ]
     hashes = {archive.name: checksum}
     app_records = []
@@ -71,7 +72,7 @@ def main():
             run([binary, '--write-icon', icon])
             options = ['--icon', icon]
         run([sys.executable, '-B', sdk/'scripts/package-app.py', '--binary', binary, '--output', bundle,
-             '--name', name, '--identifier', identifier, '--version', '0.1.0', '--build-version', '20', '--sign-identity', '-', *options])
+             '--name', name, '--identifier', identifier, '--version', '0.1.0', '--build-version', '21', '--sign-identity', '-', *options])
         run(['codesign', '--verify', '--deep', '--strict', bundle])
         zipped = out / (name.replace(' ', '-') + '.zip')
         run(['ditto', '-c', '-k', '--norsrc', '--noextattr', '--keepParent', bundle, zipped])
@@ -83,9 +84,9 @@ def main():
     if clean_source(ROOT, env) != revision:
         raise ValueError('source changed during private packaging')
     (out/'SHA256SUMS').write_text(''.join(f'{value}  {name}\n' for name,value in sorted(hashes.items())), encoding='utf-8')
-    (out/'README.md').write_text('# Private Vellum consumer bundle\n\nAll apps were built from the included, independently verified extracted SDK.\nVerify SHA256SUMS before extraction. Only named archives in SHA256SUMS are delivery payloads. build/ contains intermediate SDKs, consumer source, binaries and ZIP checks for local testing; do not treat those working files as checksummed delivery payloads.\n\nForge and Measure Pad run normally. Documents requires -data-dir /absolute/private/workspace; it opens independent A/B repositories. Document Starter launches normally from Finder and uses its own module-derived Application Support directory. For isolated tests or an existing private notebook, launch it with --args -data-dir /absolute/private/document-data. Use fresh private directories for testing. No app defaults to Vellum Notes storage.\n\nApps are ad-hoc signed and unnotarized. Only the recorded Apple Silicon Mac configuration is qualified; human IME/VoiceOver and downloaded-quarantine launch remain unqualified. No public release or audit approval is implied.\n\nThe extracted SDK includes source, both starter profiles, guides and known limits. Do not run prepare.sh over it. Failed producer attempts retain partial output and never write BUNDLE_MANIFEST.json as a successful result.\n', encoding='utf-8')
+    (out/'README.md').write_text('# Private Vellum consumer bundle\n\nAll apps were built from the included, independently verified extracted SDK.\nVerify SHA256SUMS before extraction. Only named archives in SHA256SUMS are delivery payloads. build/ contains intermediate SDKs, consumer source, binaries and ZIP checks for local testing; do not treat those working files as checksummed delivery payloads.\n\nForge, Notes and Measure Pad run normally. Notes uses its established Application Support/Vellum Notes directory; use --args -data-dir /absolute/private/notes-test for isolated checks. Documents requires -data-dir /absolute/private/workspace; it opens independent A/B repositories. Document Starter launches normally from Finder and uses its own module-derived Application Support directory. For isolated tests or an existing private notebook, launch it with --args -data-dir /absolute/private/document-data. Use fresh private directories for testing. No app defaults to Vellum Notes storage.\n\nApps are ad-hoc signed and unnotarized. Only the recorded Apple Silicon Mac configuration is qualified; human IME/VoiceOver and downloaded-quarantine launch remain unqualified. No public release or audit approval is implied.\n\nThe extracted SDK includes source, both starter profiles, guides and known limits. Do not run prepare.sh over it. Failed producer attempts retain partial output and never write BUNDLE_MANIFEST.json as a successful result.\n', encoding='utf-8')
     # Publish the completion record only after all other delivery metadata exists.
-    (out/'BUNDLE_MANIFEST.json').write_text(json.dumps(dict(source_commit=revision, build_version='20', private=True, signing='ad-hoc', notarized=False,
+    (out/'BUNDLE_MANIFEST.json').write_text(json.dumps(dict(source_commit=revision, build_version='21', private=True, signing='ad-hoc', notarized=False,
             sdk_sha256=checksum, apps=app_records, files=hashes), indent=2)+'\n', encoding='utf-8')
     print(json.dumps(dict(output=str(out), source_commit=revision, apps=len(apps), private=True)))
 
