@@ -41,3 +41,19 @@ worker retirement. Native geometry persistence is reused with stable titles;
 A/B startup order restores the active document. Forge extends its existing
 workspace with an optional validated LastStudy path and keeps recovery precedence.
 Existing notebook/recovery schemas and Undo history semantics are unchanged.
+
+## Finder contract
+
+Driver.OnOpenFiles delivers detached absolute paths on the application owner,
+with at most sixteen pending paths and one owner waiter. Initial marks requests
+captured before Driver.Run; warm delivery waits for native window readiness.
+Opt-in bundle metadata captures cold launch events before Go driver binding.
+Unbinding restores the previous native handler and drops queued references.
+Apps validate their own document extension/content and retain recovery/dirty
+Save/Discard/Cancel decisions. The current examples refuse multi-file batches;
+Documents routes to the active window, with deterministic startup fallback.
+Registration uses Alternate handler rank and never overrides the user's default.
+
+Native Quit is intercepted at AppKit's applicationShouldTerminate: selector as
+well as the existing Go Quit request hook. The original delegate implementation
+is restored on retirement; opted-out applications keep upstream behavior.

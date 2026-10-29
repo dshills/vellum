@@ -85,6 +85,7 @@ func (f *Files) ConfigureRestoration(r *Repository) error {
 			if result.Err != nil {
 				f.model.status = "Window session: " + result.Err.Error()
 				f.workspaceQueued = false
+				f.resumeOpen = false
 				if f.quitAwaitWorkspace {
 					f.quitAwaitWorkspace = false
 					f.finishQuit(false)
@@ -95,6 +96,11 @@ func (f *Files) ConfigureRestoration(r *Repository) error {
 				f.workspaceQueued = false
 				f.saveWorkspace()
 			}
+			if f.resumeOpen && !f.workspace.State().Busy {
+				f.resumeOpen = false
+				f.continueOpen()
+			}
+			f.resumeExternal()
 			if f.quitAwaitWorkspace && !f.workspace.State().Busy {
 				f.quitAwaitWorkspace = false
 				f.finishQuit(true)

@@ -108,6 +108,19 @@ func (m *workbench) bindFiles() (err error) {
 	}()
 	var e error
 	m.files, e = vdoc.New(vdoc.Config[studyFile]{Owner: m.application, Window: m.ref.ID(), Journal: m.journal, Filename: "Study", Extensions: []string{"vforge"}, MaxBytes: studyLimit, Codec: vdoc.Codec[studyFile]{Capture: func() (studyFile, error) { return m.captureStudy(), nil }, Encode: encodeStudy, Decode: decodeStudy, Install: m.installStudy}, OnComplete: func(r vdoc.Result) {
+		if m.pendingExternalStudy != "" {
+			path := m.pendingExternalStudy
+			m.pendingExternalStudy = ""
+			m.startupRestore = false
+			m.status = "Opening Finder study"
+			if err := m.openStudy(path, false); err != nil {
+				m.status = err.Error()
+			}
+			m.changed()
+			return
+		}
+		m.startupRestore = false
+
 		if r.Err != nil {
 			m.status = r.Err.Error()
 		} else {
@@ -147,6 +160,7 @@ func (m *workbench) bindFiles() (err error) {
 	}
 	m.loadWorkspace()
 	if m.recovered == nil && m.lastStudy != "" && !m.preferencesBlocked {
+		m.startupRestore = true
 		if err := m.files.Open(m.ref.Context(), vdoc.OpenOptions{Path: m.lastStudy}); err != nil {
 			m.status = "Restore: " + err.Error()
 		}

@@ -32,6 +32,7 @@ var (
 // would. Do not invoke Run, AppKit, global appearance, or user preferences here.
 func stableFacadeConsumer(d cogent.Driver, bar cogent.TitlebarToolbar, item cogent.TitlebarToolbarItem, appearance cogent.SystemAppearance) {
 	var (
+		_ func(cogent.OpenFilesEvent)                          = d.OnOpenFiles
 		_ func()                                               = d.OnQuitRequested
 		_ ui.Theme                                             = d.Theme
 		_ *command.Registry                                    = d.Commands
@@ -62,7 +63,7 @@ func stableFacadeConsumer(d cogent.Driver, bar cogent.TitlebarToolbar, item coge
 		_ color.NRGBA                                          = appearance.Accent
 	)
 	_ = cogent.Driver{
-		OnQuitRequested: func() {}, Theme: ui.Theme{}, Commands: (*command.Registry)(nil),
+		OnOpenFiles: func(cogent.OpenFilesEvent) {}, OnQuitRequested: func() {}, Theme: ui.Theme{}, Commands: (*command.Registry)(nil),
 		CommandMenus: []app.MenuGroup{}, OnError: func(error) {},
 		FollowSystemAppearance: true, OnSystemAppearance: func(cogent.SystemAppearance) {},
 		TitlebarToolbar:          (*cogent.TitlebarToolbar)(nil),

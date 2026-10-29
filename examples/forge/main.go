@@ -80,7 +80,7 @@ func run(smoke bool, exitAfter time.Duration) error {
 	if !smoke {
 		menus = []app.MenuGroup{{Label: "File", Commands: []string{"forge.open", "forge.save", "forge.save-as", "forge.recent", "forge.revert"}}, {Label: "Edit", Commands: []string{"forge.undo", "forge.redo", "forge.copy", "forge.paste", "forge.duplicate", "forge.rename", "forge.delete"}}, {Label: "View", Commands: []string{"forge.browser", "forge.inspector", "forge.isolate", "forge.restore-visibility", "forge.customize", "forge.reset-workspace"}}}
 	}
-	e = a.Run(context.Background(), cogent.Driver{Theme: t, Commands: m.commands, CommandMenus: menus, TitlebarToolbar: toolbar, OnError: func(e error) { fmt.Fprintln(os.Stderr, e) }})
+	e = a.Run(context.Background(), cogent.Driver{OnOpenFiles: func(event cogent.OpenFilesEvent) { m.handleOpenFiles(event.Paths, event.Initial) }, Theme: t, Commands: m.commands, CommandMenus: menus, TitlebarToolbar: toolbar, OnError: func(e error) { fmt.Fprintln(os.Stderr, e) }})
 	if e != nil {
 		a.Close()
 		if smoke {

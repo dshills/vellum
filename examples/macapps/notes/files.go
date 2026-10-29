@@ -16,6 +16,9 @@ import (
 // Files is app-local document wiring; it consumes only existing public framework
 // APIs. Owner callbacks own all state. A timer only posts bounded owner requests.
 type Files struct {
+	pendingExternal                                *externalOpen
+	openDestination                                string
+	resumeOpen                                     bool
 	workspace                                      *document.Session[WindowSession]
 	workspaceProtected, workspaceQueued, restoring bool
 	quitAwaitWorkspace                             bool
@@ -141,20 +144,17 @@ func (f *Files) Save(choose bool) error {
 	f.model.status = "Saving notebook…"
 	return f.main.Save(f.ref.Context(), document.SaveOptions{Choose: choose})
 }
-func (f *Files) Open() error {
-	if f.blocked() {
-		return document.ErrBusy
-	}
-	if err := f.model.flush(); err != nil {
-		return err
-	}
-	if f.model.History().Dirty {
-		f.prompt = "open"
-		return nil
-	}
-	return f.main.Open(f.ref.Context(), document.OpenOptions{})
-}
+func (f *Files) Open() error { return f.openNotebook("") }
+
 func (f *Files) completed(r document.Result) {
+	if f.pendingExternal != nil {
+		request := f.pendingExternal
+		f.pendingExternal = nil
+		f.restoring = false
+		f.model.accept(f.OpenPath(request.path, request.initial))
+		return
+	}
+
 	if r.Err != nil {
 		if f.restoring {
 			f.workspaceProtected = true
@@ -212,7 +212,7 @@ func (f *Files) recovered(r document.Result) {
 				f.finishQuit(true)
 			}
 		} else if intent == "open" {
-			f.model.accept(f.Open())
+			f.continueOpen()
 		}
 	} else {
 		f.lastRecovery = f.capturedRevision
@@ -309,7 +309,7 @@ func (f *Files) settleIntent(intent string, save bool) {
 		f.clear = true
 		f.startRecovery()
 	} else {
-		f.model.accept(f.main.Open(f.ref.Context(), document.OpenOptions{DiscardChanges: true}))
+		f.model.accept(f.main.Open(f.ref.Context(), document.OpenOptions{Path: f.openDestination, DiscardChanges: true}))
 	}
 }
 func (f *Files) status() string {
@@ -337,6 +337,9 @@ func (f *Files) promptView() ui.Node {
 			f.prompt = ""
 			if prompt == "quit" {
 				f.finishQuit(false)
+			}
+			if prompt == "open" {
+				f.openDestination = ""
 			}
 		}
 	}

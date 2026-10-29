@@ -148,6 +148,29 @@ def binary_digest(path):
     return digest.hexdigest()
 
 
+def document_type_info(records):
+    if records is None:
+        return {}
+    if not isinstance(records, list) or not 1 <= len(records) <= 8:
+        raise ValueError("document types require one to eight records")
+    extensions, identifiers, types, exports = set(), set(), [], []
+    for record in records:
+        if not isinstance(record, dict) or set(record) != {"extension", "uti", "name"}:
+            raise ValueError("invalid document type fields")
+        extension, uti, name = record["extension"], record["uti"], record["name"]
+        if (not isinstance(extension, str) or not re.fullmatch(r"[a-z0-9]{1,16}", extension)
+                or not isinstance(uti, str) or len(uti) > 160 or not re.fullmatch(r"[A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)+", uti)
+                or not isinstance(name, str) or not 1 <= len(name) <= 80 or any(ord(c) < 32 for c in name)
+                or extension in extensions or uti in identifiers):
+            raise ValueError("invalid or duplicate document type")
+        extensions.add(extension); identifiers.add(uti)
+        types.append({"CFBundleTypeName": name, "CFBundleTypeRole": "Editor", "LSHandlerRank": "Alternate",
+                      "CFBundleTypeExtensions": [extension], "LSItemContentTypes": [uti]})
+        exports.append({"UTTypeIdentifier": uti, "UTTypeDescription": name, "UTTypeConformsTo": ["public.data"],
+                        "UTTypeTagSpecification": {"public.filename-extension": [extension]}})
+    return {"VellumHandlesOpenDocuments": True, "CFBundleDocumentTypes": types, "UTExportedTypeDeclarations": exports}
+
+
 def verify_app(stage, name, binary_sha256, manifest_bytes, notice_record, icon_record=None):
     if binary_digest(stage/"Contents/MacOS"/name) != binary_sha256:
         raise ValueError("packaged app executable changed")
@@ -155,13 +178,20 @@ def verify_app(stage, name, binary_sha256, manifest_bytes, notice_record, icon_r
     if app_notices.read_regular(resources/"APP_MANIFEST.json", len(manifest_bytes)) != manifest_bytes:
         raise ValueError("packaged app manifest changed")
     app_icons.verify(resources, icon_record)
+    declared = document_type_info(json.loads(manifest_bytes).get("document_types"))
+    info = plistlib.loads((stage/"Contents/Info.plist").read_bytes())
+    if any(info.get(key) != value for key, value in declared.items()):
+        raise ValueError("packaged document type metadata changed")
     if icon_record is not None and plistlib.loads((stage/"Contents/Info.plist").read_bytes()).get("CFBundleIconFile") != app_icons.ICON_NAME:
         raise ValueError("packaged app icon metadata changed")
     if notice_record is not None:
         app_notices.verify(resources/app_notices.DIRECTORY, notice_record["artifact_sha256"], notice_record)
 
 
-def package(binary, output, name, identifier, version, target, identity=None, build_version="1", notice_bundle=None, *, public=False, icon=None):
+def package(binary, output, name, identifier, version, target, identity=None, build_version="1", notice_bundle=None, *, public=False, icon=None, document_types=None):
+    declared = document_type_info(document_types)
+    if declared and target != "darwin":
+        raise ValueError("document type registration is implemented only for macOS")
     if icon is not None and target != "darwin":
         raise ValueError("app icons are implemented only for macOS")
     if type(public) is not bool:
@@ -213,6 +243,8 @@ def package(binary, output, name, identifier, version, target, identity=None, bu
         if target == "darwin":
             darwin_dependencies(executable)
         manifest = {"schema":1,"name":name,"identifier":identifier,"version":version,"build_version":build_version,"sdk_release":sdk_release,"target":target,"source_binary_sha256":binary_digest(executable),"private_build":not public,"signed_identity":identity,"notarized":False,"native_distribution_audit":audit,"target_runtime":"unverified"}
+        if document_types is not None:
+            manifest["document_types"] = document_types
         if public:
             manifest["release_authorization"] = {
                 "metadata_sha256": hashlib.sha256(metadata_bytes).hexdigest(),
@@ -225,6 +257,7 @@ def package(binary, output, name, identifier, version, target, identity=None, bu
             if notice_bundle is not None:
                 manifest["component_notices"] = app_notices.copy(notice_bundle, resources/app_notices.DIRECTORY, manifest["source_binary_sha256"])
             info={"CFBundlePackageType":"APPL","CFBundleName":name,"CFBundleDisplayName":name,"CFBundleExecutable":name,"CFBundleIdentifier":identifier,"CFBundleVersion":build_version,"CFBundleShortVersionString":version,"NSHighResolutionCapable":True}
+            info.update(declared)
             if icon is not None:
                 manifest["app_icon"] = app_icons.install(icon, resources)
                 info["CFBundleIconFile"] = app_icons.ICON_NAME
@@ -294,10 +327,14 @@ def main():
     parser.add_argument("--platform",dest="target",choices=["darwin","windows","linux"],default=platform.system().lower())
     parser.add_argument("--notice-bundle",type=Path,help="explicit binary-bound original notice bundle for a macOS app; rights review remains pending")
     parser.add_argument("--icon",type=Path,help="macOS app icon: .icns or 1024x1024 PNG; embedded before signing")
+    parser.add_argument("--document-types",type=Path,help="bounded JSON array of extension/uti/name registrations; existing default handlers are preserved")
     parser.add_argument("--public",action="store_true",help="require existing source release-audit gates and binary-bound notices; does not publish or notarize")
     parser.add_argument("--sign-identity",help="explicit macOS code-signing identity; '-' requests ad-hoc signing")
     args=parser.parse_args()
-    print(json.dumps(package(args.binary.absolute(),args.output.absolute(),args.name,args.identifier,args.version,args.target,args.sign_identity,args.build_version,args.notice_bundle,public=args.public,icon=args.icon),indent=2))
+    records=None
+    if args.document_types is not None:
+        records=json.loads(app_notices.read_regular(args.document_types,64<<10))
+    print(json.dumps(package(args.binary.absolute(),args.output.absolute(),args.name,args.identifier,args.version,args.target,args.sign_identity,args.build_version,args.notice_bundle,public=args.public,icon=args.icon,document_types=records),indent=2))
 
 
 if __name__=="__main__":main()

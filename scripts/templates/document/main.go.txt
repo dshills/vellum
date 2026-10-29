@@ -115,7 +115,7 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	runErr := a.Run(ctx, cogent.Driver{OnQuitRequested: quit.Request, OnWindowActivated: func(app.WindowRef) { files.Activated() }, Theme: notes.Theme(), Commands: m.Commands(), CommandMenus: nativeNotesMenus(), TitlebarToolbars: func(opening app.WindowRef) (*cogent.TitlebarToolbar, error) { return nativeNotesToolbar(opening, m) }, OnError: func(err error) { fmt.Fprintln(os.Stderr, err) }})
+	runErr := a.Run(ctx, cogent.Driver{OnOpenFiles: func(e cogent.OpenFilesEvent) { files.HandleOpenFiles(e.Paths, e.Initial) }, OnQuitRequested: quit.Request, OnWindowActivated: func(app.WindowRef) { files.Activated() }, Theme: notes.Theme(), Commands: m.Commands(), CommandMenus: nativeNotesMenus(), TitlebarToolbars: func(opening app.WindowRef) (*cogent.TitlebarToolbar, error) { return nativeNotesToolbar(opening, m) }, OnError: func(err error) { fmt.Fprintln(os.Stderr, err) }})
 	stopErr := files.Stop()
 	if stopErr != nil {
 		releaseLock = false

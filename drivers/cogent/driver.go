@@ -37,6 +37,11 @@ type Extension interface {
 type ThemeExtension interface{ SetTheme(ui.Theme) }
 
 type Driver struct {
+	// OnOpenFiles receives bounded native Finder requests on the UI owner.
+	// It must not nest Do; content/dirty/recovery validation remains app-owned.
+	// macOS only. Initial requests predate any native input in this Run.
+	OnOpenFiles func(OpenFilesEvent)
+
 	// OnQuitRequested opts into application-owned coordinated Quit. It runs on
 	// the UI owner and must not nest Do. It should obtain all document decisions
 	// before closing windows. Nil preserves the existing per-window Quit policy.
@@ -692,8 +697,18 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			e.SetHandled()
 		}
 	}
+	openFiles, stopOpenFiles, err := configureOpenFiles(a, d.OnOpenFiles)
+	if err != nil {
+		return err
+	}
+	defer stopOpenFiles()
 	if d.OnQuitRequested != nil {
 		callback := &quitCallback{owner: a, callback: d.OnQuitRequested}
+		stopNativeQuit, err := bindNativeQuit(callback)
+		if err != nil {
+			return err
+		}
+		defer stopNativeQuit()
 		core.TheApp.SetQuitReqFunc(func() {
 			if a.Context().Err() != nil || ctx.Err() != nil || len(a.Windows()) == 0 {
 				core.TheApp.Quit()
@@ -710,6 +725,9 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 		return ctx.Err()
 	}
 	syncTopology()
+	if openFiles != nil {
+		openFiles.markReady()
+	}
 	if err := failure.Load(); err != nil && !started.Load() {
 		return *err
 	}

@@ -180,7 +180,25 @@ func run() (runErr error) {
 	if e != nil {
 		return e
 	}
-	return a.Run(context.Background(), cogent.Driver{OnQuitRequested: quit.Request, Theme: notes.Theme(), Commands: w.menus, CommandMenus: nativeNotesMenus(), OnWindowActivated: w.activate, TitlebarToolbars: func(ref app.WindowRef) (*cogent.TitlebarToolbar, error) {
+	return a.Run(context.Background(), cogent.Driver{OnOpenFiles: func(event cogent.OpenFilesEvent) {
+		d, e := w.current()
+		if e != nil {
+			for _, id := range ids {
+				for ref, candidate := range w.documents {
+					if ref.ID() == id && ref.Context().Err() == nil {
+						d = candidate
+						break
+					}
+				}
+				if d != nil {
+					break
+				}
+			}
+		}
+		if d != nil {
+			d.files.HandleOpenFiles(event.Paths, event.Initial)
+		}
+	}, OnQuitRequested: quit.Request, Theme: notes.Theme(), Commands: w.menus, CommandMenus: nativeNotesMenus(), OnWindowActivated: w.activate, TitlebarToolbars: func(ref app.WindowRef) (*cogent.TitlebarToolbar, error) {
 		d := w.documents[ref]
 		if d == nil {
 			return nil, app.ErrWindowClosed

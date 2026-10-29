@@ -227,3 +227,26 @@ a previously invalid session record. Recovery takes precedence and retains the
 recorded external destination after explicit Restore. Quit waits for metadata IO.
 Forge similarly retains its last successful study in its existing workspace
 settings and reopens through its document session; interrupted recovery wins.
+
+### Finder document opening
+
+Set `cogent.Driver.OnOpenFiles` to receive a bounded detached `OpenFilesEvent` on
+its UI owner. Do not nest `Application.Do` in the callback. Route paths through
+existing validation and save decisions. `Initial` marks capture before native
+input/window binding; warm requests wait for native readiness. Notes and
+Document Starter accept one `.vellumnotes` file, Forge one `.vforge` study.
+Multiple files are refused with status feedback; A/B Documents routes to the
+active document. Recovery remains higher priority than opening another file.
+
+For packaged cold-launch delivery, pass `--document-types /absolute/types.json`
+to `scripts/package-app.py`. The bounded JSON array contains exact `extension`,
+`uti` and `name` strings. For example:
+
+```json
+[{"extension":"vellumnotes","uti":"com.dshills.vellum.vellumnotes","name":"Vellum notebook"}]
+```
+
+Packaging verifies matching signed Info.plist declarations. Handler rank is
+Alternate: use Finder's Open With when another app owns the type. Registration
+does not change system defaults. The private bundle registers Notes, Document
+Starter and Forge; Documents remains an explicit-data-directory diagnostic app.

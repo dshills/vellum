@@ -36,6 +36,21 @@ class AppChecks(unittest.TestCase):
    self.assertTrue((out/"Contents/Info.plist").is_file());self.assertTrue((out/"Contents/MacOS/Test").is_file());execute.assert_not_called()
    info=plistlib.loads((out/"Contents/Info.plist").read_bytes());self.assertEqual(info["CFBundleShortVersionString"],"0.1.0");self.assertEqual(info["CFBundleVersion"],"1");self.assertNotIn("CFBundleIconFile",info)
    manifest=json.loads((out/"Contents/Resources/APP_MANIFEST.json").read_text());self.assertEqual(manifest["sdk_release"],json.loads((app.ROOT/"release/version.json").read_text())["version"]);self.assertEqual(manifest["build_version"],"1")
+ def test_document_registration_is_signed_metadata_without_default_override(self):
+  with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"),mock.patch.object(app,"run_child"):
+   root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");out=root/"Doc.app"
+   records=[dict(extension="vforge",uti="com.example.study",name="Example study")]
+   app.package(binary,out,"Doc","com.example.doc","0.1.0","darwin",document_types=records)
+   info=plistlib.loads((out/"Contents/Info.plist").read_bytes())
+   self.assertTrue(info["VellumHandlesOpenDocuments"]);self.assertEqual(info["CFBundleDocumentTypes"][0]["LSHandlerRank"],"Alternate")
+   manifest=(out/"Contents/Resources/APP_MANIFEST.json").read_bytes();self.assertEqual(json.loads(manifest)["document_types"],records)
+   info["CFBundleDocumentTypes"][0]["LSItemContentTypes"]=["wrong.type"]
+   (out/"Contents/Info.plist").write_bytes(plistlib.dumps(info))
+   with self.assertRaisesRegex(ValueError,"document type metadata"):app.verify_app(out,"Doc",app.binary_digest(binary),manifest,None)
+ def test_document_registration_rejects_bad_and_duplicate_records(self):
+  good=dict(extension="vforge",uti="com.example.study",name="Study")
+  for records in ([],[good,good],[dict(good,extension="../escape")],[dict(good,uti="bad")],[dict(good,extra=True)]):
+   with self.subTest(records=records),self.assertRaises(ValueError):app.document_type_info(records)
  def test_bundle_versions_are_distinct_and_numeric(self):
   with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"),mock.patch.object(app,"run_child"):
    root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture")
