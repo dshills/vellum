@@ -1,0 +1,13 @@
+{
+  "source_commit": "e932a7bec483dab736ca65e61c0e20fafdd3d621",
+  "method": "app-restricted native accessibility actions; not physical pointer evidence",
+  "fixture": "fresh disposable private directory",
+  "steps": [
+    "New and Save: seven fixture notes persisted",
+    "dirty Close/Cancel: window remains with six notes",
+    "Redo after Cancel restores saved seventh note",
+    "clean Close retires process; saved file retains seven notes",
+    "relaunch reopens saved notebook without recovery prompt"
+  ],
+  "result": "PASS"
+}
