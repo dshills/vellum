@@ -2,6 +2,7 @@ package cogent
 
 import (
 	"github.com/dshills/vellum/app"
+	"path/filepath"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -13,7 +14,9 @@ func TestOpenFilesOwnerBoundsReadinessAndRetirement(t *testing.T) {
 	var calls atomic.Int32
 	events := make(chan OpenFilesEvent, 20)
 	r := &openFilesReceiver{owner: a, callback: func(e OpenFilesEvent) { calls.Add(1); events <- e }}
-	paths := []string{"/tmp/a.vellumnotes"}
+	directory := t.TempDir()
+	want := filepath.Join(directory, "a.vellumnotes")
+	paths := []string{want}
 	if !r.enqueue(OpenFilesEvent{paths, false}) {
 		t.Fatal("warm refusal")
 	}
@@ -25,28 +28,28 @@ func TestOpenFilesOwnerBoundsReadinessAndRetirement(t *testing.T) {
 	r.markReady()
 	select {
 	case e := <-events:
-		if e.Paths[0] != "/tmp/a.vellumnotes" {
+		if e.Paths[0] != want {
 			t.Fatal("aliased request")
 		}
 	case <-time.After(time.Second):
 		t.Fatal("owner delivery absent")
 	}
 	r.close()
-	if r.enqueue(OpenFilesEvent{[]string{"/tmp/late"}, false}) {
+	if r.enqueue(OpenFilesEvent{[]string{filepath.Join(directory, "late")}, false}) {
 		t.Fatal("late request accepted")
 	}
 	q := &openFilesReceiver{owner: a, callback: func(OpenFilesEvent) {}}
 	for range 16 {
-		if !q.enqueue(OpenFilesEvent{[]string{"/tmp/pending"}, false}) {
+		if !q.enqueue(OpenFilesEvent{[]string{filepath.Join(directory, "pending")}, false}) {
 			t.Fatal("early capacity")
 		}
 	}
-	if q.enqueue(OpenFilesEvent{[]string{"/tmp/over"}, false}) {
+	if q.enqueue(OpenFilesEvent{[]string{filepath.Join(directory, "over")}, false}) {
 		t.Fatal("unbounded queue")
 	}
 	q.close()
 	unsafeReceiver := &openFilesReceiver{owner: a, callback: func(OpenFilesEvent) {}}
-	for _, p := range []string{"relative", "/tmp/invalid\x00"} {
+	for _, p := range []string{"relative", filepath.Join(directory, "invalid") + "\x00"} {
 		if unsafeReceiver.enqueue(OpenFilesEvent{[]string{p}, true}) {
 			t.Fatal("unsafe path")
 		}
@@ -57,7 +60,7 @@ func TestOpenFilesInitialDeliveryBeforeReadiness(t *testing.T) {
 	defer a.Close()
 	done := make(chan bool, 1)
 	r := &openFilesReceiver{owner: a, callback: func(e OpenFilesEvent) { done <- e.Initial }}
-	if !r.enqueue(OpenFilesEvent{[]string{"/tmp/start.vforge"}, true}) {
+	if !r.enqueue(OpenFilesEvent{[]string{filepath.Join(t.TempDir(), "start.vforge")}, true}) {
 		t.Fatal("cold refusal")
 	}
 	select {
