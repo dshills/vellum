@@ -86,7 +86,7 @@ func openDocument(a *app.Application, id, dir string) (result *documentWindow, e
 	if e != nil {
 		return nil, e
 	}
-	d.ref, e = a.OpenWindow(app.Window{ID: id, Title: "Vellum Documents — " + id, Width: 1000, Height: 720, View: d.model.View, CloseRequest: func() bool { return d.files != nil && d.files.RequestClose() }})
+	d.ref, e = a.OpenWindow(app.Window{ID: id, Title: "Vellum Documents — " + id, Width: 1000, Height: 720, Chrome: app.WindowChrome{Style: app.ChromeStandard, Appearance: app.AppearanceLight}, View: d.model.View, CloseRequest: func() bool { return d.files != nil && d.files.RequestClose() }})
 	if e != nil {
 		return nil, e
 	}
