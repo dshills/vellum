@@ -1,0 +1,12 @@
+{
+  "result": "PASS",
+  "source_commit": "62e953cbfb2b196a1c76b671f2840a18598ec57a",
+  "installed_build": "20",
+  "method": "native Save/Open panels through app-restricted AX and foreground-guarded key helper",
+  "steps": [
+    "Save As navigated to disposable external directory and wrote seven notes",
+    "New note plus Command-S updated external file to eight notes; private default stayed seven",
+    "Command-Q and restart returned to private default",
+    "Native Open explicitly reopened eight-note external notebook"
+  ]
+}
