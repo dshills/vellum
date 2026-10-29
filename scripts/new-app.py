@@ -39,9 +39,27 @@ def copy_document_template(stage, module):
             for old, new in mapping.items():
                 text = text.replace(old, new)
             (destination / path.name).write_text(text, encoding="utf-8")
-    main = (ROOT / "scripts/templates/document/main.go.txt").read_text(encoding="utf-8")
-    (stage / "main.go").write_text(main.replace("__VELLUM_MODULE__", module), encoding="utf-8")
-    (stage / "README.md").write_text("# Document starter\n\nRun go test -race -tags offscreen ./... and go run . -data-dir /absolute/private/app-directory.\n\nThis complete app recipe includes Save/Open/Save As, dirty decisions, recovery, prose editing, full-color native toolbar and Undo/Redo. Its application-owned sources live in internal/notebook. The explicit private directory prevents using another app's notebook. Do not reuse one directory across different applications. Recovery and file workers retire before the repository lock is released. This is a larger reference starter; the default template remains minimal.\n")
+    storage_id = "vellum.document." + hashlib.sha256(module.encode("utf-8")).hexdigest()[:32]
+    for name in ("main.go", "paths.go", "paths_test.go"):
+        text = (ROOT / "scripts/templates/document" / (name + ".txt")).read_text(encoding="utf-8")
+        text = text.replace("__VELLUM_MODULE__", module).replace("__VELLUM_STORAGE_ID__", storage_id)
+        (stage / name).write_text(text, encoding="utf-8")
+    (stage / "README.md").write_text(
+        "# Document starter\n\n"
+        "Run `go test -race -tags offscreen ./...` and `go run .`. Packaged apps also launch normally from Finder.\n\n"
+        "This complete app recipe includes Save/Open/Save As, dirty decisions, recovery, prose editing, full-color native toolbar and Undo/Redo. "
+        "Its application-owned sources live in internal/notebook.\n\n"
+        "Default macOS storage: `~/Library/Application Support/" + storage_id + "`. "
+        "Other hosts use os.UserConfigDir and remain unqualified. "
+        "This identity derives from your Go module. Keep paths.go's applicationStorageID stable across upgrades; "
+        "choose a distinct module for each different application. No Vellum Notes storage is reused.\n\n"
+        "For tests or an existing private notebook, use `go run . -data-dir /absolute/private/app-directory`. "
+        "Do not reuse one directory across different applications. The existing repository checks refuse symlinks, "
+        "broad permissions and concurrent access; they do not change permissions on existing folders. "
+        "Unavailable configuration refuses startup unless an explicit absolute override is supplied. "
+        "Recovery and file workers retire before the repository lock is released. "
+        "This is a larger reference starter; the default template remains minimal.\n", encoding="utf-8")
+
 
 
 def main():

@@ -1,0 +1,53 @@
+package main
+
+import (
+	"errors"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+func TestDefaultStorageIsStablePrivateApplicationIdentity(t *testing.T) {
+	base := t.TempDir()
+	get := func() (string, error) { return base, nil }
+	first, err := resolveDataDirectory("", get)
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := resolveDataDirectory("", get)
+	if err != nil || first != second || filepath.Dir(first) != base || filepath.Base(first) != applicationStorageID {
+		t.Fatal("unstable or escaped application directory", second, err)
+	}
+	if first == filepath.Join(base, "Vellum Notes") || !strings.HasPrefix(applicationStorageID, "vellum.document.") {
+		t.Fatal("unexpected shared notebook identity")
+	}
+}
+
+func TestExplicitStorageDoesNotConsultConfiguration(t *testing.T) {
+	directory := t.TempDir()
+	got, err := resolveDataDirectory(directory, func() (string, error) {
+		t.Fatal("explicit override consulted configuration")
+		return "", nil
+	})
+	if err != nil || got != directory {
+		t.Fatal(got, err)
+	}
+	if _, err := resolveDataDirectory("relative", func() (string, error) {
+		t.Fatal("relative override consulted configuration")
+		return "", nil
+	}); err == nil {
+		t.Fatal("relative directory accepted")
+	}
+}
+
+func TestUnavailableConfigurationRefusesFallback(t *testing.T) {
+	missing := errors.New("configuration unavailable")
+	if _, err := resolveDataDirectory("", func() (string, error) { return "", missing }); !errors.Is(err, missing) {
+		t.Fatal("configuration error lost", err)
+	}
+	for _, base := range []string{"", ".", "relative/path"} {
+		if _, err := resolveDataDirectory("", func() (string, error) { return base, nil }); err == nil {
+			t.Fatal("nonabsolute configuration accepted", base)
+		}
+	}
+}

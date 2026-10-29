@@ -1,0 +1,29 @@
+package main
+
+import (
+	"fmt"
+	"path/filepath"
+)
+
+// Derived from this application's Go module at generation time. Keep this stable
+// across upgrades, and use a different module identity for a different app.
+const applicationStorageID = "__VELLUM_STORAGE_ID__"
+
+// resolveDataDirectory chooses a location; OpenRepository performs private
+// directory, symlink and concurrent-instance validation before loading any data.
+func resolveDataDirectory(override string, configDirectory func() (string, error)) (string, error) {
+	if override != "" {
+		if !filepath.IsAbs(override) {
+			return "", fmt.Errorf("data-dir must be an absolute private directory")
+		}
+		return filepath.Clean(override), nil
+	}
+	base, err := configDirectory()
+	if err != nil {
+		return "", fmt.Errorf("resolve application storage: %w", err)
+	}
+	if !filepath.IsAbs(base) {
+		return "", fmt.Errorf("application configuration directory must be absolute; supply -data-dir")
+	}
+	return filepath.Join(base, applicationStorageID), nil
+}

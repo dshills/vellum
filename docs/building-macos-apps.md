@@ -192,8 +192,21 @@ It copies the tested Notes app recipe into app-owned internal packages, includin
 prose editing, native toolbar/menu actions, input settlement, Save/Open/Save As,
 dirty-close decisions, recovery and Undo/Redo. Full-color artwork stays local.
 
-Run `go test -race -tags offscreen ./...`, then
-`go run . -data-dir /absolute/private/my-doc-data`. A data directory is required;
-the generated app never defaults to Vellum Notes storage. Use a separate private
-directory per application. Customize the copied internal model and views. The
-default minimal template remains available for small non-document utilities.
+Run `go test -race -tags offscreen ./...`, then `go run .`. The packaged app
+also starts normally from Finder. On macOS, its default notebook/recovery slot
+is `~/Library/Application Support/vellum.document.<module-hash>`; the generated
+README lists the exact directory. The 128-bit hash derives from your Go module,
+so different application modules have different storage identities. Retain the
+generated `applicationStorageID` across upgrades, even if the module is renamed.
+Generating multiple apps with the same module intentionally shares that identity.
+
+For tests or an existing private notebook, use
+`go run . -data-dir /absolute/private/my-doc-data`. Explicit absolute overrides
+take precedence without consulting the configuration directory. Missing or
+nonabsolute OS configuration refuses startup instead of falling back to the
+working directory or another app. The existing repository checks create a
+private directory and refuse symlinks, broad permissions and concurrent access;
+they do not tighten an existing folder's permissions. No Vellum Notes default
+is reused or migrated. Use a separate directory per application. Other hosts
+use `os.UserConfigDir` and remain unqualified. Customize the copied internal
+model and views. The default minimal template remains available for utilities.

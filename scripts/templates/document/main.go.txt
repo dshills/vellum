@@ -9,9 +9,9 @@ import (
 	"os"
 	"os/signal"
 
+	"__VELLUM_MODULE__/internal/notebook"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/drivers/cogent"
-	"__VELLUM_MODULE__/internal/notebook"
 )
 
 func main() {
@@ -22,11 +22,14 @@ func main() {
 }
 
 func run() error {
-	directory := flag.String("data-dir", "", "required absolute private notebook directory")
+	directory := flag.String("data-dir", "", "absolute private notebook directory (default: this app in Application Support)")
 	flag.Parse()
-	if *directory == "" { return errors.New("supply -data-dir with an absolute private application directory") }
+	storage, err := resolveDataDirectory(*directory, os.UserConfigDir)
+	if err != nil {
+		return err
+	}
 
-	repository, err := notes.OpenRepository(*directory)
+	repository, err := notes.OpenRepository(storage)
 	if err != nil {
 		return err
 	}
