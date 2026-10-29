@@ -23,6 +23,7 @@ type document struct {
 	Selection []string
 }
 type workbench struct {
+	lastStudy                                         string
 	recentStudies                                     []string
 	recentOpen                                        bool
 	pendingStudyPath                                  string

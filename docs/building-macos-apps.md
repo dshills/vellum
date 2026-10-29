@@ -82,8 +82,10 @@ preserve the live model and history. The `Written` result and the acknowledged
 error are distinct: a file can have been replaced before a later sync/stale error.
 
 Notes initially saves its private notebook; Save As switches the current
-file destination. Restart opens the private default, so external notebooks are
-reopened explicitly. There is no external-file merge/watch or persistent Undo
+file destination. The Notes, Documents and generated document executables opt into bounded
+WindowSession metadata so restart reopens the last successful external notebook.
+Recovery is offered first; invalid/missing external files preserve the live
+private default and their metadata for explicit repair. There is no external-file merge/watch or persistent Undo
 log. Keep those limits visible in your application instructions.
 
 Recovery uses a separate session and journal so a recovery write cannot mark the
@@ -210,3 +212,18 @@ they do not tighten an existing folder's permissions. No Vellum Notes default
 is reused or migrated. Use a separate directory per application. Other hosts
 use `os.UserConfigDir` and remain unqualified. Customize the copied internal
 model and views. The default minimal template remains available for utilities.
+
+## Restoring documents and windows
+
+`Files.ConfigureRestoration` is app-owned startup wiring. It reads a bounded
+16 KiB WindowSession.json beside the private notebook, and opens the last external
+notebook through the existing document worker. Writes use a separate document
+session, never filesystem IO in View/owner callbacks. Active-window timestamps
+order A/B startup creation so the last active window is created last. Existing
+native window geometry persistence restores positions/sizes for stable titles.
+Successful save/open records the path; missing/invalid metadata or an external
+file never replaces the live default. Successful explicit file action may replace
+a previously invalid session record. Recovery takes precedence and retains the
+recorded external destination after explicit Restore. Quit waits for metadata IO.
+Forge similarly retains its last successful study in its existing workspace
+settings and reopens through its document session; interrupted recovery wins.

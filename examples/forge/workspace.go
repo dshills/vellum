@@ -9,9 +9,12 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"strings"
+	"unicode/utf8"
 )
 
 type workspaceSettings struct {
+	LastStudy                  string `json:",omitempty"`
 	Version                    int
 	Left, Right                float32
 	HideBrowser, HideInspector bool
@@ -28,6 +31,9 @@ func decodeWorkspace(b []byte) (workspaceSettings, error) {
 	}
 	if s.Version != 1 || math.IsNaN(float64(s.Left)) || math.IsNaN(float64(s.Right)) || s.Left < .1 || s.Left > .5 || s.Right < .35 || s.Right > .9 {
 		return s, fmt.Errorf("workspace range")
+	}
+	if s.LastStudy != "" && (!filepath.IsAbs(s.LastStudy) || len(s.LastStudy) > 1024 || !strings.EqualFold(filepath.Ext(s.LastStudy), ".vforge") || !utf8.ValidString(s.LastStudy) || strings.ContainsRune(s.LastStudy, 0)) {
+		return s, fmt.Errorf("invalid restored study")
 	}
 	if len(s.Recent) > 10 {
 		return s, fmt.Errorf("recent study limit")
@@ -54,6 +60,7 @@ func (m *workbench) loadWorkspace() {
 		var s workspaceSettings
 		s, e = decodeWorkspace(b)
 		if e == nil {
+			m.lastStudy = s.LastStudy
 			m.recentStudies = append([]string(nil), s.Recent...)
 			m.left = s.Left
 			m.right = s.Right
@@ -71,7 +78,7 @@ func (m *workbench) saveWorkspace(recovery string) {
 	if !m.workspaceLoaded || m.preferencesBlocked {
 		return
 	}
-	s := workspaceSettings{Version: 1, Left: m.left, Right: m.right, HideBrowser: m.hideBrowser, HideInspector: m.hideInspector, Recent: append([]string(nil), m.recentStudies...)}
+	s := workspaceSettings{LastStudy: m.lastStudy, Version: 1, Left: m.left, Right: m.right, HideBrowser: m.hideBrowser, HideInspector: m.hideInspector, Recent: append([]string(nil), m.recentStudies...)}
 	b, e := json.Marshal(s)
 	if e == nil {
 		_, e = (vdoc.FileStore{}).Write(context.Background(), workspacePath(recovery), b, 16<<10)

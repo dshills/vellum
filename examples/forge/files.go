@@ -111,6 +111,7 @@ func (m *workbench) bindFiles() (err error) {
 		if r.Err != nil {
 			m.status = r.Err.Error()
 		} else {
+			m.lastStudy = r.Path
 			m.recordRecent(r.Path)
 			m.status = string(r.Action) + " · " + filepath.Base(r.Path)
 		}
@@ -145,6 +146,11 @@ func (m *workbench) bindFiles() (err error) {
 		return err
 	}
 	m.loadWorkspace()
+	if m.recovered == nil && m.lastStudy != "" && !m.preferencesBlocked {
+		if err := m.files.Open(m.ref.Context(), vdoc.OpenOptions{Path: m.lastStudy}); err != nil {
+			m.status = "Restore: " + err.Error()
+		}
+	}
 	m.bindWorkspaceCommands()
 	m.bindRecentCommands()
 	return nil

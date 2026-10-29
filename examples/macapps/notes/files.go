@@ -16,6 +16,12 @@ import (
 // Files is app-local document wiring; it consumes only existing public framework
 // APIs. Owner callbacks own all state. A timer only posts bounded owner requests.
 type Files struct {
+	workspace                                      *document.Session[WindowSession]
+	workspaceProtected, workspaceQueued, restoring bool
+	quitAwaitWorkspace                             bool
+	activated                                      int64
+	restorePath                                    string
+
 	quitHeld         bool
 	quitDone         func(bool)
 	saved            bool
@@ -123,7 +129,9 @@ func AttachFiles(a *app.Application, ref app.WindowRef, m *Model, r *Repository,
 	}()
 	return f, nil
 }
-func (f *Files) busy() bool               { return f.main.State().Busy || f.recovery.State().Busy }
+func (f *Files) busy() bool {
+	return f.main.State().Busy || f.recovery.State().Busy || f.workspace != nil && f.workspace.State().Busy
+}
 func (f *Files) blocked() bool            { return f.quitHeld || f.blockedWithoutQuit() }
 func (f *Files) blockedWithoutQuit() bool { return f.busy() || f.prompt != "" || f.clear }
 func (f *Files) Save(choose bool) error {
@@ -148,12 +156,19 @@ func (f *Files) Open() error {
 }
 func (f *Files) completed(r document.Result) {
 	if r.Err != nil {
+		if f.restoring {
+			f.workspaceProtected = true
+			f.restoring = false
+		}
 		f.intent = ""
 		f.model.status = r.Err.Error()
 		f.finishQuit(false)
 		return
 	}
+	f.restoring = false
+	f.workspaceProtected = false
 	f.saved = true
+	f.saveWorkspace()
 	if r.Action == document.Save {
 		f.model.status = "Saved notebook"
 	} else {
@@ -189,7 +204,13 @@ func (f *Files) recovered(r document.Result) {
 		if intent == "close" {
 			_ = f.owner.CloseWindow(f.ref)
 		} else if intent == "quit" || intent == "quit-clear" {
-			f.finishQuit(true)
+			if f.workspace != nil && f.workspace.State().Last.Err != nil {
+				f.finishQuit(false)
+			} else if f.workspace != nil && f.workspace.State().Busy {
+				f.quitAwaitWorkspace = true
+			} else {
+				f.finishQuit(true)
+			}
 		} else if intent == "open" {
 			f.model.accept(f.Open())
 		}
@@ -356,6 +377,12 @@ func (f *Files) promptView() ui.Node {
 				}
 				f.offer = nil
 				f.prompt = ""
+				if f.restorePath != "" {
+					if err := f.replaceMainPath(f.restorePath); err != nil {
+						f.model.accept(err)
+						return
+					}
+				}
 				f.model.status = "Recovered notebook · Save to keep it"
 			}},
 			{ID: "notes-recovery-discard", Kind: ui.Button, Text: "Discard Recovery", Activate: func() {
@@ -382,7 +409,7 @@ func (f *Files) Stop() error {
 	case <-time.After(time.Until(deadline)):
 		return errors.New("notes: recovery scheduler did not retire; repository lock retained until process exit")
 	}
-	for f.main.State().WorkerPending || f.recovery.State().WorkerPending {
+	for f.main.State().WorkerPending || f.recovery.State().WorkerPending || f.workspace != nil && f.workspace.State().WorkerPending {
 		if time.Now().After(deadline) {
 			return errors.New("notes: file worker did not retire; repository lock retained until process exit")
 		}

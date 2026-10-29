@@ -28,3 +28,16 @@ dirty decision and validates approved revisions. No participating window closes
 until all approvals and recovery clears complete. Cancel and any failure unlock
 survivors. A successful save before Cancel remains saved. Applications that do
 not opt in retain existing close semantics. Ordinary window close stays separate.
+
+## Restoration contract
+
+Notes-family windows opt into a separate bounded 16 KiB WindowSession record
+containing version, last successful notebook path and last activation timestamp.
+Reads happen at startup; writes and document reopens use existing document
+workers. Recovery is resolved first and keeps its recorded destination. Unknown,
+malformed or missing files preserve the live default; invalid records are kept
+until an explicit successful file action replaces them. Metadata joins Quit and
+worker retirement. Native geometry persistence is reused with stable titles;
+A/B startup order restores the active document. Forge extends its existing
+workspace with an optional validated LastStudy path and keeps recovery precedence.
+Existing notebook/recovery schemas and Undo history semantics are unchanged.

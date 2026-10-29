@@ -108,11 +108,14 @@ func run() error {
 	if err != nil {
 		return err
 	}
+	if err := files.ConfigureRestoration(repository); err != nil {
+		return err
+	}
 	quit, err := notes.NewQuitGroup(a, files)
 	if err != nil {
 		return err
 	}
-	runErr := a.Run(ctx, cogent.Driver{OnQuitRequested: quit.Request, Theme: notes.Theme(), Commands: m.Commands(), CommandMenus: nativeNotesMenus(), TitlebarToolbars: func(opening app.WindowRef) (*cogent.TitlebarToolbar, error) { return nativeNotesToolbar(opening, m) }, OnError: func(err error) { fmt.Fprintln(os.Stderr, err) }})
+	runErr := a.Run(ctx, cogent.Driver{OnQuitRequested: quit.Request, OnWindowActivated: func(app.WindowRef) { files.Activated() }, Theme: notes.Theme(), Commands: m.Commands(), CommandMenus: nativeNotesMenus(), TitlebarToolbars: func(opening app.WindowRef) (*cogent.TitlebarToolbar, error) { return nativeNotesToolbar(opening, m) }, OnError: func(err error) { fmt.Fprintln(os.Stderr, err) }})
 	stopErr := files.Stop()
 	if stopErr != nil {
 		releaseLock = false

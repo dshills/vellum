@@ -12,6 +12,7 @@ import (
 	"github.com/dshills/vellum/examples/macapps/notes"
 	"os"
 	"path/filepath"
+	"sort"
 )
 
 type documentWindow struct {
@@ -32,6 +33,9 @@ type workspace struct {
 func (w *workspace) activate(ref app.WindowRef) {
 	if w.documents[ref] != nil && ref.Context().Err() == nil {
 		w.active = ref
+		if w.documents[ref].files != nil {
+			w.documents[ref].files.Activated()
+		}
 		_ = w.owner.Invalidate("")
 	}
 }
@@ -128,6 +132,9 @@ func openDocument(a *app.Application, id, dir string) (result *documentWindow, e
 	if e != nil {
 		return nil, e
 	}
+	if e = d.files.ConfigureRestoration(r); e != nil {
+		return nil, e
+	}
 	return d, nil
 }
 func run() (runErr error) {
@@ -154,7 +161,11 @@ func run() (runErr error) {
 		}
 	}()
 	var files []*notes.Files
-	for _, id := range []string{"A", "B"} {
+	ids := []string{"A", "B"}
+	sort.SliceStable(ids, func(i, j int) bool {
+		return notes.SessionActivation(filepath.Join(*dir, ids[i])) < notes.SessionActivation(filepath.Join(*dir, ids[j]))
+	})
+	for _, id := range ids {
 		d, e := openDocument(a, id, filepath.Join(*dir, id))
 		if e != nil {
 			return e

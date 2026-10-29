@@ -42,6 +42,7 @@ not independent publisher authenticity, notarization or a new distribution audit
 
 Command-Q follows each window's save/close policy. Cancel preserves a dirty
 window, but clean windows may already have closed; Quit is not atomic across
-all documents. Last-window closure ends Run. Relaunch loads the ordinary startup
-windows rather than restoring an arbitrary previous window set. Finish current
+all documents. Last-window closure ends Run. Current Notes/Document apps restore the last successful external paths for their
+startup windows, with recovery priority and native geometry reuse. They do not
+restore an arbitrary unbounded window set. Finish current
 file operations or decisions before retrying closure.
