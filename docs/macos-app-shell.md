@@ -71,3 +71,21 @@ models, histories, recovery files and native toolbar namespaces. Close one while
 retaining the other; OS focus changes route File/Edit menus to the surviving
 document. Source tests cover routing and retirement; native observations remain
 separate from human accessibility and other-platform qualification.
+
+
+## Coordinated application Quit
+
+`Driver.OnQuitRequested` is an opt-in owner callback for native application Quit.
+It must not nest Do or block for native work. Repeated foreign requests coalesce
+while a callback awaits the owner. The handler is installed before native windows
+appear and removed after Run. Forced shutdown and no-window termination keep the
+existing terminal path. Nil retains per-window close semantics.
+
+The app-owned `notes.QuitGroup` demonstrates sequential input settlement and
+Save/Discard/Cancel decisions while holding all participating document commands.
+It checks live references and approved journal revisions, clears recovery, then
+closes the complete approved set. Cancel, save/clear errors, stale state and
+retired references keep surviving windows open. Saving before a later Cancel
+retains that successful save. Ordinary red-button window close is independent.
+Notes, the generated document starter and the A/B Documents consumer opt in.
+Forge and Measure Pad each have one window and retain their existing close path.

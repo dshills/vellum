@@ -16,6 +16,8 @@ import (
 // Files is app-local document wiring; it consumes only existing public framework
 // APIs. Owner callbacks own all state. A timer only posts bounded owner requests.
 type Files struct {
+	quitHeld         bool
+	quitDone         func(bool)
 	saved            bool
 	owner            *app.Application
 	ref              app.WindowRef
@@ -121,8 +123,9 @@ func AttachFiles(a *app.Application, ref app.WindowRef, m *Model, r *Repository,
 	}()
 	return f, nil
 }
-func (f *Files) busy() bool    { return f.main.State().Busy || f.recovery.State().Busy }
-func (f *Files) blocked() bool { return f.busy() || f.prompt != "" || f.clear }
+func (f *Files) busy() bool               { return f.main.State().Busy || f.recovery.State().Busy }
+func (f *Files) blocked() bool            { return f.quitHeld || f.blockedWithoutQuit() }
+func (f *Files) blockedWithoutQuit() bool { return f.busy() || f.prompt != "" || f.clear }
 func (f *Files) Save(choose bool) error {
 	if f.blocked() {
 		return document.ErrBusy
@@ -147,6 +150,7 @@ func (f *Files) completed(r document.Result) {
 	if r.Err != nil {
 		f.intent = ""
 		f.model.status = r.Err.Error()
+		f.finishQuit(false)
 		return
 	}
 	f.saved = true
@@ -166,6 +170,7 @@ func (f *Files) startRecovery() {
 		f.model.status = "Recovery: " + err.Error()
 		f.clear = false
 		f.intent = ""
+		f.finishQuit(false)
 	}
 }
 func (f *Files) recovered(r document.Result) {
@@ -173,6 +178,7 @@ func (f *Files) recovered(r document.Result) {
 		f.model.status = "Recovery: " + r.Err.Error()
 		f.clear = false
 		f.intent = ""
+		f.finishQuit(false)
 		return
 	}
 	if f.capturedClear {
@@ -182,6 +188,8 @@ func (f *Files) recovered(r document.Result) {
 		f.intent = ""
 		if intent == "close" {
 			_ = f.owner.CloseWindow(f.ref)
+		} else if intent == "quit" || intent == "quit-clear" {
+			f.finishQuit(true)
 		} else if intent == "open" {
 			f.model.accept(f.Open())
 		}
@@ -244,6 +252,25 @@ func (f *Files) RequestClose() bool {
 	return false
 }
 func (f *Files) settleIntent(intent string, save bool) {
+	if intent == "quit" && f.prompt == intent && !f.busy() {
+		f.prompt = ""
+		if !save {
+			f.finishQuit(true)
+			return
+		}
+		f.intent = "quit"
+		if err := f.withQuitAccess(f.model.flush); err != nil {
+			f.model.accept(err)
+			f.finishQuit(false)
+			return
+		}
+		if err := f.withQuitAccess(func() error { return f.main.Save(f.ref.Context(), document.SaveOptions{}) }); err != nil {
+			f.model.accept(err)
+			f.finishQuit(false)
+		}
+		return
+	}
+
 	if f.prompt != intent || f.busy() {
 		return
 	}
@@ -287,9 +314,15 @@ func (f *Files) promptView() ui.Node {
 	cancel := func() {
 		if current() {
 			f.prompt = ""
+			if prompt == "quit" {
+				f.finishQuit(false)
+			}
 		}
 	}
 	text := "Save changes before opening another notebook?"
+	if prompt == "quit" {
+		text = "Save changes before quitting? Cancel keeps every window open."
+	}
 	if prompt == "close" {
 		text = "Save changes before closing Notes?"
 	}

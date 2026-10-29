@@ -164,11 +164,12 @@ func (m *Model) SetSettlement(boundary func(func(error)) error) error {
 // model action. At most one request is retained. Duplicate or late completion
 // callbacks cannot repeat an action; committed Change callbacks remain admitted
 // while pending. Direct mutators remain available for portable model consumers.
-func (m *Model) Request(action func() error) error {
+func (m *Model) Request(action func() error) error { return m.request(action, false) }
+func (m *Model) request(action func() error, preparingQuit bool) error {
 	if action == nil {
 		return ErrInvalid
 	}
-	if m.pending || m.files != nil && m.files.blocked() {
+	if m.pending || m.files != nil && (m.files.blockedWithoutQuit() || m.files.quitHeld && !preparingQuit) {
 		return ErrPending
 	}
 	if m.settlement == nil {
@@ -196,6 +197,9 @@ func (m *Model) Request(action func() error) error {
 		}
 		outcome = err
 		m.accept(err)
+		if err != nil && preparingQuit && m.files != nil {
+			m.files.finishQuit(false)
+		}
 	}
 	if err := m.settlement(finish); err != nil {
 		finish(err)

@@ -153,17 +153,23 @@ func run() (runErr error) {
 			_ = d.repository.Close()
 		}
 	}()
+	var files []*notes.Files
 	for _, id := range []string{"A", "B"} {
 		d, e := openDocument(a, id, filepath.Join(*dir, id))
 		if e != nil {
 			return e
 		}
 		w.documents[d.ref] = d
+		files = append(files, d.files)
 	}
 	if e = w.bindMenus(); e != nil {
 		return e
 	}
-	return a.Run(context.Background(), cogent.Driver{Theme: notes.Theme(), Commands: w.menus, CommandMenus: nativeNotesMenus(), OnWindowActivated: w.activate, TitlebarToolbars: func(ref app.WindowRef) (*cogent.TitlebarToolbar, error) {
+	quit, e := notes.NewQuitGroup(a, files...)
+	if e != nil {
+		return e
+	}
+	return a.Run(context.Background(), cogent.Driver{OnQuitRequested: quit.Request, Theme: notes.Theme(), Commands: w.menus, CommandMenus: nativeNotesMenus(), OnWindowActivated: w.activate, TitlebarToolbars: func(ref app.WindowRef) (*cogent.TitlebarToolbar, error) {
 		d := w.documents[ref]
 		if d == nil {
 			return nil, app.ErrWindowClosed

@@ -37,6 +37,11 @@ type Extension interface {
 type ThemeExtension interface{ SetTheme(ui.Theme) }
 
 type Driver struct {
+	// OnQuitRequested opts into application-owned coordinated Quit. It runs on
+	// the UI owner and must not nest Do. It should obtain all document decisions
+	// before closing windows. Nil preserves the existing per-window Quit policy.
+	OnQuitRequested func()
+
 	// OnWindowActivated observes macOS native focus gained on the application
 	// owner for the exact live window. Use it to route process-wide menus.
 	// It must not enter Application.Do. Other platforms retain existing behavior.
@@ -687,6 +692,17 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			e.SetHandled()
 		}
 	}
+	if d.OnQuitRequested != nil {
+		callback := &quitCallback{owner: a, callback: d.OnQuitRequested}
+		core.TheApp.SetQuitReqFunc(func() {
+			if a.Context().Err() != nil || ctx.Err() != nil || len(a.Windows()) == 0 {
+				core.TheApp.Quit()
+				return
+			}
+			callback.request()
+		})
+		defer core.TheApp.SetQuitReqFunc(nil)
+	}
 	a.SetWake(wake)
 	defer a.SetWake(nil)
 	defer a.SetServices(nil)
@@ -703,6 +719,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 	if !started.Load() {
 		return fmt.Errorf("cogent: no native window started")
 	}
+
 	stop := context.AfterFunc(ctx, quit)
 	defer stop()
 	core.Wait()
