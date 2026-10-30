@@ -44,6 +44,21 @@ The optional producer DELIVERY.json binds this installation receipt; it makes
 no native runtime/launch claim. The standalone installer remains available for
 retrying already completed bundles.
 
+## Interrupted installation
+
+Ordinary extraction, verification, receipt and publication failures remove their
+staging directory and publish no new version. An abruptly killed installer may
+leave a hidden `.install-*` staging directory; its presence is not a completed
+installation. Retry the same completed bundle: a new staging directory is used,
+and the lock is released by the operating system when the old process exits.
+Existing installed versions are not overwritten. Select a prior version by its
+exact versioned directory if needed; there is no automatic application-data
+rollback. Preserve unsaved work before launching a different version. Do not
+delete staging directories while an installer may still be active.
+
+These failure paths have synthetic fault-injection and subprocess-termination
+coverage. They do not establish power-loss durability or native app behavior.
+
 ## Quit and reopening
 
 Notes, Document Starter and A/B Documents opt into coordinated Command-Q. Every
