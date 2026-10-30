@@ -601,3 +601,134 @@ func TestRedoToSavedRevisionClearsEarlierDirtyRecovery(t *testing.T) {
 		t.Fatal("clean redo retained obsolete recovery", err)
 	}
 }
+
+func TestSaveReplacementErrorPreservesRecoveryAndRetry(t *testing.T) {
+	x := filesFixture(t, privateDirectory(t))
+	x.owner(t, func() {
+		if err := x.f.Save(false); err != nil {
+			t.Fatal(err)
+		}
+	})
+	x.finish(t)
+	x.owner(t, func() {
+		if err := x.m.Update(x.m.Selected(), "Durability uncertain", "Retain recovery 😀"); err != nil {
+			t.Fatal(err)
+		}
+		x.f.Checkpoint()
+	})
+	x.finish(t)
+	recoveryBefore, err := os.ReadFile(x.r.RecoveryPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	failure := errors.New("injected post-replacement directory sync failure")
+	x.owner(t, func() {
+		replaceMainStore(t, x, failureStore{func(ctx context.Context, p string, b []byte, n int64) (bool, error) {
+			written, err := (document.FileStore{}).Write(ctx, p, b, n)
+			if err != nil {
+				return written, err
+			}
+			return written, failure
+		}})
+		if err := x.f.Save(false); err != nil {
+			t.Fatal(err)
+		}
+	})
+	x.finish(t)
+	data, err := os.ReadFile(x.r.Path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	saved, err := DecodeNotebook(data)
+	if err != nil || saved.Notes[0].Title != "Durability uncertain" {
+		t.Fatal("replacement bytes lost", err)
+	}
+	recoveryAfter, err := os.ReadFile(x.r.RecoveryPath)
+	if err != nil || !bytes.Equal(recoveryBefore, recoveryAfter) {
+		t.Fatal("uncertain save cleared recovery", err)
+	}
+	x.owner(t, func() {
+		state := x.f.main.State()
+		if !state.Last.Written || !errors.Is(state.Last.Err, failure) || !x.m.History().Dirty || x.f.ref.Context().Err() != nil {
+			t.Fatal("post-replacement error was acknowledged", state)
+		}
+		replaceMainStore(t, x, document.FileStore{})
+		if err := x.f.Save(false); err != nil {
+			t.Fatal(err)
+		}
+	})
+	x.finish(t)
+	x.owner(t, func() {
+		if x.m.History().Dirty || x.f.main.State().Last.Err != nil {
+			t.Fatal("retry did not acknowledge save")
+		}
+		if err := x.m.Undo(); err != nil || !x.m.History().Dirty {
+			t.Fatal("retry lost undo", err)
+		}
+		if err := x.m.Redo(); err != nil || x.m.History().Dirty {
+			t.Fatal("retry lost saved revision", err)
+		}
+	})
+	recoveryAfter, err = os.ReadFile(x.r.RecoveryPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	marker, err := decodeRecovery(recoveryAfter)
+	if err != nil || marker.Notebook != nil {
+		t.Fatal("successful retry did not clear recovery", err)
+	}
+}
+
+func TestFailedRecoveryCheckpointRetriesWithoutChangingSavedNotebook(t *testing.T) {
+	x := filesFixture(t, privateDirectory(t))
+	x.owner(t, func() {
+		if err := x.f.Save(false); err != nil {
+			t.Fatal(err)
+		}
+	})
+	x.finish(t)
+	primaryBefore, err := os.ReadFile(x.r.Path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Remove(x.r.RecoveryPath); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(x.r.RecoveryPath, 0700); err != nil {
+		t.Fatal(err)
+	}
+	x.owner(t, func() {
+		if err := x.m.Update(x.m.Selected(), "Recovery retry", "New body"); err != nil {
+			t.Fatal(err)
+		}
+		x.f.Checkpoint()
+	})
+	x.finish(t)
+	x.owner(t, func() {
+		if !x.m.History().Dirty || x.f.lastRecovery != 0 || !strings.HasPrefix(x.m.status, "Recovery:") {
+			t.Fatal("failed checkpoint acknowledged or stranded", x.m.status)
+		}
+	})
+	if err := os.Remove(x.r.RecoveryPath); err != nil {
+		t.Fatal(err)
+	}
+	x.owner(t, func() { x.f.Checkpoint() })
+	x.finish(t)
+	data, err := os.ReadFile(x.r.RecoveryPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	recovered, err := decodeRecovery(data)
+	if err != nil || recovered.Notebook == nil || recovered.Notebook.Notes[0].Title != "Recovery retry" {
+		t.Fatal("recovery retry lost edits", err)
+	}
+	primaryAfter, err := os.ReadFile(x.r.Path)
+	if err != nil || !bytes.Equal(primaryBefore, primaryAfter) {
+		t.Fatal("checkpoint changed main file", err)
+	}
+	x.owner(t, func() {
+		if !x.m.History().Dirty || x.f.lastRecovery != x.m.History().Revision || x.f.clear || x.f.busy() {
+			t.Fatal("successful checkpoint changed saved state or retained work")
+		}
+	})
+}
