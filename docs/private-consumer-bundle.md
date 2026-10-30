@@ -105,5 +105,9 @@ lifecycle/CI evidence; it does not qualify later workflow changes. New checkpoin
 use internal code review; historical Prism receipts retain their original scope.
 
 Install the completed bundle with the [versioned private installer](private-macos-installation.md).
+To inspect an existing delivered bundle and installation without reinstalling,
+compiling or launching, use the [read-only delivery verifier](private-macos-installation.md#verify-an-existing-delivery-without-reinstalling).
+It checks SDK contents, receipt/source links, archive/installed bytes, app metadata
+and strict signatures. It does not establish runtime or publisher authenticity.
 The existing Notes app is also included for ordinary use; native tests use an
 explicit disposable -data-dir and never migrate or edit an existing notebook.

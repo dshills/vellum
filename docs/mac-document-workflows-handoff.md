@@ -7,18 +7,18 @@ public release/tag/assets, new audit decision, signing identity or notarization.
 
 ## Source and package identity
 
-- Main at `df07cd4ce70b221c443a2f90f8738f3b8a827a3c` is pushed and green in
-  [Framework](https://github.com/dshills/vellum/actions/runs/41059541280),
-  [Stable root API](https://github.com/dshills/vellum/actions/runs/41059541360)
-  and [Platform adapters](https://github.com/dshills/vellum/actions/runs/41059541272).
-  Linux needed one targeted retry after a Go proxy transport error; the unchanged
-  source then passed. Framework passed its original attempt including optional
-  cache saving. These are exact-main results, not hosted results for later work.
-- The local `codex/mac-build23-closeout` branch adds historical compatibility,
-  bounded fuzzing, producer preflight and a generated-fixture packaging fix.
-  Use `git rev-parse HEAD` for the current documentation checkpoint. These later
-  commits have focused/local SDK verification and are not claimed pushed/merged
-  or hosted-CI-qualified here.
+- Main at `fa85ebe46da7b9cce836f865a171b2738ffaa769` is pushed and green in
+  [Framework](https://github.com/dshills/vellum/actions/runs/41073526868),
+  [Stable root API](https://github.com/dshills/vellum/actions/runs/41073526779)
+  and [Platform adapters](https://github.com/dshills/vellum/actions/runs/41073526784).
+  All three passed their original attempts. This includes the prior build23
+  compatibility/fuzz/preflight/generator work; it is no longer an unmerged branch.
+  These are exact-main results, not hosted results for subsequent maintenance.
+- Current local work is on `codex/mac-offscreen-maintenance24`. It adds installer
+  failure coverage, a read-only delivery verifier, an app-local lifetime fix,
+  dependency applicability checks and this handoff refresh. Use `git rev-parse HEAD`
+  for its exact documentation checkpoint. It has focused local verification;
+  it has not been merged/pushed or hosted-CI-qualified by this checkpoint.
 - **Final private build23 source:**
   `e0e011c605f8ee6ea84827414a1636bcca74c97e`.
   SDK SHA256:
@@ -40,8 +40,11 @@ public release/tag/assets, new audit decision, signing identity or notarization.
 No app window was launched during this work. Forge's headless icon-export command
 returns before application/UI/data initialization. Native launch/input checks
 remain deferred; no current app liveness or post-test relaunch is claimed.
-The latest Go application runtime correction remains f5d6feb (Quit/deferred Open).
-Subsequent changes add tests/fixtures, producer/generator tooling and documentation.
+The installed build23 contains f5d6feb (Quit/deferred Open). Newer source commit
+`e589f36e` additionally refuses late actions after their exact window retires,
+including when another window reuses the ID. That app-local correction is tested
+in Notes and a generated document consumer, but is NOT in installed build23.
+No newer SDK/app candidate has been packaged, installed or launched in this pass.
 
 The public v1 source and six-app build13 release retain their original hashes
 and scope. The private five-app set is Forge, Measure Pad, Documents, Document
@@ -95,6 +98,31 @@ and installed strict signatures, build-number/identifier checks, six archive
 hashes and preflight/installation identity. These checks did not execute the
 native UI. Known AppKit deprecation/linker warnings did not fail packaging.
 
+## Subsequent offscreen maintenance
+
+1. `42873dc8`: six installer fault boundaries and a killed synthetic extractor
+   preserve the prior version and allow retry. Hidden staging debris after abrupt
+   termination is documented; no power-loss guarantee or automatic data rollback.
+2. `faa14efe`: `verify-private-macos.py` independently verifies an existing complete
+   SDK/five-app delivery and its selected installation without build/install/launch.
+   Actual final build23 passed all-file/hash/source/receipt/app-metadata checks
+   plus strict signatures for all five archived and installed apps.
+3. `e589f36e`: overlapping Save/Open/Quit/Close tests reproduced late Open settlement
+   creating a prompt on a retired window model. Exact-window lifetime checks at
+   action admission and completion fix it; four late-action cases cover Open,
+   Save, Close and Delete. Full Notes race/vet and focused generated-consumer
+   checks pass. This source-only fix requires a newer package for native testing.
+4. `2888cb31`: [dependency recheck](security/dependency-alerts-2026-10-30.md) preserves
+   original notices and keeps alert 4 open with its limited disposition. A focused
+   evidence guard requires reassessment on changes. The source-built component
+   inventory does not certify build23's different prebuilt native archive.
+5. This documentation phase updates exact-main/package/source distinctions and
+   adds the [safe desktop resumption checklist](mac-desktop-resumption.md).
+
+Each checkpoint has a [recorded internal review](reviews/mac-offscreen-maintenance24/).
+Existing build23 manifests/receipts and historical native evidence are unchanged.
+No external review, dependency pin, stable API, release gate or backend change.
+
 ## Repeatable developer commands
 
 Use Go 1.25.6 as declared in go.mod. For portable Notes ownership/history/file
@@ -107,6 +135,8 @@ python3 -B scripts/ci-cache-budget_test.py
 python3 -B scripts/check-stages_test.py
 python3 -B scripts/private-macos-bundle_test.py
 python3 -B scripts/install-private-macos_test.py
+python3 -B scripts/verify-private-macos_test.py
+python3 -B scripts/dependency-disposition_test.py
 ```
 
 For a new matched SDK/app candidate, commit first, prepare pinned native sources,
@@ -116,6 +146,12 @@ Use a fresh output and versioned nonsynced installation. Nothing launches.
 BUNDLE_MANIFEST records completed packaging; optional installation is complete
 only when DELIVERY.json binds the installed receipt. Keep that source identity
 with any later native results. Hosted CI is a separate exact-commit result.
+
+To recheck the installed final build23 bytes without reinstalling or starting any
+app, use the [existing-delivery verifier](private-macos-installation.md#verify-an-existing-delivery-without-reinstalling).
+The [resumption checklist](mac-desktop-resumption.md) includes exact local paths
+and the caller-pinned bundle manifest digest. Verification of those old package
+bytes does not test the newer source-only lifetime fix.
 
 ## Remaining native checks — deferred
 
