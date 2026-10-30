@@ -1,0 +1,41 @@
+{
+  "source_commit": "b9212489afc921171fc5abbd5275d8919ae930dd",
+  "build_version": "24",
+  "sdk_sha256": "5a825eb07c480f2df248435b7c0a55e0b0cb5104ccd2de3b8f146c55c2798382",
+  "files": {
+    "Vellum-SDK.tar.gz": "5a825eb07c480f2df248435b7c0a55e0b0cb5104ccd2de3b8f146c55c2798382",
+    "Vellum-Forge.zip": "21ed72cabbd52306d568e3b505111e5efe9eb3d86cddbd05f6d0f472fafbf3e1",
+    "Vellum-Measure-Pad.zip": "a02ecfac2dd1e1177e33bdea566874f2f274b5734400229a049044030102c82a",
+    "Vellum-Documents.zip": "13ff82715862c6715a3c3f6d6fe8c04bb74f47fabe3ad360ee324f95f37bc729",
+    "Vellum-Document-Starter.zip": "90be8dbbe204bb43539cd5e3572044f688e4fc77cb32f525c613e7d8c43ad2f1",
+    "Vellum-Notes.zip": "076ef40eb15a1378ce11848ed56c31285a5ad07acb172bb1794b07af21fc7f1e"
+  },
+  "manifest_sha256": "516456cc39bc0b3c2b8faf14871cc820afda813a0a5f269e23da15fd97c77727",
+  "preflight_sha256": "75c0bcc3e5ecad4d43bd3b0f7e5b7989c147a480992e685a3c4565d4b94009aa",
+  "installation_sha256": "1c8a8b8425759434214631ff73b8ec9293af9c89dd82847f111cdea544a39fcd",
+  "installation": "~/Applications/Vellum/build24-b9212489afc9",
+  "apps": [
+    "Vellum Forge",
+    "Vellum Measure Pad",
+    "Vellum Documents",
+    "Vellum Document Starter",
+    "Vellum Notes"
+  ],
+  "signing": "ad-hoc",
+  "notarized": false,
+  "desktop_checks": "deferred",
+  "native_runtime": "not executed",
+  "prior_build23": "retained",
+  "checks": [
+    "exact-source green CI",
+    "Go 1.25.6 producer admission",
+    "pinned native preparation",
+    "SDK all-file/relocation/module-origin verification",
+    "generated minimal/document race/vet/build",
+    "public SDK contract scenarios",
+    "five app builds and ZIP-extracted strict signatures",
+    "versioned installation bytes and strict signatures",
+    "durable archive and metadata copy identities"
+  ],
+  "headless_icon_export": "Forge icon-only process; exits before UI/data initialization"
+}
