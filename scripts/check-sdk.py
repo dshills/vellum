@@ -264,6 +264,29 @@ def native_benchmark_report(stdout):
     return reports[0]
 
 
+MAINTENANCE_TOOL_TESTS = ['verify-private-macos_test.py', 'check-private-macos-linkage_test.py',
+                          'macos_deployment_test.py', 'private_bundle_preflight_test.py', 'native_toolchain_test.py']
+
+
+def check_maintenance_tools(sdk, manifest, env):
+    declared=manifest.get('maintenance_tool_tests')
+    if declared is None:
+        return dict(status='not declared by historical SDK',suites=[],native_runtime='not executed')
+    expected=['scripts/'+name for name in MAINTENANCE_TOOL_TESTS]
+    if declared!=expected:raise ValueError('invalid SDK maintenance suite declaration')
+    for name in expected:
+        path=sdk/name
+        if name not in manifest['files'] or not path.is_file() or path.is_symlink():
+            raise ValueError('missing SDK maintenance suite: '+name)
+    toolenv=dict(env)
+    for key in ('PYTHONPATH','PYTHONHOME'):toolenv.pop(key,None)
+    toolenv['PYTHONNOUSERSITE']='1'
+    for name in expected:
+        run_child([sys.executable,'-B',str(sdk/name)],cwd=sdk.parent,env=toolenv,
+                  check=True,stdout=sys.stderr,timeout=60)
+    return dict(status='passed',suites=expected,native_runtime='not executed')
+
+
 def check(path, expected_sha256=None, native_runtime=False, allow_self_attested=False):
     if expected_sha256 is None and not allow_self_attested:
         raise ValueError("executing SDK code requires --sha256 from a trusted producer or explicit --allow-self-attested")
@@ -277,6 +300,7 @@ def check(path, expected_sha256=None, native_runtime=False, allow_self_attested=
     with tempfile.TemporaryDirectory(prefix="vellum SDK relocation ") as temporary:
         base = Path(temporary)
         sdk = extract_verified(path, base / "extracted SDK", verified)
+        maintenance=check_maintenance_tools(sdk,verified["manifest"],env)
         consumer = base / "consumer application"
         run_child(["python3", str(sdk / "scripts/new-app.py"), str(consumer), "--module=example.com/vellum-relocation-consumer"], env=env, check=True, stdout=sys.stderr, timeout=GENERATOR_TIMEOUT_SECONDS)
         modules = decode_objects(check_child_output(["go", "list", "-m", "-json", "all"], cwd=consumer, env=env, text=True, timeout=COMMAND_TIMEOUT_SECONDS))
@@ -304,7 +328,7 @@ def check(path, expected_sha256=None, native_runtime=False, allow_self_attested=
             run_child(["go", "build", "-o", str(diagnostic), "."], cwd=sdk / "examples/hello", env=env, check=True, stdout=sys.stderr, timeout=COMMAND_TIMEOUT_SECONDS)
             completed = run_child([str(diagnostic), "--benchmark", "--idle=1s", "--samples=3"], env=child_environment(runtime=True), check=True, text=True, capture_output=True, timeout=RUNTIME_TIMEOUT_SECONDS)
             native = native_benchmark_report(completed.stdout)
-        return {"event": "vellum.sdk.relocated", "digest_verified_against_expected": expected_sha256 is not None, "trust_basis": "caller-supplied expected digest" if expected_sha256 is not None else "explicit self-attestation", "independent_authenticity_verified": False, "archive_sha256": verified["archive_sha256"], "version": verified["manifest"]["release"]["version"], "source": verified["manifest"].get("source"), "verified_files": len(verified["manifest"]["files"]), "replacements_within_sdk": origins, "document_replacements_within_sdk": document_origins, "path_contains_spaces": " " in str(sdk), "checks": ["manifest all-file integrity", "external Go module cache verification", "minimal consumer race/vet/build", "document consumer race/vet/build", "public API scenarios race/vet"], "native_runtime": native if native_runtime else "not executed", "public_distribution_audit": "not certified"}
+        return {"event": "vellum.sdk.relocated", "digest_verified_against_expected": expected_sha256 is not None, "trust_basis": "caller-supplied expected digest" if expected_sha256 is not None else "explicit self-attestation", "independent_authenticity_verified": False, "archive_sha256": verified["archive_sha256"], "version": verified["manifest"]["release"]["version"], "source": verified["manifest"].get("source"), "verified_files": len(verified["manifest"]["files"]), "replacements_within_sdk": origins, "document_replacements_within_sdk": document_origins, "path_contains_spaces": " " in str(sdk), "checks": ["manifest all-file integrity", "external Go module cache verification", "minimal consumer race/vet/build", "document consumer race/vet/build", "public API scenarios race/vet"], "native_runtime": native if native_runtime else "not executed", "public_distribution_audit": "not certified", "maintenance_tools": maintenance}
 
 
 def main():

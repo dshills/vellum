@@ -143,3 +143,19 @@ manifest. Missing/failed evidence or OS/SDK drift leaves no completion marker an
 no automatic installation/delivery receipt. Completed older bundles remain readable
 with their original scope. Build24 is retained unchanged; no rebuild is required
 solely for this new producer guard.
+
+## Relocated maintenance-tool checks
+
+New SDK manifests declare five focused maintenance suites: independent verifier,
+static private linkage, deployment metadata, producer preflight and native input
+capture. SDK verification runs those copies from the verified extraction, with
+a working directory outside the SDK and Python import overrides removed. Missing
+suite coverage, a failed suite or an inconsistent declaration fails verification;
+the result records exactly which suites ran. Existing generated-Go consumer checks
+remain unchanged. These Python suites use disposable/synthetic fixtures, not app
+windows or personal notebooks.
+
+Older SDKs without the declaration remain readable and report that maintenance
+tests were not declared; they are not silently credited with the new checks.
+A private precommit tooling snapshot exercised the new path successfully without
+rebuilding/installing apps or changing the original build24 SDK identity.

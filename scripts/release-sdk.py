@@ -516,6 +516,11 @@ def package(root, output, public=False, include_untracked=False, *, macos_gpu_li
                             add_member(archive, prefix + "/" + name, data)
                             checksums[name] = hashlib.sha256(data).hexdigest()
                         manifest = {"schema": 1, "release": metadata, "source": state, "private_build": not public, "untracked_files": sorted(included_untracked), "files": checksums}
+                        if "scripts/check-sdk.py" in checksums:
+                            suites=['scripts/'+name for name in ['verify-private-macos_test.py','check-private-macos-linkage_test.py','macos_deployment_test.py','private_bundle_preflight_test.py','native_toolchain_test.py']]
+                            if not set(suites)<=set(checksums):raise ValueError("SDK maintenance suite coverage is incomplete")
+                            manifest['maintenance_tool_tests']=suites
+
                         if documentation:
                             manifest["documentation_overlays"] = {"schema": 1, "scope_note": DOCUMENTATION_NOTE,
                                                                   "documents": documentation}

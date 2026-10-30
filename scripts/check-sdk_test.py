@@ -235,4 +235,26 @@ class SDKChecks(unittest.TestCase):
    modules[-1]["Replace"]["Dir"]=str(Path(tmp)/"original checkout")
    with self.assertRaisesRegex(ValueError,"outside relocated SDK"):sdk.check_origin(modules,root)
    with self.assertRaisesRegex(ValueError,"missing explicit"):sdk.check_origin(modules[:2],root)
+class MaintenanceTools(unittest.TestCase):
+ def test_declared_suites_run_from_relocated_sdk_with_clean_python_imports(self):
+  with tempfile.TemporaryDirectory(prefix='SDK tools with spaces ') as t:
+   root=Path(t)/'SDK';(root/'scripts').mkdir(parents=True)
+   names=['scripts/'+name for name in sdk.MAINTENANCE_TOOL_TESTS]
+   for name in names:(root/name).write_text('# synthetic suite')
+   manifest=dict(maintenance_tool_tests=names,files={name:'0'*64 for name in names})
+   with mock.patch.object(sdk,'run_child') as commands:
+    result=sdk.check_maintenance_tools(root,manifest,{'PYTHONPATH':'/original/checkout','PYTHONHOME':'/original/python'})
+   self.assertEqual(result['status'],'passed');self.assertEqual(commands.call_count,5)
+   for call in commands.call_args_list:
+    self.assertTrue(Path(call.args[0][-1]).is_relative_to(root));self.assertEqual(call.kwargs['cwd'],root.parent)
+    self.assertNotIn('PYTHONPATH',call.kwargs['env']);self.assertNotIn('PYTHONHOME',call.kwargs['env']);self.assertEqual(call.kwargs['timeout'],60)
+   (root/names[0]).unlink()
+   with mock.patch.object(sdk,'run_child') as commands,self.assertRaisesRegex(ValueError,'missing SDK'):sdk.check_maintenance_tools(root,manifest,{})
+   commands.assert_not_called()
+ def test_legacy_and_failure_do_not_claim_tool_verification(self):
+  with mock.patch.object(sdk,'run_child') as commands:
+   r=sdk.check_maintenance_tools(Path('/unused'),{'files':{}},{})
+   self.assertNotEqual(r['status'],'passed');commands.assert_not_called()
+   with self.assertRaises(ValueError):sdk.check_maintenance_tools(Path('/unused'),dict(maintenance_tool_tests=[],files={}),{})
+
 if __name__=="__main__":unittest.main()
