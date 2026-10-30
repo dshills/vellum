@@ -1,0 +1,48 @@
+{
+  "historical_sources": [
+    {
+      "name": "notes13",
+      "source_commit": "64bf9cfbb9cfb57d96e1aecd0adad01239ca3c7a",
+      "source_directory": "examples/macapps/notes",
+      "source_files": {
+        "files.go": "f051bc6f993f0a9c42efc61bc59ce0dfd8b906722fab7c86746b1e5417f39a3f",
+        "lock_darwin.go": "8c7d86f5c4e0d435a43c50a1aefcdbd17e23df9271b48b919716ad958cb1f6b2",
+        "lock_other.go": "4f6cba5ba70f7f5d35a5ac16285a2bf2770cb21d331fcc9721732887cd1031e7",
+        "model.go": "91aa836858c0d183c00ddf961705ae439254633b5fd93d2c10cb90310d49e5b5",
+        "notebook.go": "88aee6d4aa58a820b0e37ef80f80f3e2c9ad9fc8a7cfa15e8749d1019e8d9732",
+        "repository.go": "f3ca73bb3c8cab097f25fd4f9c386d862e00d5bdefa22d9abdde1290d5e38c67",
+        "view.go": "49b0c2fed53a9058c6632357e6eca24ac30f20e128305e215c76b13ef0a98ee6"
+      }
+    },
+    {
+      "name": "notes22",
+      "source_commit": "4f447e85aa97dbcfa3b36d2707a679c173791777",
+      "source_directory": "examples/macapps/notes",
+      "source_files": {
+        "files.go": "093d7f397d4c7bbc031f202a5088cadb3a41f7ed8ed487bbf023bd552b6e4e82",
+        "find.go": "ae1130e8336c944fb2470147e51397ef102c3a4a7cb61494da3753743576604a",
+        "lock_darwin.go": "8c7d86f5c4e0d435a43c50a1aefcdbd17e23df9271b48b919716ad958cb1f6b2",
+        "lock_other.go": "4f6cba5ba70f7f5d35a5ac16285a2bf2770cb21d331fcc9721732887cd1031e7",
+        "model.go": "4af6a8ff7865718ab73af77a5c6f476afd2e191dfd37b33d5cfff4e26f7acf4a",
+        "notebook.go": "88aee6d4aa58a820b0e37ef80f80f3e2c9ad9fc8a7cfa15e8749d1019e8d9732",
+        "open_files.go": "3340a202a8757f31d29431cdcc9cbd5d8ab0776ab13eb9c826af49d9501309ae",
+        "quit.go": "d200645909dcf90a4824511174efdc79306e2b4cae0efc96f29a33c70d638679",
+        "repository.go": "f3ca73bb3c8cab097f25fd4f9c386d862e00d5bdefa22d9abdde1290d5e38c67",
+        "view.go": "c2c911b3e4e5f65b24f04812854a400cb85833eb4fbe9db01754fb919aba6995",
+        "workspace.go": "94f7f2bed3b172daa17e480ccd8d15da127564250808749f1aeee5bbaa6ac121"
+      }
+    }
+  ],
+  "fixtures": {
+    "notes-build13.vellumnotes": "6efe6b8e845e22973337bbf1e269c2c9e57c6e2174153f0ad49f482944e12674",
+    "notes-build22.vellumnotes": "6efe6b8e845e22973337bbf1e269c2c9e57c6e2174153f0ad49f482944e12674",
+    "recovery-build13.vellumnotes": "6fc90c5f2ad18b6508a4e8c244d26488c6348bd1c6eaf7600fcd37189261948e",
+    "recovery-build22.vellumnotes": "6fc90c5f2ad18b6508a4e8c244d26488c6348bd1c6eaf7600fcd37189261948e",
+    "window-session-build22.json": "3b3d770ce5d8e9cedf79825fe532eab432ad5a736730e5f63170c886346d66d3"
+  },
+  "generation": "Original historical app source and encoder; current compatible root/native types. Test invokes model/codec only, no native application run or user storage.",
+  "generators": {
+    "generate-notes13.go.txt": "0225be28de1262f7ae6ebc1029abec0c18a995a3f86b4cc7168d8c738c9bd34f",
+    "generate-notes22.go.txt": "b54cdda7cca61e163cde478e923538e99426ce3bc3db8ef4539c23d9d63f8b54"
+  }
+}

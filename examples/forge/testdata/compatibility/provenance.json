@@ -1,0 +1,32 @@
+{
+  "historical_sources": [
+    {
+      "name": "forge22",
+      "source_commit": "4f447e85aa97dbcfa3b36d2707a679c173791777",
+      "source_directory": "examples/forge",
+      "source_files": {
+        "clipboard.go": "065b76d1332250bdf59850194f5aef818880c953f4905bef5809ee0fd738b22e",
+        "files.go": "ffa1d69445352d62d26471b7af683374150b1e1d735d2b179e482c550df30a97",
+        "handles.go": "8d83d08364f63091a9a4b922005273331dc822028ce97af2723302b0d4cfe962",
+        "icon.go": "f197c51f0089f66e9c73e4e4c4a6dd84e03ed4ff1bb14b766b43e24cb459f0a2",
+        "isolation.go": "ec8bf71546b4a91df7ed294ef7aa39adaa15ea1724333ec90bb5d867df678367",
+        "main.go": "3b85aecd19cf443e2cf7933f2c78edbb846ae4a5964871bf14a9f9d0a3928c72",
+        "model.go": "d1655c1840c0393d8b8839f4059af04cd72df9e21c350b87134c8d01b76db282",
+        "open_files.go": "6d027ab1428c5a8663348704ce7fad7b9a5df3203f3891adb1dc5edce2ca8e17",
+        "recent.go": "638df3578fe4e2072577945b9945c2212f623405f5f19d20206f94cafcb8f6b0",
+        "rename.go": "673f60fa7cba7ab1f52a065d9fd8a89e8aad635787a302a4b4255f274b720f7f",
+        "smoke.go": "3c8a8dd4f76e8fc6b93e83008c62b89657bb8a4ea68150469fa9c4b7ce1c1b12",
+        "tool_icons.go": "55713f985b1565e85cdd49600a0a390f1f302fd702e5f1b85f442b01d13c5360",
+        "view.go": "22e5368b93667409686cbb07853e5ead3ff77569e6dcf61816e341bcaa178676",
+        "workspace.go": "a365df3fcef84bd740bf0ae3b186e3187c51249b966e718f8cd68824312af51b"
+      }
+    }
+  ],
+  "fixtures": {
+    "study-build22.vforge": "e2b77917054f3bc80d2e8bb7a87cbb696d4767e7f2780417b8a2470993530055"
+  },
+  "generation": "Original historical app source and encoder; current compatible root/native types. Test invokes model/codec only, no native application run or user storage.",
+  "generators": {
+    "generate-forge22.go.txt": "3d294051abb010544a253c434e445e88adfc8ae021517b391f88b65d6e98578a"
+  }
+}

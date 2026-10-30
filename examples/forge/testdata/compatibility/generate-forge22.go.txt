@@ -1,0 +1,10 @@
+package main
+import("testing";"os";"path/filepath")
+func TestHistoricalFixture(t *testing.T){
+ m:=newWorkbench();if e:=m.add();e!=nil{t.Fatal(e)};m.scene.Camera.Distance=12
+ m.state.Selection=[]string{"shaft","body-8"};m.state.Selected="body-8"
+ s:=m.captureStudy();data,e:=encodeStudy(s);if e!=nil{t.Fatal(e)}
+ dir:=os.Getenv("VELLUM_COMPAT_OUTPUT");if dir==""{t.Fatal("fixture output required")}
+ if e=os.WriteFile(filepath.Join(dir,"study-build22.vforge"),data,0600);e!=nil{t.Fatal(e)}
+ if input:=os.Getenv("VELLUM_COMPAT_READ");input!=""{data,e=os.ReadFile(input);if e!=nil{t.Fatal(e)};if _,e=decodeStudy(data);e!=nil{t.Fatal(e)}}
+}

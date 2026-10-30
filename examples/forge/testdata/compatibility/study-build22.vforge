@@ -1,0 +1,275 @@
+{
+  "Version": 1,
+  "Document": {
+    "Objects": [
+      {
+        "ID": "base",
+        "Name": "Machined base",
+        "Bounds": {
+          "Min": {
+            "X": -2,
+            "Y": -0.18,
+            "Z": -1.3
+          },
+          "Max": {
+            "X": 2,
+            "Y": 0.18,
+            "Z": 1.3
+          }
+        },
+        "Color": {
+          "R": 154,
+          "G": 168,
+          "B": 188,
+          "A": 255
+        },
+        "Visible": true,
+        "Shape": 0,
+        "Overlay": false,
+        "ScreenSize": 0
+      },
+      {
+        "ID": "rail-front",
+        "Name": "Front guide rail",
+        "Bounds": {
+          "Min": {
+            "X": -1.8,
+            "Y": 0.18,
+            "Z": 0.72
+          },
+          "Max": {
+            "X": 1.8,
+            "Y": 0.35,
+            "Z": 0.9
+          }
+        },
+        "Color": {
+          "R": 103,
+          "G": 119,
+          "B": 143,
+          "A": 255
+        },
+        "Visible": true,
+        "Shape": 0,
+        "Overlay": false,
+        "ScreenSize": 0
+      },
+      {
+        "ID": "rail-back",
+        "Name": "Rear guide rail",
+        "Bounds": {
+          "Min": {
+            "X": -1.8,
+            "Y": 0.18,
+            "Z": -0.9
+          },
+          "Max": {
+            "X": 1.8,
+            "Y": 0.35,
+            "Z": -0.72
+          }
+        },
+        "Color": {
+          "R": 103,
+          "G": 119,
+          "B": 143,
+          "A": 255
+        },
+        "Visible": true,
+        "Shape": 0,
+        "Overlay": false,
+        "ScreenSize": 0
+      },
+      {
+        "ID": "housing",
+        "Name": "Motor housing",
+        "Bounds": {
+          "Min": {
+            "X": -1.75,
+            "Y": 0.18,
+            "Z": -0.65
+          },
+          "Max": {
+            "X": -0.55,
+            "Y": 1.3,
+            "Z": 0.65
+          }
+        },
+        "Color": {
+          "R": 53,
+          "G": 111,
+          "B": 220,
+          "A": 255
+        },
+        "Visible": true,
+        "Shape": 0,
+        "Overlay": false,
+        "ScreenSize": 0
+      },
+      {
+        "ID": "carriage",
+        "Name": "Sliding carriage",
+        "Bounds": {
+          "Min": {
+            "X": -0.2,
+            "Y": 0.35,
+            "Z": -0.62
+          },
+          "Max": {
+            "X": 1.05,
+            "Y": 0.9,
+            "Z": 0.62
+          }
+        },
+        "Color": {
+          "R": 243,
+          "G": 142,
+          "B": 68,
+          "A": 255
+        },
+        "Visible": true,
+        "Shape": 0,
+        "Overlay": false,
+        "ScreenSize": 0
+      },
+      {
+        "ID": "cap",
+        "Name": "End support",
+        "Bounds": {
+          "Min": {
+            "X": 1.45,
+            "Y": 0.18,
+            "Z": -0.65
+          },
+          "Max": {
+            "X": 1.8,
+            "Y": 0.8,
+            "Z": 0.65
+          }
+        },
+        "Color": {
+          "R": 76,
+          "G": 172,
+          "B": 164,
+          "A": 255
+        },
+        "Visible": true,
+        "Shape": 0,
+        "Overlay": false,
+        "ScreenSize": 0
+      },
+      {
+        "ID": "shaft",
+        "Name": "Drive shaft",
+        "Bounds": {
+          "Min": {
+            "X": -0.55,
+            "Y": 0.45,
+            "Z": -0.1
+          },
+          "Max": {
+            "X": 1.5,
+            "Y": 0.65,
+            "Z": 0.1
+          }
+        },
+        "Color": {
+          "R": 194,
+          "G": 202,
+          "B": 217,
+          "A": 255
+        },
+        "Visible": true,
+        "Shape": 1,
+        "Overlay": false,
+        "ScreenSize": 0
+      },
+      {
+        "ID": "body-8",
+        "Name": "Body 8",
+        "Bounds": {
+          "Min": {
+            "X": -0.5,
+            "Y": 1.35,
+            "Z": -0.35
+          },
+          "Max": {
+            "X": 0.09999999999999998,
+            "Y": 1.95,
+            "Z": 0.35
+          }
+        },
+        "Color": {
+          "R": 158,
+          "G": 112,
+          "B": 221,
+          "A": 255
+        },
+        "Visible": true,
+        "Shape": 0,
+        "Overlay": false,
+        "ScreenSize": 0
+      }
+    ],
+    "Features": [
+      {
+        "ID": "create-base",
+        "Label": "Machined base",
+        "Object": "base"
+      },
+      {
+        "ID": "create-rail-front",
+        "Label": "Front guide rail",
+        "Object": "rail-front"
+      },
+      {
+        "ID": "create-rail-back",
+        "Label": "Rear guide rail",
+        "Object": "rail-back"
+      },
+      {
+        "ID": "create-housing",
+        "Label": "Motor housing",
+        "Object": "housing"
+      },
+      {
+        "ID": "create-carriage",
+        "Label": "Sliding carriage",
+        "Object": "carriage"
+      },
+      {
+        "ID": "create-cap",
+        "Label": "End support",
+        "Object": "cap"
+      },
+      {
+        "ID": "create-shaft",
+        "Label": "Drive shaft",
+        "Object": "shaft"
+      },
+      {
+        "ID": "create-body-8",
+        "Label": "New body",
+        "Object": "body-8"
+      }
+    ],
+    "Marker": 8,
+    "Selected": "body-8",
+    "Selection": [
+      "shaft",
+      "body-8"
+    ]
+  },
+  "Camera": {
+    "Target": {
+      "X": 0,
+      "Y": 0.45,
+      "Z": 0
+    },
+    "Yaw": 0.65,
+    "Pitch": 0.42,
+    "Distance": 12,
+    "Orthographic": false
+  },
+  "Next": 9
+}

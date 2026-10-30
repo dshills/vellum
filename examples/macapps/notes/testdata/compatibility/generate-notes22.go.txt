@@ -1,0 +1,15 @@
+package notes
+import("testing";"os";"encoding/json";"path/filepath")
+func TestHistoricalFixture(t *testing.T){
+ m:=New();id,e:=m.Add();if e!=nil{t.Fatal(e)}
+ if e=m.Update(id,"Résumé 😀","Historical fixture\r\ne\u0301 אבג\nLast line\n");e!=nil{t.Fatal(e)}
+ if e=m.SetPinned(id,true);e!=nil{t.Fatal(e)}
+ b,e:=m.CaptureNotebook();if e!=nil{t.Fatal(e)}
+ data,e:=EncodeNotebook(b);if e!=nil{t.Fatal(e)}
+ dir:=os.Getenv("VELLUM_COMPAT_OUTPUT");if dir==""{t.Fatal("fixture output required")}
+ if e=os.WriteFile(filepath.Join(dir,"notes-build22.vellumnotes"),data,0600);e!=nil{t.Fatal(e)}
+ r,e:=encodeRecovery(Recovery{Version:1,Notebook:&b});if e!=nil{t.Fatal(e)}
+ if e=os.WriteFile(filepath.Join(dir,"recovery-build22.vellumnotes"),r,0600);e!=nil{t.Fatal(e)}
+ session:=WindowSession{Version:1,Path:"/tmp/Vellum Compatibility/Notebook.vellumnotes",Activated:1};metadata,e:=json.Marshal(session);if e!=nil{t.Fatal(e)};if e=os.WriteFile(filepath.Join(dir,"window-session-build22.json"),metadata,0600);e!=nil{t.Fatal(e)}
+ if input:=os.Getenv("VELLUM_COMPAT_READ");input!=""{data,e=os.ReadFile(input);if e!=nil{t.Fatal(e)};if _,e=DecodeNotebook(data);e!=nil{t.Fatal(e)};var v any;if e=json.Unmarshal(data,&v);e!=nil{t.Fatal(e)}}
+}
