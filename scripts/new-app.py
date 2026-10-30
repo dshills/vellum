@@ -39,6 +39,19 @@ def copy_document_template(stage, module):
             for old, new in mapping.items():
                 text = text.replace(old, new)
             (destination / path.name).write_text(text, encoding="utf-8")
+    # Tests are part of the reusable recipe; retain fixture bytes and provenance
+    # without applying UI/import text substitutions to persisted file formats.
+    fixtures = ROOT / "examples/macapps/notes/testdata"
+    if fixtures.exists() or fixtures.is_symlink():
+        if fixtures.is_symlink() or not fixtures.is_dir():
+            raise ValueError("document template testdata must be a regular directory")
+        for path in sorted(fixtures.rglob("*")):
+            if path.is_symlink() or not (path.is_dir() or path.is_file()):
+                raise ValueError("document template testdata contains a link or special file")
+            if path.is_file():
+                target = stage / "internal/notebook/testdata" / path.relative_to(fixtures)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(path, target)
     storage_id = "vellum.document." + hashlib.sha256(module.encode("utf-8")).hexdigest()[:32]
     for name in ("main.go", "paths.go", "paths_test.go"):
         text = (ROOT / "scripts/templates/document" / (name + ".txt")).read_text(encoding="utf-8")
