@@ -480,3 +480,15 @@ Preparation still reconstructs sources from checksum-verified pinned modules and
 validates every patch input/output. `go mod verify` runs after restoration and
 preparation in both root and native modules. A cache hit is an optimization,
 not evidence of test success or an alternative to source verification.
+
+The Framework workflow restores caches without an automatic post-save. After
+successful checks, optional upload runs only with five minutes of job headroom,
+is capped at two minutes, and does not gate verification. Near-deadline runs skip
+upload; checks and the existing 60/35-minute job deadlines remain unchanged. This
+prevents cache cleanup alone from canceling an otherwise completed verification
+run. It does not waive a timeout in the checks themselves.
+
+For the current private document-app candidate and safely deferred native work,
+use the [maintenance handoff](mac-document-workflows-handoff.md). A new matched
+SDK/app build and verified installation can run without opening desktop windows;
+see the [one-command recipe](private-consumer-bundle.md#build-verify-and-install-without-desktop-checks).

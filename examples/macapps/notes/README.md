@@ -96,8 +96,11 @@ unavailable storage stop startup without overwriting those files.
 
 Command-S saves to `Notebook.vellumnotes` initially; Command-Shift-S chooses a new
 file destination; Command-O opens a notebook. Matching accessible toolbar buttons
-use the same commands. Save As switches the current destination; a later launch
-starts with the default local notebook, so use Open to return to an external file.
+use the same commands. Save As switches the current destination. The native
+Notes, Documents and generated Document Starter hosts configure bounded restoration
+metadata so restart can reopen the last successful external file. Recovery takes
+priority; unavailable files or invalid metadata preserve the private default. A
+model-only host without ConfigureRestoration starts from its private default.
 Saving a new fictional sample notebook is explicit; a clean sample journal is
 not labeled as an already saved disk file. The whole notebook includes stable
 note IDs, next ID, folders/selection and exact plain UTF-8 body bytes. Undo/Redo
@@ -116,8 +119,10 @@ Every two seconds, an idle owner may capture a changed committed notebook to a
 separate recovery session. Native composition, pending input, file IO and a
 recovery decision postpone capture. Recovery never marks the main notebook saved.
 After interruption, startup explicitly offers Restore, Discard or Close without
-changing files. Restored content is dirty with fresh session history and saves
-to the default local notebook. Successful save/open or explicit discard writes
+changing files. Restored content is dirty with fresh session history. When valid
+WindowSession metadata retains the external destination, Save returns to that
+path; otherwise it uses
+the private default. Successful save/open or explicit discard writes
 an atomic clean marker. Recovery is the last completed snapshot, not a guarantee
 that the newest keystroke survives force quit, power loss or blocked IO.
 
@@ -187,3 +192,11 @@ All is one document Undo/Redo step. Host settlement admits search, find query,
 replacement, title and body before an action; native composition must settle.
 Recovery/dirty dialogs retain priority, and rejected/stale operations preserve
 contents. The generated Document Starter and A/B Documents share this recipe.
+
+## Current maintenance handoff
+
+See the [document-workflow handoff](../../../docs/mac-document-workflows-handoff.md)
+for current source/package identities and deferred native checks. Late Quit
+settlement is canceled after its coordination epoch ends. Failed window-session
+writes cancel dependent Open requests explicitly; retry Open after repairing
+storage. No deferred request is replayed by an unrelated later write.

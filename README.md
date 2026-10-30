@@ -238,11 +238,12 @@ apps launch normally with their own private Application Support storage and
 retain an explicit `-data-dir` override for isolated testing.
 
 The [matching private SDK/app recipe](docs/private-consumer-bundle.md) builds
-Forge, Measure Pad, the two-window Documents diagnostic and Document Starter
-from one extracted SDK. These newer private bundles are separate from the six
+Forge, Measure Pad, the two-window Documents diagnostic, Document Starter and
+Notes from one extracted SDK. These newer private bundles are separate from the six
 published build13 apps. The offscreen SDK consumer CI checks both starter
 profiles, while native UI observations remain separate. Current checkpoints
-use internal code reviews.
+use internal code reviews. See the [current document-workflow handoff](docs/mac-document-workflows-handoff.md)
+for private build identities, recent maintenance and explicitly deferred desktop checks.
 
 ## Verification
 

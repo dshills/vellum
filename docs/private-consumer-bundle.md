@@ -85,10 +85,11 @@ not an OS filesystem sandbox or a public distribution certification.
 
 Each private delivery should carry its exact source commit, SDK digest, named
 archive checksums, signing route and separate automated/native observations.
-Current working instructions supersede old handoffs that describe commits as
-local or lifecycle checks as unfinished; keep historical source/hash records
-unchanged. The [consumer closeout](reviews/consumer-closeout/README.md) describes
-the completed lifecycle checks, exact-main CI and review policy. New checkpoints
+Use the [current document-workflow handoff](mac-document-workflows-handoff.md)
+for exact source/package identities and the remaining deferred native checks.
+Keep historical source/hash records unchanged. The older
+[consumer closeout](reviews/consumer-closeout/README.md) records its own earlier
+lifecycle/CI evidence; it does not qualify later workflow changes. New checkpoints
 use internal code review; historical Prism receipts retain their original scope.
 
 Install the completed bundle with the [versioned private installer](private-macos-installation.md).

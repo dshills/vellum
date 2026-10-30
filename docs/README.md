@@ -6,6 +6,7 @@ and [implementation status](implementation.md). For current Mac use, follow the
 and [release closeout](../specs/macos-v1-release.md). The older delivery plan
 retains broader qualification work.
 
+- [Current document-workflow handoff](mac-document-workflows-handoff.md): private candidate identities, offscreen checks and deferred native acceptance.
 - [Mac input widgets](mac-widget-integration.md): public API setup, themes, owner values and focus helpers.
 - [Mac widget demo](mac-widget-demo.md): run the private light/dark gallery.
 - [Repository layout](repository-layout.md): package, module, command and archive boundaries.

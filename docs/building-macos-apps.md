@@ -96,7 +96,9 @@ content is dirty and history is fresh. Successful file actions or explicit
 discard atomically write a clean marker. Recovery is the last completed copy,
 not a guarantee for the latest keystroke. A recovery-marker failure after a
 successful main save preserves saved bytes, reports the error and keeps the
-window open for retry.
+window open for retry. A failed WindowSession write cancels dependent deferred
+Open requests and reports that Open must be retried; it never replays them after
+an unrelated metadata write.
 
 Use `CloseRequest` to refuse native close until settlement and the save decision
 finish. Then close the exact original `WindowRef`. On shutdown cancel the
@@ -106,11 +108,13 @@ retirement bound fails. Window lifetime cancellation prevents late installation.
 
 ## Mac presentation and verification
 
-Use standard native chrome for ordinary applications. The Notes unified-chrome
-example reserves a measured 52 Dp header; that measurement is specific to its
-configuration. The supported `TitlebarToolbar` entry point has its documented
-single-window/customization limits. Retain original-color `IconImage` assets;
-use the Mac theme and system preferences where appropriate. See
+Use standard native chrome for ordinary applications. Current Notes and both
+document hosts use ChromeStandard, with TitlebarToolbars providing each window's
+native toolbar; the view does not reserve the former 52 Dp client header.
+TitlebarToolbar remains the supported single-window entry point, while the
+per-window factory supplies independent commands and availability. Retain
+original-color IconImage assets; use the Mac theme and system preferences where
+appropriate. See
 [Mac themes](mac-theming.md) and [native toolbar](native-titlebar-toolbar-prototype.md).
 The current Notes body font/gutter and rich formatting limits remain documented;
 this stabilization adds no editor-presentation API.
