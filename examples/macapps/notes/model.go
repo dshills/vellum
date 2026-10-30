@@ -9,6 +9,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/command"
 	"github.com/dshills/vellum/editor"
 	"github.com/dshills/vellum/history"
@@ -171,6 +172,9 @@ func (m *Model) request(action func() error, preparingQuit bool) error {
 	if action == nil {
 		return ErrInvalid
 	}
+	if m.files != nil && m.files.ref.Context().Err() != nil {
+		return app.ErrWindowClosed
+	}
 	if m.pending || m.files != nil && (m.files.blockedWithoutQuit() || m.files.quitHeld && !preparingQuit) {
 		return ErrPending
 	}
@@ -194,6 +198,10 @@ func (m *Model) request(action func() error, preparingQuit bool) error {
 		}
 		m.pendingInputError = nil
 		m.pending = false
+		// Settlement can outlive this exact window even when its ID is reused.
+		if err == nil && m.files != nil && m.files.ref.Context().Err() != nil {
+			err = app.ErrWindowClosed
+		}
 		if err == nil {
 			err = action()
 		}
