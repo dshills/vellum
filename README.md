@@ -243,9 +243,9 @@ Notes from one extracted SDK. These newer private bundles are separate from the 
 published build13 apps. The offscreen SDK consumer CI checks both starter
 profiles, while native UI observations remain separate. Current checkpoints
 use internal code reviews. See the [current document-workflow handoff](docs/mac-document-workflows-handoff.md)
-for verified private build24 identities, historical file compatibility, producer
-preflight and explicitly deferred desktop checks. Build24 declares macOS 27.0
-minimum; its static checks on 27.2 do not extend the historical support matrix.
+for the [indexed private candidate](release/private-macos-candidate.json), historical
+file compatibility, producer preflight and explicitly deferred desktop checks.
+The index records actual OS requirements; static checks extend no support matrix.
 
 ## Verification
 

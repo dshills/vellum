@@ -107,19 +107,22 @@ operations or decisions before retrying closure. Finder Open With accepts one
 notebook or study at a time; registration never changes system defaults. See
 [the app-building guide](building-macos-apps.md#finder-document-opening).
 
-## Current private build24
+## Current indexed private candidate
 
-The current verified installed version is
-`~/Applications/Vellum/build24-b9212489afc9/apps`, paired with an SDK from green
-source `b9212489afc921171fc5abbd5275d8919ae930dd`. It includes e589f36e's retired-window
-action correction. Packaging, independent integrity/signature verification and
-static linkage inspection passed; native launch/input checks remain deferred.
+Use the [candidate index](../release/private-macos-candidate.json) and its generated
+[current identity table](mac-document-workflows-handoff.md#source-and-package-identity)
+for the selected installation, source and digests. Run
+`python3 -B scripts/private-candidate.py` from the checkout to check recorded
+report/guide consistency; add `--verify-local` for actual archive/installed bytes
+and signatures without launch. To select a later candidate deliberately, update
+the index and its source-bound evidence, regenerate the marked guide blocks with
+`--write-docs`, then review and commit the diff. Never rewrite historical receipts.
 
-All five executables declare minimum macOS 27.0; the inspection host is 27.2.
-This private package cannot run on the historically qualified 26.6.2 host and
-extends no framework qualification to 27.2. Build23 and prior directories remain
-retained. See the [current handoff](mac-document-workflows-handoff.md#source-and-package-identity)
-and [packet summary](reports/mac-build24/README.md) for exact identities and limits.
+The retained build24 includes e589f36e's lifecycle correction, but its original
+metadata predates the new explicit minimum field. Its observed 27.0 requirement
+is recorded; no 27.2 launch or older-host compatibility is claimed. Desktop checks
+remain deferred. Earlier versions remain retained. See the historical
+[build24 packet](reports/mac-build24/README.md) for that payload's exact scope.
 
 ## Static native linkage inspection
 

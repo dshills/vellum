@@ -7,47 +7,41 @@ public release/tag/assets, new audit decision, signing identity or notarization.
 
 ## Source and package identity
 
-- Main at `b9212489afc921171fc5abbd5275d8919ae930dd` is pushed and green in
-  [Framework](https://github.com/dshills/vellum/actions/runs/41091357397),
-  [Stable root API](https://github.com/dshills/vellum/actions/runs/41091357457)
-  and [Platform adapters](https://github.com/dshills/vellum/actions/runs/41091357554).
-  All three passed their first attempts. The previous five maintenance commits
-  are merged, including the retired-window action fix at e589f36e.
-- **Current private build24 source:** the same `b9212489` green commit.
-  SDK SHA256:
-  `5a825eb07c480f2df248435b7c0a55e0b0cb5104ccd2de3b8f146c55c2798382`.
-  Installed apps: `~/Applications/Vellum/build24-b9212489afc9/apps`.
-  The SDK and all five app archives were freshly built from that one source,
-  copied to durable private delivery storage, independently verified and installed.
-- Bundle manifest SHA256:
-  `516456cc39bc0b3c2b8faf14871cc820afda813a0a5f269e23da15fd97c77727`.
-  Installation receipt SHA256:
-  `1c8a8b8425759434214631ff73b8ec9293af9c89dd82847f111cdea544a39fcd`.
-  Preflight SHA256:
-  `75c0bcc3e5ecad4d43bd3b0f7e5b7989c147a480992e685a3c4565d4b94009aa`.
-  BUNDLE_MANIFEST, PREFLIGHT, DELIVERY, INSTALLATION, PACKAGING, VERIFICATION,
-  LINKAGE, CI and SHA256SUMS retain their distinct scopes in the private packet.
-- Subsequent report/checker work is on `codex/mac-build24-closeout`. Use
-  `git rev-parse HEAD` for its current documentation/tooling checkpoint.
-  These newer commits have focused local checks and are not claimed merged,
-  pushed or hosted-CI-qualified. They do not relabel the built source or SDK.
-- Build23 at source `e0e011c605f8ee6ea84827414a1636bcca74c97e`, SDK
-  `a9857bff74590959d688e2827af2918d87468b1667773b6a278123f8fb4cbc75`, and older
-  installations remain retained. Do not overwrite, migrate or delete them.
-  The original failed producer attempts retain their historical diagnostic scope.
+The [candidate index](../release/private-macos-candidate.json) is the checked source
+of the selected private artifact identities. Its marked table and the resumption
+commands are generated; use `python3 -B scripts/private-candidate.py --write-docs`
+when deliberately selecting another candidate, then review the index/evidence diff.
+Ordinary checkout merges do not relabel an existing package or its test results.
 
-No app window was launched. The Forge icon-only exporter exits before UI/data
-initialization. Native launch/input checks remain deferred; no current app
-liveness or post-test relaunch is claimed. The e589f36e lifecycle correction is
-now included in installed build24 and tested in the SDK's generated consumer;
-its physical/native behavior remains unverified.
+<!-- vellum-candidate:facts:start -->
+| Record | Identity |
+| --- | --- |
+| Candidate | `build24-b9212489afc9` |
+| Packaged source | `b9212489afc921171fc5abbd5275d8919ae930dd` |
+| SDK SHA256 | `5a825eb07c480f2df248435b7c0a55e0b0cb5104ccd2de3b8f146c55c2798382` |
+| Bundle manifest SHA256 | `516456cc39bc0b3c2b8faf14871cc820afda813a0a5f269e23da15fd97c77727` |
+| Installation receipt SHA256 | `1c8a8b8425759434214631ff73b8ec9293af9c89dd82847f111cdea544a39fcd` |
+| Preflight SHA256 | `75c0bcc3e5ecad4d43bd3b0f7e5b7989c147a480992e685a3c4565d4b94009aa` |
+| Installed apps | `~/Applications/Vellum/build24-b9212489afc9/apps` |
+| Minimum macOS | `27.0` |
+| Inspected host | `27.2` |
+| Desktop checks | `deferred` |
+<!-- vellum-candidate:facts:end -->
 
-**Deployment limitation:** all five build24 executables declare minimum macOS
-27.0, SDK 27.0, and were statically inspected on the current 27.2 host. They
-cannot run on the historically qualified 26.6.2 host. This is a private current-Mac
-candidate, not an extension of the existing framework support matrix or a new
-qualified release. No target was clamped or support promise changed. Launch on
-27.2 still needs the deferred native checks.
+The e589f36e retired-window action fix is included in build24. No app window was
+opened; Forge's icon-only exporter exits before UI/data setup. Native launch/input
+checks remain deferred and no current app liveness is claimed. Build23 and older
+installed versions remain retained.
+
+**Deployment limitation:** build24 requires macOS 27.0. The recorded 27.2 inspection
+is static only; historical 26.6.2 qualification does not transfer. These binaries
+cannot run there and no support-matrix extension or 27.2 launch result is implied.
+
+Current checkout/merge status belongs to Git and exact-commit CI, separately from
+the selected artifact. The recorded post-build24 integration at 7505e730 passed
+Framework 41104628914, Stable root API 41104628933 and Platform adapters 41104628954.
+Later tool changes have their own focused reviews; they do not change build24's
+source or receipts. See [packaging reliability reviews](reviews/mac-packaging-reliability/).
 
 The public v1 source and six-app build13 release retain their original hashes
 and scope. The private five-app set is Forge, Measure Pad, Documents, Document
