@@ -1,7 +1,8 @@
 # Matching private SDK and application bundle
 
-From a clean committed Apple Silicon checkout, prepare native dependencies and
-source drivers/cogent/env.sh. Run:
+From a clean committed Apple Silicon checkout, put Go 1.25.6 on PATH, prepare
+native dependencies and source drivers/cogent/env.sh. Build in a new nonsynced
+location such as /private/tmp; copy only completed archives into Documents. Run:
 
 ```sh
 python3 -B scripts/private-macos-bundle.py --output /absolute/new/private-bundle
@@ -34,7 +35,8 @@ unqualified. Native UI observations are separate from automated SDK/routing test
 Only the SDK/app archives named in SHA256SUMS are payloads. The build/ subtree
 retains intermediate binaries, extracted sources and signature checks for local
 diagnosis; it is not covered by the top-level archive checksum list. Copy only
-the named archives, README, checksum list and BUNDLE_MANIFEST for delivery.
+the named archives, README, checksum list, BUNDLE_MANIFEST, PREFLIGHT and (when
+installation was requested) DELIVERY for delivery.
 
 ## Build, verify and install without desktop checks
 
@@ -48,6 +50,16 @@ python3 -B scripts/private-macos-bundle.py \
   --build-version 23 \
   --install-to "$HOME/Applications/Vellum"
 ```
+
+Preflight rejects known Documents/Desktop/iCloud/CloudStorage output locations
+and aliases, existing outputs, outputs inside the checkout, a Go version other
+than go.mod, non-Darwin/ARM64/cgo configuration, an active prepare lock, or missing
+prepared-module sentinel files. It reserves no output on admission failure.
+PREFLIGHT.json records Go environment and SHA256 identities of the resolved Go,
+compile and link tools plus sampled native files. Those samples are rechecked
+after packaging and the receipt hash is bound into BUNDLE_MANIFEST and DELIVERY.
+This is sampled evidence, not a complete or authenticated toolchain closure.
+Full pinned preparation, module integrity and SDK relocation checks still apply.
 
 Use Go 1.25.6 on PATH (the child environment uses GOTOOLCHAIN=local), prepare the
 pinned native sources, and source drivers/cogent/env.sh first. The command builds

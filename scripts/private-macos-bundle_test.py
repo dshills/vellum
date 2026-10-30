@@ -92,6 +92,21 @@ class Delivery(unittest.TestCase):
    with mock.patch.object(bundle,'load_script',side_effect=self.loader(self.checker())),mock.patch.object(self.installer,'install',side_effect=drift):
     with self.assertRaisesRegex(ValueError,'identity changed'):bundle.install_delivery(out,root/'installed')
    self.assertFalse((out/'DELIVERY.json').exists())
+ def test_preflight_receipt_is_bound_and_tampering_refused(self):
+  for corrupt in (False, True):
+   with self.subTest(corrupt=corrupt),tempfile.TemporaryDirectory() as d,mock.patch.object(sys,'platform','darwin'),mock.patch.object(self.installer,'signature'):
+    root=Path(d).resolve();out,m=self.fixture(root)
+    (out/'PREFLIGHT.json').write_text('{"toolchain":"fixture"}')
+    m['preflight_sha256']=bundle.digest(out/'PREFLIGHT.json')
+    (out/'BUNDLE_MANIFEST.json').write_text(json.dumps(m))
+    if corrupt:(out/'PREFLIGHT.json').write_text('changed')
+    with mock.patch.object(bundle,'load_script',side_effect=self.loader(self.checker())):
+     if corrupt:
+      with self.assertRaisesRegex(ValueError,'preflight receipt'):bundle.install_delivery(out,root/'installed')
+      self.assertFalse((out/'DELIVERY.json').exists())
+     else:
+      receipt=bundle.install_delivery(out,root/'installed')
+      self.assertEqual(receipt['preflight_sha256'],m['preflight_sha256'])
  def test_build_version_admission(self):
   self.assertEqual(bundle.build_version('23'),'23')
   for value in ('', '-1', '1/2', '1234567', 'v23'):

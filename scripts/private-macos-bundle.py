@@ -5,12 +5,14 @@ import hashlib
 import importlib.util
 import json
 import platform
+import os
 import re
 from pathlib import Path
 import sys
 sys.dont_write_bytecode = True
 from child_process import run_child, check_child_output
 from sdk_environment import child_environment
+from private_bundle_preflight import preflight, verify_snapshot
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -69,6 +71,10 @@ def install_delivery(out, destination):
     checksums = ''.join(f'{value}  {name}\n' for name, value in sorted(files.items()))
     if (out/'SHA256SUMS').read_text(encoding='utf-8') != checksums:
         raise ValueError('SHA256SUMS disagrees with producer manifest')
+    if 'preflight_sha256' in manifest:
+        installer.regular(out/'PREFLIGHT.json', 1 << 20)
+        if installer.digest(out/'PREFLIGHT.json') != manifest['preflight_sha256']:
+            raise ValueError('preflight receipt identity mismatch')
     # Verify archive contents and the SDK's recorded clean source, not just a hash.
     checker = load_script('check-sdk')
     verified = checker.verify_archive(out/sdk_name, manifest['sdk_sha256'])
@@ -91,6 +97,8 @@ def install_delivery(out, destination):
                    sdk_sha256=manifest['sdk_sha256'], manifest_sha256=manifest_digest,
                    installation=str(target), installation_sha256=installer.digest(installation_path),
                    private=True, signing='ad-hoc', notarized=False, native_runtime='not executed')
+    if 'preflight_sha256' in manifest:
+        receipt['preflight_sha256'] = manifest['preflight_sha256']
     with receipt_path.open('x', encoding='utf-8') as stream:
         stream.write(json.dumps(receipt, indent=2)+'\n')
     return receipt
@@ -106,8 +114,13 @@ def main():
         parser.error('requires an Apple Silicon Mac')
     env = child_environment()
     revision = clean_source(ROOT, env)
-    out = args.output.absolute()
+    admission = preflight(ROOT, args.output, env, args.install_to)
+    # Use the resolved admitted Go driver even if an ambient PATH alias changes.
+    env['PATH'] = str(Path(admission['toolchain']['binaries']['go']['path']).parent) + os.pathsep + env.get('PATH', '')
+    out = Path(admission['output'])
     out.mkdir()  # exclusive: failed attempts retain partial output
+    (out/'PREFLIGHT.json').write_text(json.dumps(dict(source_commit=revision, **admission), indent=2)+'\n')
+    admission_digest = digest(out/'PREFLIGHT.json')
     work = out / "build"; work.mkdir()
     def run(argv, cwd=ROOT):
         run_child([str(a) for a in argv], cwd=cwd, env=env, check=True, timeout=600)
@@ -161,15 +174,18 @@ def main():
         run(['codesign', '--verify', '--deep', '--strict', extracted/(name+'.app')])
         hashes[zipped.name] = digest(zipped)
         app_records.append(dict(name=name, archive=zipped.name, module=str(module.relative_to(out)), binary_sha256=digest(binary)))
+    verify_snapshot(ROOT, admission)
+    if digest(out/'PREFLIGHT.json') != admission_digest:
+        raise ValueError('preflight receipt changed during packaging')
     if clean_source(ROOT, env) != revision:
         raise ValueError('source changed during private packaging')
     (out/'SHA256SUMS').write_text(''.join(f'{value}  {name}\n' for name,value in sorted(hashes.items())), encoding='utf-8')
     (out/'README.md').write_text('# Private Vellum consumer bundle\n\nAll apps were built from the included, independently verified extracted SDK.\nVerify SHA256SUMS before extraction. Only named archives in SHA256SUMS are delivery payloads. build/ contains intermediate SDKs, consumer source, binaries and ZIP checks for local testing; do not treat those working files as checksummed delivery payloads.\n\nForge, Notes and Measure Pad run normally. Notes uses its established Application Support/Vellum Notes directory; use --args -data-dir /absolute/private/notes-test for isolated checks. Documents requires -data-dir /absolute/private/workspace; it opens independent A/B repositories. Document Starter launches normally from Finder and uses its own module-derived Application Support directory. For isolated tests or an existing private notebook, launch it with --args -data-dir /absolute/private/document-data. Use fresh private directories for testing. No generated starter defaults to Vellum Notes storage.\n\nApps are ad-hoc signed and unnotarized. Only the recorded Apple Silicon Mac configuration is qualified; human IME/VoiceOver and downloaded-quarantine launch remain unqualified. No public release or audit approval is implied.\n\nThe extracted SDK includes source, both starter profiles, guides and known limits. Do not run prepare.sh over it. Failed producer attempts retain partial output. BUNDLE_MANIFEST.json records completed packaging; optional installation completes only when DELIVERY.json exists. No app is launched by packaging or installation.\n', encoding='utf-8')
     # Publish the completion record only after all other delivery metadata exists.
     (out/'BUNDLE_MANIFEST.json').write_text(json.dumps(dict(source_commit=revision, build_version=args.build_version, private=True, signing='ad-hoc', notarized=False,
-            sdk_sha256=checksum, apps=app_records, files=hashes), indent=2)+'\n', encoding='utf-8')
+            sdk_sha256=checksum, apps=app_records, files=hashes, preflight_sha256=digest(out/'PREFLIGHT.json')), indent=2)+'\n', encoding='utf-8')
     if args.install_to is not None:
-        install_delivery(out, args.install_to)
+        install_delivery(out, Path(admission['install_to']))
     print(json.dumps(dict(output=str(out), source_commit=revision, apps=len(apps), private=True)))
 
 if __name__ == '__main__':
