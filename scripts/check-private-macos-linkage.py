@@ -87,6 +87,34 @@ def tool(*args):
     return check_child_output(list(args), env=child_environment(), text=True, timeout=20)
 
 
+def inspect_app(app,name,identifier,build,host):
+    v.no_links(app)
+    executable=app/'Contents/MacOS'/name;v.no_links(executable)
+    # Inspect only the reviewed route: exactly one Mach-O main executable.
+    binaries=[];count=0
+    for path in app.rglob('*'):
+        count+=1
+        if count>2000 or path.is_symlink():
+            raise ValueError('app file count or symlink outside admitted route')
+        if not path.is_file() and not path.is_dir():
+            raise ValueError('special file outside admitted app route')
+        if path.is_file():
+            v.installer.regular(path, v.installer.MAX_ARCHIVE)
+            with path.open('rb') as stream:
+                if stream.read(4) in MACH:binaries.append(path)
+    if binaries!=[executable]:
+        raise ValueError('unexpected embedded Mach-O closure')
+    info=plistlib.loads(v.read_regular(app/'Contents/Info.plist'))
+    v.require_fields(info,dict(CFBundleExecutable=name,CFBundleIdentifier=identifier,CFBundleVersion=build),'app plist')
+    if tool('lipo','-archs',str(executable)).split()!=['arm64']:
+        raise ValueError('expected thin ARM64 executable')
+    header=tool('otool','-arch','arm64','-hv',str(executable))
+    if not re.search(r'^MH_MAGIC_64\s+ARM64\s+\S+\s+\S+\s+EXECUTE\s',header,re.M):
+        raise ValueError('expected ARM64 Mach-O executable header')
+    observed=parse_commands(tool('otool','-arch','arm64','-l',str(executable)),host)
+    return dict(name=name,executable_sha256=v.installer.digest(executable),architectures=['arm64'],**observed)
+
+
 def inspect(installation, receipt_sha256):
     if sys.platform!='darwin':
         raise ValueError('static Mach-O inspection requires macOS tools')
@@ -104,31 +132,7 @@ def inspect(installation, receipt_sha256):
     apps=[]
     v.no_links(installation/'apps')
     for name in names:
-        app=installation/'apps'/(name+'.app');v.no_links(app)
-        executable=app/'Contents/MacOS'/name;v.no_links(executable)
-        # Inspect only the reviewed route: exactly one Mach-O main executable.
-        binaries=[];count=0
-        for path in app.rglob('*'):
-            count+=1
-            if count>2000 or path.is_symlink():
-                raise ValueError('app file count or symlink outside admitted route')
-            if not path.is_file() and not path.is_dir():
-                raise ValueError('special file outside admitted app route')
-            if path.is_file():
-                v.installer.regular(path, v.installer.MAX_ARCHIVE)
-                with path.open('rb') as stream:
-                    if stream.read(4) in MACH:binaries.append(path)
-        if binaries!=[executable]:
-            raise ValueError('unexpected embedded Mach-O closure')
-        info=plistlib.loads(v.read_regular(app/'Contents/Info.plist'))
-        v.require_fields(info,dict(CFBundleExecutable=name,CFBundleIdentifier=v.IDENTIFIERS[name],CFBundleVersion=receipt['build_version']),'app plist')
-        if tool('lipo','-archs',str(executable)).split()!=['arm64']:
-            raise ValueError('expected thin ARM64 executable')
-        header=tool('otool','-arch','arm64','-hv',str(executable))
-        if not re.search(r'^MH_MAGIC_64\s+ARM64\s+\S+\s+\S+\s+EXECUTE\s',header,re.M):
-            raise ValueError('expected ARM64 Mach-O executable header')
-        observed=parse_commands(tool('otool','-arch','arm64','-l',str(executable)),host)
-        apps.append(dict(name=name,executable_sha256=v.installer.digest(executable),architectures=['arm64'],**observed))
+        apps.append(inspect_app(installation/'apps'/(name+'.app'),name,v.IDENTIFIERS[name],receipt['build_version'],host))
     return dict(source_commit=receipt['source_commit'],build_version=receipt['build_version'],
                 installation_sha256=receipt_hash,host_version=host,host_meets_declared_minima=True,
                 apps=apps,native_runtime='not executed',qualification='static metadata only; no support-matrix extension',

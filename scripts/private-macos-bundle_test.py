@@ -112,4 +112,36 @@ class Delivery(unittest.TestCase):
   for value in ('', '-1', '1/2', '1234567', 'v23'):
    with self.assertRaises(argparse.ArgumentTypeError):bundle.build_version(value)
 
+
+class Completion(unittest.TestCase):
+ def fixture(self):
+  apps=[]
+  for name in bundle.load_script('check-private-macos-linkage').v.IDENTIFIERS:
+   report=dict(name=name,architectures=['arm64'],rpaths=[],dynamic_loader='/usr/lib/dyld',
+      dependencies=[dict(kind='LC_LOAD_DYLIB',path='/usr/lib/libSystem.B.dylib')],deployment=dict(minimum='27.0',sdk='27.0'))
+   apps.append(dict(name=name,linkage=report))
+  return dict(apps=apps,expected_minimum_macos='27.0',native_sdk_version='27.0')
+ def test_only_complete_expected_linkage_publishes_once(self):
+  with tempfile.TemporaryDirectory() as t:
+   out=Path(t);m=self.fixture();bundle.publish_bundle_manifest(out,m)
+   self.assertEqual(json.loads((out/'BUNDLE_MANIFEST.json').read_text()),m)
+   with self.assertRaises(FileExistsError):bundle.publish_bundle_manifest(out,m)
+ def test_failure_or_drift_never_publishes_completion(self):
+  for failure in ('missing','identity','minimum','sdk','rpath','dependency','architecture'):
+   with self.subTest(failure=failure),tempfile.TemporaryDirectory() as t:
+    out=Path(t);m=self.fixture();r=m['apps'][0]['linkage']
+    if failure=='missing':m['apps'].pop()
+    if failure=='identity':r['name']='Other'
+    if failure=='minimum':r['deployment']['minimum']='28.0'
+    if failure=='sdk':r['deployment']['sdk']='28.0'
+    if failure=='rpath':r['rpaths']=['/private/tmp/build']
+    if failure=='dependency':r['dependencies'][0]['path']='/private/tmp/missing.dylib'
+    if failure=='architecture':r['architectures']=['x86_64']
+    with self.assertRaises(ValueError):bundle.publish_bundle_manifest(out,m)
+    self.assertFalse((out/'BUNDLE_MANIFEST.json').exists());self.assertFalse((out/'DELIVERY.json').exists())
+ def test_minimum_argument_is_explicit_version_not_deployment_override(self):
+  self.assertEqual(bundle.minimum_version('27.0'),'27.0')
+  for value in ('','latest','-1','27.0;bad'):
+   with self.assertRaises(argparse.ArgumentTypeError):bundle.minimum_version(value)
+
 if __name__=='__main__':unittest.main()

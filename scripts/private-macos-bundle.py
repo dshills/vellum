@@ -104,10 +104,45 @@ def install_delivery(out, destination):
     return receipt
 
 
+def linkage_expectations(report, minimum, sdk):
+    linkage=load_script('check-private-macos-linkage')
+    if (report.get('architectures')!=['arm64'] or report.get('rpaths')!=[]
+            or report.get('dynamic_loader')!='/usr/lib/dyld'
+            or not isinstance(report.get('dependencies'),list) or not 1<=len(report['dependencies'])<=256
+            or any(not isinstance(d,dict) or d.get('kind') not in linkage.LOADS
+                   or not isinstance(d.get('path'),str) or not linkage.system_dependency(d['path'])
+                   for d in report['dependencies'])):
+        raise ValueError('packaged app linkage does not match system-library-only route')
+    deployment=report.get('deployment',{})
+    if (linkage.version(deployment.get('minimum'))!=linkage.version(minimum)
+            or linkage.version(deployment.get('sdk'))!=linkage.version(sdk)):
+        raise ValueError('packaged app deployment/SDK differs from explicit expectation')
+
+
+def publish_bundle_manifest(out, manifest):
+    apps=manifest.get('apps',[])
+    expected=load_script('check-private-macos-linkage').v.IDENTIFIERS
+    if len(apps)!=len(expected) or {a['name'] for a in apps}!=set(expected):
+        raise ValueError('incomplete app linkage coverage')
+    for item in apps:
+        report=item.get('linkage',{})
+        if report.get('name')!=item['name']:raise ValueError('app linkage identity mismatch')
+        linkage_expectations(report,manifest['expected_minimum_macos'],manifest['native_sdk_version'])
+    with (out/'BUNDLE_MANIFEST.json').open('x',encoding='utf-8') as stream:
+        stream.write(json.dumps(manifest,indent=2)+'\n')
+
+
+def minimum_version(value):
+    try:load_script('check-private-macos-linkage').version(value)
+    except ValueError as e:raise argparse.ArgumentTypeError(str(e)) from e
+    return value
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--build-version', type=build_version, default='22')
+    parser.add_argument('--expected-minimum-macos',required=True,type=minimum_version,help='explicit expected executable minimum; does not set compiler deployment flags')
     parser.add_argument('--install-to', type=Path, help='verify and install without launching; use a nonsynced directory')
     args = parser.parse_args()
     if platform.system() != 'Darwin' or platform.machine() != 'arm64':
@@ -145,6 +180,7 @@ def main():
         ('Vellum Document Starter', consumer, '.', 'com.dshills.vellum.documentstarter.demo'),
         ('Vellum Notes', sdk/'examples/macapps', './cmd/notes', 'com.dshills.vellum.notes.demo'),
     ]
+    linkage_checker=load_script('check-private-macos-linkage')
     hashes = {archive.name: checksum}
     app_records = []
     for index, (name, module, package, identifier) in enumerate(apps):
@@ -172,8 +208,10 @@ def main():
         extracted = work / ('ZIP check ' + str(index)); extracted.mkdir()
         run(['ditto', '-x', '-k', zipped, extracted])
         run(['codesign', '--verify', '--deep', '--strict', extracted/(name+'.app')])
+        observed=linkage_checker.inspect_app(extracted/(name+'.app'),name,identifier,args.build_version,platform.mac_ver()[0])
+        linkage_expectations(observed,args.expected_minimum_macos,admission['native_toolchain']['sdk']['version'])
         hashes[zipped.name] = digest(zipped)
-        app_records.append(dict(name=name, archive=zipped.name, module=str(module.relative_to(out)), binary_sha256=digest(binary)))
+        app_records.append(dict(name=name, archive=zipped.name, module=str(module.relative_to(out)), binary_sha256=digest(binary),linkage=observed))
     verify_snapshot(ROOT, admission, env)
     if digest(out/'PREFLIGHT.json') != admission_digest:
         raise ValueError('preflight receipt changed during packaging')
@@ -182,8 +220,9 @@ def main():
     (out/'SHA256SUMS').write_text(''.join(f'{value}  {name}\n' for name,value in sorted(hashes.items())), encoding='utf-8')
     (out/'README.md').write_text('# Private Vellum consumer bundle\n\nAll apps were built from the included, independently verified extracted SDK.\nVerify SHA256SUMS before extraction. Only named archives in SHA256SUMS are delivery payloads. build/ contains intermediate SDKs, consumer source, binaries and ZIP checks for local testing; do not treat those working files as checksummed delivery payloads.\n\nForge, Notes and Measure Pad run normally. Notes uses its established Application Support/Vellum Notes directory; use --args -data-dir /absolute/private/notes-test for isolated checks. Documents requires -data-dir /absolute/private/workspace; it opens independent A/B repositories. Document Starter launches normally from Finder and uses its own module-derived Application Support directory. For isolated tests or an existing private notebook, launch it with --args -data-dir /absolute/private/document-data. Use fresh private directories for testing. No generated starter defaults to Vellum Notes storage.\n\nApps are ad-hoc signed and unnotarized. Only the recorded Apple Silicon Mac configuration is qualified; human IME/VoiceOver and downloaded-quarantine launch remain unqualified. No public release or audit approval is implied.\n\nThe extracted SDK includes source, both starter profiles, guides and known limits. Do not run prepare.sh over it. Failed producer attempts retain partial output. BUNDLE_MANIFEST.json records completed packaging; optional installation completes only when DELIVERY.json exists. No app is launched by packaging or installation.\n', encoding='utf-8')
     # Publish the completion record only after all other delivery metadata exists.
-    (out/'BUNDLE_MANIFEST.json').write_text(json.dumps(dict(source_commit=revision, build_version=args.build_version, private=True, signing='ad-hoc', notarized=False,
-            sdk_sha256=checksum, apps=app_records, files=hashes, preflight_sha256=digest(out/'PREFLIGHT.json')), indent=2)+'\n', encoding='utf-8')
+    publish_bundle_manifest(out,dict(source_commit=revision, build_version=args.build_version, private=True, signing='ad-hoc', notarized=False,
+            expected_minimum_macos=args.expected_minimum_macos,native_sdk_version=admission['native_toolchain']['sdk']['version'],
+            sdk_sha256=checksum, apps=app_records, files=hashes, preflight_sha256=digest(out/'PREFLIGHT.json')))
     if args.install_to is not None:
         install_delivery(out, Path(admission['install_to']))
     print(json.dumps(dict(output=str(out), source_commit=revision, apps=len(apps), private=True)))

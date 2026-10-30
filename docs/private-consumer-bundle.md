@@ -5,7 +5,7 @@ native dependencies and source drivers/cogent/env.sh. Build in a new nonsynced
 location such as /private/tmp; copy only completed archives into Documents. Run:
 
 ```sh
-python3 -B scripts/private-macos-bundle.py --output /absolute/new/private-bundle
+python3 -B scripts/private-macos-bundle.py --output /absolute/new/private-bundle --expected-minimum-macos 27.0
 ```
 
 The exclusive output contains an SDK, Forge, Measure Pad, the A/B Documents
@@ -48,6 +48,7 @@ nonsynced installation parent:
 python3 -B scripts/private-macos-bundle.py \
   --output /absolute/new/private-bundle \
   --build-version 24 \
+  --expected-minimum-macos 27.0 \
   --install-to "$HOME/Applications/Vellum"
 ```
 
@@ -126,3 +127,19 @@ This records selected inputs, not a complete SDK or compiler/runtime closure.
 The compiler default minimum is diagnostic; actual executable load metadata is
 the authoritative packaging observation. Older build24 receipts are preserved
 with their original narrower provenance; no new fields are backfilled into them.
+
+## Completion checks for native linkage
+
+New producer invocations require `--expected-minimum-macos` as an explicit artifact
+expectation. It compares the actual executable minimum; it does not change compiler
+flags, framework support policy or release/performance gates. Select it deliberately
+for the intended private candidate rather than copying an older qualification claim.
+
+Before BUNDLE_MANIFEST.json is written, every freshly ZIP-extracted app must pass
+the existing static ARM64/system-library-only route checks. Its actual minimum
+must equal the supplied expectation and its SDK version must match preflight.
+Per-app linkage evidence and the expectations are recorded in the completed
+manifest. Missing/failed evidence or OS/SDK drift leaves no completion marker and
+no automatic installation/delivery receipt. Completed older bundles remain readable
+with their original scope. Build24 is retained unchanged; no rebuild is required
+solely for this new producer guard.
