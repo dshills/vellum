@@ -146,7 +146,7 @@ class IconChecks(unittest.TestCase):
 
     def test_icon_is_present_before_signing_and_verified_after_publication(self):
         for tamper in (None, "icon", "plist"):
-            with self.subTest(tamper=tamper), tempfile.TemporaryDirectory() as temporary, mock.patch.object(app.platform, "system", return_value="Darwin"), mock.patch.object(app, "darwin_dependencies"):
+            with self.subTest(tamper=tamper), tempfile.TemporaryDirectory() as temporary, mock.patch.object(app.platform, "system", return_value="Darwin"), mock.patch.object(app, "darwin_dependencies"), mock.patch.object(app.macos_deployment,"inspect",return_value=dict(minimum="27.0",architectures={"arm64":dict(minimum="27.0",sdk="27.0")})):
                 root = Path(temporary)
                 binary = root / "binary"
                 binary.write_bytes(b"\xcf\xfa\xed\xfefixture")
@@ -164,7 +164,9 @@ class IconChecks(unittest.TestCase):
                         if tamper == "icon":
                             (bundle / "Contents/Resources" / app_icons.ICON_NAME).write_bytes(b"tampered")
                         else:
-                            (bundle / "Contents/Info.plist").write_bytes(plistlib.dumps({"CFBundleIconFile": "Wrong.icns"}))
+                            info=plistlib.loads((bundle / "Contents/Info.plist").read_bytes())
+                            info["CFBundleIconFile"]="Wrong.icns"
+                            (bundle / "Contents/Info.plist").write_bytes(plistlib.dumps(info))
                 with mock.patch.object(app_icons, "install", side_effect=install), mock.patch.object(app, "run_child", side_effect=signing):
                     if tamper:
                         with self.assertRaisesRegex(ValueError, "icon.*changed"):

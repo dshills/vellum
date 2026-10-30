@@ -150,3 +150,19 @@ static inspection nor prior native evidence extends the framework support matrix
 to 27.2 or qualifies launch there. Desktop checks remain deferred. No deployment
 target was patched, no minimum support promise changed and no runtime compatibility
 with older systems was established. See the [current handoff](mac-document-workflows-handoff.md).
+
+## Minimum-system metadata for new packages
+
+New macOS packages derive deployment observations from every Mach-O architecture.
+APP_MANIFEST.json records those slice requirements and their highest minimum;
+Info.plist uses that same value as LSMinimumSystemVersion. Packaging rechecks
+both against the copied/signed executable before publication. Independent delivery
+and static linkage checks reject contradictory or partially bound minimum metadata.
+A universal package never advertises a minimum below one of its included slices.
+
+This does not lower the executable target or qualify another OS. Existing build24
+has no new minimum field in its original plist/resource manifest; it remains
+readable as a legacy unrecorded format, with the observed 27.0 requirement retained
+in its existing linkage report. No fields or signatures are patched in place.
+The packaging correction was checked on a disposable signed copy, so build24 does
+not need rebuilding or replacement solely to test the new metadata path.

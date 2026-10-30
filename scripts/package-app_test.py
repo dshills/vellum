@@ -15,6 +15,10 @@ import zipfile
 spec=importlib.util.spec_from_file_location("package_app",Path(__file__).with_name("package-app.py"));app=importlib.util.module_from_spec(spec);spec.loader.exec_module(app)
 policy=app.load_release_policy()
 class AppChecks(unittest.TestCase):
+ def setUp(self):
+  patch=mock.patch.object(app.macos_deployment,'inspect',return_value=dict(minimum='27.0',architectures={'arm64':dict(minimum='27.0',sdk='27.0')}))
+  patch.start();self.addCleanup(patch.stop)
+
  def test_windows_and_linux_layouts(self):
   for target,magic in [("windows",b"MZ\x00\x00"),("linux",b"\x7fELF")]:
    with self.subTest(target=target),tempfile.TemporaryDirectory() as tmp:
@@ -36,6 +40,17 @@ class AppChecks(unittest.TestCase):
    self.assertTrue((out/"Contents/Info.plist").is_file());self.assertTrue((out/"Contents/MacOS/Test").is_file());execute.assert_not_called()
    info=plistlib.loads((out/"Contents/Info.plist").read_bytes());self.assertEqual(info["CFBundleShortVersionString"],"0.1.0");self.assertEqual(info["CFBundleVersion"],"1");self.assertNotIn("CFBundleIconFile",info)
    manifest=json.loads((out/"Contents/Resources/APP_MANIFEST.json").read_text());self.assertEqual(manifest["sdk_release"],json.loads((app.ROOT/"release/version.json").read_text())["version"]);self.assertEqual(manifest["build_version"],"1")
+ def test_minimum_os_is_bound_to_info_manifest_and_executable(self):
+  with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"):
+   root=Path(tmp);binary=root/'binary';binary.write_bytes(b"\xcf\xfa\xed\xfefixture");out=root/'OS.app'
+   app.package(binary,out,'OS','org.example.os','1.0.0','darwin')
+   path=out/'Contents/Info.plist';info=plistlib.loads(path.read_bytes());manifest=(out/'Contents/Resources/APP_MANIFEST.json').read_bytes()
+   self.assertEqual(info['LSMinimumSystemVersion'],'27.0');self.assertEqual(json.loads(manifest)['macos_deployment']['minimum'],'27.0')
+   info['LSMinimumSystemVersion']='26.0';path.write_bytes(plistlib.dumps(info))
+   with self.assertRaisesRegex(ValueError,'minimum OS metadata'):app.verify_app(out,'OS',app.binary_digest(binary),manifest,None)
+   info['LSMinimumSystemVersion']='27.0';path.write_bytes(plistlib.dumps(info))
+   with mock.patch.object(app.macos_deployment,'inspect',return_value=dict(minimum='28.0',architectures={})),self.assertRaisesRegex(ValueError,'minimum OS metadata'):
+    app.verify_app(out,'OS',app.binary_digest(binary),manifest,None)
  def test_document_registration_is_signed_metadata_without_default_override(self):
   with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"),mock.patch.object(app,"run_child"):
    root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture");out=root/"Doc.app"

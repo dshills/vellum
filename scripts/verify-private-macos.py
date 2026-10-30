@@ -6,6 +6,7 @@ import importlib.util
 import json
 from pathlib import Path
 import plistlib
+import macos_deployment
 import re
 import sys
 import tempfile
@@ -69,6 +70,8 @@ def verify_app(app, item, build):
     require_fields(manifest, dict(name=item['name'], identifier=IDENTIFIERS[item['name']],
         build_version=build, source_binary_sha256=item['binary_sha256'],
         private_build=True, signed_identity='-', notarized=False), 'app manifest')
+    deployment=manifest.get('macos_deployment')
+    macos_deployment.verify(info,deployment,macos_deployment.inspect(app/'Contents/MacOS'/item['name']) if deployment is not None else None)
     # The source binary hash is pre-signing; codesign binds the final executable
     # and resource manifest. Do not compare a pre-signing hash to signed bytes.
     installer.signature(app)

@@ -80,6 +80,7 @@ class Linkage(unittest.TestCase):
             for name,identifier in m.v.IDENTIFIERS.items():
                 contents=root/'apps'/(name+'.app')/'Contents';(contents/'MacOS').mkdir(parents=True)
                 (contents/'MacOS'/name).write_bytes(b'\xcf\xfa\xed\xfe' + b'fictional executable')
+                (contents/'Resources').mkdir();(contents/'Resources/APP_MANIFEST.json').write_text('{}')
                 (contents/'Info.plist').write_bytes(plistlib.dumps(dict(CFBundleExecutable=name,CFBundleIdentifier=identifier,CFBundleVersion='24')))
             calls=[]
             def static_tool(*args):

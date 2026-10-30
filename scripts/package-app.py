@@ -24,6 +24,7 @@ if __name__ == "__main__":
 
 import app_notices
 import app_icons
+import macos_deployment
 
 from native_archive import regular_stream, unchanged
 
@@ -178,8 +179,11 @@ def verify_app(stage, name, binary_sha256, manifest_bytes, notice_record, icon_r
     if app_notices.read_regular(resources/"APP_MANIFEST.json", len(manifest_bytes)) != manifest_bytes:
         raise ValueError("packaged app manifest changed")
     app_icons.verify(resources, icon_record)
-    declared = document_type_info(json.loads(manifest_bytes).get("document_types"))
+    data=json.loads(manifest_bytes)
+    declared = document_type_info(data.get("document_types"))
     info = plistlib.loads((stage/"Contents/Info.plist").read_bytes())
+    deployment=data.get("macos_deployment")
+    macos_deployment.verify(info,deployment,macos_deployment.inspect(stage/"Contents/MacOS"/name) if deployment is not None else None)
     if any(info.get(key) != value for key, value in declared.items()):
         raise ValueError("packaged document type metadata changed")
     if icon_record is not None and plistlib.loads((stage/"Contents/Info.plist").read_bytes()).get("CFBundleIconFile") != app_icons.ICON_NAME:
@@ -242,6 +246,7 @@ def package(binary, output, name, identifier, version, target, identity=None, bu
         validate(executable,name,identifier,version,target,identity,build_version)
         if target == "darwin":
             darwin_dependencies(executable)
+            deployment=macos_deployment.inspect(executable)
         manifest = {"schema":1,"name":name,"identifier":identifier,"version":version,"build_version":build_version,"sdk_release":sdk_release,"target":target,"source_binary_sha256":binary_digest(executable),"private_build":not public,"signed_identity":identity,"notarized":False,"native_distribution_audit":audit,"target_runtime":"unverified"}
         if document_types is not None:
             manifest["document_types"] = document_types
@@ -252,11 +257,13 @@ def package(binary, output, name, identifier, version, target, identity=None, bu
                 "scope": "producer release-audit declaration; not independent binary-source attestation",
             }
         if target=="darwin":
+            manifest["macos_deployment"]=deployment
             resources = stage/"Contents/Resources"
             resources.mkdir()
             if notice_bundle is not None:
                 manifest["component_notices"] = app_notices.copy(notice_bundle, resources/app_notices.DIRECTORY, manifest["source_binary_sha256"])
             info={"CFBundlePackageType":"APPL","CFBundleName":name,"CFBundleDisplayName":name,"CFBundleExecutable":name,"CFBundleIdentifier":identifier,"CFBundleVersion":build_version,"CFBundleShortVersionString":version,"NSHighResolutionCapable":True}
+            info["LSMinimumSystemVersion"]=deployment["minimum"]
             info.update(declared)
             if icon is not None:
                 manifest["app_icon"] = app_icons.install(icon, resources)

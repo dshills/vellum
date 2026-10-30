@@ -46,6 +46,7 @@ python3 -B scripts/install-private-macos_test.py
 python3 -B scripts/verify-private-macos_test.py
 python3 -B scripts/check-private-macos-linkage_test.py
 python3 -B scripts/dependency-disposition_test.py
+python3 -B scripts/macos_deployment_test.py
 python3 scripts/package-app_test.py
 python3 scripts/app_icons_test.py
 )

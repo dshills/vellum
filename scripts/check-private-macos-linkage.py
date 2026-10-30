@@ -6,6 +6,7 @@ import json
 from pathlib import Path, PurePosixPath
 import platform
 import plistlib
+import macos_deployment
 import re
 import subprocess
 import sys
@@ -112,6 +113,11 @@ def inspect_app(app,name,identifier,build,host):
     if not re.search(r'^MH_MAGIC_64\s+ARM64\s+\S+\s+\S+\s+EXECUTE\s',header,re.M):
         raise ValueError('expected ARM64 Mach-O executable header')
     observed=parse_commands(tool('otool','-arch','arm64','-l',str(executable)),host)
+    resource,_=v.record(app/'Contents/Resources/APP_MANIFEST.json')
+    declared=resource.get('macos_deployment')
+    if declared is not None or 'LSMinimumSystemVersion' in info:
+        actual=dict(minimum=observed['deployment']['minimum'],architectures={'arm64':{k:observed['deployment'][k] for k in ('minimum','sdk')}})
+        macos_deployment.verify(info,declared,actual)
     return dict(name=name,executable_sha256=v.installer.digest(executable),architectures=['arm64'],**observed)
 
 
