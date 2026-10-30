@@ -111,3 +111,18 @@ It checks SDK contents, receipt/source links, archive/installed bytes, app metad
 and strict signatures. It does not establish runtime or publisher authenticity.
 The existing Notes app is also included for ordinary use; native tests use an
 explicit disposable -data-dir and never migrate or edit an existing notebook.
+
+## Native toolchain provenance
+
+New producer preflights also record effective Go cgo compiler/flag values,
+PATH-resolved drivers, xcrun-selected compiler/linker identities and versions,
+Apple SDK path/version/settings hash and deployment overrides. Dry-run compiler
+plans use `-###`; no test application is executed. These inputs are rechecked
+before completion. Compiler wrappers requiring multiple command words are refused
+rather than silently misattributed. The controlled child environment and global
+Xcode/deployment settings remain unchanged.
+
+This records selected inputs, not a complete SDK or compiler/runtime closure.
+The compiler default minimum is diagnostic; actual executable load metadata is
+the authoritative packaging observation. Older build24 receipts are preserved
+with their original narrower provenance; no new fields are backfilled into them.

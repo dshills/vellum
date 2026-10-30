@@ -41,6 +41,7 @@ python3 scripts/check-sdk_test.py
 python3 -B scripts/check-sdk-ci_test.py
 python3 -B scripts/private-macos-bundle_test.py
 python3 -B scripts/private_bundle_preflight_test.py
+python3 -B scripts/native_toolchain_test.py
 python3 -B scripts/install-private-macos_test.py
 python3 -B scripts/verify-private-macos_test.py
 python3 -B scripts/check-private-macos-linkage_test.py

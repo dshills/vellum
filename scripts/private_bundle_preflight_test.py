@@ -9,6 +9,10 @@ import private_bundle_preflight as p
 
 
 class Preflight(unittest.TestCase):
+    def setUp(self):
+        patch=mock.patch.object(p,'native_capture',return_value={'synthetic':'native snapshot'})
+        self.native=patch.start();self.addCleanup(patch.stop)
+
     def fixture(self, directory):
         base = Path(directory).resolve()
         root = base/'source'; root.mkdir()
@@ -44,9 +48,9 @@ class Preflight(unittest.TestCase):
             self.assertFalse((base/'installed').exists())
             self.assertEqual(result['toolchain']['configuration'],config)
             self.assertEqual(result['toolchain']['binaries']['compile']['sha256'],hashlib.sha256(b'compile').hexdigest())
-            p.verify_snapshot(root,result)
+            p.verify_snapshot(root,result,{})
             (tools/'compile').write_bytes(b'changed')
-            with self.assertRaisesRegex(ValueError,'toolchain changed'):p.verify_snapshot(root,result)
+            with self.assertRaisesRegex(ValueError,'toolchain changed'):p.verify_snapshot(root,result,{})
 
     def test_wrong_version_target_and_cgo_fail_before_output(self):
         for key,value in [('GOVERSION','go1.27.3'),('GOOS','linux'),('GOARCH','amd64'),('CGO_ENABLED','0')]:
@@ -71,7 +75,14 @@ class Preflight(unittest.TestCase):
             base,root,tools,config=self.fixture(d)
             result=self.invoke(root,tools,config,base/'result')
             (root/'drivers/cogent/build/upstream/core/scene.go').write_text('changed')
-            with self.assertRaisesRegex(ValueError,'native preparation changed'):p.verify_snapshot(root,result)
+            with self.assertRaisesRegex(ValueError,'native preparation changed'):p.verify_snapshot(root,result,{})
+
+    def test_native_selection_drift_refuses_completion(self):
+        with tempfile.TemporaryDirectory() as d:
+            base,root,tools,config=self.fixture(d)
+            result=self.invoke(root,tools,config,base/'result')
+            self.native.return_value={'synthetic':'changed SDK'}
+            with self.assertRaisesRegex(ValueError,'native compiler/linker/SDK'):p.verify_snapshot(root,result,{})
 
     def test_synced_alias_existing_and_checkout_output_refused_before_go(self):
         with tempfile.TemporaryDirectory() as d:

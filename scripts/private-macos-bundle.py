@@ -174,7 +174,7 @@ def main():
         run(['codesign', '--verify', '--deep', '--strict', extracted/(name+'.app')])
         hashes[zipped.name] = digest(zipped)
         app_records.append(dict(name=name, archive=zipped.name, module=str(module.relative_to(out)), binary_sha256=digest(binary)))
-    verify_snapshot(ROOT, admission)
+    verify_snapshot(ROOT, admission, env)
     if digest(out/'PREFLIGHT.json') != admission_digest:
         raise ValueError('preflight receipt changed during packaging')
     if clean_source(ROOT, env) != revision:

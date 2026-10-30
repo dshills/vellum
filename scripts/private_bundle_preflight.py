@@ -10,6 +10,7 @@ import re
 import shutil
 
 from child_process import check_child_output
+from native_toolchain import capture as native_capture
 
 SENTINELS = {
     'upstream': ('cogentcore.org/core', ('go.mod', 'core/scene.go', 'system/driver/desktop/window.go')),
@@ -52,7 +53,8 @@ def preflight(root, output, env, install_to=None):
         raise ValueError('Go executable is unavailable; put the declared Go version on PATH')
     executable = Path(executable).resolve(strict=True)
     config = json.loads(check_child_output([str(executable), 'env', '-json', 'GOVERSION', 'GOOS',
-        'GOARCH', 'CGO_ENABLED', 'GOROOT', 'GOTOOLDIR'], cwd=root, env=env, text=True, timeout=20))
+        'GOARCH', 'CGO_ENABLED', 'GOROOT', 'GOTOOLDIR', 'CC', 'CXX',
+        'CGO_CFLAGS', 'CGO_CPPFLAGS', 'CGO_CXXFLAGS', 'CGO_LDFLAGS'], cwd=root, env=env, text=True, timeout=20))
     wanted = 'go'+match.group(1)
     if config.get('GOVERSION') != wanted:
         raise ValueError(f"private producer requires {wanted}; PATH selects {config.get('GOVERSION')}")
@@ -87,11 +89,15 @@ def preflight(root, output, env, install_to=None):
             raise ValueError('wrong prepared native module: '+name)
     return {'output': str(output), 'install_to': str(destination) if destination else None,
         'toolchain': {'configuration': config, 'binaries': identities},
+        'native_toolchain': native_capture(config, env),
         'native_preparation': {'scope': 'presence/module identity and sampled sentinel hashes; full preparation/SDK verification still required',
             'manifest_sha256': digest(manifest), 'checked_files': checked}}
 
 
-def verify_snapshot(root, admission):
+def verify_snapshot(root, admission, env=None):
+    if 'native_toolchain' in admission:
+        if env is None or native_capture(admission['toolchain']['configuration'], env) != admission['native_toolchain']:
+            raise ValueError('native compiler/linker/SDK selection changed during packaging')
     for item in admission['toolchain']['binaries'].values():
         if digest(Path(item['path'])) != item['sha256']:
             raise ValueError('toolchain changed during packaging')
