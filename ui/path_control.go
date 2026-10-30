@@ -123,7 +123,7 @@ func (p *PathControl) View() (Node, error) {
 			}
 		}
 	}
-	segmentStyle := Style{GrowX: Some(float32(0)), GrowY: Some(float32(0)), Padding: Some(Insets{Top: 3, Bottom: 3, Left: 5, Right: 5}), MinSize: Some(Size{Height: 24})}
+	segmentStyle := Style{GrowX: Some(float32(0)), GrowY: Some(float32(0)), Border: Some(Border{}), Background: Some(color.NRGBA{}), Padding: Some(Insets{Top: 1, Bottom: 1, Left: 5, Right: 5}), MinSize: Some(Size{Height: 16})}
 	appendSegment := func(n Node) {
 		if len(root.Children) > 0 {
 			root.Children = append(root.Children, Node{ID: n.ID + "/separator", Kind: Icon, Icon: SymbolRight})

@@ -49,8 +49,8 @@ func bindNumberField(r *record, sp *core.Spinner) {
 				if r.node.NumberButtons != ui.NumberButtonsStepper {
 					return
 				}
-				s.Min.Set(units.Dp(18), units.Dp(24))
-				s.Max.Set(units.Dp(18), units.Dp(24))
+				s.Min.Set(units.Dp(18), units.Dp(18))
+				s.Max.Set(units.Dp(18), units.Dp(18))
 				s.IconSize.Set(units.Dp(16))
 				s.Margin.Zero()
 				s.Padding.Zero()

@@ -159,7 +159,7 @@ func (p *FontPicker) View() (Node, error) {
 			face = f
 		}
 	}
-	comboStyle := Style{MinSize: Some(Size{Width: 160, Height: 28}), GrowX: Some(float32(1)), GrowY: Some(float32(0)), Padding: Some(Insets{}), CornerRadius: Some(float32(5)), Border: Some(Border{Width: 1, Color: color.NRGBA{R: 128, G: 128, B: 132, A: 255}})}.Overlay(p.FieldStyle)
+	comboStyle := Style{MinSize: Some(Size{Width: 160, Height: 16}), GrowX: Some(float32(1)), GrowY: Some(float32(0)), Padding: Some(Insets{}), CornerRadius: Some(float32(5)), Border: Some(Border{Width: 1, Color: color.NRGBA{R: 128, G: 128, B: 132, A: 255}})}.Overlay(p.FieldStyle)
 	// ComboBox children already supply text and arrow insets. Reusing an input
 	// theme must not add a second outer layer of field padding.
 	comboStyle.Padding = Some(Insets{})
@@ -217,7 +217,7 @@ func (p *FontPicker) View() (Node, error) {
 		{ID: id + "/font/family-label", Kind: Label, Text: "Family"}, familyNode,
 		{ID: id + "/font/style-row", Kind: Row, Style: Style{Gap: Some(float32(8)), Align: Some(AlignCenter)}, Children: []Node{
 			faceNode,
-			{ID: FontSizeID(id), Kind: NumberField, Number: p.Value.Size, Numeric: Numeric{Min: MinFontPickerSize, Max: MaxFontPickerSize, Step: 1}, NumberButtons: NumberButtonsStepper, Disabled: !available(), Style: Style{MinSize: Some(Size{Width: 88, Height: 28}), MaxSize: Some(Size{Width: 88}), GrowX: Some(float32(0))}, Accessibility: Accessibility{Name: label + " size", Help: "Font size from 6 to 144 logical pixels"}, Change: func(e ChangeEvent) {
+			{ID: FontSizeID(id), Kind: NumberField, Number: p.Value.Size, Numeric: Numeric{Min: MinFontPickerSize, Max: MaxFontPickerSize, Step: 1}, NumberButtons: NumberButtonsStepper, Disabled: !available(), Style: Style{MinSize: Some(Size{Width: 88, Height: 16}), MaxSize: Some(Size{Width: 88}), GrowX: Some(float32(0))}, Accessibility: Accessibility{Name: label + " size", Help: "Font size from 6 to 144 logical pixels"}, Change: func(e ChangeEvent) {
 				if !available() {
 					return
 				}

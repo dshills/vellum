@@ -299,6 +299,9 @@ func TestButtonIconAboveTextGeometryRoutingAndRestoration(t *testing.T) {
 				if artBox.Max.X > textBox.Min.X || artBox.Dx() >= lastIconWidth {
 					t.Fatal("inline layout/icon size not restored", artBox, textBox, lastIconWidth)
 				}
+				if fullColor && textBox.Min.X-artBox.Max.X < 4 {
+					t.Fatal("full-color inline artwork touches its label", artBox, textBox)
+				}
 				if !fullColor && button.ChildByName("space") == nil {
 					t.Fatal("native inline spacer not restored")
 				}

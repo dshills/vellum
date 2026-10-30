@@ -21,6 +21,9 @@ func installButtonImage(r *record, button *core.Button) {
 			s.Gap.Set(units.Dp(4))
 		} else {
 			s.Direction = styles.Row
+			if r.node.IconImage != nil && r.node.Text != "" {
+				s.Gap.Set(units.Dp(6))
+			}
 		}
 	})
 	button.FinalMaker(func(p *tree.Plan) {

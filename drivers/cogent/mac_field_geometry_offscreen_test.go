@@ -43,7 +43,7 @@ func TestMacFieldInsetsAndOutlineGeometry(t *testing.T) {
 				if caption.Min.X <= outer.Min.X || caption.Min.Y <= outer.Min.Y || box.Min.X <= outer.Min.X || box.Max.X >= outer.Max.X {
 					t.Fatal("caption/input touches group border", outer, caption, box)
 				}
-				if input.Styles.Padding.Left.Value < 8 || input.Styles.Padding.Top.Value < 5 || input.Styles.MaxBorder.Width.Top.Value < 2 {
+				if input.Styles.Padding.Left.Value < 8 || input.Styles.Padding.Top.Value < 2 || input.Styles.MaxBorder.Width.Top.Value < 2 {
 					t.Fatal("text inset or full focus border lost")
 				}
 				if input.Text() != "Untitled" {

@@ -40,7 +40,7 @@ func (s *SecureField) View() (Node, error) {
 	if !s.AllowReveal || !available() {
 		s.revealed = false
 	}
-	clear := Style{Border: Some(Border{}), Background: Some(color.NRGBA{}), MinSize: Some(Size{Height: 26}), MaxSize: Some(Size{}), GrowX: Some(float32(1)), Padding: Some(Insets{Top: 2, Bottom: 2, Left: 6, Right: 6})}
+	clear := Style{Border: Some(Border{}), Background: Some(color.NRGBA{}), MinSize: Some(Size{Height: 16}), MaxSize: Some(Size{}), GrowX: Some(float32(1)), Padding: Some(Insets{Top: 2, Bottom: 2, Left: 6, Right: 6})}
 	field := Node{ID: SecureInputID(id), Kind: TextField, Text: s.Text, Placeholder: s.Placeholder, Secure: true, Reveal: s.revealed, Style: clear, Accessibility: Accessibility{Name: label, Help: "Protected text entry"}, Change: func(e ChangeEvent) {
 		if available() {
 			e.ID = id
@@ -53,7 +53,7 @@ func (s *SecureField) View() (Node, error) {
 		if s.revealed {
 			text = "Hide"
 		}
-		children = append(children, Node{ID: id + "/secure/reveal", Kind: Button, Text: text, Appearance: ButtonQuiet, Accessibility: Accessibility{Name: text + " " + label}, Style: Style{GrowX: Some(float32(0)), Padding: Some(Insets{Top: 3, Bottom: 3, Left: 6, Right: 6})}, Activate: func() {
+		children = append(children, Node{ID: id + "/secure/reveal", Kind: Button, Text: text, Appearance: ButtonQuiet, Accessibility: Accessibility{Name: text + " " + label}, Style: Style{GrowX: Some(float32(0)), Border: Some(Border{}), Padding: Some(Insets{Top: 1, Bottom: 1, Left: 6, Right: 6})}, Activate: func() {
 			if available() && s.AllowReveal {
 				s.revealed = !s.revealed
 			}

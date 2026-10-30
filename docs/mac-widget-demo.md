@@ -22,6 +22,11 @@ appearance controls. Light/Dark and Blue/Purple/Green change that page locally,
 retaining values and immutable full-color icons. The rest of each bundle keeps
 its startup appearance. Scroll inside a page to reach its controls. The ordinary macOS title bar remains draggable.
 
+Regular Mac-themed fields and buttons use compact sizing; combo/font/password
+editors keep one shared focus outline. Menus use compact rows with one pointer or
+keyboard highlight, and inline full-color artwork keeps a visible label gap. See
+the [AppKit comparison and verification limits](reports/mac-widget-fidelity-20261030/README.md).
+
 
 - **Checklist, File / folder field and Date range** (Components): edit sample
   checklist names/completion, browse/drop/reveal an accepted local path, or choose

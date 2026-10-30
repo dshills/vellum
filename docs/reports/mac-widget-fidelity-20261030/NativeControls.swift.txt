@@ -1,0 +1,44 @@
+import AppKit
+
+final class Delegate: NSObject, NSApplicationDelegate {
+ var window: NSWindow!
+ @objc func appearance(_ sender:NSSegmentedControl) { NSApp.appearance = NSAppearance(named: sender.selectedSegment == 0 ? .aqua : .darkAqua) }
+ @objc func act(_ sender:NSControl) {}
+ func applicationDidFinishLaunching(_ note:Notification) {
+  window=NSWindow(contentRect:NSRect(x:0,y:0,width:660,height:740),styleMask:[.titled,.closable,.miniaturizable,.resizable],backing:.buffered,defer:false)
+  window.title="Native AppKit Controls — Reference"
+  window.isReleasedWhenClosed=false
+  let root=NSStackView();root.orientation = .vertical;root.alignment = .leading;root.spacing=14;root.edgeInsets=NSEdgeInsets(top:24,left:24,bottom:24,right:24)
+  window.contentView=root
+  func label(_ text:String)->NSTextField { let v=NSTextField(labelWithString:text);v.font = .systemFont(ofSize:13);return v }
+  func row(_ title:String,_ controls:[NSView]) { let l=label(title);l.widthAnchor.constraint(equalToConstant:140).isActive=true;let r=NSStackView(views:[l]+controls);r.orientation = .horizontal;r.alignment = .centerY;r.spacing=10;root.addArrangedSubview(r) }
+  let heading=label("Native macOS input and selection controls");heading.font = .boldSystemFont(ofSize:20);root.addArrangedSubview(heading)
+  let modes=NSSegmentedControl(labels:["Light","Dark"],trackingMode:.selectOne,target:self,action:#selector(appearance(_:)));modes.selectedSegment=0;row("Appearance",[modes])
+  let search=NSSearchField();search.placeholderString="Search objects";search.widthAnchor.constraint(equalToConstant:280).isActive=true;row("Search",[search])
+  let name=NSTextField(string:"Untitled");name.widthAnchor.constraint(equalToConstant:240).isActive=true;row("Drawing name",[name])
+  let number=NSTextField(string:"3");number.alignment = .right;number.widthAnchor.constraint(equalToConstant:70).isActive=true
+  let stepper=NSStepper();stepper.minValue=0;stepper.maxValue=1000;stepper.integerValue=3;stepper.target=self;stepper.action = #selector(act(_:));row("Copies",[number,stepper])
+  let pop=NSPopUpButton();pop.addItems(withTitles:["Millimeters","Centimeters","Inches"]);pop.widthAnchor.constraint(equalToConstant:240).isActive=true;row("Units",[pop])
+  let combo=NSComboBox();combo.addItems(withObjectValues:["Millimeters","Centimeters","Inches"]);combo.stringValue="Millimeters";combo.widthAnchor.constraint(equalToConstant:240).isActive=true;row("Editable units",[combo])
+  let seg=NSSegmentedControl(labels:["Design","Inspect","Export"],trackingMode:.selectOne,target:self,action:#selector(act(_:)));seg.selectedSegment=0;row("Segmented",[seg])
+  let check=NSButton(checkboxWithTitle:"Snap to grid",target:self,action:#selector(act(_:)));check.state = .on
+  let disabled=NSButton(checkboxWithTitle:"Disabled",target:nil,action:nil);disabled.isEnabled=false;row("Checkboxes",[check,disabled])
+  let radio=NSButton(radioButtonWithTitle:"Automatic",target:self,action:#selector(act(_:)));radio.state = .on
+  let radio2=NSButton(radioButtonWithTitle:"Manual",target:self,action:#selector(act(_:)));row("Radio",[radio,radio2])
+  let toggle=NSSwitch();toggle.state = .on;toggle.target=self;toggle.action = #selector(act(_:));row("Switch",[toggle])
+  let slider=NSSlider(value:40,minValue:0,maxValue:100,target:self,action:#selector(act(_:)));slider.widthAnchor.constraint(equalToConstant:240).isActive=true;row("Slider",[slider])
+  let progress=NSProgressIndicator();progress.isIndeterminate=false;progress.minValue=0;progress.maxValue=100;progress.doubleValue=40;progress.widthAnchor.constraint(equalToConstant:240).isActive=true;row("Progress",[progress])
+  let buttons=["Cancel","Apply","Save…"].map { title -> NSButton in let b=NSButton(title:title,target:self,action:#selector(act(_:)));b.bezelStyle = .rounded;return b };buttons[1].keyEquivalent="\r";row("Buttons",buttons)
+  let small=NSButton(title:"Small",target:self,action:#selector(act(_:)));small.bezelStyle = .rounded;small.controlSize = .small
+  let regular=NSButton(title:"Regular",target:self,action:#selector(act(_:)));regular.bezelStyle = .rounded
+  let large=NSButton(title:"Large",target:self,action:#selector(act(_:)));large.bezelStyle = .rounded;large.controlSize = .large;row("Sizes",[small,regular,large])
+  let date=NSDatePicker();date.datePickerStyle = .textFieldAndStepper;date.datePickerElements = [.yearMonthDay];row("Date",[date])
+  let note=label("Actual AppKit controls; app-local appearance only. No document or system settings change.");note.textColor = .secondaryLabelColor;root.addArrangedSubview(note)
+  root.addArrangedSubview(NSView())
+  window.center();window.makeKeyAndOrderFront(nil);NSApp.activate(ignoringOtherApps:true)
+ }
+ func applicationShouldTerminateAfterLastWindowClosed(_ sender:NSApplication)->Bool {true}
+}
+let application=NSApplication.shared
+application.setActivationPolicy(.regular)
+let delegate=Delegate();application.delegate=delegate;application.run()

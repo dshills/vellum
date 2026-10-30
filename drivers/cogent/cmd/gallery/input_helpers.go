@@ -156,7 +156,7 @@ func (m *inputHelpersGallery) setAppearance(dark bool) {
 	m.tokens.InputStyle.Padding = ui.Some(ui.Insets{})
 	m.tokens.InputStyle.MaxSize = ui.Some(ui.Size{Width: 360})
 	m.datePicker.Style = theme.Kinds[ui.TextField]
-	m.datePicker.Style.MinSize = ui.Some(ui.Size{Width: 180, Height: 28})
+	m.datePicker.Style.MinSize = ui.Some(ui.Size{Width: 180, Height: 16})
 	m.datePicker.Style.MaxSize = ui.Some(ui.Size{Width: 240})
 	m.datePicker.PopoverStyle = theme.Kinds[ui.FormGroup]
 	m.combo.Style = theme.Kinds[ui.TextField]
@@ -273,7 +273,7 @@ func (m *inputHelpersGallery) view() ui.Node {
 		{ID: "search-results", Kind: ui.FormGroup, Text: "Components", Children: matches},
 		field,
 		{ID: "quantity-field", Kind: ui.FormGroup, Text: "Copies", Children: []ui.Node{
-			{ID: "quantity", Kind: ui.NumberField, NumberButtons: ui.NumberButtonsStepper, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 88, Height: 28}), MaxSize: ui.Some(ui.Size{Width: 104})}, Number: m.quantity, Numeric: ui.Numeric{Min: 0, Max: 1000, Step: 1}, Accessibility: ui.Accessibility{Name: "Copies"}, Disabled: m.disabled, Change: func(e ui.ChangeEvent) { m.quantity = e.Number }},
+			{ID: "quantity", Kind: ui.NumberField, NumberButtons: ui.NumberButtonsStepper, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 88, Height: 16}), MaxSize: ui.Some(ui.Size{Width: 104})}, Number: m.quantity, Numeric: ui.Numeric{Min: 0, Max: 1000, Step: 1}, Accessibility: ui.Accessibility{Name: "Copies"}, Disabled: m.disabled, Change: func(e ui.ChangeEvent) { m.quantity = e.Number }},
 		}},
 		{ID: "context-demo", Kind: ui.Button, Text: "Right-click or Control-click for actions", Disabled: m.disabled, Accessibility: ui.Accessibility{Name: "Context menu demo", Help: "Shift-F10 also opens the menu"}, ContextMenu: &ui.ContextMenu{Options: []ui.Option{{ID: "inspect", Label: "Inspect"}, {ID: "sep", Separator: true}, {ID: "grid", Label: "Show grid", Checkable: true, Checked: m.contextChecked}}, Change: func(e ui.ChangeEvent) {
 			m.contextAction = e.SelectedID

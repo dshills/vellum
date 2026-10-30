@@ -91,6 +91,15 @@ func styleManagedInputFocus(r *record, s *styles.Style) {
 			s.Cursor = cursors.Grab
 		}
 		if err == nil && style.Border.Set {
+			// Mac-themed controls use the managed border and focus ring. The
+			// backend's Material elevation also reserves invisible shadow space,
+			// inflating quiet buttons and the composites that contain them.
+			if r.theme.Palette.Set && r.node.Kind != ui.Checkbox {
+				s.BoxShadow = nil
+				s.MaxBoxShadow = nil
+				s.Border.Offset.Zero()
+				s.MaxBorder.Offset.Zero()
+			}
 			border := style.Border.Value
 			restoreManagedBorder(s, border)
 			s.MaxBorder = s.Border

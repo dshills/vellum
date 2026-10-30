@@ -29,7 +29,10 @@ func TestMacPersonalWidgetsGeometryMatrix(t *testing.T) {
 					if dark {
 						cfg.Theme.Default.Background = ui.Some(color.NRGBA{R: 29, G: 29, B: 31, A: 255})
 					}
-					secure := &ui.SecureField{ID: "secure", Label: "Synthetic password", Text: "synthetic", AllowReveal: true, Style: cfg.Theme.Kinds[ui.TextField], Change: func(ui.ChangeEvent) {}}
+					// Embedded editors own their insets; the surrounding row owns only its outline.
+					fieldStyle := cfg.Theme.Kinds[ui.TextField]
+					fieldStyle.Padding = ui.Some(ui.Insets{})
+					secure := &ui.SecureField{ID: "secure", Label: "Synthetic password", Text: "synthetic", AllowReveal: true, Style: fieldStyle, Change: func(ui.ChangeEvent) {}}
 					path := &ui.PathControl{ID: "path", MaxVisible: 3, MaxLabelRunes: 12, Items: []ui.PathItem{{ID: "home", Label: "Home"}, {ID: "docs", Label: "Documents"}, {ID: "drawings", Label: "Drawings"}, {ID: "file", Label: "Untitled.vellum", Kind: ui.PathFile}}, Navigate: func(ui.PathEvent) {}}
 					font := &ui.FontPicker{ID: "font", Label: "Drawing font", Value: ui.FontSelection{FamilyID: "noto", TypefaceID: "regular", Size: 16}, Families: []ui.FontFamily{{ID: "noto", Name: "Noto Sans", Typefaces: []ui.FontTypeface{{ID: "regular", Name: "Regular", Weight: 400}}}}, FieldStyle: cfg.Theme.Kinds[ui.TextField], Change: func(ui.FontSelectionEvent) {}}
 					tags := &ui.TokenField{ID: "tags", Label: "Tags", Tokens: []ui.Token{{ID: "design", Text: "Design"}}, InputStyle: cfg.Theme.Kinds[ui.TextField], Change: func(ui.TokenEvent) {}}
@@ -86,6 +89,16 @@ func TestMacPersonalWidgetsGeometryMatrix(t *testing.T) {
 						control := findRecord(root, groupID).widget.AsWidget().Geom.TotalBBox
 						if control.Empty() || !control.In(content) {
 							t.Fatal("composite escaped form", groupID, control, content)
+						}
+					}
+					// The regular AppKit reference on macOS 27 uses 26-point fields.
+					// Allow font/rounding differences while rejecting the previous
+					// 38–40-point composites. DPI here is deterministic, not a display change.
+					for _, id := range []string{"secure", ui.FontFamilyID("font"), ui.FontTypefaceID("font"), ui.FontSizeID("font"), ui.PathSegmentID("path", "home")} {
+						widget := findRecord(root, id).widget.AsWidget()
+						height := float32(widget.Geom.TotalBBox.Dy()) / float32(scale)
+						if height < 18 || height > 32 {
+							t.Fatal("regular control height diverged from compact Mac sizing", id, height)
 						}
 					}
 					for _, pair := range [][2]string{{ui.SecureInputID("secure"), "secure"}, {ui.ComboInputID(ui.FontFamilyID("font")), ui.FontFamilyID("font")}, {ui.ComboMenuID(ui.FontFamilyID("font")), ui.FontFamilyID("font")}, {ui.ComboInputID(ui.FontTypefaceID("font")), ui.FontTypefaceID("font")}, {ui.FontSizeID("font"), "font/font/style-row"}, {ui.TokenInputID("tags"), "tags/tokens/entry"}, {ui.ColorWellButtonID("well"), "well"}} {

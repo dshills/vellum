@@ -244,3 +244,21 @@ reused. These are automated routing/pixel checks; live inactive input-border
 pixels have not been independently captured. Controls without explicit managed
 borders, caret appearance and other native control classes keep their existing
 policy. No public API, rendering backend, pacing or release gate changes.
+
+## Regular-control fidelity maintenance (2026-10-30)
+
+Mac regular controls use compact content minimums rather than treating a full
+AppKit outer height as the content size and then adding padding again. Composite
+editors retain text insets; outer styling can supply the shared outline. The
+gallery uses zero outer padding for combo/secure rows to avoid duplicate insets.
+Quiet path segments and reveal actions are borderless. Explicit bordered Mac
+palette actions discard backend Material shadow/offset reservations while
+retaining a stable focus-ring allowance. Inline full-color button artwork has a
+six-logical-pixel default label gap; explicit caller gap overrides still win.
+
+Managed menu rows use a 16-logical-pixel content minimum plus vertical padding,
+expanding for text as needed. Enabled pointer entry transfers focus; keyboard
+navigation then owns the single highlight even if the pointer has not moved.
+Disabled rows neither focus nor highlight. This maintenance adds no public API or
+new control, and uses internal review under the current CONTRIBUTING policy.
+[Actual AppKit comparison, checks and remaining limits](../docs/reports/mac-widget-fidelity-20261030/README.md).

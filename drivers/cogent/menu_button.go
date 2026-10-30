@@ -425,9 +425,12 @@ func populateManagedMenu(r *record, p *menuPopup, scene *core.Scene, keyboard fu
 			style.MaxBorder.Width.Zero()
 			style.Border.Radius.Set(units.Dp(4))
 			style.Padding.Set(units.Dp(4), units.Dp(10))
-			style.Min.Y = units.Dp(24)
+			style.Min.Y = units.Dp(16)
 			style.Background = colors.Uniform(color.NRGBA{})
-			if style.Is(states.Focused) || style.Is(states.Hovered) || style.Is(states.Active) {
+			// Pointer entry transfers focus below. Hover must not retain a
+			// second highlight after keyboard navigation moves focus elsewhere.
+			style.StateLayer = 0
+			if !o.Disabled && (style.Is(states.Focused) || style.Is(states.Active)) {
 				style.Background = colors.Uniform(managedAccent(r))
 				style.Color = colors.Uniform(color.NRGBA{R: 255, G: 255, B: 255, A: 255})
 				if r.theme.Palette.Set {
@@ -467,6 +470,11 @@ func populateManagedMenu(r *record, p *menuPopup, scene *core.Scene, keyboard fu
 			item.OnFinal(events.Click, func(events.Event) { closeMenuChain(p.top()) })
 		}
 
+		item.On(events.MouseEnter, func(events.Event) {
+			if !o.Disabled && !p.dead.Load() {
+				item.SetFocus()
+			}
+		})
 		item.OnFocus(func(events.Event) { postControl(r, func() { _ = r.control.a.Invalidate(r.control.window) }) })
 	}
 	scene.OnFirst(events.KeyChord, func(e events.Event) {

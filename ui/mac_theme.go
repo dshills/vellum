@@ -33,14 +33,14 @@ func MacThemeWithAccent(dark bool, accent color.NRGBA) Theme {
 	ink := color.NRGBA{R: 35, G: 35, B: 37, A: 255}
 	field := color.NRGBA{R: 255, G: 255, B: 255, A: 255}
 	button := color.NRGBA{R: 249, G: 249, B: 250, A: 255}
-	line := color.NRGBA{R: 191, G: 191, B: 195, A: 255}
+	line := color.NRGBA{R: 208, G: 208, B: 212, A: 255}
 	if dark {
 		ink = color.NRGBA{R: 241, G: 241, B: 243, A: 255}
 		field = color.NRGBA{R: 35, G: 35, B: 37, A: 255}
 		button = color.NRGBA{R: 65, G: 65, B: 68, A: 255}
-		line = color.NRGBA{R: 98, G: 98, B: 102, A: 255}
+		line = color.NRGBA{R: 90, G: 90, B: 94, A: 255}
 	}
-	control := Style{Padding: Some(Insets{Top: 5, Right: 8, Bottom: 5, Left: 8}), CornerRadius: Some(float32(5)), Border: Some(Border{Width: 1, Color: line})}
+	control := Style{Padding: Some(Insets{Top: 2, Right: 8, Bottom: 2, Left: 8}), CornerRadius: Some(float32(5)), Border: Some(Border{Width: 1, Color: line})}
 	input := control
 	input.Background = Some(field)
 	input.MinSize = Some(Size{Width: 220, Height: 16})
@@ -52,6 +52,7 @@ func MacThemeWithAccent(dark bool, accent color.NRGBA) Theme {
 	number.MaxSize = Some(Size{Width: 160})
 	number.GrowX = Some(float32(0))
 	buttonStyle := control
+	buttonStyle.Padding = Some(Insets{Top: 3, Right: 8, Bottom: 3, Left: 8})
 	buttonStyle.Background = Some(button)
 	return Theme{Palette: Some(palette), Default: Style{Foreground: Some(ink), Typography: Some(MacTypography(13, 400))}, Kinds: map[Kind]Style{
 		Dialog:    {Background: Some(palette.Popup), Foreground: Some(palette.Ink), CornerRadius: Some(float32(8))},

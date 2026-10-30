@@ -52,14 +52,14 @@ func (c *ComboBox) View() (Node, error) {
 	}
 	root := Node{ID: id, Kind: Row, Disabled: !available(), Style: style, Accessibility: Accessibility{Name: label}}
 	// The single outer border is supplied by the caller's MacTheme input style.
-	clear := Style{Border: Some(Border{}), Background: Some(color.NRGBA{}), MinSize: Some(Size{Height: 26}), MaxSize: Some(Size{}), GrowX: Some(float32(1)), GrowY: Some(float32(0)), Padding: Some(Insets{Top: 2, Bottom: 2, Left: 6, Right: 4})}
+	clear := Style{Border: Some(Border{}), Background: Some(color.NRGBA{}), MinSize: Some(Size{Height: 16}), MaxSize: Some(Size{}), GrowX: Some(float32(1)), GrowY: Some(float32(0)), Padding: Some(Insets{Top: 2, Bottom: 2, Left: 6, Right: 4})}
 	root.Children = []Node{{ID: ComboInputID(id), Kind: TextField, Text: c.Text, Placeholder: c.Placeholder, Style: clear, Accessibility: Accessibility{Name: label}, Change: func(e ChangeEvent) {
 		if available() {
 			c.Change(ComboEvent{ID: id, Text: e.Text})
 		}
 	}}}
 	if len(c.Options) > 0 {
-		root.Children = append(root.Children, Node{ID: ComboMenuID(id), Kind: MenuButton, MenuAnchorID: id, Icon: SymbolDown, Appearance: ButtonTool, Options: options, Style: Style{Border: Some(Border{}), Background: Some(color.NRGBA{}), Padding: Some(UniformInsets(3)), MinSize: Some(Size{Width: 24, Height: 26}), MaxSize: Some(Size{Width: 28}), GrowX: Some(float32(0))}, Accessibility: Accessibility{Name: label + " suggestions"}, Change: func(e ChangeEvent) {
+		root.Children = append(root.Children, Node{ID: ComboMenuID(id), Kind: MenuButton, MenuAnchorID: id, Icon: SymbolDown, Appearance: ButtonTool, Options: options, Style: Style{Border: Some(Border{}), Background: Some(color.NRGBA{}), Padding: Some(UniformInsets(2)), MinSize: Some(Size{Width: 16, Height: 16}), MaxSize: Some(Size{Width: 20}), GrowX: Some(float32(0))}, Accessibility: Accessibility{Name: label + " suggestions"}, Change: func(e ChangeEvent) {
 			if !available() {
 				return
 			}
