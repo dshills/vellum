@@ -7,44 +7,47 @@ public release/tag/assets, new audit decision, signing identity or notarization.
 
 ## Source and package identity
 
-- Main at `fa85ebe46da7b9cce836f865a171b2738ffaa769` is pushed and green in
-  [Framework](https://github.com/dshills/vellum/actions/runs/41073526868),
-  [Stable root API](https://github.com/dshills/vellum/actions/runs/41073526779)
-  and [Platform adapters](https://github.com/dshills/vellum/actions/runs/41073526784).
-  All three passed their original attempts. This includes the prior build23
-  compatibility/fuzz/preflight/generator work; it is no longer an unmerged branch.
-  These are exact-main results, not hosted results for subsequent maintenance.
-- Current local work is on `codex/mac-offscreen-maintenance24`. It adds installer
-  failure coverage, a read-only delivery verifier, an app-local lifetime fix,
-  dependency applicability checks and this handoff refresh. Use `git rev-parse HEAD`
-  for its exact documentation checkpoint. It has focused local verification;
-  it has not been merged/pushed or hosted-CI-qualified by this checkpoint.
-- **Final private build23 source:**
-  `e0e011c605f8ee6ea84827414a1636bcca74c97e`.
+- Main at `b9212489afc921171fc5abbd5275d8919ae930dd` is pushed and green in
+  [Framework](https://github.com/dshills/vellum/actions/runs/41091357397),
+  [Stable root API](https://github.com/dshills/vellum/actions/runs/41091357457)
+  and [Platform adapters](https://github.com/dshills/vellum/actions/runs/41091357554).
+  All three passed their first attempts. The previous five maintenance commits
+  are merged, including the retired-window action fix at e589f36e.
+- **Current private build24 source:** the same `b9212489` green commit.
   SDK SHA256:
-  `a9857bff74590959d688e2827af2918d87468b1667773b6a278123f8fb4cbc75`.
-  Installed apps: `~/Applications/Vellum/build23-e0e011c605f8/apps`.
-  The matching SDK and all five app archives were rebuilt from this one committed
-  source, copied to durable private delivery storage, and independently verified.
-- BUNDLE_MANIFEST, PREFLIGHT, DELIVERY, INSTALLATION, VERIFICATION and SHA256SUMS
-  identify the exact bytes, sampled Go/compiler/native inputs and installation.
-  Repeated installation reverified bytes/signatures at the same target. The
-  source-bound preflight digest is
-  `b511219651fde2e0d358d5720877310aacc8cdd9f5c0131554246b2262a5642f`.
-- Initial source-df07cd4 build23 and older build22 installations remain retained.
-  Use the final e0e011c path above. A Documents-based producer attempt failed
-  strict signature checks; a later source-81b3f19 attempt failed generated test
-  fixture verification. Neither failed attempt produced a completion/delivery
-  manifest or installed its incomplete payload.
+  `5a825eb07c480f2df248435b7c0a55e0b0cb5104ccd2de3b8f146c55c2798382`.
+  Installed apps: `~/Applications/Vellum/build24-b9212489afc9/apps`.
+  The SDK and all five app archives were freshly built from that one source,
+  copied to durable private delivery storage, independently verified and installed.
+- Bundle manifest SHA256:
+  `516456cc39bc0b3c2b8faf14871cc820afda813a0a5f269e23da15fd97c77727`.
+  Installation receipt SHA256:
+  `1c8a8b8425759434214631ff73b8ec9293af9c89dd82847f111cdea544a39fcd`.
+  Preflight SHA256:
+  `75c0bcc3e5ecad4d43bd3b0f7e5b7989c147a480992e685a3c4565d4b94009aa`.
+  BUNDLE_MANIFEST, PREFLIGHT, DELIVERY, INSTALLATION, PACKAGING, VERIFICATION,
+  LINKAGE, CI and SHA256SUMS retain their distinct scopes in the private packet.
+- Subsequent report/checker work is on `codex/mac-build24-closeout`. Use
+  `git rev-parse HEAD` for its current documentation/tooling checkpoint.
+  These newer commits have focused local checks and are not claimed merged,
+  pushed or hosted-CI-qualified. They do not relabel the built source or SDK.
+- Build23 at source `e0e011c605f8ee6ea84827414a1636bcca74c97e`, SDK
+  `a9857bff74590959d688e2827af2918d87468b1667773b6a278123f8fb4cbc75`, and older
+  installations remain retained. Do not overwrite, migrate or delete them.
+  The original failed producer attempts retain their historical diagnostic scope.
 
-No app window was launched during this work. Forge's headless icon-export command
-returns before application/UI/data initialization. Native launch/input checks
-remain deferred; no current app liveness or post-test relaunch is claimed.
-The installed build23 contains f5d6feb (Quit/deferred Open). Newer source commit
-`e589f36e` additionally refuses late actions after their exact window retires,
-including when another window reuses the ID. That app-local correction is tested
-in Notes and a generated document consumer, but is NOT in installed build23.
-No newer SDK/app candidate has been packaged, installed or launched in this pass.
+No app window was launched. The Forge icon-only exporter exits before UI/data
+initialization. Native launch/input checks remain deferred; no current app
+liveness or post-test relaunch is claimed. The e589f36e lifecycle correction is
+now included in installed build24 and tested in the SDK's generated consumer;
+its physical/native behavior remains unverified.
+
+**Deployment limitation:** all five build24 executables declare minimum macOS
+27.0, SDK 27.0, and were statically inspected on the current 27.2 host. They
+cannot run on the historically qualified 26.6.2 host. This is a private current-Mac
+candidate, not an extension of the existing framework support matrix or a new
+qualified release. No target was clamped or support promise changed. Launch on
+27.2 still needs the deferred native checks.
 
 The public v1 source and six-app build13 release retain their original hashes
 and scope. The private five-app set is Forge, Measure Pad, Documents, Document
@@ -111,7 +114,7 @@ native UI. Known AppKit deprecation/linker warnings did not fail packaging.
    creating a prompt on a retired window model. Exact-window lifetime checks at
    action admission and completion fix it; four late-action cases cover Open,
    Save, Close and Delete. Full Notes race/vet and focused generated-consumer
-   checks pass. This source-only fix requires a newer package for native testing.
+   checks pass. This fix is now included in build24; native testing remains deferred.
 4. `2888cb31`: [dependency recheck](security/dependency-alerts-2026-10-30.md) preserves
    original notices and keeps alert 4 open with its limited disposition. A focused
    evidence guard requires reassessment on changes. The source-built component
@@ -122,6 +125,25 @@ native UI. Known AppKit deprecation/linker warnings did not fail packaging.
 Each checkpoint has a [recorded internal review](reviews/mac-offscreen-maintenance24/).
 Existing build23 manifests/receipts and historical native evidence are unchanged.
 No external review, dependency pin, stable API, release gate or backend change.
+
+## Build24 delivery closeout
+
+1. `b9212489`: reviewed integration and push, followed by exact-source green CI.
+2. `9b61d7a2`: fresh matched SDK/five-app producer and versioned installation;
+   Go 1.25.6, relocated consumer race/vet/build and extracted signatures passed.
+3. `7a5e060f`: independent durable-delivery verifier passed source/hash/receipt,
+   app-metadata, installed bytes and ten strict signature checks without rebuild.
+4. `1dd1b88f`: reusable static linkage checker and six focused tests. All five
+   installed apps are thin ARM64 with 23 system dependencies each, no rpaths,
+   system dyld, no embedded environment overrides or extra Mach-O binaries.
+   Deployment metadata has the 27.0 limitation above; runtime is not executed.
+5. This final documentation checkpoint binds exact identities, retained versions,
+   testing boundaries and the deferred acceptance cases. The checker added after
+   packaging runs from the current checkout; it is not relabeled as SDK content.
+
+[Build24 packet summary](reports/mac-build24/README.md) and
+[internal reviews](reviews/mac-build24/) distinguish packaging, independent
+verification and static metadata evidence. Historical reports remain unchanged.
 
 ## Repeatable developer commands
 
@@ -136,6 +158,7 @@ python3 -B scripts/check-stages_test.py
 python3 -B scripts/private-macos-bundle_test.py
 python3 -B scripts/install-private-macos_test.py
 python3 -B scripts/verify-private-macos_test.py
+python3 -B scripts/check-private-macos-linkage_test.py
 python3 -B scripts/dependency-disposition_test.py
 ```
 
@@ -147,11 +170,11 @@ BUNDLE_MANIFEST records completed packaging; optional installation is complete
 only when DELIVERY.json binds the installed receipt. Keep that source identity
 with any later native results. Hosted CI is a separate exact-commit result.
 
-To recheck the installed final build23 bytes without reinstalling or starting any
+To recheck the installed final build24 bytes without reinstalling or starting any
 app, use the [existing-delivery verifier](private-macos-installation.md#verify-an-existing-delivery-without-reinstalling).
 The [resumption checklist](mac-desktop-resumption.md) includes exact local paths
-and the caller-pinned bundle manifest digest. Verification of those old package
-bytes does not test the newer source-only lifetime fix.
+and the caller-pinned bundle manifest digest. Static verification does not
+establish physical behavior of the included lifetime fix.
 
 ## Remaining native checks — deferred
 

@@ -8,16 +8,16 @@ input, accessibility, security, quarantine or application document settings.
 ## Offscreen identity checks available now
 
 The [current handoff](mac-document-workflows-handoff.md) distinguishes green main,
-local maintenance and installed package source. The final installed build23 uses
-source `e0e011c605f8ee6ea84827414a1636bcca74c97e`; its SDK SHA256 is
-`a9857bff74590959d688e2827af2918d87468b1667773b6a278123f8fb4cbc75`.
+local maintenance and installed package source. The current installed build24 uses
+source `b9212489afc921171fc5abbd5275d8919ae930dd`; its SDK SHA256 is
+`5a825eb07c480f2df248435b7c0a55e0b0cb5104ccd2de3b8f146c55c2798382`.
 From the current checkout, verify that completed private payload without launch:
 
 ```sh
 python3 -B scripts/verify-private-macos.py \
-  --bundle "$HOME/Documents/ChatGPT/Go Native UI/deliveries/mac-build23-20261030/final-build23-e0e011c" \
-  --installation "$HOME/Applications/Vellum/build23-e0e011c605f8" \
-  --manifest-sha256 f0d3a2ac660fd68e6bbace8adc19096dc07d056af8753ded8fc9d4da794da6d4
+  --bundle "$HOME/Documents/ChatGPT/Go Native UI/deliveries/mac-build24-20261030/final-build24-b9212489" \
+  --installation "$HOME/Applications/Vellum/build24-b9212489afc9" \
+  --manifest-sha256 516456cc39bc0b3c2b8faf14871cc820afda813a0a5f269e23da15fd97c77727
 ```
 
 The command uses caller-selected paths, temporary archive snapshots and codesign;
@@ -26,13 +26,22 @@ inputs concurrently. Paths are the recorded owner's local delivery convention;
 on another host select the explicitly transferred complete delivery/installation
 and their reviewed identities. Do not substitute a similarly named old build.
 
-The newer app-local fix at `e589f36e` is source-only. Installed build23 cannot
-validate it. When a newer candidate is requested, package committed source through
-the existing matched SDK/five-app producer with a fresh output and build version,
-then record its receipts and exact installation. Do not overwrite build23 or
-relabel old archives. A new package requires its own physical results; passing
-source tests or old signatures cannot supply them. No rebuild is required simply
-to keep this checklist current.
+Build24 includes the e589f36e retired-window action correction. Build23 and older
+versions remain retained. Do not overwrite their directories or relabel archives.
+The new static checker runs from the current checkout, after byte verification:
+
+```sh
+python3 -B scripts/check-private-macos-linkage.py \
+  --installation "$HOME/Applications/Vellum/build24-b9212489afc9" \
+  --installation-sha256 1c8a8b8425759434214631ff73b8ec9293af9c89dd82847f111cdea544a39fcd
+```
+
+All five executables declare macOS 27.0 minimum; the inspection host is 27.2.
+Build24 cannot run on the historically qualified 26.6.2 host, and no 27.2 runtime
+qualification is claimed. Keep that private-candidate limitation separate from
+the unchanged framework support matrix. Do not claim a lower minimum from prior
+builds or signatures. A new package/host needs its own justified physical checks;
+no rebuild or campaign is needed merely to refresh this checklist.
 
 ## Before any native check, after desktop deferral is lifted
 

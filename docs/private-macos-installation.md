@@ -51,7 +51,7 @@ From a checkout containing the verifier, on macOS:
 ```sh
 python3 -B scripts/verify-private-macos.py \
   --bundle /absolute/completed-private-delivery \
-  --installation /absolute/Applications/Vellum/build23-sourceprefix \
+  --installation /absolute/Applications/Vellum/build24-sourceprefix \
   --manifest-sha256 EXPECTED_BUNDLE_MANIFEST_SHA256
 ```
 
@@ -107,17 +107,19 @@ operations or decisions before retrying closure. Finder Open With accepts one
 notebook or study at a time; registration never changes system defaults. See
 [the app-building guide](building-macos-apps.md#finder-document-opening).
 
-## Current private build23
+## Current private build24
 
-The final verified installed version is
-`~/Applications/Vellum/build23-e0e011c605f8/apps`, paired with an SDK from source
-`e0e011c605f8ee6ea84827414a1636bcca74c97e`. No app window was launched for these
-installation checks. Earlier source-df07cd4 build23 and build22 directories remain
-retained; use the e0e011c version for this candidate. Subsequent source commit
-`e589f36e` fixes late action settlement after window retirement; it is NOT in
-these installed apps. No newer package or native qualification is claimed. See the
-[current handoff](mac-document-workflows-handoff.md#source-and-package-identity)
-for checks, exact SDK identity and desktop work still deferred by the owner.
+The current verified installed version is
+`~/Applications/Vellum/build24-b9212489afc9/apps`, paired with an SDK from green
+source `b9212489afc921171fc5abbd5275d8919ae930dd`. It includes e589f36e's retired-window
+action correction. Packaging, independent integrity/signature verification and
+static linkage inspection passed; native launch/input checks remain deferred.
+
+All five executables declare minimum macOS 27.0; the inspection host is 27.2.
+This private package cannot run on the historically qualified 26.6.2 host and
+extends no framework qualification to 27.2. Build23 and prior directories remain
+retained. See the [current handoff](mac-document-workflows-handoff.md#source-and-package-identity)
+and [packet summary](reports/mac-build24/README.md) for exact identities and limits.
 
 ## Static native linkage inspection
 

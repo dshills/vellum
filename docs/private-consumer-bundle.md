@@ -47,7 +47,7 @@ nonsynced installation parent:
 ```sh
 python3 -B scripts/private-macos-bundle.py \
   --output /absolute/new/private-bundle \
-  --build-version 23 \
+  --build-version 24 \
   --install-to "$HOME/Applications/Vellum"
 ```
 

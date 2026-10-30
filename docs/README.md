@@ -6,7 +6,7 @@ and [implementation status](implementation.md). For current Mac use, follow the
 and [release closeout](../specs/macos-v1-release.md). The older delivery plan
 retains broader qualification work.
 
-- [Current document-workflow handoff](mac-document-workflows-handoff.md): green main, private build23 identities, newer source-only maintenance and deferred native acceptance.
+- [Current document-workflow handoff](mac-document-workflows-handoff.md): green main, verified private build24 identities, static OS requirements and deferred native acceptance.
 - [Safe desktop resumption](mac-desktop-resumption.md): offscreen identity checks now and bounded disposable-fixture checks only after desktop deferral is lifted.
 - [Mac input widgets](mac-widget-integration.md): public API setup, themes, owner values and focus helpers.
 - [Mac widget demo](mac-widget-demo.md): run the private light/dark gallery.
