@@ -243,7 +243,8 @@ Notes from one extracted SDK. These newer private bundles are separate from the 
 published build13 apps. The offscreen SDK consumer CI checks both starter
 profiles, while native UI observations remain separate. Current checkpoints
 use internal code reviews. See the [current document-workflow handoff](docs/mac-document-workflows-handoff.md)
-for private build identities, recent maintenance and explicitly deferred desktop checks.
+for private build23 identities, historical file compatibility, bounded codec fuzzing,
+producer preflight and explicitly deferred desktop checks.
 
 ## Verification
 

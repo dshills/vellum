@@ -7,27 +7,45 @@ public release/tag/assets, new audit decision, signing identity or notarization.
 
 ## Source and package identity
 
-- Main at `ac61d782ff226dfbff2adb0c750e68693eab88bd` is pushed and green in
-  Framework, Stable root API and Platform adapters. Framework succeeded on its
-  second attempt after its first attempt passed verification but timed out
-  saving cache. This is prior-source CI evidence, not a result for later commits.
-- The local `codex/mac-offscreen-closeout` branch adds five ordered maintenance
-  checkpoints. Use `git rev-parse HEAD` and `git status --short --branch` for the
-  exact candidate; this handoff does not claim the branch was pushed or merged.
-- The latest runtime correction is `f5d6feb` (stale Quit/deferred Open cleanup).
-  Packaging tooling is `02ee981`; documentation-only changes may follow it.
-- The last durable private bundle remains build22 at source
-  `4f447e85aa97dbcfa3b36d2707a679c173791777`, SDK SHA256
-  `28957d16841d4b8bbecbf53f2724b68cf812cd5cad048cc093e0d83d1cc7f4fa`.
-  It predates f5d6feb and does not contain those two lifecycle corrections.
-  No rebuild of that bundle is claimed here.
-- The installed build22 path is
-  `~/Applications/Vellum/build22-4f447e85aa97/apps`. Do not infer current app
-  liveness or replace an open version from this historical installation record.
+- Main at `df07cd4ce70b221c443a2f90f8738f3b8a827a3c` is pushed and green in
+  [Framework](https://github.com/dshills/vellum/actions/runs/41059541280),
+  [Stable root API](https://github.com/dshills/vellum/actions/runs/41059541360)
+  and [Platform adapters](https://github.com/dshills/vellum/actions/runs/41059541272).
+  Linux needed one targeted retry after a Go proxy transport error; the unchanged
+  source then passed. Framework passed its original attempt including optional
+  cache saving. These are exact-main results, not hosted results for later work.
+- The local `codex/mac-build23-closeout` branch adds historical compatibility,
+  bounded fuzzing, producer preflight and a generated-fixture packaging fix.
+  Use `git rev-parse HEAD` for the current documentation checkpoint. These later
+  commits have focused/local SDK verification and are not claimed pushed/merged
+  or hosted-CI-qualified here.
+- **Final private build23 source:**
+  `e0e011c605f8ee6ea84827414a1636bcca74c97e`.
+  SDK SHA256:
+  `a9857bff74590959d688e2827af2918d87468b1667773b6a278123f8fb4cbc75`.
+  Installed apps: `~/Applications/Vellum/build23-e0e011c605f8/apps`.
+  The matching SDK and all five app archives were rebuilt from this one committed
+  source, copied to durable private delivery storage, and independently verified.
+- BUNDLE_MANIFEST, PREFLIGHT, DELIVERY, INSTALLATION, VERIFICATION and SHA256SUMS
+  identify the exact bytes, sampled Go/compiler/native inputs and installation.
+  Repeated installation reverified bytes/signatures at the same target. The
+  source-bound preflight digest is
+  `b511219651fde2e0d358d5720877310aacc8cdd9f5c0131554246b2262a5642f`.
+- Initial source-df07cd4 build23 and older build22 installations remain retained.
+  Use the final e0e011c path above. A Documents-based producer attempt failed
+  strict signature checks; a later source-81b3f19 attempt failed generated test
+  fixture verification. Neither failed attempt produced a completion/delivery
+  manifest or installed its incomplete payload.
+
+No app window was launched during this work. Forge's headless icon-export command
+returns before application/UI/data initialization. Native launch/input checks
+remain deferred; no current app liveness or post-test relaunch is claimed.
+The latest Go application runtime correction remains f5d6feb (Quit/deferred Open).
+Subsequent changes add tests/fixtures, producer/generator tooling and documentation.
 
 The public v1 source and six-app build13 release retain their original hashes
-and scope. The newer private five-app set is Forge, Measure Pad, Documents,
-Document Starter and Notes. It is a separate payload.
+and scope. The private five-app set is Forge, Measure Pad, Documents, Document
+Starter and Notes. It remains a separate ad-hoc, unnotarized private payload.
 
 ## Completed offscreen maintenance
 
@@ -50,11 +68,32 @@ regressions passed. Tooling checks passed for cache budget/dispatch, private
 producer/installer, app packaging and SDK verification. There is no new root
 stable API, native facade or dependency-pin change.
 
-The installation extension was also exercised against a copied, unchanged
-build22 SDK and all five ZIPs in a fresh temporary installation. Archive hashes,
-SDK source, extracted bytes and actual strict codesign verification passed.
-No app launched. This is compatibility evidence for the existing payload, not a
-new-source app build or physical acceptance.
+## Build23 closeout
+
+1. `fd239b9`: recorded the initial verified build23 SDK/app installation.
+2. `77a5f26`: historical build13/build22 Notes, recovery, metadata and build22
+   Forge fixtures retain original encoder/generator hashes. Current readers and
+   reverse historical-decoder checks preserve the fictional samples. No arbitrary
+   downgrade compatibility or personal-document migration is implied.
+3. `f6b5320`: five capped fuzz targets passed bounded race-enabled mutation runs;
+   ordinary seeds, full byte-limit checks and accepted-model/history invariants
+   also passed. No parser runtime fix or schema change was needed.
+4. `81b3f19`: producer preflight rejects wrong Go/target/cgo, incomplete or active
+   native preparation, existing/source output and known synced paths before
+   reserving output. It records and rechecks sampled Go/compiler/native hashes.
+5. `e0e011c`: the SDK integration check exposed omitted generated testdata.
+   The reviewed correction copies fixture bytes/provenance unchanged and refuses
+   links/special files; standalone and relocated generated-consumer checks pass.
+   Final build23 was then rebuilt and installed from this corrected source.
+6. The final documentation checkpoint records exact delivery, checks and deferred
+   native work, without changing the packaged source/bytes.
+
+[Internal reviews](reviews/mac-build23/) record scope, findings, fixes and checks.
+The final producer passed SDK all-file/relocation/module-origin checks, minimal
+and document consumer race/vet/build, public API scenarios, all five ZIP-extracted
+and installed strict signatures, build-number/identifier checks, six archive
+hashes and preflight/installation identity. These checks did not execute the
+native UI. Known AppKit deprecation/linker warnings did not fail packaging.
 
 ## Repeatable developer commands
 

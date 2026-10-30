@@ -59,3 +59,13 @@ They do not restore an arbitrary unbounded window set. Finish current file
 operations or decisions before retrying closure. Finder Open With accepts one
 notebook or study at a time; registration never changes system defaults. See
 [the app-building guide](building-macos-apps.md#finder-document-opening).
+
+## Current private build23
+
+The final verified installed version is
+`~/Applications/Vellum/build23-e0e011c605f8/apps`, paired with an SDK from source
+`e0e011c605f8ee6ea84827414a1636bcca74c97e`. No app window was launched for these
+installation checks. Earlier source-df07cd4 build23 and build22 directories remain
+retained; use the e0e011c version for this candidate. See the
+[current handoff](mac-document-workflows-handoff.md#source-and-package-identity)
+for checks, exact SDK identity and desktop work still deferred by the owner.
