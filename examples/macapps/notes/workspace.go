@@ -85,6 +85,13 @@ func (f *Files) ConfigureRestoration(r *Repository) error {
 			if result.Err != nil {
 				f.model.status = "Window session: " + result.Err.Error()
 				f.workspaceQueued = false
+				// A dependent Open must not linger and replay after an unrelated
+				// metadata write. Report cancellation and require explicit retry.
+				if f.resumeOpen || f.pendingExternal != nil {
+					f.pendingExternal = nil
+					f.openDestination = ""
+					f.model.status += " · Open request canceled; retry Open"
+				}
 				f.resumeOpen = false
 				if f.quitAwaitWorkspace {
 					f.quitAwaitWorkspace = false

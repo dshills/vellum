@@ -111,3 +111,34 @@ func TestFinderInvalidBatchAndRecoveryPreserveLiveNotebook(t *testing.T) {
 	})
 
 }
+
+func TestFinderOpenDuringQuitCannotBypassDirtyDecisions(t *testing.T) {
+	a, files, group := quitFiles(t)
+	target := writeNotebookFixture(t, 8)
+	if err := a.Do(func() {
+		f := files[0]
+		if _, err := f.model.Add(); err != nil {
+			t.Fatal(err)
+		}
+		group.Request()
+		if err := f.OpenPath(target, true); err != document.ErrBusy {
+			t.Fatal("Finder bypassed Quit", err)
+		}
+		f.promptView().Dismiss()
+		if group.running || f.quitHeld || f.pendingExternal != nil || len(f.model.Items()) != 7 || !f.model.History().Dirty {
+			t.Fatal("rejected Finder request changed notebook")
+		}
+		if err := f.OpenPath(target, false); err != nil {
+			t.Fatal(err)
+		}
+		if f.prompt != "open" {
+			t.Fatal("retry skipped dirty Open decision")
+		}
+		f.promptView().Dismiss()
+		if f.openDestination != "" || len(f.model.Items()) != 7 || !f.model.History().Dirty {
+			t.Fatal("Cancel lost existing edits or retained target")
+		}
+	}); err != nil {
+		t.Fatal(err)
+	}
+}

@@ -1,6 +1,9 @@
 package notes
 
-import "github.com/dshills/vellum/app"
+import (
+	"context"
+	"github.com/dshills/vellum/app"
+)
 
 // QuitGroup coordinates a bounded, fixed set of document windows on the UI
 // owner. No window closes until every document approves and clears recovery.
@@ -100,6 +103,10 @@ func (g *QuitGroup) prepare(index int, epoch uint64) {
 		g.prepare(index+1, epoch)
 	}
 	err := f.model.request(func() error {
+		// Native settlement may outlive an aborted Quit or another window.
+		if !g.valid(epoch) {
+			return context.Canceled
+		}
 		if err := f.withQuitAccess(f.model.flush); err != nil {
 			f.finishQuit(false)
 			return err

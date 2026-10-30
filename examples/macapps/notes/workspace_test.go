@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -166,6 +167,50 @@ func TestWindowSessionWriteFailurePreventsCoordinatedQuit(t *testing.T) {
 	x.owner(t, func() {
 		if len(x.a.Windows()) != 1 || x.f.quitHeld || x.m.History().Dirty {
 			t.Fatal("failed metadata lost saved window")
+		}
+	})
+}
+
+func TestWindowSessionFailureCancelsQueuedFinderOpenAndAllowsRetry(t *testing.T) {
+	x := filesFixture(t, privateDirectory(t))
+	if err := x.f.ConfigureRestoration(x.r); err != nil {
+		t.Fatal(err)
+	}
+	metadata := filepath.Join(x.r.Directory, "WindowSession.json")
+	if err := os.Mkdir(metadata, 0700); err != nil {
+		t.Fatal(err)
+	}
+	target := writeNotebookFixture(t, 8)
+	x.owner(t, func() {
+		x.f.Activated()
+		if !x.f.workspace.State().Busy {
+			t.Fatal("metadata write not in flight")
+		}
+		if err := x.f.OpenPath(target, false); err != nil {
+			t.Fatal(err)
+		}
+		if x.f.pendingExternal == nil {
+			t.Fatal("Finder request was not queued")
+		}
+	})
+	x.finish(t)
+	x.owner(t, func() {
+		if x.f.pendingExternal != nil || x.f.resumeOpen || len(x.m.Items()) != 6 || x.m.History().Dirty || !strings.Contains(x.m.status, "Open request canceled") {
+			t.Fatal("failed metadata stranded or silently applied request", x.m.status)
+		}
+	})
+	if err := os.Remove(metadata); err != nil {
+		t.Fatal(err)
+	}
+	x.owner(t, func() {
+		if err := x.f.OpenPath(target, false); err != nil {
+			t.Fatal(err)
+		}
+	})
+	x.finish(t)
+	x.owner(t, func() {
+		if x.f.main.State().Path != target || len(x.m.Items()) != 8 || x.m.History().Dirty || x.f.pendingExternal != nil {
+			t.Fatal("explicit retry did not open target exactly once")
 		}
 	})
 }

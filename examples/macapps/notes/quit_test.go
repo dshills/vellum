@@ -235,3 +235,43 @@ func TestQuitHoldPreservesNativeInputsUntilSettlement(t *testing.T) {
 		}
 	})
 }
+
+func TestQuitLateSettlementCannotReopenAbortedPrompt(t *testing.T) {
+	a, files, group := quitFiles(t)
+	if err := a.Do(func() {
+		m := files[0].model
+		if _, err := m.Add(); err != nil {
+			t.Fatal(err)
+		}
+		var finish func(error)
+		if err := m.SetSettlement(func(done func(error)) error { finish = done; return nil }); err != nil {
+			t.Fatal(err)
+		}
+		group.Request()
+		if finish == nil || !m.pending {
+			t.Fatal("missing pending settlement")
+		}
+		if err := a.CloseWindow(files[1].ref); err != nil {
+			t.Fatal(err)
+		}
+		group.Request() // retirement aborts the original epoch
+		finish(nil)
+		if group.running || files[0].quitHeld || files[0].prompt != "" || m.pending || len(a.Windows()) != 1 || !m.History().Dirty {
+			t.Fatal("late completion resurrected Quit", files[0].prompt)
+		}
+		if err := m.SetSettlement(nil); err != nil {
+			t.Fatal(err)
+		}
+		group.Request()
+		finish(nil) // duplicate from the obsolete request cannot affect the new epoch
+		if !group.running || files[0].prompt != "quit" {
+			t.Fatal("new Quit not independently usable")
+		}
+		files[0].promptView().Dismiss()
+		if group.running || files[0].quitHeld || len(a.Windows()) != 1 {
+			t.Fatal("new Cancel did not release survivor")
+		}
+	}); err != nil {
+		t.Fatal(err)
+	}
+}

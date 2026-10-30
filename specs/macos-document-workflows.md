@@ -79,3 +79,12 @@ cache with OS/architecture/Go/dependency/native-pin keys, then reconstruct and
 verify pinned native source and run module integrity checks. Prepared native
 source and published artifacts are excluded. Hosted results require a pushed
 commit; local parsing and dispatch checks do not claim a green hosted run.
+
+## Failure and retirement corrections
+
+Quit input settlement revalidates its coordination epoch before flushing or
+showing a decision; a late acknowledgment from an aborted Quit cannot reopen its
+prompt. A failed window-session write explicitly cancels dependent deferred Open
+requests, drops their paths and reports that Open must be retried. It preserves
+the live notebook and dirty decisions; an unrelated later write never replays a
+failed request. These corrections remain app-owned and add no framework APIs.
