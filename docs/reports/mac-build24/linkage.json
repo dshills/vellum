@@ -1,0 +1,552 @@
+{
+  "source_commit": "b9212489afc921171fc5abbd5275d8919ae930dd",
+  "build_version": "24",
+  "installation_sha256": "1c8a8b8425759434214631ff73b8ec9293af9c89dd82847f111cdea544a39fcd",
+  "host_version": "27.2",
+  "host_meets_declared_minima": true,
+  "apps": [
+    {
+      "name": "Vellum Forge",
+      "executable_sha256": "6ca0892c3dd640e410958026b49ebfd2523ef2dd92d716b7710c3c3e4a231dbb",
+      "architectures": [
+        "arm64"
+      ],
+      "dependencies": [
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Cocoa.framework/Versions/A/Cocoa"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/UniformTypeIdentifiers.framework/Versions/A/UniformTypeIdentifiers"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/PDFKit.framework/Versions/A/PDFKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/AVKit.framework/Versions/A/AVKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/AVFoundation.framework/Versions/A/AVFoundation"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreMedia.framework/Versions/A/CoreMedia"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/UserNotifications.framework/Versions/A/UserNotifications"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreServices.framework/Versions/A/CoreServices"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/QuickLookUI.framework/Versions/A/QuickLookUI"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/usr/lib/libobjc.A.dylib"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Carbon.framework/Versions/A/Carbon"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Metal.framework/Versions/A/Metal"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreVideo.framework/Versions/A/CoreVideo"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/OpenGL.framework/Versions/A/OpenGL"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/usr/lib/libresolv.9.dylib"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/usr/lib/libSystem.B.dylib"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics"
+        }
+      ],
+      "deployment": {
+        "command": "LC_BUILD_VERSION",
+        "minimum": "27.0",
+        "sdk": "27.0"
+      },
+      "rpaths": [],
+      "dynamic_loader": "/usr/lib/dyld"
+    },
+    {
+      "name": "Vellum Measure Pad",
+      "executable_sha256": "6080c902bbf5f8e8466558125dea239c4a38eb0cc2463aa3de7ad76a2d19cf50",
+      "architectures": [
+        "arm64"
+      ],
+      "dependencies": [
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Cocoa.framework/Versions/A/Cocoa"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/UniformTypeIdentifiers.framework/Versions/A/UniformTypeIdentifiers"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/PDFKit.framework/Versions/A/PDFKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/AVKit.framework/Versions/A/AVKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/AVFoundation.framework/Versions/A/AVFoundation"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreMedia.framework/Versions/A/CoreMedia"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/UserNotifications.framework/Versions/A/UserNotifications"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreServices.framework/Versions/A/CoreServices"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/QuickLookUI.framework/Versions/A/QuickLookUI"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/usr/lib/libobjc.A.dylib"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Carbon.framework/Versions/A/Carbon"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Metal.framework/Versions/A/Metal"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreVideo.framework/Versions/A/CoreVideo"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/OpenGL.framework/Versions/A/OpenGL"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/usr/lib/libresolv.9.dylib"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/usr/lib/libSystem.B.dylib"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics"
+        }
+      ],
+      "deployment": {
+        "command": "LC_BUILD_VERSION",
+        "minimum": "27.0",
+        "sdk": "27.0"
+      },
+      "rpaths": [],
+      "dynamic_loader": "/usr/lib/dyld"
+    },
+    {
+      "name": "Vellum Documents",
+      "executable_sha256": "c424b691abbcfbfe72d65a721229da95b89a72f1703b3e08775ab0e6794df77c",
+      "architectures": [
+        "arm64"
+      ],
+      "dependencies": [
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Cocoa.framework/Versions/A/Cocoa"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/UniformTypeIdentifiers.framework/Versions/A/UniformTypeIdentifiers"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/PDFKit.framework/Versions/A/PDFKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/AVKit.framework/Versions/A/AVKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/AVFoundation.framework/Versions/A/AVFoundation"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreMedia.framework/Versions/A/CoreMedia"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/UserNotifications.framework/Versions/A/UserNotifications"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreServices.framework/Versions/A/CoreServices"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/QuickLookUI.framework/Versions/A/QuickLookUI"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/usr/lib/libobjc.A.dylib"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Carbon.framework/Versions/A/Carbon"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Metal.framework/Versions/A/Metal"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreVideo.framework/Versions/A/CoreVideo"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/OpenGL.framework/Versions/A/OpenGL"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/usr/lib/libresolv.9.dylib"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/usr/lib/libSystem.B.dylib"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics"
+        }
+      ],
+      "deployment": {
+        "command": "LC_BUILD_VERSION",
+        "minimum": "27.0",
+        "sdk": "27.0"
+      },
+      "rpaths": [],
+      "dynamic_loader": "/usr/lib/dyld"
+    },
+    {
+      "name": "Vellum Document Starter",
+      "executable_sha256": "87d26e4646730b4f8750227188ee237d9b82fef7f1cee7bdf64203767ac55ff1",
+      "architectures": [
+        "arm64"
+      ],
+      "dependencies": [
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Cocoa.framework/Versions/A/Cocoa"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/UniformTypeIdentifiers.framework/Versions/A/UniformTypeIdentifiers"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/PDFKit.framework/Versions/A/PDFKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/AVKit.framework/Versions/A/AVKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/AVFoundation.framework/Versions/A/AVFoundation"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreMedia.framework/Versions/A/CoreMedia"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/UserNotifications.framework/Versions/A/UserNotifications"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreServices.framework/Versions/A/CoreServices"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/QuickLookUI.framework/Versions/A/QuickLookUI"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/usr/lib/libobjc.A.dylib"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/usr/lib/libresolv.9.dylib"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Carbon.framework/Versions/A/Carbon"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Metal.framework/Versions/A/Metal"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreVideo.framework/Versions/A/CoreVideo"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/OpenGL.framework/Versions/A/OpenGL"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/usr/lib/libSystem.B.dylib"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics"
+        }
+      ],
+      "deployment": {
+        "command": "LC_BUILD_VERSION",
+        "minimum": "27.0",
+        "sdk": "27.0"
+      },
+      "rpaths": [],
+      "dynamic_loader": "/usr/lib/dyld"
+    },
+    {
+      "name": "Vellum Notes",
+      "executable_sha256": "0bde8d5975a0069f0d8f8abffc3939bfa33413efd701a04e5f308be387045984",
+      "architectures": [
+        "arm64"
+      ],
+      "dependencies": [
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Cocoa.framework/Versions/A/Cocoa"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/UniformTypeIdentifiers.framework/Versions/A/UniformTypeIdentifiers"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/PDFKit.framework/Versions/A/PDFKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/AVKit.framework/Versions/A/AVKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/AVFoundation.framework/Versions/A/AVFoundation"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreMedia.framework/Versions/A/CoreMedia"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/UserNotifications.framework/Versions/A/UserNotifications"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreServices.framework/Versions/A/CoreServices"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/QuickLookUI.framework/Versions/A/QuickLookUI"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/usr/lib/libobjc.A.dylib"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/usr/lib/libresolv.9.dylib"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Carbon.framework/Versions/A/Carbon"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Metal.framework/Versions/A/Metal"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreVideo.framework/Versions/A/CoreVideo"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/OpenGL.framework/Versions/A/OpenGL"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/Security.framework/Versions/A/Security"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/usr/lib/libSystem.B.dylib"
+        },
+        {
+          "kind": "LC_LOAD_DYLIB",
+          "path": "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics"
+        }
+      ],
+      "deployment": {
+        "command": "LC_BUILD_VERSION",
+        "minimum": "27.0",
+        "sdk": "27.0"
+      },
+      "rpaths": [],
+      "dynamic_loader": "/usr/lib/dyld"
+    }
+  ],
+  "native_runtime": "not executed",
+  "qualification": "static metadata only; no support-matrix extension",
+  "scope": "current private five-app system-library-only route; dlopen/plugins/transitive system closure not proven"
+}

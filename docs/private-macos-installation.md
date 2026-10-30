@@ -118,3 +118,33 @@ retained; use the e0e011c version for this candidate. Subsequent source commit
 these installed apps. No newer package or native qualification is claimed. See the
 [current handoff](mac-document-workflows-handoff.md#source-and-package-identity)
 for checks, exact SDK identity and desktop work still deferred by the owner.
+
+## Static native linkage inspection
+
+After byte/signature verification, inspect the current private five-app
+system-library-only route from a checkout containing the checker:
+
+```sh
+python3 -B scripts/check-private-macos-linkage.py \
+  --installation /absolute/Applications/Vellum/build24-sourceprefix \
+  --installation-sha256 EXPECTED_INSTALLATION_JSON_SHA256
+```
+
+The required receipt digest pins the explicitly selected installation. The checker
+uses bounded-duration lipo/otool calls and reads file metadata; it does not execute
+apps or the dynamic loader. It requires one thin ARM64 executable per app, macOS
+load metadata, system-library paths only, the system dyld, no embedded dyld
+environment overrides and no rpaths. Extra Mach-O binaries, symlinks, malformed
+metadata and a deployment minimum above the current inspection host are refused.
+This deliberately checks the existing packaging route, not an arbitrary dylib,
+plugin or framework dependency resolver. Run the byte/signature verifier first;
+the receipt digest alone does not authenticate installed executable contents.
+Do not modify the installation concurrently with either check.
+
+Build24's five binaries declare minimum macOS **27.0** and SDK 27.0; static
+inspection was on macOS 27.2. They cannot be used on the historically qualified
+26.6.2 host. This private candidate retains its actual requirements; neither
+static inspection nor prior native evidence extends the framework support matrix
+to 27.2 or qualifies launch there. Desktop checks remain deferred. No deployment
+target was patched, no minimum support promise changed and no runtime compatibility
+with older systems was established. See the [current handoff](mac-document-workflows-handoff.md).
