@@ -7,6 +7,8 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Record job start for optional cache budget
+        run: echo "VELLUM_CI_STARTED=$(date +%s)" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
@@ -16,7 +18,8 @@ jobs:
           go-version-file: go.mod
           cache: false
       - name: Restore verified downloads and Go build cache
-        uses: actions/cache@v4
+        id: go-cache
+        uses: actions/cache/restore@v4
         with:
           path: |
             ${{ runner.temp }}/vellum-go-cache/mod/cache/download
@@ -46,6 +49,20 @@ jobs:
         run: scripts/check.sh --stage offscreen
       - name: Existing offscreen benchmarks
         run: scripts/benchmark.sh
+      - name: Check optional cache save budget
+        id: cache-budget
+        if: success() && steps.go-cache.outputs.cache-hit != 'true'
+        run: python3 -B scripts/ci-cache-budget.py "$VELLUM_CI_STARTED" 60 >> "$GITHUB_OUTPUT"
+      - name: Save verified downloads and Go build cache
+        if: success() && steps.cache-budget.outputs.save == 'true'
+        continue-on-error: true
+        timeout-minutes: 2
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ${{ runner.temp }}/vellum-go-cache/mod/cache/download
+            ${{ runner.temp }}/vellum-go-cache/build
+          key: ${{ steps.go-cache.outputs.cache-primary-key }}
 
   sdk-consumers:
     # Separate from the long framework job; no desktop/runtime execution.
@@ -54,6 +71,8 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Record job start for optional cache budget
+        run: echo "VELLUM_CI_STARTED=$(date +%s)" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
@@ -63,7 +82,8 @@ jobs:
           cache: false
       - run: echo "VELLUM_CACHE_DIR=$RUNNER_TEMP/vellum-sdk-cache" >> "$GITHUB_ENV"
       - name: Restore verified downloads and Go build cache
-        uses: actions/cache@v4
+        id: go-cache
+        uses: actions/cache/restore@v4
         with:
           path: |
             ${{ runner.temp }}/vellum-sdk-cache/mod/cache/download
@@ -95,3 +115,17 @@ jobs:
             ${{ runner.temp }}/vellum-sdk-consumers/*.stderr
           if-no-files-found: ignore
           retention-days: 7
+      - name: Check optional cache save budget
+        id: cache-budget
+        if: success() && steps.go-cache.outputs.cache-hit != 'true'
+        run: python3 -B scripts/ci-cache-budget.py "$VELLUM_CI_STARTED" 35 >> "$GITHUB_OUTPUT"
+      - name: Save verified downloads and Go build cache
+        if: success() && steps.cache-budget.outputs.save == 'true'
+        continue-on-error: true
+        timeout-minutes: 2
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ${{ runner.temp }}/vellum-sdk-cache/mod/cache/download
+            ${{ runner.temp }}/vellum-sdk-cache/build
+          key: ${{ steps.go-cache.outputs.cache-primary-key }}

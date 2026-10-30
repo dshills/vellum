@@ -25,6 +25,7 @@ check_tooling() (
 cd "$VELLUM_REPO_ROOT"
 python3 -B scripts/native-patch-inventory.py --check
 python3 -B scripts/check-stages_test.py
+python3 -B scripts/ci-cache-budget_test.py
 python3 drivers/cogent/prepare_test.py
 python3 scripts/check-text-backend_test.py
 python3 scripts/check-text-backend.py
