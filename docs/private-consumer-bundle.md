@@ -36,6 +36,38 @@ retains intermediate binaries, extracted sources and signature checks for local
 diagnosis; it is not covered by the top-level archive checksum list. Copy only
 the named archives, README, checksum list and BUNDLE_MANIFEST for delivery.
 
+## Build, verify and install without desktop checks
+
+For a new private candidate, one command also verifies installation. Use a new
+output directory outside the checkout, a deliberate numeric build version and a
+nonsynced installation parent:
+
+```sh
+python3 -B scripts/private-macos-bundle.py \
+  --output /absolute/new/private-bundle \
+  --build-version 23 \
+  --install-to "$HOME/Applications/Vellum"
+```
+
+Use Go 1.25.6 on PATH (the child environment uses GOTOOLCHAIN=local), prepare the
+pinned native sources, and source drivers/cogent/env.sh first. The command builds
+all five apps from the extracted SDK, verifies that SDK's clean source identity,
+all six archive checksums and the checksum list, then calls the existing strict
+versioned installer. It never launches or focuses an app. Existing installations
+and notebook contents are preserved. Build versions accept one to six decimal
+digits; omitting the option retains the older producer default of 22.
+
+BUNDLE_MANIFEST.json means packaging completed. With --install-to, DELIVERY.json
+is the final success record: it binds the SDK, source, bundle manifest and exact
+INSTALLATION.json digest/path, with native_runtime recorded as not executed.
+If installation fails, the completed bundle remains available for diagnosis,
+but no delivery receipt is written. Use the standalone installer to retry an
+unchanged completed bundle; it verifies an existing installation before reuse.
+Do not reuse an output directory or overwrite prior delivery receipts.
+
+These are reproducible steps and source checks, not a promise of byte-identical
+compiler output across hosts. Physical app acceptance remains a separate task.
+
 ## Reproducible verification and handoff
 
 Before packaging, the offscreen CI command can independently export and verify a

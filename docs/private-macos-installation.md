@@ -38,6 +38,12 @@ The installation is private, ad-hoc signed and unnotarized. This is byte/identit
 and signature verification of the explicitly selected local producer payload,
 not independent publisher authenticity, notarization or a new distribution audit.
 
+For a fresh SDK/app build and this installation in one offscreen command, see
+[build, verify and install](private-consumer-bundle.md#build-verify-and-install-without-desktop-checks).
+The optional producer DELIVERY.json binds this installation receipt; it makes
+no native runtime/launch claim. The standalone installer remains available for
+retrying already completed bundles.
+
 ## Quit and reopening
 
 Notes, Document Starter and A/B Documents opt into coordinated Command-Q. Every

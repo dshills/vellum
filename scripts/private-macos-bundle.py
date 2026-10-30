@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Build a private SDK and five apps from that extracted SDK; never publishes."""
+"""Build a private SDK and five apps from that extracted SDK; optionally install without launching; never publishes."""
 import argparse
 import hashlib
 import importlib.util
 import json
 import platform
+import re
 from pathlib import Path
 import sys
 sys.dont_write_bytecode = True
@@ -24,9 +25,82 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def load_script(name):
+    spec = importlib.util.spec_from_file_location('private_bundle_' + name.replace('-', '_'), ROOT/'scripts'/(name+'.py'))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def build_version(value):
+    if not re.fullmatch(r'[0-9]{1,6}', value):
+        raise argparse.ArgumentTypeError('build version must contain 1..6 decimal digits')
+    return value
+
+
+def install_delivery(out, destination):
+    """Verify completed producer bytes and delegate installation without launch."""
+    installer = load_script('install-private-macos')
+    manifest_path = out/'BUNDLE_MANIFEST.json'
+    installer.regular(manifest_path, 1 << 20)
+    manifest_digest = installer.digest(manifest_path)
+    manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+    files = manifest.get('files', {})
+    sdk_name = 'Vellum-SDK.tar.gz'
+    apps = manifest.get('apps', [])
+    if (not isinstance(apps, list) or len(apps) != len(installer.APP_NAMES)
+            or any(not isinstance(item, dict) for item in apps)
+            or {item.get('name') for item in apps} != installer.APP_NAMES):
+        raise ValueError('expected the complete five-app producer bundle')
+    app_names = [item['archive'] for item in apps]
+    if (manifest.get('private') is not True or manifest.get('signing') != 'ad-hoc'
+            or manifest.get('notarized') is not False or not isinstance(files, dict)
+            or set(files) != {sdk_name, *app_names}
+            or manifest.get('sdk_sha256') != files.get(sdk_name)):
+        raise ValueError('inconsistent private producer manifest')
+    for name, expected in files.items():
+        if (Path(name).name != name or not isinstance(expected, str)
+                or not re.fullmatch(r'[0-9a-f]{64}', expected)):
+            raise ValueError('invalid payload identity')
+        installer.regular(out/name, installer.MAX_ARCHIVE)
+        if installer.digest(out/name) != expected:
+            raise ValueError('payload SHA256 mismatch: ' + name)
+    installer.regular(out/'SHA256SUMS', 1 << 20)
+    checksums = ''.join(f'{value}  {name}\n' for name, value in sorted(files.items()))
+    if (out/'SHA256SUMS').read_text(encoding='utf-8') != checksums:
+        raise ValueError('SHA256SUMS disagrees with producer manifest')
+    # Verify archive contents and the SDK's recorded clean source, not just a hash.
+    checker = load_script('check-sdk')
+    verified = checker.verify_archive(out/sdk_name, manifest['sdk_sha256'])
+    if verified['manifest'].get('source') != {'commit': manifest['source_commit'], 'clean': True}:
+        raise ValueError('SDK source identity mismatch')
+    receipt_path = out/'DELIVERY.json'
+    if receipt_path.exists() or receipt_path.is_symlink():
+        raise ValueError('delivery receipt already exists; preserve the completed delivery')
+    target = installer.install(out, destination)
+    installation_path = target/'INSTALLATION.json'
+    installer.regular(installation_path, 1 << 20)
+    installation = json.loads(installation_path.read_text(encoding='utf-8'))
+    if (installer.digest(manifest_path) != manifest_digest
+            or installation.get('manifest_sha256') != manifest_digest
+            or installation.get('source_commit') != manifest['source_commit']
+            or installation.get('build_version') != manifest['build_version']
+            or installation.get('archives') != {name: files[name] for name in app_names}):
+        raise ValueError('installed producer identity changed')
+    receipt = dict(source_commit=manifest['source_commit'], build_version=manifest['build_version'],
+                   sdk_sha256=manifest['sdk_sha256'], manifest_sha256=manifest_digest,
+                   installation=str(target), installation_sha256=installer.digest(installation_path),
+                   private=True, signing='ad-hoc', notarized=False, native_runtime='not executed')
+    with receipt_path.open('x', encoding='utf-8') as stream:
+        stream.write(json.dumps(receipt, indent=2)+'\n')
+    return receipt
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--build-version', type=build_version, default='22')
+    parser.add_argument('--install-to', type=Path, help='verify and install without launching; use a nonsynced directory')
     args = parser.parse_args()
     if platform.system() != 'Darwin' or platform.machine() != 'arm64':
         parser.error('requires an Apple Silicon Mac')
@@ -78,7 +152,7 @@ def main():
                 uti='com.dshills.vellum.' + extension, name='Vellum ' + extension + ' document')]))
             options += ['--document-types', types]
         run([sys.executable, '-B', sdk/'scripts/package-app.py', '--binary', binary, '--output', bundle,
-             '--name', name, '--identifier', identifier, '--version', '0.1.0', '--build-version', '22', '--sign-identity', '-', *options])
+             '--name', name, '--identifier', identifier, '--version', '0.1.0', '--build-version', args.build_version, '--sign-identity', '-', *options])
         run(['codesign', '--verify', '--deep', '--strict', bundle])
         zipped = out / (name.replace(' ', '-') + '.zip')
         run(['ditto', '-c', '-k', '--norsrc', '--noextattr', '--keepParent', bundle, zipped])
@@ -90,10 +164,12 @@ def main():
     if clean_source(ROOT, env) != revision:
         raise ValueError('source changed during private packaging')
     (out/'SHA256SUMS').write_text(''.join(f'{value}  {name}\n' for name,value in sorted(hashes.items())), encoding='utf-8')
-    (out/'README.md').write_text('# Private Vellum consumer bundle\n\nAll apps were built from the included, independently verified extracted SDK.\nVerify SHA256SUMS before extraction. Only named archives in SHA256SUMS are delivery payloads. build/ contains intermediate SDKs, consumer source, binaries and ZIP checks for local testing; do not treat those working files as checksummed delivery payloads.\n\nForge, Notes and Measure Pad run normally. Notes uses its established Application Support/Vellum Notes directory; use --args -data-dir /absolute/private/notes-test for isolated checks. Documents requires -data-dir /absolute/private/workspace; it opens independent A/B repositories. Document Starter launches normally from Finder and uses its own module-derived Application Support directory. For isolated tests or an existing private notebook, launch it with --args -data-dir /absolute/private/document-data. Use fresh private directories for testing. No app defaults to Vellum Notes storage.\n\nApps are ad-hoc signed and unnotarized. Only the recorded Apple Silicon Mac configuration is qualified; human IME/VoiceOver and downloaded-quarantine launch remain unqualified. No public release or audit approval is implied.\n\nThe extracted SDK includes source, both starter profiles, guides and known limits. Do not run prepare.sh over it. Failed producer attempts retain partial output and never write BUNDLE_MANIFEST.json as a successful result.\n', encoding='utf-8')
+    (out/'README.md').write_text('# Private Vellum consumer bundle\n\nAll apps were built from the included, independently verified extracted SDK.\nVerify SHA256SUMS before extraction. Only named archives in SHA256SUMS are delivery payloads. build/ contains intermediate SDKs, consumer source, binaries and ZIP checks for local testing; do not treat those working files as checksummed delivery payloads.\n\nForge, Notes and Measure Pad run normally. Notes uses its established Application Support/Vellum Notes directory; use --args -data-dir /absolute/private/notes-test for isolated checks. Documents requires -data-dir /absolute/private/workspace; it opens independent A/B repositories. Document Starter launches normally from Finder and uses its own module-derived Application Support directory. For isolated tests or an existing private notebook, launch it with --args -data-dir /absolute/private/document-data. Use fresh private directories for testing. No generated starter defaults to Vellum Notes storage.\n\nApps are ad-hoc signed and unnotarized. Only the recorded Apple Silicon Mac configuration is qualified; human IME/VoiceOver and downloaded-quarantine launch remain unqualified. No public release or audit approval is implied.\n\nThe extracted SDK includes source, both starter profiles, guides and known limits. Do not run prepare.sh over it. Failed producer attempts retain partial output. BUNDLE_MANIFEST.json records completed packaging; optional installation completes only when DELIVERY.json exists. No app is launched by packaging or installation.\n', encoding='utf-8')
     # Publish the completion record only after all other delivery metadata exists.
-    (out/'BUNDLE_MANIFEST.json').write_text(json.dumps(dict(source_commit=revision, build_version='22', private=True, signing='ad-hoc', notarized=False,
+    (out/'BUNDLE_MANIFEST.json').write_text(json.dumps(dict(source_commit=revision, build_version=args.build_version, private=True, signing='ad-hoc', notarized=False,
             sdk_sha256=checksum, apps=app_records, files=hashes), indent=2)+'\n', encoding='utf-8')
+    if args.install_to is not None:
+        install_delivery(out, args.install_to)
     print(json.dumps(dict(output=str(out), source_commit=revision, apps=len(apps), private=True)))
 
 if __name__ == '__main__':
