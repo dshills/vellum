@@ -44,6 +44,38 @@ The optional producer DELIVERY.json binds this installation receipt; it makes
 no native runtime/launch claim. The standalone installer remains available for
 retrying already completed bundles.
 
+## Verify an existing delivery without reinstalling
+
+From a checkout containing the verifier, on macOS:
+
+```sh
+python3 -B scripts/verify-private-macos.py \
+  --bundle /absolute/completed-private-delivery \
+  --installation /absolute/Applications/Vellum/build23-sourceprefix \
+  --manifest-sha256 EXPECTED_BUNDLE_MANIFEST_SHA256
+```
+
+Use the complete five-app producer delivery, including SDK, named ZIPs,
+SHA256SUMS, BUNDLE_MANIFEST.json and DELIVERY.json. The selected installation must
+have its bound INSTALLATION.json. If the manifest records a preflight digest,
+PREFLIGHT.json is also required. A copied INSTALLATION.json, when present in the
+delivery, must match the installed receipt exactly. Older completed deliveries
+without a preflight field remain supported.
+
+The verifier hashes owned temporary archive snapshots, reuses the bounded SDK
+all-file/source checker, verifies all receipt links, compares installed bytes to
+the app ZIPs, and checks app metadata plus strict signatures for extracted and
+installed apps. It never builds, reinstalls, executes an app, reads notebooks or
+writes to the delivery/installation. Temporary extraction is removed afterward.
+A nonzero exit means verification failed. JSON output records the exact identity
+and explicitly says native runtime was not executed.
+
+The optional manifest digest should come from a separately trusted record.
+Omitting it checks local self-consistency only. Neither mode establishes publisher
+authenticity, current compiler identity, notarization, a new distribution approval,
+power-loss durability or native interaction. Do not modify the selected delivery
+or installation concurrently with verification.
+
 ## Interrupted installation
 
 Ordinary extraction, verification, receipt and publication failures remove their
