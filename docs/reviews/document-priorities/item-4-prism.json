@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "905f8dae447db5cc0cefa0fece7b0e25",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "ff8eedc83d1241effc42fe0396075dea9ab5b840",
+    "branch": "codex/document-acceptance"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 1,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "be71e0b9d8b81de1",
+      "severity": "low",
+      "category": "docs",
+      "title": "Result file references an ephemeral machine-local fixture path",
+      "message": "The recorded fixture path points into the OS temp directory (/private/tmp is macOS-specific and periodically garbage-collected), so the evidence in this result file cannot be re-inspected or re-verified by anyone reading it later. If the fixture artifacts need to accompany this record, they will already be gone.",
+      "suggestion": "Either copy the fixture (or its generating script/config) into the repo next to this result file, or add a field documenting how the fixture can be regenerated, e.g. \"fixture\": {\"path\": \"/private/tmp/vellum-document-acceptance-9vp_0828\", \"ephemeral\": true, \"regenerate\": \"script or command\"}.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "docs/reviews/document-priorities/item-4-result.json",
+          "lines": {
+            "start": 3,
+            "end": 3
+          }
+        }
+      ],
+      "tags": [
+        "reproducibility",
+        "evidence"
+      ],
+      "evidence": "  \"fixture\": \"/private/tmp/vellum-document-acceptance-9vp_0828\",",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 81608,
+    "totalMs": 81611
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 2,
+    "bytes": 3430,
+    "chunks": 1,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 3717,
+        "output": 18582,
+        "reasoning": 17431,
+        "cachedInput": 2240
+      }
+    ],
+    "splits": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

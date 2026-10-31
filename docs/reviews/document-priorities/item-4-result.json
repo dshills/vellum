@@ -1,0 +1,36 @@
+{
+  "candidate": "build24-b9212489afc9",
+  "fixture": "/private/tmp/vellum-document-acceptance-9vp_0828",
+  "normal_restart": {
+    "normal_quit_observed": true,
+    "process_absent_before_restart": true,
+    "A": {
+      "count": 8,
+      "selected": "n11",
+      "status": "Opened notebook"
+    },
+    "B": {
+      "count": 8,
+      "selected": "n11",
+      "status": "Opened notebook"
+    },
+    "last_active_A_restored_first": true
+  },
+  "recovery": {
+    "interrupted_exact_fixture_pid": 6245,
+    "checkpoint_count": 9,
+    "primary_count_before": 8,
+    "primary_sha256_before": "5dc672904edf6c84f2c89a4af422160d1358352ab105aa95ffee33071cbd6bb9",
+    "restored_count": 9,
+    "selected": "n12",
+    "title": "Recovered after interrupted work",
+    "body": "Recovery café 日本語\nThis ninth note was never saved.",
+    "status_before_save": "Recovered notebook · Save to keep it",
+    "status_after_save": "Saved notebook",
+    "external_B_sha256_after": "4df1e57eaf5d4faa03246a66734bdd5aa571797752fafe0fd2cf09f4426a5a10",
+    "external_A_sha256_unchanged": "8fab1d977d1b91e1c0ff226fd2f552b0ec35cab18d98d5f8f9ab42af3935ac0c",
+    "final_normal_quit_observed": true
+  },
+  "fixture_ephemeral": true,
+  "fixture_reinspection": "Temporary fixture may expire; final synthetic notebooks retained in item-4-fixture. Re-run the native procedure in item-4.md with fresh private data to reproduce behavior."
+}
