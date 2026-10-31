@@ -1,0 +1,152 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "216cf35952113b69552db6ee5d3ef2cf",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "121dde859369b3ce091fe66cdfa2d34367e23be1",
+    "branch": "codex/next-five-application-readiness"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 3,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "c3472228df1029a5",
+      "severity": "low",
+      "category": "docs",
+      "title": "Resolution cites v1.1.2 while the entry's candidate build is build25-ed4f71f49bbf",
+      "message": "The CUA-25-1 entry header records the observation against candidate build25-ed4f71f49bbf, but the new Status line closes it based on physical operator verification on 'v1.1.2' with no stated mapping between the two identifiers. If v1.1.2 is a different build than the one observed, the original observation on build25-ed4f71f49bbf was never physically reproduced on that build and 'resolved' overstates what was verified; if they are the same build, the inconsistent naming hurts traceability of the issue log.",
+      "suggestion": "State the build-to-version mapping explicitly in the status line, e.g. 'verification on v1.1.2 (build25-ed4f71f49bbf)' if they match, or 'verification on v1.1.2 (later build than the observed build25-ed4f71f49bbf)' if they differ.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "docs/daily-use/ISSUE-LOG.md",
+          "lines": {
+            "start": 43,
+            "end": 43
+          }
+        }
+      ],
+      "tags": [
+        "traceability",
+        "issue-log",
+        "versioning"
+      ],
+      "evidence": "- Status: resolved for the reported scenario by physical operator verification on v1.1.2 (2026-10-31): both body and title accept text after clicking. The earlier tool delivery observation is not a confirmed product defect. See [focus qualification](../reviews/application-readiness/item-1.md).",
+      "fix": {
+        "before": "- Status: resolved for the reported scenario by physical operator verification on v1.1.2 (2026-10-31): both body and title accept text after clicking. The earlier tool delivery observation is not a confirmed product defect. See [focus qualification](../reviews/application-readiness/item-1.md).",
+        "after": "- Status: resolved for the reported scenario by physical operator verification on v1.1.2 (build25-ed4f71f49bbf; 2026-10-31): both body and title accept text after clicking. The earlier tool delivery observation is not a confirmed product defect. See [focus qualification](../reviews/application-readiness/item-1.md)."
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "8146c1809ed384a7",
+      "severity": "low",
+      "category": "docs",
+      "title": "Permanent review record cites an ephemeral /private/tmp checkout as the app under test",
+      "message": "This file is a permanent acceptance record, but it names /private/tmp/vellum-v112-focus-check as the location of the app under test. macOS periodically purges /private/tmp, so that path will not resolve for future readers and the sentence reads as if the artifact is still available there. The commit hash already provides source provenance, so the ephemeral path should be explicitly marked as a discarded scratch checkout.",
+      "suggestion": "Keep the commit hash as the source of truth and label the tmp path as a non-preserved scratch checkout, e.g. '...source 121dde..., run from a temporary scratch checkout (/private/tmp/vellum-v112-focus-check, not preserved), not an existing daily notebook.'",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reviews/application-readiness/item-1.md",
+          "lines": {
+            "start": 6,
+            "end": 7
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "provenance"
+      ],
+      "evidence": "The app uses v1.1.2 source 121dde859369b3ce091fe66cdfa2d34367e23be1 and\n/private/tmp/vellum-v112-focus-check, not an existing daily notebook.",
+      "fix": {
+        "before": "The app uses v1.1.2 source 121dde859369b3ce091fe66cdfa2d34367e23be1 and\n/private/tmp/vellum-v112-focus-check, not an existing daily notebook.",
+        "after": "The app uses v1.1.2 source 121dde859369b3ce091fe66cdfa2d34367e23be1, run from a\ntemporary scratch checkout (/private/tmp/vellum-v112-focus-check, not preserved),\nnot an existing daily notebook."
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "777a91c762f0dd7a",
+      "severity": "low",
+      "category": "docs",
+      "title": "Acceptance record does not identify the regression test by file or command",
+      "message": "The record summarizes a new offscreen regression (down/up event routing between title and body in code and prose modes across three cycles, focus checks before and after settled view invalidations) and a passing 'focused race test', but never names the test file, package, or command used. Anyone auditing this acceptance decision later cannot locate or re-run the evidence the record depends on, which weakens the traceability of the sign-off.",
+      "suggestion": "Add a line identifying the regression by file/test name and how to invoke it, e.g. 'Regression: \u003cpackage\u003e/\u003cTestName\u003e, run with go test \u003cpackage\u003e -run \u003cpattern\u003e', so the record links to the concrete test it describes.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "docs/reviews/application-readiness/item-1.md",
+          "lines": {
+            "start": 14,
+            "end": 17
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "traceability",
+        "testing"
+      ],
+      "evidence": "The new offscreen regression routes down/up events between a title field and",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 167853,
+    "totalMs": 167876
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 2,
+    "bytes": 4640,
+    "chunks": 1,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 4036,
+        "output": 23818,
+        "reasoning": 21512,
+        "cachedInput": 1728
+      }
+    ],
+    "widenedFiles": 1,
+    "splits": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

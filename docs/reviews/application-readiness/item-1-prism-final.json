@@ -1,0 +1,143 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f6696c27157ffb15c716732f121e90f5",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "121dde859369b3ce091fe66cdfa2d34367e23be1",
+    "branch": "codex/next-five-application-readiness"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 3,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "9921bfdd4f91b6cd",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Range variable prose captured in builder closure passed to simpleManual",
+      "message": "The node-builder closure captures the range variable prose (and name). If the module's go directive is below 1.22 and simpleManual stores the closure for later or asynchronous invocation (e.g. window rebuild), every invocation would see the final loop value; only the synchronous t.Run call makes this safe today.",
+      "suggestion": "Confirm go.mod targets go \u003e= 1.22 (loop variables are per-iteration) or pass prose explicitly as a parameter to the builder closure instead of relying on capture: `builder := func(prose bool) ui.Node { ... }; simpleManual(t, cfg, func() ui.Node { return builder(prose) })`.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/editor_pointer_focus_offscreen_test.go",
+          "lines": {
+            "start": 25,
+            "end": 25
+          }
+        }
+      ],
+      "tags": [
+        "go-loop-variable",
+        "closure-capture",
+        "location-corrected"
+      ],
+      "evidence": "\t\t\tm, a := simpleManual(t, manualConfig(t, 7), func() ui.Node {",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "debfbb649b6e2464",
+      "severity": "low",
+      "category": "testing",
+      "title": "No guard for missing window before dereferencing w",
+      "message": "w is dereferenced without a guard (w.state.root, w.incarnation), so if the helper returns a nil pointer / zero value for a missing window the test fails with an opaque nil-pointer panic instead of a clear message.",
+      "suggestion": "Fail fast with a readable message right after lookup, e.g. `if w == nil { t.Fatal(\"window 'one' not found\") }` (or the equivalent zero-value check for find's return type) before using w in the cycle loop.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/editor_pointer_focus_offscreen_test.go",
+          "lines": {
+            "start": 32,
+            "end": 32
+          }
+        }
+      ],
+      "tags": [
+        "robustness",
+        "nil-check",
+        "location-corrected"
+      ],
+      "evidence": "\t\t\tw := m.implementation.find(\"one\")",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "180b0147331aac99",
+      "severity": "low",
+      "category": "testing",
+      "title": "snap.Windows[0] indexed without length check",
+      "message": "snap.Windows is indexed at 0 without a length check in two places; if Snapshot ever returns no windows the test panics with an index-out-of-range error rather than a descriptive failure.",
+      "suggestion": "Guard before indexing, e.g. `if len(snap.Windows) == 0 { t.Fatal(\"snapshot has no windows\") }` before reading snap.Windows[0].FocusedID.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/editor_pointer_focus_offscreen_test.go",
+          "lines": {
+            "start": 50,
+            "end": 50
+          }
+        }
+      ],
+      "tags": [
+        "robustness",
+        "bounds-check",
+        "location-corrected"
+      ],
+      "evidence": "\t\t\t\t\tif snap.Windows[0].FocusedID != id {",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 68854,
+    "totalMs": 68854
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 1,
+    "bytes": 2518,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 1674,
+        "output": 7914,
+        "reasoning": 7190,
+        "cachedInput": 896
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

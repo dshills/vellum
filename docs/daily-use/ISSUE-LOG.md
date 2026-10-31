@@ -40,4 +40,4 @@ For each new issue, copy this template:
 - Reproduces: one AX-click attempt and one coordinate-click attempt in this session; physical mouse reproduction not performed.
 - Impact: limited tool automation; no confirmed product data loss or blocker.
 - Evidence location: [session report](../reviews/next-five-stability/item-5.md).
-- Status: unclassified tool observation, product reproduction pending; not a proven product defect or a passing click test.
+- Status: not reproduced with physical input on the later v1.1.2 suite build4, source 121dde859369b3ce091fe66cdfa2d34367e23be1 (2026-10-31); historical build25 was not physically retested: both body and title accept text after clicking. The earlier tool delivery observation is not a confirmed product defect. See [focus qualification](../reviews/application-readiness/item-1.md).
