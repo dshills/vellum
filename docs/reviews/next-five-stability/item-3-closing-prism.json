@@ -1,0 +1,154 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "6784d984ef386b1fc953cfd8dc4eaad0",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "d7b05d31c476ca17566812037ab324791cbd84a8",
+    "branch": "codex/next-five-stability"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 2,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "13883a9d3d179a68",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "workspace packaged_binary_sha256 is not a valid 64-character SHA-256 digest",
+      "message": "The workspace feature's packaged_binary_sha256 is 63 hex characters (\"...3dcebebadd7\"), not the 64 required for a SHA-256 digest. Any hash comparison or integrity verification using this manifest will fail or, worse, the value may be a truncated/pasted digest that does not match the actual packaged binary, defeating the manifest's purpose of pinning the packaged artifact.",
+      "suggestion": "Re-run the hash tooling over the packaged workspace binary (directory examples/replay, target ./cmd/workspace) and paste the full 64-character digest, e.g. `shasum -a 256 \u003cbinary\u003e`.",
+      "confidence": 0.75,
+      "locations": [
+        {
+          "path": "docs/reviews/next-five-stability/item-3-build.json",
+          "lines": {
+            "start": 87,
+            "end": 87
+          }
+        }
+      ],
+      "tags": [
+        "sha256",
+        "integrity",
+        "manifest",
+        "location-corrected"
+      ],
+      "evidence": "      \"packaged_binary_sha256\": \"8c3ded58dbdaf4bd0a67586be9d1b4eccfa374a38e09e355b31a3dceebebadd7\"",
+      "fix": {
+        "before": "      \"packaged_binary_sha256\": \"8c3ded58dbdaf4bd0a67586be9d1b4eccfa374a38e09e355b31a3dceebebadd7\"",
+        "after": "      \"packaged_binary_sha256\": \"\u003c64-character sha256 hex digest of the packaged workspace binary\u003e\""
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "8c2aa4d210563547",
+      "severity": "low",
+      "category": "testing",
+      "title": "No automated validation of manifest hashes",
+      "message": "The manifest is a hand-maintained JSON document with 42 hash fields. Malformed values (e.g., the 63-character workspace digest at line 106) are easy to introduce and hard to spot by eye. No validation is shown anywhere in this change, so typos will silently ship.",
+      "suggestion": "Validate the manifest in CI: parse it and assert every input_binary_sha256/packaged_binary_sha256 matches ^[0-9a-f]{64}$ and that ids/targets are unique, failing the build otherwise.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "docs/reviews/next-five-stability/item-3-build.json",
+          "lines": {
+            "start": 2,
+            "end": 12
+          }
+        }
+      ],
+      "tags": [
+        "ci",
+        "validation",
+        "manifest"
+      ],
+      "evidence": "  \"version\": \"v1.1.1\",\n  \"build_version\": \"3\",",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "9be8e564ca5bc535",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "replay input and packaged hashes are identical, suggesting the packaged hash was not computed from the packaged artifact",
+      "message": "For the \"replay\" feature (built with the offscreen tag), packaged_binary_sha256 is identical to input_binary_sha256. Every other feature in this manifest has distinct input and packaged digests, implying packaging (codesigning, bundling, stripping) modifies the binary. An identical digest suggests the packaged value was copied from the input value rather than computed from the actual packaged artifact, so the manifest may not pin what was really delivered.",
+      "suggestion": "Compute the digest from the final packaged replay binary after packaging completes and record that value; only keep the identical value if packaging is genuinely a byte-for-byte no-op for this target.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reviews/next-five-stability/item-3-build.json",
+          "lines": {
+            "start": 179,
+            "end": 180
+          }
+        }
+      ],
+      "tags": [
+        "sha256",
+        "verification",
+        "manifest",
+        "location-corrected"
+      ],
+      "evidence": "      \"input_binary_sha256\": \"fb110eb955f1c12763ed55a383c82246302ed11c647dd84b9ca16ced7246598d\",\n      \"packaged_binary_sha256\": \"fb110eb955f1c12763ed55a383c82246302ed11c647dd84b9ca16ced7246598d\"",
+      "fix": {
+        "before": "      \"packaged_binary_sha256\": \"fb110eb955f1c12763ed55a383c82246302ed11c647dd84b9ca16ced7246598d\"",
+        "after": "      \"packaged_binary_sha256\": \"\u003c64-character sha256 hex digest of the packaged replay binary\u003e\""
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 167424,
+    "totalMs": 167449
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 4,
+    "bytes": 10906,
+    "chunks": 1,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 10640,
+        "output": 23553,
+        "reasoning": 21778,
+        "cachedInput": 4416
+      }
+    ],
+    "splits": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

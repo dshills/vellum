@@ -1,0 +1,192 @@
+{
+  "schema": 1,
+  "version": "v1.1.1",
+  "build_version": "3",
+  "source_commit": "d7b05d31c476ca17566812037ab324791cbd84a8",
+  "private_build": true,
+  "features": [
+    {
+      "id": "forge",
+      "name": "Vellum Forge",
+      "directory": "examples/forge",
+      "target": ".",
+      "flags": [],
+      "input_binary_sha256": "f24c4deadfdfc63f70d3bac58ebedae470913247c6040d145b43c707ef0264ae",
+      "packaged_binary_sha256": "3d9d8cda95604cb5d7c8fdbcc2424193fff505585e17eeb317226b11d35d6854"
+    },
+    {
+      "id": "documents",
+      "name": "Vellum Suite Documents",
+      "directory": "examples/macapps",
+      "target": "./cmd/documents",
+      "flags": [],
+      "input_binary_sha256": "88564704ded218b5e83ef8f1d0fc0a3d95fc855e164a7e951451ded7bd013d21",
+      "packaged_binary_sha256": "f824be4941a8a6ecf586044d4cec611f71315e8dc6dbd3d20fcb5cdbc8583669"
+    },
+    {
+      "id": "notes",
+      "name": "Vellum Suite Notes",
+      "directory": "examples/macapps",
+      "target": "./cmd/notes",
+      "flags": [],
+      "input_binary_sha256": "4f5dbfddc9290fa2c2a346cb1223f9f668101f63b1508d71d5423e915d7648ef",
+      "packaged_binary_sha256": "07e40e427a4f749ce4c85abe454474bff8b8b170f6828b0e16dc139be8b78876"
+    },
+    {
+      "id": "reminders",
+      "name": "Vellum Reminders",
+      "directory": "examples/macapps",
+      "target": "./cmd/reminders",
+      "flags": [],
+      "input_binary_sha256": "4247065833d5f366c1e7c3eae11ab4eef818512669adc90604ac37140d6a76ff",
+      "packaged_binary_sha256": "ca9e83fcad0496bcd3b58d3443bfcac904ca86a8503e024d0f6603916c6ab3e4"
+    },
+    {
+      "id": "forma",
+      "name": "Vellum Forma",
+      "directory": "examples/showcase",
+      "target": "./cmd/forma",
+      "flags": [],
+      "input_binary_sha256": "3efd4e1540aab9079ca2a9e5df4d40c24f7280eacf93758ea44a98ecfa09dc3d",
+      "packaged_binary_sha256": "608c2350d659a2c95aa935a364af76791e672d48ceedb5e60d0f0f3b4af2a668"
+    },
+    {
+      "id": "luma",
+      "name": "Vellum Luma",
+      "directory": "examples/showcase",
+      "target": "./cmd/luma",
+      "flags": [],
+      "input_binary_sha256": "3cf10db5c58d6b79fcb5756180804c71657c1241f7478ea19dbb9ad67f0b330f",
+      "packaged_binary_sha256": "34332ba5aeeeed8c9ab867d9894b3640a1ba83a9eb9c0ff5089678772379cb19"
+    },
+    {
+      "id": "pulse",
+      "name": "Vellum Pulse",
+      "directory": "examples/showcase",
+      "target": "./cmd/pulse",
+      "flags": [],
+      "input_binary_sha256": "318d673a6a3c4d85e51a85da5b229dcfb9519c86dbc0a8cbd1e41fa9609a8673",
+      "packaged_binary_sha256": "dccddb857a225c44d873ed6786aada2e8f5a1a736547e772de8fc1c80dd9f7be"
+    },
+    {
+      "id": "placement",
+      "name": "Vellum Placement",
+      "directory": "examples/placement",
+      "target": ".",
+      "flags": [],
+      "input_binary_sha256": "15019553669b2dcc79dffd527f0d2257400650f732d2239b6ca222d770d93b9a",
+      "packaged_binary_sha256": "fb24ff757ede6fd30b37d86720c9de849b9cd5dbfffaee1a5148566247fa424d"
+    },
+    {
+      "id": "workspace",
+      "name": "Vellum Workspace",
+      "directory": "examples/replay",
+      "target": "./cmd/workspace",
+      "flags": [],
+      "input_binary_sha256": "f15fa8a1869624db13cce4859874c197b3f33e0c6a7f6207bd6f4c93a244bac7",
+      "packaged_binary_sha256": "8c3ded58dbdaf4bd0a67586be9d1b4eccfa374a38e09e355b31a3dceebebadd7"
+    },
+    {
+      "id": "gallery",
+      "name": "Vellum Controls",
+      "directory": "drivers/cogent",
+      "target": "./cmd/gallery",
+      "flags": [],
+      "input_binary_sha256": "86512598d3460d544c3cffa5d2babfbdf1951e9866b3e898f0a3c6dccf8a8b0f",
+      "packaged_binary_sha256": "3fb8e950e3073eb2d16018c00bb0d17f2e3f462849fce047ad6af38c1e686455"
+    },
+    {
+      "id": "workbench",
+      "name": "Vellum Workbench",
+      "directory": "drivers/cogent",
+      "target": "./cmd/workbench",
+      "flags": [],
+      "input_binary_sha256": "0db0d533451d0ea94fd1232b9e0dd381088e771a9bd314fe3316d7b475d31fd1",
+      "packaged_binary_sha256": "53998f3bf00bd08c19d207fc6a978fcdb98a1afb31fbe0c7109711f2fdeaff95"
+    },
+    {
+      "id": "editor",
+      "name": "Vellum Editor",
+      "directory": "examples/editor",
+      "target": ".",
+      "flags": [],
+      "input_binary_sha256": "ec92a958e7c6f10f9e2efa0d78fb65fafd6b48e2344c61252f3053f4ca21dc75",
+      "packaged_binary_sha256": "90c512fbccd515535f6b9e0c8e02e26a49d5a64976cf55d4edbd6409b0de1cc2"
+    },
+    {
+      "id": "grid",
+      "name": "Vellum Grid",
+      "directory": "examples/grid",
+      "target": ".",
+      "flags": [],
+      "input_binary_sha256": "392afb211de1769546e6fc109a726e3a047a60f66c9192025f7ce8b4ac9759c1",
+      "packaged_binary_sha256": "5c5b4f79e9f8fda8aafddcf9824aa150d3e0456e560aedd85e4394326c5f1367"
+    },
+    {
+      "id": "loadedgrid",
+      "name": "Vellum Loaded Grid",
+      "directory": "examples/loadedgrid",
+      "target": ".",
+      "flags": [],
+      "input_binary_sha256": "7bb59f8c4bfe4d51485e29aa8d3506d6a67564e97f0420f25167534f5fe58f7c",
+      "packaged_binary_sha256": "cba4f56f0bf206d16d3097fac5bfdd1ceaf5d49304fd6d4f3c4af575dc5d91ef"
+    },
+    {
+      "id": "loadedtree",
+      "name": "Vellum Tree",
+      "directory": "examples/loadedtree",
+      "target": ".",
+      "flags": [],
+      "input_binary_sha256": "39187e83d80ed075f46a050e5957c5ed1e0a8e6251dc7c17480583d3f0722e72",
+      "packaged_binary_sha256": "450ba7a75899b66d37cf9b1352f72265f1ff102732bc2f1a5c52e49b10f883ac"
+    },
+    {
+      "id": "drawing",
+      "name": "Vellum Drawing",
+      "directory": "examples/drawing",
+      "target": ".",
+      "flags": [],
+      "input_binary_sha256": "ee15912a3c8257b4e5c43800d302bf5ebeb3376d1a5f98e4f019292735ceaa5f",
+      "packaged_binary_sha256": "437e11ab9cfa88747c06a1d2aa0524397477e5b64fcce96d52ff2e065b0c8ad2"
+    },
+    {
+      "id": "imaging",
+      "name": "Vellum Imaging",
+      "directory": "examples/imaging",
+      "target": ".",
+      "flags": [],
+      "input_binary_sha256": "85fe00b2a5b6a806a16529f656c4a51e880f432d46f888b09638539af803f85a",
+      "packaged_binary_sha256": "b236b86eb32b6993c2a50d88808813fd9022871743d62ea57a9d90d0e149d4d9"
+    },
+    {
+      "id": "viewport3d",
+      "name": "Vellum 3D",
+      "directory": "examples/viewport3d",
+      "target": ".",
+      "flags": [],
+      "input_binary_sha256": "8f6953d6def0cceb86bccc7887d045dab499211a14f25cfa1683f538573e2cbf",
+      "packaged_binary_sha256": "2ce16b22ea5ef4f17e101fb1c4991c5c918de40c11e9af1cb1b5a640dedcfb54"
+    },
+    {
+      "id": "replay",
+      "name": "replay",
+      "directory": "examples/replay",
+      "target": "./cmd/native",
+      "flags": [
+        "-tags",
+        "offscreen"
+      ],
+      "input_binary_sha256": "fb110eb955f1c12763ed55a383c82246302ed11c647dd84b9ca16ced7246598d",
+      "packaged_binary_sha256": "fb110eb955f1c12763ed55a383c82246302ed11c647dd84b9ca16ced7246598d"
+    },
+    {
+      "id": "hub",
+      "name": "Vellum Demo Suite",
+      "directory": "examples/demo-suite",
+      "target": ".",
+      "flags": [],
+      "input_binary_sha256": "2d75fc328b930afe9b77a713ab609f494e7c11e50963f8d92429445b06ec0876",
+      "packaged_binary_sha256": "ea18f244385c8f58c8c3a70ad0b44ff7eda65aeea3639fec95a14022e0e6bf96"
+    }
+  ]
+}
