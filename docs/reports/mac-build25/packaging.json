@@ -1,0 +1,35 @@
+{
+  "source_commit": "ed4f71f49bbf623dd8e205571669539212068c62",
+  "build_version": "25",
+  "sdk_sha256": "65c07945d2b153e7e0f7cfb64a0c3631807e7c9ce0b4e0cb26ff862a74fb718e",
+  "manifest_sha256": "4af562c72c7e5d53f572a10aa169430f100fb9fe65d97b303c5af8495d532f34",
+  "installation": "~/Applications/Vellum/build25-ed4f71f49bbf",
+  "installation_sha256": "cae57baf1822fe35dd78bea79075c54ef1ec35c1021eec2b36bc53ff3cb0ad85",
+  "private": true,
+  "signing": "ad-hoc",
+  "notarized": false,
+  "native_runtime": "not executed",
+  "preflight_sha256": "ed90a8f690ed4095c9ccb926bbd6732901459322d71f2f70af46743919c3840b",
+  "files": {
+    "Vellum-SDK.tar.gz": "65c07945d2b153e7e0f7cfb64a0c3631807e7c9ce0b4e0cb26ff862a74fb718e",
+    "Vellum-Forge.zip": "0c65178f23e65b8e6f81031de09fed695683d9b712e01643184a69c49684298a",
+    "Vellum-Measure-Pad.zip": "10f09b067f58ff7e0a9abed06cf68098c820cef6f18223ce43b8db28efe9d1ef",
+    "Vellum-Documents.zip": "f0938a9d9b0a845f0932ab9a6ebfab8718ea8ee96a76f02197f2260d96c355fa",
+    "Vellum-Document-Starter.zip": "dd4d7d231b221068f2d5c57e9b785b2a3531885dec921be38d4212c7eba6fb91",
+    "Vellum-Notes.zip": "9281c6242937813d3860ae43664cb356699e94b2b170e7e5262f412d23800c78"
+  },
+  "apps": [
+    "Vellum Forge",
+    "Vellum Measure Pad",
+    "Vellum Documents",
+    "Vellum Document Starter",
+    "Vellum Notes"
+  ],
+  "desktop_checks": "deferred",
+  "checks": [
+    "SDK relocation and generated consumer race/vet/build",
+    "five ZIP-extracted strict signatures and macOS 27.0 linkage",
+    "durable packet and installed bytes independently verified"
+  ],
+  "prior_build24": "retained"
+}

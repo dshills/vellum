@@ -16,13 +16,13 @@ Ordinary checkout merges do not relabel an existing package or its test results.
 <!-- vellum-candidate:facts:start -->
 | Record | Identity |
 | --- | --- |
-| Candidate | `build24-b9212489afc9` |
-| Packaged source | `b9212489afc921171fc5abbd5275d8919ae930dd` |
-| SDK SHA256 | `5a825eb07c480f2df248435b7c0a55e0b0cb5104ccd2de3b8f146c55c2798382` |
-| Bundle manifest SHA256 | `516456cc39bc0b3c2b8faf14871cc820afda813a0a5f269e23da15fd97c77727` |
-| Installation receipt SHA256 | `1c8a8b8425759434214631ff73b8ec9293af9c89dd82847f111cdea544a39fcd` |
-| Preflight SHA256 | `75c0bcc3e5ecad4d43bd3b0f7e5b7989c147a480992e685a3c4565d4b94009aa` |
-| Installed apps | `~/Applications/Vellum/build24-b9212489afc9/apps` |
+| Candidate | `build25-ed4f71f49bbf` |
+| Packaged source | `ed4f71f49bbf623dd8e205571669539212068c62` |
+| SDK SHA256 | `65c07945d2b153e7e0f7cfb64a0c3631807e7c9ce0b4e0cb26ff862a74fb718e` |
+| Bundle manifest SHA256 | `4af562c72c7e5d53f572a10aa169430f100fb9fe65d97b303c5af8495d532f34` |
+| Installation receipt SHA256 | `cae57baf1822fe35dd78bea79075c54ef1ec35c1021eec2b36bc53ff3cb0ad85` |
+| Preflight SHA256 | `ed90a8f690ed4095c9ccb926bbd6732901459322d71f2f70af46743919c3840b` |
+| Installed apps | `~/Applications/Vellum/build25-ed4f71f49bbf/apps` |
 | Minimum macOS | `27.0` |
 | Inspected host | `27.2` |
 | Desktop checks | `deferred` |

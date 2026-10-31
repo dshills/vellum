@@ -1,0 +1,13 @@
+# Item 4: matching SDK and five-app candidate
+
+Build25 was produced from clean committed source ed4f71f49bbf623dd8e205571669539212068c62 using Go 1.25.6, then installed without launching. The included SDK passed relocation, origin, generated consumer and contract checks. All five apps passed ZIP extraction, strict ad-hoc signature, installed-byte and system-library linkage verification. Every app declares minimum macOS 27.0 and SDK 27.0; the inspection host is 27.2. Build24 and existing notebook data remain intact.
+
+The selected candidate index and generated guide now point to build25. Raw inspection reports are under docs/reports/mac-build25. Producer runtime labels remain “not executed”; native acceptance belongs to the next item.
+
+Three failed attempts were retained temporarily (these /private/tmp diagnostics may expire) under /private/tmp/vellum-stability-build25, -final and -sdk27. The first exposed the stale SDK consumer v1.0.0 assertion, corrected and reviewed in ed4f71f4. The next two failed the strict deployment guard because ambient clang selected 27.2 while Xcode SDK admission selected 27.0. The controlled child environment intentionally strips ambient SDK/compiler overrides; those overrides did not resolve the mismatch. No guard was weakened and no failed output was selected.
+
+The successful attempt is /private/tmp/vellum-stability-build25-wrapper. An explicit PATH compiler wrapper selects the recorded Xcode SDK and -mmacosx-version-min=27.0. Preflight records the wrapper and underlying compiler hashes; the source snapshot was checked again before publication. compiler-wrapper.sh is preserved alongside the durable delivery packet (auxiliary reproduction material, outside the payload checksum list). Its clang++ alias uses the same wrapper; source extensions select C++ compilation. The wrapper targets this local Xcode installation, not a portable toolchain distribution.
+
+The durable packet contains the six payload archives (five app ZIPs and one SDK tarball) and producer metadata, with no build intermediates. Independent verification of that copy against the installation passed, as did the separate linkage inspection. This is private qualification, not notarization, quarantine admission, public release, IME or VoiceOver acceptance.
+
+Default Prism completed full coverage with one low naming-consistency finding. The durable packet directory now uses the same 12-character source prefix as the candidate and installation. Discarded doc suggestions were also clarified: temporary diagnostic paths may expire; the durable packet includes PREFLIGHT.json with the wrapper digest at native_toolchain.binaries.cc_driver.sha256. No payload hashes changed.

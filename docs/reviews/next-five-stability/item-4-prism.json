@@ -1,0 +1,182 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "02623323f2e81a43427386badfb2f282",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "ed4f71f49bbf623dd8e205571669539212068c62",
+    "branch": "codex/next-five-stability"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 1,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "cf06df3a01adecff",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Inconsistent source_commit abbreviation length across manifest fields",
+      "message": "The build25 update abbreviates source_commit (ed4f71f49bbf...) to 12 hex chars in \"id\" and \"installation\" (\"build25-ed4f71f49bbf\") but to only 8 hex chars in the \"packet\" path (\"final-build25-ed4f71f4\"). Two different prefixes for the same commit in one manifest make it harder to correlate the release record with the delivery artifacts and report directories, and invite copy-paste drift in future bumps. Note the same 12/8 split existed in build24, so this is convention, not a regression, but it is a good moment to align the fields.",
+      "suggestion": "Pick a single canonical abbreviation length for source_commit (e.g., the 12-char prefix already used by \"id\" and \"installation\") and generate every derived field from source_commit in one place, so future version bumps cannot produce mismatched prefixes.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "release/private-macos-candidate.json",
+          "lines": {
+            "start": 11,
+            "end": 11
+          }
+        }
+      ],
+      "tags": [
+        "consistency",
+        "release-metadata"
+      ],
+      "evidence": "  \"packet\": \"Documents/ChatGPT/Go Native UI/deliveries/mac-build25-20261031/final-build25-ed4f71f4\",",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 316721,
+    "totalMs": 227033
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 7,
+    "bytes": 29682,
+    "chunks": 3,
+    "llmCalls": 6,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 15453,
+        "output": 47779,
+        "reasoning": 44297,
+        "cachedInput": 2304
+      }
+    ],
+    "widenedFiles": 1,
+    "splits": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "52f9404e25c25e5d",
+        "severity": "low",
+        "category": "docs",
+        "title": "Artifacts claimed as \"retained\" are referenced only via ephemeral /private/tmp paths",
+        "message": "The document claims the three failed attempts were \"retained\" but only gives /private/tmp paths (and the successful attempt likewise lives at /private/tmp/vellum-stability-build25-wrapper). macOS periodically purges items under /private/tmp, so these references will go stale and future auditors following this review item will find missing artifacts, undermining the doc's evidentiary value.",
+        "suggestion": "Either move the retained material to a durable location and update the paths, or explicitly note in the doc that the /private/tmp paths are point-in-time references and that only the delivery packet and compiler-wrapper.sh are durably preserved.",
+        "confidence": 0.7,
+        "locations": [
+          {
+            "path": "docs/reviews/next-five-stability/item-4.md",
+            "lines": {
+              "start": 7,
+              "end": 7
+            }
+          }
+        ],
+        "tags": [
+          "ephemeral-paths",
+          "auditability"
+        ],
+        "evidence": "Three failed attempts were retained under /private/tmp/vellum-stability-build25, -final and -sdk27.",
+        "fix": {
+          "before": "Three failed attempts were retained under /private/tmp/vellum-stability-build25, -final and -sdk27.",
+          "after": "Three failed attempts were recorded under /private/tmp/vellum-stability-build25, -final and -sdk27 (note: /private/tmp is periodically purged, so these are point-in-time references, not durable retention)."
+        },
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      },
+      "reason": "quoted evidence not found in docs/reviews/next-five-stability/item-4.md"
+    },
+    {
+      "finding": {
+        "id": "b1844664d9148630",
+        "severity": "low",
+        "category": "security",
+        "title": "Build-affecting compiler wrapper is excluded from the packet's checksum list with no stated hash location",
+        "message": "compiler-wrapper.sh directly determines SDK selection and -mmacosx-version-min for the produced binaries, yet the doc places it outside the payload checksum list and does not state where its preflight-recorded hash (\"Preflight records the wrapper and underlying compiler hashes\") durably lives. If that preflight record is not part of the packet's producer metadata, the only integrity anchor for a build-affecting artifact is unclear and may itself be ephemeral.",
+        "suggestion": "State explicitly that the wrapper's recorded hash is carried in the durable packet's producer metadata (or add the wrapper to the checksum manifest as auxiliary material), and name the exact durable location of the preserved compiler-wrapper.sh copy so the reproduction material is verifiable.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "docs/reviews/next-five-stability/item-4.md",
+            "lines": {
+              "start": 9,
+              "end": 9
+            }
+          }
+        ],
+        "tags": [
+          "supply-chain",
+          "reproducibility",
+          "integrity"
+        ],
+        "evidence": "compiler-wrapper.sh is preserved alongside the durable delivery packet (auxiliary reproduction material, outside the payload checksum list).",
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      },
+      "reason": "quoted evidence not found in docs/reviews/next-five-stability/item-4.md"
+    },
+    {
+      "finding": {
+        "id": "141b8a9e8b805233",
+        "severity": "low",
+        "category": "docs",
+        "title": "\"Six payload archives\" is unexplained against the five apps described earlier",
+        "message": "Paragraph 1 establishes a scope of \"All five apps\" plus an included SDK, but the packet is later described as containing \"six payload archives\" with no enumeration or explanation of the mapping (e.g., five apps plus the SDK archive, or something else). A reviewer auditing this qualification cannot reconcile the count against the verification report from the doc alone.",
+        "suggestion": "Enumerate the six archives (or state explicitly which artifacts they correspond to, e.g., the five apps plus the SDK archive) so the packet contents are auditable directly from this document.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "docs/reviews/next-five-stability/item-4.md",
+            "lines": {
+              "start": 11,
+              "end": 11
+            }
+          }
+        ],
+        "tags": [
+          "auditability",
+          "clarity"
+        ],
+        "evidence": "The durable packet contains the six payload archives and producer metadata, with no build intermediates.",
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      },
+      "reason": "quoted evidence not found in docs/reviews/next-five-stability/item-4.md"
+    }
+  ],
+  "suppressed": []
+}

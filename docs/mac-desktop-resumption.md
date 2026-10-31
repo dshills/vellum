@@ -14,12 +14,12 @@ candidate identity from current source integration. These commands come from the
 <!-- vellum-candidate:commands:start -->
 ```sh
 python3 -B scripts/verify-private-macos.py \
-  --bundle "$HOME/Documents/ChatGPT/Go Native UI/deliveries/mac-build24-20261030/final-build24-b9212489" \
-  --installation "$HOME/Applications/Vellum/build24-b9212489afc9" \
-  --manifest-sha256 516456cc39bc0b3c2b8faf14871cc820afda813a0a5f269e23da15fd97c77727
+  --bundle "$HOME/Documents/ChatGPT/Go Native UI/deliveries/mac-build25-20261031/final-build25-ed4f71f49bbf" \
+  --installation "$HOME/Applications/Vellum/build25-ed4f71f49bbf" \
+  --manifest-sha256 4af562c72c7e5d53f572a10aa169430f100fb9fe65d97b303c5af8495d532f34
 python3 -B scripts/check-private-macos-linkage.py \
-  --installation "$HOME/Applications/Vellum/build24-b9212489afc9" \
-  --installation-sha256 1c8a8b8425759434214631ff73b8ec9293af9c89dd82847f111cdea544a39fcd
+  --installation "$HOME/Applications/Vellum/build25-ed4f71f49bbf" \
+  --installation-sha256 cae57baf1822fe35dd78bea79075c54ef1ec35c1021eec2b36bc53ff3cb0ad85
 ```
 <!-- vellum-candidate:commands:end -->
 
