@@ -1,0 +1,13 @@
+{
+  "status": "incomplete",
+  "command": "prism review staged --format json",
+  "exit_code": 4,
+  "error": "provider review: response cut off even at 16384 output tokens, and the part cannot be split further",
+  "counted_as_approval": false,
+  "replacement_scopes": [
+    "code",
+    "tests",
+    "docs"
+  ],
+  "settings": "default provider/model; only paths scope changed"
+}

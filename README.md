@@ -129,13 +129,14 @@ experimental. See the [support matrix](docs/macos-v1.md#supported-api-contract).
 
 ### Private Documents evaluation
 
-The internal **build24-b9212489afc9** candidate (minimum macOS 27.0) now has
-recorded native document-workflow checks on macOS 27.2: exact Unicode Save/Open,
-Find/Replace with settled keyboard Undo/Redo, coordinated Save A / Cancel B Quit,
-normal restoration, and recovery of an unsaved note after a controlled interruption.
-Focused offscreen race tests cover the corresponding routing and persistence
-contracts. See the [acceptance records](docs/reviews/document-priorities/) for
-scope, evidence and default Prism reviews.
+The selected internal **build25-ed4f71f49bbf** candidate (minimum macOS 27.0)
+has three recorded native sessions on macOS 27.2 covering Unicode persistence,
+Find/Replace, settled Undo/Redo and normal restart. See the
+[build25 session record](docs/reviews/next-five-stability/item-5.md).
+Broader coordinated Quit and interrupted recovery acceptance belongs to the
+historical build24 [document-workflow records](docs/reviews/document-priorities/);
+it is not repeated-build25 coverage. Multi-day operator use remains pending;
+see the [dated evaluation ledger](docs/daily-use/SESSION-LOG.md).
 
 For an existing verified private installation, run from the checkout root:
 

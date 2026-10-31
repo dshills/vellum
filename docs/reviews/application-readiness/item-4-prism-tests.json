@@ -1,0 +1,123 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "4149d773b4987daedd8e52fc702d9c1f",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "7eb77e59279018f2673dd60687e4bf13f3c46640",
+    "branch": "codex/next-five-application-readiness"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 2,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "4d254f8dc376e17a",
+      "severity": "low",
+      "category": "testing",
+      "title": "Repeated-day test passes the same session object three times",
+      "message": "`[self.session('2026-10-31')]*3` repeats one dict object (and one checks list) three times instead of creating three distinct session records. The behavior under test is deduplication by date, but because all three list entries are the same object, an implementation that deduplicates by object identity would also pass, and any in-place mutation by evaluate() would be applied three times at once. Building three separate dicts, as real data would contain, makes the test genuinely exercise date-based deduplication.",
+      "suggestion": "Create three distinct session dicts with a list comprehension: `self.report([self.session('2026-10-31') for _ in range(3)])`.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "scripts/check-daily-evaluation_test.py",
+          "lines": {
+            "start": 20,
+            "end": 20
+          }
+        }
+      ],
+      "tags": [
+        "tests",
+        "test-data"
+      ],
+      "evidence": "        self.assertEqual(self.report([self.session('2026-10-31')]*3)['status'], 'pending')",
+      "fix": {
+        "before": "        self.assertEqual(self.report([self.session('2026-10-31')]*3)['status'], 'pending')",
+        "after": "        self.assertEqual(self.report([self.session('2026-10-31') for _ in range(3)])['status'], 'pending')"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "ce2c3aa1af34d9e9",
+      "severity": "low",
+      "category": "testing",
+      "title": "Qualifying case never asserts qualifying_operator_days contents",
+      "message": "The happy-path case only asserts `status == 'recorded'` and never inspects `qualifying_operator_days`, even though the negative test (automated runs) treats that list as a meaningful output. A regression that records the wrong days, duplicated days, or no days at all while still returning 'recorded' would go completely uncaught by this suite.",
+      "suggestion": "Capture the report and additionally assert on the qualifying days, e.g. their count (or the exact expected dates in whatever format evaluate() emits).",
+      "confidence": 0.7,
+      "locations": [
+        {
+          "path": "scripts/check-daily-evaluation_test.py",
+          "lines": {
+            "start": 25,
+            "end": 25
+          }
+        }
+      ],
+      "tags": [
+        "tests",
+        "coverage"
+      ],
+      "evidence": "        self.assertEqual(self.report(sessions)['status'], 'recorded')",
+      "fix": {
+        "before": "        self.assertEqual(self.report(sessions)['status'], 'recorded')",
+        "after": "        report = self.report(sessions)\n        self.assertEqual(report['status'], 'recorded')\n        self.assertEqual(len(report['qualifying_operator_days']), 3)"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 200198,
+    "totalMs": 200230
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 1,
+    "bytes": 2118,
+    "chunks": 1,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 2592,
+        "output": 22721,
+        "reasoning": 21019,
+        "cachedInput": 1984
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
