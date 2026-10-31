@@ -1,0 +1,183 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "9dba6bedef55e549a7b9cc764320e2fb",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "c18f47a6e9441500e2ad3ca221f80659186bd781",
+    "branch": "codex/next-five-stability"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 2,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "33518e27ee5d9dec",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Child is not detached from the hub's process group despite the detach claim",
+      "message": "The comment states the child \"continues when the hub is closed\", but the child stays in the hub's process group and session. Closing the hub via a signal to its process group or terminal (SIGHUP/SIGINT/SIGTERM to the group) will also terminate the workbench, breaking the documented intent. Only a plain parent exit detaches it.",
+      "suggestion": "Put the child in its own process group (add \"syscall\" to the imports) so group-wide signals sent to the hub do not kill the workbench:\n\n\tcmd.SysProcAttr = \u0026syscall.SysProcAttr{Setpgid: true}\n\nthen start it as usual.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "examples/demo-suite/automation_launch.go",
+          "lines": {
+            "start": 18,
+            "end": 20
+          }
+        }
+      ],
+      "tags": [
+        "exec",
+        "process-management",
+        "signal-handling"
+      ],
+      "evidence": "\tcmd := exec.Command(filepath.Join(bundle, \"Contents/MacOS/Vellum Workbench\"), \"-automation\")\n\tcmd.Stdout = file\n\tcmd.Stderr = file",
+      "fix": {
+        "before": "\tcmd := exec.Command(filepath.Join(bundle, \"Contents/MacOS/Vellum Workbench\"), \"-automation\")\n\tcmd.Stdout = file\n\tcmd.Stderr = file",
+        "after": "\tcmd := exec.Command(filepath.Join(bundle, \"Contents/MacOS/Vellum Workbench\"), \"-automation\")\n\tcmd.Stdout = file\n\tcmd.Stderr = file\n\tcmd.SysProcAttr = \u0026syscall.SysProcAttr{Setpgid: true}"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "5ffcf023a4395a78",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Child process exit status from cmd.Wait() is silently discarded",
+      "message": "The exit status of the launched workbench is discarded with `_ = cmd.Wait()`. If the child crashes or exits with an error right after starting (e.g., bad flags, missing frameworks, immediate abort), nothing is recorded anywhere: the caller already received a success message and the log file may be empty, so the failure is completely silent and undebuggable.",
+      "suggestion": "Capture and log the Wait error (add \"log\" to the imports). If the caller should learn about early failures, you could also wait briefly for a quick exit and surface it, but at minimum record it:\n\n\tgo func() {\n\t\tif waitErr := cmd.Wait(); waitErr != nil {\n\t\t\tlog.Printf(\"automation workbench exited: %v\", waitErr)\n\t\t}\n\t}()",
+      "confidence": 0.9,
+      "locations": [
+        {
+          "path": "examples/demo-suite/automation_launch.go",
+          "lines": {
+            "start": 24,
+            "end": 24
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "exec"
+      ],
+      "evidence": "\tgo func() { _ = cmd.Wait() }()",
+      "fix": {
+        "before": "\tgo func() { _ = cmd.Wait() }()",
+        "after": "\tgo func() {\n\t\tif waitErr := cmd.Wait(); waitErr != nil {\n\t\t\tlog.Printf(\"automation workbench exited: %v\", waitErr)\n\t\t}\n\t}()"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "6025ea2eacf8e336",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Each launch truncates the fixed-name automation log file",
+      "message": "The log uses a fixed filename combined with os.O_TRUNC, so every launch wipes the previous run's output. The success message then points the user at this file as the place to look, but any earlier crash diagnostics are already gone. Concurrent launches would also interleave writes into the same file.",
+      "suggestion": "Either append across runs (os.O_APPEND) or give each launch its own file, e.g. include a timestamp in the name:\n\n\tpath := filepath.Join(dir, fmt.Sprintf(\"automation-workbench-%d.log\", time.Now().Unix()))\n\nand drop O_TRUNC when appending.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/demo-suite/automation_launch.go",
+          "lines": {
+            "start": 13,
+            "end": 13
+          }
+        }
+      ],
+      "tags": [
+        "logging",
+        "diagnostics"
+      ],
+      "evidence": "\tfile, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)",
+      "fix": {
+        "before": "\tfile, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)",
+        "after": "\tfile, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "3285fbbd3af549f9",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Write error returned without context, inconsistent with wrapped decode error",
+      "message": "The os.WriteFile failure is returned bare, while the decode failure just above is wrapped with context. A caller that logs this error cannot tell whether the replay failed to decode its result or to persist the report, or which file was being written.",
+      "suggestion": "Wrap the error so it carries context and remains inspectable with errors.Is/errors.As: `return \"\", fmt.Errorf(\"write replay report: %w\", err)`.",
+      "confidence": 0.75,
+      "locations": [
+        {
+          "path": "examples/demo-suite/replay_result.go",
+          "lines": {
+            "start": 23,
+            "end": 24
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "error-context"
+      ],
+      "evidence": "if err := os.WriteFile(report, out, 0600); err != nil {\n\t\treturn \"\", err\n\t}",
+      "fix": {
+        "before": "if err := os.WriteFile(report, out, 0600); err != nil {\n\t\treturn \"\", err\n\t}",
+        "after": "if err := os.WriteFile(report, out, 0600); err != nil {\n\t\treturn \"\", fmt.Errorf(\"write replay report: %w\", err)\n\t}"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 138060,
+    "totalMs": 138107
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 2,
+    "bytes": 2151,
+    "chunks": 1,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 3957,
+        "output": 16759,
+        "reasoning": 14486,
+        "cachedInput": 1920
+      }
+    ],
+    "splits": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -1,0 +1,57 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "7bd9864ce387a406d6d9431e3e61daac",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "c18f47a6e9441500e2ad3ca221f80659186bd781",
+    "branch": "codex/next-five-stability"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 43972,
+    "totalMs": 43973
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 1,
+    "bytes": 4430,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 1840,
+        "output": 7177,
+        "reasoning": 7173,
+        "cachedInput": 1792
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

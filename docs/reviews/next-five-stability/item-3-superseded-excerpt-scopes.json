@@ -1,0 +1,67 @@
+{
+  "original_sha256": "a3a232f9a16e2157e58fafa485915f0e0c9de19d02fa223dd8c2324b8e12139b",
+  "groups": [
+    {
+      "name": "directory",
+      "path": "/private/tmp/vellum-suite-review-directory-bounded.go",
+      "functions": [
+        "suiteDirectory",
+        "demoVersion"
+      ],
+      "source_ranges": [
+        {
+          "function": "suiteDirectory",
+          "start_line": 38,
+          "end_line_exclusive": 59,
+          "body_sha256": "bf94b72f93e1181e0e6bcd7eb4fb25c904d3767b179a948d29527d8ad1fabf04"
+        },
+        {
+          "function": "demoVersion",
+          "start_line": 160,
+          "end_line_exclusive": 161,
+          "body_sha256": "573021e9ee3b7434d9dce2b0d436f1d3b5a319521d6456fe41999b460c73ffdc"
+        }
+      ],
+      "snippet_sha256": "69f951a4ed4cfb6418929f589f8e2d3607f6f1068bd0d738c946f875c4372a92"
+    },
+    {
+      "name": "feature",
+      "path": "/private/tmp/vellum-suite-review-feature-bounded.go",
+      "functions": [
+        "launchFeature"
+      ],
+      "source_ranges": [
+        {
+          "function": "launchFeature",
+          "start_line": 59,
+          "end_line_exclusive": 107,
+          "body_sha256": "340464d363351854512f24a263b4cdcba5cba8d2ba154039e5d15625d5157641"
+        }
+      ],
+      "snippet_sha256": "70ae5498f680e429a6e11cd97c848c28a4399e5d9ccf682df2963eae16fe49e2"
+    },
+    {
+      "name": "view",
+      "path": "/private/tmp/vellum-suite-review-view-bounded.go",
+      "functions": [
+        "suiteView",
+        "featureByID"
+      ],
+      "source_ranges": [
+        {
+          "function": "suiteView",
+          "start_line": 107,
+          "end_line_exclusive": 151,
+          "body_sha256": "817f18c45606ee59d0c3d57d71d3fe10efa8d9b8fecc8982bb02254af0e6afdd"
+        },
+        {
+          "function": "featureByID",
+          "start_line": 151,
+          "end_line_exclusive": 160,
+          "body_sha256": "17d4dbe09b5e61673da0bfa7ac264258c44634d65d8200c18a1dd9bde6987635"
+        }
+      ],
+      "snippet_sha256": "90e6310931df4ab76fbb923969baac1ccd453b37cb1b6bd8ffbe44bdc5c08076"
+    }
+  ]
+}

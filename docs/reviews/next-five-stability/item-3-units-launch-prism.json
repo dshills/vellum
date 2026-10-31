@@ -1,0 +1,142 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "ec8744327d00e1b137ada104562a4bc5",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "c18f47a6e9441500e2ad3ca221f80659186bd781",
+    "branch": "codex/next-five-stability"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 3,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "1bde55a074270f87",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Per-feature arguments keyed by raw string IDs with silent fallback",
+      "message": "The switch on the string feature.ID has no default case, and the required flags live here rather than on the featureDemo definition. A new (or renamed) feature silently launches with no `--args` at all — e.g. a feature that needs `-data-dir` isolation would share the app's default data directory, and grid/gallery demos would lose their demo flags, with no compile-time or test signal.",
+      "suggestion": "Declare the per-feature arguments (or a needs-data-dir flag) as fields on featureDemo where each feature is defined, so adding a feature forces deciding its arguments, e.g. `feature.Args []string` / `feature.DataDir bool`, and featureArguments just assembles them. Alternatively add a default case that returns an error for unknown IDs so omissions surface immediately.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/demo-suite/feature_arguments.go",
+          "lines": {
+            "start": 10,
+            "end": 24
+          }
+        }
+      ],
+      "tags": [
+        "switch",
+        "silent-fallback"
+      ],
+      "evidence": "switch feature.ID {\n\tcase \"documents\", \"notes\":",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "79ccc9639836841e",
+      "severity": "low",
+      "category": "correctness",
+      "title": "Success message returned alongside a non-nil error",
+      "message": "The service closure returns the human-readable \"opened ...\" message together with whatever error Run() produced. If the service harness renders or logs the message even when err != nil, a failed launch is presented as a success (\"opened in its own application\") next to the error, which is confusing when diagnosing why a feature did not start.",
+      "suggestion": "Only return the success message when the launch actually succeeded:\n\n```go\nif err = exec.CommandContext(ctx, \"open\", args...).Run(); err != nil {\n    return \"\", err\n}\nreturn feature.Name + \" opened in its own application. Close its windows when finished.\", nil\n```",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/demo-suite/feature_launch.go",
+          "lines": {
+            "start": 27,
+            "end": 28
+          }
+        }
+      ],
+      "tags": [
+        "error-handling"
+      ],
+      "evidence": "err = exec.CommandContext(ctx, \"open\", args...).Run()\n\t\treturn feature.Name + \" opened in its own application. Close its windows when finished.\", err",
+      "fix": {
+        "before": "\t\terr = exec.CommandContext(ctx, \"open\", args...).Run()\n\t\treturn feature.Name + \" opened in its own application. Close its windows when finished.\", err",
+        "after": "\t\tif err = exec.CommandContext(ctx, \"open\", args...).Run(); err != nil {\n\t\t\treturn \"\", err\n\t\t}\n\t\treturn feature.Name + \" opened in its own application. Close its windows when finished.\", nil"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "609e38888537f6bb",
+      "severity": "low",
+      "category": "correctness",
+      "title": "Cancelling ctx kills only the `open` helper, not the launched application",
+      "message": "exec.CommandContext kills only the short-lived `open` helper process when ctx is cancelled, not the application `open -n` launched. If the harness cancels the service context (timeout, suite shutdown) while `open` is mid-launch, the service fails with a \"signal: killed\" error even though the GUI app may still (or already) be running, and the launched app is then unstoppable from the harness. The success message's \"Close its windows when finished\" already assumes the app outlives the call, so tying the launch to ctx cancellation is misleading.",
+      "suggestion": "Either drop the context from the launch (plain exec.Command, since the app's lifetime is user-controlled) or document that ctx cancellation only aborts the launch helper and leaves a running app behind; if the goal is to stop the app on cancellation, launch it via os/exec with a process group and kill the child instead.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "examples/demo-suite/feature_launch.go",
+          "lines": {
+            "start": 27,
+            "end": 27
+          }
+        }
+      ],
+      "tags": [
+        "exec",
+        "context"
+      ],
+      "evidence": "err = exec.CommandContext(ctx, \"open\", args...).Run()",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 85608,
+    "totalMs": 85624
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 2,
+    "bytes": 1919,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 1448,
+        "output": 8182,
+        "reasoning": 6986
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

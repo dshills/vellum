@@ -1,0 +1,96 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b8fec7640b2a983b35faf8ad7d771c81",
+  "repo": {
+    "root": "",
+    "head": "",
+    "branch": ""
+  },
+  "inputs": {
+    "mode": "snippet"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 1
+    },
+    "highestSeverity": "high"
+  },
+  "findings": [
+    {
+      "id": "af6522bfebfeec1d",
+      "severity": "high",
+      "category": "bug",
+      "title": "Unused imports prevent the file from compiling",
+      "message": "The file imports context, github.com/dshills/vellum/ui, os/exec, and strings but never references any of them. Imports in Go are scoped per file, so the note about receiver declarations in sibling files does not help: the compiler will reject this file with four \"imported and not used\" errors, so the package (and any build/test of examples/demo-suite) fails to compile.",
+      "suggestion": "Delete the four unused imports (or move the code that uses them into this file). Only encoding/json, fmt, os, path/filepath, and github.com/dshills/vellum are referenced here.",
+      "confidence": 0.95,
+      "locations": [
+        {
+          "path": "examples/demo-suite/suite.go",
+          "lines": {
+            "start": 3,
+            "end": 13
+          }
+        }
+      ],
+      "tags": [
+        "compile-error",
+        "unused-imports",
+        "go",
+        "unverified"
+      ],
+      "evidence": "import (\n\t\"context\"\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"github.com/dshills/vellum\"\n\t\"github.com/dshills/vellum/ui\"\n\t\"os\"\n\t\"os/exec\"\n\t\"path/filepath\"\n\t\"strings\"\n)",
+      "fix": {
+        "before": "import (\n\t\"context\"\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"github.com/dshills/vellum\"\n\t\"github.com/dshills/vellum/ui\"\n\t\"os\"\n\t\"os/exec\"\n\t\"path/filepath\"\n\t\"strings\"\n)",
+        "after": "import (\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"os\"\n\t\"path/filepath\"\n\n\t\"github.com/dshills/vellum\"\n)"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 54375,
+    "totalMs": 54376
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 1,
+    "bytes": 3980,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 1897,
+        "output": 7597,
+        "reasoning": 7225,
+        "cachedInput": 896
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

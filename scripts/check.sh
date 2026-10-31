@@ -98,6 +98,7 @@ cd "$VELLUM_REPO_ROOT"
 (cd "$VELLUM_REPO_ROOT/examples/loadedtree" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
 
 (cd "$VELLUM_REPO_ROOT/examples/placement" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
+(cd "$VELLUM_REPO_ROOT/examples/demo-suite" && python3 -B bundle_tools_test.py && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
 
 (cd "$VELLUM_REPO_ROOT/examples/personal-mac" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
 

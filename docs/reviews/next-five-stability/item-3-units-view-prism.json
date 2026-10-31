@@ -1,0 +1,151 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "21583b883ea70604389cf33b58be35a9",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "c18f47a6e9441500e2ad3ca221f80659186bd781",
+    "branch": "codex/next-five-stability"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 3,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "3c3b3b1d3f7dcc89",
+      "severity": "low",
+      "category": "testing",
+      "title": "Loop leaks modal state into the command assertions that follow",
+      "message": "After the page/modal loop, `d.modal` is left as `true` from the final iteration (`modal=true`, page=`\"suite\"`). The subsequent `d.commands()` call and `r.Invoke(...)` assertions therefore run with modal state still enabled. If the command registry or the demo view behavior is modal-dependent (which is likely given the test explicitly iterates modal states), the command assertions are implicitly coupled to leftover loop state rather than a clean baseline, making the test fragile and its intent unclear.",
+      "suggestion": "Explicitly reset the demo state to a known baseline after the validation loop, e.g. `d.tab = \"overview\"; d.modal = false`, before calling `d.commands()`, so the command assertions are independent of loop leftovers.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/demo-suite/services_test.go",
+          "lines": {
+            "start": 30,
+            "end": 38
+          }
+        }
+      ],
+      "tags": [
+        "test-hygiene",
+        "state-leak"
+      ],
+      "evidence": "for _, modal := range []bool{false, true} {",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "b44cc1744e2233fb",
+      "severity": "low",
+      "category": "style",
+      "title": "Missing blank line between function declarations",
+      "message": "The file body ends with `}` on line 62 and `func TestServicePayloadContracts` starts on line 63 with no blank line between the two top-level declarations. This is unusual formatting for Go test files (gofmt will not insert it, but virtually every codebase and editor convention separates top-level declarations with a blank line), and it makes the file harder to scan.",
+      "suggestion": "Add a blank line between the closing brace of `TestAllPagesAndModalContracts` and the `func TestServicePayloadContracts` declaration.",
+      "confidence": 0.75,
+      "locations": [
+        {
+          "path": "examples/demo-suite/services_test.go",
+          "lines": {
+            "start": 62,
+            "end": 63
+          }
+        }
+      ],
+      "tags": [
+        "gofmt",
+        "conventions",
+        "tests"
+      ],
+      "evidence": "}\nfunc TestServicePayloadContracts(t *testing.T) {",
+      "fix": {
+        "before": "}\nfunc TestServicePayloadContracts(t *testing.T) {",
+        "after": "}\n\nfunc TestServicePayloadContracts(t *testing.T) {"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "000e48deb89ae553",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Replay run failure discards the captured output",
+      "message": "When the replay binary fails (or is killed by ctx cancellation), only the exec error (e.g. \"exit status 1\") is returned and the captured stdout/stderr in `out` is discarded. This demo exists to surface results to the user via d.service, so a bare exit-status error gives no diagnostic clue about why the replay failed (common when the `replay` binary was never built).",
+      "suggestion": "Wrap the error and include the combined output so the demo shows what the replay binary printed, e.g. `return \"\", fmt.Errorf(\"replay run failed: %w: %s\", err, out)` (add `fmt` to the imports).",
+      "confidence": 0.75,
+      "locations": [
+        {
+          "path": "examples/demo-suite/suite.go",
+          "lines": {
+            "start": 34,
+            "end": 37
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "exec",
+        "diagnostics"
+      ],
+      "evidence": "\t\tout, err := exec.CommandContext(ctx, filepath.Join(dir, \"replay\"), \"-batch\", \"64\").CombinedOutput()\n\t\tif err != nil {\n\t\t\treturn \"\", err\n\t\t}",
+      "fix": {
+        "before": "\t\tout, err := exec.CommandContext(ctx, filepath.Join(dir, \"replay\"), \"-batch\", \"64\").CombinedOutput()\n\t\tif err != nil {\n\t\t\treturn \"\", err\n\t\t}",
+        "after": "\t\tout, err := exec.CommandContext(ctx, filepath.Join(dir, \"replay\"), \"-batch\", \"64\").CombinedOutput()\n\t\tif err != nil {\n\t\t\treturn \"\", fmt.Errorf(\"replay run failed: %w: %s\", err, out)\n\t\t}"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 174021,
+    "totalMs": 174055
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 2,
+    "bytes": 4407,
+    "chunks": 1,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 5437,
+        "output": 23484,
+        "reasoning": 21691,
+        "cachedInput": 2496
+      }
+    ],
+    "splits": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

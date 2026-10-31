@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "562450b898ecae93baf5b13feab6952f",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "c18f47a6e9441500e2ad3ca221f80659186bd781",
+    "branch": "codex/next-five-stability"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 1,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "a9d07c5f0c7340f0",
+      "severity": "low",
+      "category": "correctness",
+      "title": "Suite path taken from the receipt is resolved relative to the CWD",
+      "message": "selected_suite() decides whether to restore from the archive using suite.exists(), so a stray file (or a symlink to a nonexistent target) at the receipt's suite path skips restoration and is then passed to verify_suite() and to `open` as if it were the real bundle. The intended condition is that the suite directory is present.",
+      "suggestion": "Use a directory check (or the bundle_tools helper if one exists) so a leftover file doesn't masquerade as the suite, e.g. `if not suite.is_dir():`.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/demo-suite/launch.py",
+          "lines": {
+            "start": 18,
+            "end": 19
+          }
+        }
+      ],
+      "tags": [
+        "launch",
+        "path-handling",
+        "fix-dropped"
+      ],
+      "evidence": "        restored = Path(tempfile.mkdtemp(prefix='vellum-demo-restored-', dir='/private/tmp'))",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 57877,
+    "totalMs": 57887
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 4,
+    "bytes": 2997,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 1675,
+        "output": 7450,
+        "reasoning": 7176,
+        "cachedInput": 832
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

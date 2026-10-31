@@ -24,7 +24,7 @@ class Stages(unittest.TestCase):
     target=root/'drivers/cogent/build'/name;target.mkdir(parents=True);(target/'go.mod').touch()
    (root/'drivers/cogent/env.sh').write_text(':\n')
    (root/'scripts/check-example.sh').write_text('#!/bin/sh\necho example-suite >> "$VELLUM_STAGE_LOG"\n');(root/'scripts/check-example.sh').chmod(0o755)
-   for name in ['sdk-contract','replay','grid','loadedgrid','loadedtree','placement','personal-mac','forge']:(root/'examples'/name).mkdir(parents=True)
+   for name in ['sdk-contract','replay','grid','loadedgrid','loadedtree','placement','demo-suite','personal-mac','forge']:(root/'examples'/name).mkdir(parents=True)
    tools=root/'bin';tools.mkdir()
    for name in ['go','python3']:
     executable=tools/name;executable.write_text('#!/bin/sh\n'+('if [ "$1 $2" = "env GOOS" ]; then echo darwin; exit 0; fi\n' if name=='go' else '')+'echo "'+name+' $*" >> "$VELLUM_STAGE_LOG"\n');executable.chmod(0o755)
@@ -35,6 +35,7 @@ class Stages(unittest.TestCase):
    self.assertEqual(complete,log.read_text().splitlines())
    self.assertIn('go test -race ./...',complete);self.assertIn('go vet ./...',complete);self.assertIn('example-suite',complete)
    self.assertIn('go test -race -tags offscreen -timeout=20m ./...',complete)
+   self.assertIn('python3 -B bundle_tools_test.py',complete)
    self.assertTrue(any('sceneplan' in line and 'gpuscene' in line for line in complete))
    self.assertTrue(any('TestMainQueuePublicationDuringStartupDispatch' in line for line in complete))
 if __name__=='__main__':unittest.main()

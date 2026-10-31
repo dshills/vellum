@@ -11,6 +11,9 @@ Full-color toolbar and picker artwork remains untinted.
 
 ## See it in action
 
+The [demo suite](examples/demo-suite/README.md) builds and launches a version-aware
+hub with the current feature examples, including palette-to-canvas and Documents.
+
 Original, runnable Mac apps built with Vellum's public Go APIs. These
 windows use managed Mac-themed UI, native AppKit toolbars and full-color icons.
 The screenshots are actual app captures; artwork and data are original fixtures.

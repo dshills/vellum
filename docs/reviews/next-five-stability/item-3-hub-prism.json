@@ -1,0 +1,68 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "59c8be52076a69ecf819b166fd4ff2f4",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "c18f47a6e9441500e2ad3ca221f80659186bd781",
+    "branch": "codex/next-five-stability"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 361176,
+    "totalMs": 276817
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 10,
+    "bytes": 48834,
+    "chunks": 3,
+    "llmCalls": 7,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 28253,
+        "output": 71163,
+        "reasoning": 69786,
+        "cachedInput": 7552
+      }
+    ],
+    "splits": 1,
+    "excluded": [
+      {
+        "path": "examples/demo-suite/go.sum",
+        "reason": "lockfile"
+      }
+    ],
+    "truncatedBytes": 0,
+    "skipped": [
+      {
+        "target": "chunk 3/3 (examples/demo-suite/services_test.go, examples/demo-suite/suite.go)",
+        "reason": "review failed: response cut off even at 16384 output tokens, and the part cannot be split further: response cut off at the output limit (16384 tokens)"
+      }
+    ],
+    "complete": false
+  },
+  "discarded": [],
+  "suppressed": []
+}

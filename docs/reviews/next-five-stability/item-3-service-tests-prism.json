@@ -1,0 +1,147 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "3a609632c111eb6d9200f89e0cc2958a",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "c18f47a6e9441500e2ad3ca221f80659186bd781",
+    "branch": "codex/next-five-stability"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 3,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "2595827289bb02bc",
+      "severity": "low",
+      "category": "bug",
+      "title": "Error from deferred a.Close() is ignored",
+      "message": "The deferred app.Close() return value is discarded, so teardown failures of the app (window/process release, final flushes) are silently dropped in every run of this test.",
+      "suggestion": "Surface the Close error in the test so resource teardown problems are reported:",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "examples/demo-suite/services_test.go",
+          "lines": {
+            "start": 18,
+            "end": 18
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "defer"
+      ],
+      "evidence": "\tdefer a.Close()",
+      "fix": {
+        "before": "\tdefer a.Close()",
+        "after": "\tdefer func() {\n\t\tif e := a.Close(); e != nil {\n\t\t\tt.Error(e)\n\t\t}\n\t}()"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "38e528cef83887ce",
+      "severity": "low",
+      "category": "bug",
+      "title": "t.Fatalf inside the validation loop hides subsequent contract failures",
+      "message": "The page/modal contract loop uses t.Fatalf on the first validation failure, so only one broken page or modal combination is reported per run. When a change breaks several views at once (e.g. a shared widget refactor), each run surfaces only the first violation and the rest require repeated fix cycles.",
+      "suggestion": "Use t.Errorf instead of t.Fatalf so the loop continues and every failing page/modal combination is reported in a single run:",
+      "confidence": 0.7,
+      "locations": [
+        {
+          "path": "examples/demo-suite/services_test.go",
+          "lines": {
+            "start": 33,
+            "end": 35
+          }
+        }
+      ],
+      "tags": [
+        "testing",
+        "test-verbosity"
+      ],
+      "evidence": "\t\t\tif e := ui.Validate(d.view()); e != nil {\n\t\t\t\tt.Fatalf(\"%s modal=%t: %v\", page, modal, e)\n\t\t\t}",
+      "fix": {
+        "before": "\t\t\tif e := ui.Validate(d.view()); e != nil {\n\t\t\t\tt.Fatalf(\"%s modal=%t: %v\", page, modal, e)\n\t\t\t}",
+        "after": "\t\t\tif e := ui.Validate(d.view()); e != nil {\n\t\t\t\tt.Errorf(\"%s modal=%t: %v\", page, modal, e)\n\t\t\t}"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "ec048c954748b9b0",
+      "severity": "low",
+      "category": "bug",
+      "title": "Service payload tests only cover the happy path",
+      "message": "Every Validate call in this test passes a well-formed payload, so a Validate implementation that unconditionally returns nil (or that has a broken condition) would pass all assertions. The negative paths of the Notification, TrayOptions, and FileOptions contracts are never exercised.",
+      "suggestion": "Add table-driven negative cases asserting that invalid payloads are rejected, e.g. app.Notification{ID: \"\"}, app.TrayOptions{Title: \"\"}, and app.FileOptions{Mode: app.SaveFile, Extensions: nil} each return a non-nil error from Validate.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/demo-suite/services_test.go",
+          "lines": {
+            "start": 64,
+            "end": 72
+          }
+        }
+      ],
+      "tags": [
+        "testing",
+        "coverage"
+      ],
+      "evidence": "\tif err := (app.Notification{ID: notificationID, Title: \"Vellum Showcase\", Body: \"Demo\"}).Validate(); err != nil {\n\t\tt.Fatal(err)\n\t}",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 38318,
+    "totalMs": 38333
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 1,
+    "bytes": 2557,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 1682,
+        "output": 6969,
+        "reasoning": 6173
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

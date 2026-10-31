@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b0b54f61d89a053625f99ac377cc0bdd",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "c18f47a6e9441500e2ad3ca221f80659186bd781",
+    "branch": "codex/next-five-stability"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 1,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "1edad34e8a9794a7",
+      "severity": "low",
+      "category": "bug",
+      "title": "Suite manifest path is resolved relative to the current working directory",
+      "message": "On the non-bundle path the manifest is resolved relative to the process working directory. If the launcher is run from any directory other than the repo root the read fails even though the suite was built, and the wrapped error tells the user to rebuild, which is misleading.",
+      "suggestion": "Anchor the manifest to a known location, e.g. resolve it against the executable's directory (filepath.Join(filepath.Dir(exe), \"build/latest-suite.json\")) or accept it via a flag/environment variable; at minimum, extend the error message to state the expected working directory.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "examples/demo-suite/suite_directory.go",
+          "lines": {
+            "start": 21,
+            "end": 24
+          }
+        }
+      ],
+      "tags": [
+        "cwd-dependence",
+        "error-handling",
+        "robustness"
+      ],
+      "evidence": "  data, e := os.ReadFile(\"build/latest-suite.json\")\n  if e != nil {\n  \treturn \"\", fmt.Errorf(\"build the demo suite first: %w\", e)\n  }",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 80814,
+    "totalMs": 80815
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 3,
+    "bytes": 4476,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 2058,
+        "output": 7476,
+        "reasoning": 7112
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

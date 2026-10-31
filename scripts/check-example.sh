@@ -2,7 +2,7 @@
 set -eu
 VELLUM_REPO_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 . "$VELLUM_REPO_ROOT/drivers/cogent/env.sh"
-for VELLUM_EXAMPLE_NAME in hello measurepad personal-mac drawing viewport3d imaging editor grid placement; do
+for VELLUM_EXAMPLE_NAME in hello measurepad personal-mac demo-suite drawing viewport3d imaging editor grid placement; do
 cd "$VELLUM_REPO_ROOT/examples/$VELLUM_EXAMPLE_NAME"
 go test -race ./...
 go vet ./...

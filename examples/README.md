@@ -6,6 +6,7 @@ the [development guide](../docs/development.md) before running native examples.
 
 | Module | Purpose |
 | --- | --- |
+| [demo-suite](demo-suite/README.md) | Version-aware hub, private suite build, verified launcher and full feature catalog |
 | [showcase](showcase/README.md) | Forma design studio, Luma image library and Pulse telemetry explorer, with native README screenshots |
 | [hello](hello/README.md) | Minimal native application |
 | [personal-mac](personal-mac/README.md) | Frozen personal Mac starter: system appearance and full-color native toolbar |
