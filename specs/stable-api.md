@@ -1,6 +1,6 @@
 # Stable v1 API compatibility
 
-The owner approved the stable API/documentation and private macOS v1 packaging pass on25 October2026. This contract adopts source compatibility for the named v1 APIs; it adds no features and does not broaden runtime or distribution qualification. Current identity is `v1.0.0` in release/version.json and vellum.Version.
+The owner approved the stable API/documentation and private macOS v1 packaging pass on25 October2026. This contract adopts source compatibility for the named v1 APIs; it adds no features and does not broaden runtime or distribution qualification. Current identity is `v1.1.0` in release/version.json and vellum.Version.
 
 ## Root module
 

@@ -1,6 +1,6 @@
 # SDK versioning, compatibility and release artifacts
 
-Current source/API identity is **`v1.0.0`**, recorded by `release/version.json`
+Current source/API identity is **`v1.1.0`**, recorded by `release/version.json`
 and `vellum.Version`. The [macOS v1 closeout](macos-v1-release.md) authorizes
 private personal-use packaging and the [stable API contract](stable-api.md).
 The owner separately requested a tagged release on 26 October 2026, authorizing
@@ -29,6 +29,11 @@ older personal-v0.1 candidate; `macos_v1` and `api_compatibility` describe the c
 v1 release. `support.darwin: personal-use` is a bounded runtime-scope label, not a
 public distribution approval; the public tooling gates still require the separate
 exact-payload audit and notice checks.
+
+The owner requested the next source version and push on 31 October 2026.
+The root `v1.1.0` tag records the current source and
+[release notes](../release/notes/v1.1.0.md). Native asset identities, historical
+approvals and support boundaries remain unchanged.
 
 ## Mac distribution input inventory
 

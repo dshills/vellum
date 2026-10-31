@@ -91,9 +91,9 @@ signatures and existing release qualification.
 
 ## Current status
 
-**Latest tagged source release: [v1.0.0](https://github.com/dshills/vellum/releases/tag/v1.0.0).**
+**Latest tagged source release: [v1.1.0](https://github.com/dshills/vellum/tree/v1.1.0).**
 This release provides the Go framework source, macOS examples and build tools
-for personal use. Read the [release notes](release/notes/v1.0.0.md) for highlights
+for personal use. Read the [release notes](release/notes/v1.1.0.md) for highlights
 and the [stable API contract](specs/stable-api.md) for compatibility guarantees
 and experimental exclusions. See the showcase apps above for current UI examples.
 
@@ -101,7 +101,7 @@ Build native apps from the tagged checkout using Quick start below. GitHub's
 source ZIP/tar archives are checkout source, not prepared SDKs or installed apps;
 run the pinned dependency preparation step before native builds. The separately
 versioned native driver is consumed through the checkout's local replacements.
-This release creates the root `v1.0.0` tag; it does not add native-module tags.
+This release creates the root `v1.1.0` tag; it does not add native-module tags.
 
 **Prepared macOS downloads: [macos-v1.0.0-build13](https://github.com/dshills/vellum/releases/tag/macos-v1.0.0-build13).**
 The release contains the SDK, Vellum Notes, Mac Widgets, Mac Shell, Forma, Luma
@@ -179,7 +179,7 @@ Xcode Command Line Tools. Native applications require a supported GPU; current
 personal-use testing targets Apple Silicon macOS.
 
 ```sh
-git clone --branch v1.0.0 --depth 1 https://github.com/dshills/vellum.git
+git clone --branch v1.1.0 --depth 1 https://github.com/dshills/vellum.git
 cd vellum
 
 # Prepare pinned native sources and the local build environment.
