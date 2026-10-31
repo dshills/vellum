@@ -1,0 +1,54 @@
+{
+  "candidate": "build24-b9212489afc9",
+  "host": "macOS 27.2",
+  "route": "real macOS Save/Open chooser selected through app-bound desktop control",
+  "notebooks": {
+    "A": {
+      "file": "Acceptance-A.vellumnotes",
+      "sha256": "f0b0cb0b061cce44cf81dbf5a3bb35c101becc58229ad2980226e88adb68f5ba",
+      "bytes": 1879,
+      "notes": 7,
+      "selected": "n10",
+      "title": "Acceptance A",
+      "body": "A café 日本語\nSave and reopen exactly.",
+      "note_ids": [
+        "n1",
+        "n2",
+        "n3",
+        "n4",
+        "n5",
+        "n6",
+        "n10"
+      ],
+      "next_id": 11
+    },
+    "B": {
+      "file": "Acceptance-B.vellumnotes",
+      "sha256": "3e819348ca0df7d9cc8d2d14d401943a8457f93d22afceab5acea5640be28ead",
+      "bytes": 1871,
+      "notes": 7,
+      "selected": "n10",
+      "title": "Acceptance B",
+      "body": "B café 日本語\ngamma beta gamma",
+      "note_ids": [
+        "n1",
+        "n2",
+        "n3",
+        "n4",
+        "n5",
+        "n6",
+        "n10"
+      ],
+      "next_id": 11
+    }
+  },
+  "native_observations": {
+    "A": "Save As succeeded, Saved notebook observed; native Open selected same file; Opened notebook, seven notes, selected Acceptance A and exact body observed",
+    "B": "Save As succeeded; exact persisted seven-note Unicode payload independently decoded",
+    "focus_limit": "Native panel return did not reliably establish key-window focus for subsequent synthetic shortcuts; B native reopen and whole-app restart are not claimed here."
+  },
+  "host_command": [
+    "sw_vers"
+  ],
+  "host_observed_stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t27.2\nBuildVersion:\t\t26B123\n"
+}

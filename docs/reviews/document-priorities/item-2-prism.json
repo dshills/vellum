@@ -1,0 +1,118 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "72059499a63771d98a10359ea705f39f",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "ea300ccacf61936ac66543e6f0e406e1a4581d61",
+    "branch": "codex/document-acceptance"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 2,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "aab2fec0162e5fbc",
+      "severity": "low",
+      "category": "correctness",
+      "title": "Host version \"macOS 27.2\" is not a verifiable macOS release",
+      "message": "The recorded host \"macOS 27.2\" does not correspond to any known shipping macOS release (Apple's releases went 11–15 and then jumped to year-based 26 in 2025; a 27.x point release would postdate that). This file is acceptance evidence, so a host string that cannot be tied to a real machine undermines the credibility of every other claim in it (the sha256s, byte counts, and native observations). It suggests the value may have been written from memory rather than captured from the actual host.",
+      "suggestion": "Capture the host string from the machine that ran the acceptance test rather than writing it by hand, e.g. `\"$(sw_vers -productName) $(sw_vers -productVersion) ($(uname -m))\"`, and paste that exact output into the record. If \"27.2\" really is the host's version, keep it, but confirm it against `sw_vers -productVersion` before signing off on the file.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "docs/reviews/document-priorities/item-2-result.json",
+          "lines": {
+            "start": 3,
+            "end": 3
+          }
+        }
+      ],
+      "tags": [
+        "acceptance-evidence",
+        "metadata",
+        "verifiability"
+      ],
+      "evidence": "  \"host\": \"macOS 27.2\",",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "7567993b31ac9db7",
+      "severity": "low",
+      "category": "correctness",
+      "title": "Selected note ID \"n10\" is inconsistent with \"notes\": 7",
+      "message": "Both notebooks record \"notes\": 7 but \"selected\": \"n10\" (lines 10–11 and 19–20). If note IDs are assigned sequentially within a notebook, a 7-note notebook can only contain IDs n1–n7 and \"n10\" cannot exist; either the ID scheme allows gaps (notes created then deleted, or IDs shared across both notebooks), or one of the recorded values is wrong. Since this file is meant to serve as exact acceptance evidence, the apparent contradiction should be reconciled, not left for a reader to guess at.",
+      "suggestion": "Confirm the selected note's ID against the persisted notebook (or the procedure in item-2.md). If the ID really is n10, add a short field explaining the ID scheme (e.g. \"note_ids\": \"created n1–n10, deleted n3/n5/n8\" or note that IDs are not sequential); if the script creates n1–n7 and selects the last note, correct the value to \"n7\" in both notebooks.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "docs/reviews/document-priorities/item-2-result.json",
+          "lines": {
+            "start": 10,
+            "end": 11
+          }
+        }
+      ],
+      "tags": [
+        "acceptance-evidence",
+        "internal-consistency",
+        "data"
+      ],
+      "evidence": "      \"notes\": 7,\n      \"selected\": \"n10\",",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 82120,
+    "totalMs": 82122
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 2,
+    "bytes": 3220,
+    "chunks": 1,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 3559,
+        "output": 17763,
+        "reasoning": 15919,
+        "cachedInput": 2112
+      }
+    ],
+    "splits": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
