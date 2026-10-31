@@ -124,6 +124,31 @@ macOS/hardware/display configurations and Windows/Linux. Wayland is unsupported.
 Replay, automation, diagnostics and broader GPU/workbench workloads remain
 experimental. See the [support matrix](docs/macos-v1.md#supported-api-contract).
 
+### Private Documents evaluation
+
+The internal **build24-b9212489afc9** candidate (minimum macOS 27.0) now has
+recorded native document-workflow checks on macOS 27.2: exact Unicode Save/Open,
+Find/Replace with settled keyboard Undo/Redo, coordinated Save A / Cancel B Quit,
+normal restoration, and recovery of an unsaved note after a controlled interruption.
+Focused offscreen race tests cover the corresponding routing and persistence
+contracts. See the [acceptance records](docs/reviews/document-priorities/) for
+scope, evidence and default Prism reviews.
+
+For an existing verified private installation, run from the checkout root:
+
+```sh
+python3 -B scripts/daily-documents.py --check-only
+python3 -B scripts/daily-documents.py
+```
+
+The launcher checks the pinned candidate, installed bytes/signatures and host,
+then opens a separate persistent evaluation workspace. See the
+[daily-use guide](docs/daily-use/README.md) and [issue log](docs/daily-use/ISSUE-LOG.md).
+Multi-day use remains to be evaluated. These scoped checks do not qualify every
+control, physical pointer geometry, IME or VoiceOver, and do not change the public
+build13 downloads or the support matrix. Feature scope and installed candidate
+bytes remain frozen.
+
 ## What is available
 
 - **Mac controls and themes:** text/search fields, prose editors, selectors,
@@ -183,6 +208,7 @@ After preparation, run these commands from the repository root with
 | [Pulse](examples/showcase/README.md#pulse--telemetry-explorer) | `(cd examples/showcase && go run ./cmd/pulse)` | Dark theme, retained charts and virtualized service fixtures |
 | [Mac Widgets](docs/mac-widget-demo.md) | `(cd drivers/cogent && go run ./cmd/gallery -mac-widgets -native-titlebar -mac-system-appearance)` | Frozen widget catalogue, scoped themes, full-color icons, toolbar customization and native panels |
 | [Notes](examples/macapps/notes/README.md) | `(cd examples/macapps && go run ./cmd/notes)` | Proportional prose with emoji, folders/search, native toolbar and menus, local Save/Open, recovery and Undo/Redo |
+| [Documents](docs/daily-use/README.md) | `(cd examples/macapps && go run ./cmd/documents -data-dir /absolute/private/workspace)` | Two independent notebooks, native per-window commands, coordinated Quit, restoration and recovery |
 | [Native shell](examples/macapps/cmd/macshell/main.go) | `(cd examples/macapps && go run ./cmd/macshell)` | Two windows with independent native toolbar commands and disabled states |
 | [Drawing app](examples/placement/README.md) | `(cd examples/placement && go run .)` | Palette placement, pan/zoom, selection, editing, layers, Save/Open and Undo/Redo |
 | [Mac starter](examples/personal-mac/README.md) | `(cd examples/personal-mac && go run .)` | Small public-API consumer with a full-color native toolbar and system appearance |
@@ -244,7 +270,9 @@ published build13 apps. The offscreen SDK consumer CI checks both starter
 profiles, while native UI observations remain separate. Current checkpoints
 use internal code reviews. See the [current document-workflow handoff](docs/mac-document-workflows-handoff.md)
 for the [indexed private candidate](release/private-macos-candidate.json), historical
-file compatibility, producer preflight and explicitly deferred desktop checks.
+file compatibility, producer preflight and historical desktop-check deferrals. The
+[newer Documents acceptance records](docs/reviews/document-priorities/) supplement
+that historical record with scoped native workflow results.
 The index records actual OS requirements; static checks extend no support matrix.
 
 ## Verification
