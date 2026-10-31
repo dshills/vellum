@@ -4,6 +4,10 @@ An independent public Go SDK consumer demonstrating a reusable typed tool palett
 and a managed `ui.Canvas2D`. Block, Connector and Note use the same validation,
 command registry and bounded history path for pointer and keyboard placement.
 
+Holding a palette tool keeps the surrounding controls and canvas in place.
+Their pre-drag availability appearance is retained through release or Escape;
+command execution still checks live admission and remains blocked during capture.
+
 The right-hand **Layers** panel lists components front first. Group selectors
 appear before each group's frontmost member; component rows retain the exact
 paint order even when flat group members are interleaved. Click a component or

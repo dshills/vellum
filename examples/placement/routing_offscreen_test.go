@@ -142,10 +142,67 @@ func TestPublicPaletteCanvasConsumer(t *testing.T) {
 				click("menu:" + base64.RawURLEncoding.EncodeToString([]byte(menu)) + ":" + base64.RawURLEncoding.EncodeToString([]byte(action)))
 			}
 			settle()
+			bounds := func() map[string]image.Rectangle {
+				snapshot, err := driver.Snapshot(ctx)
+				if err != nil {
+					t.Fatal(err)
+				}
+				result := map[string]image.Rectangle{}
+				for _, e := range snapshot.Windows[0].Elements {
+					result[e.ID] = e.Bounds
+				}
+				return result
+			}
+			unchanged := func(before map[string]image.Rectangle) {
+				t.Helper()
+				after := bounds()
+				for id, old := range before {
+					if got, ok := after[id]; !ok || got != old {
+						t.Fatalf("mouse-down resized or removed %s: before=%v after=%v present=%t", id, old, got, ok)
+					}
+				}
+			}
+			for _, id := range []string{"fit", "reset"} {
+				before := bounds()
+				_, control := element(id)
+				at := control.Bounds.Min.Add(control.Bounds.Size().Div(2))
+				input(cogent.ManualInput{Type: events.MouseDown, Button: events.Left, Position: at})
+				unchanged(before)
+				input(cogent.ManualInput{Type: events.MouseUp, Button: events.Left, Position: at})
+			}
+			// A held palette press preserves every measured control while live
+			// command admission stays blocked. A short release restores admission
+			// without placing an object or changing the layout.
+			idle := bounds()
+			_, first := element("tool-block")
+			at := first.Bounds.Min.Add(first.Bounds.Size().Div(2))
+			input(cogent.ManualInput{Type: events.MouseDown, Button: events.Left, Position: at})
+			if !m.palette.State().Active {
+				t.Fatal("palette did not capture press")
+			}
+			unchanged(idle)
+			if m.commands.Invoke(ctx, "fit") == nil {
+				t.Fatal("frozen appearance admitted command during capture")
+			}
+			input(cogent.ManualInput{Type: events.MouseUp, Button: events.Left, Position: at})
+			unchanged(idle)
+			if m.palette.State().Active || m.commands.Enabled("fit") != nil || len(m.scene.Objects) != 0 {
+				t.Fatal("short release did not restore idle admission without placement")
+			}
+			input(cogent.ManualInput{Type: events.MouseDown, Button: events.Left, Position: at})
+			input(cogent.ManualInput{Type: events.KeyChord, Code: key.CodeEscape})
+			unchanged(idle)
+			if m.palette.State().Active || m.commands.Enabled("fit") != nil {
+				t.Fatal("Escape retained capture presentation or blocked admission")
+			}
+			input(cogent.ManualInput{Type: events.MouseUp, Button: events.Left, Position: at})
+			unchanged(idle)
 			for _, id := range []string{"block", "connector", "note"} {
+				beforePress := bounds()
 				_, source := element("tool-" + id)
 				_, target := element("drawing")
 				input(cogent.ManualInput{Type: events.MouseDown, Button: events.Left, Position: source.Bounds.Min.Add(source.Bounds.Size().Div(2))})
+				unchanged(beforePress)
 				pos := target.Bounds.Min.Add(target.Bounds.Size().Div(2)).Add(image.Pt(37, -19))
 				input(cogent.ManualInput{Type: events.MouseMove, Position: pos})
 				if !m.palette.State().Accepted || len(m.scene.Objects) != m.journal.Snapshot().UndoCount {
