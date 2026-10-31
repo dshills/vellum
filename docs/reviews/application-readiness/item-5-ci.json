@@ -1,0 +1,220 @@
+{
+  "date": "2026-10-31",
+  "checked_tag": "v1.1.2",
+  "checked_commit": "121dde859369b3ce091fe66cdfa2d34367e23be1",
+  "runs": [
+    {
+      "id": 41218965239,
+      "name": "Stable root API",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "121dde859369b3ce091fe66cdfa2d34367e23be1",
+      "url": "https://github.com/dshills/vellum/actions/runs/41218965239"
+    },
+    {
+      "id": 41218965261,
+      "name": "Platform adapters",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "121dde859369b3ce091fe66cdfa2d34367e23be1",
+      "url": "https://github.com/dshills/vellum/actions/runs/41218965261"
+    },
+    {
+      "id": 41218965246,
+      "name": "Framework",
+      "status": "completed",
+      "conclusion": "failure",
+      "head_sha": "121dde859369b3ce091fe66cdfa2d34367e23be1",
+      "url": "https://github.com/dshills/vellum/actions/runs/41218965246"
+    },
+    {
+      "id": 41218964692,
+      "name": "Stable root API",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "121dde859369b3ce091fe66cdfa2d34367e23be1",
+      "url": "https://github.com/dshills/vellum/actions/runs/41218964692"
+    },
+    {
+      "id": 41218964763,
+      "name": "Platform adapters",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "121dde859369b3ce091fe66cdfa2d34367e23be1",
+      "url": "https://github.com/dshills/vellum/actions/runs/41218964763"
+    },
+    {
+      "id": 41218964598,
+      "name": "Framework",
+      "status": "completed",
+      "conclusion": "failure",
+      "head_sha": "121dde859369b3ce091fe66cdfa2d34367e23be1",
+      "url": "https://github.com/dshills/vellum/actions/runs/41218964598"
+    }
+  ],
+  "framework_jobs": [
+    {
+      "name": "framework",
+      "conclusion": "failure",
+      "url": "https://github.com/dshills/vellum/actions/runs/41218965246/job/124589339236",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Record job start for optional cache budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run echo \"VELLUM_CACHE_DIR=$RUNNER_TEMP/vellum-go-cache\" >> \"$GITHUB_ENV\"",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-go@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Restore verified downloads and Go build cache",
+          "conclusion": "success"
+        },
+        {
+          "name": "Rebuild and verify pinned native sources",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify downloaded module contents",
+          "conclusion": "success"
+        },
+        {
+          "name": "Tooling and packaging regressions",
+          "conclusion": "success"
+        },
+        {
+          "name": "Portable framework race tests and vet",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native facade race tests vet and build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Pinned dependency regressions",
+          "conclusion": "success"
+        },
+        {
+          "name": "Independent example consumers",
+          "conclusion": "success"
+        },
+        {
+          "name": "Offscreen routing and integration",
+          "conclusion": "failure"
+        },
+        {
+          "name": "Existing offscreen benchmarks",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Check optional cache save budget",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Save verified downloads and Go build cache",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Run actions/setup-go@v5",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "name": "sdk-consumers",
+      "conclusion": "success",
+      "url": "https://github.com/dshills/vellum/actions/runs/41218965246/job/124589339262",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Record job start for optional cache budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-go@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run echo \"VELLUM_CACHE_DIR=$RUNNER_TEMP/vellum-sdk-cache\" >> \"$GITHUB_ENV\"",
+          "conclusion": "success"
+        },
+        {
+          "name": "Restore verified downloads and Go build cache",
+          "conclusion": "success"
+        },
+        {
+          "name": "Rebuild and verify pinned native sources",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify downloaded module contents",
+          "conclusion": "success"
+        },
+        {
+          "name": "Export and verify relocated SDK consumers",
+          "conclusion": "success"
+        },
+        {
+          "name": "Retain SDK consumer verification and failure logs",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check optional cache save budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verified downloads and Go build cache",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-go@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "local_followup": {
+    "change": "correct gallery expectations for managed disabled layout allowance",
+    "focused_race": "passed 5.075s",
+    "remote_followup_ci": "not run; commits are local and original tag is unchanged",
+    "full_gallery_race": "passed 48.013s",
+    "gallery_vet": "passed",
+    "final_focused_race": "passed after review refinements",
+    "native_patch_inventory": "matches reviewed record"
+  }
+}

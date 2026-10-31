@@ -1,0 +1,118 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f5691010b0edb6bad64080124f09c011",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "3591be32f544365d19700e4032d8fc34867f81bd",
+    "branch": "codex/next-five-application-readiness"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 2,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "0f128b9f95f147c7",
+      "severity": "low",
+      "category": "docs",
+      "title": "Comment contradicts the heading expectation it sits next to",
+      "message": "The replacement comment claims the composite disclosure header “retains Core shadow styling,” yet the very next assertion still expects the heading’s disabled-state height to be 6px smaller than normal — exactly the “drops shadow margins” shrinkage the deleted comment described. Either the comment misdescribes the new behavior or the first expectation is stale; a reader cannot tell which of the two is authoritative for `heading`.",
+      "suggestion": "Reconcile the comment with the first expectation: either explain what the remaining 6px heading shrink comes from (e.g. “the heading button still drops its shadow margins when disabled; managed fields and action buttons no longer do”) or, if the header is meant to keep full decoration, change the first expected shrink to 0.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/structure_catalogue_offscreen_test.go",
+          "lines": {
+            "start": 207,
+            "end": 209
+          }
+        }
+      ],
+      "tags": [
+        "test-expectations",
+        "comment"
+      ],
+      "evidence": "// The composite disclosure header retains Core shadow styling. Managed\n// fields and action buttons preserve decoration allowance while disabled;\n// their layout must not revert to the old disabled-state shrinkage.",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "e1e2d2918caa836d",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "`afterY-6` duplicates the sum of the per-section shrink literals",
+      "message": "The expected displacement of `section-after` is hand-maintained as a magic number (-14 before, -6 now) that must always equal the sum of the three per-section shrinks (6+2+6=14 previously, 6+0+0=6 now). If a future edit changes one shrink value but forgets the displacement literal, the test fails confusingly (“disabled section layout”) instead of pointing at the real mismatch.",
+      "suggestion": "Lift the expectations into a named slice and derive the displacement from its sum so the two assertions cannot drift apart:\n\n```go\nshrinks := []int{6, 0, 0}\nfor i, shrink := range shrinks {\n    if normalHeights[i]-disabledHeights[i] != shrink {\n        t.Fatal(\"disabled style metric\", dpi, i, normalHeights, disabledHeights)\n    }\n}\ndisabledDelta := 0\nfor _, shrink := range shrinks {\n    disabledDelta += shrink\n}\nif find(\"section-after\").Bounds.Min.Y != afterY-disabledDelta {\n    t.Fatal(\"disabled section layout\", dpi, afterY, find(\"section-after\").Bounds)\n}\n```",
+      "confidence": 0.7,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/structure_catalogue_offscreen_test.go",
+          "lines": {
+            "start": 209,
+            "end": 215
+          }
+        }
+      ],
+      "tags": [
+        "test-maintainability",
+        "magic-numbers"
+      ],
+      "evidence": "for i, shrink := range []int{6, 0, 0} {",
+      "fix": {
+        "before": "\tfor i, shrink := range []int{6, 0, 0} {\n\t\tif normalHeights[i]-disabledHeights[i] != shrink {\n\t\t\tt.Fatal(\"disabled style metric\", dpi, i, normalHeights, disabledHeights)\n\t\t}\n\t}\n\tif find(\"section-after\").Bounds.Min.Y != afterY-6 {",
+        "after": "\tshrinks := []int{6, 0, 0}\n\tfor i, shrink := range shrinks {\n\t\tif normalHeights[i]-disabledHeights[i] != shrink {\n\t\t\tt.Fatal(\"disabled style metric\", dpi, i, normalHeights, disabledHeights)\n\t\t}\n\t}\n\tdisabledDelta := 0\n\tfor _, shrink := range shrinks {\n\t\tdisabledDelta += shrink\n\t}\n\tif find(\"section-after\").Bounds.Min.Y != afterY-disabledDelta {"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 77668,
+    "totalMs": 77689
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 1,
+    "bytes": 1532,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 1281,
+        "output": 8169,
+        "reasoning": 7271
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -202,15 +202,19 @@ func testStructureCataloguePublicManual(t *testing.T, dpi float32) {
 		t.Fatal("readonly disclosure mutated", g.structureModel())
 	}
 	setup(func() { g.detailsReadOnly = false; g.detailsDisabled = true })
-	// Disabled Core buttons drop shadow margins; the inherited-disabled field
-	// drops its reserved border. These are distinct style states, not a restore.
+	// The composite disclosure header still loses 6px of Core shadow margin
+	// when disabled. Managed fields and action buttons preserve allowance;
+	// their layout must not revert to the old disabled-state shrinkage.
 	disabledHeights := []int{find(heading).Bounds.Dy(), find("section-draft").Bounds.Dy(), find("section-action").Bounds.Dy()}
-	for i, shrink := range []int{6, 2, 6} {
+	shrinks := []int{6, 0, 0}
+	disabledDelta := 0
+	for i, shrink := range shrinks {
+		disabledDelta += shrink
 		if normalHeights[i]-disabledHeights[i] != shrink {
 			t.Fatal("disabled style metric", dpi, i, normalHeights, disabledHeights)
 		}
 	}
-	if find("section-after").Bounds.Min.Y != afterY-14 {
+	if find("section-after").Bounds.Min.Y != afterY-disabledDelta {
 		t.Fatal("disabled section layout", dpi, afterY, find("section-after").Bounds)
 	}
 	if find(heading).Enabled || find("section-draft").Enabled {

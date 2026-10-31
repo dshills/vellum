@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-31",
+  "alert_number": 4,
+  "github_state_at_inspection": "open",
+  "url": "https://github.com/dshills/vellum/security/dependabot/4",
+  "advisory": "GHSA-cq8v-f236-94qc",
+  "severity": "low",
+  "dependency": {
+    "package": {
+      "ecosystem": "rust",
+      "name": "rand"
+    },
+    "manifest_path": "release/native-components/wgpu-darwin-arm64/NOTICES/itertools-0.13.0/Cargo.toml",
+    "version_requirement": ">= 0.7.0,< 0.8.0",
+    "scope": "development",
+    "relationship": "unknown"
+  },
+  "affected_range": ">= 0.7.0, < 0.8.6",
+  "first_patched": "0.8.6",
+  "inventory_path": "release/native-components/wgpu-darwin-arm64/INVENTORY.json",
+  "inventory_sha256": "443e1760808a72d4fee88330c58271e18eb87eea633d30ef180d819c6254f55e",
+  "native_artifact_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "notice_manifest_sha256": "49abb2101a0dd9cb137df206454b6620d04929a4975921fab6682ba834435620",
+  "compiled_rand_components": [],
+  "assessment": "The alert matches an upstream development dependency declaration retained as notice provenance. rand is absent from the recorded compiled-source superset for this native artifact; no affected runtime rand component is established by this alert. This is artifact-scoped triage, not a general assertion about upstream benchmarks, future native builds or all possible binaries.",
+  "action": "Preserve exact notice and artifact bytes. No dependency upgrade or alert dismissal performed; re-evaluate if the native artifact or build dependency set changes."
+}
