@@ -1,0 +1,149 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "83c06cac5a520de40195ef2bb70a4967",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "73ecac18fc70c69fda516e3c377882c844762dde",
+    "branch": "codex/next-five-stability"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 2,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "12de65e15612fa6e",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Hard-coded two-levels-up relative path couples the helper to the checkout layout",
+      "message": "The helper hard-codes the assumption that the consumer package sits exactly two levels below a root containing release/version.json. Per the doc comment this file also runs inside a relocated SDK copy; if the relocation changes the directory depth or omits the release/ tree, the test fails with a bare file-not-found error that gives no hint that the SDK layout assumption was violated. This coupling is implicit and enforced only by this test failing.",
+      "suggestion": "Either document the required layout next to the path construction (e.g. // requires \u003cmodule-root\u003e/release/version.json two dirs up) or resolve the root explicitly (walk up to go.mod, or inject the path from the caller) so the relocation contract is stated in one place rather than implied by \"..\", \"..\".",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/sdk-contract/release_identity_test.go",
+          "lines": {
+            "start": 17,
+            "end": 20
+          }
+        }
+      ],
+      "tags": [
+        "path-handling",
+        "test-infrastructure"
+      ],
+      "evidence": "\tdata, err := os.ReadFile(filepath.Join(\"..\", \"..\", \"release\", \"version.json\"))\n\tif err != nil {\n\t\tt.Fatal(err)\n\t}",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "ff7df3215220c1c4",
+      "severity": "low",
+      "category": "testing",
+      "title": "Ambiguous assertion failure message conflates two distinct contract checks",
+      "message": "The combined condition cannot distinguish between the two failure modes when it fires in CI: a package/release version mismatch versus the SDK having moved off the v1 major line. The message text \"stable-v1 consumer identity\" also never states what expectation was violated, so a maintainer seeing this failure has to re-derive the invariant from the code.",
+      "suggestion": "Split the check into two ifs with distinct, self-describing messages so the failure output names the broken contract.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "examples/sdk-contract/release_identity_test.go",
+          "lines": {
+            "start": 25,
+            "end": 27
+          }
+        }
+      ],
+      "tags": [
+        "test-diagnostics",
+        "error-messages"
+      ],
+      "evidence": "\tif release.Version != vellum.Version || !strings.HasPrefix(vellum.Version, \"v1.\") {\n\t\tt.Fatalf(\"stable-v1 consumer identity: package=%q release=%q\", vellum.Version, release.Version)\n\t}",
+      "fix": {
+        "before": "\tif release.Version != vellum.Version || !strings.HasPrefix(vellum.Version, \"v1.\") {\n\t\tt.Fatalf(\"stable-v1 consumer identity: package=%q release=%q\", vellum.Version, release.Version)\n\t}",
+        "after": "\tif release.Version != vellum.Version {\n\t\tt.Fatalf(\"release metadata out of sync with SDK: package=%q release=%q\", vellum.Version, release.Version)\n\t}\n\tif !strings.HasPrefix(vellum.Version, \"v1.\") {\n\t\tt.Fatalf(\"SDK no longer on the v1 major line: package=%q release=%q\", vellum.Version, release.Version)\n\t}"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 147658,
+    "totalMs": 147685
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 2,
+    "bytes": 3364,
+    "chunks": 1,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 4693,
+        "output": 23568,
+        "reasoning": 21503,
+        "cachedInput": 2368
+      }
+    ],
+    "widenedFiles": 1,
+    "splits": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "139fc209a68fa5ea",
+        "severity": "low",
+        "category": "maintainability",
+        "title": "Version check replaced by helper with unknown failure behavior",
+        "message": "The version check that previously failed fast with a message describing the discrepancy (t.Fatal(vellum.Version)) has been replaced with a helper whose failure semantics cannot be verified in this diff. If assertReleaseIdentity reports with t.Error rather than t.Fatal, the contract test would continue executing after a failed identity assertion.",
+        "suggestion": "Ensure assertReleaseIdentity calls t.Helper() and terminates via t.Fatal/panic on failure so callers cannot proceed past a broken release identity check.",
+        "confidence": 0.3,
+        "locations": [
+          {
+            "path": "examples/sdk-contract/contract_test.go",
+            "lines": {
+              "start": 22,
+              "end": 30
+            }
+          }
+        ],
+        "tags": [
+          "testing"
+        ],
+        "evidence": "func TestControlledViewAndCommandContract(t *testing.T) {\n  assertReleaseIdentity(t)",
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      },
+      "reason": "quoted evidence not found in examples/sdk-contract/contract_test.go"
+    }
+  ],
+  "suppressed": []
+}

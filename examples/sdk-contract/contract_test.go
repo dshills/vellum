@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dshills/vellum"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/command"
@@ -23,9 +22,7 @@ import (
 )
 
 func TestControlledViewAndCommandContract(t *testing.T) {
-	if vellum.Version != "v1.0.0" {
-		t.Fatal(vellum.Version)
-	}
+	assertReleaseIdentity(t)
 	checked := false
 	view := func() ui.Node {
 		return ui.Node{ID: "root", Kind: ui.Column, Style: ui.Style{Gap: ui.Some(float32(0)), Padding: ui.Some(ui.UniformInsets(8))}, Children: []ui.Node{{ID: "enabled", Kind: ui.Checkbox, Checked: checked, Accessibility: ui.Accessibility{Name: "Enable preview"}, Change: func(e ui.ChangeEvent) { checked = e.Checked }}}}
