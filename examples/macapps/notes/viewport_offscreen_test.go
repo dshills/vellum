@@ -64,7 +64,7 @@ func TestNotesMacLayout(t *testing.T) {
 		t.Run(size.String(), func(t *testing.T) { notesViewport(t, size) })
 	}
 }
-func notesViewport(t *testing.T, size image.Point) {
+func notesViewport(t *testing.T, size image.Point, checks ...func(*Model, *app.Application, *cogent.Manual)) {
 	ctx := context.Background()
 	model := New()
 	a, err := app.New(app.Config{})
@@ -88,7 +88,7 @@ func notesViewport(t *testing.T, size image.Point) {
 	theme := Theme()
 	theme.Default.Background = ui.Some(color.NRGBA{})
 
-	config := cogent.ManualConfig{Clock: clock, Executor: executor, Theme: theme, LogicalDPI: 160, OwnerBatch: 7, MaxWindows: 1, EventCapacity: 128}
+	config := cogent.ManualConfig{Commands: model.Commands(), Clock: clock, Executor: executor, Theme: theme, LogicalDPI: 160, OwnerBatch: 7, MaxWindows: 1, EventCapacity: 128}
 	err = fs.WalkDir(fonts.Default, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -188,4 +188,8 @@ func notesViewport(t *testing.T, size image.Point) {
 			t.Fatal(closeErr)
 		}
 	}
+	for _, check := range checks {
+		check(model, a, m)
+	}
+
 }

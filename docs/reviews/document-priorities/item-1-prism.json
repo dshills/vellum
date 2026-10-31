@@ -1,0 +1,125 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "99d0a4316d3ece837d458e018d296c46",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "0f81df6e6a4f9698fe3358710132a14987ad1f37",
+    "branch": "codex/document-acceptance"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 2,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "02870b588291f627",
+      "severity": "low",
+      "category": "docs",
+      "title": "Heading says \"keyboard history\" but the subject is undo/redo history",
+      "message": "The diagnosis is about editor focus and the Command-Z / Command-Shift-Z undo transaction, i.e. undo history. \"Keyboard history\" is not established terminology and can be misread as keyboard-event logging, making the document harder to identify when scanning the docs tree.",
+      "suggestion": "Rename the heading to match the subject, e.g. \"# Item 1 — focus and undo history diagnosis\".",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "docs/reviews/document-priorities/item-1.md",
+          "lines": {
+            "start": 1,
+            "end": 1
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "clarity"
+      ],
+      "evidence": "# Item 1 — focus and keyboard history diagnosis",
+      "fix": {
+        "before": "# Item 1 — focus and keyboard history diagnosis",
+        "after": "# Item 1 — focus and undo history diagnosis"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "d64a1d7a94a6ac7d",
+      "severity": "low",
+      "category": "docs",
+      "title": "Offscreen regression described without naming or linking the test files",
+      "message": "The paragraph summarizes what \"the new offscreen regression\" does (managed hit-testing at measured replacement bounds, explicit settlement between phases), but never identifies which files implement it. A reader cannot navigate from this diagnosis to the code it certifies, and claims like \"It does not send descriptor callbacks in place of pointer input\" cannot be located or checked from the document alone.",
+      "suggestion": "Name the regression files where the regression is first mentioned, e.g. examples/macapps/notes/find_routing_offscreen_test.go and examples/macapps/notes/viewport_offscreen_test.go.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "docs/reviews/document-priorities/item-1.md",
+          "lines": {
+            "start": 16,
+            "end": 18
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "cross-reference"
+      ],
+      "evidence": "focus, while keyboard navigation did. The new offscreen regression exercises the\nactual managed hit-testing route at measured replacement bounds, then Replace All,\nEscape, Command-Z and Command-Shift-Z, with explicit settlement between phases.",
+      "fix": {
+        "before": "focus, while keyboard navigation did. The new offscreen regression exercises the\nactual managed hit-testing route at measured replacement bounds, then Replace All,\nEscape, Command-Z and Command-Shift-Z, with explicit settlement between phases.",
+        "after": "focus, while keyboard navigation did. The new offscreen regression\n(examples/macapps/notes/find_routing_offscreen_test.go,\nexamples/macapps/notes/viewport_offscreen_test.go) exercises the\nactual managed hit-testing route at measured replacement bounds, then Replace All,\nEscape, Command-Z and Command-Shift-Z, with explicit settlement between phases."
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 165273,
+    "totalMs": 165294
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 3,
+    "bytes": 9691,
+    "chunks": 1,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 9303,
+        "output": 35745,
+        "reasoning": 32909,
+        "cachedInput": 2368
+      }
+    ],
+    "widenedFiles": 1,
+    "splits": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
