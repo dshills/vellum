@@ -18,3 +18,5 @@ The low cross-platform test finding is fixed by marking native staging tests as
 macOS-only; actual packaging already rejects unsupported hosts. Eight Python
 checks pass, including injected failure cleanup and delivery-path isolation.
 The full build from committed source follows this checkpoint.
+
+Full build5 from clean 04f1174f883469f6f62ce0975f1349127d17db9f passed all 19 strict signed bundles and ZIP-extraction checks while delivering into the synced workspace. The output contains exactly the archive and receipt, no app bundles. The original working suite was moved aside, not deleted. Canonical launch --verify-only restored the selected ZIP into fresh local staging and verified the same source/hash identity; launch then opened the v1.1.2 hub visibly. Producer native_runtime remains its original not-executed fact, with this subsequent hub startup recorded separately in item-3-result.json. The compatibility Launch.command still delegates to the canonical launcher.
