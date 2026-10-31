@@ -1,6 +1,6 @@
 # SDK versioning, compatibility and release artifacts
 
-Current source/API identity is **`v1.1.0`**, recorded by `release/version.json`
+Current source/API identity is **`v1.1.1`**, recorded by `release/version.json`
 and `vellum.Version`. The [macOS v1 closeout](macos-v1-release.md) authorizes
 private personal-use packaging and the [stable API contract](stable-api.md).
 The owner separately requested a tagged release on 26 October 2026, authorizing
@@ -34,6 +34,11 @@ The owner requested the next source version and push on 31 October 2026.
 The root `v1.1.0` tag records the current source and
 [release notes](../release/notes/v1.1.0.md). Native asset identities, historical
 approvals and support boundaries remain unchanged.
+
+The owner subsequently requested tagging and pushing the palette capture fix.
+The root `v1.1.1` source tag records that patch and its
+[release notes](../release/notes/v1.1.1.md), without replacing historical tags or
+changing native asset publication scope.
 
 ## Mac distribution input inventory
 

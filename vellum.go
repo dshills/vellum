@@ -4,4 +4,4 @@ package vellum
 
 // Version identifies the framework API release. Stable v1 compatibility applies
 // within specs/stable-api.md; experimental contracts retain their named limits.
-const Version = "v1.1.0"
+const Version = "v1.1.1"
