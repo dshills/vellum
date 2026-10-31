@@ -1,0 +1,179 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "44874be0ef84e7f05a97b82890cd83a9",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "b80cd7590b4e8dbbf39568e8852ab5586c0a1f9b",
+    "branch": "codex/next-five-stability"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 3,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "c6b0eb179126d3cd",
+      "severity": "low",
+      "category": "docs",
+      "title": "Result artifact lacks a run date/timestamp",
+      "message": "The artifact records the host and source_commit but no timestamp of when the manual run was performed, so a re-run against the same commit (or on a patched build) cannot be distinguished from the original run when comparing results over time.",
+      "suggestion": "Add a top-level \"recorded_at\" field with the ISO-8601 timestamp of the run (and optionally the operator name) next to \"source_commit\".",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reviews/next-five-stability/item-1-result.json",
+          "lines": {
+            "start": 2,
+            "end": 4
+          }
+        }
+      ],
+      "tags": [
+        "qa-artifact",
+        "reproducibility"
+      ],
+      "evidence": "  \"source_commit\": \"9dc6012e0b1f765c4272182db6d334777c8183d2\",",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "52f5cb5f106ec885",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "No overall result field despite a non-passing sub-check",
+      "message": "The file records five passing checklist items but also a non-passing desktop drag attempt, with no top-level verdict indicating whether item-1 overall passed or whether the drag failure is blocking. Consumers must cross-read multiple fields to infer the outcome, which invites misinterpretation.",
+      "suggestion": "Add an explicit top-level outcome field next to the checklist (e.g. \"overall_result\": \"pass\" or \"fail\") plus a short notes field stating whether the desktop drag failure is blocking.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "docs/reviews/next-five-stability/item-1-result.json",
+          "lines": {
+            "start": 10,
+            "end": 10
+          }
+        }
+      ],
+      "tags": [
+        "qa-artifact",
+        "schema"
+      ],
+      "evidence": "  \"desktop_drag_attempt\": \"no object change; not passed\",",
+      "fix": {
+        "before": "  \"suite_revision\": 2,",
+        "after": "  \"suite_revision\": 2,\n  \"overall_result\": \"pass\",\n  \"overall_notes\": \"All five checklist checks passed; desktop drag attempt produced no object change and is recorded as not passed (non-blocking).\","
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "52f5cb5f106ec885",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "desktop_drag_attempt conflates observation and verdict in one free-text string",
+      "message": "The value mixes a factual observation ('no object change') with a verdict ('not passed') in a single free-text string, and its type (string) is inconsistent with the sibling \"native_keyboard_placement\" object. Any tooling that aggregates these results must substring-match prose instead of reading a field, and formatting tweaks will silently break that matching.",
+      "suggestion": "Split the string into structured fields so the verdict is machine-readable, e.g. {\"object_change\": false, \"passed\": false}.",
+      "confidence": 0.65,
+      "locations": [
+        {
+          "path": "docs/reviews/next-five-stability/item-1-result.json",
+          "lines": {
+            "start": 10,
+            "end": 10
+          }
+        }
+      ],
+      "tags": [
+        "schema",
+        "consistency"
+      ],
+      "evidence": "  \"desktop_drag_attempt\": \"no object change; not passed\",",
+      "fix": {
+        "before": "  \"desktop_drag_attempt\": \"no object change; not passed\",",
+        "after": "  \"desktop_drag_attempt\": {\n    \"object_change\": false,\n    \"passed\": false\n  },"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 173245,
+    "totalMs": 173266
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 2,
+    "bytes": 3900,
+    "chunks": 1,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 5094,
+        "output": 32018,
+        "reasoning": 28726,
+        "cachedInput": 2496
+      }
+    ],
+    "splits": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "c7e64f428c0a88c5",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Drag-based checklist passes are not instrumentally corroborated",
+        "message": "Checklist steps 1, 2, 4, and 5 all specifically verify mouse-drag behavior (drag placement, held-state geometry, drop rejection, drag cancellation), but the tool's own drag attempts failed (lines 20-22), the tool only verified the final state, and the final state (one block, Undo 1 / Redo 0) is indistinguishable from a keyboard-Return placement such as the one the tool itself performed earlier. The recording of “All five checks passed” therefore rests entirely on operator self-report, not on native inspection, and the markdown does not make that limitation explicit in the acceptance sentence.",
+        "suggestion": "State explicitly that four of the five checks (the drag-dependent ones) are operator-attested and not instrumentally corroborated, and that the final native state is consistent with either a mouse drag or keyboard placement, e.g. append: “Checks 1, 2, 4 and 5 depend on mouse-drag behavior that the tool could not deliver or observe; their pass status is operator-attested only, and the final state does not distinguish a drag placement from a keyboard placement.”",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "docs/reviews/next-five-stability/item-1.md",
+            "lines": {
+              "start": 38,
+              "end": 43
+            }
+          }
+        ],
+        "tags": [
+          "evidence-integrity",
+          "acceptance-testing",
+          "docs"
+        ],
+        "evidence": "The user reported “All five checks passed”. Final native inspection independently\nshowed exactly one selected Block (block-2, 80 × 50), Undo 1 / Redo 0, rejection\noff and Connector focused after cancellation.",
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      },
+      "reason": "quoted evidence not found in docs/reviews/next-five-stability/item-1.md"
+    }
+  ],
+  "suppressed": []
+}

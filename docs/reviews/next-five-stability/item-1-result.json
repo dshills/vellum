@@ -1,0 +1,43 @@
+{
+  "source_commit": "9dc6012e0b1f765c4272182db6d334777c8183d2",
+  "suite_revision": 2,
+  "host": "macOS 27.2",
+  "native_keyboard_placement": {
+    "before_objects": 0,
+    "after_objects": 1,
+    "after_undo_objects": 0
+  },
+  "desktop_drag_attempt": {
+    "object_change": false,
+    "passed": false,
+    "blocking": false,
+    "reason": "operator checks supplied the physical acceptance"
+  },
+  "operator_checklist": {
+    "source": "direct user reply: All five checks passed",
+    "held_layout_stable": "passed",
+    "valid_block_drop": "passed",
+    "undo_redo_zero_one": "passed",
+    "rejected_note_no_addition": "passed",
+    "escape_connector_no_addition": "passed"
+  },
+  "final_native_inspection": {
+    "objects": 1,
+    "selected": "block-2",
+    "dimensions": [
+      80,
+      50
+    ],
+    "undo": 1,
+    "redo": 0,
+    "reject_all_drops": false,
+    "reject_notes": false,
+    "focused_control": "Connector",
+    "status": "Placed block-2 at (-180, -120) • 1 objects • 1 selected • Undo 1 / Redo 0",
+    "dirty": true
+  },
+  "recorded_at": "2026-10-31T14:18:27.482815+00:00",
+  "recorded_at_scope": "record finalized after operator reply and native inspection, not an exact input-event timestamp",
+  "overall_result": "pass for the operator-assisted five-step checklist",
+  "overall_notes": "Unsuccessful desktop-tool drags remain non-passing; operator physical checks supplied acceptance and final native state was independently inspected."
+}
