@@ -1,9 +1,10 @@
-# Safe resumption of deferred Mac checks
+# Safe macOS verification and native checks
 
-Status on 30 October 2026: **desktop checks remain deferred**. This checklist is
-a handoff, not permission to execute its native steps. Keep features, backend,
-rendering/pacing and release/performance policy unchanged. Do not change global
-input, accessibility, security, quarantine or application document settings.
+Current status: the 30 October desktop deferral is historical. Later scoped
+native checks are recorded in [current status](status.md); they do not complete
+every case below or imply permission for unrelated desktop actions. Keep features,
+backend and rendering/pacing unchanged. Do not change global input, accessibility,
+security, quarantine or application document settings as a testing shortcut.
 
 ## Offscreen identity checks available now
 
@@ -32,13 +33,14 @@ the standalone verifier/linkage tools remain independently consumable from SDKs.
 The commands use the recorded owner's local delivery convention. Other hosts must
 select their explicitly transferred complete payload and reviewed identities.
 Do not modify selected inputs during verification or substitute a similarly named
-old build. Build24 includes e589f36e; build23 and older installations remain retained.
+old build. Earlier versions and their source-bound receipts remain retained.
 
-All five build24 executables require macOS 27.0; recorded inspection host is 27.2.
-They cannot run on historically qualified 26.6.2, and no 27.2 launch qualification
-is claimed. Signatures/source tests do not establish physical/native behavior.
+The selected build25 executables require macOS 27.0; the recorded inspection host
+is 27.2. Later Documents sessions on 27.2 are separate runtime evidence, not
+acceptance of every app or older-host compatibility. Signatures/source tests alone
+do not establish physical/native behavior.
 
-## Before any native check, after desktop deferral is lifted
+## Before an authorized native check
 
 1. Confirm the approved app set and bounded desktop window. Use only authorized
    app-restricted input methods; stop if the foreground app changes. Do not send
@@ -81,7 +83,8 @@ last completed step. Do not turn a bounded check into a performance campaign.
 Record the exact tested source/package and separate physical-pointer/keyboard,
 accessible-action and automated/offscreen results. A code-level window-ID reuse
 test does not prove native focus; an archive signature does not prove launch.
-The lifetime regression at `e589f36e` currently has offscreen evidence only.
+The historical lifetime regression and later native sessions retain their named
+scopes; the latter are not a complete native qualification of every lifetime case.
 Human IME/VoiceOver, other hardware/hosts and quarantine/notarization remain
 unqualified. A successful local check grants no new distribution approval.
 

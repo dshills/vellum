@@ -1,11 +1,17 @@
 # macOS v1 for personal use
 
-`v1.0.0` adopts the [stable API contract](../specs/stable-api.md) for private personal use on the recorded Apple Silicon macOS 26.6.2 configuration. The [release closeout](../specs/macos-v1-release.md) governs final CI and matching SDK/apps. The completed RC, public alpha.3 and older personal-v0.1 deliveries retain their original identities. The later owner-authorized [v1.0.0 source release](../release/notes/v1.0.0.md)
-adds a public root tag and checkout source. Historical private packages retain
-their original identities. The matching-source
-[macos-v1.0.0-build13 SDK and six apps](https://github.com/dshills/vellum/releases/tag/macos-v1.0.0-build13)
-are now published as ad-hoc signed, unnotarized developer downloads. The separate
-packaging tag identifies source64bf9cf; the root v1.0.0 source tag remains4b42fb8.
+The current source release is **v1.1.3**. The v1.0.0 stable API baseline and
+recorded Apple Silicon macOS 26.6.2 qualification are historical anchors, not the
+version of every installed app. The private build25 candidate requires macOS 27.0
+and has scoped Documents checks on 27.2. That evidence does not qualify every
+app, OS or host. See [current source/artifact status](status.md).
+
+The [published build13 SDK and six apps](https://github.com/dshills/vellum/releases/tag/macos-v1.0.0-build13)
+remain the prepared public downloads. They use source 64bf9cf and SDK v1.0.0,
+while later root source tags and private builds retain distinct identities.
+They are ad-hoc signed, unnotarized developer downloads. The
+[release closeout](../specs/macos-v1-release.md) preserves the scope of the owner
+choices; it does not authorize every future native payload or signing route.
 
 ## Supported API contract
 

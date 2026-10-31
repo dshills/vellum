@@ -1,14 +1,20 @@
 # Documentation
 
-Start with the [project overview](../README.md), [development guide](development.md)
-and [implementation status](implementation.md). For current Mac use, follow the
-[v1 support guide](macos-v1.md), [stable API contract](../specs/stable-api.md)
-and [release closeout](../specs/macos-v1-release.md). The older delivery plan
-retains broader qualification work.
+Start with [current project/macOS status](status.md), the
+[project overview](../README.md), [application guide](building-macos-apps.md)
+and [development guide](development.md). The [implementation ledger](implementation.md)
+and older plans preserve chronological checkpoints; they are not the current
+release dashboard. See the [documentation audit and gaps](documentation-audit.md).
 
-- [Current document-workflow handoff](mac-document-workflows-handoff.md): indexed private artifact identities, static OS requirements and deferred native acceptance.
+- [Version-aware demo suite](../examples/demo-suite/README.md): build, verified launch and archive restoration.
+- [Work Log exported-SDK consumer](../examples/work-log/README.md): standalone app recipe and acceptance scope.
+- [Upgrade and recovery guide](upgrading-macos-apps.md): data ownership, backups, version switching and safe refusals.
+- [Multi-day evaluation](daily-use/SESSION-LOG.md): actual operator use, dated ledger and validator.
+- [Stable API contract](../specs/stable-api.md) and [Mac support guide](macos-v1.md): compatibility and qualification limits.
+
+- [Current document-workflow handoff](mac-document-workflows-handoff.md): indexed private artifact identities, producer-time facts and subsequent scoped native results.
 - [Private candidate index](../release/private-macos-candidate.json): checked source of identities and generated handoff commands; run `scripts/private-candidate.py` from the checkout.
-- [Safe desktop resumption](mac-desktop-resumption.md): offscreen identity checks now and bounded disposable-fixture checks only after desktop deferral is lifted.
+- [Safe desktop resumption](mac-desktop-resumption.md): identity verification and bounded disposable-fixture checks; historical deferral is not a current blanket status.
 - [Mac input widgets](mac-widget-integration.md): public API setup, themes, owner values and focus helpers.
 - [Mac widget demo](mac-widget-demo.md): run the private light/dark gallery.
 - [Repository layout](repository-layout.md): package, module, command and archive boundaries.

@@ -1,0 +1,6488 @@
+{
+  "base": "0b11d3b092455b9967bad891fa42ae4ba5b6f8ae",
+  "counts": {
+    "maintained": 167,
+    "archive": 677,
+    "pinned-native": 76,
+    "third-party": 16
+  },
+  "documents": [
+    {
+      "path": "CONTRIBUTING.md",
+      "category": "maintained",
+      "lines": 86
+    },
+    {
+      "path": "README.md",
+      "category": "maintained",
+      "lines": 346
+    },
+    {
+      "path": "docs/README.md",
+      "category": "maintained",
+      "lines": 46
+    },
+    {
+      "path": "docs/building-macos-apps.md",
+      "category": "maintained",
+      "lines": 256
+    },
+    {
+      "path": "docs/controls.md",
+      "category": "maintained",
+      "lines": 714
+    },
+    {
+      "path": "docs/daily-use/ISSUE-LOG.md",
+      "category": "maintained",
+      "lines": 43
+    },
+    {
+      "path": "docs/daily-use/README.md",
+      "category": "maintained",
+      "lines": 28
+    },
+    {
+      "path": "docs/daily-use/SESSION-LOG.md",
+      "category": "maintained",
+      "lines": 39
+    },
+    {
+      "path": "docs/decisions/0001-p0-foundation.md",
+      "category": "archive",
+      "lines": 48
+    },
+    {
+      "path": "docs/decisions/0002-foundation-gaps.md",
+      "category": "archive",
+      "lines": 29
+    },
+    {
+      "path": "docs/decisions/0003-remediation-feasibility.md",
+      "category": "archive",
+      "lines": 24
+    },
+    {
+      "path": "docs/decisions/0004-native-input-prototype.md",
+      "category": "archive",
+      "lines": 20
+    },
+    {
+      "path": "docs/decisions/0005-foundation-checks.md",
+      "category": "archive",
+      "lines": 20
+    },
+    {
+      "path": "docs/decisions/0006-foundation-contracts.md",
+      "category": "archive",
+      "lines": 20
+    },
+    {
+      "path": "docs/decisions/0007-foundation-integration.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/decisions/0008-foundation-acceptance-audit.md",
+      "category": "archive",
+      "lines": 9
+    },
+    {
+      "path": "docs/decisions/0009-ordered-native-events.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/decisions/0010-visual-bidi-native-range-geometry.md",
+      "category": "archive",
+      "lines": 13
+    },
+    {
+      "path": "docs/decisions/0011-multiline-native-adapter.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/decisions/0012-native-dependency-maintenance.md",
+      "category": "archive",
+      "lines": 60
+    },
+    {
+      "path": "docs/desktop-integration.md",
+      "category": "maintained",
+      "lines": 182
+    },
+    {
+      "path": "docs/development.md",
+      "category": "maintained",
+      "lines": 494
+    },
+    {
+      "path": "docs/distribution.md",
+      "category": "maintained",
+      "lines": 15
+    },
+    {
+      "path": "docs/fusion-workbench.md",
+      "category": "maintained",
+      "lines": 148
+    },
+    {
+      "path": "docs/implementation.md",
+      "category": "maintained",
+      "lines": 694
+    },
+    {
+      "path": "docs/mac-composition-widgets.md",
+      "category": "maintained",
+      "lines": 73
+    },
+    {
+      "path": "docs/mac-content-integration.md",
+      "category": "maintained",
+      "lines": 64
+    },
+    {
+      "path": "docs/mac-desktop-resumption.md",
+      "category": "maintained",
+      "lines": 91
+    },
+    {
+      "path": "docs/mac-document-controls.md",
+      "category": "maintained",
+      "lines": 109
+    },
+    {
+      "path": "docs/mac-document-workflows-handoff.md",
+      "category": "maintained",
+      "lines": 219
+    },
+    {
+      "path": "docs/mac-presentation.md",
+      "category": "maintained",
+      "lines": 40
+    },
+    {
+      "path": "docs/mac-preview-widgets.md",
+      "category": "maintained",
+      "lines": 102
+    },
+    {
+      "path": "docs/mac-theming.md",
+      "category": "maintained",
+      "lines": 63
+    },
+    {
+      "path": "docs/mac-toolbars.md",
+      "category": "maintained",
+      "lines": 274
+    },
+    {
+      "path": "docs/mac-widget-demo.md",
+      "category": "maintained",
+      "lines": 259
+    },
+    {
+      "path": "docs/mac-widget-essentials.md",
+      "category": "maintained",
+      "lines": 76
+    },
+    {
+      "path": "docs/mac-widget-integration.md",
+      "category": "maintained",
+      "lines": 186
+    },
+    {
+      "path": "docs/macos-app-shell.md",
+      "category": "maintained",
+      "lines": 91
+    },
+    {
+      "path": "docs/macos-preview-release.md",
+      "category": "maintained",
+      "lines": 105
+    },
+    {
+      "path": "docs/macos-v1-reliability.md",
+      "category": "maintained",
+      "lines": 5
+    },
+    {
+      "path": "docs/macos-v1.md",
+      "category": "maintained",
+      "lines": 66
+    },
+    {
+      "path": "docs/native-titlebar-toolbar-prototype.md",
+      "category": "maintained",
+      "lines": 133
+    },
+    {
+      "path": "docs/personal-macos-input-checklist.md",
+      "category": "maintained",
+      "lines": 58
+    },
+    {
+      "path": "docs/personal-macos-v01.md",
+      "category": "maintained",
+      "lines": 143
+    },
+    {
+      "path": "docs/private-consumer-bundle.md",
+      "category": "maintained",
+      "lines": 161
+    },
+    {
+      "path": "docs/private-macos-installation.md",
+      "category": "maintained",
+      "lines": 171
+    },
+    {
+      "path": "docs/reports/EDITOR_VISUAL_NAVIGATION.md",
+      "category": "archive",
+      "lines": 9
+    },
+    {
+      "path": "docs/reports/FOUNDATION_ACCEPTANCE_AUDIT.md",
+      "category": "archive",
+      "lines": 45
+    },
+    {
+      "path": "docs/reports/FOUNDATION_CHECKS_RESULTS.md",
+      "category": "archive",
+      "lines": 49
+    },
+    {
+      "path": "docs/reports/FOUNDATION_CONTRACTS_RESULTS.md",
+      "category": "archive",
+      "lines": 36
+    },
+    {
+      "path": "docs/reports/FOUNDATION_INTEGRATION_RESULTS.md",
+      "category": "archive",
+      "lines": 45
+    },
+    {
+      "path": "docs/reports/FOUNDATION_REGRESSION_FIX.md",
+      "category": "archive",
+      "lines": 13
+    },
+    {
+      "path": "docs/reports/FOUNDATION_RESULTS.md",
+      "category": "archive",
+      "lines": 87
+    },
+    {
+      "path": "docs/reports/INPUT_ORDERING_FIX.md",
+      "category": "archive",
+      "lines": 31
+    },
+    {
+      "path": "docs/reports/LARGE_DOCUMENT_NATIVE_INPUT.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reports/MACOS_COMPLETION_AUDIT.md",
+      "category": "archive",
+      "lines": 70
+    },
+    {
+      "path": "docs/reports/MULTILINE_NATIVE_ADAPTER.md",
+      "category": "archive",
+      "lines": 29
+    },
+    {
+      "path": "docs/reports/NATIVE_INPUT_RESULTS.md",
+      "category": "archive",
+      "lines": 61
+    },
+    {
+      "path": "docs/reports/P0_RESULTS.md",
+      "category": "archive",
+      "lines": 81
+    },
+    {
+      "path": "docs/reports/README.md",
+      "category": "archive",
+      "lines": 133
+    },
+    {
+      "path": "docs/reports/REMEDIATION_RESULTS.md",
+      "category": "archive",
+      "lines": 63
+    },
+    {
+      "path": "docs/reports/VISUAL_TEXT_GEOMETRY_FIX.md",
+      "category": "archive",
+      "lines": 29
+    },
+    {
+      "path": "docs/reports/accessibility/README.md",
+      "category": "archive",
+      "lines": 57
+    },
+    {
+      "path": "docs/reports/mac-app-icons/README.md",
+      "category": "archive",
+      "lines": 33
+    },
+    {
+      "path": "docs/reports/mac-build24/README.md",
+      "category": "archive",
+      "lines": 64
+    },
+    {
+      "path": "docs/reports/mac-integration-pass/README.md",
+      "category": "archive",
+      "lines": 48
+    },
+    {
+      "path": "docs/reports/mac-integration-pass/interactions.md",
+      "category": "archive",
+      "lines": 47
+    },
+    {
+      "path": "docs/reports/mac-personal-app-stabilization/README.md",
+      "category": "archive",
+      "lines": 96
+    },
+    {
+      "path": "docs/reports/mac-toolbar-personal/native-drag.md",
+      "category": "archive",
+      "lines": 25
+    },
+    {
+      "path": "docs/reports/mac-toolbar-personal/native-titlebar-customization.md",
+      "category": "archive",
+      "lines": 50
+    },
+    {
+      "path": "docs/reports/mac-widget-fidelity-20261030/README.md",
+      "category": "archive",
+      "lines": 77
+    },
+    {
+      "path": "docs/reports/macos-acquisition-diagnostics/README.md",
+      "category": "archive",
+      "lines": 76
+    },
+    {
+      "path": "docs/reports/macos-adaptive-tile-binning/README.md",
+      "category": "archive",
+      "lines": 111
+    },
+    {
+      "path": "docs/reports/macos-advanced-gpu/README.md",
+      "category": "archive",
+      "lines": 41
+    },
+    {
+      "path": "docs/reports/macos-advanced-native/README.md",
+      "category": "archive",
+      "lines": 125
+    },
+    {
+      "path": "docs/reports/macos-allocation/README.md",
+      "category": "archive",
+      "lines": 93
+    },
+    {
+      "path": "docs/reports/macos-app-examples/README.md",
+      "category": "archive",
+      "lines": 58
+    },
+    {
+      "path": "docs/reports/macos-app-examples/design-qa.md",
+      "category": "archive",
+      "lines": 30
+    },
+    {
+      "path": "docs/reports/macos-app-notices/README.md",
+      "category": "archive",
+      "lines": 128
+    },
+    {
+      "path": "docs/reports/macos-appkit-window-reference/README.md",
+      "category": "archive",
+      "lines": 107
+    },
+    {
+      "path": "docs/reports/macos-automation-native/README.md",
+      "category": "archive",
+      "lines": 110
+    },
+    {
+      "path": "docs/reports/macos-automation/README.md",
+      "category": "archive",
+      "lines": 70
+    },
+    {
+      "path": "docs/reports/macos-automation/records/evidence-review-v1.md",
+      "category": "archive",
+      "lines": 15
+    },
+    {
+      "path": "docs/reports/macos-automation/records/promotion-wrapper-review-v1.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reports/macos-ax-copies/README.md",
+      "category": "archive",
+      "lines": 146
+    },
+    {
+      "path": "docs/reports/macos-ax-copy-storage/README.md",
+      "category": "archive",
+      "lines": 119
+    },
+    {
+      "path": "docs/reports/macos-ax-duplicate/README.md",
+      "category": "archive",
+      "lines": 78
+    },
+    {
+      "path": "docs/reports/macos-ax-parent-graph/README.md",
+      "category": "archive",
+      "lines": 105
+    },
+    {
+      "path": "docs/reports/macos-ax-publication/README.md",
+      "category": "archive",
+      "lines": 120
+    },
+    {
+      "path": "docs/reports/macos-ax-retention/README.md",
+      "category": "archive",
+      "lines": 60
+    },
+    {
+      "path": "docs/reports/macos-ax-retirement/README.md",
+      "category": "archive",
+      "lines": 44
+    },
+    {
+      "path": "docs/reports/macos-ax-semantic/README.md",
+      "category": "archive",
+      "lines": 99
+    },
+    {
+      "path": "docs/reports/macos-ax-shared-baseline/README.md",
+      "category": "archive",
+      "lines": 100
+    },
+    {
+      "path": "docs/reports/macos-backend-build-control/README.md",
+      "category": "archive",
+      "lines": 57
+    },
+    {
+      "path": "docs/reports/macos-backend-timing/README.md",
+      "category": "archive",
+      "lines": 93
+    },
+    {
+      "path": "docs/reports/macos-benchmark-retirement/README.md",
+      "category": "archive",
+      "lines": 30
+    },
+    {
+      "path": "docs/reports/macos-breadcrumb-composed/README.md",
+      "category": "archive",
+      "lines": 53
+    },
+    {
+      "path": "docs/reports/macos-breadcrumb-controls/README.md",
+      "category": "archive",
+      "lines": 42
+    },
+    {
+      "path": "docs/reports/macos-breadcrumb-native/README.md",
+      "category": "archive",
+      "lines": 54
+    },
+    {
+      "path": "docs/reports/macos-cache-control/README.md",
+      "category": "archive",
+      "lines": 74
+    },
+    {
+      "path": "docs/reports/macos-calibration-sourcecost/README.md",
+      "category": "archive",
+      "lines": 82
+    },
+    {
+      "path": "docs/reports/macos-canvas-accessibility/README.md",
+      "category": "archive",
+      "lines": 29
+    },
+    {
+      "path": "docs/reports/macos-catalogue-lifecycle/README.md",
+      "category": "archive",
+      "lines": 53
+    },
+    {
+      "path": "docs/reports/macos-choice-catalogue/README.md",
+      "category": "archive",
+      "lines": 83
+    },
+    {
+      "path": "docs/reports/macos-choice-controls/README.md",
+      "category": "archive",
+      "lines": 82
+    },
+    {
+      "path": "docs/reports/macos-clipboard-data/README.md",
+      "category": "archive",
+      "lines": 68
+    },
+    {
+      "path": "docs/reports/macos-clipboard-data/records/evidence-review-v1.md",
+      "category": "archive",
+      "lines": 15
+    },
+    {
+      "path": "docs/reports/macos-clipboard-data/records/promotion-wrapper-review-v1.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reports/macos-clipboard/README.md",
+      "category": "archive",
+      "lines": 65
+    },
+    {
+      "path": "docs/reports/macos-closable-tabs/README.md",
+      "category": "archive",
+      "lines": 62
+    },
+    {
+      "path": "docs/reports/macos-color-picker/README.md",
+      "category": "archive",
+      "lines": 54
+    },
+    {
+      "path": "docs/reports/macos-composed-actions/README.md",
+      "category": "archive",
+      "lines": 75
+    },
+    {
+      "path": "docs/reports/macos-composed-campaign/README.md",
+      "category": "archive",
+      "lines": 62
+    },
+    {
+      "path": "docs/reports/macos-composed-controls/README.md",
+      "category": "archive",
+      "lines": 45
+    },
+    {
+      "path": "docs/reports/macos-composed-lifecycle/README.md",
+      "category": "archive",
+      "lines": 57
+    },
+    {
+      "path": "docs/reports/macos-compute-lifecycle/README.md",
+      "category": "archive",
+      "lines": 62
+    },
+    {
+      "path": "docs/reports/macos-control-refocus/README.md",
+      "category": "archive",
+      "lines": 89
+    },
+    {
+      "path": "docs/reports/macos-controls-expansion/README.md",
+      "category": "archive",
+      "lines": 71
+    },
+    {
+      "path": "docs/reports/macos-copy-control/README.md",
+      "category": "archive",
+      "lines": 58
+    },
+    {
+      "path": "docs/reports/macos-core-vet/README.md",
+      "category": "archive",
+      "lines": 26
+    },
+    {
+      "path": "docs/reports/macos-covered-fills/README.md",
+      "category": "archive",
+      "lines": 87
+    },
+    {
+      "path": "docs/reports/macos-current-catalogue/README.md",
+      "category": "archive",
+      "lines": 93
+    },
+    {
+      "path": "docs/reports/macos-current-external-ax/README.md",
+      "category": "archive",
+      "lines": 90
+    },
+    {
+      "path": "docs/reports/macos-current-grid-profiles/README.md",
+      "category": "archive",
+      "lines": 86
+    },
+    {
+      "path": "docs/reports/macos-current-grid-viewport/README.md",
+      "category": "archive",
+      "lines": 90
+    },
+    {
+      "path": "docs/reports/macos-current-native-status/README.md",
+      "category": "archive",
+      "lines": 52
+    },
+    {
+      "path": "docs/reports/macos-current-sdk/README.md",
+      "category": "archive",
+      "lines": 166
+    },
+    {
+      "path": "docs/reports/macos-current-workflows/README.md",
+      "category": "archive",
+      "lines": 89
+    },
+    {
+      "path": "docs/reports/macos-cursor-ownership/README.md",
+      "category": "archive",
+      "lines": 43
+    },
+    {
+      "path": "docs/reports/macos-default-responsiveness/README.md",
+      "category": "archive",
+      "lines": 104
+    },
+    {
+      "path": "docs/reports/macos-disclosure/README.md",
+      "category": "archive",
+      "lines": 73
+    },
+    {
+      "path": "docs/reports/macos-display-backpressure-checkpoint/README.md",
+      "category": "archive",
+      "lines": 24
+    },
+    {
+      "path": "docs/reports/macos-display-reversed/README.md",
+      "category": "archive",
+      "lines": 78
+    },
+    {
+      "path": "docs/reports/macos-display-scheduling/README.md",
+      "category": "archive",
+      "lines": 82
+    },
+    {
+      "path": "docs/reports/macos-display105-checkpoint/README.md",
+      "category": "archive",
+      "lines": 84
+    },
+    {
+      "path": "docs/reports/macos-distribution-inputs/README.md",
+      "category": "archive",
+      "lines": 59
+    },
+    {
+      "path": "docs/reports/macos-distribution-inputs/records/evidence-review-v1.md",
+      "category": "archive",
+      "lines": 13
+    },
+    {
+      "path": "docs/reports/macos-document/README.md",
+      "category": "archive",
+      "lines": 33
+    },
+    {
+      "path": "docs/reports/macos-drawing/README.md",
+      "category": "archive",
+      "lines": 55
+    },
+    {
+      "path": "docs/reports/macos-editor-gutter-font/README.md",
+      "category": "archive",
+      "lines": 123
+    },
+    {
+      "path": "docs/reports/macos-editor-publication/README.md",
+      "category": "archive",
+      "lines": 90
+    },
+    {
+      "path": "docs/reports/macos-editor/README.md",
+      "category": "archive",
+      "lines": 103
+    },
+    {
+      "path": "docs/reports/macos-editor/historical-pre-prism/README.md",
+      "category": "archive",
+      "lines": 1
+    },
+    {
+      "path": "docs/reports/macos-empty-inactive-publication/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reports/macos-empty-sprites/README.md",
+      "category": "archive",
+      "lines": 120
+    },
+    {
+      "path": "docs/reports/macos-empty-text-geometry/README.md",
+      "category": "archive",
+      "lines": 76
+    },
+    {
+      "path": "docs/reports/macos-encoding-scratch/README.md",
+      "category": "archive",
+      "lines": 106
+    },
+    {
+      "path": "docs/reports/macos-event-coalescing/README.md",
+      "category": "archive",
+      "lines": 32
+    },
+    {
+      "path": "docs/reports/macos-event-driven-loop/README.md",
+      "category": "archive",
+      "lines": 55
+    },
+    {
+      "path": "docs/reports/macos-event-publication/README.md",
+      "category": "archive",
+      "lines": 127
+    },
+    {
+      "path": "docs/reports/macos-execution/README.md",
+      "category": "archive",
+      "lines": 42
+    },
+    {
+      "path": "docs/reports/macos-field-state/README.md",
+      "category": "archive",
+      "lines": 37
+    },
+    {
+      "path": "docs/reports/macos-file-drop/README.md",
+      "category": "archive",
+      "lines": 76
+    },
+    {
+      "path": "docs/reports/macos-file-interaction/README.md",
+      "category": "archive",
+      "lines": 68
+    },
+    {
+      "path": "docs/reports/macos-fixture-font-name/README.md",
+      "category": "archive",
+      "lines": 50
+    },
+    {
+      "path": "docs/reports/macos-font-notices/README.md",
+      "category": "archive",
+      "lines": 59
+    },
+    {
+      "path": "docs/reports/macos-frame-cleanup/README.md",
+      "category": "archive",
+      "lines": 59
+    },
+    {
+      "path": "docs/reports/macos-frame-poll/README.md",
+      "category": "archive",
+      "lines": 83
+    },
+    {
+      "path": "docs/reports/macos-frame-unavailable/README.md",
+      "category": "archive",
+      "lines": 73
+    },
+    {
+      "path": "docs/reports/macos-framework-context-result/README.md",
+      "category": "archive",
+      "lines": 48
+    },
+    {
+      "path": "docs/reports/macos-framework-context/README.md",
+      "category": "archive",
+      "lines": 34
+    },
+    {
+      "path": "docs/reports/macos-framework-pending-result/README.md",
+      "category": "archive",
+      "lines": 46
+    },
+    {
+      "path": "docs/reports/macos-framework-pending/README.md",
+      "category": "archive",
+      "lines": 36
+    },
+    {
+      "path": "docs/reports/macos-framework-startup-result/README.md",
+      "category": "archive",
+      "lines": 51
+    },
+    {
+      "path": "docs/reports/macos-framework-startup/README.md",
+      "category": "archive",
+      "lines": 48
+    },
+    {
+      "path": "docs/reports/macos-geometry-reuse/README.md",
+      "category": "archive",
+      "lines": 96
+    },
+    {
+      "path": "docs/reports/macos-glyph-coverage/README.md",
+      "category": "archive",
+      "lines": 60
+    },
+    {
+      "path": "docs/reports/macos-glyph-fingerprint/README.md",
+      "category": "archive",
+      "lines": 37
+    },
+    {
+      "path": "docs/reports/macos-glyph-lookup/README.md",
+      "category": "archive",
+      "lines": 47
+    },
+    {
+      "path": "docs/reports/macos-glyph-mask-cache/README.md",
+      "category": "archive",
+      "lines": 66
+    },
+    {
+      "path": "docs/reports/macos-glyph-placement/README.md",
+      "category": "archive",
+      "lines": 98
+    },
+    {
+      "path": "docs/reports/macos-gpu-covered/README.md",
+      "category": "archive",
+      "lines": 50
+    },
+    {
+      "path": "docs/reports/macos-gpu-performance/README.md",
+      "category": "archive",
+      "lines": 98
+    },
+    {
+      "path": "docs/reports/macos-gpu-scenes/README.md",
+      "category": "archive",
+      "lines": 75
+    },
+    {
+      "path": "docs/reports/macos-gpu-sdk-stage0077/README.md",
+      "category": "archive",
+      "lines": 111
+    },
+    {
+      "path": "docs/reports/macos-grid-ax-construction/README.md",
+      "category": "archive",
+      "lines": 104
+    },
+    {
+      "path": "docs/reports/macos-grid-cell-surface/README.md",
+      "category": "archive",
+      "lines": 160
+    },
+    {
+      "path": "docs/reports/macos-grid-current/README.md",
+      "category": "archive",
+      "lines": 142
+    },
+    {
+      "path": "docs/reports/macos-grid-editing/README.md",
+      "category": "archive",
+      "lines": 44
+    },
+    {
+      "path": "docs/reports/macos-grid-editing/consumer/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reports/macos-grid-example/README.md",
+      "category": "archive",
+      "lines": 61
+    },
+    {
+      "path": "docs/reports/macos-grid-input/README.md",
+      "category": "archive",
+      "lines": 114
+    },
+    {
+      "path": "docs/reports/macos-grid-intrinsic-sizing/README.md",
+      "category": "archive",
+      "lines": 99
+    },
+    {
+      "path": "docs/reports/macos-grid-loaded/README.md",
+      "category": "archive",
+      "lines": 85
+    },
+    {
+      "path": "docs/reports/macos-grid-loaded/consumer/README.md",
+      "category": "archive",
+      "lines": 9
+    },
+    {
+      "path": "docs/reports/macos-grid-matrix/README.md",
+      "category": "archive",
+      "lines": 128
+    },
+    {
+      "path": "docs/reports/macos-grid-model/README.md",
+      "category": "archive",
+      "lines": 40
+    },
+    {
+      "path": "docs/reports/macos-grid-native/README.md",
+      "category": "archive",
+      "lines": 67
+    },
+    {
+      "path": "docs/reports/macos-grid-paint/README.md",
+      "category": "archive",
+      "lines": 134
+    },
+    {
+      "path": "docs/reports/macos-grid-pane-paint/README.md",
+      "category": "archive",
+      "lines": 96
+    },
+    {
+      "path": "docs/reports/macos-grid-pane-retention/README.md",
+      "category": "archive",
+      "lines": 82
+    },
+    {
+      "path": "docs/reports/macos-grid-performance/README.md",
+      "category": "archive",
+      "lines": 52
+    },
+    {
+      "path": "docs/reports/macos-grid-profile-diagnostics/README.md",
+      "category": "archive",
+      "lines": 97
+    },
+    {
+      "path": "docs/reports/macos-grid-publication/README.md",
+      "category": "archive",
+      "lines": 114
+    },
+    {
+      "path": "docs/reports/macos-grid-refresh/README.md",
+      "category": "archive",
+      "lines": 124
+    },
+    {
+      "path": "docs/reports/macos-grid-replay/README.md",
+      "category": "archive",
+      "lines": 46
+    },
+    {
+      "path": "docs/reports/macos-grid-selection/README.md",
+      "category": "archive",
+      "lines": 64
+    },
+    {
+      "path": "docs/reports/macos-grid-selection/consumer-v1/owned-source/README.md",
+      "category": "archive",
+      "lines": 139
+    },
+    {
+      "path": "docs/reports/macos-grid-selection/consumer-v2/owned-source/README.md",
+      "category": "archive",
+      "lines": 139
+    },
+    {
+      "path": "docs/reports/macos-grid-selection/consumer-v3/owned-source/README.md",
+      "category": "archive",
+      "lines": 139
+    },
+    {
+      "path": "docs/reports/macos-grid-update/README.md",
+      "category": "archive",
+      "lines": 74
+    },
+    {
+      "path": "docs/reports/macos-grid-variable/README.md",
+      "category": "archive",
+      "lines": 59
+    },
+    {
+      "path": "docs/reports/macos-history/README.md",
+      "category": "archive",
+      "lines": 42
+    },
+    {
+      "path": "docs/reports/macos-icon-controls/README.md",
+      "category": "archive",
+      "lines": 61
+    },
+    {
+      "path": "docs/reports/macos-image-control/README.md",
+      "category": "archive",
+      "lines": 71
+    },
+    {
+      "path": "docs/reports/macos-images/README.md",
+      "category": "archive",
+      "lines": 51
+    },
+    {
+      "path": "docs/reports/macos-imaging/README.md",
+      "category": "archive",
+      "lines": 63
+    },
+    {
+      "path": "docs/reports/macos-initial-window-size/README.md",
+      "category": "archive",
+      "lines": 78
+    },
+    {
+      "path": "docs/reports/macos-interacting-retention/README.md",
+      "category": "archive",
+      "lines": 63
+    },
+    {
+      "path": "docs/reports/macos-joined-backend/README.md",
+      "category": "archive",
+      "lines": 86
+    },
+    {
+      "path": "docs/reports/macos-joined-timing/README.md",
+      "category": "archive",
+      "lines": 82
+    },
+    {
+      "path": "docs/reports/macos-journal-phase/README.md",
+      "category": "archive",
+      "lines": 132
+    },
+    {
+      "path": "docs/reports/macos-keyed-grid-layout/README.md",
+      "category": "archive",
+      "lines": 138
+    },
+    {
+      "path": "docs/reports/macos-keyed-grid-layout/review/README.md",
+      "category": "archive",
+      "lines": 24
+    },
+    {
+      "path": "docs/reports/macos-large-tree/README.md",
+      "category": "archive",
+      "lines": 35
+    },
+    {
+      "path": "docs/reports/macos-large-tree/records/managed-qualification/qualified-v1/owned-source/README.md",
+      "category": "archive",
+      "lines": 61
+    },
+    {
+      "path": "docs/reports/macos-large-tree/records/managed-qualification/qualified-v2/owned-source/README.md",
+      "category": "archive",
+      "lines": 65
+    },
+    {
+      "path": "docs/reports/macos-large-tree/records/managed-qualification/qualified-v3/owned-source/README.md",
+      "category": "archive",
+      "lines": 65
+    },
+    {
+      "path": "docs/reports/macos-link-closure/README.md",
+      "category": "archive",
+      "lines": 74
+    },
+    {
+      "path": "docs/reports/macos-list-box/README.md",
+      "category": "archive",
+      "lines": 64
+    },
+    {
+      "path": "docs/reports/macos-listbox-metadata/README.md",
+      "category": "archive",
+      "lines": 42
+    },
+    {
+      "path": "docs/reports/macos-local-text/README.md",
+      "category": "archive",
+      "lines": 51
+    },
+    {
+      "path": "docs/reports/macos-loop-native/README.md",
+      "category": "archive",
+      "lines": 119
+    },
+    {
+      "path": "docs/reports/macos-m2-renewal/README.md",
+      "category": "archive",
+      "lines": 50
+    },
+    {
+      "path": "docs/reports/macos-managed-workbench/README.md",
+      "category": "archive",
+      "lines": 49
+    },
+    {
+      "path": "docs/reports/macos-matched-calibration/README.md",
+      "category": "archive",
+      "lines": 179
+    },
+    {
+      "path": "docs/reports/macos-media-catalogue/README.md",
+      "category": "archive",
+      "lines": 80
+    },
+    {
+      "path": "docs/reports/macos-menu-button/README.md",
+      "category": "archive",
+      "lines": 50
+    },
+    {
+      "path": "docs/reports/macos-menu-checks/README.md",
+      "category": "archive",
+      "lines": 46
+    },
+    {
+      "path": "docs/reports/macos-menu-observation/README.md",
+      "category": "archive",
+      "lines": 31
+    },
+    {
+      "path": "docs/reports/macos-minimum-go/README.md",
+      "category": "archive",
+      "lines": 71
+    },
+    {
+      "path": "docs/reports/macos-modal-geometry/README.md",
+      "category": "archive",
+      "lines": 80
+    },
+    {
+      "path": "docs/reports/macos-module-declarations/README.md",
+      "category": "archive",
+      "lines": 50
+    },
+    {
+      "path": "docs/reports/macos-native-autorelease/README.md",
+      "category": "archive",
+      "lines": 74
+    },
+    {
+      "path": "docs/reports/macos-native-choosers/README.md",
+      "category": "archive",
+      "lines": 103
+    },
+    {
+      "path": "docs/reports/macos-native-component-notices/README.md",
+      "category": "archive",
+      "lines": 72
+    },
+    {
+      "path": "docs/reports/macos-native-controls/README.md",
+      "category": "archive",
+      "lines": 94
+    },
+    {
+      "path": "docs/reports/macos-native-current/README.md",
+      "category": "archive",
+      "lines": 120
+    },
+    {
+      "path": "docs/reports/macos-native-dispatch/README.md",
+      "category": "archive",
+      "lines": 39
+    },
+    {
+      "path": "docs/reports/macos-native-followups/README.md",
+      "category": "archive",
+      "lines": 60
+    },
+    {
+      "path": "docs/reports/macos-native-foreground-control/README.md",
+      "category": "archive",
+      "lines": 86
+    },
+    {
+      "path": "docs/reports/macos-native-latency-investigation/README.md",
+      "category": "archive",
+      "lines": 132
+    },
+    {
+      "path": "docs/reports/macos-native-presentation/README.md",
+      "category": "archive",
+      "lines": 75
+    },
+    {
+      "path": "docs/reports/macos-native-ready-reference/README.md",
+      "category": "archive",
+      "lines": 105
+    },
+    {
+      "path": "docs/reports/macos-native-release-identity/README.md",
+      "category": "archive",
+      "lines": 17
+    },
+    {
+      "path": "docs/reports/macos-native-services/README.md",
+      "category": "archive",
+      "lines": 67
+    },
+    {
+      "path": "docs/reports/macos-native-submit-probe/README.md",
+      "category": "archive",
+      "lines": 59
+    },
+    {
+      "path": "docs/reports/macos-native-validation/README.md",
+      "category": "archive",
+      "lines": 70
+    },
+    {
+      "path": "docs/reports/macos-native-workspace/README.md",
+      "category": "archive",
+      "lines": 130
+    },
+    {
+      "path": "docs/reports/macos-navigation-catalogue/README.md",
+      "category": "archive",
+      "lines": 112
+    },
+    {
+      "path": "docs/reports/macos-notification-runtime/README.md",
+      "category": "archive",
+      "lines": 90
+    },
+    {
+      "path": "docs/reports/macos-notifications/README.md",
+      "category": "archive",
+      "lines": 48
+    },
+    {
+      "path": "docs/reports/macos-notifications/records/source-review.md",
+      "category": "archive",
+      "lines": 13
+    },
+    {
+      "path": "docs/reports/macos-outline-extrema/README.md",
+      "category": "archive",
+      "lines": 71
+    },
+    {
+      "path": "docs/reports/macos-outlines/README.md",
+      "category": "archive",
+      "lines": 142
+    },
+    {
+      "path": "docs/reports/macos-owned-build/README.md",
+      "category": "archive",
+      "lines": 35
+    },
+    {
+      "path": "docs/reports/macos-owned-cursors/README.md",
+      "category": "archive",
+      "lines": 81
+    },
+    {
+      "path": "docs/reports/macos-owned-linkers/README.md",
+      "category": "archive",
+      "lines": 13
+    },
+    {
+      "path": "docs/reports/macos-paced-deep-origin/README.md",
+      "category": "archive",
+      "lines": 25
+    },
+    {
+      "path": "docs/reports/macos-paced-presentation/README.md",
+      "category": "archive",
+      "lines": 77
+    },
+    {
+      "path": "docs/reports/macos-packed-coverage/README.md",
+      "category": "archive",
+      "lines": 44
+    },
+    {
+      "path": "docs/reports/macos-packed-upload/README.md",
+      "category": "archive",
+      "lines": 100
+    },
+    {
+      "path": "docs/reports/macos-palette-placement/README.md",
+      "category": "archive",
+      "lines": 44
+    },
+    {
+      "path": "docs/reports/macos-parent-graph-endurance/README.md",
+      "category": "archive",
+      "lines": 94
+    },
+    {
+      "path": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "category": "archive",
+      "lines": 68
+    },
+    {
+      "path": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/macos-parent-graph-endurance/README.md",
+      "category": "archive",
+      "lines": 89
+    },
+    {
+      "path": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "category": "archive",
+      "lines": 907
+    },
+    {
+      "path": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/workbench-endurance.md",
+      "category": "archive",
+      "lines": 231
+    },
+    {
+      "path": "docs/reports/macos-parent-graph-endurance/records/sealed-stage-review.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reports/macos-part-snapshots/README.md",
+      "category": "archive",
+      "lines": 77
+    },
+    {
+      "path": "docs/reports/macos-pending-publication/README.md",
+      "category": "archive",
+      "lines": 141
+    },
+    {
+      "path": "docs/reports/macos-pipeline-ownership/README.md",
+      "category": "archive",
+      "lines": 67
+    },
+    {
+      "path": "docs/reports/macos-placement-desktop/README.md",
+      "category": "archive",
+      "lines": 76
+    },
+    {
+      "path": "docs/reports/macos-placement-session/README.md",
+      "category": "archive",
+      "lines": 73
+    },
+    {
+      "path": "docs/reports/macos-pointer-modes/README.md",
+      "category": "archive",
+      "lines": 37
+    },
+    {
+      "path": "docs/reports/macos-popup-lifecycle/README.md",
+      "category": "archive",
+      "lines": 37
+    },
+    {
+      "path": "docs/reports/macos-post-glyph-native/README.md",
+      "category": "archive",
+      "lines": 47
+    },
+    {
+      "path": "docs/reports/macos-post-ownership/README.md",
+      "category": "archive",
+      "lines": 88
+    },
+    {
+      "path": "docs/reports/macos-pre-show-quit-checkpoint/README.md",
+      "category": "archive",
+      "lines": 19
+    },
+    {
+      "path": "docs/reports/macos-presentation-capture/README.md",
+      "category": "archive",
+      "lines": 102
+    },
+    {
+      "path": "docs/reports/macos-presentation-overlay/README.md",
+      "category": "archive",
+      "lines": 49
+    },
+    {
+      "path": "docs/reports/macos-presentation-phase/README.md",
+      "category": "archive",
+      "lines": 59
+    },
+    {
+      "path": "docs/reports/macos-presentation-physical-result/README.md",
+      "category": "archive",
+      "lines": 55
+    },
+    {
+      "path": "docs/reports/macos-presentation-physical/README.md",
+      "category": "archive",
+      "lines": 59
+    },
+    {
+      "path": "docs/reports/macos-presentation-post100/README.md",
+      "category": "archive",
+      "lines": 22
+    },
+    {
+      "path": "docs/reports/macos-presentation-post101/README.md",
+      "category": "archive",
+      "lines": 18
+    },
+    {
+      "path": "docs/reports/macos-presentation-post102/README.md",
+      "category": "archive",
+      "lines": 78
+    },
+    {
+      "path": "docs/reports/macos-presentation-post103/README.md",
+      "category": "archive",
+      "lines": 107
+    },
+    {
+      "path": "docs/reports/macos-preview-alpha3-candidate/README.md",
+      "category": "archive",
+      "lines": 52
+    },
+    {
+      "path": "docs/reports/macos-preview-app-acceptance/README.md",
+      "category": "archive",
+      "lines": 74
+    },
+    {
+      "path": "docs/reports/macos-preview-audit-approval/README.md",
+      "category": "archive",
+      "lines": 20
+    },
+    {
+      "path": "docs/reports/macos-preview-distribution/README.md",
+      "category": "archive",
+      "lines": 52
+    },
+    {
+      "path": "docs/reports/macos-preview-final-private/README.md",
+      "category": "archive",
+      "lines": 75
+    },
+    {
+      "path": "docs/reports/macos-preview-lifecycle100/README.md",
+      "category": "archive",
+      "lines": 54
+    },
+    {
+      "path": "docs/reports/macos-preview-public-candidate/MACOS-PREVIEW-RELEASE-NOTES.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reports/macos-preview-public-candidate/README.md",
+      "category": "archive",
+      "lines": 78
+    },
+    {
+      "path": "docs/reports/macos-preview-r2/README.md",
+      "category": "archive",
+      "lines": 39
+    },
+    {
+      "path": "docs/reports/macos-preview-r3-first/README.md",
+      "category": "archive",
+      "lines": 55
+    },
+    {
+      "path": "docs/reports/macos-preview-ready/README.md",
+      "category": "archive",
+      "lines": 81
+    },
+    {
+      "path": "docs/reports/macos-preview-ready/RELEASE-NOTES.md",
+      "category": "archive",
+      "lines": 62
+    },
+    {
+      "path": "docs/reports/macos-preview-resource-check/README.md",
+      "category": "archive",
+      "lines": 74
+    },
+    {
+      "path": "docs/reports/macos-preview-soak-setup/README.md",
+      "category": "archive",
+      "lines": 47
+    },
+    {
+      "path": "docs/reports/macos-preview-soak-two-hour/README.md",
+      "category": "archive",
+      "lines": 85
+    },
+    {
+      "path": "docs/reports/macos-progress-controls/README.md",
+      "category": "archive",
+      "lines": 32
+    },
+    {
+      "path": "docs/reports/macos-raster-commands/README.md",
+      "category": "archive",
+      "lines": 23
+    },
+    {
+      "path": "docs/reports/macos-raster-native/README.md",
+      "category": "archive",
+      "lines": 53
+    },
+    {
+      "path": "docs/reports/macos-raster-offscreen-cost/README.md",
+      "category": "archive",
+      "lines": 62
+    },
+    {
+      "path": "docs/reports/macos-raster-rows/README.md",
+      "category": "archive",
+      "lines": 124
+    },
+    {
+      "path": "docs/reports/macos-raster-separated-cost/README.md",
+      "category": "archive",
+      "lines": 49
+    },
+    {
+      "path": "docs/reports/macos-ready-snapshot/README.md",
+      "category": "archive",
+      "lines": 111
+    },
+    {
+      "path": "docs/reports/macos-render-priority-result/README.md",
+      "category": "archive",
+      "lines": 60
+    },
+    {
+      "path": "docs/reports/macos-render-priority/README.md",
+      "category": "archive",
+      "lines": 51
+    },
+    {
+      "path": "docs/reports/macos-replay/README.md",
+      "category": "archive",
+      "lines": 58
+    },
+    {
+      "path": "docs/reports/macos-resolved-shapes/README.md",
+      "category": "archive",
+      "lines": 155
+    },
+    {
+      "path": "docs/reports/macos-reuse-policy/README.md",
+      "category": "archive",
+      "lines": 50
+    },
+    {
+      "path": "docs/reports/macos-rgba-upload/README.md",
+      "category": "archive",
+      "lines": 29
+    },
+    {
+      "path": "docs/reports/macos-row-fragments/README.md",
+      "category": "archive",
+      "lines": 100
+    },
+    {
+      "path": "docs/reports/macos-runtime-checkpoints/README.md",
+      "category": "archive",
+      "lines": 120
+    },
+    {
+      "path": "docs/reports/macos-scene-composition/README.md",
+      "category": "archive",
+      "lines": 132
+    },
+    {
+      "path": "docs/reports/macos-scene-scratch/README.md",
+      "category": "archive",
+      "lines": 62
+    },
+    {
+      "path": "docs/reports/macos-scene-staging/README.md",
+      "category": "archive",
+      "lines": 62
+    },
+    {
+      "path": "docs/reports/macos-scene-staging/records/evidence-review-v1.md",
+      "category": "archive",
+      "lines": 15
+    },
+    {
+      "path": "docs/reports/macos-scoped-geometry/README.md",
+      "category": "archive",
+      "lines": 31
+    },
+    {
+      "path": "docs/reports/macos-scroll-surfaces/README.md",
+      "category": "archive",
+      "lines": 143
+    },
+    {
+      "path": "docs/reports/macos-sdk-build/README.md",
+      "category": "archive",
+      "lines": 15
+    },
+    {
+      "path": "docs/reports/macos-sdk-delivery-renewal/README.md",
+      "category": "archive",
+      "lines": 49
+    },
+    {
+      "path": "docs/reports/macos-sdk-lifecycle-stage0079/README.md",
+      "category": "archive",
+      "lines": 132
+    },
+    {
+      "path": "docs/reports/macos-sdk-native-stage0079/README.md",
+      "category": "archive",
+      "lines": 93
+    },
+    {
+      "path": "docs/reports/macos-sdk-refresh/README.md",
+      "category": "archive",
+      "lines": 105
+    },
+    {
+      "path": "docs/reports/macos-sdk-stage0079/README.md",
+      "category": "archive",
+      "lines": 147
+    },
+    {
+      "path": "docs/reports/macos-segmented-ready/README.md",
+      "category": "archive",
+      "lines": 97
+    },
+    {
+      "path": "docs/reports/macos-service-performance/README.md",
+      "category": "archive",
+      "lines": 83
+    },
+    {
+      "path": "docs/reports/macos-shell-contrast/README.md",
+      "category": "archive",
+      "lines": 108
+    },
+    {
+      "path": "docs/reports/macos-shell-exposure/PUBLICATION_PACKET.md",
+      "category": "archive",
+      "lines": 21
+    },
+    {
+      "path": "docs/reports/macos-shell-exposure/README.md",
+      "category": "archive",
+      "lines": 104
+    },
+    {
+      "path": "docs/reports/macos-soak-foundation/README.md",
+      "category": "archive",
+      "lines": 82
+    },
+    {
+      "path": "docs/reports/macos-source-built-gpu/README.md",
+      "category": "archive",
+      "lines": 23
+    },
+    {
+      "path": "docs/reports/macos-source-costs/README.md",
+      "category": "archive",
+      "lines": 116
+    },
+    {
+      "path": "docs/reports/macos-source-gpu-framework/README.md",
+      "category": "archive",
+      "lines": 19
+    },
+    {
+      "path": "docs/reports/macos-source-gpu-sdk-native/README.md",
+      "category": "archive",
+      "lines": 100
+    },
+    {
+      "path": "docs/reports/macos-source-gpu-sdk/README.md",
+      "category": "archive",
+      "lines": 94
+    },
+    {
+      "path": "docs/reports/macos-source105-native/README.md",
+      "category": "archive",
+      "lines": 77
+    },
+    {
+      "path": "docs/reports/macos-span-bands/README.md",
+      "category": "archive",
+      "lines": 116
+    },
+    {
+      "path": "docs/reports/macos-span-headers/README.md",
+      "category": "archive",
+      "lines": 40
+    },
+    {
+      "path": "docs/reports/macos-span-scratch/README.md",
+      "category": "archive",
+      "lines": 47
+    },
+    {
+      "path": "docs/reports/macos-span-storage/README.md",
+      "category": "archive",
+      "lines": 38
+    },
+    {
+      "path": "docs/reports/macos-split-pane/README.md",
+      "category": "archive",
+      "lines": 99
+    },
+    {
+      "path": "docs/reports/macos-staging-cache-timing/README.md",
+      "category": "archive",
+      "lines": 49
+    },
+    {
+      "path": "docs/reports/macos-staging-cache/README.md",
+      "category": "archive",
+      "lines": 56
+    },
+    {
+      "path": "docs/reports/macos-staging-reuse/README.md",
+      "category": "archive",
+      "lines": 63
+    },
+    {
+      "path": "docs/reports/macos-staging-timing/README.md",
+      "category": "archive",
+      "lines": 52
+    },
+    {
+      "path": "docs/reports/macos-static-idle/README.md",
+      "category": "archive",
+      "lines": 38
+    },
+    {
+      "path": "docs/reports/macos-static-idle/records/prism-disposition.md",
+      "category": "archive",
+      "lines": 5
+    },
+    {
+      "path": "docs/reports/macos-stdlib-inputs/README.md",
+      "category": "archive",
+      "lines": 114
+    },
+    {
+      "path": "docs/reports/macos-storage-readback/README.md",
+      "category": "archive",
+      "lines": 72
+    },
+    {
+      "path": "docs/reports/macos-structure-catalogue/README.md",
+      "category": "archive",
+      "lines": 118
+    },
+    {
+      "path": "docs/reports/macos-tab-close-focus/README.md",
+      "category": "archive",
+      "lines": 68
+    },
+    {
+      "path": "docs/reports/macos-tab-close-native/README.md",
+      "category": "archive",
+      "lines": 41
+    },
+    {
+      "path": "docs/reports/macos-test-font-notices/README.md",
+      "category": "archive",
+      "lines": 17
+    },
+    {
+      "path": "docs/reports/macos-text-batch/README.md",
+      "category": "archive",
+      "lines": 110
+    },
+    {
+      "path": "docs/reports/macos-text-modal/README.md",
+      "category": "archive",
+      "lines": 76
+    },
+    {
+      "path": "docs/reports/macos-texture-lifecycle/README.md",
+      "category": "archive",
+      "lines": 85
+    },
+    {
+      "path": "docs/reports/macos-tray/README.md",
+      "category": "archive",
+      "lines": 87
+    },
+    {
+      "path": "docs/reports/macos-tray/records/evidence-review.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reports/macos-tray/records/prism-disposition.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reports/macos-tray/records/promotion-review.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reports/macos-tray/records/source-review.md",
+      "category": "archive",
+      "lines": 13
+    },
+    {
+      "path": "docs/reports/macos-tree-boundary/README.md",
+      "category": "archive",
+      "lines": 152
+    },
+    {
+      "path": "docs/reports/macos-tree-gpu/README.md",
+      "category": "archive",
+      "lines": 78
+    },
+    {
+      "path": "docs/reports/macos-tree-local-layout/README.md",
+      "category": "archive",
+      "lines": 180
+    },
+    {
+      "path": "docs/reports/macos-tree-performance/README.md",
+      "category": "archive",
+      "lines": 76
+    },
+    {
+      "path": "docs/reports/macos-tree-publication/README.md",
+      "category": "archive",
+      "lines": 104
+    },
+    {
+      "path": "docs/reports/macos-tree-retention/README.md",
+      "category": "archive",
+      "lines": 57
+    },
+    {
+      "path": "docs/reports/macos-ui-containers/README.md",
+      "category": "archive",
+      "lines": 98
+    },
+    {
+      "path": "docs/reports/macos-uniform-crop/README.md",
+      "category": "archive",
+      "lines": 86
+    },
+    {
+      "path": "docs/reports/macos-uniform-fill/README.md",
+      "category": "archive",
+      "lines": 23
+    },
+    {
+      "path": "docs/reports/macos-upload-pilots/README.md",
+      "category": "archive",
+      "lines": 48
+    },
+    {
+      "path": "docs/reports/macos-upload-probe/README.md",
+      "category": "archive",
+      "lines": 70
+    },
+    {
+      "path": "docs/reports/macos-v1-build13-publication/README.md",
+      "category": "archive",
+      "lines": 47
+    },
+    {
+      "path": "docs/reports/macos-v1-build13/DELIVERY_README.md",
+      "category": "archive",
+      "lines": 39
+    },
+    {
+      "path": "docs/reports/macos-v1-build13/PUBLICATION_PACKET.md",
+      "category": "archive",
+      "lines": 43
+    },
+    {
+      "path": "docs/reports/macos-v1-build13/README.md",
+      "category": "archive",
+      "lines": 77
+    },
+    {
+      "path": "docs/reports/macos-v1-build13/RELEASE_BODY.md",
+      "category": "archive",
+      "lines": 72
+    },
+    {
+      "path": "docs/reports/macos-v1-build13/REPRODUCE.md",
+      "category": "archive",
+      "lines": 44
+    },
+    {
+      "path": "docs/reports/macos-v1-distribution/PUBLICATION_DRAFT.md",
+      "category": "archive",
+      "lines": 18
+    },
+    {
+      "path": "docs/reports/macos-v1-distribution/README.md",
+      "category": "archive",
+      "lines": 177
+    },
+    {
+      "path": "docs/reports/macos-v1-distribution/REPRODUCE.md",
+      "category": "archive",
+      "lines": 80
+    },
+    {
+      "path": "docs/reports/macos-v1-maintenance/README.md",
+      "category": "archive",
+      "lines": 74
+    },
+    {
+      "path": "docs/reports/macos-v1-public-packaging/PUBLICATION_PACKET.md",
+      "category": "archive",
+      "lines": 46
+    },
+    {
+      "path": "docs/reports/macos-v1-public-packaging/README.md",
+      "category": "archive",
+      "lines": 121
+    },
+    {
+      "path": "docs/reports/macos-v1-public-packaging/REPRODUCE.md",
+      "category": "archive",
+      "lines": 32
+    },
+    {
+      "path": "docs/reports/macos-v1-public-packaging/SHELL_CONTRAST_ISSUE.md",
+      "category": "archive",
+      "lines": 31
+    },
+    {
+      "path": "docs/reports/macos-v1-release/README.md",
+      "category": "archive",
+      "lines": 94
+    },
+    {
+      "path": "docs/reports/macos-v1/README.md",
+      "category": "archive",
+      "lines": 25
+    },
+    {
+      "path": "docs/reports/macos-window-metadata/README.md",
+      "category": "archive",
+      "lines": 32
+    },
+    {
+      "path": "docs/reports/macos-window-retention/README.md",
+      "category": "archive",
+      "lines": 80
+    },
+    {
+      "path": "docs/reports/macos-window-retirement-fixture/README.md",
+      "category": "archive",
+      "lines": 5
+    },
+    {
+      "path": "docs/reports/macos-window-visibility/README.md",
+      "category": "archive",
+      "lines": 137
+    },
+    {
+      "path": "docs/reports/macos-workbench-endurance/README.md",
+      "category": "archive",
+      "lines": 79
+    },
+    {
+      "path": "docs/reports/macos-workspace-acceptance/README.md",
+      "category": "archive",
+      "lines": 89
+    },
+    {
+      "path": "docs/reports/macos-workspace-recovery/README.md",
+      "category": "archive",
+      "lines": 91
+    },
+    {
+      "path": "docs/reports/macos-workspace-replay/README.md",
+      "category": "archive",
+      "lines": 23
+    },
+    {
+      "path": "docs/reports/main-consolidation-20261021/README.md",
+      "category": "archive",
+      "lines": 9
+    },
+    {
+      "path": "docs/reports/personal-macos-v01/README.md",
+      "category": "archive",
+      "lines": 53
+    },
+    {
+      "path": "docs/reports/platform-support/README.md",
+      "category": "archive",
+      "lines": 75
+    },
+    {
+      "path": "docs/reports/rendering/README.md",
+      "category": "archive",
+      "lines": 79
+    },
+    {
+      "path": "docs/reports/sdk-notices/README.md",
+      "category": "archive",
+      "lines": 30
+    },
+    {
+      "path": "docs/reports/sdk-release/README.md",
+      "category": "archive",
+      "lines": 139
+    },
+    {
+      "path": "docs/reports/sdk/README.md",
+      "category": "archive",
+      "lines": 49
+    },
+    {
+      "path": "docs/reports/sdk/final/README.md",
+      "category": "archive",
+      "lines": 23
+    },
+    {
+      "path": "docs/reports/window-context-retirement/README.md",
+      "category": "archive",
+      "lines": 54
+    },
+    {
+      "path": "docs/reports/window-context-retirement/records/final-source-review.md",
+      "category": "archive",
+      "lines": 9
+    },
+    {
+      "path": "docs/reports/window-context-retirement/records/provider-source-assessment.md",
+      "category": "archive",
+      "lines": 3
+    },
+    {
+      "path": "docs/reports/window-lifetimes/README.md",
+      "category": "archive",
+      "lines": 43
+    },
+    {
+      "path": "docs/reports/workbench-interaction/README.md",
+      "category": "archive",
+      "lines": 31
+    },
+    {
+      "path": "docs/repository-layout.md",
+      "category": "maintained",
+      "lines": 68
+    },
+    {
+      "path": "docs/research/ARCHITECTURE_COMPARISON.md",
+      "category": "archive",
+      "lines": 90
+    },
+    {
+      "path": "docs/research/ARCHITECTURE_OPTIONS.md",
+      "category": "archive",
+      "lines": 139
+    },
+    {
+      "path": "docs/research/GO_ECOSYSTEM.md",
+      "category": "archive",
+      "lines": 174
+    },
+    {
+      "path": "docs/research/README.md",
+      "category": "archive",
+      "lines": 12
+    },
+    {
+      "path": "docs/research/RECOMMENDATION.md",
+      "category": "archive",
+      "lines": 133
+    },
+    {
+      "path": "docs/research/RESEARCH.md",
+      "category": "archive",
+      "lines": 447
+    },
+    {
+      "path": "docs/reviews/BASELINE.md",
+      "category": "archive",
+      "lines": 32
+    },
+    {
+      "path": "docs/reviews/FOUNDATION_COMPLETION.md",
+      "category": "archive",
+      "lines": 16
+    },
+    {
+      "path": "docs/reviews/accessibility-completion/README.md",
+      "category": "archive",
+      "lines": 12
+    },
+    {
+      "path": "docs/reviews/application-readiness/README.md",
+      "category": "archive",
+      "lines": 21
+    },
+    {
+      "path": "docs/reviews/application-readiness/item-1.md",
+      "category": "archive",
+      "lines": 28
+    },
+    {
+      "path": "docs/reviews/application-readiness/item-2.md",
+      "category": "archive",
+      "lines": 33
+    },
+    {
+      "path": "docs/reviews/application-readiness/item-3.md",
+      "category": "archive",
+      "lines": 22
+    },
+    {
+      "path": "docs/reviews/application-readiness/item-4.md",
+      "category": "archive",
+      "lines": 28
+    },
+    {
+      "path": "docs/reviews/application-readiness/item-5.md",
+      "category": "archive",
+      "lines": 36
+    },
+    {
+      "path": "docs/reviews/ci-supported-macos-runner/README.md",
+      "category": "archive",
+      "lines": 34
+    },
+    {
+      "path": "docs/reviews/consumer-closeout/01-lifecycle.md",
+      "category": "archive",
+      "lines": 31
+    },
+    {
+      "path": "docs/reviews/consumer-closeout/02-ci.md",
+      "category": "archive",
+      "lines": 26
+    },
+    {
+      "path": "docs/reviews/consumer-closeout/03-sdk-ci.md",
+      "category": "archive",
+      "lines": 26
+    },
+    {
+      "path": "docs/reviews/consumer-closeout/04-first-launch.md",
+      "category": "archive",
+      "lines": 31
+    },
+    {
+      "path": "docs/reviews/consumer-closeout/05-handoff.md",
+      "category": "archive",
+      "lines": 26
+    },
+    {
+      "path": "docs/reviews/consumer-closeout/README.md",
+      "category": "archive",
+      "lines": 28
+    },
+    {
+      "path": "docs/reviews/document-priorities/item-1.md",
+      "category": "archive",
+      "lines": 28
+    },
+    {
+      "path": "docs/reviews/document-priorities/item-2.md",
+      "category": "archive",
+      "lines": 30
+    },
+    {
+      "path": "docs/reviews/document-priorities/item-3-native.md",
+      "category": "archive",
+      "lines": 27
+    },
+    {
+      "path": "docs/reviews/document-priorities/item-3.md",
+      "category": "archive",
+      "lines": 30
+    },
+    {
+      "path": "docs/reviews/document-priorities/item-4.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/document-priorities/item-5.md",
+      "category": "archive",
+      "lines": 13
+    },
+    {
+      "path": "docs/reviews/editor-native-20261010/README.md",
+      "category": "archive",
+      "lines": 15
+    },
+    {
+      "path": "docs/reviews/editor-visual-20261010/README.md",
+      "category": "archive",
+      "lines": 3
+    },
+    {
+      "path": "docs/reviews/everyday-macos/01-installation.md",
+      "category": "archive",
+      "lines": 23
+    },
+    {
+      "path": "docs/reviews/everyday-macos/02-lifecycle.md",
+      "category": "archive",
+      "lines": 30
+    },
+    {
+      "path": "docs/reviews/everyday-macos/03-files.md",
+      "category": "archive",
+      "lines": 27
+    },
+    {
+      "path": "docs/reviews/everyday-macos/04-presentation.md",
+      "category": "archive",
+      "lines": 28
+    },
+    {
+      "path": "docs/reviews/everyday-macos/05-acceptance.md",
+      "category": "archive",
+      "lines": 30
+    },
+    {
+      "path": "docs/reviews/everyday-macos/README.md",
+      "category": "archive",
+      "lines": 24
+    },
+    {
+      "path": "docs/reviews/foundation-acceptance-20261010/REVIEW_RECORD.md",
+      "category": "archive",
+      "lines": 26
+    },
+    {
+      "path": "docs/reviews/framework-native-content-audit/README.md",
+      "category": "archive",
+      "lines": 29
+    },
+    {
+      "path": "docs/reviews/framework-phase5/live-check.md",
+      "category": "archive",
+      "lines": 5
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/delivery/README.md",
+      "category": "archive",
+      "lines": 54
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/fidelity-delivery/README.md",
+      "category": "archive",
+      "lines": 73
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/fidelity-delivery/review-disposition.md",
+      "category": "archive",
+      "lines": 19
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase1/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase10-fidelity/README.md",
+      "category": "archive",
+      "lines": 23
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase11-ribbon-height/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase12-ribbon-fit/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase14-inspector/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase15-orientation/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase16-action-panel/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase17-window/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase18-integration/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase19-ribbon-contrast/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase2/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase20-sdk-ci/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase21-dialog-surface/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase22-native-targeting/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase23-appearance-parity/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase24-round-shaft/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase25-interaction-feedback/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase26-ci-dialog-compatibility/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase27-private-handoff/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase28-readme-gallery/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase29-documents/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase3/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase30-primitive-picking/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase31-multi-selection/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase32-direct-handles/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase33-workspace/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase34-native-polish/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase35-handle-overlays/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase36-clipboard/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase37-body-renaming/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase38-isolation/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase39-recent-revert/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase4/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase40-overlay-cursor-repair/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase5/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase6/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase7-icons/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase8-flat-tools/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/fusion-workbench/phase9-delivery/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/input-ordering-20261010/REVIEW_RECORD.md",
+      "category": "archive",
+      "lines": 21
+    },
+    {
+      "path": "docs/reviews/keyed-reconciliation/README.md",
+      "category": "archive",
+      "lines": 12
+    },
+    {
+      "path": "docs/reviews/large-native-20261010/README.md",
+      "category": "archive",
+      "lines": 3
+    },
+    {
+      "path": "docs/reviews/layout-theme/README.md",
+      "category": "archive",
+      "lines": 12
+    },
+    {
+      "path": "docs/reviews/mac-app-icons/README.md",
+      "category": "archive",
+      "lines": 41
+    },
+    {
+      "path": "docs/reviews/mac-build23/01-build23.md",
+      "category": "archive",
+      "lines": 33
+    },
+    {
+      "path": "docs/reviews/mac-build23/02-file-compatibility.md",
+      "category": "archive",
+      "lines": 34
+    },
+    {
+      "path": "docs/reviews/mac-build23/03-parser-fuzz.md",
+      "category": "archive",
+      "lines": 31
+    },
+    {
+      "path": "docs/reviews/mac-build23/04-producer-preflight.md",
+      "category": "archive",
+      "lines": 37
+    },
+    {
+      "path": "docs/reviews/mac-build23/04a-sdk-fixtures.md",
+      "category": "archive",
+      "lines": 28
+    },
+    {
+      "path": "docs/reviews/mac-build23/05-final-handoff.md",
+      "category": "archive",
+      "lines": 40
+    },
+    {
+      "path": "docs/reviews/mac-build24/01-integration.md",
+      "category": "archive",
+      "lines": 23
+    },
+    {
+      "path": "docs/reviews/mac-build24/02-package-install.md",
+      "category": "archive",
+      "lines": 29
+    },
+    {
+      "path": "docs/reviews/mac-build24/03-independent-verification.md",
+      "category": "archive",
+      "lines": 24
+    },
+    {
+      "path": "docs/reviews/mac-build24/04-static-linkage.md",
+      "category": "archive",
+      "lines": 38
+    },
+    {
+      "path": "docs/reviews/mac-build24/05-final-handoff.md",
+      "category": "archive",
+      "lines": 24
+    },
+    {
+      "path": "docs/reviews/mac-content-widgets/README.md",
+      "category": "archive",
+      "lines": 40
+    },
+    {
+      "path": "docs/reviews/mac-desktop-widgets/README.md",
+      "category": "archive",
+      "lines": 152
+    },
+    {
+      "path": "docs/reviews/mac-document-workflows/01-quit.md",
+      "category": "archive",
+      "lines": 21
+    },
+    {
+      "path": "docs/reviews/mac-document-workflows/02-restoration.md",
+      "category": "archive",
+      "lines": 22
+    },
+    {
+      "path": "docs/reviews/mac-document-workflows/03-finder.md",
+      "category": "archive",
+      "lines": 20
+    },
+    {
+      "path": "docs/reviews/mac-document-workflows/04-find-replace.md",
+      "category": "archive",
+      "lines": 21
+    },
+    {
+      "path": "docs/reviews/mac-document-workflows/05-ci-stages.md",
+      "category": "archive",
+      "lines": 22
+    },
+    {
+      "path": "docs/reviews/mac-document-workflows/06-handoff-consistency.md",
+      "category": "archive",
+      "lines": 8
+    },
+    {
+      "path": "docs/reviews/mac-document-workflows/07-native-quit-input-lifetime.md",
+      "category": "archive",
+      "lines": 18
+    },
+    {
+      "path": "docs/reviews/mac-document-workflows/08-installed-quit.md",
+      "category": "archive",
+      "lines": 46
+    },
+    {
+      "path": "docs/reviews/mac-document-workflows/09-ci-portable-paths.md",
+      "category": "archive",
+      "lines": 21
+    },
+    {
+      "path": "docs/reviews/mac-integration-pass/README.md",
+      "category": "archive",
+      "lines": 40
+    },
+    {
+      "path": "docs/reviews/mac-offscreen-closeout/01-ci-cache.md",
+      "category": "archive",
+      "lines": 21
+    },
+    {
+      "path": "docs/reviews/mac-offscreen-closeout/02-document-failures.md",
+      "category": "archive",
+      "lines": 31
+    },
+    {
+      "path": "docs/reviews/mac-offscreen-closeout/03-lifecycle.md",
+      "category": "archive",
+      "lines": 28
+    },
+    {
+      "path": "docs/reviews/mac-offscreen-closeout/04-private-delivery.md",
+      "category": "archive",
+      "lines": 41
+    },
+    {
+      "path": "docs/reviews/mac-offscreen-closeout/05-developer-handoff.md",
+      "category": "archive",
+      "lines": 33
+    },
+    {
+      "path": "docs/reviews/mac-offscreen-maintenance24/01-installation-recovery.md",
+      "category": "archive",
+      "lines": 24
+    },
+    {
+      "path": "docs/reviews/mac-offscreen-maintenance24/02-delivery-verifier.md",
+      "category": "archive",
+      "lines": 29
+    },
+    {
+      "path": "docs/reviews/mac-offscreen-maintenance24/03-operation-overlap.md",
+      "category": "archive",
+      "lines": 37
+    },
+    {
+      "path": "docs/reviews/mac-offscreen-maintenance24/04-dependency-disposition.md",
+      "category": "archive",
+      "lines": 34
+    },
+    {
+      "path": "docs/reviews/mac-offscreen-maintenance24/05-current-handoff.md",
+      "category": "archive",
+      "lines": 20
+    },
+    {
+      "path": "docs/reviews/mac-packaging-reliability/01-native-inputs.md",
+      "category": "archive",
+      "lines": 26
+    },
+    {
+      "path": "docs/reviews/mac-packaging-reliability/02-completion-linkage.md",
+      "category": "archive",
+      "lines": 24
+    },
+    {
+      "path": "docs/reviews/mac-packaging-reliability/03-minimum-metadata.md",
+      "category": "archive",
+      "lines": 28
+    },
+    {
+      "path": "docs/reviews/mac-packaging-reliability/04-relocated-tools.md",
+      "category": "archive",
+      "lines": 24
+    },
+    {
+      "path": "docs/reviews/mac-packaging-reliability/05-candidate-index.md",
+      "category": "archive",
+      "lines": 32
+    },
+    {
+      "path": "docs/reviews/mac-personal-widgets/README.md",
+      "category": "archive",
+      "lines": 1756
+    },
+    {
+      "path": "docs/reviews/mac-widget-expansion/README.md",
+      "category": "archive",
+      "lines": 71
+    },
+    {
+      "path": "docs/reviews/mac-widget-fidelity-20261030.md",
+      "category": "archive",
+      "lines": 37
+    },
+    {
+      "path": "docs/reviews/mac-widget-v11/README.md",
+      "category": "archive",
+      "lines": 40
+    },
+    {
+      "path": "docs/reviews/macos-advanced-gpu/README.md",
+      "category": "archive",
+      "lines": 26
+    },
+    {
+      "path": "docs/reviews/macos-app-examples/README.md",
+      "category": "archive",
+      "lines": 32
+    },
+    {
+      "path": "docs/reviews/macos-busy-completion/README.md",
+      "category": "archive",
+      "lines": 13
+    },
+    {
+      "path": "docs/reviews/macos-busy-paint-retry/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/macos-cursor-fastpath/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/macos-document/README.md",
+      "category": "archive",
+      "lines": 34
+    },
+    {
+      "path": "docs/reviews/macos-drawing/README.md",
+      "category": "archive",
+      "lines": 40
+    },
+    {
+      "path": "docs/reviews/macos-editor/README.md",
+      "category": "archive",
+      "lines": 37
+    },
+    {
+      "path": "docs/reviews/macos-execution/README.md",
+      "category": "archive",
+      "lines": 21
+    },
+    {
+      "path": "docs/reviews/macos-field-state/README.md",
+      "category": "archive",
+      "lines": 14
+    },
+    {
+      "path": "docs/reviews/macos-file-drop/README.md",
+      "category": "archive",
+      "lines": 32
+    },
+    {
+      "path": "docs/reviews/macos-first-release-plan/README.md",
+      "category": "archive",
+      "lines": 15
+    },
+    {
+      "path": "docs/reviews/macos-grid-editing/README.md",
+      "category": "archive",
+      "lines": 29
+    },
+    {
+      "path": "docs/reviews/macos-grid-editing/final-input/docs/reports/macos-grid-editing/README.md",
+      "category": "archive",
+      "lines": 44
+    },
+    {
+      "path": "docs/reviews/macos-grid-editing/final-input/docs/reviews/macos-grid-editing/README.md",
+      "category": "archive",
+      "lines": 29
+    },
+    {
+      "path": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "category": "archive",
+      "lines": 36
+    },
+    {
+      "path": "docs/reviews/macos-grid-editing/internal-source/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "category": "archive",
+      "lines": 198
+    },
+    {
+      "path": "docs/reviews/macos-grid-editing/internal-source/selected-source/examples/grid/README.md",
+      "category": "archive",
+      "lines": 174
+    },
+    {
+      "path": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "category": "archive",
+      "lines": 171
+    },
+    {
+      "path": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/grid-editing.md",
+      "category": "archive",
+      "lines": 86
+    },
+    {
+      "path": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/grid-native.md",
+      "category": "archive",
+      "lines": 213
+    },
+    {
+      "path": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/grid.md",
+      "category": "archive",
+      "lines": 208
+    },
+    {
+      "path": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/macos-completion.md",
+      "category": "archive",
+      "lines": 112
+    },
+    {
+      "path": "docs/reviews/macos-grid-editing/portable/README.md",
+      "category": "archive",
+      "lines": 9
+    },
+    {
+      "path": "docs/reviews/macos-grid-editing/portable/final-draft-3/source/grid-editing.md",
+      "category": "archive",
+      "lines": 86
+    },
+    {
+      "path": "docs/reviews/macos-grid-loaded/README.md",
+      "category": "archive",
+      "lines": 33
+    },
+    {
+      "path": "docs/reviews/macos-grid-loaded/prism-consumer-v1/README.md",
+      "category": "archive",
+      "lines": 5
+    },
+    {
+      "path": "docs/reviews/macos-grid-model/README.md",
+      "category": "archive",
+      "lines": 18
+    },
+    {
+      "path": "docs/reviews/macos-grid-native/README.md",
+      "category": "archive",
+      "lines": 29
+    },
+    {
+      "path": "docs/reviews/macos-grid-selection/README.md",
+      "category": "archive",
+      "lines": 26
+    },
+    {
+      "path": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "category": "archive",
+      "lines": 193
+    },
+    {
+      "path": "docs/reviews/macos-grid-selection/final-batch-v2/source/examples/grid/README.md",
+      "category": "archive",
+      "lines": 139
+    },
+    {
+      "path": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "category": "archive",
+      "lines": 35
+    },
+    {
+      "path": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "category": "archive",
+      "lines": 169
+    },
+    {
+      "path": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/grid-native.md",
+      "category": "archive",
+      "lines": 147
+    },
+    {
+      "path": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/grid-selection.md",
+      "category": "archive",
+      "lines": 99
+    },
+    {
+      "path": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/grid.md",
+      "category": "archive",
+      "lines": 206
+    },
+    {
+      "path": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/macos-completion.md",
+      "category": "archive",
+      "lines": 104
+    },
+    {
+      "path": "docs/reviews/macos-grid-selection/native-cursor-correction/source/specs/grid-native.md",
+      "category": "archive",
+      "lines": 147
+    },
+    {
+      "path": "docs/reviews/macos-grid-variable/README.md",
+      "category": "archive",
+      "lines": 13
+    },
+    {
+      "path": "docs/reviews/macos-history/README.md",
+      "category": "archive",
+      "lines": 30
+    },
+    {
+      "path": "docs/reviews/macos-icon-origins/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/macos-images/README.md",
+      "category": "archive",
+      "lines": 31
+    },
+    {
+      "path": "docs/reviews/macos-imaging/README.md",
+      "category": "archive",
+      "lines": 46
+    },
+    {
+      "path": "docs/reviews/macos-large-data/README.md",
+      "category": "archive",
+      "lines": 39
+    },
+    {
+      "path": "docs/reviews/macos-measured-input/README.md",
+      "category": "archive",
+      "lines": 32
+    },
+    {
+      "path": "docs/reviews/macos-metal-latency/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/macos-metal-latency/proposal.md",
+      "category": "archive",
+      "lines": 13
+    },
+    {
+      "path": "docs/reviews/macos-native-dispatch/README.md",
+      "category": "archive",
+      "lines": 26
+    },
+    {
+      "path": "docs/reviews/macos-native-fixture-geometry/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/macos-native-workspace/README.md",
+      "category": "archive",
+      "lines": 28
+    },
+    {
+      "path": "docs/reviews/macos-owned-asset-notices/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/macos-presentation-startup/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/macos-preview-alpha3-candidate/README.md",
+      "category": "archive",
+      "lines": 16
+    },
+    {
+      "path": "docs/reviews/macos-preview-app-acceptance/README.md",
+      "category": "archive",
+      "lines": 24
+    },
+    {
+      "path": "docs/reviews/macos-preview-audit-approval/README.md",
+      "category": "archive",
+      "lines": 8
+    },
+    {
+      "path": "docs/reviews/macos-preview-distribution/README.md",
+      "category": "archive",
+      "lines": 11
+    },
+    {
+      "path": "docs/reviews/macos-preview-final-private/README.md",
+      "category": "archive",
+      "lines": 8
+    },
+    {
+      "path": "docs/reviews/macos-preview-identity/README.md",
+      "category": "archive",
+      "lines": 12
+    },
+    {
+      "path": "docs/reviews/macos-preview-lifecycle100/README.md",
+      "category": "archive",
+      "lines": 26
+    },
+    {
+      "path": "docs/reviews/macos-preview-public-app/README.md",
+      "category": "archive",
+      "lines": 47
+    },
+    {
+      "path": "docs/reviews/macos-preview-public-candidate/README.md",
+      "category": "archive",
+      "lines": 16
+    },
+    {
+      "path": "docs/reviews/macos-preview-public-native/README.md",
+      "category": "archive",
+      "lines": 29
+    },
+    {
+      "path": "docs/reviews/macos-preview-r1/README.md",
+      "category": "archive",
+      "lines": 12
+    },
+    {
+      "path": "docs/reviews/macos-preview-ready/README.md",
+      "category": "archive",
+      "lines": 33
+    },
+    {
+      "path": "docs/reviews/macos-preview-resource-check/README.md",
+      "category": "archive",
+      "lines": 15
+    },
+    {
+      "path": "docs/reviews/macos-preview-sdk-export/README.md",
+      "category": "archive",
+      "lines": 12
+    },
+    {
+      "path": "docs/reviews/macos-preview-sdk-version/README.md",
+      "category": "archive",
+      "lines": 9
+    },
+    {
+      "path": "docs/reviews/macos-preview-soak-setup/README.md",
+      "category": "archive",
+      "lines": 10
+    },
+    {
+      "path": "docs/reviews/macos-preview-soak-two-hour/README.md",
+      "category": "archive",
+      "lines": 15
+    },
+    {
+      "path": "docs/reviews/macos-replay/README.md",
+      "category": "archive",
+      "lines": 19
+    },
+    {
+      "path": "docs/reviews/macos-sdk-cancellation/README.md",
+      "category": "archive",
+      "lines": 76
+    },
+    {
+      "path": "docs/reviews/macos-shell-contrast/README.md",
+      "category": "archive",
+      "lines": 49
+    },
+    {
+      "path": "docs/reviews/macos-shell-exposure/README.md",
+      "category": "archive",
+      "lines": 63
+    },
+    {
+      "path": "docs/reviews/macos-style-compat/README.md",
+      "category": "archive",
+      "lines": 29
+    },
+    {
+      "path": "docs/reviews/macos-v1-build13-publication/README.md",
+      "category": "archive",
+      "lines": 14
+    },
+    {
+      "path": "docs/reviews/macos-v1-build13/README.md",
+      "category": "archive",
+      "lines": 31
+    },
+    {
+      "path": "docs/reviews/macos-v1-distribution/README.md",
+      "category": "archive",
+      "lines": 44
+    },
+    {
+      "path": "docs/reviews/macos-v1-maintenance/README.md",
+      "category": "archive",
+      "lines": 32
+    },
+    {
+      "path": "docs/reviews/macos-v1-public-packaging/README.md",
+      "category": "archive",
+      "lines": 56
+    },
+    {
+      "path": "docs/reviews/macos-v1-release/README.md",
+      "category": "archive",
+      "lines": 24
+    },
+    {
+      "path": "docs/reviews/macos-v1/README.md",
+      "category": "archive",
+      "lines": 52
+    },
+    {
+      "path": "docs/reviews/next-five-stability/item-1.md",
+      "category": "archive",
+      "lines": 48
+    },
+    {
+      "path": "docs/reviews/next-five-stability/item-2.md",
+      "category": "archive",
+      "lines": 34
+    },
+    {
+      "path": "docs/reviews/next-five-stability/item-3-closing.md",
+      "category": "archive",
+      "lines": 24
+    },
+    {
+      "path": "docs/reviews/next-five-stability/item-3.md",
+      "category": "archive",
+      "lines": 79
+    },
+    {
+      "path": "docs/reviews/next-five-stability/item-4-contract.md",
+      "category": "archive",
+      "lines": 18
+    },
+    {
+      "path": "docs/reviews/next-five-stability/item-4.md",
+      "category": "archive",
+      "lines": 13
+    },
+    {
+      "path": "docs/reviews/next-five-stability/item-5.md",
+      "category": "archive",
+      "lines": 13
+    },
+    {
+      "path": "docs/reviews/placement-capture-layout/README.md",
+      "category": "archive",
+      "lines": 31
+    },
+    {
+      "path": "docs/reviews/platform-support/README.md",
+      "category": "archive",
+      "lines": 12
+    },
+    {
+      "path": "docs/reviews/project-maintenance/consumer-sdk/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/project-maintenance/document-starter/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/project-maintenance/document-windows/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/project-maintenance/general-fix-01-verified/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/project-maintenance/general-fix-02/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/project-maintenance/general-fix-03/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/project-maintenance/general-fix-04/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/project-maintenance/general-fix-05/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/project-maintenance/general-fix-06-final/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/project-maintenance/general-fix-07/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/project-maintenance/mac-visual-consistency/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/project-maintenance/private-consumer-bundle/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/project-maintenance/stabilization-ci/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/project-maintenance/stabilization-measure-pad/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/project-maintenance/stabilization-visual/README.md",
+      "category": "archive",
+      "lines": 7
+    },
+    {
+      "path": "docs/reviews/regression-fix-20261010/README.md",
+      "category": "archive",
+      "lines": 5
+    },
+    {
+      "path": "docs/reviews/release-identity/README.md",
+      "category": "archive",
+      "lines": 12
+    },
+    {
+      "path": "docs/reviews/rendering-hardening/README.md",
+      "category": "archive",
+      "lines": 12
+    },
+    {
+      "path": "docs/reviews/repo-layout-20261010/README.md",
+      "category": "archive",
+      "lines": 29
+    },
+    {
+      "path": "docs/reviews/sdk-notices/README.md",
+      "category": "archive",
+      "lines": 17
+    },
+    {
+      "path": "docs/reviews/sdk-release-completion/README.md",
+      "category": "archive",
+      "lines": 12
+    },
+    {
+      "path": "docs/reviews/sdk/README.md",
+      "category": "archive",
+      "lines": 35
+    },
+    {
+      "path": "docs/reviews/showcase-apps/README.md",
+      "category": "archive",
+      "lines": 78
+    },
+    {
+      "path": "docs/reviews/standard-controls/README.md",
+      "category": "archive",
+      "lines": 12
+    },
+    {
+      "path": "docs/reviews/starter-license/README.md",
+      "category": "archive",
+      "lines": 12
+    },
+    {
+      "path": "docs/reviews/v1-source-release/README.md",
+      "category": "archive",
+      "lines": 33
+    },
+    {
+      "path": "docs/reviews/visual-text-20261010/REVIEW.md",
+      "category": "archive",
+      "lines": 16
+    },
+    {
+      "path": "docs/reviews/windows-services/README.md",
+      "category": "archive",
+      "lines": 20
+    },
+    {
+      "path": "docs/reviews/workbench-completion/README.md",
+      "category": "archive",
+      "lines": 12
+    },
+    {
+      "path": "docs/screenshots/README.md",
+      "category": "maintained",
+      "lines": 66
+    },
+    {
+      "path": "docs/security/dependency-alerts-2026-10-25.md",
+      "category": "archive",
+      "lines": 31
+    },
+    {
+      "path": "docs/security/dependency-alerts-2026-10-30.md",
+      "category": "archive",
+      "lines": 65
+    },
+    {
+      "path": "docs/tutorials/building-an-app.md",
+      "category": "maintained",
+      "lines": 209
+    },
+    {
+      "path": "drivers/cogent/cmd/display-backpressure-smoke/README.md",
+      "category": "maintained",
+      "lines": 30
+    },
+    {
+      "path": "drivers/cogent/cmd/gallery/README.md",
+      "category": "maintained",
+      "lines": 157
+    },
+    {
+      "path": "drivers/cogent/native/README.md",
+      "category": "pinned-native",
+      "lines": 274
+    },
+    {
+      "path": "drivers/cogent/native/assets/cursors/README.md",
+      "category": "pinned-native",
+      "lines": 14
+    },
+    {
+      "path": "drivers/cogent/native/assets/fixturefont/README.md",
+      "category": "pinned-native",
+      "lines": 22
+    },
+    {
+      "path": "drivers/cogent/native/assets/iconorigins/README.md",
+      "category": "pinned-native",
+      "lines": 7
+    },
+    {
+      "path": "drivers/cogent/native/assets/iconorigins/material-notices/README.md",
+      "category": "third-party",
+      "lines": 3
+    },
+    {
+      "path": "drivers/cogent/native/assets/symbols/NOTICE.md",
+      "category": "third-party",
+      "lines": 9
+    },
+    {
+      "path": "drivers/cogent/native/patches/acknowledgedskip/README.md",
+      "category": "pinned-native",
+      "lines": 5
+    },
+    {
+      "path": "drivers/cogent/native/patches/acquisitionoutcomes/README.md",
+      "category": "pinned-native",
+      "lines": 27
+    },
+    {
+      "path": "drivers/cogent/native/patches/autorelease/README.md",
+      "category": "pinned-native",
+      "lines": 38
+    },
+    {
+      "path": "drivers/cogent/native/patches/boundedoutlines/README.md",
+      "category": "pinned-native",
+      "lines": 9
+    },
+    {
+      "path": "drivers/cogent/native/patches/cellsurface/README.md",
+      "category": "pinned-native",
+      "lines": 18
+    },
+    {
+      "path": "drivers/cogent/native/patches/computelifecycle/README.md",
+      "category": "pinned-native",
+      "lines": 28
+    },
+    {
+      "path": "drivers/cogent/native/patches/coveredfills/README.md",
+      "category": "pinned-native",
+      "lines": 24
+    },
+    {
+      "path": "drivers/cogent/native/patches/cursorfastpath/README.md",
+      "category": "pinned-native",
+      "lines": 3
+    },
+    {
+      "path": "drivers/cogent/native/patches/desktopmeasurement/README.md",
+      "category": "pinned-native",
+      "lines": 21
+    },
+    {
+      "path": "drivers/cogent/native/patches/desktoprouting/README.md",
+      "category": "pinned-native",
+      "lines": 9
+    },
+    {
+      "path": "drivers/cogent/native/patches/displaybackpressure/README.md",
+      "category": "pinned-native",
+      "lines": 3
+    },
+    {
+      "path": "drivers/cogent/native/patches/editorbodyfont/README.md",
+      "category": "pinned-native",
+      "lines": 15
+    },
+    {
+      "path": "drivers/cogent/native/patches/emptysprites/README.md",
+      "category": "pinned-native",
+      "lines": 28
+    },
+    {
+      "path": "drivers/cogent/native/patches/encodingscratch/README.md",
+      "category": "pinned-native",
+      "lines": 23
+    },
+    {
+      "path": "drivers/cogent/native/patches/eventpublication/README.md",
+      "category": "pinned-native",
+      "lines": 22
+    },
+    {
+      "path": "drivers/cogent/native/patches/exposure/README.md",
+      "category": "pinned-native",
+      "lines": 20
+    },
+    {
+      "path": "drivers/cogent/native/patches/fixedwindow/README.md",
+      "category": "pinned-native",
+      "lines": 11
+    },
+    {
+      "path": "drivers/cogent/native/patches/fontnotices/README.md",
+      "category": "pinned-native",
+      "lines": 22
+    },
+    {
+      "path": "drivers/cogent/native/patches/framecleanup/README.md",
+      "category": "pinned-native",
+      "lines": 23
+    },
+    {
+      "path": "drivers/cogent/native/patches/frametrace/README.md",
+      "category": "pinned-native",
+      "lines": 23
+    },
+    {
+      "path": "drivers/cogent/native/patches/frameunavailable/README.md",
+      "category": "pinned-native",
+      "lines": 27
+    },
+    {
+      "path": "drivers/cogent/native/patches/glyphcoverage/README.md",
+      "category": "pinned-native",
+      "lines": 26
+    },
+    {
+      "path": "drivers/cogent/native/patches/glyphfingerprint/README.md",
+      "category": "pinned-native",
+      "lines": 17
+    },
+    {
+      "path": "drivers/cogent/native/patches/glyphlookup/README.md",
+      "category": "pinned-native",
+      "lines": 13
+    },
+    {
+      "path": "drivers/cogent/native/patches/glyphmask/README.md",
+      "category": "pinned-native",
+      "lines": 22
+    },
+    {
+      "path": "drivers/cogent/native/patches/glyphplacement/README.md",
+      "category": "pinned-native",
+      "lines": 45
+    },
+    {
+      "path": "drivers/cogent/native/patches/gpucovered/README.md",
+      "category": "pinned-native",
+      "lines": 25
+    },
+    {
+      "path": "drivers/cogent/native/patches/gpuscenes/README.md",
+      "category": "pinned-native",
+      "lines": 18
+    },
+    {
+      "path": "drivers/cogent/native/patches/groupsourcedetails/README.md",
+      "category": "pinned-native",
+      "lines": 15
+    },
+    {
+      "path": "drivers/cogent/native/patches/iconorigins/README.md",
+      "category": "pinned-native",
+      "lines": 9
+    },
+    {
+      "path": "drivers/cogent/native/patches/initialsize/README.md",
+      "category": "pinned-native",
+      "lines": 21
+    },
+    {
+      "path": "drivers/cogent/native/patches/inputheadroom/README.md",
+      "category": "pinned-native",
+      "lines": 3
+    },
+    {
+      "path": "drivers/cogent/native/patches/locallayout/README.md",
+      "category": "pinned-native",
+      "lines": 26
+    },
+    {
+      "path": "drivers/cogent/native/patches/localtext/README.md",
+      "category": "pinned-native",
+      "lines": 21
+    },
+    {
+      "path": "drivers/cogent/native/patches/maincleanup/README.md",
+      "category": "pinned-native",
+      "lines": 17
+    },
+    {
+      "path": "drivers/cogent/native/patches/metallatency/README.md",
+      "category": "pinned-native",
+      "lines": 3
+    },
+    {
+      "path": "drivers/cogent/native/patches/nativeactivity/README.md",
+      "category": "pinned-native",
+      "lines": 12
+    },
+    {
+      "path": "drivers/cogent/native/patches/operationblocks/README.md",
+      "category": "pinned-native",
+      "lines": 22
+    },
+    {
+      "path": "drivers/cogent/native/patches/outlinecache/README.md",
+      "category": "pinned-native",
+      "lines": 23
+    },
+    {
+      "path": "drivers/cogent/native/patches/outlinecost/README.md",
+      "category": "pinned-native",
+      "lines": 14
+    },
+    {
+      "path": "drivers/cogent/native/patches/outlineextrema/README.md",
+      "category": "pinned-native",
+      "lines": 21
+    },
+    {
+      "path": "drivers/cogent/native/patches/packedcoverage/README.md",
+      "category": "pinned-native",
+      "lines": 19
+    },
+    {
+      "path": "drivers/cogent/native/patches/paintcompletion/README.md",
+      "category": "pinned-native",
+      "lines": 9
+    },
+    {
+      "path": "drivers/cogent/native/patches/paintretry/README.md",
+      "category": "pinned-native",
+      "lines": 3
+    },
+    {
+      "path": "drivers/cogent/native/patches/pipelinelifecycle/README.md",
+      "category": "pinned-native",
+      "lines": 19
+    },
+    {
+      "path": "drivers/cogent/native/patches/pointercapture/README.md",
+      "category": "pinned-native",
+      "lines": 15
+    },
+    {
+      "path": "drivers/cogent/native/patches/popupbuttonembedders/README.md",
+      "category": "pinned-native",
+      "lines": 21
+    },
+    {
+      "path": "drivers/cogent/native/patches/popupinspection/README.md",
+      "category": "pinned-native",
+      "lines": 23
+    },
+    {
+      "path": "drivers/cogent/native/patches/popuptimeout/README.md",
+      "category": "pinned-native",
+      "lines": 16
+    },
+    {
+      "path": "drivers/cogent/native/patches/presentation/README.md",
+      "category": "pinned-native",
+      "lines": 41
+    },
+    {
+      "path": "drivers/cogent/native/patches/proseeditor/README.md",
+      "category": "pinned-native",
+      "lines": 19
+    },
+    {
+      "path": "drivers/cogent/native/patches/rgbaupload/README.md",
+      "category": "pinned-native",
+      "lines": 14
+    },
+    {
+      "path": "drivers/cogent/native/patches/rowtracking/README.md",
+      "category": "pinned-native",
+      "lines": 32
+    },
+    {
+      "path": "drivers/cogent/native/patches/scenehost/README.md",
+      "category": "pinned-native",
+      "lines": 5
+    },
+    {
+      "path": "drivers/cogent/native/patches/scenescratch/README.md",
+      "category": "pinned-native",
+      "lines": 21
+    },
+    {
+      "path": "drivers/cogent/native/patches/scrollsurfaces/README.md",
+      "category": "pinned-native",
+      "lines": 70
+    },
+    {
+      "path": "drivers/cogent/native/patches/sourcecost/README.md",
+      "category": "pinned-native",
+      "lines": 39
+    },
+    {
+      "path": "drivers/cogent/native/patches/spanbands/README.md",
+      "category": "pinned-native",
+      "lines": 18
+    },
+    {
+      "path": "drivers/cogent/native/patches/spanheaders/README.md",
+      "category": "pinned-native",
+      "lines": 18
+    },
+    {
+      "path": "drivers/cogent/native/patches/spanscratch/README.md",
+      "category": "pinned-native",
+      "lines": 18
+    },
+    {
+      "path": "drivers/cogent/native/patches/spanstorage/README.md",
+      "category": "pinned-native",
+      "lines": 11
+    },
+    {
+      "path": "drivers/cogent/native/patches/storagereadback/README.md",
+      "category": "pinned-native",
+      "lines": 34
+    },
+    {
+      "path": "drivers/cogent/native/patches/tabclose/README.md",
+      "category": "pinned-native",
+      "lines": 12
+    },
+    {
+      "path": "drivers/cogent/native/patches/testfontnotices/README.md",
+      "category": "pinned-native",
+      "lines": 27
+    },
+    {
+      "path": "drivers/cogent/native/patches/textalign/README.md",
+      "category": "pinned-native",
+      "lines": 27
+    },
+    {
+      "path": "drivers/cogent/native/patches/textbatch/README.md",
+      "category": "pinned-native",
+      "lines": 28
+    },
+    {
+      "path": "drivers/cogent/native/patches/textcompat/README.md",
+      "category": "pinned-native",
+      "lines": 17
+    },
+    {
+      "path": "drivers/cogent/native/patches/texturelifecycle/README.md",
+      "category": "pinned-native",
+      "lines": 42
+    },
+    {
+      "path": "drivers/cogent/native/patches/tilebinning/README.md",
+      "category": "pinned-native",
+      "lines": 29
+    },
+    {
+      "path": "drivers/cogent/native/patches/uniformcrop/README.md",
+      "category": "pinned-native",
+      "lines": 27
+    },
+    {
+      "path": "drivers/cogent/native/patches/windowchrome/README.md",
+      "category": "pinned-native",
+      "lines": 11
+    },
+    {
+      "path": "drivers/cogent/native/patches/windowretirement/README.md",
+      "category": "pinned-native",
+      "lines": 17
+    },
+    {
+      "path": "examples/README.md",
+      "category": "maintained",
+      "lines": 48
+    },
+    {
+      "path": "examples/automation/README.md",
+      "category": "maintained",
+      "lines": 64
+    },
+    {
+      "path": "examples/demo-suite/README.md",
+      "category": "maintained",
+      "lines": 88
+    },
+    {
+      "path": "examples/drawing/README.md",
+      "category": "maintained",
+      "lines": 39
+    },
+    {
+      "path": "examples/editor/README.md",
+      "category": "maintained",
+      "lines": 95
+    },
+    {
+      "path": "examples/forge/README.md",
+      "category": "maintained",
+      "lines": 151
+    },
+    {
+      "path": "examples/forge/testdata/compatibility/README.md",
+      "category": "maintained",
+      "lines": 21
+    },
+    {
+      "path": "examples/grid/README.md",
+      "category": "maintained",
+      "lines": 174
+    },
+    {
+      "path": "examples/hello/README.md",
+      "category": "maintained",
+      "lines": 33
+    },
+    {
+      "path": "examples/imaging/README.md",
+      "category": "maintained",
+      "lines": 84
+    },
+    {
+      "path": "examples/imaging/acceptance/README.md",
+      "category": "maintained",
+      "lines": 83
+    },
+    {
+      "path": "examples/loadedgrid/README.md",
+      "category": "maintained",
+      "lines": 124
+    },
+    {
+      "path": "examples/loadedtree/README.md",
+      "category": "maintained",
+      "lines": 152
+    },
+    {
+      "path": "examples/macapps/README.md",
+      "category": "maintained",
+      "lines": 42
+    },
+    {
+      "path": "examples/macapps/calculator/README.md",
+      "category": "maintained",
+      "lines": 30
+    },
+    {
+      "path": "examples/macapps/notes/README.md",
+      "category": "maintained",
+      "lines": 202
+    },
+    {
+      "path": "examples/macapps/notes/testdata/compatibility/README.md",
+      "category": "maintained",
+      "lines": 21
+    },
+    {
+      "path": "examples/macapps/reminders/README.md",
+      "category": "maintained",
+      "lines": 108
+    },
+    {
+      "path": "examples/macapps/weather/README.md",
+      "category": "maintained",
+      "lines": 45
+    },
+    {
+      "path": "examples/measurepad/README.md",
+      "category": "maintained",
+      "lines": 36
+    },
+    {
+      "path": "examples/personal-mac/README.md",
+      "category": "maintained",
+      "lines": 42
+    },
+    {
+      "path": "examples/placement/README.md",
+      "category": "maintained",
+      "lines": 632
+    },
+    {
+      "path": "examples/replay/README.md",
+      "category": "maintained",
+      "lines": 110
+    },
+    {
+      "path": "examples/replay/cmd/workspace-native/README.md",
+      "category": "maintained",
+      "lines": 58
+    },
+    {
+      "path": "examples/replay/cmd/workspace-smoke/README.md",
+      "category": "maintained",
+      "lines": 52
+    },
+    {
+      "path": "examples/showcase/README.md",
+      "category": "maintained",
+      "lines": 96
+    },
+    {
+      "path": "examples/viewport3d/README.md",
+      "category": "maintained",
+      "lines": 46
+    },
+    {
+      "path": "examples/work-log/README.md",
+      "category": "maintained",
+      "lines": 47
+    },
+    {
+      "path": "prototypes/fontresources/README.md",
+      "category": "archive",
+      "lines": 26
+    },
+    {
+      "path": "prototypes/foundation/README.md",
+      "category": "archive",
+      "lines": 32
+    },
+    {
+      "path": "prototypes/foundation/native/accesskit-c/PROVENANCE.md",
+      "category": "archive",
+      "lines": 9
+    },
+    {
+      "path": "prototypes/foundationchecks/LIVE_CHECKS.md",
+      "category": "archive",
+      "lines": 26
+    },
+    {
+      "path": "prototypes/foundationchecks/README.md",
+      "category": "archive",
+      "lines": 42
+    },
+    {
+      "path": "prototypes/foundationcontracts/README.md",
+      "category": "archive",
+      "lines": 40
+    },
+    {
+      "path": "prototypes/foundationintegration/README.md",
+      "category": "archive",
+      "lines": 46
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-editor-native/README.md",
+      "category": "archive",
+      "lines": 9
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-visual-text/README.md",
+      "category": "archive",
+      "lines": 33
+    },
+    {
+      "path": "prototypes/nativeinput/README.md",
+      "category": "archive",
+      "lines": 42
+    },
+    {
+      "path": "prototypes/nativeinput/native/accesskit-c/PROVENANCE.md",
+      "category": "archive",
+      "lines": 9
+    },
+    {
+      "path": "prototypes/p0/README.md",
+      "category": "archive",
+      "lines": 65
+    },
+    {
+      "path": "prototypes/remediation/README.md",
+      "category": "archive",
+      "lines": 42
+    },
+    {
+      "path": "prototypes/remediation/native/accesskit-c/PROVENANCE.md",
+      "category": "archive",
+      "lines": 9
+    },
+    {
+      "path": "release/api/README.md",
+      "category": "maintained",
+      "lines": 9
+    },
+    {
+      "path": "release/native-components/README.md",
+      "category": "third-party",
+      "lines": 34
+    },
+    {
+      "path": "release/native-components/wgpu-darwin-arm64/NOTICES/block2-0.6.2/repository-objc-block2-LICENSE.md",
+      "category": "third-party",
+      "lines": 34
+    },
+    {
+      "path": "release/native-components/wgpu-darwin-arm64/NOTICES/cfg_aliases-0.2.1/NOTICES.md",
+      "category": "third-party",
+      "lines": 26
+    },
+    {
+      "path": "release/native-components/wgpu-darwin-arm64/NOTICES/minimal-lexical-0.2.1/LICENSE.md",
+      "category": "third-party",
+      "lines": 37
+    },
+    {
+      "path": "release/native-components/wgpu-darwin-arm64/NOTICES/objc2-0.6.4/repository-objc-runtime-LICENSE.md",
+      "category": "third-party",
+      "lines": 34
+    },
+    {
+      "path": "release/native-components/wgpu-darwin-arm64/NOTICES/objc2-core-foundation-0.3.2/repository-objc-frameworks-LICENSE.md",
+      "category": "third-party",
+      "lines": 34
+    },
+    {
+      "path": "release/native-components/wgpu-darwin-arm64/NOTICES/objc2-encode-4.1.0/repository-objc-encode-LICENSE.md",
+      "category": "third-party",
+      "lines": 34
+    },
+    {
+      "path": "release/native-components/wgpu-darwin-arm64/NOTICES/objc2-foundation-0.3.2/repository-objc-frameworks-LICENSE.md",
+      "category": "third-party",
+      "lines": 34
+    },
+    {
+      "path": "release/native-components/wgpu-darwin-arm64/NOTICES/objc2-metal-0.3.2/repository-objc-frameworks-LICENSE.md",
+      "category": "third-party",
+      "lines": 34
+    },
+    {
+      "path": "release/native-components/wgpu-darwin-arm64/NOTICES/objc2-quartz-core-0.3.2/repository-objc-frameworks-LICENSE.md",
+      "category": "third-party",
+      "lines": 34
+    },
+    {
+      "path": "release/native-components/wgpu-darwin-arm64/NOTICES/petgraph-0.8.3/assets/images/LICENSE.md",
+      "category": "third-party",
+      "lines": 7
+    },
+    {
+      "path": "release/native-components/wgpu-darwin-arm64/NOTICES/raw-window-handle-0.6.2/LICENSE-APACHE.md",
+      "category": "third-party",
+      "lines": 177
+    },
+    {
+      "path": "release/native-components/wgpu-darwin-arm64/NOTICES/raw-window-handle-0.6.2/LICENSE-MIT.md",
+      "category": "third-party",
+      "lines": 21
+    },
+    {
+      "path": "release/native-components/wgpu-darwin-arm64/NOTICES/raw-window-handle-0.6.2/LICENSE-ZLIB.md",
+      "category": "third-party",
+      "lines": 11
+    },
+    {
+      "path": "release/notes/v1.0.0.md",
+      "category": "archive",
+      "lines": 73
+    },
+    {
+      "path": "release/notes/v1.1.0.md",
+      "category": "archive",
+      "lines": 54
+    },
+    {
+      "path": "release/notes/v1.1.1.md",
+      "category": "archive",
+      "lines": 32
+    },
+    {
+      "path": "release/notes/v1.1.2.md",
+      "category": "archive",
+      "lines": 30
+    },
+    {
+      "path": "release/notes/v1.1.3.md",
+      "category": "archive",
+      "lines": 36
+    },
+    {
+      "path": "specs/README.md",
+      "category": "maintained",
+      "lines": 61
+    },
+    {
+      "path": "specs/accessibility.md",
+      "category": "maintained",
+      "lines": 371
+    },
+    {
+      "path": "specs/advanced-gpu.md",
+      "category": "maintained",
+      "lines": 215
+    },
+    {
+      "path": "specs/automation.md",
+      "category": "maintained",
+      "lines": 153
+    },
+    {
+      "path": "specs/breadcrumb.md",
+      "category": "maintained",
+      "lines": 48
+    },
+    {
+      "path": "specs/canvas-accessibility.md",
+      "category": "maintained",
+      "lines": 69
+    },
+    {
+      "path": "specs/clipboard.md",
+      "category": "maintained",
+      "lines": 109
+    },
+    {
+      "path": "specs/color-picker.md",
+      "category": "maintained",
+      "lines": 45
+    },
+    {
+      "path": "specs/control-acceptance.md",
+      "category": "maintained",
+      "lines": 273
+    },
+    {
+      "path": "specs/controls.md",
+      "category": "maintained",
+      "lines": 591
+    },
+    {
+      "path": "specs/core-source-quality.md",
+      "category": "maintained",
+      "lines": 19
+    },
+    {
+      "path": "specs/cursor-artwork.md",
+      "category": "maintained",
+      "lines": 66
+    },
+    {
+      "path": "specs/cursor-ownership.md",
+      "category": "maintained",
+      "lines": 106
+    },
+    {
+      "path": "specs/desktop-integration.md",
+      "category": "maintained",
+      "lines": 124
+    },
+    {
+      "path": "specs/desktop-pointer-modes.md",
+      "category": "maintained",
+      "lines": 88
+    },
+    {
+      "path": "specs/document.md",
+      "category": "maintained",
+      "lines": 120
+    },
+    {
+      "path": "specs/drawing.md",
+      "category": "maintained",
+      "lines": 147
+    },
+    {
+      "path": "specs/editor.md",
+      "category": "maintained",
+      "lines": 226
+    },
+    {
+      "path": "specs/event-coalescing.md",
+      "category": "maintained",
+      "lines": 70
+    },
+    {
+      "path": "specs/execution.md",
+      "category": "maintained",
+      "lines": 161
+    },
+    {
+      "path": "specs/file-drop.md",
+      "category": "maintained",
+      "lines": 53
+    },
+    {
+      "path": "specs/file-panel-lifecycle.md",
+      "category": "maintained",
+      "lines": 38
+    },
+    {
+      "path": "specs/fixture-font-naming.md",
+      "category": "maintained",
+      "lines": 49
+    },
+    {
+      "path": "specs/framework.md",
+      "category": "maintained",
+      "lines": 216
+    },
+    {
+      "path": "specs/fusion-workbench.md",
+      "category": "maintained",
+      "lines": 231
+    },
+    {
+      "path": "specs/glyph-mask-cache.md",
+      "category": "maintained",
+      "lines": 29
+    },
+    {
+      "path": "specs/gpu-frame-lifecycle.md",
+      "category": "maintained",
+      "lines": 174
+    },
+    {
+      "path": "specs/grid-editing.md",
+      "category": "maintained",
+      "lines": 92
+    },
+    {
+      "path": "specs/grid-native.md",
+      "category": "maintained",
+      "lines": 350
+    },
+    {
+      "path": "specs/grid-performance.md",
+      "category": "maintained",
+      "lines": 688
+    },
+    {
+      "path": "specs/grid-projection.md",
+      "category": "maintained",
+      "lines": 128
+    },
+    {
+      "path": "specs/grid-selection.md",
+      "category": "maintained",
+      "lines": 99
+    },
+    {
+      "path": "specs/grid.md",
+      "category": "maintained",
+      "lines": 211
+    },
+    {
+      "path": "specs/history.md",
+      "category": "maintained",
+      "lines": 88
+    },
+    {
+      "path": "specs/images.md",
+      "category": "maintained",
+      "lines": 54
+    },
+    {
+      "path": "specs/keyed-reconciliation.md",
+      "category": "maintained",
+      "lines": 36
+    },
+    {
+      "path": "specs/layout-theme.md",
+      "category": "maintained",
+      "lines": 104
+    },
+    {
+      "path": "specs/list-box.md",
+      "category": "maintained",
+      "lines": 93
+    },
+    {
+      "path": "specs/mac-collection-view.md",
+      "category": "maintained",
+      "lines": 45
+    },
+    {
+      "path": "specs/mac-composition-widgets.md",
+      "category": "maintained",
+      "lines": 82
+    },
+    {
+      "path": "specs/mac-content-widgets.md",
+      "category": "maintained",
+      "lines": 37
+    },
+    {
+      "path": "specs/mac-desktop-widgets.md",
+      "category": "maintained",
+      "lines": 79
+    },
+    {
+      "path": "specs/mac-document-controls.md",
+      "category": "maintained",
+      "lines": 27
+    },
+    {
+      "path": "specs/mac-integration-pass.md",
+      "category": "maintained",
+      "lines": 30
+    },
+    {
+      "path": "specs/mac-level-indicator.md",
+      "category": "maintained",
+      "lines": 76
+    },
+    {
+      "path": "specs/mac-personal-app-stabilization.md",
+      "category": "maintained",
+      "lines": 47
+    },
+    {
+      "path": "specs/mac-personal-widgets.md",
+      "category": "maintained",
+      "lines": 264
+    },
+    {
+      "path": "specs/mac-preview-widgets.md",
+      "category": "maintained",
+      "lines": 67
+    },
+    {
+      "path": "specs/mac-sheet.md",
+      "category": "maintained",
+      "lines": 31
+    },
+    {
+      "path": "specs/mac-shortcut-recorder.md",
+      "category": "maintained",
+      "lines": 71
+    },
+    {
+      "path": "specs/mac-toolbar-catalogue.md",
+      "category": "maintained",
+      "lines": 190
+    },
+    {
+      "path": "specs/mac-widget-essentials.md",
+      "category": "maintained",
+      "lines": 30
+    },
+    {
+      "path": "specs/mac-widget-expansion.md",
+      "category": "maintained",
+      "lines": 106
+    },
+    {
+      "path": "specs/mac-widget-v11.md",
+      "category": "maintained",
+      "lines": 32
+    },
+    {
+      "path": "specs/mac-widgets-navigation.md",
+      "category": "maintained",
+      "lines": 19
+    },
+    {
+      "path": "specs/macos-app-examples.md",
+      "category": "maintained",
+      "lines": 99
+    },
+    {
+      "path": "specs/macos-app-icons.md",
+      "category": "maintained",
+      "lines": 27
+    },
+    {
+      "path": "specs/macos-calibration.md",
+      "category": "maintained",
+      "lines": 93
+    },
+    {
+      "path": "specs/macos-completion.md",
+      "category": "maintained",
+      "lines": 1817
+    },
+    {
+      "path": "specs/macos-delivery.md",
+      "category": "maintained",
+      "lines": 1214
+    },
+    {
+      "path": "specs/macos-display-backpressure-experiment.md",
+      "category": "maintained",
+      "lines": 23
+    },
+    {
+      "path": "specs/macos-document-workflows.md",
+      "category": "maintained",
+      "lines": 90
+    },
+    {
+      "path": "specs/macos-first-release-plan.md",
+      "category": "maintained",
+      "lines": 257
+    },
+    {
+      "path": "specs/macos-post-ownership.md",
+      "category": "maintained",
+      "lines": 36
+    },
+    {
+      "path": "specs/macos-release-assessment.md",
+      "category": "maintained",
+      "lines": 546
+    },
+    {
+      "path": "specs/macos-responsiveness.md",
+      "category": "maintained",
+      "lines": 126
+    },
+    {
+      "path": "specs/macos-service-performance.md",
+      "category": "maintained",
+      "lines": 85
+    },
+    {
+      "path": "specs/macos-v1-candidate.md",
+      "category": "maintained",
+      "lines": 42
+    },
+    {
+      "path": "specs/macos-v1-release.md",
+      "category": "maintained",
+      "lines": 64
+    },
+    {
+      "path": "specs/menu-button.md",
+      "category": "maintained",
+      "lines": 74
+    },
+    {
+      "path": "specs/native-activity.md",
+      "category": "maintained",
+      "lines": 40
+    },
+    {
+      "path": "specs/native-dispatch.md",
+      "category": "maintained",
+      "lines": 96
+    },
+    {
+      "path": "specs/native-object-lifetime.md",
+      "category": "maintained",
+      "lines": 31
+    },
+    {
+      "path": "specs/native-presentation.md",
+      "category": "maintained",
+      "lines": 179
+    },
+    {
+      "path": "specs/native-window-lifecycle.md",
+      "category": "maintained",
+      "lines": 208
+    },
+    {
+      "path": "specs/notifications.md",
+      "category": "maintained",
+      "lines": 115
+    },
+    {
+      "path": "specs/paced-presentation.md",
+      "category": "maintained",
+      "lines": 127
+    },
+    {
+      "path": "specs/personal-macos-v01.md",
+      "category": "maintained",
+      "lines": 53
+    },
+    {
+      "path": "specs/placement.md",
+      "category": "maintained",
+      "lines": 130
+    },
+    {
+      "path": "specs/platform-support.md",
+      "category": "maintained",
+      "lines": 116
+    },
+    {
+      "path": "specs/presentation-capture.md",
+      "category": "maintained",
+      "lines": 141
+    },
+    {
+      "path": "specs/prototype-plan.md",
+      "category": "maintained",
+      "lines": 211
+    },
+    {
+      "path": "specs/release.md",
+      "category": "maintained",
+      "lines": 741
+    },
+    {
+      "path": "specs/rendering.md",
+      "category": "maintained",
+      "lines": 632
+    },
+    {
+      "path": "specs/replay.md",
+      "category": "maintained",
+      "lines": 263
+    },
+    {
+      "path": "specs/sdk.md",
+      "category": "maintained",
+      "lines": 268
+    },
+    {
+      "path": "specs/showcase-apps.md",
+      "category": "maintained",
+      "lines": 26
+    },
+    {
+      "path": "specs/stable-api.md",
+      "category": "maintained",
+      "lines": 59
+    },
+    {
+      "path": "specs/tab-close.md",
+      "category": "maintained",
+      "lines": 78
+    },
+    {
+      "path": "specs/tray.md",
+      "category": "maintained",
+      "lines": 106
+    },
+    {
+      "path": "specs/tree-native.md",
+      "category": "maintained",
+      "lines": 107
+    },
+    {
+      "path": "specs/tree-performance.md",
+      "category": "maintained",
+      "lines": 81
+    },
+    {
+      "path": "specs/tree.md",
+      "category": "maintained",
+      "lines": 163
+    },
+    {
+      "path": "specs/window-lifetimes.md",
+      "category": "maintained",
+      "lines": 130
+    },
+    {
+      "path": "specs/windows-services.md",
+      "category": "maintained",
+      "lines": 168
+    },
+    {
+      "path": "specs/workbench-endurance.md",
+      "category": "maintained",
+      "lines": 264
+    },
+    {
+      "path": "specs/workbench-interaction.md",
+      "category": "maintained",
+      "lines": 39
+    },
+    {
+      "path": "tools/apicompat/README.md",
+      "category": "maintained",
+      "lines": 70
+    },
+    {
+      "path": "tools/macos-calibration/README.md",
+      "category": "maintained",
+      "lines": 27
+    },
+    {
+      "path": "tools/macos-calibration/backend/BUILD_CONTROL.md",
+      "category": "archive",
+      "lines": 39
+    },
+    {
+      "path": "tools/macos-calibration/backend/PLAN.md",
+      "category": "archive",
+      "lines": 68
+    },
+    {
+      "path": "tools/macos-calibration/cachecontrol/PLAN.md",
+      "category": "archive",
+      "lines": 60
+    },
+    {
+      "path": "tools/macos-calibration/copycontrol/PLAN.md",
+      "category": "archive",
+      "lines": 54
+    },
+    {
+      "path": "tools/macos-calibration/displayclock/PHASE.md",
+      "category": "archive",
+      "lines": 33
+    },
+    {
+      "path": "tools/macos-calibration/displayclock/PLAN.md",
+      "category": "archive",
+      "lines": 42
+    },
+    {
+      "path": "tools/macos-calibration/displayclock/REVERSED.md",
+      "category": "archive",
+      "lines": 35
+    },
+    {
+      "path": "tools/macos-calibration/frameworkpending/PLAN.md",
+      "category": "archive",
+      "lines": 47
+    },
+    {
+      "path": "tools/macos-calibration/joined/PLAN.md",
+      "category": "archive",
+      "lines": 72
+    },
+    {
+      "path": "tools/macos-calibration/joinedbackend/PLAN.md",
+      "category": "archive",
+      "lines": 39
+    },
+    {
+      "path": "tools/macos-calibration/presentationphase/PLAN.md",
+      "category": "archive",
+      "lines": 74
+    },
+    {
+      "path": "tools/macos-calibration/rastercommands/NATIVE.md",
+      "category": "archive",
+      "lines": 42
+    },
+    {
+      "path": "tools/macos-calibration/rastercommands/PLAN.md",
+      "category": "archive",
+      "lines": 32
+    },
+    {
+      "path": "tools/macos-calibration/rastercost/PLAN.md",
+      "category": "archive",
+      "lines": 73
+    },
+    {
+      "path": "tools/macos-calibration/reusepolicy/PLAN.md",
+      "category": "archive",
+      "lines": 95
+    },
+    {
+      "path": "tools/macos-calibration/sourcecost/PLAN.md",
+      "category": "archive",
+      "lines": 42
+    },
+    {
+      "path": "tools/macos-calibration/stagingcache/PLAN.md",
+      "category": "archive",
+      "lines": 45
+    },
+    {
+      "path": "tools/macos-calibration/stagingcache/TIMING.md",
+      "category": "archive",
+      "lines": 35
+    },
+    {
+      "path": "tools/macos-calibration/stagingreuse/PLAN.md",
+      "category": "archive",
+      "lines": 100
+    },
+    {
+      "path": "tools/macos-calibration/stagingreuse/SEGMENTS.md",
+      "category": "archive",
+      "lines": 26
+    },
+    {
+      "path": "tools/macos-calibration/stagingreuse/TIMING.md",
+      "category": "archive",
+      "lines": 51
+    },
+    {
+      "path": "tools/macos-calibration/startup/PLAN.md",
+      "category": "archive",
+      "lines": 29
+    },
+    {
+      "path": "tools/macos-calibration/submit/PLAN.md",
+      "category": "archive",
+      "lines": 37
+    },
+    {
+      "path": "tools/macos-calibration/uniformfill/PLAN.md",
+      "category": "archive",
+      "lines": 22
+    },
+    {
+      "path": "tools/macos-calibration/upload/PLAN.md",
+      "category": "archive",
+      "lines": 57
+    },
+    {
+      "path": "tools/macos-render-priority/PLAN.md",
+      "category": "archive",
+      "lines": 46
+    }
+  ],
+  "missing_targets": [
+    {
+      "file": "docs/reports/macos-grid-selection/consumer-v1/owned-source/README.md",
+      "target": "../../docs/development.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-grid-selection/consumer-v1/owned-source/README.md",
+      "target": "../../docs/reports/macos-grid-example/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-grid-selection/consumer-v1/owned-source/README.md",
+      "target": "../../specs/grid.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-grid-selection/consumer-v2/owned-source/README.md",
+      "target": "../../docs/development.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-grid-selection/consumer-v2/owned-source/README.md",
+      "target": "../../docs/reports/macos-grid-example/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-grid-selection/consumer-v2/owned-source/README.md",
+      "target": "../../specs/grid.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-grid-selection/consumer-v3/owned-source/README.md",
+      "target": "../../docs/development.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-grid-selection/consumer-v3/owned-source/README.md",
+      "target": "../../docs/reports/macos-grid-example/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-grid-selection/consumer-v3/owned-source/README.md",
+      "target": "../../specs/grid.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-large-tree/records/managed-qualification/qualified-v1/owned-source/README.md",
+      "target": "../../docs/reports/macos-large-tree/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-large-tree/records/managed-qualification/qualified-v2/owned-source/README.md",
+      "target": "../../docs/reports/macos-large-tree/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-large-tree/records/managed-qualification/qualified-v3/owned-source/README.md",
+      "target": "../../docs/reports/macos-large-tree/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "../implementation.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-list-box/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-listbox-metadata/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-composed-controls/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-composed-campaign/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-post-glyph-native/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-benchmark-retirement/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-tree-publication/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-tree-gpu/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-large-tree/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-clipboard-data/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-tray/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-notifications/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-grid-performance/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-grid-loaded/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-grid-native/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-grid-example/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-grid-model/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-replay/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-images/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-drawing/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-document/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-native-dispatch/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-file-drop/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-history/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "workbench-interaction/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "rendering/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "platform-support/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "sdk-release/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "sdk/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "sdk/final/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "P0_RESULTS.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "FOUNDATION_RESULTS.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "REMEDIATION_RESULTS.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "NATIVE_INPUT_RESULTS.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "FOUNDATION_CHECKS_RESULTS.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "FOUNDATION_CONTRACTS_RESULTS.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "FOUNDATION_INTEGRATION_RESULTS.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "FOUNDATION_ACCEPTANCE_AUDIT.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "FOUNDATION_REGRESSION_FIX.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "INPUT_ORDERING_FIX.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "VISUAL_TEXT_GEOMETRY_FIX.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "MULTILINE_NATIVE_ADAPTER.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "LARGE_DOCUMENT_NATIVE_INPUT.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "EDITOR_VISUAL_NAVIGATION.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "../../specs/prototype-plan.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-tree-retention/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-composed-actions/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-color-picker/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-interacting-retention/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-ax-retirement/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-palette-placement/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-owned-build/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-glyph-fingerprint/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/docs/reports/README.md",
+      "target": "macos-ax-parent-graph/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-composed-campaign/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-loop-native/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-post-glyph-native/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-native-followups/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-tab-close-native/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "native-dispatch.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "clipboard.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "clipboard.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "tray.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "notifications.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "document.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "file-drop.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "drawing.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "images.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "advanced-gpu.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "editor.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "replay.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-replay/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "grid.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "grid-native.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "grid-selection.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "grid-editing.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "grid-projection.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "tree.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "grid-performance.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-grid-update/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-grid-refresh/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-empty-sprites/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-source-costs/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-raster-rows/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "automation.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "release.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "rendering.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-gpu-performance/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-span-bands/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-allocation/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-native-choosers/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-file-interaction/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-modal-geometry/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "gpu-frame-lifecycle.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "gpu-frame-lifecycle.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "gpu-frame-lifecycle.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "gpu-frame-lifecycle.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "gpu-frame-lifecycle.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "breadcrumb.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "controls.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "controls.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-choice-controls/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "controls.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-ui-containers/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "controls.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-service-performance/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-outline-extrema/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-workbench-endurance/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-scene-scratch/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-static-idle/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-part-snapshots/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "menu-button.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-menu-button/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-upload-pilots/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-local-text/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-composed-lifecycle/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-ax-retention/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-tree-performance/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-tree-gpu/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-tree-publication/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-tree-retention/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-composed-actions/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-color-picker/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-interacting-retention/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-ax-retirement/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-glyph-coverage/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-menu-checks/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-gpu-covered/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "tab-close.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-native-current/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-uniform-crop/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-managed-workbench/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../examples/replay/README.md#professional-workspace",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-workspace-replay/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "canvas-accessibility.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-span-headers/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-packed-coverage/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-owned-build/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-glyph-fingerprint/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "list-box.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-list-box/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-listbox-metadata/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-composed-controls/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/macos-completion.md",
+      "target": "../docs/reports/macos-ax-parent-graph/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/workbench-endurance.md",
+      "target": "../docs/reports/macos-part-snapshots/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/workbench-endurance.md",
+      "target": "../docs/reports/macos-composed-lifecycle/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/workbench-endurance.md",
+      "target": "../docs/reports/macos-ax-retention/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/workbench-endurance.md",
+      "target": "../docs/reports/macos-tree-retention/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/workbench-endurance.md",
+      "target": "../docs/reports/macos-composed-actions/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-parent-graph-endurance/records/provider-reviewed-sources/specs/workbench-endurance.md",
+      "target": "../docs/reports/macos-composed-controls/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reports/macos-static-idle/records/prism-disposition.md",
+      "target": "/private/tmp/vellum-large-data/docs/reports/macos-static-idle/records/evidence.tar.xz",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/docs/reports/macos-grid-editing/README.md",
+      "target": "core-v4/qualification.json",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/docs/reports/macos-grid-editing/README.md",
+      "target": "native-v1/qualification.json",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/docs/reports/macos-grid-editing/README.md",
+      "target": "native-v1/handoff.json",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/docs/reports/macos-grid-editing/README.md",
+      "target": "qualifier-deletion-check/regression.json",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/docs/reviews/macos-grid-editing/README.md",
+      "target": "portable/handoff.json",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/docs/reviews/macos-grid-editing/README.md",
+      "target": "internal-source/final-source-review.json",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/docs/reviews/macos-grid-editing/README.md",
+      "target": "prism.json",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "framework.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "grid.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "grid-selection.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "grid-editing.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "grid-native.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "keyed-reconciliation.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "layout-theme.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "controls.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "windows-services.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "workbench-interaction.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "accessibility.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "file-drop.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "editor.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "document.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "history.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "execution.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "replay.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "native-dispatch.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "macos-completion.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "drawing.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "images.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "advanced-gpu.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "rendering.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "platform-support.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "release.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "sdk.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "prototype-plan.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "../docs/implementation.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/final-input/specs/README.md",
+      "target": "../docs/reports/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/keyed-reconciliation.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/layout-theme.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/controls.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/windows-services.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/sdk.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/workbench-interaction.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "reports/workbench-interaction/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/accessibility.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/rendering.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "reports/rendering/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/platform-support.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "reports/platform-support/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/release.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "tutorials/building-an-app.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "reports/sdk-release/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/history.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/document.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "reports/macos-history/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/file-drop.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "reports/macos-file-drop/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/native-dispatch.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "reports/macos-native-dispatch/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/drawing.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "reports/macos-drawing/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/images.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "reports/macos-images/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/advanced-gpu.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "reports/macos-advanced-gpu/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "reports/macos-imaging/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/editor.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "reports/macos-editor/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/execution.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/replay.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "reports/macos-replay/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "reports/macos-grid-model/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "reports/macos-grid-variable/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md",
+      "target": "../specs/grid-selection.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/examples/grid/README.md",
+      "target": "../../docs/development.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/examples/grid/README.md",
+      "target": "../../docs/reports/macos-grid-example/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "history.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "document.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "editor.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "workbench-interaction.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "keyed-reconciliation.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "grid-selection.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "drawing.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "images.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "advanced-gpu.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "rendering.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "layout-theme.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "accessibility.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "file-drop.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "platform-support.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "release.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "execution.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "replay.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md",
+      "target": "../docs/reports/macos-replay/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/grid.md",
+      "target": "grid-selection.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/grid.md",
+      "target": "../docs/reports/macos-grid-variable/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/grid.md",
+      "target": "grid-selection.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/macos-completion.md",
+      "target": "native-dispatch.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/macos-completion.md",
+      "target": "document.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/macos-completion.md",
+      "target": "file-drop.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/macos-completion.md",
+      "target": "drawing.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/macos-completion.md",
+      "target": "images.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/macos-completion.md",
+      "target": "advanced-gpu.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/macos-completion.md",
+      "target": "editor.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/macos-completion.md",
+      "target": "replay.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/macos-completion.md",
+      "target": "../docs/reports/macos-replay/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/macos-completion.md",
+      "target": "grid-selection.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-editing/portable/final-draft-3/source/grid-editing.md",
+      "target": "grid-native.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/keyed-reconciliation.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/layout-theme.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/controls.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/windows-services.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/sdk.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/workbench-interaction.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "reports/workbench-interaction/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/accessibility.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/rendering.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "reports/rendering/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/platform-support.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "reports/platform-support/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/release.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "tutorials/building-an-app.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "reports/sdk-release/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/history.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/document.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "reports/macos-history/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/file-drop.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "reports/macos-file-drop/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/native-dispatch.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "reports/macos-native-dispatch/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/drawing.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "reports/macos-drawing/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/images.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "reports/macos-images/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/advanced-gpu.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "reports/macos-advanced-gpu/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "reports/macos-imaging/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/editor.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "reports/macos-editor/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/execution.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "../specs/replay.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "reports/macos-replay/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "reports/macos-grid-model/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/docs/implementation.md",
+      "target": "reports/macos-grid-variable/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/examples/grid/README.md",
+      "target": "../../docs/development.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/examples/grid/README.md",
+      "target": "../../docs/reports/macos-grid-example/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "keyed-reconciliation.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "layout-theme.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "controls.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "windows-services.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "workbench-interaction.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "accessibility.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "file-drop.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "editor.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "document.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "history.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "execution.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "replay.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "native-dispatch.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "drawing.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "images.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "advanced-gpu.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "rendering.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "platform-support.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "release.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "sdk.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "prototype-plan.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/README.md",
+      "target": "../docs/reports/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "history.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "document.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "editor.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "workbench-interaction.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "keyed-reconciliation.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "drawing.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "images.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "advanced-gpu.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "rendering.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "layout-theme.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "accessibility.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "file-drop.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "platform-support.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "release.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "execution.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "replay.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/framework.md",
+      "target": "../docs/reports/macos-replay/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/grid.md",
+      "target": "../docs/reports/macos-grid-variable/README.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/macos-completion.md",
+      "target": "native-dispatch.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/macos-completion.md",
+      "target": "document.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/macos-completion.md",
+      "target": "file-drop.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/macos-completion.md",
+      "target": "drawing.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/macos-completion.md",
+      "target": "images.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/macos-completion.md",
+      "target": "advanced-gpu.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/macos-completion.md",
+      "target": "editor.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/macos-completion.md",
+      "target": "replay.md",
+      "category": "archive"
+    },
+    {
+      "file": "docs/reviews/macos-grid-selection/final-batch-v2/source/specs/macos-completion.md",
+      "target": "../docs/reports/macos-replay/README.md",
+      "category": "archive"
+    }
+  ],
+  "scope_note": "Base inventory: 936 tracked Markdown files. All were inventoried and scanned for local file links; maintained entry points, status claims and commands received focused semantic review. Historical captures, pinned native documents and third-party notices were not rewritten. This is not a line-by-line correctness certification of every archived measurement or every exported Go API comment.",
+  "other_tracked_text_files": {
+    "count": 1104,
+    "scope": "Mostly captured logs, license/notice text, fixtures and source templates. Classified as evidence/legal/source material rather than maintained narrative guides; preserved without rewriting."
+  }
+}

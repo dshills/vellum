@@ -1,21 +1,18 @@
 # Framework implementation phases
 
-Current source retains the `v1.0.0` API baseline. The root source release and
-matching build13 SDK/six macOS applications are published; see the
-[publication record](reports/macos-v1-build13-publication/README.md).
-Forge is subsequent source/private-build development, outside those assets. See the
-[stable API contract](../specs/stable-api.md), [Mac support guide](macos-v1.md)
-and [final closeout report](reports/macos-v1-release/README.md). The completed
-[v1 RC acceptance](reports/macos-v1/README.md) remains source-bound historical evidence.
-The published [alpha.3 preview](https://github.com/dshills/vellum/releases/tag/v0.1.0-alpha.3)
-does not include current widgets/Notes. Broader hardware and human
-IME/VoiceOver remain outside the current qualification claim.
+Current source is v1.1.3 with the v1.0.0 stable API baseline. See
+[current status](status.md) for current source, private build25, demo build5,
+Work Log, pending multi-day use and exact-commit CI links. The published build13
+SDK/six apps are older separately identified downloads. Source releases and later
+private consumers do not rebuild those assets. Human IME/VoiceOver and broader
+hardware remain outside recorded qualification.
 
 The phase entries below retain their historical checkpoint scope, including
 then-pending checks and publication statements. They do not redefine the current
 release policy. The [Mac delivery plan](../specs/macos-delivery.md) records broader
-qualification work beyond the approved preview. Each implementation phase receives
-Prism review, relevant tests and a separate commit.
+qualification work beyond the approved preview. Historical implementation phases
+record their own reviews and tests. New external review requires an explicit
+request under [CONTRIBUTING](../CONTRIBUTING.md); old receipts are not authorization.
 
 1. Application lifecycle and keyed UI API — implemented; native driver and executable example.
 2. Commands and cancellable tasks — implemented; shared registry, menus, toolbar, palette, shortcuts and bounded owner-thread completions.

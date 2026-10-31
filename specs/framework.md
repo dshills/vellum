@@ -163,7 +163,7 @@ window-local menu widgets. Actual target runtime, native IME/accessibility and
 native Wayland acceptance remain open; [platform support](platform-support.md)
 reports those gates without inferring qualification from fixtures/crosscompiles.
 
-The independently relocated private SDK uses an explicit alpha version, complete
+The independently relocated SDK records its source API version, complete
 archive integrity checks and public consumer scenarios. [Release artifacts](release.md)
 document packaging, the selected `github.com/dshills/vellum` namespace and MIT
 license, and remaining distribution audit/qualification gates for public release.

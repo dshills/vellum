@@ -6,6 +6,8 @@ the [development guide](../docs/development.md) before running native examples.
 
 | Module | Purpose |
 | --- | --- |
+| [forge](forge/README.md) | Design workbench with assembly viewport, expressions and history |
+| [measurepad](measurepad/README.md) | Small measurement notebook using public quantity, document and history APIs |
 | [demo-suite](demo-suite/README.md) | Version-aware hub, private suite build, verified launcher and full feature catalog |
 | [showcase](showcase/README.md) | Forma design studio, Luma image library and Pulse telemetry explorer, with native README screenshots |
 | [hello](hello/README.md) | Minimal native application |
@@ -46,3 +48,9 @@ and verification workflow.
 [Measure Pad](measurepad/README.md) grows the generated minimal starter into a
 small local measurement notebook with unit expressions, Save/Open and Undo/Redo.
 It is an application example using existing public framework APIs.
+
+## Exported-SDK consumer recipe
+
+[Work Log](work-log/README.md) generates a standalone document application from a
+verified exported SDK. Its generated module lives outside this checkout; the
+recipe directory is not itself a Go module. See [current artifact identities](../docs/status.md).

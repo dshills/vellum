@@ -8,6 +8,15 @@ location such as /private/tmp; copy only completed archives into Documents. Run:
 python3 -B scripts/private-macos-bundle.py --output /absolute/new/private-bundle --expected-minimum-macos 27.0
 ```
 
+The expected minimum is a strict assertion, not a compiler flag. Preflight records
+the selected compiler/SDK; final binaries must match those admitted requirements.
+The controlled child environment drops ambient SDKROOT, GOROOT and CGO flag
+overrides. If compiler defaults target a different SDK/deployment minimum, stop
+and select a coherent toolchain rather than changing a plist or weakening the
+check. The [build25 record](reviews/next-five-stability/item-4.md) describes its
+explicit PATH compiler wrapper and the preserved preflight hash; that local Xcode
+path is reproduction material for that build, not a portable default.
+
 The exclusive output contains an SDK, Forge, Measure Pad, the A/B Documents
 consumer, the generated Document Starter and Notes. Every app compiles against the
 extracted SDK, with replacement origins checked to remain inside it. Both starter
@@ -47,7 +56,7 @@ nonsynced installation parent:
 ```sh
 python3 -B scripts/private-macos-bundle.py \
   --output /absolute/new/private-bundle \
-  --build-version 24 \
+  --build-version 26 \
   --expected-minimum-macos 27.0 \
   --install-to "$HOME/Applications/Vellum"
 ```
@@ -99,7 +108,7 @@ not an OS filesystem sandbox or a public distribution certification.
 Each private delivery should carry its exact source commit, SDK digest, named
 archive checksums, signing route and separate automated/native observations.
 Use the [current document-workflow handoff](mac-document-workflows-handoff.md)
-for exact source/package identities and the remaining deferred native checks.
+for exact source/package identities and the separately recorded native checks.
 Keep historical source/hash records unchanged. The older
 [consumer closeout](reviews/consumer-closeout/README.md) records its own earlier
 lifecycle/CI evidence; it does not qualify later workflow changes. New checkpoints

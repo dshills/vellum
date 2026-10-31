@@ -1,5 +1,11 @@
 # Bounded macOS release responsiveness assessment
 
+> Scope note: this document retains its dated plan/checkpoint history. Its older
+> “current”, proposed versions and pending performance gates describe that stage.
+> Use [current macOS status and closeout](../docs/status.md) for the present
+> source/artifact split and finite personal-use finish line. Historical measurements,
+> approvals and failures below are unchanged; this note does not pass broader gates.
+
 ## Candidate and unchanged criteria
 
 Freeze features at main `7047740`; use the existing immutable private SDK from

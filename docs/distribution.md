@@ -1,4 +1,11 @@
-# Foundation distribution checks
+# Historical foundation distribution checks
+
+This page documents the earlier foundation fixture and its optional credentialed
+route; it is not the current private SDK/app delivery procedure. Use
+[private consumer packaging](private-consumer-bundle.md),
+[installation verification](private-macos-installation.md) and
+[current distribution boundaries](status.md). No new signing/notarization action
+is authorized by the historical example below.
 
 `package_macos.py` packages a previously built native integration fixture and AccessKit dylib, enforces application-relative dynamic-library resolution, signs each native artifact and seals/verifies the complete bundle. It rejects unknown runtime dependencies and existing output paths. Default identity `-` produces a development ad-hoc bundle. It does not establish Gatekeeper trust or a clean-machine result.
 

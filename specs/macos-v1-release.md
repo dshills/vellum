@@ -1,5 +1,10 @@
 # macOS v1 private release closeout
 
+> This is the chronological record of closeout and later publication decisions.
+> [Current status](../docs/status.md) identifies the latest source tag, separately
+> versioned artifacts and remaining personal-use qualification. Historical approvals
+> below apply to their named payloads, not every later source or app bundle.
+
 Approved25 October2026: close CI, adopt the stable API/documentation contract and produce final macOS v1 SDK/apps, then relaunch Notes. Baseline is `b633872`, following the completed RC. Features, backend, rendering/pacing options and existing release responsiveness policy remain frozen.
 
 1. CI checkpoint: resolve observed required-workflow failures with focused tests; preserve test selection and runtime assertions/deadlines. Review with Prism/Anthropic Claude Sonnet5.5 and commit. Final workflow success must refer to the final release source, not an earlier passing revision.

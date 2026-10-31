@@ -19,8 +19,11 @@ Vellum/
     native/              pinned patches, assets and original notices
     build/               ignored prepared sources and build outputs
   examples/              independent application and contract modules
+    demo-suite/          version-aware packaged feature hub
+    work-log/            exported-SDK generator recipe (not a Go module)
+    forge/, measurepad/  independent application modules
     placement/           internal drawing test app (go run .)
-    macapps/cmd/         calculator, notes, weather and reminders commands
+    macapps/cmd/         calculator, notes, weather, reminders, documents and macshell commands
   docs/                  guides, decisions, research, reports and reviews
     reports/go.mod       excludes historical evidence from framework downloads
   specs/                 framework contracts and validation scope

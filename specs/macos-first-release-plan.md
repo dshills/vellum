@@ -1,5 +1,11 @@
 # First macOS developer-preview release plan
 
+> Scope note: this document retains its dated plan/checkpoint history. Its older
+> “current”, proposed versions and pending performance gates describe that stage.
+> Use [current macOS status and closeout](../docs/status.md) for the present
+> source/artifact split and finite personal-use finish line. Historical measurements,
+> approvals and failures below are unchanged; this note does not pass broader gates.
+
 Date: 22 October 2026. Status: **approved by the owner; active delivery plan**.
 
 The recommendation is to deliver a **macOS developer preview**, proposed version

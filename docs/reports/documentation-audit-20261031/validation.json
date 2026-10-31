@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-31",
+  "base_commit": "0b11d3b092455b9967bad891fa42ae4ba5b6f8ae",
+  "current_inventory_documents": 941,
+  "current_categories": {
+    "maintained": 171,
+    "archive": 678,
+    "pinned-native": 76,
+    "third-party": 16
+  },
+  "maintained_missing_file_targets": 0,
+  "maintained_unresolved_anchor_candidates": 0,
+  "maintained_missing_repository_script_references": 0,
+  "historical_unresolved_targets": 358,
+  "sdk_release_tests": {
+    "passed": 43
+  },
+  "app_generator_tests": {
+    "passed": 3
+  },
+  "sdk_documentation_overlay": {
+    "documents": [
+      "README.md",
+      "docs/README.md",
+      "docs/building-macos-apps.md",
+      "docs/development.md",
+      "docs/distribution.md",
+      "docs/documentation-audit.md",
+      "docs/implementation.md",
+      "docs/mac-desktop-resumption.md",
+      "docs/mac-document-workflows-handoff.md",
+      "docs/macos-preview-release.md",
+      "docs/macos-v1.md",
+      "docs/personal-macos-v01.md",
+      "docs/private-consumer-bundle.md",
+      "docs/private-macos-installation.md",
+      "docs/repository-layout.md",
+      "docs/security/README.md",
+      "docs/status.md",
+      "docs/tutorials/building-an-app.md",
+      "docs/upgrading-macos-apps.md",
+      "examples/README.md",
+      "examples/macapps/README.md",
+      "specs/README.md",
+      "specs/framework.md",
+      "specs/macos-completion.md",
+      "specs/macos-delivery.md",
+      "specs/macos-first-release-plan.md",
+      "specs/macos-release-assessment.md",
+      "specs/macos-v1-candidate.md",
+      "specs/macos-v1-release.md",
+      "specs/personal-macos-v01.md",
+      "specs/release.md",
+      "specs/sdk.md",
+      "specs/stable-api.md"
+    ],
+    "status": "passed",
+    "scope": "SDK documentation link-rewrite policy applied to actual changed/new guides; no SDK or native payload built"
+  },
+  "candidate_index_consistency": "passed; original generated markers unchanged",
+  "diff_check": "passed",
+  "review": "internal; no external transmission",
+  "preservation": "no existing reports/reviews, native patch docs, notices or release notes changed",
+  "limits": [
+    "Markdown parsing is a repository-oriented scan, not full CommonMark rendering",
+    "External URLs were not exhaustively fetched",
+    "No new SDK/app built or native qualification performed",
+    "Archived link targets remain recorded exceptions"
+  ]
+}

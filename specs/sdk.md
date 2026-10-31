@@ -13,6 +13,13 @@ directory. The framework namespace is `github.com/dshills/vellum` and its own co
 is MIT-licensed. Public distribution remains gated on the dependency/native audit
 and target qualification.
 
+Current source, public prepared downloads and private candidates are separately
+identified in [project status](../docs/status.md). The published build13 SDK is
+older than v1.1.3 source. Use a selected SDK's bundled docs for its actual APIs;
+do not assume a version bump rebuilds the SDK. The
+[Work Log recipe](../examples/work-log/README.md) demonstrates generation from an
+identified exported SDK.
+
 ## Documentation in the SDK archive
 
 Consumer guides and contracts retain their links to other packaged files.

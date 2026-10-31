@@ -1,5 +1,9 @@
 # Specifications
 
+For present release/artifact identities and the personal-use finish line, start
+with [current status](../docs/status.md). Contracts below describe API behavior;
+dated delivery/performance plans retain historical scope and are not a new work queue.
+
 - [Framework contract](framework.md): implemented application ownership, commands,
   tasks, docking, virtualization and GPU canvas behavior, including current limits.
 - [Indexed data grid](grid.md): bounded two-axis projection, frozen regions, stable cell identities and stale press refusal.
@@ -42,7 +46,7 @@
 - [Advanced GPU views](advanced-gpu.md): versioned shared-device contexts, custom shaders, retained 3D/depth and scoped resource helpers.
 - [Rendering](rendering.md): demand painting, resource lifetimes and device loss.
 - [Platform support](platform-support.md): Windows/Linux services and target gates.
-- [Release artifacts](release.md): alpha API, private SDK integrity and packaging.
+- [Release artifacts](release.md): stable-v1 source identity, private SDK integrity and packaging.
 - [Local SDK](sdk.md): independent applications, pinned bootstrap and benchmarks.
 - [Prototype validation plan](prototype-plan.md): research acceptance gates and
   recorded investigation progress; this is a historical foundation plan.

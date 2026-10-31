@@ -1,14 +1,46 @@
 # Building a personal macOS application
 
-Start from an identified personal SDK and an independent application module. The
-[small Mac starter](../examples/personal-mac/README.md) shows one controlled
-window and a full-color native toolbar. The [Notes consumer](../examples/macapps/notes/README.md)
-adds real local files, shared history and recovery using the same public APIs.
-No gallery internals or private driver packages are required. The matching private v1 SDK includes prose presentation, the native app shell
-and the explicitly scoped [stable API contract](../specs/stable-api.md). Older
-SDKs retain their historical capabilities; use the paired v1 source and SDK.
+Start from a prepared checkout or an identified exported SDK and generate an
+independent application module. The [current status](status.md) distinguishes
+latest source from older public downloads and the private candidate. Use the
+chosen SDK's own docs and APIs: current checkout examples may use additions that
+an older downloaded SDK does not include. No gallery internals or private driver
+packages are required. Compatibility follows the [stable API scope](../specs/stable-api.md).
 
-## Run the independent Notes source
+## Start a new application
+
+For checkout development, follow [preparation](../README.md#quick-start-on-macos) first.
+An exported SDK already contains prepared native sources; do not run prepare.sh
+over it. Verify its archive digest and keep the extraction intact. Set the path
+to the extracted SDK root (the directory containing its go.mod):
+
+```sh
+VELLUM_SDK=/absolute/path/to/extracted-sdk
+. "$VELLUM_SDK/drivers/cogent/env.sh"
+# Select the Go version in that SDK's go.mod; remove a conflicting GOROOT.
+unset GOROOT
+python3 -B "$VELLUM_SDK/scripts/new-app.py" /absolute/new/MyDocument \
+  --module example.com/my-document --template=document
+cd /absolute/new/MyDocument
+go test -race -tags offscreen ./...
+go vet -tags offscreen ./...
+go run . -data-dir /absolute/private/my-document-test
+```
+
+Omit `--template=document` for the minimal counter/canvas starter. The complete
+document starter includes Save/Open/Save As, recovery, native toolbar and
+Undo/Redo; normal packaged launch uses its own module-derived private storage.
+Keep that identity stable across app upgrades. The [Work Log recipe](../examples/work-log/README.md)
+is an exercised exported-SDK consumer; the [small Mac starter](../examples/personal-mac/README.md)
+and [Notes source](../examples/macapps/notes/README.md) show additional public API usage.
+See [upgrade and recovery guidance](upgrading-macos-apps.md) before using real data.
+
+## Historical v1 Notes source archive
+
+The following commands describe the separately identified older private delivery,
+not files guaranteed to exist beside current source or the public build13 SDK.
+Use them only if you have that matched packet; new applications should use the
+generator above.
 
 The private v1 delivery pairs `Mac examples source.zip` with
 `vellum-v1.0.0-private-sdk.tar.gz`. Its manifest pins the source commit and SDK

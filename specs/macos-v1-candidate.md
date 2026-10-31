@@ -1,5 +1,11 @@
 # macOS v1 candidate finish contract
 
+> Scope note: this document retains its dated plan/checkpoint history. Its older
+> “current”, proposed versions and pending performance gates describe that stage.
+> Use [current macOS status and closeout](../docs/status.md) for the present
+> source/artifact split and finite personal-use finish line. Historical measurements,
+> approvals and failures below are unchanged; this note does not pass broader gates.
+
 The owner approved all five areas on 25 October 2026. This contract supersedes
 the personal-v0.1 API freeze only for the following work. Keep the existing
 Cogent/WebGPU backend and experimental rendering/pacing disabled. No new widget

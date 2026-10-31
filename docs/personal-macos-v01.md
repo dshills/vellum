@@ -1,5 +1,9 @@
 # Personal-use macOS v0.1
 
+> Historical delivery ledger. Read [current status](status.md) for today's source,
+> selected packages and remaining qualification. The identities and owner choices
+> below are preserved for that earlier delivery.
+
 This is the delivery ledger for the [frozen finish contract](../specs/personal-macos-v01.md).
 It replaces repeated widget expansion with five finite integration checkpoints.
 The [frozen catalogue](../release/personal-macos-v01.json) identifies existing

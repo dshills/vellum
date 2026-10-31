@@ -1,5 +1,9 @@
 # macOS developer-preview execution ledger
 
+> Historical delivery ledger. Read [current status](status.md) for today's source,
+> selected packages and remaining qualification. The identities and owner choices
+> below are preserved for that earlier delivery.
+
 Publication update: [v0.1.0-alpha.3](https://github.com/dshills/vellum/releases/tag/v0.1.0-alpha.3)
 was published as a prerelease on 23 October 2026 at
 `320376ec8573a8603f75faaa3b3a7ea8a8ea0366`, after owner approval. The SDK,

@@ -51,7 +51,7 @@ From a checkout containing the verifier, on macOS:
 ```sh
 python3 -B scripts/verify-private-macos.py \
   --bundle /absolute/completed-private-delivery \
-  --installation /absolute/Applications/Vellum/build24-sourceprefix \
+  --installation /absolute/Applications/Vellum/buildNN-sourceprefix \
   --manifest-sha256 EXPECTED_BUNDLE_MANIFEST_SHA256
 ```
 
@@ -118,11 +118,11 @@ and signatures without launch. To select a later candidate deliberately, update
 the index and its source-bound evidence, regenerate the marked guide blocks with
 `--write-docs`, then review and commit the diff. Never rewrite historical receipts.
 
-The retained build24 includes e589f36e's lifecycle correction, but its original
-metadata predates the new explicit minimum field. Its observed 27.0 requirement
-is recorded; no 27.2 launch or older-host compatibility is claimed. Desktop checks
-remain deferred. Earlier versions remain retained. See the historical
-[build24 packet](reports/mac-build24/README.md) for that payload's exact scope.
+The selected build25 and its later [Documents sessions](reviews/next-five-stability/item-5.md)
+are distinct from the retained historical [build24 packet](reports/mac-build24/README.md).
+Producer-time `deferred`/`not executed` labels are unchanged packaging facts;
+subsequent native observations are separate, app-scoped records. Read
+[current status](status.md) before treating either as current project-wide acceptance.
 
 ## Static native linkage inspection
 
@@ -131,7 +131,7 @@ system-library-only route from a checkout containing the checker:
 
 ```sh
 python3 -B scripts/check-private-macos-linkage.py \
-  --installation /absolute/Applications/Vellum/build24-sourceprefix \
+  --installation /absolute/Applications/Vellum/buildNN-sourceprefix \
   --installation-sha256 EXPECTED_INSTALLATION_JSON_SHA256
 ```
 
@@ -150,7 +150,8 @@ Build24's five binaries declare minimum macOS **27.0** and SDK 27.0; static
 inspection was on macOS 27.2. They cannot be used on the historically qualified
 26.6.2 host. This private candidate retains its actual requirements; neither
 static inspection nor prior native evidence extends the framework support matrix
-to 27.2 or qualifies launch there. Desktop checks remain deferred. No deployment
+to 27.2 or qualifies launch there. Those build24 producer-time checks did not include native launch. Later build25
+Documents observations are separately recorded. No deployment
 target was patched, no minimum support promise changed and no runtime compatibility
 with older systems was established. See the [current handoff](mac-document-workflows-handoff.md).
 

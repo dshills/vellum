@@ -1,9 +1,9 @@
 # Build an application with Vellum
 
-This tutorial uses the private alpha SDK. Vellum's module namespace is
+This tutorial works from a prepared checkout or an identified exported SDK. Vellum's module namespace is
 `github.com/dshills/vellum` and its own code uses the MIT license. Native
 distribution audit and full target qualification remain gates.
-The alpha version is available as `vellum.Version`; see the
+The source API release is available as `vellum.Version`; see the
 [release contract](../../specs/release.md).
 
 ## Start from a checkout or relocated SDK
@@ -33,7 +33,9 @@ The generated module supplies all four local replacements explicitly: Vellum,
 its Cogent driver, the pinned Cogent source and pinned typesetting source.
 Dependency replacements do not propagate from another module's `go.mod`.
 Keep the SDK directory in place; if you move it later, regenerate replacements
-with `go mod edit`. The generated example contains a counter and GPU canvas.
+with `go mod edit`. The generated minimal example contains a counter and GPU canvas. For a complete
+document app use `--template=document`; see the [Mac app guide](../building-macos-apps.md)
+and [Work Log recipe](../../examples/work-log/README.md).
 
 ## Use ordinary Go state and controlled views
 

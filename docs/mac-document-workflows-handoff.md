@@ -1,9 +1,12 @@
 # Mac document workflow maintenance handoff
 
-As of 30 October 2026, features and the existing backend, rendering/pacing and
-release/performance policies remain frozen. Desktop checks are deferred by the
-owner. Current work uses internal review; it authorizes no external review,
-public release/tag/assets, new audit decision, signing identity or notarization.
+Current source and package status is summarized in [status.md](status.md).
+Features, backend and rendering/pacing remain within the existing frozen scope.
+The blanket desktop deferral recorded on 30 October is historical: later scoped
+Documents sessions, a consumer-app check and operator focus checks are recorded
+separately. They do not qualify every app or authorize unrelated desktop actions.
+Use CONTRIBUTING and the current task instruction for review/publication scope;
+older handoff permissions are not new authorization.
 
 ## Source and package identity
 
@@ -28,26 +31,27 @@ Ordinary checkout merges do not relabel an existing package or its test results.
 | Desktop checks | `deferred` |
 <!-- vellum-candidate:facts:end -->
 
-The e589f36e retired-window action fix is included in build24. No app window was
-opened; Forge's icon-only exporter exits before UI/data setup. Native launch/input
-checks remain deferred and no current app liveness is claimed. Build23 and older
-installed versions remain retained.
+The table preserves producer-time facts. Build25 packaging/installation did not
+launch app windows, hence its unchanged `deferred` label. Subsequent
+[build25 Documents sessions](reviews/next-five-stability/item-5.md) and
+[application-readiness work](reviews/application-readiness/README.md) have their
+own exact source/app identities. Do not replace producer receipts with later
+runtime claims or interpret those labels as a blanket current deferral.
 
-**Deployment limitation:** build24 requires macOS 27.0. The recorded 27.2 inspection
-is static only; historical 26.6.2 qualification does not transfer. These binaries
-cannot run there and no support-matrix extension or 27.2 launch result is implied.
+Build25 requires macOS 27.0 and was inspected on 27.2; the later Documents sessions
+ran on 27.2. These observations do not establish older-host compatibility or
+acceptance of all five apps. Historical 26.6.2 qualification does not transfer.
 
-Current checkout/merge status belongs to Git and exact-commit CI, separately from
-the selected artifact. The recorded post-build24 integration at 7505e730 passed
-Framework 41104628914, Stable root API 41104628933 and Platform adapters 41104628954.
-Later tool changes have their own focused reviews; they do not change build24's
-source or receipts. See [packaging reliability reviews](reviews/mac-packaging-reliability/).
+Current checkout/merge and CI state belong to exact Git commits; consult
+[the current status](status.md). Earlier post-build24 integration at 7505e730
+passed its recorded workflows, but is not CI evidence for later tags. Historical
+[packaging reliability reviews](reviews/mac-packaging-reliability/) retain their scope.
 
 The public v1 source and six-app build13 release retain their original hashes
 and scope. The private five-app set is Forge, Measure Pad, Documents, Document
 Starter and Notes. It remains a separate ad-hoc, unnotarized private payload.
 
-## Completed offscreen maintenance
+## Historical offscreen maintenance checkpoints
 
 1. `963327a`: optional CI cache upload is separate, bounded and skipped near the
    unchanged deadline. Verification and benchmarks are retained.
@@ -164,16 +168,17 @@ BUNDLE_MANIFEST records completed packaging; optional installation is complete
 only when DELIVERY.json binds the installed receipt. Keep that source identity
 with any later native results. Hosted CI is a separate exact-commit result.
 
-To recheck the installed final build24 bytes without reinstalling or starting any
+To recheck the selected installed candidate bytes without reinstalling or starting any
 app, use the [existing-delivery verifier](private-macos-installation.md#verify-an-existing-delivery-without-reinstalling).
 The [resumption checklist](mac-desktop-resumption.md) includes exact local paths
 and the caller-pinned bundle manifest digest. Static verification does not
 establish physical behavior of the included lifetime fix.
 
-## Remaining native checks — deferred
+## Historical build22 deferred session — 30 October 2026
 
-Do not launch, activate, capture or send input to test apps while desktop work
-is deferred. Automated owner/worker and filesystem results cannot establish
+The instructions below preserve that stopped session, not the current project
+status or an instruction to assume its windows still exist. In that session,
+desktop work was deferred. Automated owner/worker and filesystem results cannot establish
 physical targeting, native chooser focus or Finder/LaunchServices behavior.
 
 The bounded build22 native Quit case already passed: Save A then Cancel B kept

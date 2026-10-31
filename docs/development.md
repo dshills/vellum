@@ -1,5 +1,10 @@
 # Development
 
+Use the [current status](status.md) and [application guide](building-macos-apps.md)
+for source/artifact selection. Historical performance reports are not a release
+status dashboard. Select the Go version in go.mod; an ambient GOROOT pointing to
+a different installation must be unset before using another Go toolchain.
+
 ## Modules and dependencies
 
 The root `github.com/dshills/vellum` module contains portable public packages and uses
@@ -35,7 +40,10 @@ export VELLUM_CACHE_DIR=/tmp/vellum-go-cache
 ./scripts/check.sh
 ```
 
-The script runs root race tests and vet, native-module tests and vet, then builds
+The stage definitions in `scripts/check.sh` are authoritative for the full list
+of example and tooling checks. They include demo-suite packaging/launcher tests
+and the other independent consumers. The script runs root race tests and vet,
+native-module tests and vet, then builds
 `drivers/cogent/build/vellum-workbench`. It also race-tests, vets and builds the
 independent hello, drawing, 3D, imaging, editor, grid and placement modules, validates dependency
 preparation inputs and race-tests upstream lifecycle regressions. Exact text and

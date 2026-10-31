@@ -94,6 +94,9 @@ signatures and existing release qualification.
 
 ## Current status
 
+See the [current source/artifact status and finite macOS closeout](docs/status.md)
+and [documentation audit/gaps](docs/documentation-audit.md).
+
 **Latest tagged source release: [v1.1.3](https://github.com/dshills/vellum/tree/v1.1.3).**
 This release provides the Go framework source, macOS examples and build tools
 for personal use. Read the [release notes](release/notes/v1.1.3.md) for highlights
