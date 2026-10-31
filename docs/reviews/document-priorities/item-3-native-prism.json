@@ -1,0 +1,179 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "7ad7cc494731a481ceb503bbcbe3601d",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "de82e0426bc90008ad93289ae7a6b5c3acb6a5ea",
+    "branch": "codex/document-acceptance"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 4,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "49189754843b8457",
+      "severity": "low",
+      "category": "testing",
+      "title": "B's post-cancel state is only recorded as prose, unlike post_cancel_A",
+      "message": "B's post-cancel state — the core assertion of this scenario (\"Unsaved B must survive Cancel\") — is recorded only as prose inside native_sequence (line 11), while A gets a structured post_cancel_A object (lines 43-51). Anything parsing this JSON to verify results cannot check B's note count, Edited status, toolbar state, or the exact Unicode payload after the Cancel; it would have to regex free-text narrative.",
+      "suggestion": "Add a post_cancel_B sibling mirroring post_cancel_A, e.g. \"post_cancel_B\": { \"window\": \"Vellum Documents — B\", \"notes\": 8, \"status\": \"Edited\", \"title\": \"Unsaved B must survive Cancel\", \"body\": \"B remains dirty: café 日本語\\nDo not lose this eighth note.\", \"toolbar_enabled\": true }.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "docs/reviews/document-priorities/item-3-native-result.json",
+          "lines": {
+            "start": 11,
+            "end": 11
+          }
+        }
+      ],
+      "tags": [
+        "test-evidence",
+        "structure"
+      ],
+      "evidence": "    \"B Cancel selected; eight notes and exact unsaved Unicode payload remained, toolbar enabled, Edited status\",",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "f07dbee8198c768d",
+      "severity": "low",
+      "category": "correctness",
+      "title": "Conflicting B note counts: \"seven notes\" vs \"eight notes\"",
+      "message": "Line 12 records B's pre-closeout primary hash \"with seven notes\", but every other record for B in this file says eight notes: \"B dirtied to eight notes\" (line 5), \"eight notes and exact unsaved Unicode payload remained\" (line 11), saved_closeout.B.notes = 8 (line 30), and the n11 body calls itself \"this eighth note\" (line 37). As written, the verification record contradicts itself: a reader cannot tell whether the hash covers the 7-note on-disk fixture before the unsaved eighth note was saved, or whether \"seven\" is a transcription error in the evidence for a data-loss test.",
+      "suggestion": "State which artifact the hash covers. If it is the on-disk file before the fixture-preserving save, make the memory-vs-disk distinction explicit so the count discrepancy cannot be misread as data loss or a recording error.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "docs/reviews/document-priorities/item-3-native-result.json",
+          "lines": {
+            "start": 12,
+            "end": 12
+          }
+        }
+      ],
+      "tags": [
+        "data-consistency",
+        "test-evidence"
+      ],
+      "evidence": "    \"Before closeout B primary hash remained 3e819348ca0df7d9cc8d2d14d401943a8457f93d22afceab5acea5640be28ead with seven notes\",",
+      "fix": {
+        "before": "    \"Before closeout B primary hash remained 3e819348ca0df7d9cc8d2d14d401943a8457f93d22afceab5acea5640be28ead with seven notes\",",
+        "after": "    \"Before closeout B on-disk primary-file hash remained 3e819348ca0df7d9cc8d2d14d401943a8457f93d22afceab5acea5640be28ead (pre-dirty fixture, seven notes) while the in-memory document held eight notes\","
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "4ff8672336597166",
+      "severity": "low",
+      "category": "docs",
+      "title": "\"saved/dirty states\" leaves the A/B state mapping implicit",
+      "message": "The shorthand \"saved/dirty states\" does not say which document ended in which state, and because the preceding paragraph says B was subsequently saved normally, a reader cannot tell whether \"saved/dirty\" refers to the moment of cancellation or to the final closeout. Since this file is the human-readable summary of a precision check, the mapping should be explicit.",
+      "suggestion": "State the per-document state explicitly, e.g. \"...in their expected states at cancellation (A saved, B dirty), with the later B Save explicitly separate from cancellation acceptance.\"",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "docs/reviews/document-priorities/item-3-native.md",
+          "lines": {
+            "start": 14,
+            "end": 15
+          }
+        }
+      ],
+      "tags": [
+        "clarity",
+        "test-record"
+      ],
+      "evidence": "Both documents therefore survived the canceled Quit in their expected saved/dirty\nstates, with the later B Save explicitly separate from cancellation acceptance.",
+      "fix": {
+        "before": "Both documents therefore survived the canceled Quit in their expected saved/dirty\nstates, with the later B Save explicitly separate from cancellation acceptance.",
+        "after": "Both documents therefore survived the canceled Quit in their expected closing states\n(A saved, B dirty), with the later B Save explicitly separate from cancellation acceptance."
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "694b0d3d4d9e1b48",
+      "severity": "low",
+      "category": "docs",
+      "title": "Overbroad \"nothing changed\" disclaimer contradicts the described saves",
+      "message": "The blanket disclaimer \"No app code, artifact, personal notebook or global setting changed\" conflicts with the test description: A was saved through the Quit prompt and \"B was then saved normally\", so the synthetic A/B fixture notebook files on disk did change during this item. If \"artifact\" is meant to cover the fixture data, the claim is inaccurate; if it means build artifacts, it is ambiguous.",
+      "suggestion": "Qualify the disclaimer so it clearly excludes the fixture notebooks that were written by the test, e.g. \"No app code, build artifact, personal notebook or global setting changed; the synthetic fixture notebooks themselves were saved as described.\"",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "docs/reviews/document-priorities/item-3-native.md",
+          "lines": {
+            "start": 24,
+            "end": 24
+          }
+        }
+      ],
+      "tags": [
+        "accuracy",
+        "disclaimer",
+        "test-record"
+      ],
+      "evidence": "qualification. No app code, artifact, personal notebook or global setting changed.",
+      "fix": {
+        "before": "qualification. No app code, artifact, personal notebook or global setting changed.",
+        "after": "qualification. No app code, build artifact, personal notebook or global setting changed; the synthetic fixture notebook files themselves were saved as described above."
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 204347,
+    "totalMs": 204387
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 2,
+    "bytes": 4463,
+    "chunks": 1,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 5742,
+        "output": 40570,
+        "reasoning": 37216,
+        "cachedInput": 3776
+      }
+    ],
+    "splits": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -1,0 +1,63 @@
+{
+  "updated_utc": "2026-10-31T12:39:56.745763+00:00",
+  "candidate": "build24-b9212489afc9",
+  "native_sequence": [
+    "B dirtied to eight notes with exact Unicode title/body",
+    "User activated A",
+    "A dirtied to eight notes with exact Unicode title/body",
+    "Command-Q showed A Save/Discard/Cancel prompt",
+    "A Save selected; A remained visible and held with Saved notebook status",
+    "User activated B",
+    "B Cancel selected; eight notes and exact unsaved Unicode payload remained, toolbar enabled, Edited status",
+    "Before closeout B on-disk primary-file hash remained 3e819348ca0df7d9cc8d2d14d401943a8457f93d22afceab5acea5640be28ead with seven saved notes while memory retained eight notes",
+    "B saved normally to preserve fixture before further testing"
+  ],
+  "native_window_switch_limit": "App-bound Command-grave did not select the other window; Dock binding timed out. No unrestricted fallback input was sent.",
+  "saved_closeout": {
+    "A": {
+      "notes": 8,
+      "sha256": "8fab1d977d1b91e1c0ff226fd2f552b0ec35cab18d98d5f8f9ab42af3935ac0c",
+      "selected": "n11",
+      "n11": {
+        "ID": "n11",
+        "FolderID": "notes",
+        "Title": "Saved A during coordinated Quit",
+        "Body": "A saved first: café 日本語\nCanceling B must keep both windows.",
+        "Pinned": false
+      }
+    },
+    "B": {
+      "notes": 8,
+      "sha256": "5dc672904edf6c84f2c89a4af422160d1358352ab105aa95ffee33071cbd6bb9",
+      "selected": "n11",
+      "n11": {
+        "ID": "n11",
+        "FolderID": "notes",
+        "Title": "Unsaved B must survive Cancel",
+        "Body": "B remains dirty: café 日本語\nDo not lose this eighth note.",
+        "Pinned": false
+      }
+    }
+  },
+  "completed_utc": "2026-10-31T12:40:46.776479+00:00",
+  "post_cancel_A": {
+    "window": "Vellum Documents — A",
+    "notes": 8,
+    "status": "Saved notebook",
+    "title": "Saved A during coordinated Quit",
+    "body": "A saved first: café 日本語\nCanceling B must keep both windows.",
+    "toolbar_enabled": true,
+    "editor_focused": true
+  },
+  "scope": "User-assisted native window selection; app-bound keyboard and accessibility actions; real-file verification. No physical pointer or release qualification claim.",
+  "post_cancel_B": {
+    "window": "Vellum Documents — B",
+    "notes_in_memory": 8,
+    "status": "Edited · Command-S to save",
+    "title": "Unsaved B must survive Cancel",
+    "body": "B remains dirty: café 日本語\nDo not lose this eighth note.",
+    "toolbar_enabled": true,
+    "notes_in_primary_file": 7,
+    "primary_sha256": "3e819348ca0df7d9cc8d2d14d401943a8457f93d22afceab5acea5640be28ead"
+  }
+}
