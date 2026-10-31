@@ -1,0 +1,148 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "204186b4a4bd97b3b9464f2d2394a221",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "2c349d279978ebbf88d508c8621dd9a23f7737f1",
+    "branch": "codex/document-acceptance"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 1,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "19c386623803f667",
+      "severity": "medium",
+      "category": "testing",
+      "title": "File read of the saved notebook can fail confusingly if pathA is empty or the save did not complete",
+      "message": "`must(t, e)` aborts the test with the raw error, but the failure is indistinguishable from a genuine IO problem versus a setup bug (e.g. pathA empty because `State().Path` was not populated). When this fires, debugging \"why did reading a temp file fail\" is much harder than it needs to be.",
+      "suggestion": "Wrap the error with context so failures are self-diagnosing:",
+      "confidence": 0.85,
+      "locations": [
+        {
+          "path": "examples/macapps/notes/quit_test.go",
+          "lines": {
+            "start": 212,
+            "end": 213
+          }
+        }
+      ],
+      "tags": [
+        "io",
+        "test-diagnostics",
+        "error-wrapping"
+      ],
+      "evidence": "\tdata, e := os.ReadFile(pathA)\n\tmust(t, e)\n\tsaved, e := DecodeNotebook(data)\n\tmust(t, e)\n\tif !reflect.DeepEqual(saved.Notes, expectedA) {\n\t\tt.Fatal(\"first saved notebook differs from approved content\")\n\t}",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "2d8985accf14c9b6",
+      "severity": "low",
+      "category": "bug",
+      "title": "Update discards the expected note content, weakening the exact-content comparison",
+      "message": "The test claims to verify \"distinct exact Unicode notebooks, including CRLF\", but `id` is the only key used to update the note, and the expected content is captured from `f[i].model.Items()` immediately after the update inside the same closure. If `Update` (or a subsequent save/load) normalizes line endings or re-encodes content, the captured `expectedA` and the decoded file would both contain the same normalized value, so the CRLF/Unicode claim is never actually exercised as a distinguisher; the assertion is tautological against any transformation applied before `Items()` is read.",
+      "suggestion": "Capture the expected values from the literal strings used for the update rather than from `f[i].model.Items()`, so any normalization performed by the model or the save/load round trip is actually detected.",
+      "confidence": 0.8,
+      "locations": [
+        {
+          "path": "examples/macapps/notes/quit_test.go",
+          "lines": {
+            "start": 172,
+            "end": 178
+          }
+        }
+      ],
+      "tags": [
+        "unicode",
+        "crlf",
+        "round-trip"
+      ],
+      "evidence": "\t\tmust(t, f[i].model.Update(id, title, \"Exact café 日本語\\r\\n\"+title))",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 44154,
+    "totalMs": 44155
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 2,
+    "bytes": 4674,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 2255,
+        "output": 7950,
+        "reasoning": 7171,
+        "cachedInput": 832
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "614bf2c8c6bd8941",
+        "severity": "low",
+        "category": "bug",
+        "title": "Inner loop variable `title2` is unused and shadowed by `titles[i2]`",
+        "message": "The inner range loop declares `i2` and `title2`, then immediately discards `title2` and re-derives the title via `titles[i2]`. This is confusing, and `title2` is unused (Go will reject unused loop variables? No — Go does not reject unused range variables, but linters and reviewers will flag it as dead). More importantly, the indirection through `titles[i2]` makes the relationship between the loop and the data opaque and easy to get wrong if the slices ever diverge.",
+        "suggestion": "Use the range variables directly and drop the redundant re-indexing:",
+        "confidence": 0.75,
+        "locations": [
+          {
+            "path": "examples/macapps/notes/quit_test.go",
+            "lines": {
+              "start": 175,
+              "end": 178
+            }
+          }
+        ],
+        "tags": [
+          "dead-code",
+          "clarity",
+          "loop"
+        ],
+        "evidence": "\t\t\tid2, e := f[i2].model.Add()\n\t\t\tmust(t, f[i2].model.Update(id2, titles[i2], \"\"))",
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      },
+      "reason": "quoted evidence not found in examples/macapps/notes/quit_test.go"
+    }
+  ],
+  "suppressed": []
+}

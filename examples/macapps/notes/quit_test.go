@@ -6,6 +6,8 @@ import (
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/document"
 	"github.com/dshills/vellum/history"
+	"os"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -163,18 +165,38 @@ func TestQuitAsynchronousSettlementRefusalUnlocksWorkspace(t *testing.T) {
 }
 func TestQuitSavedFirstThenCancelLastKeepsBoth(t *testing.T) {
 	a, f, g := quitFiles(t)
-	_ = a.Do(func() { _, _ = f[0].model.Add(); _, _ = f[1].model.Add(); g.Request(); f[0].settleIntent("quit", true) })
+	var expectedA, expectedB []Note
+	var pathA, pathB string
+	must(t, a.Do(func() {
+		expected := [2][]Note{f[0].model.Items(), f[1].model.Items()}
+		for i, title := range []string{"Acceptance A", "Acceptance B"} {
+			id, e := f[i].model.Add()
+			must(t, e)
+			body := "Exact café 日本語\r\n" + title
+			expected[i] = append(expected[i], Note{ID: id, FolderID: "notes", Title: title, Body: body})
+			must(t, f[i].model.Update(id, title, body))
+		}
+		expectedA = expected[0]
+		expectedB = expected[1]
+		pathA = f[0].main.State().Path
+		pathB = f[1].main.State().Path
+		if pathA == "" || pathB == "" {
+			t.Fatal("fixture primary paths must be populated before Quit")
+		}
+		g.Request()
+		f[0].settleIntent("quit", true)
+	}))
 	until := time.Now().Add(3 * time.Second)
 	for time.Now().Before(until) {
-		_ = a.Drain()
+		must(t, a.Drain())
 		ready := false
-		_ = a.Do(func() { ready = f[1].prompt == "quit" })
+		must(t, a.Do(func() { ready = f[1].prompt == "quit" }))
 		if ready {
 			break
 		}
 		time.Sleep(time.Millisecond)
 	}
-	_ = a.Do(func() {
+	must(t, a.Do(func() {
 		if f[1].prompt != "quit" {
 			t.Fatal("second decision absent")
 		}
@@ -182,7 +204,27 @@ func TestQuitSavedFirstThenCancelLastKeepsBoth(t *testing.T) {
 		if g.running || len(a.Windows()) != 2 || f[0].model.History().Dirty || !f[1].model.History().Dirty {
 			t.Fatal("Cancel changed saved/dirty workspace")
 		}
-	})
+		if f[0].quitHeld || f[1].quitHeld || f[0].ref.Context().Err() != nil || f[1].ref.Context().Err() != nil {
+			t.Fatal("Cancel retained a hold or retired a window")
+		}
+		if !reflect.DeepEqual(f[0].model.Items(), expectedA) || !reflect.DeepEqual(f[1].model.Items(), expectedB) {
+			t.Fatal("Cancel changed exact live Unicode notebooks")
+		}
+	}))
+	data, e := os.ReadFile(pathA)
+	if e != nil {
+		t.Fatalf("read approved A notebook %q after second Quit prompt: %v", pathA, e)
+	}
+	saved, e := DecodeNotebook(data)
+	if e != nil {
+		t.Fatalf("decode approved A notebook %q: %v", pathA, e)
+	}
+	if !reflect.DeepEqual(saved.Notes, expectedA) {
+		t.Fatal("first saved notebook differs from approved content")
+	}
+	if _, e = os.Stat(pathB); !os.IsNotExist(e) {
+		t.Fatalf("canceled second notebook unexpectedly persisted: %v", e)
+	}
 }
 
 func TestQuitRequestAfterUnexpectedRetirementUnlocksSurvivor(t *testing.T) {
