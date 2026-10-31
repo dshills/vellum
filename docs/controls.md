@@ -704,3 +704,11 @@ highlight; editable grids and unselected active cells retain their cell cursor.
 Grids without a semantic palette keep their established appearance. This style
 repair applies to both existing grid render routes; selection identities,
 virtualization, editing and input routing are unchanged.
+
+## Availability and layout
+
+Managed buttons, menu buttons, checkboxes and single-line text fields retain
+their enabled layout allowance when disabled. Disabled controls still use their
+disabled appearance and refuse activation; preserving border/shadow allowance
+does not restore keyboard focusability or paint an enabled focus ring. Explicit
+managed border styles and flat Mac button presentation retain their own spacing.

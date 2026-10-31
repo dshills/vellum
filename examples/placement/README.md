@@ -5,8 +5,8 @@ and a managed `ui.Canvas2D`. Block, Connector and Note use the same validation,
 command registry and bounded history path for pointer and keyboard placement.
 
 Holding a palette tool keeps the surrounding controls and canvas in place.
-Their pre-drag availability appearance is retained through release or Escape;
-command execution still checks live admission and remains blocked during capture.
+Unavailable actions may become disabled during capture without changing their
+dimensions. Command execution remains blocked until release or Escape.
 
 The right-hand **Layers** panel lists components front first. Group selectors
 appear before each group's frontmost member; component rows retain the exact

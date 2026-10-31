@@ -866,6 +866,7 @@ func mountShallowScoped(parent tree.Node, n ui.Node, a *app.Application, scope a
 	if r.node.Kind == ui.Row || r.node.Kind == ui.Button || r.node.Kind == ui.MenuButton {
 		r.widget.AsWidget().FinalStyler(func(s *styles.Style) { styleSplitButtonLayout(r, s) })
 	}
+	r.widget.AsWidget().FinalStyler(func(s *styles.Style) { styleManagedAvailability(r, s) })
 	return r, nil
 }
 func syncRecord(r *record, n ui.Node) error {

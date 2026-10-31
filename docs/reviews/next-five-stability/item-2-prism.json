@@ -1,0 +1,64 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "56733ef00b0731ba8e797b24656544ee",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "c7f54bfd8845d6c2024b60a55a8c80a41d1a324c",
+    "branch": "codex/next-five-stability"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 312203,
+    "totalMs": 312207
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 8,
+    "bytes": 16533,
+    "chunks": 1,
+    "llmCalls": 6,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 17163,
+        "output": 54734,
+        "reasoning": 51622,
+        "cachedInput": 6272
+      }
+    ],
+    "widenedFiles": 2,
+    "splits": 2,
+    "excluded": [
+      {
+        "path": "examples/placement/palette_presentation.go",
+        "reason": "deleted"
+      }
+    ],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

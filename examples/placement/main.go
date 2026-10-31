@@ -286,6 +286,5 @@ func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 	if m.prompt == "png-export" && m.pngDraft != nil {
 		root.Focus = ui.FocusRequest{ID: "png-scale", Sequence: m.modalEpoch}
 	}
-	m.retainPalettePresentation(&root)
 	return root
 }

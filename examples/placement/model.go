@@ -23,7 +23,6 @@ type component struct {
 	Color         color.RGBA
 }
 type model struct {
-	palettePresentation               map[string]controlPresentation
 	pngDraft                          *pngDraft
 	savedViews                        []savedView
 	viewsDraft                        *savedViewsDraft
