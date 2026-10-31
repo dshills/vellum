@@ -1,0 +1,149 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "909af2d6cbd56df3dc7ddf0d74fb0936",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "cacc55ff626fb4fd8c2da81f7b4f05e293d98167",
+    "branch": "codex/next-five-application-readiness"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 2,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "7ac1768cda9342a1",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Symlink/`..` guard rejects valid output paths (macOS /tmp, relative `..` paths)",
+      "message": "Path.absolute() neither normalizes `..` nor resolves symlinks, so this check rejects any output path that merely *spelled* differently from its resolved form: `--output ../../consumers/out` run from inside the repo fails, and on macOS `--output /tmp/out` fails because `/tmp` -\u003e `/private/tmp` is a system symlink. Only paths that actually resolve into the checkout are a safety problem; legitimate aliases like these are blocked, making the tool unusable for reasonable inputs.",
+      "suggestion": "Resolve first and test containment on the resolved path. A symlink pointing into the checkout still resolves under ROOT and is rejected, while harmless `..` components and system symlinks are accepted: `output = args.output.expanduser().resolve()` then `if output.is_relative_to(ROOT): raise ...`.",
+      "confidence": 0.7,
+      "locations": [
+        {
+          "path": "examples/work-log/create.py",
+          "lines": {
+            "start": 24,
+            "end": 26
+          }
+        }
+      ],
+      "tags": [
+        "path-handling",
+        "validation"
+      ],
+      "evidence": "    output = args.output.expanduser().absolute()\n    if output != output.resolve() or output.is_relative_to(ROOT):\n        raise ValueError('output must be outside the checkout without symlink aliases')",
+      "fix": {
+        "before": "    output = args.output.expanduser().absolute()\n    if output != output.resolve() or output.is_relative_to(ROOT):\n        raise ValueError('output must be outside the checkout without symlink aliases')",
+        "after": "    output = args.output.expanduser().resolve()\n    if output.is_relative_to(ROOT):\n        raise ValueError('output must be outside the checkout without symlink aliases')"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "db23080b7376199a",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Partial output directory is left behind when generation fails, blocking re-runs",
+      "message": "The output directory is created before extraction and generation run, but nothing removes it if a later step raises (check=True on new-app.py, the template-count check, or a manifest KeyError). Because mkdir is deliberately exclusive, every retry then dies with an unhandled FileExistsError until the operator deletes the half-populated directory by hand.",
+      "suggestion": "Wrap everything after the mkdir in try/except BaseException, remove the tree on failure (shutil.rmtree(output, ignore_errors=True)), and re-raise, so a failed run never burns the chosen output path. At minimum catch CalledProcessError and print which step failed.",
+      "confidence": 0.65,
+      "locations": [
+        {
+          "path": "examples/work-log/create.py",
+          "lines": {
+            "start": 27,
+            "end": 31
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "cleanup"
+      ],
+      "evidence": "    output.mkdir(mode=0o700)  # exclusive; never replace existing source or notebooks\n    sdk = checker.extract_verified(args.sdk, output/'sdk', verified)\n    app = output/'Work Log'\n    subprocess.run([sys.executable, '-B', str(sdk/'scripts/new-app.py'), str(app),\n                    '--module=example.com/vellum-work-log', '--template=document'], check=True)",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "460d0ea5fe111dd7",
+      "severity": "low",
+      "category": "correctness",
+      "title": "Generated main.go is read and rewritten with locale-dependent encoding",
+      "message": "read_text()/write_text() use the locale-preferred encoding. On a C/POSIX-locale system any non-ASCII byte in the generated Go file raises UnicodeDecodeError, and on a cp1252 Windows system bytes are decoded and re-encoded with mojibake, silently corrupting the generated source.",
+      "suggestion": "Pass encoding='utf-8' to both read and write so generated Go source is round-tripped byte-safely regardless of locale.",
+      "confidence": 0.7,
+      "locations": [
+        {
+          "path": "examples/work-log/create.py",
+          "lines": {
+            "start": 33,
+            "end": 37
+          }
+        }
+      ],
+      "tags": [
+        "encoding",
+        "portability"
+      ],
+      "evidence": "    text = main_go.read_text()\n    old = 'Title: \"Vellum Document\"'\n    if text.count(old) != 1:\n        raise ValueError('SDK document template changed; review the Work Log customization')\n    main_go.write_text(text.replace(old, 'Title: \"Vellum Work Log\"'))",
+      "fix": {
+        "before": "    main_go = app/'main.go'\n    text = main_go.read_text()\n    old = 'Title: \"Vellum Document\"'\n    if text.count(old) != 1:\n        raise ValueError('SDK document template changed; review the Work Log customization')\n    main_go.write_text(text.replace(old, 'Title: \"Vellum Work Log\"'))",
+        "after": "    main_go = app/'main.go'\n    text = main_go.read_text(encoding='utf-8')\n    old = 'Title: \"Vellum Document\"'\n    if text.count(old) != 1:\n        raise ValueError('SDK document template changed; review the Work Log customization')\n    main_go.write_text(text.replace(old, 'Title: \"Vellum Work Log\"'), encoding='utf-8')"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 275121,
+    "totalMs": 275163
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 2,
+    "bytes": 4974,
+    "chunks": 1,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 6036,
+        "output": 35875,
+        "reasoning": 32435,
+        "cachedInput": 2624
+      }
+    ],
+    "splits": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

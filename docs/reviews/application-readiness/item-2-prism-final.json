@@ -1,0 +1,208 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "c7ed1bdc38dca6116df5ce9bb9c0f292",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "cacc55ff626fb4fd8c2da81f7b4f05e293d98167",
+    "branch": "codex/next-five-application-readiness"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 4,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "f6bd88e1a1e10b52",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Failed run leaves a partial output directory that blocks all reruns",
+      "message": "Every step after output.mkdir (extract_verified, new-app.py exit code, the Title sentinel check) can fail and leave a half-populated output directory behind. Because mkdir is deliberately exclusive, rerunning the same command then dies with FileExistsError, and the leftover directory can be mistaken for a successfully generated consumer. Generation should be all-or-nothing.",
+      "suggestion": "Build into a private temporary directory and atomically rename it into place as the last step, or wrap the post-mkdir work in try/except that removes the partial output before re-raising, e.g.\n\n    try:\n        ...extract, generate, patch, write CONSUMER.json...\n    except BaseException:\n        shutil.rmtree(output, ignore_errors=True)\n        raise",
+      "confidence": 0.75,
+      "locations": [
+        {
+          "path": "examples/work-log/create.py",
+          "lines": {
+            "start": 27,
+            "end": 31
+          }
+        }
+      ],
+      "tags": [
+        "python",
+        "cleanup",
+        "example"
+      ],
+      "evidence": "    output.mkdir(mode=0o700)  # exclusive; never replace existing source or notebooks\n    sdk = checker.extract_verified(args.sdk, output/'sdk', verified)\n    app = output/'Work Log'\n    subprocess.run([sys.executable, '-B', str(sdk/'scripts/new-app.py'), str(app),\n                    '--module=example.com/vellum-work-log', '--template=document'], check=True)",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "fd6876f2370b6279",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "scripts/ dir inserted at sys.path[0] can shadow stdlib modules",
+      "message": "The checker is loaded by explicit file location (spec_from_file_location), so this module-level insert is not needed for that import; its only effect is that scripts/ is searched before the standard library for everything imported afterwards, including inside exec_module(checker). A scripts/types.py or scripts/json.py would silently shadow the stdlib.",
+      "suggestion": "Append instead of inserting at position 0 so stdlib and site-packages win, and verify whether the entry is needed at all:\n\nsys.path.append(str(ROOT / 'scripts'))",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "examples/work-log/create.py",
+          "lines": {
+            "start": 11,
+            "end": 11
+          }
+        }
+      ],
+      "tags": [
+        "python",
+        "import-hygiene"
+      ],
+      "evidence": "sys.path.insert(0, str(ROOT / 'scripts'))",
+      "fix": {
+        "before": "sys.path.insert(0, str(ROOT / 'scripts'))",
+        "after": "sys.path.append(str(ROOT / 'scripts'))"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "914aeecff8499b5c",
+      "severity": "low",
+      "category": "correctness",
+      "title": "Path.is_relative_to requires Python 3.9, raising AttributeError on older interpreters",
+      "message": "Path.is_relative_to was added in Python 3.9, and it is the newest API used in this file (everything else is 3.5-era). On an older interpreter the containment guard raises AttributeError after verify_archive has already done its work, so the script crashes with an unrelated traceback instead of the intended error. If the project still supports pre-3.9, use an equivalent comparison.",
+      "suggestion": "Replace the 3.9-only call with the equivalent membership test that works on older interpreters:\n\n    if output == ROOT or ROOT in output.parents:\n        raise ValueError('output must be outside the checkout')",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "examples/work-log/create.py",
+          "lines": {
+            "start": 25,
+            "end": 26
+          }
+        }
+      ],
+      "tags": [
+        "python",
+        "portability"
+      ],
+      "evidence": "    if output.is_relative_to(ROOT):",
+      "fix": {
+        "before": "    if output.is_relative_to(ROOT):\n        raise ValueError('output must be outside the checkout')",
+        "after": "    if output == ROOT or ROOT in output.parents:\n        raise ValueError('output must be outside the checkout')"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "e102633b060cc4b0",
+      "severity": "low",
+      "category": "bug",
+      "title": "Nested --output paths fail with a cryptic FileNotFoundError",
+      "message": "mkdir() defaults to parents=False, so an --output like ~/.local/share/worklogs/run1 fails with a bare FileNotFoundError ('No such file or directory') naming the parent, which reads like a bug in the script rather than a usage problem.",
+      "suggestion": "Pass parents=True (intermediate directories get umask-default permissions; only the leaf is 0700), or catch FileNotFoundError and print an actionable message telling the user to create the parent first.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "examples/work-log/create.py",
+          "lines": {
+            "start": 27,
+            "end": 27
+          }
+        }
+      ],
+      "tags": [
+        "python",
+        "cli"
+      ],
+      "evidence": "    output.mkdir(mode=0o700)  # exclusive; never replace existing source or notebooks",
+      "fix": {
+        "before": "    output.mkdir(mode=0o700)  # exclusive; never replace existing source or notebooks",
+        "after": "    output.mkdir(mode=0o700, parents=True)  # exclusive; never replace existing source or notebooks"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "b4dbb9ac28ec5331",
+      "severity": "low",
+      "category": "correctness",
+      "title": "Child process stdout pollutes the script's machine-readable output contract",
+      "message": "The script's only deliberate stdout line is print(app), i.e. the created application path, which suggests piping into a follow-up build step. new-app.py inherits stdout, so any progress or log output it prints is mixed into that stream and breaks naive consumers like \"create.py ... | xargs go build\".",
+      "suggestion": "Discard (or capture) the child's stdout while leaving stderr intact so check=True failures still surface, e.g. add stdout=subprocess.DEVNULL to the subprocess.run call.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/work-log/create.py",
+          "lines": {
+            "start": 30,
+            "end": 31
+          }
+        }
+      ],
+      "tags": [
+        "python",
+        "subprocess",
+        "cli"
+      ],
+      "evidence": "    subprocess.run([sys.executable, '-B', str(sdk/'scripts/new-app.py'), str(app),\n                    '--module=example.com/vellum-work-log', '--template=document'], check=True)",
+      "fix": {
+        "before": "    subprocess.run([sys.executable, '-B', str(sdk/'scripts/new-app.py'), str(app),\n                    '--module=example.com/vellum-work-log', '--template=document'], check=True)",
+        "after": "    subprocess.run([sys.executable, '-B', str(sdk/'scripts/new-app.py'), str(app),\n                    '--module=example.com/vellum-work-log', '--template=document'],\n                   check=True, stdout=subprocess.DEVNULL)"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 141818,
+    "totalMs": 141872
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 1,
+    "bytes": 2521,
+    "chunks": 1,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 2742,
+        "output": 21224,
+        "reasoning": 18431,
+        "cachedInput": 1344
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

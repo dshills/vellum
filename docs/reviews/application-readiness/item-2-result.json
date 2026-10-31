@@ -1,0 +1,38 @@
+{
+  "sdk_sha256": "65c07945d2b153e7e0f7cfb64a0c3631807e7c9ce0b4e0cb26ff862a74fb718e",
+  "sdk_release": "v1.1.1",
+  "source": {
+    "clean": true,
+    "commit": "ed4f71f49bbf623dd8e205571669539212068c62"
+  },
+  "application_module": "example.com/vellum-work-log",
+  "customization": "window title only; generated application-owned document recipe",
+  "status": "bounded consumer acceptance passed; not multi-day qualification",
+  "date": "2026-10-31",
+  "go": "go1.25.6",
+  "package": {
+    "output": "/private/tmp/vellum-work-log-consumer/Vellum Work Log.app",
+    "private_build": true,
+    "target": "darwin",
+    "signed": true,
+    "notarized": false,
+    "native_distribution_audit": "pending",
+    "packaged_binary_sha256": "77c8a1e788ac259cdb98522150a318159d45d6845813c1215c5b3619444d28f4"
+  },
+  "notebook_sha256": "6726cba91f27f1ae6e70799c27d057fd6a6c513889390c061b33997bc655b4fc",
+  "native_checks": [
+    "new dated note",
+    "Unicode title/body",
+    "Undo removes insertion; Redo restores",
+    "Save reports saved",
+    "normal Quit and restart preserves seven notes, n10 selection and exact title/body",
+    "native Open chooser reloads Notebook.vellumnotes, reports Opened notebook"
+  ],
+  "checks": [
+    "generated module origins inside extracted SDK",
+    "consumer race tests",
+    "vet",
+    "build",
+    "strict ad-hoc signature"
+  ]
+}
