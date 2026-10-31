@@ -1,0 +1,128 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "8a39b3d7a4a352ae9b75103e9ce5884d",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "b508a35d94c6cf1704a4ee0dba5da9a8602b0a29",
+    "branch": "codex/next-five-stability"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 1,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "022d976c27d15734",
+      "severity": "low",
+      "category": "docs",
+      "title": "New log entry does not follow the issue template this file mandates",
+      "message": "The file opens with \"For each new issue, copy this template\" listing required fields (ID/date/candidate/macOS, workflow, exact steps, expected, actual, reproduces attempts/failures, impact, evidence location, status), but the new entry is a freeform paragraph. It has no ID, no expected-vs-actual split, no reproduce attempt counts, no impact classification, and no evidence location or status, so future entries in this log will be inconsistently structured and hard to grep or cross-reference. It is also appended directly under the template bullets without a separating heading, so it can be misread as part of the template itself.",
+      "suggestion": "Rewrite the entry using the template bullets (and introduce it with a heading such as \"## Entries\" so template and log content stay visually distinct). Example rewrite is given in the fix.",
+      "confidence": 0.8,
+      "locations": [
+        {
+          "path": "docs/daily-use/ISSUE-LOG.md",
+          "lines": {
+            "start": 21,
+            "end": 21
+          }
+        }
+      ],
+      "tags": [
+        "documentation",
+        "template-conformance",
+        "issue-log",
+        "location-corrected"
+      ],
+      "evidence": "2026-10-31 / build25 / macOS 27.2: three bounded native sessions passed. Saved Unicode content, selection, note counts and Find/Replace result survived restart; insertion and replacement Undo/Redo passed after focus settled. No reproducible product blocker found in this scope. Tool editor clicks did not establish focus in session two; explicit New Note focus worked. No multi-day human-use claim.",
+      "fix": {
+        "before": "2026-10-31 / build25 / macOS 27.2: three bounded native sessions passed. Saved Unicode content, selection, note counts and Find/Replace result survived restart; insertion and replacement Undo/Redo passed after focus settled. No reproducible product blocker found in this scope. Tool editor clicks did not establish focus in session two; explicit New Note focus worked. No multi-day human-use claim.",
+        "after": "- ID / date / candidate / macOS: LOG-2026-10-31 / 2026-10-31 / build25 / macOS 27.2\n- Workflow and affected notebook (avoid private content): daily document workflow, three bounded native sessions\n- Exact steps, including focus and save state: saved Unicode content, selection, note counts and Find/Replace result; restarted app; tested insertion and replacement Undo/Redo after focus settled\n- Expected: saved state survives restart; Undo/Redo works\n- Actual: matched expected in all three sessions; editor clicks did not establish focus in session two, explicit New Note focus worked\n- Reproduces: attempts / failures: 3 attempts / 0 failures; focus anomaly observed once, not reproduced\n- Impact: data loss, blocked work, or inconvenience: inconvenience (focus workaround needed)\n- Evidence location (redacted): session notes\n- Status / fix commit / verification: closed, no reproducible blocker in this scope; no multi-day human-use claim"
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 318130,
+    "totalMs": 318145
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 5,
+    "bytes": 9280,
+    "chunks": 1,
+    "llmCalls": 5,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 8518,
+        "output": 38905,
+        "reasoning": 35670,
+        "cachedInput": 1792
+      }
+    ],
+    "widenedFiles": 1,
+    "splits": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "7d23435ca3f07566",
+        "severity": "low",
+        "category": "maintainability",
+        "title": "Observed focus defect is dismissed inline without repro data or an ID",
+        "message": "The entry records a real defect symptom (clicks into the tool editor did not establish focus) but buries it inside a \"passed\" summary with no ID, no reproduce attempts, and no evidence location, while concluding \"No reproducible product blocker found in this scope\". A future reader cannot tell whether this was investigated, how often it was seen, or where the session evidence lives, so the observation is likely to be lost rather than tracked as a candidate issue.",
+        "suggestion": "Either give the focus anomaly its own templated entry (with ID, exact steps, expected vs actual, attempts/failures, evidence location, and status \"open/under investigation\") or explicitly state in this entry that it was probed N times without reproduction and reference where the session notes are stored.",
+        "confidence": 0.7,
+        "locations": [
+          {
+            "path": "docs/daily-use/ISSUE-LOG.md",
+            "lines": {
+              "start": 23,
+              "end": 23
+            }
+          }
+        ],
+        "tags": [
+          "issue-tracking",
+          "documentation",
+          "focus-handling"
+        ],
+        "evidence": "Tool editor clicks did not establish focus in session two; explicit New Note focus worked.",
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      },
+      "reason": "quoted evidence not found in docs/daily-use/ISSUE-LOG.md"
+    }
+  ],
+  "suppressed": []
+}

@@ -1,0 +1,13 @@
+# Item 5: bounded Documents sessions and daily-use setup
+
+Three native sessions ran on build25-ed4f71f49bbf, macOS 27.2, using a fresh synthetic private profile. Session one created and saved a Unicode note; normal Quit removed the process. Session two reopened the exact title/body with seven notes and retained selection, created an eighth note, verified insertion Undo/Redo, found one “two” match and replaced it with “2”, then verified replacement Undo/Redo after Done returned editor focus. Saved state was observed before normal Quit, and process absence was checked. Session three reopened eight notes with n11 selected, the exact replacement body and saved status; it quit normally. The final JSON bytes were independently asserted and hashed in item-5-result.json.
+
+Direct AX/coordinate editor clicks in session two did not establish focus; the attempted input did not change the note. New Note explicitly focused its title and Tab focused its body. That tool limitation is not recorded as a passing click test or a proven product defect. Find query results settled before replacement was invoked. No data-loss or reproducible workflow blocker was found in this bounded scope.
+
+The frozen daily launcher now admits only this selected candidate and uses a new versioned private profile, preserving the prior build24 directory. The existing symlink/ownership/mode guards remain in place; no automatic migration or personal-file import occurs. Launcher safety tests and check-only validation precede launch. Daily launch startup is verified separately below.
+
+These three short sessions qualify the recorded workflows on this host. Multi-day human use, IME, VoiceOver and quarantine admission remain unqualified; prior build24 fault/dual-window acceptance is historical evidence, not repeated build25 coverage.
+
+The launcher check-only verification passed without creating data; the subsequent launch created its versioned root with mode 0700 and opened build25 Documents visibly with six sample notes and clean sample status. Both A/B windows were opened by the application. The daily app is left open for use; synthetic acceptance notebooks were not copied into it. The two existing launcher safety tests passed and Python compilation passed.
+
+Default Prism completed full coverage with one low issue-log formatting finding. The log now separates the bounded QA result from an explicitly unclassified tool-focus observation, follows the template, gives actual attempt scope and links evidence. No product defect or repeated test count is inferred from the observation. The synthetic saved notebook and matching result hash are also preserved outside the payload packet at deliveries/mac-build25-20261031/native-session-evidence in the shared workspace.

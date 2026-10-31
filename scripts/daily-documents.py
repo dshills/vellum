@@ -9,8 +9,8 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = Path.home() / 'Library/Application Support/Vellum Internal Evaluation/Documents'
-CANDIDATE = 'build24-b9212489afc9'
+CANDIDATE = 'build25-ed4f71f49bbf'
+DATA = Path.home() / 'Library/Application Support/Vellum Internal Evaluation' / ('Documents-' + CANDIDATE)
 
 
 def private_directory(path, create=False):
