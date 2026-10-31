@@ -1,0 +1,237 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "aa95ca18a0db2fdf0bef117adf7a2cbc",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "874375d3a46e630c46df31a100530c3e310ef6cb",
+    "branch": "codex/document-acceptance"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 2,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "4fb46c592f7a73f1",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Transient status embedded in a persistent log header",
+      "message": "The header hardcodes a point-in-time status ('ready to begin daily evaluation; no daily-use sessions recorded yet') in a file intended as a persistent issue log. This line will become stale as soon as the first session or issue is recorded, and nothing in the template prompts updating it, so future readers may be misled about the current state.",
+      "suggestion": "Keep transient status out of the log header; record it in a dated first entry (using the template's ID/date/status fields) or a separate status note, leaving the header stable.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "docs/daily-use/ISSUE-LOG.md",
+          "lines": {
+            "start": 3,
+            "end": 3
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "maintainability"
+      ],
+      "evidence": "Candidate: build24-b9212489afc9. Status: ready to begin daily evaluation; no daily-use sessions recorded yet.",
+      "fix": {
+        "before": "Candidate: build24-b9212489afc9. Status: ready to begin daily evaluation; no daily-use sessions recorded yet.",
+        "after": "Candidate: build24-b9212489afc9."
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "55fe617b64c77a2e",
+      "severity": "low",
+      "category": "docs",
+      "title": "Cross-reference is plain text, not a navigable link",
+      "message": "The reference to the prior Undo-failure writeup is inline plain text rather than a markdown link, so readers cannot click through to the referenced resolution note and link checkers cannot verify the target exists. Because the target lives in a different directory (../reviews/...), the path will also break silently if either file moves.",
+      "suggestion": "Use a relative markdown link so the reference is navigable and verifiable.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "docs/daily-use/ISSUE-LOG.md",
+          "lines": {
+            "start": 5,
+            "end": 5
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "links"
+      ],
+      "evidence": "No open reproducible document-workflow defect was found in the scoped acceptance run. The earlier keyboard Undo failure was resolved by settling focus between actions; see ../reviews/document-priorities/item-1.md. This is not a claim that the application is defect-free.",
+      "fix": {
+        "before": "see ../reviews/document-priorities/item-1.md.",
+        "after": "see [../reviews/document-priorities/item-1.md](../reviews/document-priorities/item-1.md)."
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 224688,
+    "totalMs": 224719
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 3,
+    "bytes": 6061,
+    "chunks": 1,
+    "llmCalls": 6,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 8107,
+        "output": 41175,
+        "reasoning": 36153,
+        "cachedInput": 6336
+      }
+    ],
+    "splits": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "1a841488343acfd4",
+        "severity": "low",
+        "category": "docs",
+        "title": "Ambiguous wording about what a successful launch proves",
+        "message": "\"It requests launch through macOS\" names no mechanism (LaunchServices? `open`?) and no consequence. Because the preceding sentence says \"Verification failures stop launch\", a reader may assume a successful launch means the app is visibly up and start testing immediately. The sentence should state that a successful launch request does not prove the UI appeared and that a human must confirm it.",
+        "suggestion": "Reword to something concrete, e.g.: \"The launcher asks macOS (LaunchServices) to open the app rather than starting it in-process, so a successful launch does not prove the UI appeared; after each launch, confirm the window is visible and focused in the app before beginning the session.\"",
+        "confidence": 0.55,
+        "locations": [
+          {
+            "path": "docs/daily-use/README.md",
+            "lines": {
+              "start": 12,
+              "end": 12
+            }
+          }
+        ],
+        "tags": [
+          "documentation",
+          "clarity"
+        ],
+        "evidence": "It requests launch through macOS; visible startup is still confirmed in the app.",
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      },
+      "reason": "quoted evidence not found in docs/daily-use/README.md"
+    },
+    {
+      "finding": {
+        "id": "ee3d665a0e6aebdc",
+        "severity": "low",
+        "category": "docs",
+        "title": "Notebooks \"A and B\" are referenced but never defined",
+        "message": "The README introduces notebooks \"A and B\" but never says what they are, how they are created or named on disk, or how they map onto the per-session steps in the numbered list below. A new evaluator cannot reproduce the intended setup from this document alone.",
+        "suggestion": "Add one sentence defining A and B (their filenames under `~/Library/Application Support/Vellum Internal Evaluation/Documents`, which notebook a session should use, and where they are first created), or link to the acceptance-record item that defines them.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "docs/daily-use/README.md",
+            "lines": {
+              "start": 14,
+              "end": 14
+            }
+          }
+        ],
+        "tags": [
+          "documentation",
+          "runbook"
+        ],
+        "evidence": "First launch creates it with mode 0700; A and B are separate notebooks.",
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      },
+      "reason": "quoted evidence not found in docs/daily-use/README.md"
+    },
+    {
+      "finding": {
+        "id": "9e5d94b950ef648c",
+        "severity": "low",
+        "category": "docs",
+        "title": "\"Save As may deliberately select another location\" is unclear",
+        "message": "As written, this can be read as Save As choosing a different location on its own. The operationally important point — that Save As intentionally lets the user write outside the 0700 evaluation directory, so the permissions and backup guarantees described in this paragraph do not apply to that file — is never stated, and that is exactly the risk an evaluator needs spelled out.",
+        "suggestion": "Reword, e.g.: \"Save As intentionally lets you pick a location outside the evaluation directory; anything saved elsewhere is not covered by the 0700 permissions or the pre-version-change backup step.\"",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "docs/daily-use/README.md",
+            "lines": {
+              "start": 14,
+              "end": 14
+            }
+          }
+        ],
+        "tags": [
+          "documentation",
+          "clarity"
+        ],
+        "evidence": "Save As may deliberately select another location.",
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      },
+      "reason": "quoted evidence not found in docs/daily-use/README.md"
+    },
+    {
+      "finding": {
+        "id": "c0576bc49566c2ed",
+        "severity": "low",
+        "category": "docs",
+        "title": "Cross-references omit paths to the acceptance records and issue log",
+        "message": "\"the item 3 and item 4 acceptance records\" are referenced with no path, so a reader starting from this README cannot locate them (they live under docs/reviews/document-priorities/). The same applies to the bare \"ISSUE-LOG.md\" reference on line 22, which is only findable by inference. A runbook should be self-contained.",
+        "suggestion": "Use relative links, e.g. \"the [item 3](../reviews/document-priorities/item-3.md) and [item 4](../reviews/document-priorities/item-4.md) acceptance records\" and \"Record any defect in [ISSUE-LOG.md](ISSUE-LOG.md)\".",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "docs/daily-use/README.md",
+            "lines": {
+              "start": 24,
+              "end": 24
+            }
+          }
+        ],
+        "tags": [
+          "documentation",
+          "cross-references"
+        ],
+        "evidence": "Use the item 3 and item 4 acceptance records for coordinated Quit and isolated interruption results.",
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      },
+      "reason": "quoted evidence not found in docs/daily-use/README.md"
+    }
+  ],
+  "suppressed": []
+}

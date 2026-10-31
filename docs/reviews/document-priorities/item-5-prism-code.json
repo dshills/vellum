@@ -1,0 +1,126 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "53cb5467e4a832ebccfcfbdc6593dbe0",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "874375d3a46e630c46df31a100530c3e310ef6cb",
+    "branch": "codex/document-acceptance"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 2,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "487e80910d42162c",
+      "severity": "low",
+      "category": "correctness",
+      "title": "Launcher does not establish a working directory before exec",
+      "message": "Double-clicking a .command file in Finder runs it with the user's home directory as the working directory, and running it from a terminal inherits that shell's cwd. The launcher never pins a working directory, so if daily-documents.py resolves any paths relative to the current directory (rather than to its own __file__), its output will land in unpredictable locations such as $HOME.",
+      "suggestion": "Run the Python script from a predictable working directory, e.g. cd \"$script_dir\" before the exec line (or ensure daily-documents.py resolves all paths relative to its own __file__ so cwd does not matter).",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/Launch-Daily-Documents.command",
+          "lines": {
+            "start": 3,
+            "end": 4
+          }
+        }
+      ],
+      "tags": [
+        "cwd",
+        "macos",
+        "launcher"
+      ],
+      "evidence": "script_dir=\"${0:A:h}\"\nexec python3 -B \"$script_dir/daily-documents.py\"",
+      "fix": {
+        "before": "script_dir=\"${0:A:h}\"",
+        "after": "script_dir=\"${0:A:h}\"\ncd \"$script_dir\""
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "bc2fc52a36873f35",
+      "severity": "low",
+      "category": "correctness",
+      "title": "Launcher silently drops command-line arguments",
+      "message": "The exec line invokes daily-documents.py without forwarding \"$@\". The .command file is also a normal executable script, so when run from a terminal any flags or arguments the user passes (e.g. --help or a date override) are silently discarded instead of reaching daily-documents.py.",
+      "suggestion": "Forward arguments to the Python script: exec python3 -B \"$script_dir/daily-documents.py\" \"$@\". This is a no-op when double-clicked (no arguments) and correct when run from a shell.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "scripts/Launch-Daily-Documents.command",
+          "lines": {
+            "start": 4,
+            "end": 4
+          }
+        }
+      ],
+      "tags": [
+        "arguments",
+        "cli",
+        "zsh"
+      ],
+      "evidence": "exec python3 -B \"$script_dir/daily-documents.py\"",
+      "fix": {
+        "before": "exec python3 -B \"$script_dir/daily-documents.py\"",
+        "after": "exec python3 -B \"$script_dir/daily-documents.py\" \"$@\""
+      },
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 227228,
+    "totalMs": 227263
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 3,
+    "bytes": 5239,
+    "chunks": 1,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 5528,
+        "output": 32010,
+        "reasoning": 29457,
+        "cachedInput": 5440
+      }
+    ],
+    "splits": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
