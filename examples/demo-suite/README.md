@@ -16,9 +16,14 @@ Then run from this directory:
 ./Launch.command
 ```
 
-Builds default to a new private /private/tmp directory. To choose one, use
+Delivery output defaults to a new private /private/tmp directory. To choose one, use
 `./build.sh --output /private/tmp/my-new-suite --build-version 2`; an existing
-output is refused. Source/Go version comes from release/version.json, vellum.go
+output is refused. App bundles, build binaries and verification extractions always
+stay in separate private /private/tmp staging, even when delivery output is in
+a synced Documents folder. Only the ZIP and DELIVERY.json are written to the
+chosen output, preventing file-provider Finder metadata from contaminating signed
+bundles. Failed staging is removed; delivery output is retained for diagnosis. Successful
+staging may expire; the verified archive remains the restoration source. Source/Go version comes from release/version.json, vellum.go
 and go.mod. All module replacements are checkout-relative. No user-specific path,
 release tag or Go cache directory is embedded in these build scripts.
 

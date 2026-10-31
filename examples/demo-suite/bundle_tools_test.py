@@ -1,4 +1,5 @@
 import json
+import sys
 from pathlib import Path
 import tempfile
 import unittest
@@ -36,6 +37,30 @@ class DeliveryTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 build.reserve_output(alias / 'new')
             self.assertFalse((root / 'new').exists())
+
+    @unittest.skipUnless(sys.platform == "darwin", "native macOS staging")
+    def test_delivery_destination_never_holds_executable_bundles(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            with build.build_locations(root / 'synced-delivery') as (delivery, staging):
+                self.assertEqual(delivery, root / 'synced-delivery')
+                self.assertEqual(list(delivery.iterdir()), [])
+                self.assertTrue(staging.is_relative_to(Path('/private/tmp')))
+                self.assertFalse(staging.is_relative_to(delivery))
+                self.assertEqual(staging.stat().st_mode & 0o777, 0o700)
+            staging.rmdir()
+
+    @unittest.skipUnless(sys.platform == "darwin", "native macOS staging")
+    def test_failed_build_removes_only_its_staging(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            with self.assertRaisesRegex(RuntimeError, 'synthetic build failure'):
+                with build.build_locations(root / 'delivery') as (delivery, staging):
+                    (staging / 'partial-app').write_text('generated')
+                    (delivery / 'diagnostic').write_text('preserved')
+                    raise RuntimeError('synthetic build failure')
+            self.assertFalse(staging.exists())
+            self.assertEqual((delivery / 'diagnostic').read_text(), 'preserved')
 
     def test_modified_selected_archive_is_refused_before_extract_or_launch(self):
         with tempfile.TemporaryDirectory() as temporary:

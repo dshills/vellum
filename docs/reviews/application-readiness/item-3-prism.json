@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "bca05d6ae0198671c6e25b6b86efa56d",
+  "repo": {
+    "root": "/Users/dshills/Documents/ChatGPT/Go Native UI/vellum-priorities",
+    "head": "074137e1c4d5a3a1de6efad61a2109f13d580d0c",
+    "branch": "codex/next-five-application-readiness"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 1,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "37a75542957a28d4",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Staging directory leaks on build failure",
+      "message": "The staging directory created in build_locations() is never removed when build() fails partway (go build failure, codesign failure, 'source changed during build; suite not promoted', etc.). Each failed run leaves a full vellum-demo-staging-* directory containing large Go binaries, .app bundles, and a zip in /private/tmp, which accumulates unbounded across CI retries and developer runs. /private/tmp is also subject to OS cleanup, so a receipt published on success pointing at str(suite) can silently dangle.",
+      "suggestion": "Add an explicit failure path that removes the staging tree while preserving it on success, e.g. wrap the build body after build_locations() in try/except that does shutil.rmtree(staging, ignore_errors=True) before re-raising. Note that only the *next* created staging directory is removable at the time of a previous failure, so implement cleanup at the start of a failed build in a wrapper, or track and remove stale vellum-demo-staging-* dirs.",
+      "confidence": 0.9,
+      "locations": [
+        {
+          "path": "examples/demo-suite/build.py",
+          "lines": {
+            "start": 30,
+            "end": 51
+          }
+        }
+      ],
+      "tags": [
+        "resource-leak",
+        "temp-files"
+      ],
+      "evidence": "    staging = Path(tempfile.mkdtemp(prefix='vellum-demo-staging-', dir='/private/tmp'))",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    },
+    {
+      "id": "37a75542957a28d4",
+      "severity": "low",
+      "category": "bug",
+      "title": "Hardcoded /private/tmp path breaks tests on non-macOS",
+      "message": "Hardcoding dir='/private/tmp' makes build_locations() raise FileNotFoundError on any non-macOS system (no /private/tmp) and ignores TMPDIR on macOS. build_locations() is a standalone function called directly by tests with no platform guard, so the test suite now fails on Linux CI (where the rest of the tests, e.g. identity() parsing of go.mod, are platform-agnostic). It also bypasses the user's configured temp location on macOS.",
+      "suggestion": "Use a portable local-scratch directory, e.g. Path(tempfile.gettempdir()) with a fallback, or gate the hardcoded /private/tmp on sys.platform == 'darwin'. If /private/tmp is intentional and asserted by tests, add a skipUnless(sys.platform == 'darwin') guard to the test.",
+      "confidence": 0.9,
+      "locations": [
+        {
+          "path": "examples/demo-suite/build.py",
+          "lines": {
+            "start": 30,
+            "end": 51
+          }
+        }
+      ],
+      "tags": [
+        "portability"
+      ],
+      "evidence": "    staging = Path(tempfile.mkdtemp(prefix='vellum-demo-staging-', dir='/private/tmp'))",
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 184892,
+    "totalMs": 184893
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "wafer",
+      "model": "GLM-5.3"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3"
+      }
+    ],
+    "files": 3,
+    "bytes": 11497,
+    "chunks": 1,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "wafer",
+        "model": "GLM-5.3",
+        "input": 7357,
+        "output": 23174,
+        "reasoning": 21374
+      }
+    ],
+    "widenedFiles": 2,
+    "splits": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
